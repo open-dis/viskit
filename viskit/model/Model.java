@@ -125,6 +125,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         metaData.version = jaxbRoot.getVersion();
         metaData.name = jaxbRoot.getName();
         metaData.pkg = jaxbRoot.getPackage();
+        metaData.extend = jaxbRoot.getExtend();
         List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
@@ -178,7 +179,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
        jaxbRoot.setVersion(nIe(metaData.version));
        jaxbRoot.setAuthor(nIe(metaData.author));
        jaxbRoot.setPackage(nIe(metaData.pkg));
-
+       jaxbRoot.setExtend(nIe(metaData.extend));
        List clis = jaxbRoot.getComment();
        clis.clear();;
        String cmt = nIe(metaData.comment);

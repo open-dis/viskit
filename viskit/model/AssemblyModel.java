@@ -671,7 +671,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       nodeCache.clear();
       assEdgeCache.clear();
       pointLess = new Point(100,100);
-      metaData = new GraphMetaData(); //todo need new object?
+      metaData = new GraphMetaData(this); //todo need new object?
       metaData.name = "Assembly_name"; // override
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
     }

@@ -43,8 +43,9 @@ public class MetaDataDialog extends JDialog
   JFrame parentFrame;
   Component locationComp;
   GraphMetaData param;
-  JTextField nameTf, packageTf, authorTf, versionTf;
+  JTextField nameTf, packageTf, authorTf, versionTf, extendTf;
   JTextArea commentTa;
+
   public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd)
   {
     this(f,comp,gmd,"Event Graph Properties");
@@ -89,9 +90,15 @@ public class MetaDataDialog extends JDialog
     textFieldPanel.add(versLab);
     textFieldPanel.add(versionTf);
 
+    JLabel extendLab = new JLabel("extends",JLabel.TRAILING);
+    extendTf = new JTextField(20);
+    extendLab.setLabelFor(extendTf);
+    textFieldPanel.add(extendLab);
+    textFieldPanel.add(extendTf);
+
     //Lay out the panel.
     SpringUtilities.makeCompactGrid(textFieldPanel,
-                                    4, 2, //rows, cols
+                                    5, 2, //rows, cols
                                     6, 6,        //initX, initY
                                     6, 6);       //xPad, yPad
 
@@ -153,6 +160,7 @@ public class MetaDataDialog extends JDialog
     authorTf.setText(param.author);
     versionTf.setText(param.version);
     commentTa.setText(param.comment);
+    extendTf.setText(param.extend);
     nameTf.selectAll();
   }
   private void unloadWidgets()
@@ -162,6 +170,7 @@ public class MetaDataDialog extends JDialog
     param.name = nameTf.getText().trim();
     param.pkg = packageTf.getText().trim();
     param.version = versionTf.getText().trim();
+    param.extend = extendTf.getText().trim();
   }
   class cancelButtonListener implements ActionListener
   {
