@@ -1,14 +1,11 @@
 package viskit;
 
-import viskit.model.EventArgument;
-
 import javax.swing.*;
-import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
-import javax.swing.border.EtchedBorder;
+import javax.swing.event.CaretListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
