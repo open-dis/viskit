@@ -1,6 +1,8 @@
 
 package viskit.model;
 
+import viskit.VGlobals;
+
 /**
  * Represents the information about one state variable. This
  * includes its name, type, initial value, and current value.
@@ -14,7 +16,13 @@ public class vStateVariable extends ViskitElement
   
   /** The variable type. This can be a primitive or a class name. */
   private String variableType;
-  
+
+  /** The above field holds the size within the brackets **/
+  private String arrayVariableType;
+
+  /** array size, for (multi-dim) array */
+  private String[] arraySize;
+
   /** Object that represents its current value */
   private Object currentValue;
 
@@ -30,7 +38,7 @@ public class vStateVariable extends ViskitElement
                        String pVariableType)
   {
    variableName = pVariableName;
-   variableType = pVariableType;
+   setType(pVariableType);
    currentValue = null;
   }
 
@@ -76,9 +84,20 @@ public class vStateVariable extends ViskitElement
    * @param pVariableType represenation of the type of the state variable
    */
   public void setType(String pVariableType)
-  { variableType = pVariableType;
+  {
+    variableType = pVariableType;
+    arrayVariableType = VGlobals.instance().stripArraySize(pVariableType);
+    arraySize = VGlobals.instance().getArraySize(pVariableType);
   }
-  
+
+  public String getArrayType()
+  {
+    return arrayVariableType;
+  }
+  public String[] getArraySize()
+  {
+    return arraySize;
+  }
   /**
    * Returns an object that represents the current value of the object.
    */

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.awt.event.ActionListener;
@@ -214,7 +215,11 @@ public class VGlobals
     // state variables
     for (Iterator itr = stateVars.iterator(); itr.hasNext();) {
       vStateVariable sv = (vStateVariable) itr.next();
-      String result = handleNameType(sv.getName(),sv.getType());
+      String result;
+      if(sv.getType().indexOf('[') != -1)
+        result = handleNameType(sv.getName(),sv.getArrayType());
+      else
+        result = handleNameType(sv.getName(),sv.getType());
       if(result != null) {
         clearNamespace();
         return bshErr +"\n" + result;
@@ -224,7 +229,11 @@ public class VGlobals
     // Sim parameters
     for (Iterator itr = simParms.iterator(); itr.hasNext();) {
       vParameter par = (vParameter) itr.next();
-      String result = handleNameType(par.getName(),par.getType());
+      String result;
+      if(par.getType().indexOf('[') != -1)
+        result = handleNameType(par.getName(),par.getArrayType());
+      else
+        result = handleNameType(par.getName(),par.getType());
       if(result != null) {
         clearNamespace();
         return bshErr +"\n" + result;
@@ -235,7 +244,11 @@ public class VGlobals
     if(node != null) {
       for(Iterator itr = node.getLocalVariables().iterator(); itr.hasNext(); ) {
         EventLocalVariable elv = (EventLocalVariable)itr.next();
-        String result = handleNameType(elv.getName(),elv.getType());
+        String result;
+        if(elv.getType().indexOf('[') != -1)
+          result = handleNameType(elv.getName(),elv.getArrayType());
+        else
+          result = handleNameType(elv.getName(),elv.getType());
         if(result != null) {
           clearNamespace();
           return bshErr +"\n" + result;
@@ -450,6 +463,33 @@ public class VGlobals
     }
     return false;
   }
+
+  Pattern bracketsPattern = Pattern.compile("\\[.*?\\]");
+  Pattern spacesPattern = Pattern.compile("\\s");
+
+  public String stripArraySize(String typ)
+  {
+    Matcher m = bracketsPattern.matcher(typ);
+    String r = m.replaceAll("[]");            // [blah] with[]
+    m = spacesPattern.matcher(r);
+    return m.replaceAll("");
+  }
+
+  public String[] getArraySize(String typ)
+  {
+    Vector v = new Vector();
+    Matcher m = bracketsPattern.matcher(typ);
+
+    while(m.find())
+    {
+      String g = m.group();
+      v.add(g.substring(1,g.length()-1).trim());
+    }
+    if(v.size() <= 0)
+      return null;
+    return (String[])v.toArray(new String[0]);
+  }
+
   /**
    * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
    * around to see if we've already got it covered.  If not, we add it to the end of the list.
