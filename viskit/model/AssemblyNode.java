@@ -40,7 +40,7 @@ abstract public class AssemblyNode extends ViskitElement
   }
   public void setName(String s)
   {
-    this.name = name;
+    this.name = s;
   }
   public String getType()
   {
