@@ -1,6 +1,7 @@
 package viskit.model;
 
 import viskit.ViskitAssemblyView;
+import viskit.FileBasedAssyNode;
 
 import java.awt.Point;
 import java.io.File;
@@ -18,7 +19,10 @@ import java.util.Vector;
 public interface ViskitAssemblyModel
 {
   public void newEventGraph(String widgetName, String className, Point p);
+  public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p);
+
   public void newPropChangeListener(String widgetName, String className, Point p);
+  public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
   /**
     *  Reports saved state of model.  Becomes "clean" after a save.
     */
@@ -29,7 +33,8 @@ public interface ViskitAssemblyModel
    */
   public void newModel      (File f);
   public void saveModel     (File f);
-  
+  public File getFile       ();
+
   public GraphMetaData getMetaData();
   public void changeMetaData    (GraphMetaData gmd);
 
@@ -49,8 +54,8 @@ public interface ViskitAssemblyModel
   public void deletePropChangeEdge(PropChangeEdge pce);
   public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
 
-  public String buildJavaSource();
-  public File   compileJavaClass(String src);
+  //public String buildJavaAssemblySource();
+  //public File   compileJavaClass(String src);
 
   public Vector getVerboseEntityNames();
 }

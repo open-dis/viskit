@@ -162,7 +162,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
     fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
+    fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
     //fileMenu.add(buildMenuItem(controller,"compileJavaClass","Compile Java Class",new Integer(KeyEvent.VK_M),null));
     fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
@@ -453,11 +453,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JComponent buildTreePanels()
   {
-    lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png", this);
+    lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png", this, (AssemblyController)getController());
     LegosPanel lPan = new LegosPanel(lTree);
 
     //PropChangeListenersList pcList = new PropChangeListenersList(this);
-    pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20), this);
+    pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20), this, (AssemblyController)getController());
     PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree); //pcList);
 
     lTree.setBackground(background);
@@ -491,9 +491,27 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   class vDropTargetAdapter extends DropTargetAdapter
   {
+/*
+    public void dragEnter(DropTargetDragEvent dtde)
+    {
+    }
+
+    public void dragExit(DropTargetEvent dte)
+    {
+    }
+
+    public void dragOver(DropTargetDragEvent dtde)
+    {
+    }
+
+    public void dropActionChanged(DropTargetDragEvent dtde)
+    {
+    }
+*/
 
     public void drop(DropTargetDropEvent dtde)
     {
+      System.out.println("drop");
       if(dragged != null) {
         try {
           Point p = dtde.getLocation();
@@ -501,12 +519,25 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
           String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
           String[] sa = s.split("\t");
 
-          if(sa[0].equals("simkit.BasicSimEntity")) {
-            ((ViskitAssemblyController)getController()).newEventGraphNode(sa[1],p);
+          // Check for XML-based node
+
+          try {
+            FileBasedAssyNode xn = FileBasedAssyNode.fromString(sa[1]);
+            if(sa[0].equals("simkit.BasicSimEntity"))
+              ((ViskitAssemblyController)getController()).newFileBasedEventGraphNode(xn,p);
+            else if(sa[0].equals("java.beans.PropertyChangeListener"))
+              ((ViskitAssemblyController)getController()).newFileBasedPropChangeListenerNode(xn,p);
           }
-          else if(sa[0].equals("java.beans.PropertyChangeListener")) {
-            ((ViskitAssemblyController)getController()).newPropChangeListenerNode(sa[1],p);
+          catch (FileBasedAssyNode.exception exception) {
+            // Else class-based node
+            if(sa[0].equals("simkit.BasicSimEntity")) {
+              ((ViskitAssemblyController)getController()).newEventGraphNode(sa[1],p);
+            }
+            else if(sa[0].equals("java.beans.PropertyChangeListener")) {
+              ((ViskitAssemblyController)getController()).newPropChangeListenerNode(sa[1],p);
+            }
           }
+
           dragged = null;
           return;
         }
@@ -514,6 +545,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
           e.printStackTrace();
         }
         catch (IOException e) {
+          e.printStackTrace();
+        }
+        catch (Throwable e) {
           e.printStackTrace();
         }
       }

@@ -3,6 +3,7 @@ package viskit.model;
 import viskit.ModelEvent;
 import viskit.VGlobals;
 import viskit.AssemblyRunner;
+import viskit.FileBasedAssyNode;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
@@ -42,6 +43,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   HashMap assEdgeCache = new HashMap();
   public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
   private Point pointLess = new Point(100,100);
+
   public void init()
   {
     try {
@@ -56,6 +58,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
   }
 
+  public File getFile()
+  {
+    return currentFile;
+  }
+  
   public void saveModel(File f)
   {
 
@@ -78,7 +85,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        if(jaxbRoot.getSchedule() == null) {
          jaxbRoot.setSchedule(oFactory.createSchedule());
        }
-       jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+       if(metaData.stopTime != "")
+         jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+       else
+         jaxbRoot.getSchedule().setStopTime("100");
+
        jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
 
 /*
@@ -112,6 +123,13 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        return;
      }
 
+  }
+
+  public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p)
+  {
+    // This is not needed
+    //todo yank out all the FileBasedAssyNode stuff
+    newEventGraph(widgetName,node.loadedClass,p);
   }
 
   public void newEventGraph(String widgetName, String className, Point  p)
@@ -175,6 +193,13 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     modelDirty = true;
     notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
+  }
+
+  public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p)
+  {
+    // This is not needed
+    //todo yank out all the FileBasedAssyNode stuff
+    newPropChangeListener(widgetName,node.loadedClass,p);
   }
 
   public AdapterEdge newAdapterEdge (AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target)
@@ -844,59 +869,6 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     metaData = gmd;
   }
 
-  public String buildJavaSource()
-  {
-    try {
-      SimkitAssemblyXML2Java x2j = new SimkitAssemblyXML2Java(currentFile);
-      x2j.unmarshal();
-      return x2j.translate();
-     }
-     catch (Exception e) {
-       e.printStackTrace();
-     }
-     return null;
-  }
-
-  public File compileJavaClass(String src)
-  {
-    // Find the package subdirectory
-    Pattern pat = Pattern.compile("package.+;");
-    Matcher mat = pat.matcher(src);
-    boolean fnd = mat.find();
-
-    String packagePath = "";
-    if(fnd) {
-      int st = mat.start();
-      int end = mat.end();
-      String s = src.substring(st,end);
-      s = s.replace(';','/');
-      String[] sa = s.split("\\s");
-      sa[1] = sa[1].replace('.','/');
-      packagePath = sa[1].trim();
-    }
-    // done finding the package subdir (just to mark the file as "deleteOnExit")
-    try {
-      String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
-      File f = VGlobals.instance().getWorkDirectory();
-      f = new File(f,baseName+".java");
-      f.createNewFile();
-      f.deleteOnExit();
-
-      FileWriter fw = new FileWriter(f);
-      fw.write(src);
-      fw.flush();
-      fw.close();
-
-      int reti =  com.sun.tools.javac.Main.compile(new String[]{/*"-verbose", */"-d", f.getParent(), f.getCanonicalPath()});
-
-      if(reti == 0)
-        return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
 
   /**
    *   "nullIfEmpty" Return the passed string if non-zero length, else null

@@ -46,17 +46,26 @@ public class PclNodeInspectorDialog extends JDialog
 
   public static boolean showDialog(JFrame f, Component comp, PropChangeListenerNode parm)
   {
-    if (dialog == null)
-      dialog = new PclNodeInspectorDialog(f, comp, parm);
-    else
-      dialog.setParams(comp, parm);
+    try {
+      if (dialog == null)
+        dialog = new PclNodeInspectorDialog(f, comp, parm);
+      else
+        dialog.setParams(comp, parm);
+    }
+    catch (ClassNotFoundException e) {
+      String msg = "An object type specified in this element (probably "+parm.getType()+") was not found.\n" +
+                   "Add the XML or class file defining the element to the proper list at left.";
+      JOptionPane.showMessageDialog(f,msg,"Property Change Listener Definition Not Found",JOptionPane.ERROR_MESSAGE);
+      dialog = null;
+      return false; // unmodified
+    }
 
     dialog.setVisible(true);
     // above call blocks
     return modified;
   }
 
-  private PclNodeInspectorDialog(JFrame parent, Component comp, PropChangeListenerNode lv)
+  private PclNodeInspectorDialog(JFrame parent, Component comp, PropChangeListenerNode lv) throws ClassNotFoundException
   {
     super(parent, "Property Change Listener", true);
     this.pclNode = lv;
@@ -111,7 +120,7 @@ public class PclNodeInspectorDialog extends JDialog
     okButt.addActionListener(new applyButtonListener());
   }
 
-  public void setParams(Component c, PropChangeListenerNode p)
+  public void setParams(Component c, PropChangeListenerNode p) throws ClassNotFoundException
   {
     pclNode = p;
     locationComp = c;
@@ -126,7 +135,7 @@ public class PclNodeInspectorDialog extends JDialog
     this.setLocationRelativeTo(c);
   }
 
-  private void fillWidgets()
+  private void fillWidgets() throws ClassNotFoundException
   {
     if (pclNode != null) {
 
@@ -192,7 +201,7 @@ public class PclNodeInspectorDialog extends JDialog
   /**
    * Initialize the InstantiationsPanel with the data from the pclnode
    */
-  private void setupIP()
+  private void setupIP() throws ClassNotFoundException
   {
     ip.setData(pclNode.getInstantiator());
   }

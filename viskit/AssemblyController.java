@@ -2,15 +2,17 @@ package viskit;
 
 import viskit.mvc.mvcAbstractController;
 import viskit.model.*;
+import viskit.xsd.translator.SimkitXML2Java;
+import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Collection;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import actions.ActionIntrospector;
 import org.jgraph.graph.DefaultGraphCell;
@@ -33,6 +35,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   //-----------------
   {
     //newEventGraph();
+    // The following comments were an attempt to solve classloader issues that needed to be solved
+    // a different way
     try {
       simEvSrcClass   = Class.forName("simkit.SimEventSource");
       simEvLisClass   = Class.forName("simkit.SimEventListener");
@@ -42,6 +46,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     catch (ClassNotFoundException e) {
       ((ViskitAssemblyView)getView()).genericErrorReport("Internal error","simkit.jar not in classpath");
     }
+
   }
 
   public void runEventGraphEditor()
@@ -120,24 +125,44 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   }
 
   private int egNodeCount=0;
-  public void newEventGraphNode(String typeName, Point p)
+  private String shortEgName(String typeName)
   {
     String shortname = "evgr_";
     if(typeName.lastIndexOf('.') != -1)
       shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
-    shortname = shortname + egNodeCount++;
-    ((viskit.model.AssemblyModel) getModel()).newEventGraph(shortname, typeName, p);
+    return shortname + egNodeCount++;
   }
-
-  public void newPropChangeListenerNode(String name, Point p)
+  public void newEventGraphNode(String typeName, Point p)
+  {
+    String shName = shortEgName(typeName);
+    ((viskit.model.AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
+  }
+  public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p)
+  {
+    String shName = shortEgName(xnode.loadedClass);
+    ((viskit.model.ViskitAssemblyModel)getModel()).newEventGraphFromXML(shName,xnode,p);
+  }
+  private String shortPCLName(String typeName)
   {
     String shortname = "lstnr_";
-    if(name.lastIndexOf('.') != -1)
-      shortname = name.substring(name.lastIndexOf('.')+1) + "_";
+    if(typeName.lastIndexOf('.') != -1)
+      shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
 
-    shortname = shortname + egNodeCount++; // use same counter
-    ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(shortname,name,p);
+    return shortname + egNodeCount++; // use same counter
   }
+  public void newPropChangeListenerNode(String name, Point p)
+  {
+    String shName = shortPCLName(name);
+    ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(shName,name,p);
+  }
+
+  public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p)
+  {
+    String shName = shortPCLName(xnode.loadedClass);
+    ((viskit.model.AssemblyModel)getModel()).newPropChangeListenerFromXML(shName,xnode,p);
+
+  }
+
   /**
    *
    * @return true = continue, false = don't (i.e., we cancelled)
@@ -446,7 +471,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
   }
 
-  public void generateJavaClass()
+
+  /********************************/
+
+
+  /* from menu:*/
+  public void generateJavaSource()
   {
     String source = produceJavaClass();
     if(source != null && source.length() > 0)
@@ -462,53 +492,253 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
       this.saveAs();
     }
-
-    return ((ViskitAssemblyModel)getModel()).buildJavaSource();
+    return buildJavaAssemblySource(((ViskitAssemblyModel)getModel()).getFile());
   }
-  String packageFromLastCompile;
 
-  public File compileJavaClass()
+  // above are routines to operate on current assembly
+
+  public static String buildJavaAssemblySource(File f)
   {
-    String source = produceJavaClass();
-    if(source != null && source.length() > 0) {
-       Pattern p = Pattern.compile("package.*;");
-      Matcher m = p.matcher(source);
-      if(m.find()){
-        String nuts = m.group();
-        if(nuts.endsWith(";"))
-          nuts=nuts.substring(0,nuts.length()-1);
+    try {
+      SimkitAssemblyXML2Java x2j = new SimkitAssemblyXML2Java(f);
+      x2j.unmarshal();
+      return x2j.translate();
+     }
+     catch (Exception e) {
+       e.printStackTrace();
+     }
+     return null;
+  }
+  public static String buildJavaEventGraphSource(File f)
+  {
+    try {
+      SimkitXML2Java x2j = new SimkitXML2Java(f);
+      x2j.unmarshal();
+      return x2j.translate();
+     }
+     catch (Exception e) {
+       e.printStackTrace();
+     }
+     return null;
+  }
+  public static File compileJavaClassFromStringAndHandleDependencies(String src)
+  {
+    handleFileBasedClasses();
+    return compileJavaClassFromString(src);
+  }
 
-        String[] sa = nuts.split("\\s");
-        packageFromLastCompile = sa[1];
-      }
-      File f = ((ViskitAssemblyModel)getModel()).compileJavaClass(source);
+  public static File compileJavaClassFromString(String src)
+  {
+    String baseName=null;
+
+    // Find the package subdirectory
+    Pattern pat = Pattern.compile("package.+;");
+    Matcher mat = pat.matcher(src);
+    boolean fnd = mat.find();
+
+    String packagePath = "";
+    if(fnd) {
+      int st = mat.start();
+      int end = mat.end();
+      String s = src.substring(st,end);
+      s = s.replace(';','/');
+      String[] sa = s.split("\\s");
+      sa[1] = sa[1].replace('.','/');
+      packagePath = sa[1].trim();
+    }
+    // done finding the package subdir (just to mark the file as "deleteOnExit")
+
+    pat = Pattern.compile("public\\s+class\\s+");
+    mat = pat.matcher(src);
+    fnd = mat.find();
+   // if(fnd) {
+      int end = mat.end();
+      String s = src.substring(end,end+128).trim();
+      String[]sa = s.split("\\s+");
+
+      baseName = sa[0];
+   // }
+    try {
+      //String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
+      File f = VGlobals.instance().getWorkDirectory();
+      f = new File(f,baseName+".java");
+      f.createNewFile();
       f.deleteOnExit();
-      return f;
+
+      FileWriter fw = new FileWriter(f);
+      fw.write(src);
+      fw.flush();
+      fw.close();
+
+      //String cp = System.getProperty("java.class.path");
+      String cp = getCustomClassPath();
+     // cp = f.getParent()+System.getProperty("path.separator") + cp;
+      int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+      if(reti == 0)
+        return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
+    }
+    catch(Exception e) {
+      e.printStackTrace();
     }
     return null;
   }
+
+  /** do a temporary file gig to point to a java class file which we created from
+   * a passed eventgraph xml file.
+   * @param xmlFile
+   * @return
+   */
+/*
+  public static File xcreateTemporaryEventGraphClass(File xmlFile)
+  {
+    try {
+      System.out.println("xunmarshalling "+xmlFile.getPath());
+      dumpFile(xmlFile);
+      SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
+      x2j.unmarshal();
+      String src = x2j.translate();
+      return compileJavaClassFromString(src);
+     }
+     catch (Exception e) {
+       e.printStackTrace();
+     }
+     return null;
+  }
+*/
+  public static PkgAndFile createTemporaryEventGraphClass(File xmlFile)
+  {
+    try {
+/*
+      System.out.println("eg unmarshalling "+xmlFile.getPath());
+      dumpFile(xmlFile);
+      SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
+      x2j.unmarshal();
+      String src = x2j.translate();
+*/
+      String src = buildJavaEventGraphSource(xmlFile);
+      return compileJavaClassAndSetPackage(src);
+     }
+     catch (Exception e) {
+       e.printStackTrace();
+     }
+     return null;
+
+  }
+
+/*
+  private static void dumpFile(File f)
+  {
+    try {
+      BufferedReader br = new BufferedReader(new FileReader(f));
+      while(br.ready()) {
+        System.out.println(br.readLine());
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+*/
+
+  public static PkgAndFile compileJavaClassAndSetPackage(String source)
+  {
+    String pkg = null;
+    if (source != null && source.length() > 0) {
+      Pattern p = Pattern.compile("package.*;");
+      Matcher m = p.matcher(source);
+      if (m.find()) {
+        String nuts = m.group();
+        if (nuts.endsWith(";"))
+          nuts = nuts.substring(0, nuts.length() - 1);
+
+        String[] sa = nuts.split("\\s");
+        pkg = sa[1];
+      }
+      File f = compileJavaClassFromString(source);
+      if (f != null) {
+        f.deleteOnExit();
+        return new PkgAndFile(pkg, f);
+      }
+    }
+    return null;
+  }
+
+  // From menu
   public void runAssembly()
   {
-    File f = compileJavaClass();
-    if(f != null) {
+    // These have to be on the classpath:
+    // done abovehandleFileBasedClasses();
+
+    String src = produceJavaClass();                   // asks to save
+    PkgAndFile paf = compileJavaClassAndSetPackage(src);
+    if(paf != null) {
+      File f = paf.f;
       String clNam = f.getName().substring(0,f.getName().indexOf('.'));
-      clNam = packageFromLastCompile + "." + clNam;
-      String classPath = System.getProperty("java.class.path");
-      String sourceDir = f.getParent();
-      if(classPath.indexOf(sourceDir) == -1)
-        classPath = sourceDir + Vstatics.getPathSeparator() + classPath;
+      clNam = paf.pkg + "." + clNam;
+
+      String classPath = getCustomClassPath();
 
       String[] execStrings = buildExecStrings(clNam,classPath);
+
       try {
         Runtime.getRuntime().exec(execStrings);
       }
       catch (IOException e) {
         e.printStackTrace();
       }
+
+
     }
     else
-      JOptionPane.showMessageDialog(null,"Error on compile");
+      JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
   }
+  static String getCustomClassPath()
+  {
+    String classPath = System.getProperty("java.class.path");
+    File base = VGlobals.instance().getWorkDirectory();
+    if(classPath.indexOf(base.getAbsolutePath()) == -1)
+      classPath = base.getAbsolutePath() + Vstatics.getPathSeparator() + classPath;
+    return classPath;
+  }
+
+  private static void handleFileBasedClasses()
+  {
+    Collection fileClasses = FileBasedClassManager.inst().getFileLoadedClasses();
+    for (Iterator itr = fileClasses.iterator(); itr.hasNext();) {
+      FileBasedAssyNode fbn = (FileBasedAssyNode) itr.next();
+      if(fbn.isXML) {
+        createTemporaryEventGraphClass(fbn.xmlSource);
+      }
+      else {
+        moveClassFileIntoPlace(fbn);
+      }
+    }
+  }
+
+  private static void moveClassFileIntoPlace(FileBasedAssyNode fbn)
+  {
+    File f = new File(VGlobals.instance().getWorkDirectory(),
+        fbn.pkg.replace('.',Vstatics.getFileSeparator().charAt(0)));
+    f.mkdir();
+
+    File target = new File(f,fbn.classFile.getName());
+    try {
+      target.createNewFile();
+
+      BufferedInputStream is = new BufferedInputStream(new FileInputStream(fbn.classFile));
+      BufferedOutputStream os= new BufferedOutputStream(new FileOutputStream(target));
+      int b;
+      while((b = is.read()) != -1)
+        os.write(b);
+      is.close();
+      os.close();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
   private String[] buildExecStrings(String className, String classPath)
   {
     Vector v = new Vector();
@@ -534,5 +764,16 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     String[] ra = new String[v.size()];
     return (String[])v.toArray(ra);
+  }
+}
+class PkgAndFile
+{
+  String pkg;
+  File f;
+
+  PkgAndFile(String pkg, File f)
+  {
+    this.pkg = pkg;
+    this.f = f;
   }
 }

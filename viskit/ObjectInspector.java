@@ -55,7 +55,7 @@ public class ObjectInspector  extends JDialog implements ActionListener
   {
     contentP.removeAll();
 
-    ip = new InstantiationPanel(this,lis);
+    ip = new InstantiationPanel(this,lis,false,true);  // allow type editing
     ip.setBorder(null);
 
     contentP.add(ip);
@@ -72,7 +72,7 @@ public class ObjectInspector  extends JDialog implements ActionListener
     // enable ok butt
   }
 
-  public void setData(VInstantiator vi)
+  public void setData(VInstantiator vi) throws ClassNotFoundException
   {
 //    myVcon = vi.vcopy();
 //    ip.setData(myVcon);

@@ -18,7 +18,9 @@ import java.io.File;
 public interface ViskitAssemblyController
 {
   public void newEventGraphNode(String name, Point p);
-  public void newPropChangeListenerNode(String name, Point p);  
+  public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
+  public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
+  public void newPropChangeListenerNode(String name, Point p);
   public void newAssembly();
   public void editGraphMetaData  ();
   
@@ -43,9 +45,11 @@ public interface ViskitAssemblyController
   void save();
   void saveAs();
 
-  void generateJavaClass();
-  File compileJavaClass();
+
+  void generateJavaSource();
+  //File compileJavaClass();
   void runAssembly();
-  
+
+
   void runEventGraphEditor();
 }

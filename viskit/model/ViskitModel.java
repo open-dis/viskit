@@ -40,20 +40,20 @@ public interface ViskitModel
   public boolean isDirty       ();
 
   /**
-   * This is messaged by the controller, typically after a newModel(f) message.  It is used to get a vector of all the
-   * nodes in the graph.  Since the EventNode object has src and target members, it also serves to get all the edges.
+   * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
+   * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
    * @return Vector of EventNodes.
    */
   public Vector    getAllNodes ();
 
   /**
-   * Messaged by controller to get all defined StateVariables.
+   * Messaged by controller to inst all defined StateVariables.
    * @return Vector of StateVariables.
    */
   public Vector    getStateVariables();
   
   /**
-   * Messaged by controller to get all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
+   * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
    * @return Vector of vParameter objects.
    */
   public Vector getSimParameters();

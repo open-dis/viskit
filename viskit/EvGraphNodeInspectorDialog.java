@@ -43,17 +43,26 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
   public static boolean showDialog(JFrame f, Component comp, EvGraphNode parm)
   {
-    if (dialog == null)
-      dialog = new EvGraphNodeInspectorDialog(f, comp, parm);
-    else
-      dialog.setParams(comp, parm);
+    try {
+      if (dialog == null)
+        dialog = new EvGraphNodeInspectorDialog(f, comp, parm);
+      else
+        dialog.setParams(comp, parm);
+    }
+    catch (ClassNotFoundException e) {
+      String msg = "An object type specified in this element (probably "+parm.getType()+") was not found.\n" +
+                   "Add the XML or class file defining the element to the proper list at left.";
+      JOptionPane.showMessageDialog(f,msg,"Event Graph Definition Not Found",JOptionPane.ERROR_MESSAGE);
+      dialog = null;
+      return false; // unmodified
+    }
 
     dialog.setVisible(true);
     // above call blocks
     return modified;
   }
 
-  private EvGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv)
+  private EvGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv) throws ClassNotFoundException
   {
     super(parent, "Event Graph Inspector", true);
     this.egNode = lv;
@@ -99,7 +108,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     okButt.addActionListener(new applyButtonListener());
   }
 
-  public void setParams(Component c, EvGraphNode p)
+  public void setParams(Component c, EvGraphNode p) throws ClassNotFoundException
   {
     egNode = p;
     locationComp = c;
@@ -114,7 +123,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     this.setLocationRelativeTo(c);
   }
 
-  private void fillWidgets()
+  private void fillWidgets() throws ClassNotFoundException
   {
     if (egNode != null) {
       handleField.setText(egNode.getName());

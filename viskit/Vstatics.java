@@ -89,34 +89,48 @@ public class Vstatics
     c.setMaximumSize(new Dimension(Integer.MAX_VALUE,height));
     c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
   }
-  public static Class ClassForName(String s)
+
+  /**
+   * Call this method to inst a class representation of an entity.  We'll try first
+   * the "standard" classpath-classloader, then try to inst any that were loaded by file.
+   * @param s
+   * @return
+   */
+  public static Class classForName(String s)
+  {
+    Class c = cForName(s,Vstatics.class.getClassLoader());
+    if(c == null)
+      c = FileBasedClassManager.inst().getFileClass(s);
+    return c;
+  }
+
+  static Class cForName(String s, ClassLoader clsLoader)
   {
     Class c = null;
     try {
-      c = Class.forName(s);
+      c = Class.forName(s,false,clsLoader); //true,clsLoader);
       return c;
     }
     catch (ClassNotFoundException e) {
-      c = tryPrimsAndArrays(s);
+      c = tryPrimsAndArrays(s,clsLoader);
       if(c == null) {
-        c = tryCommonClasses(s);
+        c = tryCommonClasses(s,clsLoader);
         if(c == null)
-          System.err.println("what to do here... "+s);
+          ; //System.err.println("Vstatics what to do here... "+s);
       }
       return c;
   }
-
   }
   static class retrnChar
   {
     char c;
   }
-  static Class tryCommonClasses(String s) {
+  static Class tryCommonClasses(String s, ClassLoader cLdr) {
     String conv = commonExpansions(s);
     if(conv == null)
       return null;
     try {
-      return Class.forName(conv);
+      return Class.forName(conv,false,cLdr); // test 26JUL04 true,cLdr);
     }
     catch(Exception e) {
       return null;
@@ -172,7 +186,7 @@ public class Vstatics
     else
       return null;
   }
-  static Class tryPrimsAndArrays(String s) {
+  static Class tryPrimsAndArrays(String s, ClassLoader cLdr) {
     String[] spl = s.split("\\[");
     boolean isArray = spl.length > 1;
     char prefix = ' ';
@@ -206,14 +220,14 @@ public class Vstatics
     String ns = sb.toString().trim();
 
     try {
-      c = Class.forName(ns,false,Vstatics.class.getClassLoader());
+      c = Class.forName(ns,false,cLdr); //Vstatics.class.getClassLoader());
       return c;
     }
     catch (ClassNotFoundException e) {
       // one last check
       if(commonExpansions(name) != null)
       {
-        return tryPrimsAndArrays(s.replaceFirst(name,commonExpansions(name)));
+        return tryPrimsAndArrays(s.replaceFirst(name,commonExpansions(name)),cLdr);
       }
       return null;
     }

@@ -24,7 +24,7 @@ public class LegosPanel extends ClassPanel
   LegosTree tree ;
   public LegosPanel(LegosTree ltree)
   {
-    super(ltree,"Event Graphs","Add event graph class file or directory root to this list",
-                               "Remove event graph class file or directory from this list");
+    super(ltree,"Event Graphs","Add event graph class file, XML file or directory root to this list",
+                               "Remove event graph class file, XML file or directory from this list");
   }
 }

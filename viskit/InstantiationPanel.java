@@ -57,6 +57,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   }
   public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener, boolean onlyConstr)
   {
+    this(ownerDialog,changedListener,onlyConstr,false);
+  }
+  public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener, boolean onlyConstr, boolean typeEditable)
+  {
     modifiedListener = changedListener;
     packMe = ownerDialog;
     constructorOnly = onlyConstr;
@@ -66,7 +70,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     JPanel topP = new JPanel(new SpringLayout());
     typeLab = new JLabel("type",JLabel.TRAILING);
     typeTF = new JTextField();
-    typeTF.setEditable(false);
+    typeTF.setEditable(typeEditable);
     typeLab.setLabelFor(typeTF);
 
     methodLab = new JLabel("method",JLabel.TRAILING);
@@ -119,6 +123,22 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       int lastIdx = 0;
       public void actionPerformed(ActionEvent e)
       {
+        if(!typeTF.getText().trim().equals(myVi.getType())) {
+          String newType = typeTF.getText().trim();
+          // update the panels
+          try {
+            ffPan.setType(newType);
+            conPan.setType(newType);
+            factPan.setType(newType);
+          }
+          catch (ClassNotFoundException e1) {
+            JOptionPane.showMessageDialog(InstantiationPanel.this, "Unknown type");
+            return;
+          }
+          ffPan.setData(new VInstantiator.FreeF(newType,""));
+          conPan.setData(new VInstantiator.Constr(newType,new Vector()));
+          factPan.setData(new VInstantiator.Factory(newType,"","",new Vector()));
+        }
         int idx = methodCB.getSelectedIndex();
         if(lastIdx != idx)
           if(modifiedListener != null)
@@ -161,7 +181,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     }
   }
   VInstantiator myVi;
-  public void setData(VInstantiator vi)
+  public void setData(VInstantiator vi) throws ClassNotFoundException
   {
     myVi = vi.vcopy();
     String typ = vi.getType();
@@ -228,9 +248,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       value.setText(viff.getValue());
     }
     String typ;
-    public void setType(String typ)
+    public void setType(String typ) throws ClassNotFoundException
     {
       this.typ = typ;
+      if(Vstatics.classForName(typ) == null)  // just to check exception
+        throw new ClassNotFoundException(typ);
     }
     public VInstantiator getData()
     {
@@ -266,19 +288,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       //setup(className);         don't init in constructor
     }
     String typ;
-    public void setType(String clName)
+    public void setType(String clName) throws ClassNotFoundException
     {
       typ = clName;
       removeAll();
       tp.removeAll();
       //modifiedListener = changedListener;
-      try {
-        clazz = Class.forName(clName);
-        construct = clazz.getConstructors();
-        constructorPanels = new ConstructorPanel[construct.length];
-      }
-      catch (ClassNotFoundException e) {
-      }
+
+      //clazz = Class.forName(clName);
+      clazz = Vstatics.classForName(clName);
+      if(clazz == null)
+        throw new ClassNotFoundException(clName);
+      construct = clazz.getConstructors();
+      constructorPanels = new ConstructorPanel[construct.length];
 
       if (construct == null || construct.length <= 0) {
         // here if there is no way to directly build an object of this class.
@@ -551,13 +573,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
     String typ;
     Class myObjClass;
-    public void setType(String clName)
+    public void setType(String clName) throws ClassNotFoundException
     {
       typ = clName;
-      myObjClass = Vstatics.ClassForName(typ);
+      myObjClass = Vstatics.classForName(typ);
       if (myObjClass == null) {
-        System.err.println("can find class for " + typ);
-        return;
+        throw new ClassNotFoundException(typ);
       }
       factMethodLab.setEnabled(false);
       factMethodTF.setEnabled(false);
@@ -577,12 +598,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       factMethodTF.setText(vi.getMethod());
       add(topP);
 
+/*
       if(vi.getParams().size() <= 0) {
         JLabel tempLab = new JLabel("no arguments to chosen factory method",JLabel.CENTER);
         add(tempLab);
         add(Box.createVerticalGlue());
         return;
       }
+*/
       olp = new ObjListPanel(ip);
       olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                       "Method arguments",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));

@@ -89,7 +89,7 @@ public class ArrayInspector  extends JDialog
   {
     olp = new ObjListPanel(listnr);
     olp.setDialogInfo(parent,parent);
-    olp.setData(lis,false); // don't show the type
+    olp.setData(lis, false); // don't show the type
 
     contentP.removeAll();
     contentP.add(upPan);
@@ -110,7 +110,7 @@ public class ArrayInspector  extends JDialog
   public void setType(String typ)
   {
     myArrTyp = typ;
-    Class c = Vstatics.ClassForName(typ);
+    Class c = Vstatics.classForName(typ);
     myTyp = Vstatics.convertClassName(c.getComponentType().getName());
     typeTF.setText(typ);
   }

@@ -61,7 +61,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
        field[i].setText(inst.toString());
        field[i].addCaretListener(this);
 
-       Class c = Vstatics.ClassForName(inst.getType());
+       Class c = Vstatics.classForName(inst.getType());
        if(c == null)
          System.err.println("what to do here... "+inst.getType());
 
@@ -118,7 +118,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     int idx = Integer.parseInt(e.getActionCommand());
 
     VInstantiator vinst = shadow[idx];
-    Class c = Vstatics.ClassForName(vinst.getType());
+    Class c = Vstatics.classForName(vinst.getType());
     if (c.isArray()) {
       ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
       ai.setType(vinst.getType());
@@ -135,7 +135,15 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     else {
       ObjectInspector oi = new ObjectInspector(parent, this);     // "this" could be locComp
       oi.setType(vinst.getType());
-      oi.setData(vinst);
+      try {
+        oi.setData(vinst);
+      }
+      catch (ClassNotFoundException e1) {
+        String msg = "An object type specified in this element (probably "+vinst.getType()+") was not found.\n" +
+                     "Add the XML or class file defining the element to the proper list at left.";
+        JOptionPane.showMessageDialog(parent,msg,"Class Definition Not Found",JOptionPane.ERROR_MESSAGE);
+        return;
+      }
       oi.setVisible(true); // blocks
       if (oi.modified) {
         shadow[idx] = oi.getData();

@@ -96,7 +96,8 @@ jta.setEditable(false);
         System.setOut(newSysOut);
         System.setErr(newSysOut);
 
-        AssemblyController.compileJavaClassFromString(src);
+        AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
+        
         System.out.flush();
 
         System.setOut(origSysOut);
