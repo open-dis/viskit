@@ -11,10 +11,10 @@ package viskit;
  */
 
 import viskit.model.EvGraphNode;
-import viskit.model.ConstructorArgument;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
@@ -22,17 +22,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class EvGraphNodeInspectorDialog extends JDialog
 {
   private JLabel handleLab;
-  private JLabel typeLab;
+  //private JLabel typeLab;
   private JTextField handleField;    // Text field that holds the parameter name
-  private JTextField typeField;
+  //private JTextField typeField;
   private InstantiationPanel ip;
   private Class myClass;
   private static EvGraphNodeInspectorDialog dialog;
@@ -72,16 +69,18 @@ public class EvGraphNodeInspectorDialog extends JDialog
     content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     handleField = new JTextField();
-    clampHeight(handleField);
+    Vstatics.clampHeight(handleField);
     handleField.addCaretListener(lis);
     handleLab = new JLabel("handle",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
 
+/*
     typeLab = new JLabel("type",JLabel.TRAILING);
     typeField = new JTextField();
-    clampHeight(typeField);
+    Vstatics.clampHeight(typeField);
     typeField.setEditable(false);
     typeLab.setLabelFor(typeField);
+*/
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -125,6 +124,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     if (egNode != null) {
 
+/*
       try {
         myClass = Class.forName(egNode.getType());
         Constructor[] cons = myClass.getConstructors();
@@ -132,12 +132,14 @@ public class EvGraphNodeInspectorDialog extends JDialog
       catch (ClassNotFoundException e) {
         e.printStackTrace();
       }
+*/
 
       handleField.setText(egNode.getName());
-      typeField.setText(egNode.getType());
 
-      ip = new InstantiationPanel(myClass,lis);
+      ip = new InstantiationPanel(lis);
       setupIP();
+
+
       JPanel content = new JPanel();
       content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
       content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -145,11 +147,10 @@ public class EvGraphNodeInspectorDialog extends JDialog
       JPanel cont = new JPanel(new SpringLayout());
       cont.add(handleLab);
       cont.add(handleField);
-      cont.add(typeLab);
-      cont.add(typeField);
-      SpringUtilities.makeCompactGrid(cont, 2 , 2, 10, 10, 5, 5);
+      SpringUtilities.makeCompactGrid(cont, 1 , 2, 10, 10, 5, 5);
       content.add(cont);
 
+      ip.setAlignmentX(Box.CENTER_ALIGNMENT);
       content.add(ip);
       content.add(Box.createVerticalStrut(5));
       content.add(buttPan);
@@ -157,7 +158,6 @@ public class EvGraphNodeInspectorDialog extends JDialog
     }
     else {
       handleField.setText("egNode name");
-      //commentField.setText("comments here");
     }
   }
 
@@ -167,8 +167,9 @@ public class EvGraphNodeInspectorDialog extends JDialog
     nm = nm.replaceAll("\\s", "");
     if (egNode != null) {
       egNode.setName(nm);
-      ArrayList arl = ip.getData();
-      egNode.setConstructorArguments(ip.getData());
+      egNode.setInstantiator(ip.getData());
+  //    ArrayList arl = ip.getData();
+  //    egNode.setConstructorArguments(ip.getData());
     }
     else {
       newName = nm;
@@ -181,11 +182,9 @@ public class EvGraphNodeInspectorDialog extends JDialog
    */
   private void setupIP()
   {
-    //if (egNode.getConstructorArguments().isEmpty())
-    //  return;           must handle zero-arg constructors
-    ArrayList ca = egNode.getConstructorArguments();
-
-    ip.setData(ca);
+    ip.setData(egNode.getInstantiator());
+    ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+                    "Object creation",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
   }
   class cancelButtonListener implements ActionListener
   {
@@ -230,6 +229,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
    */
   boolean checkBlankFields()
   {
+/*
     ArrayList constr = ip.getData();
     testLp:
     {
@@ -246,6 +246,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
       }
 
       return false; // no blank fields , don't cancel close
+
     }   // testLp
 
     // Here if we found a problem
@@ -255,6 +256,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
       return false;  // don't cancel
     else
       return true;  // cancel close
+*/return false;
   }
 
   class myCloseListener extends WindowAdapter
@@ -272,13 +274,6 @@ public class EvGraphNodeInspectorDialog extends JDialog
       else
         canButt.doClick();
     }
-  }
-
-  void clampHeight(JComponent comp)
-  {
-    Dimension d = comp.getPreferredSize();
-    comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
-    comp.setMinimumSize(new Dimension(Integer.MAX_VALUE,d.height));
   }
 }
 

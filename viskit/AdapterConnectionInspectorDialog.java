@@ -143,7 +143,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
   }
   private void pairWidgets(JLabel lab, JComponent tf, boolean edit)
   {
-    clampHeight(tf);
+    Vstatics.clampHeight(tf);
     lab.setLabelFor(tf);
     if(tf instanceof JTextField){
       ((JTextField)tf).addCaretListener(lis);

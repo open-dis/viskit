@@ -70,7 +70,7 @@ public class PclNodeInspectorDialog extends JDialog
     content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     handleField = new JTextField();
-    clampHeight(handleField);
+    Vstatics.clampHeight(handleField);
     handleField.addCaretListener(lis);
     handleLab = new JLabel("handle",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
@@ -78,7 +78,7 @@ public class PclNodeInspectorDialog extends JDialog
     typeLab = new JLabel("type",JLabel.TRAILING);
     //typeField = new JLabel("bogus",JLabel.CENTER);
     typeField = new JTextField();
-    clampHeight(typeField);
+    Vstatics.clampHeight(typeField);
     typeField.setEditable(false);
     typeLab.setLabelFor(typeField);
 
@@ -135,7 +135,7 @@ public class PclNodeInspectorDialog extends JDialog
       handleField.setText(pclNode.getName());
       typeField.setText(pclNode.getType());
 
-      ip = new InstantiationPanel(myClass,lis);
+      ip = new InstantiationPanel(lis);
       setupIP();
       JPanel content = new JPanel();
       content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
@@ -166,7 +166,7 @@ public class PclNodeInspectorDialog extends JDialog
     nm = nm.replaceAll("\\s", "");
     if (pclNode != null) {
       pclNode.setName(nm);
-      pclNode.setConstructorArguments(ip.getData());
+      pclNode.setInstantiator(ip.getData());
     }
     else {
       newName = nm;
@@ -179,11 +179,7 @@ public class PclNodeInspectorDialog extends JDialog
    */
   private void setupIP()
   {
-    //if (pclNode.getConstructorArguments().isEmpty())
-    //  return;           must handle zero-arg constructors
-    ArrayList ca = pclNode.getConstructorArguments();
-
-    ip.setData(ca);
+    ip.setData(pclNode.getInstantiator());
   }
   class cancelButtonListener implements ActionListener
   {
@@ -251,13 +247,6 @@ public class PclNodeInspectorDialog extends JDialog
       else
         canButt.doClick();
     }
-  }
-
-  void clampHeight(JComponent comp)
-  {
-    Dimension d = comp.getPreferredSize();
-    comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
-    comp.setMinimumSize(new Dimension(Integer.MAX_VALUE,d.height));
   }
 }
 

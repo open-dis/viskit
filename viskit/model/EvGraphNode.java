@@ -26,7 +26,7 @@ public class EvGraphNode extends ViskitElement
   private String type;
 
   private Vector    connections = new Vector();
-  private ArrayList constructorArguments = new ArrayList();
+  //private ArrayList constructorArguments = new ArrayList();
   private ArrayList comments = new ArrayList();
 /*
   private ArrayList transitions = new ArrayList();
@@ -35,10 +35,12 @@ public class EvGraphNode extends ViskitElement
 */
   private Point     position = new Point(0,0);
 
+  private VInstantiator instantiator;
   EvGraphNode(String name, String type)      // package access on constructor
   {
     this.name = name;
     this.type = type;
+    instantiator = new VInstantiator.FreeF(type,"");
   }
   public String toString()
   {
@@ -85,15 +87,7 @@ public class EvGraphNode extends ViskitElement
     this.type = typ;
 
   }
-  public ArrayList getConstructorArguments()
-  {
-    return constructorArguments;
-  }
-  public void setConstructorArguments(ArrayList lis)
-  {
-    constructorArguments = lis;
-  }
- 
+
   public ArrayList getComments()
   {
     return comments;
@@ -123,5 +117,16 @@ public class EvGraphNode extends ViskitElement
   {
     this.position = position;
   }
+  
+  public VInstantiator getInstantiator()
+  {
+    return instantiator;
+  }
+
+  public void setInstantiator(VInstantiator instantiator)
+  {
+    this.instantiator = instantiator;
+  }
+
 
 }

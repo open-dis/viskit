@@ -370,7 +370,9 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxBPcl.setCoordinate(coor);
 
     List lis = jaxBPcl.getTerminalParameter();
-    lis.clear();;
+    lis.clear();
+    //todo redo
+/*
     for (Iterator itr = pclNode.getConstructorArguments().iterator(); itr.hasNext();) {
       ConstructorArgument ca = (ConstructorArgument) itr.next();
       TerminalParameter tp = null;
@@ -384,6 +386,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       tp.setValue(ca.getValue());
       lis.add(tp);
     }
+*/
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
@@ -407,7 +410,9 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbSE.setCoordinate(coor);
 
     List lis = jaxbSE.getParameters();
-    lis.clear();;
+    lis.clear();
+    //todo redo
+    /*
     for (Iterator itr = evNode.getConstructorArguments().iterator(); itr.hasNext();) {
       ConstructorArgument ca = (ConstructorArgument) itr.next();
       TerminalParameter tp = null;
@@ -421,7 +426,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       tp.setValue(ca.getValue());
       lis.add(tp);
     }
-
+   */
     modelDirty = true;
     this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
   }

@@ -254,7 +254,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     vcrToolBar.add(Box.createHorizontalGlue());
     vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-
+    ActionListener temp = new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        JOptionPane.showMessageDialog(AssemblyViewFrame.this,"Not yet implemented.");
+      }
+    };
+    vcrStop.addActionListener(temp);
+    vcrPause.addActionListener(temp);
+    vcrPlay.addActionListener(temp);
+    vcrStep.addActionListener(temp);     
   }
   private void buildToolbar()
   {

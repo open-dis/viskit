@@ -24,17 +24,19 @@ public class PropChangeListenerNode extends ViskitElement
   private String name;
   private String type;
   private Vector connections = new Vector();
-  private ArrayList constructorArguments = new ArrayList();
+
+  private VInstantiator instantiator;
 
   private Point     position = new Point(0,0);
-  //private ArrayList comments = new ArrayList();
 
 
   PropChangeListenerNode(String name, String type)      // package access on constructor
   {
     this.name = name;
     this.type = type;
-  }
+    instantiator = new VInstantiator.FreeF(type,"");
+ }
+
   public String toString()
   {
     return name;
@@ -57,14 +59,16 @@ public class PropChangeListenerNode extends ViskitElement
   {
     type = typ;
   }
-  public ArrayList getConstructorArguments()
+  public VInstantiator getInstantiator()
   {
-    return constructorArguments;
+    return instantiator;
   }
-  public void setConstructorArguments(ArrayList lis)
+
+  public void setInstantiator(VInstantiator instantiator)
   {
-    constructorArguments = lis;
+    this.instantiator = instantiator;
   }
+
 
   public Point getPosition()
   {

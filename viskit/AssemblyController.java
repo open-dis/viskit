@@ -32,6 +32,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void generateJavaClass()
   {
+if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if(((ViskitAssemblyModel)getModel()).isDirty()) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
@@ -66,6 +67,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   File lastFile;
   public void open()
   {
+if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if (((AssemblyModel)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
@@ -80,6 +82,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void save()
   //----------------
   {
+if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if(lastFile == null)
       saveAs();
     else
@@ -88,6 +91,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void saveAs()
   {
+if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name);
     if(lastFile != null) {
       ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
