@@ -50,6 +50,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   Vector simParameters = new Vector();
 
   private String privateLocVarPrefix = "_idxvar_";
+  private String stateVarPrefix      = "state_";
 
   private GraphMetaData metaData;
 
@@ -302,7 +303,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       if(sv.getType().indexOf('[') != -1) {
         Object o = st.getIndex();
         if(o instanceof LocalVariable)
-          est.setIndexingExpression(((LocalVariable)o).getValue());
+          est.setIndexingExpression(((LocalVariable)o).getName());
         // todo confirm the following
         else if(o instanceof Parameter)
           est.setIndexingExpression(((Parameter)o).getName());
@@ -629,6 +630,49 @@ public class Model extends mvcAbstractModel implements ViskitModel
   }
 
   private int locVarNameSequence = 0;
+
+  public String generateLocalVariableName()
+  {
+    String nm = null;
+    int seqNum=locVarNameSequence;
+    do {
+      nm = privateLocVarPrefix + seqNum++; // always start at 0 //locVarNameSequence++;
+    }while(!isUniqueLVname(nm));
+    return nm;
+  }
+
+  private boolean isUniqueLVname(String nm)
+  {
+    for (Iterator itr = evNodeCache.values().iterator(); itr.hasNext();) {
+      EventNode event = (EventNode) itr.next();
+      for (Iterator itt = event.getLocalVariables().iterator(); itt.hasNext();) {
+        LocalVariable lv = (LocalVariable) itt.next();
+        if(lv.getName().equals(nm))
+          return false;
+      }
+    }
+    return true;
+  }
+  private boolean isUniqueSVname(String nm)
+  {
+    for (Iterator itr = stateVariables.iterator(); itr.hasNext();) {
+      vStateVariable sv = (vStateVariable)itr.next();
+      if(sv.getName().equals(nm))
+        return false;
+    }
+    return true;
+  }
+  
+  public String generateStateVariableName()
+  {
+    String nm = null;
+    int startnum = 0;
+    do {
+      nm = stateVarPrefix + startnum++;
+    }while(!isUniqueSVname(nm));
+    return nm;
+  }
+
   /**
    * Here we convert indexing expressions into local variable references
    * @param targ
@@ -648,9 +692,11 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
           LocalVariable lvar = oFactory.createLocalVariable();
 
+
           lvar.setName(privateLocVarPrefix + locVarNameSequence++);
+          lvar.setName(est.getIndexingExpression());
           lvar.setType("int");
-          lvar.setValue(est.getIndexingExpression());
+          lvar.setValue("0"); //jmb est.getIndexingExpression());
           lvar.getComment().clear();
           lvar.getComment().add("used internally");
           locVarList.add(lvar);
