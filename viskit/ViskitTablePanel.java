@@ -270,7 +270,7 @@ public abstract class ViskitTablePanel extends JPanel
   }
 
   /**
-   * Update the table row (typ. after editing) represented the passed rowObject.
+   * Update the table row, typically after editing, representing the passed rowObject.
    * @param rowObject
    */
   public void updateRow(Object rowObject)
