@@ -5,6 +5,8 @@ import viskit.model.vStateVariable;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * A dialog class that lets the user add a new state variable to the document.
@@ -20,7 +22,9 @@ public class StateVariableDialog extends ViskitSmallDialog
 {
   private JTextField stateVarNameField;    // Text field that holds the parameter name
   private JTextField commentField;          // Text field that holds the comment
+  private JTextField arraySizeField;
   private JComboBox  stateVarTypeCombo;    // Editable combo box that lets us select a type
+  private JLabel     arrSizeLab;
 
   private vStateVariable stVar;
   private Component locationComp;
@@ -55,20 +59,18 @@ public class StateVariableDialog extends ViskitSmallDialog
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
         JLabel commLab = new JLabel("comment");
+            arrSizeLab = new JLabel("array size");
+
         int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,commLab});
 
         stateVarNameField = new JTextField(15);   setMaxHeight(stateVarNameField);
         commentField       = new JTextField(25);   setMaxHeight(commentField);
-        //stateVarTypeCombo = new JComboBox();
-        //stateVarTypeCombo.setModel(VGlobals.instance().getTypeCBModel(stateVarTypeCombo));
-        //
-
-        //stateVarTypeCombo.setEditable(true);
         stateVarTypeCombo = VGlobals.instance().getTypeCB(); setMaxHeight(stateVarTypeCombo);
+        arraySizeField    = new JTextField(15);
 
         fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarNameField));
-        // no init val...fieldsPanel.add(new OneLinePanel(initLab,w,expressionField));
         fieldsPanel.add(new OneLinePanel(typeLab,w,stateVarTypeCombo));
+        fieldsPanel.add(new OneLinePanel(arrSizeLab,w,arraySizeField));
         fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
        con.add(fieldsPanel);
        con.add(Box.createVerticalStrut(5));
@@ -88,7 +90,8 @@ public class StateVariableDialog extends ViskitSmallDialog
 
     modified        = (param==null?true:false);     // if it's a new stVar, they can always accept defaults with no typing
     okButt.setEnabled((param==null?true:false));
-
+    arrSizeLab.setEnabled(false);
+    arraySizeField.setEditable(false);
     getRootPane().setDefaultButton(canButt);
 
     pack();     // do this prior to next
@@ -99,12 +102,22 @@ public class StateVariableDialog extends ViskitSmallDialog
     okButt .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener(okButt);
-    this.stateVarNameField.addCaretListener(lis);
-    this.commentField.      addCaretListener(lis);
-    this.stateVarTypeCombo.addActionListener(lis);
+    stateVarNameField.addCaretListener(lis);
+    commentField.      addCaretListener(lis);
+    stateVarTypeCombo.addActionListener(lis);
+    // also, check for array
+    stateVarTypeCombo.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        boolean isArray = ((String)stateVarTypeCombo.getSelectedItem()).indexOf('[') != -1;
+        arraySizeField.setEditable(isArray);
+        arrSizeLab.setEnabled(isArray);
+      }
+    });
 
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new WindowClosingListener(this,okButt,canButt));
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowClosingListener(this,okButt,canButt));
   }
 
   void setParams(Component c, Object p)
@@ -129,10 +142,15 @@ public class StateVariableDialog extends ViskitSmallDialog
       stateVarTypeCombo.setSelectedItem(stVar.getType());
       //setType(stVar.getType(),stateVarTypeCombo);
       commentField.setText(stVar.getComment());
+      boolean isArray = stVar.getType().indexOf('[') != -1;
+      arraySizeField.setEditable(isArray);
+      arrSizeLab.setEnabled(isArray);
     }
     else {
       stateVarNameField.setText("state_"+count++);
       commentField.setText("");
+      arraySizeField.setEditable(false);
+      arrSizeLab.setEnabled(false);
     }
     stateVarNameField.requestFocus();
     stateVarNameField.selectAll();

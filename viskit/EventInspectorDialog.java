@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -32,6 +33,7 @@ public class EventInspectorDialog extends JDialog
   private static boolean modified = false;
   private JButton canButt, okButt;
   private JTextField name;
+  private JTextField comment;
   private TransitionsPanel transitions;
   private ArgumentsPanel arguments;
   private LocalVariablesPanel localVariables;
@@ -96,6 +98,29 @@ public class EventInspectorDialog extends JDialog
     threePanels.add(namePan);
     threePanels.add(Box.createVerticalStrut(5));
 
+    // comment
+    JPanel commentPan = new JPanel();
+    commentPan.setLayout(new BoxLayout(commentPan, BoxLayout.X_AXIS));
+    commentPan.setOpaque(false);
+    commentPan.setBorder(BorderFactory.createTitledBorder("Description"));
+    comment = new JTextField("");
+    comment.setOpaque(true);
+    comment.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+    commentPan.add(comment);
+    d = commentPan.getPreferredSize();
+    d.width = Integer.MAX_VALUE;
+    commentPan.setMaximumSize(d);
+
+    JButton edComment = new JButton(" ... ");
+    edComment.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+    edComment.setToolTipText("Click to edit a long description");
+    Dimension dd = edComment.getPreferredSize();
+    dd.height = d.height;
+    edComment.setMaximumSize(dd);
+    commentPan.add(edComment);
+
+    threePanels.add(commentPan);
+    threePanels.add(Box.createVerticalStrut(5));
 /*
       // delay
       JPanel delayPan = new JPanel();
@@ -120,7 +145,7 @@ public class EventInspectorDialog extends JDialog
     localVariables.setBorder(BorderFactory.createTitledBorder("Local variables"));
     threePanels.add(localVariables);
     threePanels.add(Box.createVerticalStrut(5));
- 
+
     // state transitions
     transitions = new TransitionsPanel();
     transitions.setBorder(BorderFactory.createTitledBorder("State transitions"));
@@ -147,8 +172,10 @@ public class EventInspectorDialog extends JDialog
     okButt.addActionListener(new applyButtonListener());
     myChangeListener = new myChangeActionListener();
     //name.addActionListener(chlis);
-    name.addKeyListener(new myKeyListener());
-
+    KeyListener klis = new myKeyListener();
+    name.addKeyListener(klis);
+    comment.addKeyListener(klis);
+    edComment.addActionListener(new commentListener());
     arguments.addPlusListener(myChangeListener);
     arguments.addMinusListener(myChangeListener);
     arguments.addDoubleClickedListener(new ActionListener()
@@ -223,8 +250,11 @@ public class EventInspectorDialog extends JDialog
 
   private void fillWidgets()
   {
-    setTitle("Event -- " + node.getName());
-    name.setText(node.getName());
+    String nmSt = node.getName();
+    nmSt.replace(' ','_');
+    setTitle("Event -- " + nmSt); //node.getName());
+    name.setText(nmSt); //node.getName());
+    comment.setText(fillString(node.getComments()));
     transitions.setTransitions(node.getTransitions());
     arguments.setData(node.getArguments());
     localVariables.setData(node.getLocalVariables());
@@ -236,11 +266,24 @@ public class EventInspectorDialog extends JDialog
   private void unloadWidgets(EventNode en)
   {
     if (modified) {
-      en.setName(name.getText());
+      en.setName(name.getText().trim().replace(' ','_'));
+      //en.setName(name.getText());
       en.setTransitions(transitions.getTransitions());
       en.setArguments(arguments.getData());
       en.setLocalVariables(new Vector(localVariables.getData()));
+      en.getComments().clear();
+      en.getComments().add(comment.getText().trim());
     }
+  }
+  private String fillString (ArrayList lis)
+  {
+    if(lis == null) return "";
+    StringBuffer sb = new StringBuffer();
+    for(Iterator itr = lis.iterator(); itr.hasNext();) {
+      sb.append((String)itr.next());
+      sb.append(" ");
+    }
+    return sb.toString().trim();
   }
 
   class cancelButtonListener implements ActionListener
@@ -324,6 +367,19 @@ public class EventInspectorDialog extends JDialog
         }
       else
         canButt.doClick();
+    }
+  }
+  class commentListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      StringBuffer sb = new StringBuffer(EventInspectorDialog.this.comment.getText().trim());
+      boolean modified = EventCommentDialog.showDialog(fr,EventInspectorDialog.this,sb);
+      if(modified) {
+        EventInspectorDialog.this.comment.setText(sb.toString().trim());
+        EventInspectorDialog.this.comment.setCaretPosition(0);
+        okButt.setEnabled(true);
+      }
     }
   }
 }

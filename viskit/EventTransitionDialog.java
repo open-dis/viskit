@@ -227,8 +227,8 @@ public class EventTransitionDialog extends JDialog
       assTo.setSelected(!param.isOperation());
 
       setVarNameComboBox(param);
-      if(param.getComments().size() > 0)
-        commentField.setText((String)param.getComments().get(0));
+      if(stateVarsCB.getItemCount() > 0)
+        commentField.setText(((vStateVariable)stateVarsCB.getItemAt(0)).getComment());
       else
         commentField.setText("");
       vStateVariable vsv = (vStateVariable)stateVarsCB.getSelectedItem();

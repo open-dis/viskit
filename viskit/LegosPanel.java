@@ -1,7 +1,12 @@
 package viskit;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -16,8 +21,10 @@ import java.awt.*;
 public class LegosPanel extends JPanel
 {
   JButton plus,minus;
-  public LegosPanel(LegosTree tree)
+  LegosTree tree ;
+  public LegosPanel(LegosTree ltree)
   {
+    this.tree = ltree;
     setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
     JLabel lab = new JLabel("Event Graphs");
     lab.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -53,6 +60,47 @@ public class LegosPanel extends JPanel
       buttPan.add(Box.createHorizontalGlue());
     add(buttPan);
 
+    plus.addActionListener( new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+          JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+          jfc.setFileFilter(new ClassTypeFilter());
+          jfc.setAcceptAllFileFilterUsed(false);
+          jfc.setMultiSelectionEnabled(true);
+          jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+          int retv = jfc.showOpenDialog(LegosPanel.this);
+          if (retv == JFileChooser.APPROVE_OPTION) {
+            File[] fa = jfc.getSelectedFiles();
+            for(int i=0;i<fa.length;i++) {
+            Boolean recurse = null;
+            if(fa[i].isDirectory()) {
+              if(recurse == null) {
+                int retrn = JOptionPane.showConfirmDialog(LegosPanel.this,"Recurse directories?","Question",JOptionPane.YES_OPTION,JOptionPane.QUESTION_MESSAGE);
+                recurse = new Boolean(retrn==JOptionPane.YES_OPTION);
+              }
+              tree.addContentRoot(fa[i],recurse.booleanValue());
+            }
+            else
+              tree.addContentRoot(fa[i]);
+            }
+          }
+        }
+    });
+  }
+  static class ClassTypeFilter extends FileFilter
+  {
+    public boolean accept(File f)
+    {
+      if(f.isFile() && !f.getName().endsWith(".class") && !f.getName().endsWith(".jar"))
+        return false;
+      return true;
+    }
+
+    public String getDescription()
+    {
+      return "Java class files, jar files or directories";
+    }
   }
 
 }

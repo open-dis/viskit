@@ -29,10 +29,13 @@ public interface ViskitController
   void newArc          (Object[] nodes);
   void newCancelArc    (Object[] nodes);
 
+  void editGraphMetaData  ();
+  
   void newEventGraph();
   void newAssembly();
-  void newEventGraphEditor();
-  void newAssemblyEditor();
+
+  void runEventGraphEditor();  
+  void runAssemblyEditor();
   
   /* requests to the controller to perform editing operations on existing entities */
   void nodeEdit         (EventNode node);

@@ -34,12 +34,13 @@ import java.util.List;
  * information.  What hasn't been done is to put in accessor methods for the view to
  * read pieces that it needs, say after it receives a "new model" event.
  */
+
 public class Model extends mvcAbstractModel implements ViskitModel
 {
   JAXBContext jc;
   ObjectFactory oFactory;
 
-  SimkitModule jaxbRoot;
+  SimEntity jaxbRoot;
   File currentFile;
 
   public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/simkit.xsd";
@@ -50,12 +51,14 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   private String privateLocVarPrefix = "_idxvar_";
 
+  private GraphMetaData metaData;
+
   public void init()
   {
     try {
       jc = JAXBContext.newInstance("viskit.xsd.bindings");
       oFactory = new ObjectFactory();
-      jaxbRoot = oFactory.createSimkitModule(); // to start with empty graph
+      jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
     }
     catch (JAXBException e) {
       JOptionPane.showMessageDialog(null,"Exception on JAXBContext instantiation" +
@@ -75,6 +78,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
   }
   private boolean modelDirty = false;
 
+  public GraphMetaData getMetaData()
+  {
+    return metaData;
+  }
+
+  public void changeMetaData(GraphMetaData gmd)
+  {
+    metaData = gmd;
+  }
   /**
    * Replace current model with one contained in the passed file.
    *
@@ -84,7 +96,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     if (f == null) {
       try {
-        jaxbRoot = oFactory.createSimkitModule(); // to start with empty graph
+        jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
       }
       catch (JAXBException e) {
         JOptionPane.showMessageDialog(null,"Exception on JAXBContext instantiation" +
@@ -98,6 +110,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       simParameters.removeAllElements();
       evNodeCache.clear();
       edgeCache.clear();
+      metaData = new GraphMetaData();
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
     }
     else {
@@ -106,7 +119,19 @@ public class Model extends mvcAbstractModel implements ViskitModel
         // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
         // see u.isValidating()
         // Unmarshaller does NOT validate by default
-        jaxbRoot = (SimkitModule) u.unmarshal(f);
+        jaxbRoot = (SimEntity) u.unmarshal(f);
+        metaData = new GraphMetaData();
+        metaData.author = jaxbRoot.getAuthor();
+        metaData.version = jaxbRoot.getVersion();
+        metaData.name = jaxbRoot.getName();
+        metaData.pkg = jaxbRoot.getPackage();
+        List lis = jaxbRoot.getComment();
+        StringBuffer sb = new StringBuffer("");
+        for(Iterator itr = lis.iterator(); itr.hasNext();) {
+          sb.append((String)itr.next());
+          sb.append(" ");
+        }
+        metaData.comment = sb.toString().trim();
 
         VGlobals.instance().reset();
         stateVariables.removeAllElements();
@@ -149,8 +174,17 @@ public class Model extends mvcAbstractModel implements ViskitModel
        if((dot=nm.indexOf('.')) != -1)
          nm = nm.substring(0,dot);
        
-       jaxbRoot.setName(nm);
-       jaxbRoot.setVersion("0.1");
+       jaxbRoot.setName(nIe(metaData.name));
+       jaxbRoot.setVersion(nIe(metaData.version));
+       jaxbRoot.setAuthor(nIe(metaData.author));
+       jaxbRoot.setPackage(nIe(metaData.pkg));
+
+       List clis = jaxbRoot.getComment();
+       clis.clear();;
+       String cmt = nIe(metaData.comment);
+       if(cmt != null)
+         clis.add(cmt.trim());
+
        m.marshal(jaxbRoot,fw);
        fw.close();
 
@@ -304,8 +338,17 @@ public class Model extends mvcAbstractModel implements ViskitModel
     se.to = target;
     src.getConnections().add(se);
     target.getConnections().add(se);
-
     se.conditional = ed.getCondition();
+
+    List cmt = ed.getComment();
+    if(!cmt.isEmpty()) {
+      StringBuffer sb = new StringBuffer();
+      for(Iterator itr = cmt.iterator(); itr.hasNext();) {
+        sb.append((String)itr.next());
+        sb.append("  ");
+      }
+      se.conditionalsComment = sb.toString().trim();
+    }
     se.delay = ed.getDelay();
     se.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
     edgeCache.put(ed,se);
@@ -321,8 +364,18 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     CancellingEdge ce = new CancellingEdge();
     ce.opaqueModelObject = ed;
-
     ce.conditional = ed.getCondition();
+
+    List cmt = ed.getComment();
+    if(!cmt.isEmpty()) {
+      StringBuffer sb = new StringBuffer();
+      for(Iterator itr = cmt.iterator(); itr.hasNext();) {
+        sb.append((String)itr.next());
+        sb.append("  ");
+      }
+      ce.conditionalsComment = sb.toString().trim();
+    }
+
     ce.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
 
     ce.from = src;
@@ -473,7 +526,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     StateVariable s = null;
     try {s = this.oFactory.createStateVariable(); } catch(JAXBException e){ System.out.println("newStVarJAXBEX"); }
     s.setName(nIe(name));
-    s.setShortName(nIe(name));
+    //s.setShortName(nIe(name));
     s.setType(nIe(type));
     s.getComment().add(comment);
 
@@ -498,7 +551,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     // fill out jaxb variable
     StateVariable sv = (StateVariable)vsv.opaqueModelObject;
     sv.setName(nIe(vsv.getName()));
-    sv.setShortName(nIe(vsv.getName()));
+    //sv.setShortName(nIe(vsv.getName()));
     sv.setType(nIe(vsv.getType()));
     sv.getComment().clear();
     sv.getComment().add(vsv.getComment());
@@ -801,7 +854,10 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     Schedule sch = (Schedule)e.opaqueModelObject;
     sch.setCondition(e.conditional);
+    sch.getComment().clear();
+    sch.getComment().add(e.conditionalsComment);
     sch.setDelay(""+e.delay);
+
     sch.setEvent((Event)e.to.opaqueModelObject);
     sch.setPriority("0");  // todo implement priority
 
@@ -831,6 +887,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     Cancel can = (Cancel)e.opaqueModelObject;
     can.setCondition(e.conditional);
     can.setEvent((Event)e.to.opaqueModelObject);
+    can.getComment().clear();
+    can.getComment().add(e.conditionalsComment);
 
     can.getEdgeParameter().clear();
      for(Iterator itr = e.parameters.iterator(); itr.hasNext();) {

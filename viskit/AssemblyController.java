@@ -11,6 +11,13 @@ import viskit.mvc.mvcAbstractController;
  * Date: May 14, 2004
  * Time: 9:26:02 AM
  */
+
 public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController
 {
+  public void begin()
+  //-----------------
+  {
+    //newEventGraph();
+  }
+
 }

@@ -8,7 +8,8 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -68,6 +69,32 @@ public class EdgeParametersPanel extends ViskitTablePanel
   public void setArgumentList(ArrayList lis)
   {
     argList = lis;
+  }
+
+  /**
+   * This is overridden because I've removed the plus minus buttons.  The number of parameters must
+   * match the target.
+   * @param data
+   */
+  public void setData(java.util.List data)
+  //--------------------------------------
+  {
+    ArrayList myList = new ArrayList(data);
+    int diff = argList.size() - myList.size();
+    if(diff == 0)
+      super.setData(data);
+    else if (diff > 0) {
+      //more arguments than we've got.
+      for(int i=0;i<diff;i++)
+        myList.add(new vEdgeParameter("0"));
+      super.setData(myList);
+    }
+    else {
+      // fewer arguments than we've got.
+      for(int i=0;i>diff;i--)
+        myList.remove(myList.size()-1);
+      super.setData(myList);
+    }
   }
 
   class DifferentTableColumnBackgroundRenderer extends DefaultTableCellRenderer

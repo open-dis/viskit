@@ -9,6 +9,24 @@ package viskit.model;
  * Date: Apr 12, 2004
  * Time: 3:50:28 PM
  */
+
 public class GraphMetaData
 {
+  public String name = "EventGraph_name";
+  public String pkg = "";
+  public String author = "";
+  public String version = "1.0";
+  public String comment = "";
+
+  public GraphMetaData()
+  {
+    author = System.getProperty("user.name");
+  }
+  public GraphMetaData(String n, String p, String a, String v)
+  {
+    name = n;
+    pkg = p;
+    author = a;
+    version = v;
+  }
 }

@@ -158,6 +158,8 @@ public class EventArgumentDialog extends JDialog
       parameterTypeCombo.setSelectedItem(myEA.getType());
       if(myEA.getComments().size() > 0)
         commentField.setText((String)myEA.getComments().get(0));
+      else
+        commentField.setText("");
     }
     else {
       nameField.setText("");

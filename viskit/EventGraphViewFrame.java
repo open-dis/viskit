@@ -53,7 +53,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
   // We keep a reference to the menus in case we have to turn menu
   // items on or off
-  private JMenu fileMenu, editMenu, simulationMenu;
+  private JMenu fileMenu, editMenu; //, simulationMenu;
 
   /**
    * Two right panels
@@ -111,7 +111,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public EventGraphViewFrame(Model mod, Controller ctrl)
   //====================================================
   {
-    super("Viskit");
+    super("Viskit -- Simkit Event Graph Editor");
     this.initMVC(mod,ctrl);   // set up mvc linkages
     this.initUI();            // build widgets
 
@@ -358,14 +358,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     fileMenu.setMnemonic(KeyEvent.VK_F);
     fileMenu.add(buildMenuItem(controller,"newEventGraph",    "New Event Graph", new Integer(KeyEvent.VK_N),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
-    fileMenu.add(buildMenuItem(controller,"newAssemblyEditor", "Assembly Editor", null,null));
     fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
     fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
+    fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
-    fileMenu.addSeparator();;
+    fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
+    fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
 
     // Set up edit menu
@@ -393,17 +394,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     // This starts off being disabled, until something is selected
     ActionIntrospector.getAction(controller,"newSelfRefEdge").setEnabled(false);
-    
+
+    editMenu.addSeparator();
+    editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Graph Properties...",null,null));
+
+
     // Set up simulation menu for controlling the simulation
-    simulationMenu = new JMenu("Simulation");
-    simulationMenu.setMnemonic(KeyEvent.VK_S);
-    simulationMenu.add(buildMenuItem(controller,"eventList","Event List...",new Integer(KeyEvent.VK_L),null));
+    //simulationMenu = new JMenu("Simulation");
+    //simulationMenu.setMnemonic(KeyEvent.VK_S);
+    //simulationMenu.add(buildMenuItem(controller,"eventList","Event List...",new Integer(KeyEvent.VK_L),null));
 
     // Create a new menu bar and add the menus we created above to it
     menuBar = new JMenuBar();
     menuBar.add(fileMenu);
     menuBar.add(editMenu);
-    menuBar.add(simulationMenu);
+    //menuBar.add(simulationMenu);
 
     this.setJMenuBar(menuBar);
   }
@@ -659,12 +664,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     return null;
   }
 
-  public File saveFileAsk()
+  public File saveFileAsk(String suggNameNoType)
   //-----------------------
   {
     if(jfc == null)
       jfc = new JFileChooser(System.getProperty("user.dir"));
-
+    jfc.setSelectedFile(new File(suggNameNoType+".xml"));
     int retv = jfc.showSaveDialog(this);
     if(retv == JFileChooser.APPROVE_OPTION)
       return jfc.getSelectedFile();
@@ -681,7 +686,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public boolean doEditNode(EventNode node)
   //---------------------------------------
   {
-    return EventInspectorDialog.showDialog(this,this.graphPane,node); // blocks
+    return EventInspectorDialog.showDialog(this,this,node); // blocks
   }
 
   public boolean doEditEdge(SchedulingEdge edge)

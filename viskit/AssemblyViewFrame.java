@@ -2,6 +2,10 @@ package viskit;
 
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.model.Model;
+import viskit.model.AssemblyModel;
+import viskit.model.ViskitAssemblyModel;
+import viskit.jgraph.vGraphAssemblyModel;
+import viskit.jgraph.vGraphAssemblyComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,22 +19,23 @@ import java.awt.*;
  * Date: May 10, 2004
  * Time: 2:07:37 PM
  */
+
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView
 {
-  private Model model;
-  private Controller controller;
+  private ViskitAssemblyModel model;
+  private ViskitAssemblyController controller;
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
-  public AssemblyViewFrame(Model model, Controller controller)
+  public AssemblyViewFrame(ViskitAssemblyModel model, ViskitAssemblyController controller)
   {
-    super("Simkit Assembly Editor");
+    super("Viskit -- Simkit Assembly Editor");
     this.model = model;
     this.controller = controller;
 
     Container cont = getContentPane();
 
     buildMenus();
-    JPanel canvas = buildCanvas();
+    JComponent canvas = buildCanvas();
     JComponent trees = buildTreePanels();
     buildToolBar();
     JScrollPane leftsp = new JScrollPane(trees);
@@ -43,6 +48,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     //jsp.setDividerLocation(0.5d);
     cont.add(jsp);
 
+
+
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     setLocation(((d.width - 800) / 2)+30, ((d.height - 600) / 2)+30);
     setSize(800, 600);
@@ -52,9 +59,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
 
   }
-  private JPanel buildCanvas()
+  private vGraphAssemblyComponent graphPane;
+  private JComponent buildCanvas()
   {
-    return new JPanel();
+    // Set up the basic panes for the layouts
+    vGraphAssemblyModel mod = new vGraphAssemblyModel();
+    graphPane = new vGraphAssemblyComponent(mod,this);
+    mod.graph = graphPane;                               // todo fix this
+
+    return graphPane;
   }
   private JSplitPane panJsp;
 

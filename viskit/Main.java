@@ -1,6 +1,7 @@
 package viskit;
 
 import viskit.model.Model;
+import viskit.model.ViskitModel;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
@@ -52,7 +53,13 @@ public class Main
     catch (Exception e) {
       System.err.println("Could not enable " + laf);
     }
-
+    Model mod = new Model();
+    Controller cont = new Controller();
+    VGlobals.instance().buildEventGraphViewFrame(cont,mod);
+    VGlobals.instance().runEventGraphView();
+    
+    cont.newEventGraph();
+/*
     Controller controller = new Controller();
     Model model = new Model();
     EventGraphViewFrame view = new EventGraphViewFrame(model, controller);
@@ -63,6 +70,7 @@ public class Main
 
     view.setVisible(true);
     controller.begin();
+*/
   }
 
   private static void setAllFonts(JFrame f)

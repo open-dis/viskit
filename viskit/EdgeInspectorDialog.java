@@ -268,9 +268,11 @@ public class EdgeInspectorDialog extends JDialog
       {
         vEdgeParameter ep = (vEdgeParameter)event.getSource();
 
-        boolean modified = EdgeParameterDialog.showDialog(myFrame,EdgeInspectorDialog.this,ep);
-        if(modified) {
+        boolean wasmodified = EdgeParameterDialog.showDialog(myFrame,EdgeInspectorDialog.this,ep);
+        if(wasmodified) {
           parameters.updateRow(ep);
+          okButt.setEnabled(true);
+          modified=true;
         }
       }
     });
@@ -318,16 +320,23 @@ public class EdgeInspectorDialog extends JDialog
    parameters.setData(edge.parameters);
 
     if(edge instanceof SchedulingEdge) {
-      conditionals.setText(edge.conditional);
+      if(edge.conditional == null || edge.conditional.trim().length() <= 0)
+        conditionals.setText("true");
+      else
+        conditionals.setText(edge.conditional);
       conditionals.setComment(edge.conditionalsComment);
-      //conditionals.setText(((Schedule)((SchedulingEdge)edgeCopy).opaqueModelObject).getCondition());
-      delay.setText(""+edge.delay);
-      //delay.setText((((Schedule)((SchedulingEdge)edgeCopy).opaqueModelObject).getDelay()));
+      if(edge.delay == null || edge.delay.trim().length() <= 0)
+        delay.setText("0.0");
+      else
+        delay.setText(""+edge.delay);
       delay.setEnabled(true);
       delayPan.setBorder(delayPanBorder);
   }
     else {
-      conditionals.setText(edge.conditional);
+      if(edge.conditional == null || edge.conditional.trim().length() <= 0)
+        conditionals.setText("true");
+      else
+       conditionals.setText(edge.conditional);
       conditionals.setComment(edge.conditionalsComment);
       //conditionals.setText(((Cancel)((CancellingEdge)edgeCopy).opaqueModelObject).getCondition());
       delay.setText("n/a");
@@ -338,10 +347,16 @@ public class EdgeInspectorDialog extends JDialog
 
   private void unloadWidgets()
   {
-    //edge.from = (EventNode)srcEvent.getSelectedItem(); //edgeCopy.from;
-    //edge.to   = (EventNode)targEvent.getSelectedItem(); //edgeCopy.to;
-    edge.delay = delay.getText();
-    edge.conditional = conditionals.getText();
+    String delaySt = delay.getText();
+    if(delaySt == null || delaySt.trim().length() <= 0)
+      edge.delay = "0.0";
+    else
+      edge.delay = delay.getText();
+    String condSt = conditionals.getText();
+    if(condSt == null || condSt.trim().length() <= 0)
+      edge.conditional = "true";
+    else
+      edge.conditional = conditionals.getText();
     edge.conditionalsComment = conditionals.getComment();
     edge.parameters.clear();
     for(Iterator itr = parameters.getData().iterator(); itr.hasNext(); ) {
@@ -376,7 +391,16 @@ public class EdgeInspectorDialog extends JDialog
     public void actionPerformed(ActionEvent event)
     {
       if(modified) {
-        String parseResults = VGlobals.instance().parseCode(edge.from,conditionals.getText());
+        StringBuffer sb = new StringBuffer();
+        if(edge instanceof SchedulingEdge) {
+          sb.append("double delay = "+ delay.getText());
+          sb.append(";\n");
+        }
+        sb.append("if(");
+        sb.append(conditionals.getText());
+        sb.append("){;}");
+        
+        String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionals.getText()+post);
         if(parseResults != null) {
           int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
                                         "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
@@ -384,8 +408,8 @@ public class EdgeInspectorDialog extends JDialog
             return;
         }
         unloadWidgets();
-      setVisible(false);
       }
+      setVisible(false);
     }
   }
   class myChangeListener implements ChangeListener

@@ -31,7 +31,7 @@ import java.util.Vector;
  */
 
 public class Controller extends mvcAbstractController implements ViskitController
-/***************************************************************************/
+/*******************************************************************************/
 {
   public Controller()
   //=================
@@ -40,7 +40,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void begin()
   //-----------------
   {
-    newEventGraph();
+    // wait for Main to do this after the first window is put up
+    // newEventGraph();
   }
 
   public void quit()
@@ -60,6 +61,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
         return;
 
     ((ViskitModel) getModel()).newModel(null);
+    editGraphMetaData();
   }
 
   public void newAssembly()
@@ -120,7 +122,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void saveAs()
   //------------------
   {
-    lastFile = ((ViskitView)getView()).saveFileAsk();
+    lastFile = ((ViskitView)getView()).saveFileAsk(((ViskitModel)getModel()).getMetaData().name);
     if(lastFile != null) {
       ((ViskitModel)getModel()).saveModel(lastFile);
       ((ViskitView)getView()).fileName(lastFile.getName());
@@ -285,26 +287,19 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     return false;
   }
 
-  public void  newAssemblyEditor()
+  public void runAssemblyEditor()
   {
-    AssemblyViewFrame avf = VGlobals.instance().getAssemblyEditor();
-    if(avf == null) {
-      avf = new AssemblyViewFrame((viskit.model.Model)getModel(),this);
-      VGlobals.instance().setAssemblyEditor(avf);
-    }
-    avf.setVisible(true);
-    avf.toFront();
+    if (VGlobals.instance().getAssemblyEditor() == null)
+      VGlobals.instance().buildAssemblyViewFrame();
+    VGlobals.instance().runAssemblyView();
   }
 
-  public void newEventGraphEditor()
+  public void runEventGraphEditor()
   {
-    EventGraphViewFrame egvf = VGlobals.instance().getEventGraphEditor();
-    if(egvf == null) {
-      egvf = new EventGraphViewFrame((viskit.model.Model)getModel(),this);
-      VGlobals.instance().setEventGraphEditor(egvf);
-    }
-    egvf.setVisible(true);
-    egvf.toFront();
+    if (VGlobals.instance().getEventGraphEditor() == null)
+      VGlobals.instance().buildEventGraphViewFrame();
+    VGlobals.instance().runEventGraphView();
+
   }
 
   public void eventList()
@@ -321,7 +316,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void newNode(Point p)
   //--------------------------
   {
-    String fauxName = "evnt " + nodeCount++;
+    String fauxName = "evnt_" + nodeCount++;
     ((viskit.model.ViskitModel) getModel()).newEvent(fauxName, p);
   }
 
@@ -354,6 +349,15 @@ public class Controller extends mvcAbstractController implements ViskitControlle
         }
       }
     }
+  }
+
+  public void editGraphMetaData()
+  //--------------------------
+  {
+    GraphMetaData gmd = ((ViskitModel)getModel()).getMetaData();
+    boolean modified = MetaDataDialog.showDialog((EventGraphViewFrame)getView(),(EventGraphViewFrame)getView(),gmd);
+    if(modified)
+      ((ViskitModel)getModel()).changeMetaData(gmd);
   }
   
   public void nodeEdit(viskit.model.EventNode node)      // shouldn't be required

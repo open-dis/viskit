@@ -410,7 +410,7 @@ public abstract class ViskitTablePanel extends JPanel
   {
     shadow.add(o);
     Vector rowData = new Vector();
-    String[] fields = getFields(o,0);
+    String[] fields = getFields(o,shadow.size()-1);
     rowData.addAll(Arrays.asList(fields));
     mod.addRow(rowData);
   }

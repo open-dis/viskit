@@ -53,15 +53,37 @@ public class VGlobals
     buildTypePopup();
   }
 
+  /* routines to manage the singleton-aspect of the views. */
+
   AssemblyViewFrame avf;
+  /**
+   * Get a reference to the assembly editor view.
+   * @return a reference to the assembly editor view or null if yet unbuilt.
+   */
   public AssemblyViewFrame getAssemblyEditor()
   {
     return avf;
   }
-
-  public void setAssemblyEditor(AssemblyViewFrame avf)
+  public AssemblyViewFrame buildAssemblyViewFrame()
   {
-    this.avf = avf;
+    return buildAssemblyViewFrame(new AssemblyController(), new AssemblyModel());
+  }
+  public AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont, AssemblyModel mod)
+  {
+    avf = new AssemblyViewFrame(mod,cont);
+    cont.setModel(mod);   // registers cntl as model listener
+    cont.setView(avf);
+
+    mod.init();
+    cont.begin();
+
+    return avf;
+  }
+
+  public void runAssemblyView()
+  {
+    avf.setVisible(true);
+    avf.toFront();
   }
 
   EventGraphViewFrame egvf;
@@ -69,12 +91,28 @@ public class VGlobals
   {
     return egvf;
   }
-
-  public void setEventGraphEditor(EventGraphViewFrame fr)
+  public EventGraphViewFrame buildEventGraphViewFrame()
   {
-    this.egvf = fr;
+    return buildEventGraphViewFrame(new Controller(), new Model());
   }
-  
+  public EventGraphViewFrame buildEventGraphViewFrame(Controller cont, Model mod)
+  {
+    egvf = new EventGraphViewFrame(mod,cont);
+    cont.setModel(mod);   // registers cntl as model listener
+    cont.setView(egvf);
+
+    mod.init();
+    cont.begin();
+
+    return egvf;
+  }
+
+  public void runEventGraphView()
+  {
+    egvf.setVisible(true);
+    egvf.toFront();
+  }
+
 
   public void setStateVarsList(Collection svs)
   {
