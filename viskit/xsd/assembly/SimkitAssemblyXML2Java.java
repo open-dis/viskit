@@ -10,6 +10,11 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.PrintStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.ListIterator;
 import javax.xml.bind.JAXBContext;
@@ -29,25 +34,26 @@ public class SimkitAssemblyXML2Java {
     private SimkitAssemblyType root;
 
     InputStream fileInputStream;
+    String fileBaseName;
     JAXBContext jaxbCtx;
 
     /* convenience Strings for formatting */
 
-    String sp  = " ";
-    String sp4 = sp+sp+sp+sp;
-    String sp8 = sp4+sp4;
-    String sp12 = sp8+sp4;
-    String sp16 = sp8+sp8;
-    String ob  = "{";
-    String cb  = "}";
-    String sc  = ";";
-    String cm  = ",";
-    String lp  = "(";
-    String rp  = ")";
-    String eq  = "=";
-    String pd  = ".";
-    String qu  = "\"";
-    String nw = "new";
+    final String sp  = " ";
+    final String sp4 = sp+sp+sp+sp;
+    final String sp8 = sp4+sp4;
+    final String sp12 = sp8+sp4;
+    final String sp16 = sp8+sp8;
+    final String ob  = "{";
+    final String cb  = "}";
+    final String sc  = ";";
+    final String cm  = ",";
+    final String lp  = "(";
+    final String rp  = ")";
+    final String eq  = "=";
+    final String pd  = ".";
+    final String qu  = "\"";
+    final String nw = "new";
 
     
     /** 
@@ -57,6 +63,7 @@ public class SimkitAssemblyXML2Java {
      */
 
     public SimkitAssemblyXML2Java(String xmlFile) {
+	fileBaseName = baseNameOf(xmlFile);
 	try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
             fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
@@ -66,6 +73,12 @@ public class SimkitAssemblyXML2Java {
 	
     }
     
+    public SimkitAssemblyXML2Java(File f) throws Exception {
+        fileBaseName = baseNameOf(f.getName());
+        jaxbCtx = JAXBContext.newInstance("viskit.xsd.assembly.bindings");
+        fileInputStream = new FileInputStream(f);
+    }
+
     public void unmarshal() {
 	Unmarshaller u;
 	try {
@@ -212,7 +225,8 @@ public class SimkitAssemblyXML2Java {
 	    type.equals("double") |
 	    type.equals("float") |
 	    type.equals("int") |
-	    type.equals("long") 
+	    type.equals("long") |
+	    type.equals("short") 
 	) return true;
 	else return false;
     }
@@ -227,8 +241,7 @@ public class SimkitAssemblyXML2Java {
 
     boolean isArray(String type) {
 	if ( 
-	    type.endsWith("[]") |
-	    type.endsWith("[ ]") 
+	    type.endsWith("]")
 	) return true;
 	else return false;
     }
@@ -330,6 +343,7 @@ public class SimkitAssemblyXML2Java {
 	PrintWriter pw = new PrintWriter(t);
 
 	pw.println();
+	pw.println(sp4 + cb);
 	pw.println(cb);
     }
 
@@ -343,6 +357,18 @@ public class SimkitAssemblyXML2Java {
 
     public void writeOut(String data, java.io.PrintStream out) {
 	out.println(data);	
+    }
+
+    private String baseNameOf( String s ) {
+        return s.substring(0,s.indexOf(pd));
+    }
+
+    boolean compileCode(String fileName) {
+        return (
+            com.sun.tools.javac.Main.compile(
+                 new String[] {fileName}
+            ) == 0
+        );
     }
 
     void error(String desc) {
@@ -360,16 +386,38 @@ public class SimkitAssemblyXML2Java {
     /**
      * @param args the command line arguments
      * args[0] - XML file to translate
+     * args[1] - flag stdout ouput
      * follow this pattern to use this class from another,
      * otherwise this can be used stand alone from CLI
      */
 
     public static void main(String[] args) {
 
+        System.out.println("Generating Java Source...");
+
 	SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(args[0]);
 	sax2j.unmarshal();
 	String dotJava = sax2j.translate();
-	sax2j.writeOut(dotJava,System.out);
+	if ( args.length > 1 ) sax2j.writeOut(dotJava,System.out);
+
+        System.out.println("Done.");
+
+        System.out.println("Generating Java Bytecode...");
+
+	try {
+            String fileName = sax2j.fileBaseName + ".java";
+            FileOutputStream fout =
+                new FileOutputStream(fileName);
+            PrintStream ps = new PrintStream(fout,true);
+            sax2j.writeOut(dotJava,ps);
+            if ( !sax2j.compileCode(fileName) )
+                sax2j.error("Compile error " + fileName);
+            else
+                System.out.println("Done.");
+        } catch (FileNotFoundException fnfe) {
+                sax2j.error("Bad filename " + sax2j.fileBaseName);
+        }
+
 
     }
     
