@@ -23,6 +23,7 @@ import java.util.ListIterator;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Marshaller;
 
 import viskit.xsd.bindings.assembly.*;
 
@@ -92,6 +93,17 @@ public class SimkitAssemblyXML2Java {
 	} catch (Exception e) { e.printStackTrace(); }
     }  
 
+    public void marshal() {
+        Marshaller m;
+        try {
+            m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                new Boolean(true));
+            m.marshal(this.root,System.out);
+
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    
     public String translate() {
 
 	StringBuffer source = new StringBuffer();
@@ -458,6 +470,7 @@ public class SimkitAssemblyXML2Java {
 
 	SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(args[0]);
 	sax2j.unmarshal();
+        sax2j.marshal();
 	String dotJava = sax2j.translate();
 	if ( args.length > 1 ) sax2j.writeOut(dotJava,System.out);
 
