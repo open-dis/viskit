@@ -3,11 +3,15 @@ package viskit;
 import simkit.Schedule;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Clipboard;
-import java.awt.Toolkit;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +35,8 @@ public class ExternalAssemblyRunner extends JFrame
   double defaultStopTime;
   List outputs;
   RunnerPanel runPanel;
-  ActionListener closer;
+  ActionListener closer,saver;
+  static String lineSep = System.getProperty("line.separator");
 
   public ExternalAssemblyRunner(String className, boolean verbose, double stopTime, List outputEntities)
   {
@@ -42,7 +47,8 @@ public class ExternalAssemblyRunner extends JFrame
     this.outputs = outputEntities;
 
     closer = new closeListener();
-    
+    saver = new saveListener();
+
     doMenus();
 
     setTitle("Running "+className);
@@ -161,6 +167,66 @@ public class ExternalAssemblyRunner extends JFrame
       System.exit(0);
     }
   }
+  private JFileChooser saveChooser;
+
+  class saveListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      if(saveChooser == null) {
+        saveChooser = new JFileChooser(System.getProperty("user.dir"));
+      }
+      File fil = getUniqueName("AssemblyOutput.txt",saveChooser.getCurrentDirectory());
+      saveChooser.setSelectedFile(fil);
+
+      int retv = saveChooser.showSaveDialog(ExternalAssemblyRunner.this);
+      if(retv != JFileChooser.APPROVE_OPTION)
+        return;
+
+      fil = saveChooser.getSelectedFile();
+      if(fil.exists()) {
+        int r = JOptionPane.showConfirmDialog(ExternalAssemblyRunner.this, "File exists.  Overwrite?","Confirm",
+                                              JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        if(r != JOptionPane.YES_OPTION)
+          return;
+      }
+
+      try {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(fil));
+
+        bw.write(runPanel.soutTA.getText());
+        bw.write(lineSep);
+        bw.write(runPanel.serrTA.getText());
+        bw.flush();
+        bw.close();
+      }
+      catch (IOException e1) {
+        JOptionPane.showMessageDialog(ExternalAssemblyRunner.this,e1.getMessage(),"I/O Error,",JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  // dup of EventGraphViewFrame
+  private File getUniqueName(String suggName, File parent)
+  {
+    String appnd = "";
+    String suffix = "";
+
+    int lastDot = suggName.lastIndexOf('.');
+    if(lastDot != -1) {
+      suffix = suggName.substring(lastDot);
+      suggName = suggName.substring(0,lastDot);
+    }
+    int count = -1;
+    File fil = null;
+    do {
+      fil = new File(parent,suggName + appnd + suffix);
+      appnd = "" + ++count;
+    }
+    while (fil.exists());
+
+    return fil;
+  }
+
   private void _start()
   {
     Schedule.stopAtTime(getStopTime());
@@ -234,15 +300,18 @@ public class ExternalAssemblyRunner extends JFrame
   {
     JMenuBar mb = new JMenuBar();
     JMenu file = new JMenu("File");
-    JMenuItem close = new JMenuItem("close");
+    JMenuItem save  = new JMenuItem("Save output streams");
+    JMenuItem close = new JMenuItem("Close");
     JMenu edit = new JMenu("Edit");
-    JMenuItem copy = new JMenuItem("copy");
-    JMenuItem selAll = new JMenuItem("select all");
+    JMenuItem copy = new JMenuItem("Copy");
+    JMenuItem selAll = new JMenuItem("Select all");
 
+    save.addActionListener(saver);
     close.addActionListener(closer);
     copy.addActionListener(new copyListener());
     selAll.addActionListener(new selectAllListener());
     
+    file.add(save);
     file.add(close);
     edit.add(copy);
     edit.add(selAll);
