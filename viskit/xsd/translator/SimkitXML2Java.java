@@ -430,6 +430,7 @@ public class SimkitXML2Java {
 	    }
 	}
 	
+        pw.println(sp4 + run.getCode());
 	pw.println(sp4 + cb);
 	pw.println();
     }
@@ -505,7 +506,8 @@ public class SimkitXML2Java {
 		doCancel((CancelType)o,e,pw);
 	    }
 	}
-
+        
+        pw.println(sp4 + e.getCode());
 	pw.println(sp4 + cb);
 	pw.println();
 	
@@ -625,9 +627,41 @@ public class SimkitXML2Java {
 	}
 	
     }
+    
+    void doFunctionBlock(PrintWriter pw) {
+        List functions = this.root.getFunction();
+        ListIterator li = functions.listIterator();
+        while(li.hasNext()) {
+            FunctionType f = (FunctionType)(li.next());
+            List pList = f.getParameter();
+            ListIterator pli = pList.listIterator();
+            pw.print(sp4 + f.getScope() + sp + f.getReturnType() + sp);
+            pw.print(f.getName() + lp);
+            
+	    while ( pli.hasNext() ) {
+	        Parameter pt = (Parameter) li.next();
+	        pw.print(pt.getType() + sp + shortinate(pt.getName()));
+	        if ( pList.size() > 1 ) {
+ 	            if ( pList.indexOf(pt) <  pList.size() - 1 ) {
+	                pw.print(cm);
+		        pw.println();
+		        pw.print(sp8 + sp4);
+	            }
+	        }
+	    }
+            
+            pw.println(rp + sp + ob);
+            pw.println(sp4 + f.getCode());
+            pw.println(sp4 + cb);
+            pw.println();
+        }
+        
+    }
 
     void buildTail(StringWriter t) {
 	PrintWriter pw = new PrintWriter(t);
+        
+        doFunctionBlock(pw);
 
 	pw.println();
 	pw.println(cb);
