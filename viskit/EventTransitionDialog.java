@@ -89,11 +89,11 @@ public class EventTransitionDialog extends JDialog
           commentField.setEditable(false);
         actionField        = new JTextField(25);   setMaxHeight(actionField);
 
-        fieldsPanel.add(new OneLinePanel(actionLab,w,actionField));
+        fieldsPanel.add(new OneLinePanel(nameLab,w,testVars));
         fieldsPanel.add(new OneLinePanel(null,w,assTo));
         fieldsPanel.add(new OneLinePanel(null,w,opOn));
-        //fieldsPanel.add(new OneLinePanel(nameLab,w,nameField));
-   fieldsPanel.add(new OneLinePanel(nameLab,w,testVars));
+        fieldsPanel.add(new OneLinePanel(actionLab,w,actionField));
+        fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
 
        con.add(fieldsPanel);
@@ -196,6 +196,7 @@ public class EventTransitionDialog extends JDialog
         commentField.setText((String)param.getComments().get(0));
       else
         commentField.setText("");
+      testVars.setModel(VGlobals.instance().getStateVarsCBModel());   // get new ones
     }
     else {
       nameField.setText("param name");
