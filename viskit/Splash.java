@@ -27,8 +27,8 @@ public class Splash extends JFrame
   {
     super();
     this.setUndecorated(true);
-    this.setBackground(new Color(255,255,255,128));
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash.png"));
+    this.setBackground(new Color(255,255,255,0)); //128));
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
     label = new JLabel(icon);
     label.setOpaque(false);
     this.getContentPane().add(label, BorderLayout.CENTER);
