@@ -2,9 +2,8 @@ package viskit;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.print.PrinterJob;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 
 /**
@@ -28,8 +27,11 @@ public class SourceWindow extends JFrame
     this.main = main;
     this.src = source;
 
+    JPanel outerPan = new JPanel(new BorderLayout());
+    setContentPane(outerPan);
     JPanel con = new JPanel();
-    setContentPane(con);
+    outerPan.add(con,BorderLayout.CENTER);
+
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
     con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     JToolBar tb = new JToolBar();
@@ -39,7 +41,7 @@ public class SourceWindow extends JFrame
     tb.add(new JLabel("Font:"));
     tb.add(fontPlus);
     tb.add(fontMinus);
-    tb.add(new JLabel("     "));
+    //tb.add(new JLabel("     "));
     tb.add(printB);
     fontPlus.addActionListener(new ActionListener()
     {
@@ -56,7 +58,7 @@ public class SourceWindow extends JFrame
       }
     });
 
-    con.add(tb);
+    outerPan.add(tb,BorderLayout.NORTH);
 
     /*JTextArea*/ jta = new JTextArea(src);
     jta.setEditable(false);
@@ -77,7 +79,7 @@ public class SourceWindow extends JFrame
     JButton closeButt = new JButton("Close");
     buttPan.add(closeButt);
 
-    buttPan.add(Box.createHorizontalStrut(40));
+    //buttPan.add(Box.createHorizontalStrut(40));
     con.add(buttPan);
 
     this.setSize(main.getWidth()-200,main.getHeight()-100);
