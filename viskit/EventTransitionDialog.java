@@ -127,13 +127,6 @@ public class EventTransitionDialog extends JDialog
 
     fillWidgets();     // put the data into the widgets
 
-    modified        = (param==null?true:false);     // if it's a new param, they can always accept defaults with no typing
-    okButt.setEnabled((param==null?true:false));
-
-    getRootPane().setDefaultButton(canButt);
-
-    pack();     // do this prior to next
-    this.setLocationRelativeTo(locationComp);
 
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
@@ -185,6 +178,15 @@ public class EventTransitionDialog extends JDialog
     RadButtListener rbl = new RadButtListener();
     this.assTo.addActionListener(rbl);
     this.opOn.addActionListener(rbl);
+
+    modified        = (param==null?true:false);     // if it's a new param, they can always accept defaults with no typing
+    okButt.setEnabled((param==null?true:false));
+
+    getRootPane().setDefaultButton(canButt);
+
+    pack();     // do this prior to next
+    this.setLocationRelativeTo(locationComp);
+
   }
 
   private int maxWidth(JComponent[] c)
@@ -225,7 +227,7 @@ public class EventTransitionDialog extends JDialog
       actionField.setText(param.getOperationOrAssignment());
       String ie = param.getIndexingExpression();
       if(ie == null || ie.equals(""))
-        arrayIndexField.setText(((ViskitModel)parentFrame.getModel()).generateLocalVariableName());
+        arrayIndexField.setText(((ViskitModel)parentFrame.getModel()).generateIndexVariableName());
       else
         arrayIndexField.setText(param.getIndexingExpression());
       opOn.setSelected(param.isOperation());
@@ -242,13 +244,13 @@ public class EventTransitionDialog extends JDialog
     else {
       //nameField.setText("");
       actionField.setText("");
-      arrayIndexField.setText( ((ViskitModel)parentFrame.getModel()).generateLocalVariableName());
+      arrayIndexField.setText( ((ViskitModel)parentFrame.getModel()).generateIndexVariableName());
       arrayIndexField.setEditable(false);
       stateVarsCB.setSelectedIndex(0);
       commentField.setText("");
       assTo.setSelected(true);
     }
-    indexPanel.setVisible(((vStateVariable)stateVarsCB.getItemAt(0)).getType().indexOf('[')!= -1);
+    indexPanel.setVisible(((vStateVariable)stateVarsCB.getSelectedItem()).getType().indexOf('[')!= -1);
     pack();
   }
 
