@@ -17,13 +17,13 @@
             <TerminalParameter type="float" value="0.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
         </MultiParameter>
-        <TerminalParameter type="float" value="26.0f"/>
+        <TerminalParameter type="float" value="40.0f"/>
         <MultiParameter type="short[]">
             <TerminalParameter type="short" value="2"/>
             <TerminalParameter type="short" value="0"/>
             <TerminalParameter type="short" value="0"/>
         </MultiParameter>
-        <TerminalParameter type="float" value=".00001f"/>
+        <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="268" x="180"/>
     </SimEntity>
     <SimEntity name="SimPinger_2" type="diskit.SimPinger">
@@ -43,13 +43,13 @@
             <TerminalParameter type="float" value="0.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
         </MultiParameter>
-        <TerminalParameter type="float" value="25.0f"/>
+        <TerminalParameter type="float" value="40.0f"/>
         <MultiParameter type="short[]">
             <TerminalParameter type="short" value="1"/>
             <TerminalParameter type="short" value="0"/>
             <TerminalParameter type="short" value="0"/>
         </MultiParameter>
-        <TerminalParameter type="float" value=".00001f"/>
+        <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="289" x="41"/>
     </SimEntity>
     <SimEntity name="SimMover3DLite_5" type="diskit.SimMover3DLite">
@@ -65,7 +65,7 @@
             <TerminalParameter type="short" value="0"/>
             <TerminalParameter type="short" value="0"/>
         </MultiParameter>
-        <TerminalParameter type="float" value=".00001f"/>
+        <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="278" x="301"/>
     </SimEntity>
     <SimEntity name="SimMover3DLite_6" type="diskit.SimMover3DLite">
@@ -75,13 +75,13 @@
             <TerminalParameter type="float" value="0.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
         </MultiParameter>
-        <TerminalParameter type="float" value="10.0f"/>
+        <TerminalParameter type="float" value="40.0f"/>
         <MultiParameter type="short[]">
             <TerminalParameter type="short" value="0"/>
             <TerminalParameter type="short" value="0"/>
             <TerminalParameter type="short" value="4"/>
         </MultiParameter>
-        <TerminalParameter type="float" value=".00001f"/>
+        <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="280" x="457"/>
     </SimEntity>
     <PropertyChangeListener name="SimplePropertyDumper_0" type="simkit.util.SimplePropertyDumper"/>
