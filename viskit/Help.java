@@ -7,16 +7,18 @@ import javax.swing.*;
  */
 public class Help {
     
+    public static final String VERSION = "0.1.2";
+    
     private Component parent;
     private Icon icon;
     
     private static final String CR = System.getProperty("line.separator");
     
     public static final String ABOUT_EG_STRING =
-        "Viskit Event Graph Editor" + CR + "   version 0.1.1" + CR + CR;
+        "Viskit Event Graph Editor" + CR + "   version " + VERSION + CR + CR;
     
     public static final String ABOUT_ASSEMBLY_STRING =
-        "Viskit Assembly Editor" + CR + "   version 0.1.1" + CR + CR ;
+        "Viskit Assembly Editor" + CR + "   version " + VERSION + CR + CR ;
 
     
     public static final String DEVELOPERS =         
