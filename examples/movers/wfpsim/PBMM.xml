@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity extend="simkit.simdx.PathMoverManager" package="examples.movers.wfpsim" name="PBMM" author="rmgoldbe" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>PatrolBoatMoverManager ( PBMM for short )</Comment>
+    <Parameter name="patrolBoatMover" type="examples.movers.wfpsim.TypedBasicMover">
+        <Comment/>
+    </Parameter>
+    <Parameter name="path" type="java.awt.geom.Point2D[]">
+        <Comment/>
+    </Parameter>
+    <StateVariable name="wayPoint" type="int">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="patrolling" type="boolean">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="patrolBoat" type="examples.movers.wfpsim.TypedBasicMover">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="wayPoint">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="patrolBoat">
+            <Assignment value="patrolBoatMover"/>
+        </StateTransition>
+        <Coordinate x="46" y="55"/>
+    </Event>
+    <Event name="StartPatrolling">
+        <Comment/>
+        <StateTransition state="patrolling">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule delay="0.0" condition="patrolling" event="NextWayPt" priority="0">
+            <Comment/>
+        </Schedule>
+        <Coordinate x="48" y="175"/>
+    </Event>
+    <Event name="NextWayPt">
+        <Comment/>
+        <StateTransition state="patrolBoat">
+            <Operation method="moveTo(path[wayPoint])"/>
+        </StateTransition>
+        <Schedule event="StartMove"/>
+        <Coordinate x="219" y="203"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <LocalVariable type="examples.movers.wfpsim.TypedBasicMover" value="null" name="tgt">
+            <Comment/>
+        </LocalVariable>
+        <Schedule delay="getMoveTime()" condition="true" event="EndMove" priority="0">
+            <Comment/>
+            <EdgeParameter value="tgt"/>
+        </Schedule>
+        <Coordinate x="419" y="114"/>
+    </Event>
+    <Event name="EndMove">
+        <Comment/>
+        <Argument type="examples.movers.wfpsim.TypedBasicMover" name="tgt"/>
+        <StateTransition state="wayPoint">
+            <Assignment value="wayPoint + ((wayPoint &gt;= (path.length-1))?1:-wayPoint)"/>
+        </StateTransition>
+        <Schedule event="NextWayPt"/>
+        <Schedule delay="0.0" condition="(!patrolling) &amp;&amp; (tgt != null)" event="EndIntercept" priority="0">
+            <Comment/>
+            <EdgeParameter value="tgt"/>
+        </Schedule>
+        <Coordinate x="424" y="319"/>
+    </Event>
+    <Event name="Intercept">
+        <Comment>Notes: the thesis shows a schedule from EndMove if another Intercept is immediately ready</Comment>
+        <Argument type="java.awt.geom.Point2D" name="intercept"/>
+        <Argument type="examples.movers.wfpsim.TypedBasicMover" name="newTarget"/>
+        <StateTransition state="patrolBoat">
+            <Operation method="moveTo(intercept)"/>
+        </StateTransition>
+        <StateTransition state="patrolling">
+            <Assignment value="false"/>
+        </StateTransition>
+        <Cancel event="EndMove"/>
+        <Schedule delay="getMoveTime()" condition="true" event="EndMove" priority="0">
+            <Comment/>
+            <EdgeParameter value="newTarget"/>
+        </Schedule>
+        <Coordinate x="50" y="324"/>
+    </Event>
+    <Event name="EndIntercept">
+        <Comment/>
+        <Argument type="examples.movers.wfpsim.TypedBasicMover" name="tgt"/>
+        <StateTransition state="patrolling">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Coordinate x="417" y="460"/>
+    </Event>
+    <Event name="Stop">
+        <Comment/>
+        <StateTransition state="patrolling">
+            <Assignment value="false"/>
+        </StateTransition>
+        <Cancel event="EndMove"/>
+        <Coordinate x="58" y="462"/>
+    </Event>
+</SimEntity>
+
