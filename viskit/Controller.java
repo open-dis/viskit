@@ -64,12 +64,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     editGraphMetaData();
   }
 
-  public void newAssembly()
-  //-----------------------
-  {
-    //todo implement
-  }
-
 /**
  *
  * @return true = continue, false = don't (i.e., we cancelled)

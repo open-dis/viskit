@@ -41,6 +41,10 @@ public class ModelEvent extends mvcModelEvent
   public static final int CANCELLINGEDGEDELETED = 14;
   public static final int CANCELLINGEDGECHANGED = 15;
 
+  public static final int NEWASSEMBLYMODEL = 16;
+  public static final int EVENTGRAPHADDED = 17;
+
+
   public ModelEvent(Object obj, int id, String message)
   {
     super(obj,id,message);

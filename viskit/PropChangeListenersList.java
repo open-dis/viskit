@@ -2,6 +2,8 @@ package viskit;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
 import java.util.jar.JarFile;
 import java.util.Iterator;
@@ -19,19 +21,31 @@ import java.io.IOException;
  * Date: May 14, 2004
  * Time: 10:10:45 AM
  */
-public class PropChangeListenersList extends JList
+public class PropChangeListenersList extends JList implements DragGestureListener, DragSourceListener
 {
   DefaultListModel model;// = new DefaultListModel();
-  public PropChangeListenersList()
+  ImageIcon icon;
+  Image     myIconImage;
+
+  DragStartListener lis;
+
+  public PropChangeListenersList(DragStartListener lis)
   {
     super();
 
-
+    this.lis = lis;
     model = buildSampleData();
 
     setModel(model);
+    setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     setCellRenderer(new PCLRenderer());
     setVisibleRowCount(100);
+    DragSource dragSource = DragSource.getDefaultDragSource();
+
+    dragSource.createDefaultDragGestureRecognizer(this, // component where drag originates
+        DnDConstants.ACTION_COPY_OR_MOVE, // actions
+        this); // drag gesture recognizer
+
   }
 
   private DefaultListModel buildSampleData()
@@ -90,7 +104,7 @@ public class PropChangeListenersList extends JList
 
   class PCLRenderer extends JPanel implements ListCellRenderer
   {
-    ImageIcon ii;
+    //ImageIcon ii;
     JLabel lab;
     JLabel txt;
     Font unsel, sel;
@@ -98,10 +112,12 @@ public class PropChangeListenersList extends JList
 
     public PCLRenderer()
     {
-      ii = new ImageIcon(ClassLoader.getSystemResource("viskit/images/propchangelistener.png"));
-      lab = new JLabel(ii);
-      //lab.setBackground(PropChangeListenersList.this.getSelectionBackground());
-      lab.setOpaque(false);
+      //icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/propchangelistener.png"));
+      icon = new PropChangListIcon(20,20);
+      myIconImage = icon.getImage();
+      lab = new JLabel(icon);
+      lab.setBackground(background);
+      lab.setOpaque(true);
 
       txt = new JLabel("junk");
       unsel = PropChangeListenersList.this.getFont();
@@ -144,4 +160,46 @@ public class PropChangeListenersList extends JList
     else
       return null;
   }
+
+  // Drag stuff
+  public void dragGestureRecognized(DragGestureEvent e)
+  {
+    String s = getClassName();
+    if(s != null) {
+      //e.startDrag(DragSource.DefaultCopyDrop,new StringSelection(s), this);
+      try{
+      if(lis != null)
+        lis.startingDrag(new StringSelection(s));
+      e.startDrag(DragSource.DefaultCopyDrop,
+          myIconImage,new Point(-icon.getIconWidth()/2,
+              -icon.getIconHeight()/2),new StringSelection(s), this);
+      }
+      catch(InvalidDnDOperationException ex) {
+        ex.printStackTrace();
+        System.out.println(ex);
+      }
+    }
+  }
+
+  public void dragDropEnd(DragSourceDropEvent e){}
+  public void dragEnter(DragSourceDragEvent e){}
+  public void dragExit(DragSourceEvent e){}
+  public void dragOver(DragSourceDragEvent e){}
+  public void dropActionChanged(DragSourceDragEvent e){}
+
+  public String getClassName()
+  {
+   Object o = PropChangeListenersList.this.getSelectedValue();
+/*
+    TreePath path = getLeadSelectionPath();
+    DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
+    Object o = dmtn.getUserObject();
+*/
+    if (o != null && o instanceof Class)
+      return ((Class) o).getName();
+    return
+        null;
+  }
+
 }
+

@@ -1,17 +1,26 @@
 package viskit;
 
 import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcModelEvent;
 import viskit.model.Model;
 import viskit.model.AssemblyModel;
 import viskit.model.ViskitAssemblyModel;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.jgraph.vGraphAssemblyComponent;
+import viskit.images.AdapterIcon;
+import viskit.images.SimEventListenerIcon;
+import viskit.images.PropChangeListenerIcon;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -23,7 +32,7 @@ import java.awt.event.*;
  * Time: 2:07:37 PM
  */
 
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView
+public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
 {
   private ViskitAssemblyModel model;
   private ViskitAssemblyController controller;
@@ -42,11 +51,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private ButtonGroup modeButtonGroup;
 
   private JToggleButton selectMode;
-  private JToggleButton adapterMode,bridgeMode;
+  private JToggleButton adapterMode, simEventListenerMode, propChangeListenerMode;
   private JButton zoomIn, zoomOut;
 
   private JPanel canvasPanel;
-
+  private LegosTree lTree;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
@@ -159,12 +168,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     // Buttons for what mode we are in
 
-    selectMode    = makeJTButton(null, "viskit/images/selectNode.png",
+    selectMode             = makeJTButton(null, "viskit/images/selectNode.png",
                                        "Select items on the graph");
-    adapterMode       = makeJTButton(null, "viskit/images/adapter.png",
+    //adapterMode          = makeJTButton(null, "viskit/images/adapter.png",
+    adapterMode            = makeJTButton(null,new AdapterIcon(24,24),
                                        "Connect assemblies with adapter pattern");
-    bridgeMode        = makeJTButton(null, "viskit/images/bridge.png",
-                                       "Connect assemblies with bridge pattern");
+
+    //simEventListenerMode = makeJTButton(null, "viskit/images/bridge.png",
+    simEventListenerMode   = makeJTButton(null,new SimEventListenerIcon(24,24),
+                                       "Connect assemblies through a SimEvent listener pattern");
+    //propChangeListenerMode = makeJTButton(null, "viskit/images/bridge.png",
+    propChangeListenerMode = makeJTButton(null,new PropChangeListenerIcon(24,24),
+                                       "Connect a property change listener to a SimEntity");
+
     zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                                         "Zoom in on the graph");
 
@@ -173,17 +189,21 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     modeButtonGroup.add(selectMode);
     modeButtonGroup.add(adapterMode);
-    modeButtonGroup.add(bridgeMode);
+    modeButtonGroup.add(simEventListenerMode);
+    modeButtonGroup.add(propChangeListenerMode);
 
     // Make selection mode the default mode
     selectMode.setSelected(true);
 
     toolBar.add(new JLabel("Mode: "));
+
     toolBar.add(selectMode);
     toolBar.addSeparator(new Dimension(5,24));
     toolBar.add(adapterMode);
     toolBar.addSeparator(new Dimension(5,24));
-    toolBar.add(bridgeMode);
+    toolBar.add(simEventListenerMode);
+    toolBar.addSeparator(new Dimension(5,24));
+    toolBar.add(propChangeListenerMode);
 
     toolBar.addSeparator(new Dimension(24,24));
     toolBar.add(new JLabel("Zoom: "));
@@ -235,6 +255,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     else jtb = new JToggleButton();
     return (JToggleButton)buttonCommon(jtb,icPath,tt);
   }
+  private JToggleButton makeJTButton(Action a, Icon ic, String tt)
+  {
+    JToggleButton jtb;
+    if(a != null)jtb = new JToggleButton(a);
+    else jtb = new JToggleButton();
+    jtb.setIcon(ic);
+    return (JToggleButton)buttonCommon2(jtb,tt);
+  }
   private JButton makeButton(Action a, String icPath, String tt)
   {
     JButton b;
@@ -245,6 +273,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt)
   {
     b.setIcon(new ImageIcon(ClassLoader.getSystemResource(icPath)));
+    return buttonCommon2(b,tt);
+  }
+  private AbstractButton buttonCommon2(AbstractButton b, String tt)
+  {
     b.setToolTipText(tt);
     b.setBorder(BorderFactory.createEtchedBorder());
     b.setText(null);
@@ -264,6 +296,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     graphPane.addMouseListener(new vCursorHandler());
     try{
+      //DropTarget dt = graphPane.getDropTarget();
+      //System.out.println("blub");
       graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
     }
     catch(Exception e) {
@@ -281,10 +315,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JComponent buildTreePanels()
   {
-    LegosTree lTree= new LegosTree();
+    lTree = new LegosTree(this);
     LegosPanel lPan = new LegosPanel(lTree);
 
-    PropChangeListenersList pcList = new PropChangeListenersList();
+    PropChangeListenersList pcList = new PropChangeListenersList(this);
     PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pcList);
 
     lTree.setBackground(background);
@@ -304,8 +338,85 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       pcPan.setMinimumSize(new Dimension(20,80));
       lPan.setMinimumSize(new Dimension(20,80));
 
+    lTree.setDragEnabled(true);
+  //  lTree.setTransferHandler(new JTreeToJgraphTransferHandler());
+   // lTree.addMouseListener( new DragMouseAdapter());
     return panJsp;
   }
+
+  // Two classes to support dragging and dropping on the graph
+  class xDragMouseAdapter extends MouseAdapter
+  {
+    public void mousePressed(MouseEvent e)
+    {
+      JComponent c = (JComponent) e.getSource();
+      System.out.println(c);
+/*
+      if(c == EventGraphViewFrame.this.addSelfRef)
+        dragger = SELF_REF_DRAG;
+      else
+        dragger = NODE_DRAG;
+*/
+
+   //   TransferHandler handler = c.getTransferHandler();
+   //   handler.exportAsDrag(c, e, TransferHandler.COPY);
+    }
+  }
+  Transferable dragged;
+  public void startingDrag(Transferable trans)
+  {
+    dragged = trans;
+  }
+
+  class vDropTargetAdapter extends DropTargetAdapter
+  {
+
+    public void drop(DropTargetDropEvent dtde)
+    {
+      if(dragged != null) {
+        try {
+          String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
+          Class uo = null;
+          Class c = null;
+          Class cc= null;
+          try {
+            uo = Class.forName(s);     // what we've drug
+            c  = Class.forName("simkit.BasicSimEntity");   // what  we're checking for
+            cc = Class.forName("java.beans.PropertyChangeListener");      // ditto
+          }
+          catch (ClassNotFoundException e) {
+            e.printStackTrace();
+          }
+          Point p = dtde.getLocation();
+
+          if(((Class)cc).isAssignableFrom(uo))
+            ((ViskitAssemblyController)getController()).newPropChangeListenerNode(s,p);
+          else if(((Class)c).isAssignableFrom(uo))
+            ((ViskitAssemblyController)getController()).newEventGraphNode(s,p);
+
+          dragged = null;
+          return;
+        }
+        catch (UnsupportedFlavorException e) {
+          e.printStackTrace();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      else {
+/*
+        // get the node in question from the graph
+        Object o = graphPane.getViskitElementAt(p);
+        if(o != null && o instanceof EventNode) {
+          EventNode en = (EventNode)o;
+          // We're making a self-referential arc
+          ((ViskitController)getController()).newArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
+*/
+        }
+      }
+    }
+
   private void buildToolBar()
   {
 
@@ -362,52 +473,33 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
   }
 
-
-  final static int NODE_DRAG = 0;
-  final static int SELF_REF_DRAG = 1;
-  private int dragger;
-  // Two classes to support dragging and dropping on the graph
-  class DragMouseAdapter extends MouseAdapter
+  /**
+   * This is where the "master" model (simkit.viskit.model.Model) updates the view.
+   * Not so much to do in this editor as in EventGraphViewFrame
+   * @param event
+   */
+  public void modelChanged(mvcModelEvent event)
+  //-------------------------------------------
   {
-    public void mousePressed(MouseEvent e)
-    {
-      JComponent c = (JComponent) e.getSource();
-      //todo
-/*
-      if(c == EventGraphViewFrame.this.addSelfRef)
-        dragger = SELF_REF_DRAG;
-      else
-        dragger = NODE_DRAG;
-*/
-
-      TransferHandler handler = c.getTransferHandler();
-      handler.exportAsDrag(c, e, TransferHandler.COPY);
-    }
-  }
-  class vDropTargetAdapter extends DropTargetAdapter
-  {
-    public void drop(DropTargetDropEvent dtde)
+    System.out.println("AssView got "+event.toString());
+    switch(event.getID())
     {
 /*
-      Point p = dtde.getLocation();  // subtract the size of the label
-      if(dragger == NODE_DRAG) {
-        Point pp = new Point(
-          // todo addEvent is the drug-from JLabel
-          p.x - addEvent.getWidth(),
-          p.y - addEvent.getHeight());
-        ((ViskitController)getController()).newNode(pp);
-      }
-      else {
-        // get the node in question from the graph
-        Object o = graphPane.getViskitElementAt(p);
-        if(o != null && o instanceof EventNode) {
-          EventNode en = (EventNode)o;
-          // We're making a self-referential arc
-          ((ViskitController)getController()).newArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
-        }
-      }
+      case ModelEvent.EVENTGRAPHADDED:
+        break;
+      case ModelEvent.NEWASSEMBLYMODEL:
+        // fall through
 */
+
+      // Changes the graph needs to know about
+      default:
+        this.graphPane.viskitModelChanged((ModelEvent)event);
+
     }
   }
 
+}
+interface DragStartListener
+{
+  public void startingDrag(Transferable trans);
 }

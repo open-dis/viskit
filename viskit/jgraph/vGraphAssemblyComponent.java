@@ -64,7 +64,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     this.setLockedHandleColor(Color.red);
     this.setHighlightColor(Color.red);
     //this.setHandleColor(Color.orange);
-
+    this.setDropEnabled(true);
   }
 
   public void updateUI()
@@ -90,9 +90,13 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     currentModelEvent = ev;
 
     switch (ev.getID()) {
-      case ModelEvent.NEWMODEL:
+      case ModelEvent.NEWASSEMBLYMODEL:
         model.deleteAll();
         break;
+      case ModelEvent.EVENTGRAPHADDED:
+        model.addEGNode((EvGraphNode)ev.getSource());
+        break;
+/*
       case ModelEvent.EVENTADDED:
         model.addEventNode((EventNode) ev.getSource());
         break;
@@ -120,6 +124,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       case ModelEvent.CANCELLINGEDGEDELETED:
         model.deleteCancellingEdge((CancellingEdge) ev.getSource());
         break;
+*/
       default:
         //System.out.println("duh")
         ;

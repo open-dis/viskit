@@ -33,7 +33,6 @@ public interface ViskitController
   void editGraphMetaData  ();
   
   void newEventGraph();
-  void newAssembly();
 
   void runEventGraphEditor();  
   void runAssemblyEditor();

@@ -2,10 +2,8 @@ package viskit.jgraph;
 
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
-import viskit.model.CancellingEdge;
+import viskit.model.*;
 import viskit.model.Edge;
-import viskit.model.EventNode;
-import viskit.model.SchedulingEdge;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,6 +142,17 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     c.removeAllChildren();
     this.remove(new Object[]{c});
   }
+  public void addEGNode(EvGraphNode egn)
+  {
+    DefaultGraphCell c = new AssemblyCircleCell(egn.getName());
+    egn.opaqueViewObject = c;
+    c.setUserObject(egn);
+    Map attributes = new Hashtable();
+    attributes.put(c,createBounds(egn.getPosition().x,egn.getPosition().y,Color.black));
+    c.add(new vPortCell(egn.getName()+"/Center"));
+    this.insert(new Object[]{c},attributes,null,null,null);
+  }
+
   public void addEventNode(EventNode en)
   {
     DefaultGraphCell c = new CircleCell(en.getName());

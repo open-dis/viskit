@@ -1,5 +1,7 @@
 package viskit;
 
+import java.awt.*;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -11,4 +13,10 @@ package viskit;
  */
 public interface ViskitAssemblyController
 {
+  public void newEventGraphNode(String name, Point p);
+  public void newPropChangeListenerNode(String name, Point p);  
+  public void newAssembly();
+  public void editGraphMetaData  ();
+  
+
 }

@@ -21,8 +21,8 @@ import java.awt.event.ActionListener;
 
 public class MetaDataDialog extends JDialog
 {
-  private static MetaDataDialog dialog;
-  private static boolean modified = false;
+  protected static MetaDataDialog dialog;
+  protected static boolean modified = false;
 
   private JButton canButt;
   private JButton okButt;
@@ -47,7 +47,12 @@ public class MetaDataDialog extends JDialog
   JTextArea commentTa;
   public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd)
   {
-    super(f, "Event Graph Properties", true);
+    this(f,comp,gmd,"Event Graph Properties");
+  }
+
+  public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd, String title)
+  {
+    super(f,title, true);
     this.param = gmd;
     this.locationComp = comp;
     this.parentFrame = f;

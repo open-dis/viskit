@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
@@ -56,6 +57,9 @@ public class VGlobals
   /* routines to manage the singleton-aspect of the views. */
 
   AssemblyViewFrame avf;
+  AssemblyController acont;
+  AssemblyModel amod;
+  boolean assyFirstRun = false;
   /**
    * Get a reference to the assembly editor view.
    * @return a reference to the assembly editor view or null if yet unbuilt.
@@ -71,6 +75,8 @@ public class VGlobals
   public AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont, AssemblyModel mod)
   {
     avf = new AssemblyViewFrame(mod,cont);
+    acont = cont;
+    amod = mod;
     cont.setModel(mod);   // registers cntl as model listener
     cont.setView(avf);
 
@@ -84,6 +90,19 @@ public class VGlobals
   {
     avf.setVisible(true);
     avf.toFront();
+
+      SwingUtilities.invokeLater(new Runnable()
+      {
+        public void run()
+        {
+          if(assyFirstRun)
+            return;
+
+          assyFirstRun = true;
+          acont.newAssembly();
+        }
+      });
+
   }
 
   EventGraphViewFrame egvf;
