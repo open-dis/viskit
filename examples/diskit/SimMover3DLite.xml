@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity package="diskit" name="SimMover3DLite" version="1.0" extend="diskit.DISMover3DBase" author="rmgoldbe" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="rmgoldbe" package="diskit" version="1.0" name="SimMover3DLite" extend="diskit.DISMover3DBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Unencumbered math version</Comment>
-    <Parameter type="mil.navy.nps.math.Vec4f" name="start">
+    <Parameter name="start" type="mil.navy.nps.math.Vec4f">
         <Comment>would be nice to have a clone method</Comment>
     </Parameter>
-    <Parameter type="float" name="speedLimit">
+    <Parameter name="speedLimit" type="float">
         <Comment/>
     </Parameter>
-    <Parameter type="short[]" name="id">
+    <Parameter name="id" type="short[]">
         <Comment/>
     </Parameter>
-    <Parameter type="float" name="tol">
+    <Parameter name="tol" type="float">
         <Comment>floating point roundoff error tolerance</Comment>
     </Parameter>
     <StateVariable type="mil.navy.nps.math.Vec4f" name="startPosition">
@@ -48,50 +48,38 @@
         <StateTransition state="isMoving">
             <Assignment value="false"/>
         </StateTransition>
-        <Schedule priority="0" delay="0.0" event="Init" condition="true">
+        <Schedule condition="true" priority="0" delay="0.0" event="Init">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Coordinate y="82" x="40"/>
+        <Coordinate x="40" y="82"/>
     </Event>
     <Event name="Init">
         <Comment>send this</Comment>
         <Argument type="diskit.SimMover3DLite" name="me"/>
-        <Coordinate y="282" x="43"/>
+        <Coordinate x="43" y="282"/>
     </Event>
     <Event name="StartMove">
         <Comment/>
-        <LocalVariable type="float[]" name="v" value="new float[4]; velocity.get(v)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable type="float[]" name="d" value="new float[4]; destination.get(d)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable type="float" name="distSquare" value="0.0f">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable type="float[]" name="s" value="new float[4]; startPosition.get(s)">
-            <Comment/>
-        </LocalVariable>
         <StateTransition state="velocity">
-            <Operation method="set(d[0]-s[0], d[1]-s[1], d[2]-s[2], d[3]-s[3])"/>
+            <Operation method="sub(destination,startPosition)"/>
         </StateTransition>
         <StateTransition state="isMoving">
-            <Assignment value="(distSquare = (v[0]*v[0] + v[1]*v[1] + v[2]*v[2])) &gt; tol &amp;&amp; v[3] &gt; tol"/>
+            <Assignment value="velocity.length_sqr() &gt; tol &amp;&amp; velocity.get(3) &gt; tol"/>
         </StateTransition>
         <StateTransition state="currentSpeed">
-            <Assignment value="(float) Math.sqrt((double)distSquare)/v[3]"/>
+            <Assignment value="(float) Math.sqrt((double)velocity.length_sqr())/velocity.get(3)"/>
         </StateTransition>
         <StateTransition state="duration">
-            <Assignment value="v[3]"/>
+            <Assignment value="velocity.get(3)"/>
         </StateTransition>
-        <Schedule priority="0" delay="0.0" event="SpeedLimit" condition="currentSpeed - maxSpeed &gt; tol">
+        <Schedule condition="currentSpeed - maxSpeed &gt; tol" priority="0" delay="0.0" event="SpeedLimit">
             <Comment/>
         </Schedule>
-        <Schedule priority="0" delay="(double)duration" event="ArrivePoint" condition="isMoving">
+        <Schedule condition="isMoving" priority="0" delay="(double)duration" event="ArrivePoint">
             <Comment/>
         </Schedule>
-        <Coordinate y="157" x="140"/>
+        <Coordinate x="140" y="157"/>
     </Event>
     <Event name="SpeedLimit">
         <Comment/>
@@ -109,7 +97,7 @@
         </StateTransition>
         <Cancel event="ArrivePoint"/>
         <Schedule event="StartMove"/>
-        <Coordinate y="381" x="144"/>
+        <Coordinate x="144" y="381"/>
     </Event>
     <Event name="ArrivePoint">
         <Comment/>
@@ -122,7 +110,7 @@
         <StateTransition state="isMoving">
             <Assignment value="false"/>
         </StateTransition>
-        <Coordinate y="198" x="297"/>
+        <Coordinate x="297" y="198"/>
     </Event>
     <Event name="UpdateDestination">
         <Comment/>
@@ -132,7 +120,7 @@
         </StateTransition>
         <Schedule event="StartMove"/>
         <Cancel event="ArrivePoint"/>
-        <Coordinate y="36" x="144"/>
+        <Coordinate x="144" y="36"/>
     </Event>
 </SimEntity>
 
