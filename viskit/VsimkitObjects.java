@@ -26,7 +26,7 @@ public class VsimkitObjects
    * VGlobals uses this field, which combines all the methods below.
    * It does not use the individual methods.
    */
-  public static HashMap hashmap = new HashMap();
+  private static HashMap hashmap = new HashMap();
 
   static {
     try {
@@ -37,15 +37,24 @@ public class VsimkitObjects
         String nm = meths[i].getName();
         nm = nm.substring(4); // lose the 'get_'
         nm = "simkit."+nm.replace('_','.');
-
-        Object o = meths[i].invoke(null,null);
+        String nm2 = nm.substring(nm.lastIndexOf('.')+1);  // with no package
+        Object m = meths[i].invoke(null,null);
+        Object o = new FullNameAndInstance(nm,m);
         hashmap.put(nm,o);
+        hashmap.put(nm2,o);
       }
     }
     catch (Exception e) {
       System.err.println("VsimkitObjects error");
       System.err.println(e);
     }
+  }
+
+  public static Object getInstance(String nm) {return hashmap.get(nm);}
+  public static Object getFullName(String nm) {
+    FullNameAndInstance fnai = (FullNameAndInstance)hashmap.get(nm);
+    if(fnai == null) return null;
+    return fnai.fullname;
   }
 
   // Here are all the objects in the random package that could be used:
@@ -98,5 +107,15 @@ public class VsimkitObjects
   public static Object get_random_UniformVariate ()          { return new  UniformVariate (); }
   public static Object get_random_WeibullVariate ()          { return new  WeibullVariate (); }
 
-  // todo All other simkit objects
 }
+  // todo All other simkit objects
+  class FullNameAndInstance
+  {
+    public String fullname;
+    public Object instance;
+    public FullNameAndInstance(String nm, Object o)
+    {
+      fullname = nm;
+      instance = o;
+    }
+  }

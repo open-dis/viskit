@@ -456,6 +456,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     StateVariable s = null;
     try {s = this.oFactory.createStateVariable(); } catch(JAXBException e){ System.out.println("newStVarJAXBEX"); }
     s.setName(name);
+    s.setShortName(name);
     s.setType(type);
     s.getComment().add(comment);
 

@@ -170,7 +170,8 @@ public class VGlobals
   {
     if (!handlePrimitive(name, typ)) {
         try {
-          interpreter.set(name,instantiateType(typ));      // the 2nd param will be null if nogo and cause exc
+          Object o = instantiateType(typ);
+          interpreter.set(name,VsimkitObjects.getFullName(typ));      // the 2nd param will be null if nogo and cause exc
         }
         catch (Exception ex) {
           clearNamespace();
@@ -204,7 +205,7 @@ public class VGlobals
       return o;
 
     // OK. See if we've got a dummy one in our HashMap
-    return VsimkitObjects.hashmap.get(typ);
+    return VsimkitObjects.getInstance(typ);
   }
 
   private boolean handlePrimitive(String name, String typ)
@@ -350,14 +351,14 @@ public class VGlobals
 */
    for(int i=0;i<morePackages.length;i++) {
      if(moreClasses[i].length <= 0) {           // if no classes, make the "package selectable
-       mi = new JMenuItem(morePackages[i]);
+       mi = new MyJMenuItem(morePackages[i],null);
        mi.addActionListener(myListener);
        popup.add(mi);
      }
      else {
        m = new JMenu(morePackages[i]);
        for(int j=0;j<moreClasses[i].length;j++) {
-         mi = new JMenuItem(moreClasses[i][j]);
+         mi = new MyJMenuItem(moreClasses[i][j],morePackages[i]+"."+moreClasses[i][j]);
          mi.addActionListener(myListener);
          m.add(mi);
        }
@@ -386,9 +387,9 @@ public class VGlobals
            popup.show(cb,0,0);
       }
       else {
-        JMenuItem mi = (JMenuItem)o;
+        MyJMenuItem mi = (MyJMenuItem)o;
         if(!mi.getText().equals("cancel"))
-          pending.setSelectedItem(mi.getText());
+          pending.setSelectedItem(mi.getFullName()); //mi.getText());
         else
           pending.setSelectedItem(lastSelected);
       }
@@ -474,4 +475,21 @@ public class VGlobals
     simParms.clear();
   }
 
+  /**
+   * Small class to hold on to the fully-qualified class name, while displaying only the
+   * un-qualified name;
+   */
+  class MyJMenuItem extends JMenuItem
+  {
+    private String fullName;
+    MyJMenuItem(String nm, String fullName)
+    {
+      super(nm);
+      this.fullName = fullName;
+    }
+    public String getFullName()
+    {
+      return fullName;
+    }
+  }
 }
