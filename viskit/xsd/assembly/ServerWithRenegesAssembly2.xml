@@ -48,7 +48,7 @@
         </FactoryParameter>
     </SimEntity>
         
-    <SimEntity name="csl" type="simkit.examples.CollectionSizeListener" />
+    <SimEntity name="csl" type="simkit.util.CollectionSizeListener" />
     <SimEntity name="ial" type="simkit.examples.IntegerArrivalListener" />
     <SimEntity name="time" type="simkit.examples.TimeListener" />
         
@@ -92,10 +92,10 @@
     <PropertyChangeListenerConnection source="time" listener="delayInQueueStat" property="delayInQueue" />
     <PropertyChangeListenerConnection source="time" listener="delayInQueueRenegeStat" property="delayInQueueRenege" />
     <PropertyChangeListenerConnection source="time" listener="delayInQueueServedStat" property="delayInQueueServed" />
-
+<!--
     <Output entity="server" />
     <Output entity="arrival" />
-
+-->
     <Schedule stopTime="10.0" />
 
 </SimkitAssembly>
