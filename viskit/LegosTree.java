@@ -3,6 +3,7 @@ package viskit;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
@@ -37,18 +38,21 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private DragStartListener lis;
   private AssemblyController controller;
   private Vector recurseNogoList;
+  private String genericTableToolTip = "Drag onto canvas";
 
-  public LegosTree(String className, String iconPath, DragStartListener dslis, AssemblyController controller)
+  public LegosTree(String className, String iconPath, DragStartListener dslis, AssemblyController controller, String tooltip)
   {
-    this(className, new ImageIcon(ClassLoader.getSystemResource(iconPath)), dslis, controller);
+    this(className, new ImageIcon(ClassLoader.getSystemResource(iconPath)), dslis, controller, tooltip);
   }
 
-  public LegosTree(String className, ImageIcon icon, DragStartListener dslis, AssemblyController controller)
+  public LegosTree(String className, ImageIcon icon, DragStartListener dslis, AssemblyController controller, String tooltip)
   {
     super();
     lis = dslis;
     targetClassName = className;
     this.controller = controller;
+    genericTableToolTip = tooltip;
+
     mod = new DefaultTreeModel(root);
 
     try {
@@ -89,6 +93,17 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         DnDConstants.ACTION_COPY_OR_MOVE, // actions
         this); // drag gesture recognizer
 
+  }
+
+  /**
+   * Override to provide a global tooltip for entire table..not just for nodes
+   * @param event
+   * @return
+   */
+  public String getToolTipText(MouseEvent event)
+  {
+    String s = super.getToolTipText(event);
+    return s == null ? genericTableToolTip : s;
   }
 
   public Class getTargetClass()

@@ -260,62 +260,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return 0;
   }
 
-
-/*
-  private JPanel vcrToolBar;
-  private JButton vcrStop, vcrPause, vcrPlay, vcrStep;
-  private JCheckBox  vcrVerbose;
-  private void buildVCRToolbar()
-  {
-    vcrToolBar = new JPanel();
-    vcrToolBar.setLayout(new BoxLayout(vcrToolBar,BoxLayout.X_AXIS));
-    vcrToolBar.add(Box.createHorizontalGlue());
-
-    vcrStop = makeButton(null, "viskit/images/Stop24.gif", "Stop the simulation run");
-    vcrStop.setEnabled(false);
-    vcrToolBar.add(vcrStop);
-    vcrPlay = makeButton(null, "viskit/images/Play24.gif", "Begin or resume the simulation run");
-    vcrToolBar.add(vcrPlay);
-    vcrPause = makeButton(null, "viskit/images/Pause24.gif", "Pause the simulation run");
-    vcrToolBar.add(vcrPause);
-    vcrPause.setEnabled(false);
-    vcrStep = makeButton(null, "viskit/images/StepForward24.gif", "Step the simulation");
-    vcrToolBar.add(vcrStep);
-
-    vcrToolBar.add(Box.createHorizontalStrut(20));
-
-    JLabel vcrSimTimeLab = new JLabel("Sim. time:");
-    JTextField vcrSimTime = new JTextField(10);
-    vcrSimTime.setEditable(false);
-    clampSize(vcrSimTime);
-
-    vcrToolBar.add(vcrSimTimeLab);
-    vcrToolBar.add(vcrSimTime);
-    vcrToolBar.add(Box.createHorizontalStrut(10));
-
-    JLabel vcrStopTimeLabel = new JLabel("Stop time:");
-    vcrStopTime = new JTextField(10);
-    clampSize(vcrStopTime);
-
-    vcrToolBar.add(vcrStopTimeLabel);
-    vcrToolBar.add(vcrStopTime);
-    vcrToolBar.add(Box.createHorizontalStrut(10));
-
-    vcrVerbose = new JCheckBox("verbose output",false);
-    vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
-    vcrToolBar.add(vcrVerbose);
-
-    vcrToolBar.add(Box.createHorizontalGlue());
-    vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-    
-    ViskitAssemblyController controller = (ViskitAssemblyController)getController();
-
-    vcrStop.addActionListener(ActionIntrospector.getAction(controller,"vcrStop"));
-    vcrPause.addActionListener(ActionIntrospector.getAction(controller,"vcrRewind"));
-    vcrPlay.addActionListener(ActionIntrospector.getAction(controller,"vcrPlay"));
-    vcrStep.addActionListener(ActionIntrospector.getAction(controller,"vcrStep"));
-  }
-*/
   private void buildToolbar()
   {
     modeButtonGroup = new ButtonGroup();
@@ -484,13 +428,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JComponent buildTreePanels()
   {
-    lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png", this, (AssemblyController)getController());
+    lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
+                          this, (AssemblyController)getController(),
+                          "Drag an Event Graph onto the canvas to add it to the assembly");
     LegosPanel lPan = new LegosPanel(lTree);
-    lPan.setToolTipText("Drag Event Graphs onto canvas");
 
-    pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20), this, (AssemblyController)getController());
-    PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree); //pcList);
-    pcPan.setToolTipText("Drag Property Change Listeners onto canvas");
+    pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
+                            this, (AssemblyController)getController(),
+                           "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
+    PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree);
 
     lTree.setBackground(background);
     pclTree.setBackground(background);
@@ -503,8 +449,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     lTree.setDragEnabled(true);
     pclTree.setDragEnabled(true);
-    //  lTree.setTransferHandler(new JTreeToJgraphTransferHandler());
-    // lTree.addMouseListener( new DragMouseAdapter());
+
     return panJsp;
   }
   
