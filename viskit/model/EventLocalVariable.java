@@ -1,5 +1,6 @@
 package viskit.model;
 
+import viskit.VGlobals;
 
 
 /**
@@ -15,11 +16,13 @@ public class EventLocalVariable extends ViskitElement
   private String name;
   private String value;
   private String comment="";
+  private String arrayType;
+  private String[] arraySize;
 
   public EventLocalVariable(String name, String type, String value)
   {
     this.name = name;
-    this.type = type;
+    setType(type);
     this.value = value;
   }
   public String getComment()
@@ -47,10 +50,12 @@ public class EventLocalVariable extends ViskitElement
     return type;
   }
 
+/*
   public void setType(String type)
   {
     this.type = type;
   }
+*/
 
   public String getValue()
   {
@@ -61,4 +66,16 @@ public class EventLocalVariable extends ViskitElement
   {
     this.value = value;
   }
+  
+  public void setType(String pType)
+  {
+    type = pType;
+    arrayType = VGlobals.instance().stripArraySize(pType);
+    arraySize = VGlobals.instance().getArraySize(pType);
+  }
+
+  public String   getArrayType()       { return arrayType; }
+  public String[] getArraySize()       { return arraySize; }
+
+
 }
