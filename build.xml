@@ -39,6 +39,7 @@
     <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
     
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
+    <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
               
@@ -255,10 +256,13 @@
     <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples"/>
     
     <target depends="jar" description="diskit module" name="examples.diskit">
+	<echo message="Building DISkit:"/>
         <ant dir="${dir.examples}/diskit" target="dist"/>
-    <!-- do not clobber revised diskit.jar from DISKIT distribution.  this needs a better fix!  Rick Goldberg to follow up.
+	<echo message="Building DISKIT:"/>
+	<ant dir="${dir.diskit}" target="dist"/>
         <copy file="${dir.examples}/diskit/lib/dis.jar" todir="${dir.lib.ext}"/>
-        <copy file="${dir.examples}/diskit/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> -->
+        <copy file="${dir.examples}/diskit/dist/lib/diskit0.jar" todir="${dir.lib.ext}"/> 
+        <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
     </target>
     
     <!-- TARGET: buildapp from Kirk Stork -->
