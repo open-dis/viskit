@@ -9,6 +9,9 @@ import java.awt.dnd.*;
 import java.util.jar.JarFile;
 import java.util.*;
 import java.io.*;
+import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -261,9 +264,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   {
     JarFile jarFile = null;
     try {
-      jarFile = new JarFile(jarFileName);
+      URL jurl = ClassLoader.getSystemResource(jarFileName);
+      URI juri = new URI(jurl.toString());
+      jarFile = new JarFile(juri.getPath()); //jarFileName);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       JOptionPane.showMessageDialog(LegosTree.this, "Error reading " + jarFileName, "I/O Error", JOptionPane.ERROR_MESSAGE);
       return;
 

@@ -11,6 +11,8 @@ import java.util.Vector;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URI;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -54,9 +56,11 @@ public class PropChangeListenersList extends JList implements DragGestureListene
     String jarFileName = "lib/simkit.jar";
     JarFile jarFile = null;
     try {
-      jarFile = new JarFile(jarFileName);
+      URL jurl = ClassLoader.getSystemResource(jarFileName);
+      URI juri = new URI(jurl.toString());
+      jarFile = new JarFile(juri.getPath()); //jarFileName);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       e.printStackTrace();
       return mod;
     }
