@@ -78,6 +78,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
   }
   private boolean modelDirty = false;
 
+  /**
+   * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
+   * @param dirt
+   */
+  public void setDirty(boolean dirt)
+  {
+    modelDirty = dirt;
+  }
+  
   public GraphMetaData getMetaData()
   {
     return metaData;
