@@ -129,6 +129,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
       content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
       content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
+/*
       JPanel cont = new JPanel(new SpringLayout());
       cont.add(handleLab);
       cont.add(handleField);
@@ -136,6 +137,16 @@ public class EvGraphNodeInspectorDialog extends JDialog
       cont.add(outputCheck);
       SpringUtilities.makeCompactGrid(cont, 1 , 3, 10, 10, 5, 5);
       content.add(cont);
+*/
+
+      JPanel bcont = new JPanel();
+      bcont.setLayout(new BoxLayout(bcont,BoxLayout.X_AXIS));
+      bcont.add(handleLab);
+      bcont.add(Box.createHorizontalStrut(5));
+      bcont.add(handleField);
+      bcont.add(outputCheck);
+      bcont.add(Box.createHorizontalGlue());
+      content.add(bcont);
 
       ip.setAlignmentX(Box.CENTER_ALIGNMENT);
       content.add(ip);

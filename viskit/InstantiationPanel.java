@@ -45,10 +45,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   private JDialog packMe;
   boolean constructorOnly = false;
 
+/*
   public InstantiationPanel(ActionListener changedListener)
   {
     this(null,changedListener);
   }
+*/
   public InstantiationPanel(JDialog ownerDialog,ActionListener changedListener)
   {
     this(ownerDialog,changedListener,false);
@@ -133,8 +135,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             break;
         case FACT:
             instPaneLayMgr.show(instPane,"factPan");
-            factPan.factClassTF.requestFocus();
-            factPan.factClassTF.selectAll();
+            factPan.factClassCB.requestFocus();
+            //factPan.factClassCB.selectAll();
             break;
         default:
             System.err.println("bad data Instantiation panel");
@@ -284,7 +286,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       }
       else {
         for (int i = 0; i < construct.length; ++i) {
-          constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this);
+          constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this,packMe);
           constructorPanels[i].setData(buildDummyInstantiators(construct[i]));
           String sign = ConstructorPanel.getSignature(construct[i].getParameterTypes());
 
@@ -390,7 +392,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   {
     private InstantiationPanel ip;
     private JLabel factClassLab, factMethodLab;
-    private JTextField factClassTF, factMethodTF;
+    private JComboBox factClassCB;
+    private JTextField factMethodTF;
     private JButton factMethodButt;
     private JPanel topP;
     private ObjListPanel olp;
@@ -402,13 +405,16 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
       topP = new JPanel(new SpringLayout());
       factClassLab = new JLabel("Factory class",JLabel.TRAILING);
-      factClassTF = new JTextField();
-      Vstatics.clampHeight(factClassTF);
-      factClassLab.setLabelFor(factClassTF);
+      factClassCB = new JComboBox(new Object[]{"simkit.random.RandomVariateFactory"});
+      // this is wierd, I want it's height to be the one for a non-editable CB
+    //  factClassCB.setEditable(false);
+      factClassCB.setEditable(true);
+      Vstatics.clampHeight(factClassCB);
+      factClassLab.setLabelFor(factClassCB);
 
       JLabel dummy = new JLabel("");
       JLabel classHelp = new JLabel("(Press return after entering class name)");
-      classHelp.setFont(factClassTF.getFont());
+      classHelp.setFont(factClassCB.getFont());
       dummy.setLabelFor(classHelp);
 
       factMethodLab = new JLabel("Class method",JLabel.TRAILING);
@@ -419,11 +425,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
         tinyP.add(factMethodTF);
         factMethodButt = new JButton("...");
-        factMethodButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        factMethodButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0,3,0,3)));
         Vstatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
         tinyP.add(factMethodButt);
       topP.add(factClassLab);
-      topP.add(factClassTF);
+      topP.add(factClassCB);
       topP.add(dummy);
       topP.add(classHelp);
       topP.add(factMethodLab);
@@ -432,9 +438,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
       add(topP);
 
-      factClassTF.addActionListener(new MyClassListener());
+      factClassCB.addActionListener(new MyClassListener());
       MyCaretListener myCarListener = new MyCaretListener();
-      factClassTF.addCaretListener(myCarListener);
+      //factClassCB.addCaretListener(myCarListener);
       factMethodButt.addActionListener(new MyChangedListener());
       factMethodTF.addCaretListener(myCarListener);
     }
@@ -454,27 +460,32 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
           ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"TF edited pressed"));
       }
     }
+
+    boolean noClassAction = false;
     class MyClassListener implements ActionListener
     {
       public void actionPerformed(ActionEvent e)
       {
+        if(noClassAction)
+          return;
         Class c = null;
-        String cName = factClassTF.getText().trim();
+        //String cName = factClassCB.getText().trim();
+        String cName = factClassCB.getSelectedItem().toString();
         try {
           c = Class.forName(cName);
         }
         catch (ClassNotFoundException e1) {
           JOptionPane.showMessageDialog(ip,cName + " class not found");
-          factClassTF.requestFocus();
-          factClassTF.selectAll();
+          factClassCB.requestFocus();
+          //factClassCB.selectAll();
           return;
         }
 
         Method[] statMeths = c.getMethods();
         if(statMeths == null || statMeths.length <= 0) {
           JOptionPane.showMessageDialog(ip,cName + " contains no methods");
-          factClassTF.requestFocus();
-          factClassTF.selectAll();
+          factClassCB.requestFocus();
+          //factClassCB.selectAll();
           return;
         }
         Vector vn = new Vector();
@@ -482,12 +493,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 // test
 
 
+/*
 try {
 myObjClass = Class.forName("simkit.random.RandomVariate");
 }
 catch (ClassNotFoundException e1) {
 e1.printStackTrace();
 }
+*/
 
 
         for(int i=0;i<statMeths.length;i++) {
@@ -501,17 +514,17 @@ e1.printStackTrace();
         }
         if(vn.size() <= 0) {
           JOptionPane.showMessageDialog(ip,"<html><center>"+cName + " contains no static methods<br>returning "+typ+".");
-          factClassTF.requestFocus();
-          factClassTF.selectAll();
+          factClassCB.requestFocus();
+          //factClassCB.selectAll();
           return;
         }
         String[] ms = new String[0];
         ms =(String[])vn.toArray(ms);
-        Object ret = JOptionPane.showInputDialog(ip,"Choose method","Factory methods",JOptionPane.PLAIN_MESSAGE,null,
+        Object ret = JOptionPane.showInputDialog(packMe,"Choose method","Factory methods",JOptionPane.PLAIN_MESSAGE,null,
               ms,ms[0]);
         if(ret == null) {
-          factClassTF.requestFocus();
-          factClassTF.selectAll();
+          factClassCB.requestFocus();
+          //factClassCB.selectAll();
           return;
         }
 
@@ -532,7 +545,7 @@ e1.printStackTrace();
         olp = new ObjListPanel(ip);
         olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                         "Method arguments",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
-
+        olp.setDialogInfo(packMe,packMe);
         olp.setData(vc,true);
         add(olp);
 
@@ -566,7 +579,10 @@ e1.printStackTrace();
         return;
 
       removeAll();
-      factClassTF.setText(vi.getFactoryClass());
+      //factClassCB.setText(vi.getFactoryClass());
+      noClassAction = true;
+      factClassCB.setSelectedItem(vi.getFactoryClass());              // this runs action event
+      noClassAction = false;
       factMethodTF.setText(vi.getMethod());
       add(topP);
 
@@ -579,6 +595,7 @@ e1.printStackTrace();
       olp = new ObjListPanel(ip);
       olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                       "Method arguments",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
+      olp.setDialogInfo(packMe,packMe);
 
       olp.setData(vi.getParams(),true);
       add(olp);
@@ -589,7 +606,8 @@ e1.printStackTrace();
 
     public VInstantiator getData()
     {
-      String fc = factClassTF.getText();if(fc==null)fc="";else fc=fc.trim();
+      //String fc = factClassCB.getText();
+      String fc = (String)factClassCB.getSelectedItem();if(fc==null)fc="";else fc=fc.trim();
       String m  = factMethodTF.getText();if(m==null)m ="";else m = m.trim();
       List lis;
       if(olp != null)

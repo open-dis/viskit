@@ -232,19 +232,19 @@ public class PclEdgeInspectorDialog extends JDialog
 
       try {
         Class c = Class.forName(classname);
-        BeanInfo binf = Introspector.getBeanInfo(c);
+        Class stopClass = Class.forName("simkit.BasicSimEntity");
+        BeanInfo binf = Introspector.getBeanInfo(c,stopClass);
         PropertyDescriptor[] pds = binf.getPropertyDescriptors();
         if(pds == null || pds.length <=0) {
-          JOptionPane.showMessageDialog(PclEdgeInspectorDialog.this,"No properties found in "+classname+".");
+          JOptionPane.showMessageDialog(PclEdgeInspectorDialog.this,"No properties found in "+classname+".\n"+
+                                          "Enter name manually.");
           return;
         }
         Vector nams = new Vector();
         Vector typs = new Vector();
         for(int i=0;i<pds.length;i++) {
-          if(pds[i].getWriteMethod() != null)         // want getters but no setters
+          if(pds[i].getWriteMethod() != null)         // want getters but no setter
             continue;
-          Class pc = pds[i].getClass();
-          //todo continue filtering    don't want to show everything
           nams.add(pds[i].getName());
           typs.add(pds[i].getPropertyType().getName());
         }

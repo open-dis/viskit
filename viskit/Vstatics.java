@@ -76,9 +76,19 @@ public class Vstatics
   {
     Dimension d = comp.getPreferredSize();
     comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
-    comp.setMinimumSize(new Dimension(Integer.MAX_VALUE,d.height));
+    comp.setMinimumSize(new Dimension(Integer.MIN_VALUE,d.height));
   }
-
+  /**
+   * Clamp the height of a component to another's height
+   * @param c
+   * @param h
+   */
+  public static void clampHeight(JComponent c, JComponent h)
+  {
+    int height =  h.getPreferredSize().height;
+    c.setMaximumSize(new Dimension(Integer.MAX_VALUE,height));
+    c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
+  }
   public static Class ClassForName(String s)
   {
     Class c = null;

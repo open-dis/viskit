@@ -34,12 +34,12 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     setLayout(new SpringLayout());
     this.changeListener = changeListener;
   }
-  public void setDialogInfo(JFrame parent, Component locComp)
+  public void setDialogInfo(JDialog parent, Component locComp)
   {
     this.parent = parent;
     this.locComp = locComp;
   }
-  private JFrame parent;
+  private JDialog parent;
   private Component locComp;
 
   public void setData(List lis, boolean showLabels)  // of Vinstantiators
@@ -56,9 +56,10 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
        label[i] = new JLabel(inst.getType(), JLabel.TRAILING);
        if(showLabels)
          add(label[i]);
-       field[i] = new JTextField(inst.toString());
-       field[i].addCaretListener(this);
+       field[i] = new JTextField();
        Vstatics.clampHeight(field[i]);
+       field[i].setText(inst.toString());
+       field[i].addCaretListener(this);
 
        Class c = Vstatics.ClassForName(inst.getType());
        if(c == null)
@@ -70,8 +71,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
            tinyP.add(field[i]);
            JButton b = new JButton("...");
-           b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+           b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 3)));
            Vstatics.clampSize(b, field[i], b);
+
            tinyP.add(b);
            if(showLabels)
              label[i].setLabelFor(tinyP);

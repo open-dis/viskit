@@ -27,7 +27,7 @@ public class ObjectInspector  extends JDialog implements ActionListener
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 
-  public ObjectInspector(JFrame parent, JComponent comp)
+  public ObjectInspector(JDialog parent, JComponent comp)
   {
     super(parent,"Object Inspector",true);
     locationComp = comp;

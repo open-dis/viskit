@@ -175,7 +175,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
   }
 
-  public AdapterEdge newAdapterEdge (EvGraphNode src, EvGraphNode target)
+  public AdapterEdge newAdapterEdge (AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target)
   {
     AdapterEdge ae = new AdapterEdge();
     ae.setFrom(src);
@@ -207,7 +207,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     return ae;
   }
 
-  public PropChangeEdge newPclEdge(EvGraphNode src, PropChangeListenerNode target)
+  public PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target) //EvGraphNode src, PropChangeListenerNode target)
   {
     PropChangeEdge pce = new PropChangeEdge();
     pce.setFrom(src);
@@ -240,7 +240,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     return pce;
   }
 
-  public void newSimEvLisEdge (EvGraphNode src, EvGraphNode target){
+  public void newSimEvLisEdge (AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target){
+  {
     SimEvListenerEdge sele = new SimEvListenerEdge();
     sele.setFrom(src);
     sele.setTo(target);

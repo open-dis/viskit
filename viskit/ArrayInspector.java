@@ -30,11 +30,13 @@ public class ArrayInspector  extends JDialog
   private JTextField typeTF, sizeTF;
   private JPanel upPan;
   private enableApplyButtonListener listnr;
+  private JDialog parent;
 
-  public ArrayInspector(JFrame parent, JComponent comp)
+  public ArrayInspector(JDialog parent, JComponent comp)
   {
     super(parent,"Array Inspector",true);
     locationComp = comp;
+    this.parent = parent;
     contentP = new JPanel();
     contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
     contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -60,11 +62,10 @@ public class ArrayInspector  extends JDialog
     upPan.add(typeTF);
     upPan.add(countLab);
     upPan.add(sizeTF);
-  upPan.add(helpLab);
-  upPan.add(helpTextLabel);
+    upPan.add(helpLab);
+    upPan.add(helpTextLabel);
 
-    //SpringUtilities.makeCompactGrid(upPan,2,2,5,5,5,5);
-  SpringUtilities.makeCompactGrid(upPan,3,2,5,5,5,5);
+    SpringUtilities.makeCompactGrid(upPan,3,2,5,5,5,5);
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -87,6 +88,7 @@ public class ArrayInspector  extends JDialog
   public void setData(List lis) // of instantiators
   {
     olp = new ObjListPanel(listnr);
+    olp.setDialogInfo(parent,parent);
     olp.setData(lis,false); // don't show the type
 
     contentP.removeAll();
@@ -115,7 +117,7 @@ public class ArrayInspector  extends JDialog
 
   public VInstantiator.Array getData()
   {
-    return new VInstantiator.Array(myArrTyp,olp.getData());
+    return new VInstantiator.Array(typeTF.getText().trim(),olp.getData());
   }
   class sizeListener implements ActionListener
   {
@@ -126,7 +128,6 @@ public class ArrayInspector  extends JDialog
   }
     public void setSize()
     {
-System.out.println("setSize()");
       String s = sizeTF.getText().trim();
       int sz;
       try {

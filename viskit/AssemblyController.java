@@ -28,10 +28,21 @@ import org.jgraph.graph.DefaultGraphCell;
 
 public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController
 {
+  Class simEvSrcClass,simEvLisClass,propChgSrcClass,propChgLisClass;
+
   public void begin()
   //-----------------
   {
     //newEventGraph();
+    try {
+      simEvSrcClass   = Class.forName("simkit.SimEventSource");
+      simEvLisClass   = Class.forName("simkit.SimEventListener");
+      propChgSrcClass = Class.forName("simkit.PropertyChangeSource");
+      propChgLisClass = Class.forName("java.beans.PropertyChangeListener");
+    }
+    catch (ClassNotFoundException e) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("Internal error","simkit.jar not in classpath");
+    }
   }
 
   public void runEventGraphEditor()
@@ -164,8 +175,17 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void newAdapterArc(Object[]nodes)
   {
-    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
-    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    AssemblyNode oA = (AssemblyNode)((DefaultGraphCell)nodes[0]).getUserObject();
+    AssemblyNode oB = (AssemblyNode)((DefaultGraphCell)nodes[1]).getUserObject();
+
+    AssemblyNode[] oArr = checkLegalForSEListenerArc(oA,oB);
+    if(oArr == null) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","The nodes must be a SimEventListener and SimEventSource combination.");
+      return;
+    }
+    adapterEdgeEdit(((ViskitAssemblyModel)getModel()).newAdapterEdge(oArr[0],oArr[1]));
+
+/*
     if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
     else {
@@ -174,22 +194,43 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       if(ae != null)     // shouldn't happen
         adapterEdgeEdit(ae);
     }
+*/
   }
   public void newSimEvListArc(Object[]nodes)
   {
-    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
-    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    AssemblyNode oA = (AssemblyNode)((DefaultGraphCell)nodes[0]).getUserObject();
+    AssemblyNode oB = (AssemblyNode)((DefaultGraphCell)nodes[1]).getUserObject();
+
+    AssemblyNode[] oArr = checkLegalForSEListenerArc(oA,oB);
+
+    if(oArr == null) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","The nodes must be a SimEventListener and SimEventSource combination.");
+      return;
+    }
+    ((ViskitAssemblyModel)getModel()).newSimEvLisEdge(oArr[0],oArr[1]);
+
+/*
     if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
     else
     ((ViskitAssemblyModel)getModel()).newSimEvLisEdge((EvGraphNode)oA,(EvGraphNode)oB);
+*/
   }
   public void newPropChangeListArc(Object[]nodes)
   {
     // One and only one has to be a prop change listener
-    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
-    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    AssemblyNode oA = (AssemblyNode)((DefaultGraphCell)nodes[0]).getUserObject();
+    AssemblyNode oB = (AssemblyNode)((DefaultGraphCell)nodes[1]).getUserObject();
 
+    AssemblyNode[] oArr = checkLegalForPropChangeArc(oA,oB);
+
+    if(oArr == null) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
+      return;
+    }
+    pcListenerEdgeEdit(((ViskitAssemblyModel)getModel()).newPclEdge(oArr[0],oArr[1]));
+
+/*
     PropChangeEdge pce = null;
     if(oA instanceof PropChangeListenerNode && !(oB instanceof PropChangeListenerNode)) {
       pce = ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oB,(PropChangeListenerNode)oA);
@@ -202,6 +243,65 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     // edit right away
     if(pce != null)
       pcListenerEdgeEdit(pce);
+*/
+  }
+
+  AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b)
+  {
+    Class ca = findClass(a);
+    Class cb = findClass(b);
+    AssemblyNode [] ra = orderSELSrcAndLis(a,b,ca,cb);
+    return ra;
+  }
+
+  AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b)
+  {
+    Class ca = findClass(a);
+    Class cb = findClass(b);
+    AssemblyNode [] ra = orderPCLSrcAndLis(a,b,ca,cb);
+    return ra;
+
+  }
+  Class findClass(AssemblyNode o)
+  {
+    try {
+      return Class.forName(o.getType());
+    }
+    catch(Exception e) {}
+    return null;
+  }
+  AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
+  {
+    AssemblyNode[] obArr = new AssemblyNode[2];
+    if(propChgSrcClass.isAssignableFrom(ca))
+      obArr[0] = a;
+    else if(propChgSrcClass.isAssignableFrom(cb))
+      obArr[0] = b;
+    if(propChgLisClass.isAssignableFrom(cb))
+      obArr[1] = b;
+    else if(propChgLisClass.isAssignableFrom(ca))
+      obArr[1] = a;
+
+    if(obArr[0] == null | obArr[1] == null || obArr[0]==obArr[1])
+      return null;
+    return obArr;
+  }
+
+  AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
+  {
+    AssemblyNode[] obArr = new AssemblyNode[2];
+    if(simEvSrcClass.isAssignableFrom(ca))
+      obArr[0] = a;
+    else if(simEvSrcClass.isAssignableFrom(cb))
+      obArr[0] = b;
+    if(simEvLisClass.isAssignableFrom(cb))
+      obArr[1] = b;
+    else if(simEvLisClass.isAssignableFrom(ca))
+      obArr[1] = a;
+
+    if(obArr[0] == null | obArr[1] == null || obArr[0]==obArr[1])
+      return null;
+    return obArr;
   }
 
   public void pcListenerEdit(PropChangeListenerNode pclNode)

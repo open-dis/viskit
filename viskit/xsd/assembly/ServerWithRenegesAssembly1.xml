@@ -52,7 +52,7 @@
     <SimEntity name="ial" type="simkit.examples.IntegerArrivalListener" />
     <SimEntity name="time" type="simkit.examples.TimeListener" />
         
-    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" >
         <TerminalParameter type="java.lang.String" value="numberInQueue" />
     </PropertyChangeListener>
         
