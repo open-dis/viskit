@@ -658,11 +658,34 @@ public class SimkitXML2Java {
     }
 
     boolean compileCode (String fileName) {
-	return ( 
-	    com.sun.tools.javac.Main.compile(
-                 new String[] {fileName}
-	    ) == 0
-	);
+        String fName = this.root.getName();
+        if ( !fName.equals(fileName) ) {
+            System.out.println("Using " + fName);
+            fileName = fName + ".java";
+        }
+	String path = this.root.getPackage();
+	File fDest;
+	char[] pchars;
+	int j;
+	// this doesn't work! : path.replaceAll(pd,File.separator);
+	pchars = path.toCharArray();
+	for (j = 0; j<pchars.length; j++) {
+	    if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
+	}
+	path = new String(pchars);
+	try {
+	    File f = new File(pd + File.separator + path);
+	    f.mkdirs();
+	    fDest = new File(path + File.separator + fileName);
+	    f = new File(fileName);
+	    f.renameTo(fDest);
+	} catch (Exception e) { e.printStackTrace(); }	
+        return (
+            com.sun.tools.javac.Main.compile(
+                 new String[] {"-verbose","-sourcepath",path,"-d",pd,path+File.separator+fileName}
+            ) == 0
+        );
+    
     }
 
     private String indexFrom(StateTransitionType st) {
