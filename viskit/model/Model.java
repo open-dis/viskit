@@ -80,9 +80,6 @@ public class Model extends mvcAbstractModel implements ViskitModel
    */
   public void newModel(File f)
   {
-    tempRemoveAllNodes();   // this should not be require...removeAll() should work
-    tempRemoveAllEdges();
-
     if (f == null) {
       try {
         jaxbRoot = oFactory.createSimkitModule(); // to start with empty graph
@@ -806,29 +803,5 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELLINGEDGECHANGED, "Cancelling edge changed"));
-  }
-
-  private Vector testNodes = new Vector();
-  private Vector testEdges = new Vector();
-
-  private void tempRemoveAllNodes()
-  {
-    for(Iterator itr = testNodes.iterator(); itr.hasNext();) {
-      EventNode en = (EventNode)itr.next();
-      notifyChanged(new ModelEvent(en, ModelEvent.EVENTDELETED, "Event deleted"));
-    }
-    testNodes.clear();
-  }
-
-  private void tempRemoveAllEdges()
-  {
-    for(Iterator itr = testEdges.iterator(); itr.hasNext();) {
-      Edge en = (Edge)itr.next();
-      if(en instanceof CancellingEdge)
-        notifyChanged(new ModelEvent(en, ModelEvent.CANCELLINGEDGEDELETED, "CanEdge deleted"));
-      else
-        notifyChanged(new ModelEvent(en, ModelEvent.EDGEDELETED,"Edge deleted"));
-    }
-    testEdges.clear();
   }
 }
