@@ -1,16 +1,13 @@
 package viskit;
 
-import actions.ActionIntrospector;
-
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.*;
-import java.io.PrintStream;
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -22,51 +19,54 @@ import java.lang.reflect.InvocationTargetException;
  * Time: 10:51:00 AM
  */
 
+/**
+ * A VCR-controls and TextArea panel.  Hijacks System.out and System.err and displays them on its TextAreas.
+ */
 public class RunnerPanel extends JPanel
 {
   String lineEnd = System.getProperty("line.separator");
 
-  public JTextArea soutTA,serrTA;
+  public JTextArea soutTA, serrTA;
   public JSplitPane splPn;
 
-  public JButton vcrStop,vcrPlay,vcrRewind,vcrStep,closeButt;
+  public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButt;
   public JCheckBox vcrVerbose;
 
-  public JTextField vcrSimTime,vcrStopTime;
+  public JTextField vcrSimTime, vcrStopTime;
 
   public RunnerPanel(boolean verbose)
   {
     setLayout(new BorderLayout());
-    setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    soutTA = new JTextArea("Assembly output stream:"+lineEnd+
-                           "----------------------"+lineEnd);
-    soutTA.setEditable(false);
-    soutTA.setFont(new Font("Monospaced",Font.PLAIN,12));
-    soutTA.setBackground(new Color(0xFB,0xFB,0xE5));
+    soutTA = new JTextArea("Assembly output stream:" + lineEnd +
+        "----------------------" + lineEnd);
+    soutTA.setEditable(true); //false);
+    soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
+    soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
     JScrollPane jsp = new JScrollPane(soutTA);
 
-    serrTA = new JTextArea("Assembly error stream:"+lineEnd+
-                           "---------------------"+lineEnd);
+    serrTA = new JTextArea("Assembly error stream:" + lineEnd +
+        "---------------------" + lineEnd);
     serrTA.setForeground(Color.red);
-    serrTA.setEditable(false);
-    serrTA.setFont(new Font("Monospaced",Font.PLAIN,12));
-    serrTA.setBackground(new Color(0xFB,0xFB,0xE5));
+    serrTA.setEditable(true); //false);
+    serrTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
+    serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
     JScrollPane jspErr = new JScrollPane(serrTA);
 
-    splPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,true,jsp,jspErr);
+    splPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, jsp, jspErr);
 
-    add(splPn,BorderLayout.CENTER);
-    add( makeVCRPanel(),BorderLayout.SOUTH);
+    add(splPn, BorderLayout.CENTER);
+    add(makeVCRPanel(), BorderLayout.SOUTH);
     vcrVerbose.setSelected(verbose);
 
     setupPipes();
   }
-  
+
   JPanel makeVCRPanel()
   {
     JPanel vcrToolBar = new JPanel();
-    vcrToolBar.setLayout(new BoxLayout(vcrToolBar,BoxLayout.X_AXIS));
+    vcrToolBar.setLayout(new BoxLayout(vcrToolBar, BoxLayout.X_AXIS));
     vcrToolBar.add(Box.createHorizontalGlue());
 
     vcrStop = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Stop24.gif")));
@@ -100,7 +100,7 @@ public class RunnerPanel extends JPanel
     JLabel vcrSimTimeLab = new JLabel("Sim. time:");
     vcrSimTime = new JTextField(10);
     vcrSimTime.setEditable(false);
-    Vstatics.clampSize(vcrSimTime,vcrSimTime,vcrSimTime);
+    Vstatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
 
     vcrToolBar.add(vcrSimTimeLab);
     vcrToolBar.add(vcrSimTime);
@@ -108,13 +108,13 @@ public class RunnerPanel extends JPanel
 
     JLabel vcrStopTimeLabel = new JLabel("Stop time:");
     vcrStopTime = new JTextField(10);
-    Vstatics.clampSize(vcrStopTime,vcrStopTime,vcrStopTime);
+    Vstatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
 
     vcrToolBar.add(vcrStopTimeLabel);
     vcrToolBar.add(vcrStopTime);
     vcrToolBar.add(Box.createHorizontalStrut(10));
 
-    vcrVerbose = new JCheckBox("verbose output",false);
+    vcrVerbose = new JCheckBox("verbose output", false);
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     vcrToolBar.add(vcrVerbose);
 
@@ -123,34 +123,83 @@ public class RunnerPanel extends JPanel
     vcrToolBar.add(closeButt);
 
     vcrToolBar.add(Box.createHorizontalGlue());
-    vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
     return vcrToolBar;
   }
 
+  PipedInputStream piOut;
+  PipedInputStream piErr;
+  PipedOutputStream poOut;
+  PipedOutputStream poErr;
+
   private void setupPipes()
   {
-    System.setOut(new PrintStream(new BufferedOutputStream(new myPrintStr(soutTA))));
-    System.setErr(new PrintStream(new BufferedOutputStream(new myPrintStr(serrTA))));
+    try {
+      piOut = new PipedInputStream();
+      poOut = new PipedOutputStream(piOut);
+      System.setOut(new PrintStream(poOut, true));
+      piErr = new PipedInputStream();
+      poErr = new PipedOutputStream(piErr);
+      System.setErr(new PrintStream(poErr, true));
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    new ReaderThread(piOut, soutTA).start();
+    new ReaderThread(piErr, serrTA).start();
   }
-  class myPrintStr extends OutputStream
+
+  class ReaderThread extends Thread
   {
-    JTextArea myTA;
-    myPrintStr(JTextArea ta)
+    PipedInputStream pi;
+    JTextArea myTa;
+
+    ReaderThread(PipedInputStream pi, JTextArea ta)
     {
-      myTA = ta;
+      this.pi = pi;
+      this.myTa = ta;
     }
-    char ca[] = new char[1];
-    public void write(int b) throws IOException
+
+    public void run()
     {
-      ca[0] = (char)b;
-      new inSwingThread(myTA,new String(ca));
+      final byte[] buf = new byte[1024];
+
+      while (true) {
+        int len = -1;
+        try {
+          len = pi.read(buf);
+        }
+        catch (IOException e) {
+          // this happens when the thread that was the writer is dead.  Seems screwy when you
+          // compare it to System.out, which doesn't care if anybody lives or dies.  The thread in
+          // ExternalAssemblyRunner dies each time we exit Schedule, whether stepping or otherwise.
+          // It's fine to just set up the I/O again and wait for the next time.
+
+          setupPipes();
+          return;
+        }
+        if (len == -1) {
+          setupPipes();
+          return;
+        }
+
+        // Write to the swing widget
+        new inSwingThread(myTa, new String(buf, 0, len));
+      }
     }
   }
+
+  /**
+   * Class to encapsulate a packet containing a JTextArea reference and a string, and append the
+   * string to the TextArea in the GUI thread.
+   */
   class inSwingThread implements Runnable
   {
     JTextArea ta;
     String s;
+
     inSwingThread(JTextArea ta, String s)
     {
       this.ta = ta;
@@ -158,6 +207,7 @@ public class RunnerPanel extends JPanel
 
       SwingUtilities.invokeLater(this);
     }
+
     public void run()
     {
       ta.append(s);

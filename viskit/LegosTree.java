@@ -56,7 +56,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return;
     }
 
-    addJarFile("lib/simkit.jar");
+    addJarFile("simkit.SimEntity","lib/simkit.jar");
     setModel(mod);
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     expandAll(this, true);
@@ -260,29 +260,63 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     return parent;
   }
 
-  private void addJarFile(String jarFileName)
+  private void addJarFile(String jarFilePath)
+  {
+    JarFile jf = null;
+    try {
+      jf = new JarFile(jarFilePath);
+    }
+    catch (IOException e) {
+        JOptionPane.showMessageDialog(LegosTree.this, "Error reading " + jarFilePath, "I/O Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+   jarFileCommon(jf);
+  }
+
+  /**
+   * Get the jar file which is in our classpath, which contains the class in question
+   * @param classInJarFile
+   * @param jarFileName
+   */
+  private void addJarFile(String classInJarFile, String jarFileName)
   {
     JarFile jarFile = null;
     try {
-      URL jurl = ClassLoader.getSystemResource(jarFileName);
-      URI juri = new URI(jurl.toString());
-      jarFile = new JarFile(juri.getPath()); //jarFileName);
+      // This way doesn't need jar file dir on classpath
+      Class c = Class.forName(classInJarFile);
+
+      String clsName = "/"+c.getName().replace('.','/')+".class";
+      URL classU = c.getResource(clsName);
+      String jp = classU.getPath();
+      int bang = jp.indexOf('!');
+      if(bang >= 0)
+        jp = jp.substring(0,bang);
+      URI jui = new URI(jp.toString());
+      jarFile = new JarFile(jui.getPath());
+
+      // This way needs jar file directory on classpath
+      //URL jurl = ClassLoader.getSystemResource(jarFileName);
+      //URI juri = new URI(jurl.toString());
+      //jarFile = new JarFile(juri.getPath()); //jarFileName);
     }
     catch (Exception e) {
       JOptionPane.showMessageDialog(LegosTree.this, "Error reading " + jarFileName, "I/O Error", JOptionPane.ERROR_MESSAGE);
       return;
 
     }
-    //Class c = simkit.BasicSimEntity.class;
+    jarFileCommon(jarFile);
+  }
 
-    java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass); //c);
+  private void jarFileCommon(JarFile jarFile)
+  {
+    java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
     if (list == null || list.size() <= 0) {
-      JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +//"c.getName() + " found\n" +
-          "in " + jarFileName, "Not found", JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
+          "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);
       return;
     }
 
-    DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFileName);
+    DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
     mod.insertNodeInto(localRoot, root, 0);
 
     for (Iterator itr = list.iterator(); itr.hasNext();) {

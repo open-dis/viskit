@@ -464,6 +464,20 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     outTL.add(op);
   }
 
+  public Vector getVerboseEntityNames()
+  {
+    Vector v = new Vector();
+    for (Iterator itr = jaxbRoot.getOutput().iterator(); itr.hasNext();) {
+      OutputType ot = (OutputType)itr.next();
+      Object entity = ot.getEntity();
+      if(entity instanceof SimEntity)
+        v.add(((SimEntity)entity).getName());
+      else if (entity instanceof PropertyChangeListener)
+        v.add(((PropertyChangeListener)entity).getName());
+    }
+    return v;
+  }
+
   private List getInstantiatorListFromJaxbParmList(List lis)
   {
     Vector v = new Vector();

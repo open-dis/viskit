@@ -3,12 +3,15 @@ package viskit;
 import simkit.Schedule;
 
 import javax.swing.*;
-import java.util.Vector;
-import java.util.List;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.ActionListener;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Clipboard;
+import java.awt.Toolkit;
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -28,7 +31,8 @@ public class ExternalAssemblyRunner extends JFrame
   double defaultStopTime;
   List outputs;
   RunnerPanel runPanel;
-  
+  ActionListener closer;
+
   public ExternalAssemblyRunner(String className, boolean verbose, double stopTime, List outputEntities)
   {
     this.targetClassName = className;
@@ -36,6 +40,8 @@ public class ExternalAssemblyRunner extends JFrame
     this.defaultStopTime = stopTime;
 
     this.outputs = outputEntities;
+
+    doMenus();
 
     setTitle("Running "+className);
     runPanel = new RunnerPanel(verbose);
@@ -47,7 +53,9 @@ public class ExternalAssemblyRunner extends JFrame
     runPanel.vcrStep.addActionListener(new stepListener());
   //  runPanel.setVerboseListener(new verboseListener());
     // not needed.just check eachtime
-    runPanel.closeButt.addActionListener(new closeListener());
+
+    closer = new closeListener();
+    runPanel.closeButt.addActionListener(closer);
 
     Class targetClass = null;
     try {
@@ -86,6 +94,27 @@ public class ExternalAssemblyRunner extends JFrame
     runPanel.splPn.setDividerLocation(0.85d);       // clumsy way
   }
 
+  private String borderString = "******************************";
+
+  private void dumpOutputs()
+  {
+    System.out.println("\n"+borderString);
+    boolean first=true;
+    for(Iterator itr = outputs.iterator();itr.hasNext();) {
+      try {
+        Field fld = targetObject.getClass().getField((String)itr.next());
+        if(first)
+          first=false;
+        else
+          System.out.println();
+        System.out.println(fld.getName()+" dump:\n"+fld.get(targetObject).toString());
+      }
+      catch (Exception e) {
+       // e.printStackTrace();
+      }
+    }
+    System.out.println(borderString+"\n");
+  }
 
   class startResumeListener implements ActionListener
   {
@@ -138,10 +167,9 @@ public class ExternalAssemblyRunner extends JFrame
     {
       public void run()
       {
+        dumpOutputs();
         Schedule.startSimulation();
-        //System.out.println("********************");
-        System.out.flush();
-        System.err.flush();
+        dumpOutputs();
 
         // update GUI stuff in GUI thread
         SwingUtilities.invokeLater(new Runnable(){
@@ -200,7 +228,45 @@ public class ExternalAssemblyRunner extends JFrame
         break;
     }
   }
+  private void doMenus()
+  {
+    JMenuBar mb = new JMenuBar();
+    JMenu file = new JMenu("File");
+    JMenuItem close = new JMenuItem("close");
+    JMenu edit = new JMenu("Edit");
+    JMenuItem copy = new JMenuItem("copy");
+    JMenuItem selAll = new JMenuItem("select all");
 
+    close.addActionListener(closer);
+    copy.addActionListener(new copyListener());
+    selAll.addActionListener(new selectAllListener());
+    
+    file.add(close);
+    edit.add(copy);
+    edit.add(selAll);
+    mb.add(file);
+    mb.add(edit);
+    setJMenuBar(mb);
+  }
+
+  class copyListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      String s = runPanel.soutTA.getSelectedText() + "\n" + runPanel.serrTA.getSelectedText();
+      StringSelection ss = new StringSelection(s);
+      Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clpbd.setContents(ss,ss);
+    }
+  }
+  class selectAllListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      runPanel.soutTA.selectAll();
+      runPanel.serrTA.selectAll();
+    }
+  }
   class timekeeper extends simkit.SimEntityBase
   {
     public synchronized void doTick()
@@ -228,16 +294,12 @@ public class ExternalAssemblyRunner extends JFrame
     viskit.Main.setLandFandFonts(); // same as editor
 
     Vector v=null;
-    if(args.length > 2) {
+    if(args.length > 3) {
       v = new Vector();
-      for(int i=2;i<args.length;i++)
+      for(int i=3;i<args.length;i++)
         v.add(args[i]);
     }
 
     new ExternalAssemblyRunner(args[0],Boolean.valueOf(args[1]).booleanValue(),Double.valueOf(args[2]).doubleValue(), v);
-  }
-  public static void testmain(String[] args)
-  {
-    testmain(new String[]{"simkit.examples.ServerWithRenegesAssembly1_mikeTest","true","29.3"});
   }
 }

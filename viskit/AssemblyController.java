@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.File;
-import java.io.Reader;
 import java.io.IOException;
 
 import actions.ActionIntrospector;
@@ -498,9 +497,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         classPath = sourceDir + Vstatics.getPathSeparator() + classPath;
 
       String[] execStrings = buildExecStrings(clNam,classPath);
-      Process proc = null;
       try {
-        proc = Runtime.getRuntime().exec(execStrings);
+        Runtime.getRuntime().exec(execStrings);
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -524,44 +522,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     v.add("viskit.ExternalAssemblyRunner");
     v.add(className);
 
-    //todo get global defaultVerbose boolean from graphmetadata
-    v.add("true");
-    //todo get stoptime from graphmetadata
-    v.add("22.2");
-    // todo add names of entities which should be defaultVerbose
-    //v.add("arrival");
-    // etc
+    v.add(""+((ViskitAssemblyModel) getModel()).getMetaData().verbose);
+    v.add(((ViskitAssemblyModel) getModel()).getMetaData().stopTime);
+
+    Vector vec = ((ViskitAssemblyModel)getModel()).getVerboseEntityNames();
+    for (Iterator itr = vec.iterator(); itr.hasNext();) {
+      v.add(itr.next());
+    }
+
     String[] ra = new String[v.size()];
     return (String[])v.toArray(ra);
-  }
-
-  public void xvcrPlay()
-  {
-    File f = compileJavaClass();
-    if(f != null) {
-      String clNam = f.getName().substring(0,f.getName().indexOf('.'));
-      clNam = packageFromLastCompile + "." + clNam;
-      //((ViskitAssemblyModel) getModel()).startAssemblyRun(clNam,f.getParent());
-      AssemblyRunner runner = new AssemblyRunner(clNam);
-      String cp = runner.getClasspath();
-      String pathSep = System.getProperty("path.separator");
-      runner.setClasspath(f.getParent()+pathSep+cp);
-
-      new RunWindow((JFrame)getView(),runner).setVisible(true);   // blocks
-    }
-    else
-      JOptionPane.showMessageDialog(null,"Error on compile");
-  }
-  public void xvcrPause()
-  {
-    System.out.println("vcrRewind");
-  }
-  public void xvcrStop()
-  {
-    System.out.println("vcrStop");
-  }
-  public void xvcrStep()
-  {
-    System.out.println("vcrStep");
   }
 }
