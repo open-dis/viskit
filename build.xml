@@ -39,10 +39,12 @@
     <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
     
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
+    
     <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
-              
+    
+    
     <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
 
     <property description="where the help source sits" location="${dir.src}/viskit/javahelp" name="javahelp"/>
@@ -136,7 +138,6 @@
                 <pathelement location="${dir.lib}/jgraph.jar"/>
                 <pathelement location="${dir.lib}/actions.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
-                <!-- <pathelement location="${dir.lib}/tools.jar"/> -->
                 <pathelement location="${dir.lib}/trang.jar"/>
                 <pathelement location="${dir.lib}/trangtask.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
@@ -146,9 +147,9 @@
                 <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
                 <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
                 <pathelement location="${dir.lib}/commons-logging-1.0.4.jar"/>
+                <pathelement location="${dir.lib}/cli.jar"/>
                 <pathelement location="${dir.lib}/log4j-1.2.8.jar"/>
                 <pathelement location="${dir.lib}/xerces.jar"/>
-		            <pathelement location="${dir.lib}/viskit.jar"/>
                 <pathelement location="${dir.build.classes}"/>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -266,10 +267,11 @@
             </classpath>
             <src path="${dir.src.simtran.util}"/>
         </javac>
-        <javac destdir="${dir.build.classes}">
+        <javac debug="on" destdir="${dir.build.classes}">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
