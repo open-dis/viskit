@@ -1,70 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="help" name="Viskit">
-	<description>
+    <description>
          Ant build file for the NPS Viskit and associated libraries. Third
          party jar files are not compiled from source here, but they are copied as
          necessary for the Viskit distribution.  This buildfile was created and tested
          using Ant version 1.5.1
-        </description>
-	
+    </description>
+
 <!-- magic properties, do not change or delete -->
 
-	<property name="build.compiler" value="modern"/>
-	
+    <property name="build.compiler" value="modern"/>
+
 <!-- CVS properties (this file) -->
-	<property name="CVSId" value="$Id$"/>
+    <property name="CVSId" value="$Id$"/>
 
-<!-- Project directories             -->
+<!-- Project directories -->
 
-	<property description="Root of the Viskit source tree." location="." name="dir.src"/>
-	
-	<property description="Root of the Viskit binary tree." location="${basedir}/build" name="dir.build"/>
-	          
-	<property description="Directory for built and copied jar files that will wind up in dir.dist." location="${dir.build}/lib" name="dir.build.lib"/>
-	          
-	<property description="Where the distribution files wind up." location="${basedir}/dist" name="dir.dist"/>
-	          
-	<property description="Location of Viskit's dependencies" location="${basedir}/lib" name="dir.lib"/>
-	          
-	<property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.3" name="dir.lib.xml"/>
-	          
-	<property description="Location of class files resulting from operations of this build file." location="${dir.build}/classes" name="dir.build.classes"/>
-	          
-	<property description="Root of the javadoc tree for Viskit." location="${dir.build}/doc" name="dir.build.doc"/>
-                  
-        <property description="Generated JAXB bindings for Simtran" location="${dir.src}/viskit/xsd/bindings" name="dir.src.simtran"/>
-                  
-        <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
-                  
-        <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
-                  
-        <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>             
+    <property description="Root of the Viskit source tree." location="." name="dir.src"/>
+
+    <property description="Root of the Viskit binary tree." location="${basedir}/build" name="dir.build"/>
+          
+    <property description="Directory for built and copied jar files that will wind up in dir.dist." location="${dir.build}/lib" name="dir.build.lib"/>
+          
+    <property description="Where the distribution files wind up." location="${basedir}/dist" name="dir.dist"/>
+          
+    <property description="Location of Viskit's dependencies" location="${basedir}/lib" name="dir.lib"/>
+          
+    <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.3" name="dir.lib.xml"/>
+          
+    <property description="Location of class files resulting from operations of this build file." location="${dir.build}/classes" name="dir.build.classes"/>
+          
+    <property description="Root of the javadoc tree for Viskit." location="${dir.build}/doc" name="dir.build.doc"/>
+              
+    <property description="Generated JAXB bindings for Simtran" location="${dir.src}/viskit/xsd/bindings" name="dir.src.simtran"/>
+              
+    <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
+              
+    <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
+              
+    <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>         
 
 <!--  === TARGET: help === -->
-	<target name="help">
-		<echo message="This is the Ant build file for the NPS Viskit and associated libraries. Third-party jar files are not compiled from source here, but they are copied as necessary for the simkit distribution.  This buildfile was created and tested using Ant version 1.5.1. Modified from Simkit's build.xml"/>
+    <target name="help">
+        <echo message="This is the Ant build file for the NPS Viskit and associated libraries. Third-party jar files are not compiled from source here, but they are copied as necessary for the simkit distribution.  This buildfile was created and tested using Ant version 1.5.1. Modified from Simkit's build.xml"/>
     </target>
 
 <!--  === TARGET: init === -->
-	<target description="Preparatory actions required for all targets." name="init">
-	    <tstamp/>
-		<echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
-		<echo message="Buildfile version ${CVSId}"/>
-		<echo message="Base directory: ${basedir}"/>
-		<echo message="Source directory: ${dir.src}"/>
-		<echo message="Build directory: ${dir.build}"/>
-	</target>
-	
+    <target description="Preparatory actions required for all targets." name="init">
+        <tstamp/>
+        <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
+        <echo message="Buildfile version ${CVSId}"/>
+        <echo message="Base directory: ${basedir}"/>
+        <echo message="Source directory: ${dir.src}"/>
+        <echo message="Build directory: ${dir.build}"/>
+    </target>
+
 <!--  === TARGET: build.init === -->
-	<target depends="init" description="Preparatory actions for compilation and documentation targets" name="build.init">
-		<mkdir dir="${dir.build}"/>
-		<mkdir dir="${dir.build.lib}"/>
-		<mkdir dir="${dir.build.classes}"/>
-                <mkdir dir="${dir.build.doc}"/>
-                <mkdir dir="${dir.src.simtran}"/>
-                <mkdir dir="${dir.src.simasm}"/>
-	</target>
-	
+    <target depends="init" description="Preparatory actions for compilation and documentation targets" name="build.init">
+        <mkdir dir="${dir.build}"/>
+        <mkdir dir="${dir.build.lib}"/>
+        <mkdir dir="${dir.build.classes}"/>
+        <mkdir dir="${dir.build.doc}"/>
+        <mkdir dir="${dir.src.simtran}"/>
+        <mkdir dir="${dir.src.simasm}"/>
+    </target>
+
 <!--  === TARGET: clean === -->
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
         <delete dir="${dir.src.simtran}"/>
@@ -74,33 +74,31 @@
     </target>
 
 <!--  === TARGET: compile === -->
-  
     <target depends="compile.simxml.util" name="compile">
         <javac destdir="${dir.build.classes}" excludes="xsd/**">
-        	<classpath>
-        		<pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
-        		<pathelement location="${dir.lib}/jdom.jar"/>
-        		<pathelement location="${dir.lib}/jgraph.jar"/>
-        		<pathelement location="${dir.lib}/actions.jar"/>
-        		<pathelement location="${dir.lib}/simkit.jar"/>
-                        <pathelement location="${dir.lib}/tools.jar"/>
-        		<pathelement location="${dir.build.classes}"/>
-        		<fileset dir="${dir.lib.xml}" includes="*.jar"/>
-        	</classpath>
-        	<src path="${dir.src}/viskit/"/>
+            <classpath>
+                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+                <pathelement location="${dir.lib}/jdom.jar"/>
+                <pathelement location="${dir.lib}/jgraph.jar"/>
+                <pathelement location="${dir.lib}/actions.jar"/>
+                <pathelement location="${dir.lib}/simkit.jar"/>
+                <pathelement location="${dir.lib}/tools.jar"/>
+                <pathelement location="${dir.build.classes}"/>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+            </classpath>
+            <src path="${dir.src}/viskit/"/>
         </javac>
-
         <copy todir="${dir.build.classes}">
             <fileset dir="${dir.src}">
-            	<include name="**/*.txt"/>
-            	<include name="**/*.png"/>
-            	<include name="**/*.gif"/>
-            	<include name="**/*.jpg"/>
-        	<include name="*.txt"/>
-        	<exclude name="build/"/>
+                <include name="**/*.txt"/>
+                <include name="**/*.png"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.jpg"/>
+            <include name="*.txt"/>
+            <exclude name="build/"/>
             </fileset>
         </copy>
-	</target>
+    </target>
 <!--  === TARGET: jar === -->
     <target depends="compile" name="jar">
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
@@ -108,17 +106,14 @@
 
 <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target depends="build.init,compile" description="Create the javadoc for Viskit." name="doc">
-        
         <javadoc access="private" author="true" destdir="${dir.build.doc}" excludepackagenames="*.test.*" sourcepath="${dir.src}" version="true">
-                 
-                <!-- Include all the jar files in the lib directory; this prevents some
+            <!-- Include all the jar files in the lib directory; this prevents some
                      javadoc warnings about classes not being found. -->
-        	<classpath>
-        		<fileset dir="${dir.lib.xml}" includes="*.jar"/>
-                        <fileset dir="${dir.lib}" includes="*.jar"/>
-                        <fileset dir="${dir.lib}/jwsdp-1.3" includes="*.jar"/>
-        	</classpath>
-            
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+                <fileset dir="${dir.lib}" includes="*.jar"/>
+                <fileset dir="${dir.lib}/jwsdp-1.3" includes="*.jar"/>
+            </classpath>
             <package name="viskit"/>
             <package name="viskit.xsd"/>
             <package name="viskit.xsd.bindings"/>
@@ -127,86 +122,81 @@
             <package name="viskit.xsd.translator"/>
         </javadoc>
     </target>
-    
+
 <!-- === TARGET: dist === -->
+    <target depends="jar, doc" name="dist">
+        <mkdir dir="${dir.dist}"/>
+        <mkdir dir="${dir.dist}/doc"/>
+        <copy todir="${dir.dist}">
+            <fileset dir="${dir.build.lib}"/>
+        </copy>
+        <copy todir="${dir.dist}/doc">
+            <fileset dir="${dir.build.doc}"/>
+        </copy>
+    </target>
 
-	<target depends="jar, doc" name="dist">
-	    <mkdir dir="${dir.dist}"/>
-	    <mkdir dir="${dir.dist}/doc"/>
-		<copy todir="${dir.dist}">
-			<fileset dir="${dir.build.lib}"/>
-		</copy>
-		<copy todir="${dir.dist}/doc">
-			<fileset dir="${dir.build.doc}"/>
-		</copy>
-	</target>
-	
-        <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
-             <classpath>
-                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-             </classpath>
-        </taskdef>
-        
-        <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
-             <classpath>
-                 <fileset dir="${dir.lib}" includes="trang*.jar"/>
-             </classpath>
-        </taskdef>       
-        <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
-            
-            <xjc package="viskit.xsd.bindings" schema="${dir.src.simtran.util}/simkit.xsd" target="${dir.src}"/>
-              
-            <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}"/>
-        </target>
-        
-        <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
+    <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
+         <classpath>
+             <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+         </classpath>
+    </taskdef>
+    
+    <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
+         <classpath>
+             <fileset dir="${dir.lib}" includes="trang*.jar"/>
+         </classpath>
+    </taskdef>   
 
-            <trang failonerror="true" input="${dir.src.simtran.util}/simkit.dtd" output="${dir.src.simtran.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
-                
-            <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        </target>
-        
-        <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
-            <javac destdir="${dir.build.classes}">
-        	<classpath>
-        		<fileset dir="${dir.lib.xml}" includes="*.jar"/>
-        	</classpath>
-                <src path="${dir.src.simtran}"/>
-            </javac>
-            <copy todir="${dir.build.classes}/viskit/xsd/bindings">
-                <fileset dir="${dir.src}/viskit/xsd/bindings" includes="jaxb.properties"/>
-                <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser"/>
-            </copy>
-            <javac destdir="${dir.build.classes}">
-        	<classpath>
-        		<fileset dir="${dir.lib.xml}" includes="*.jar"/>
-        	</classpath>
-        	<src path="${dir.src.simasm}"/>
-            </javac>    
-            <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
-                <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="jaxb.properties"/>
-                <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser"/>
-            </copy>
-            
-        </target>
-        
-        <target depends="compile.bindings" description="Build xml2java utils" name="compile.simxml.util">
-            <javac destdir="${dir.build.classes}">
-                <classpath>
-                    <fileset dir="${dir.build.classes}"/>
-        	    <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                    <pathelement location="${dir.lib}/tools.jar"/>
-                </classpath>
-                <src path="${dir.src.simtran.util}"/>
-            </javac>    
-            <javac destdir="${dir.build.classes}">
-                <classpath>
-                    <fileset dir="${dir.build.classes}"/>
-        	    <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                    <pathelement location="${dir.lib}/tools.jar"/>
+    <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
+        <xjc package="viskit.xsd.bindings" schema="${dir.src.simtran.util}/simkit.xsd" target="${dir.src}"/>
+        <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}"/>
+    </target>
+    
+    <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
+        <trang failonerror="true" input="${dir.src.simtran.util}/simkit.dtd" output="${dir.src.simtran.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
+    </target>
+    
+    <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
+        <javac destdir="${dir.build.classes}">
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
-                <src path="${dir.src.simasm.util}"/>
-                <include name="SimkitAssemblyXML2Java.java"/>
-            </javac>
-        </target>   
+            <src path="${dir.src.simtran}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings">
+            <fileset dir="${dir.src}/viskit/xsd/bindings" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}">
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+            </classpath>
+            <src path="${dir.src.simasm}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
+            <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser"/>
+        </copy>
+    </target>
+    
+    <target depends="compile.bindings" description="Build xml2java utils" name="compile.simxml.util">
+        <javac destdir="${dir.build.classes}">
+            <classpath>
+                <fileset dir="${dir.build.classes}"/>
+                <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
+                <pathelement location="${dir.lib}/tools.jar"/>
+            </classpath>
+            <src path="${dir.src.simtran.util}"/>
+        </javac>
+        <javac destdir="${dir.build.classes}">
+            <classpath>
+                <fileset dir="${dir.build.classes}"/>
+                <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
+                <pathelement location="${dir.lib}/tools.jar"/>
+            </classpath>
+            <src path="${dir.src.simasm.util}"/>
+            <include name="SimkitAssemblyXML2Java.java"/>
+        </javac>
+    </target>   
 </project>
