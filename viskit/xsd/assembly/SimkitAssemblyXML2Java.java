@@ -330,10 +330,6 @@ public class SimkitAssemblyXML2Java {
             String n = a.getName();
             pw.print(sp8 + "simkit.Bridge" + sp + n + sp + eq + sp + nw + sp + "simkit.Bridge");
             pw.println(lp + qu + a.getEventHeard() + qu + cm + sp + qu + a.getEventSent() + qu + rp + sc);
-            pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
-            pw.println(a.getName() + rp + sc);
-            pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
-            pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
             pw.println();
         }
         
@@ -373,7 +369,16 @@ public class SimkitAssemblyXML2Java {
 	        pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
 	    }
 	}            
-        
+  pw.println();
+  connects = this.root.getAdapter().listIterator();
+  while (connects.hasNext()) {
+    AdapterType a = (AdapterType) connects.next();
+    pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
+    pw.println(a.getName() + rp + sc);
+    pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
+    pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
+    pw.println();    
+  }
         pw.println(sp4 + cb);
 	pw.println();
     }
