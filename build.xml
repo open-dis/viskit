@@ -5,7 +5,7 @@
 	<description>
          Ant build file for the NPS Viskit and associated libraries. Third
          party jar files are not compiled from source here, but they are copied as
-         necessary for the simkit distribution.  This buildfile was created and tested
+         necessary for the Viskit distribution.  This buildfile was created and tested
          using Ant version 1.5.1
         </description>
 	
@@ -52,19 +52,19 @@
 	          description="Root of the javadoc tree for Viskit." />
                   
         <property name="dir.src.simtran"
-                  location="${dir.src}/simkit/xsd/bindings"
+                  location="${dir.src}/viskit/xsd/bindings"
                   description="Generated JAXB bindings for Simtran" />
                   
         <property name="dir.src.simasm"
-                  location="${dir.src}/simkit/xsd/bindings/assembly"
+                  location="${dir.src}/viskit/xsd/bindings/assembly"
                   description="Generated JAXB bindings for Simasm" />
                   
         <property name="dir.src.simasm.util"
-                  location="${dir.src}/simkit/xsd/assembly"
+                  location="${dir.src}/viskit/xsd/assembly"
                   description="Simasm utility" />
                   
         <property name="dir.src.simtran.util"
-                  location="${dir.src}/simkit/xsd/translator"
+                  location="${dir.src}/viskit/xsd/translator"
                   description="Simtran utility" />             
 
 <!--  === TARGET: help === -->
@@ -119,7 +119,7 @@
         		<pathelement location="${dir.build.classes}" />
         		<fileset dir="${dir.lib.xml}" includes="*.jar" />
         	</classpath>
-        	<src path="${dir.src}/simkit/viskit/"/>
+        	<src path="${dir.src}/viskit/"/>
         </javac>
 	</target>
 <!--  === TARGET: jar === -->
@@ -149,8 +149,8 @@
         		<fileset dir="${dir.lib.xml}" includes="*.jar" />
         	</classpath>
             
-            <package name="simkit.viskit" />
-            <package name="simkit.xsd" />
+            <package name="viskit" />
+            <package name="viskit.xsd" />
         </javadoc>
     </target>
     
@@ -184,12 +184,12 @@
                 description="Create bindings to the simkit XML Schema" >
             
             <xjc target="${dir.src}"
-                package="simkit.xsd.bindings"
+                package="viskit.xsd.bindings"
                 schema="${dir.src.simtran.util}/simkit.xsd" />
               
             <xjc target="${dir.src}"
                 extension="true"
-                package="simkit.xsd.bindings.assembly"
+                package="viskit.xsd.bindings.assembly"
                 schema="${dir.src.simasm.util}/assembly.xsd" />
         </target>
         
@@ -221,9 +221,9 @@
         	</classpath>
                 <src path="${dir.src.simtran}"/>
             </javac>
-            <copy todir="${dir.build.classes}/simkit/xsd/bindings" >
-                <fileset dir="${dir.src}/simkit/xsd/bindings" includes="jaxb.properties" />
-                <fileset dir="${dir.src}/simkit/xsd/bindings" includes="bgm.ser" />
+            <copy todir="${dir.build.classes}/viskit/xsd/bindings" >
+                <fileset dir="${dir.src}/viskit/xsd/bindings" includes="jaxb.properties" />
+                <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser" />
             </copy>
             <javac destdir="${dir.build.classes}" >
         	<classpath>
@@ -231,9 +231,9 @@
         	</classpath>
         	<src path="${dir.src.simasm}"/>
             </javac>    
-            <copy todir="${dir.build.classes}/simkit/xsd/bindings/assembly" >
-                <fileset dir="${dir.src}/simkit/xsd/bindings/assembly" includes="jaxb.properties" />
-                <fileset dir="${dir.src}/simkit/xsd/bindings/assembly" includes="bgm.ser" />
+            <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly" >
+                <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="jaxb.properties" />
+                <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser" />
             </copy>
             
         </target>
