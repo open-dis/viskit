@@ -347,7 +347,18 @@ public class SimkitAssemblyXML2Java {
     void buildTail(StringWriter t) {
 
 	PrintWriter pw = new PrintWriter(t);
+	ScheduleType schedule;
 
+	if ( (schedule = this.root.getSchedule()) != null ) {
+	    pw.print(sp8 + "Schedule" + pd + "stopAtTime");
+	    pw.println(lp + schedule.getStopTime() + rp + sc);
+	
+	    pw.print(sp8 + "Schedule" + pd + "setVerbose");
+	    pw.println(lp + schedule.getVerbose() + rp + sc);
+
+	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
+	    pw.println(sp8 + "Schedule" + pd + "startSimulation" + lp + rp + sc);
+	}
 	pw.println();
 	pw.println(sp4 + cb);
 	pw.println(cb);
