@@ -513,6 +513,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     if(lis == null)
       return;
     Object o = getUO();
+    if(o == null)
+      return;
     Transferable xfer = null;
 
     if (o instanceof FileBasedAssyNode) {
@@ -542,8 +544,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
   public Object getUO()
   {
+    DefaultMutableTreeNode dmtn = null;
     TreePath path = getLeadSelectionPath();
-    DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
+    if(path == null)
+      return path;
+    dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
     return dmtn.getUserObject();
   }
 

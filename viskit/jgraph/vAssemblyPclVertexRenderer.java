@@ -288,7 +288,7 @@ public class vAssemblyPclVertexRenderer
     ra = (String[])v.toArray(ra);
     return ra;
   }
-    private String[] splitOnce(String s, int maxW, FontMetrics metrics)
+  private String[] splitOnce(String s, int maxW, FontMetrics metrics)
   {
     String[]ra = new String[2];
     ra[0] = s;

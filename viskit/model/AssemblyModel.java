@@ -88,7 +88,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        if(metaData.stopTime != "")
          jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
        else
-         jaxbRoot.getSchedule().setStopTime("100");
+         jaxbRoot.getSchedule().setStopTime("100.");
 
        jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
 
@@ -691,7 +691,9 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
         ScheduleType sch = jaxbRoot.getSchedule();
         if(sch != null) {
-          metaData.stopTime = sch.getStopTime();
+          String stpTime = sch.getStopTime();
+          if(stpTime != null && stpTime.trim().length()>0)
+            metaData.stopTime = stpTime.trim();
           metaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
         }
 /*        List lis = jaxbRoot.getComment();

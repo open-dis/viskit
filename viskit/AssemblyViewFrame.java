@@ -72,7 +72,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private JPanel canvasPanel;
   private LegosTree lTree, pclTree;
 
-  private JTextField vcrStopTime;
+  //private JTextField vcrStopTime;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
@@ -112,7 +112,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     buildMenus();
     buildToolbar();
-    buildVCRToolbar();
+    //buildVCRToolbar();
 
     // Set up a top level pane that will be the content pane. This
     // has a border layout, and contains the toolbar on the top and
@@ -232,6 +232,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   }
 
 
+/*
   private JPanel vcrToolBar;
   private JButton vcrStop, vcrPause, vcrPlay, vcrStep;
   private JCheckBox  vcrVerbose;
@@ -285,6 +286,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     vcrPlay.addActionListener(ActionIntrospector.getAction(controller,"vcrPlay"));
     vcrStep.addActionListener(ActionIntrospector.getAction(controller,"vcrStep"));
   }
+*/
   private void buildToolbar()
   {
     modeButtonGroup = new ButtonGroup();
@@ -653,6 +655,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     this.setTitle("Viskit Assembly: "+s);
   }
 
+/*
   public void setStopTime(String s)
   {
     vcrStopTime.setText(s);
@@ -672,6 +675,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
     return vcrVerbose.isSelected();
   }
+*/
 
   public int genericAsk(String title, String msg)
   //---------------------------------------------

@@ -81,8 +81,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel) getModel()).newModel(lastFile);
       ((ViskitAssemblyView) getView()).fileName(lastFile.getName());
       GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
-      ((ViskitAssemblyView) getView()).setStopTime(gmd.stopTime);
-      ((ViskitAssemblyView) getView()).setVerbose(gmd.verbose);
+      //((ViskitAssemblyView) getView()).setStopTime(gmd.stopTime);
+      //((ViskitAssemblyView) getView()).setVerbose(gmd.verbose);
     }
 
   }
@@ -110,8 +110,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   private void updateGMD()
   {
     GraphMetaData gmd = ((ViskitAssemblyModel)getModel()).getMetaData();
-    gmd.stopTime = ((ViskitAssemblyView)getView()).getStopTime();
-    gmd.verbose = ((ViskitAssemblyView)getView()).getVerbose();
+    //gmd.stopTime = ((ViskitAssemblyView)getView()).getStopTime();
+    //gmd.verbose = ((ViskitAssemblyView)getView()).getVerbose();
     ((ViskitAssemblyModel)getModel()).changeMetaData(gmd);
 
   }
