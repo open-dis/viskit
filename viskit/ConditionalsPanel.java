@@ -26,41 +26,44 @@ import java.util.Iterator;
  */
 
 public class ConditionalsPanel extends JPanel implements ActionListener
+/*********************************************************************/
 {
   JTextArea jta,jtaComments;
   Edge edge;
+
   public ConditionalsPanel(Edge edge)
+  //=================================
   {
     this.edge = edge;
     setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
     setBorder(BorderFactory.createTitledBorder("Conditional Expression"));
-    //setBorder(BorderFactory.createTitledBorder("Boolean expression"));
+
     JPanel tp = new JPanel();
-    tp.setLayout(new BoxLayout(tp,BoxLayout.X_AXIS));
-    tp.add(Box.createHorizontalStrut(5));
-    JLabel leftParen = new JLabel("if (");
-    leftParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
-    leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-    tp.add(leftParen);
-    tp.add(Box.createHorizontalGlue());
+     tp.setLayout(new BoxLayout(tp,BoxLayout.X_AXIS));
+     tp.add(Box.createHorizontalStrut(5));
+      JLabel leftParen = new JLabel("if (");
+      leftParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+      leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
+     tp.add(leftParen);
+     tp.add(Box.createHorizontalGlue());
     add(tp);
 
-    jta = new JTextArea(3,25);
-    jta.setText(edge.conditional);
-    jta.setEditable(true);
-    JScrollPane jsp = new JScrollPane(jta);
+     jta = new JTextArea(3,25);
+     jta.setText(edge.conditional);
+     jta.setEditable(true);
+     JScrollPane jsp = new JScrollPane(jta);
     add(jsp);
-    Dimension d = jsp.getPreferredSize();
-    jsp.setMinimumSize(d);
+     Dimension d = jsp.getPreferredSize();
+     jsp.setMinimumSize(d);
 
-    JPanel bp = new JPanel();
-    bp.setLayout(new BoxLayout(bp,BoxLayout.X_AXIS));
-    bp.add(Box.createHorizontalStrut(10));
-    JLabel rightParen = new JLabel(") then schedule/cancel target event");
-    rightParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
-    rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-    bp.add(rightParen);
-    bp.add(Box.createHorizontalGlue());
+     JPanel bp = new JPanel();
+     bp.setLayout(new BoxLayout(bp,BoxLayout.X_AXIS));
+     bp.add(Box.createHorizontalStrut(10));
+      JLabel rightParen = new JLabel(") then schedule/cancel target event");
+      rightParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+      rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
+     bp.add(rightParen);
+     bp.add(Box.createHorizontalGlue());
     add(bp);
 
     add(Box.createVerticalStrut(5));
@@ -76,12 +79,12 @@ public class ConditionalsPanel extends JPanel implements ActionListener
     add(Box.createVerticalStrut(5));
 */
 
-    jtaComments = new JTextArea(2,25);
-    jsp = new JScrollPane(jtaComments);
-    jsp.setBorder(BorderFactory.createTitledBorder("Comments"));
+     jtaComments = new JTextArea(2,25);
+     jsp = new JScrollPane(jtaComments);
+     jsp.setBorder(BorderFactory.createTitledBorder("Comments"));
     add(jsp);
-    d = jsp.getPreferredSize();
-    jsp.setMinimumSize(d);
+     d = jsp.getPreferredSize();
+     jsp.setMinimumSize(d);
 
     add(Box.createVerticalStrut(5));
 
@@ -114,8 +117,8 @@ public class ConditionalsPanel extends JPanel implements ActionListener
   }
 
   public void actionPerformed(ActionEvent event)
+  //--------------------------------------------
   {
-    Object o;
     try {
       Interpreter interpreter = new Interpreter();
       interpreter.setStrictJava(true);       // no loose typeing
@@ -129,7 +132,7 @@ public class ConditionalsPanel extends JPanel implements ActionListener
       String noCRs = jta.getText().replace('\n',' ');
       noCRs = "if("+noCRs+")System.out.println();";
  System.out.println(noCRs);
-      o = interpreter.eval(noCRs);
+      Object o = interpreter.eval(noCRs);
       //interpreter.eval("if(" + noCRs + ")System.out.println(\"ok\")");
     }
 
@@ -142,23 +145,32 @@ public class ConditionalsPanel extends JPanel implements ActionListener
   }
 
   public void setText(String s)
+  //---------------------------
   {
     jta.setText(s);
   }
+
   public String getText()
+  //---------------------
   {
     return jta.getText();
   }
+
   public void setComment(String s)
+  //------------------------------
   {
     jtaComments.setText(s);
   }
+
   public String getComment()
+  //------------------------
   {
     return jtaComments.getText().trim();
   }
+
   private ChangeListener lis;
   public void addChangeListener(ChangeListener lis)
+  //-----------------------------------------------
   {
     this.lis = lis;
   }
