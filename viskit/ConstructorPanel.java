@@ -12,6 +12,7 @@ package viskit;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -40,6 +41,11 @@ public class ConstructorPanel extends JPanel
   private JButton selectButt;
 
   public ConstructorPanel(Constructor construct, ActionListener selectListener, CaretListener modifiedListener)
+  {
+    this(construct,selectListener,modifiedListener,true);
+  }
+  public ConstructorPanel(Constructor construct, ActionListener selectListener, CaretListener modifiedListener,
+                          boolean showSelectButt)
   {
     rvfs = new RandomVariateFromString();
 
@@ -78,10 +84,13 @@ public class ConstructorPanel extends JPanel
             tinyP.add(b);
             innerP.add(tinyP);
             label[i].setLabelFor(tinyP);
-            if (c.isArray())
+            if (c.isArray()) {
               b.setToolTipText("Edit with array wizard");
-            else
+            }
+            else {
               b.setToolTipText("Edit with new object wizard");
+              b.addActionListener(new FactoryArgListener(i));
+            }
           }
           else {
             innerP.add(field[i]);
@@ -96,10 +105,12 @@ public class ConstructorPanel extends JPanel
       innerP.add(new JLabel("<no parameters>", JLabel.CENTER), BorderLayout.CENTER);
     }
     add(innerP);
+    if(showSelectButt) {
     add(Box.createVerticalStrut(5));
     add(Box.createVerticalGlue());
 
-    JPanel buttPan = new JPanel();
+      JPanel buttPan = new JPanel();
+
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
     buttPan.add(Box.createHorizontalGlue());
     selectButt = new JButton("Select this constructor");
@@ -113,6 +124,9 @@ public class ConstructorPanel extends JPanel
       selectButt.addActionListener(selectListener);
 
     setSelected(false);
+    }
+    else
+      setSelected(true);
   }
 
   String convertClassName(String s)
@@ -242,6 +256,18 @@ public class ConstructorPanel extends JPanel
     return buf.toString();
   }
 
+  class FactoryArgListener implements ActionListener
+  {
+    private int idx;
+    FactoryArgListener(int idx)
+    {
+      this.idx = idx;
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+      FactoryWizardDialog.showDialog(null,null,signature[idx]);
+    }
+  }
 }
 
 interface ObjectFromString
