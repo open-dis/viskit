@@ -459,7 +459,11 @@ public class SimkitXML2Java {
 	pw.println();
 	
 	pw.println(sp4 + "public void doRun() {");
-	
+        
+        if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
+            pw.println(sp8 + "super.doRun();");
+        }
+        
 	li = run.getStateTransition().listIterator();
 
 	while( li.hasNext() ) {
