@@ -398,7 +398,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     Parameter p = null;
     try {p = this.oFactory.createParameter(); } catch(JAXBException e){ System.out.println("newParmJAXBEX"); }
     p.setName(nm);
-    p.setShortName(nm);
+    //p.setShortName(nm);
     p.setType(typ);
     p.getComment().add(comment);
 
@@ -423,7 +423,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     // fill out jaxb variable
     Parameter p = (Parameter)vp.opaqueModelObject;
     p.setName(vp.getName());
-    p.setShortName(vp.getName());
+    //p.setShortName(vp.getName());
     p.setType(vp.getType());
     p.getComment().clear();
     p.getComment().add(vp.getComment());
