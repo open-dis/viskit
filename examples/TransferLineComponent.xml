@@ -5,13 +5,13 @@
     <StateVariable name="numberAvailableServers" type="int[totalNumberServers.length]"/>
     <StateVariable name="numberInQueue" type="int[totalNumberServers.length]"/>
     <Event name="Run">
-        <LocalVariable name="j" type="int">
+        <LocalVariable name="j" type="int" value="0">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="_idxvar_0" type="int">
+        <LocalVariable name="_idxvar_0" type="int" value="0">
             <Comment>used internally</Comment>
         </LocalVariable>
-        <LocalVariable name="_idxvar_1" type="int">
+        <LocalVariable name="_idxvar_1" type="int" value="0">
             <Comment>used internally</Comment>
         </LocalVariable>
         <StateTransition index="_idxvar_0" state="numberAvailableServers">
