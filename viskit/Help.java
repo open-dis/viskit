@@ -17,7 +17,7 @@ public class Help {
         "(c) 2004 under the Lesser GNU License" +CR +CR +
         "Developers:" + CR +
         "  Arnold Buss" + CR +
-        "  Michael Bailey" + CR +
+        "  Mike Bailey" + CR +
         "  Rick Goldberg";
     
     /** Creates a new instance of Help */
