@@ -226,11 +226,9 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return null;
     }
     pce.opaqueModelObject = pclc;
-    PropertyChangeListener targL = (PropertyChangeListener) target.opaqueModelObject;
-    pclc.setListener(targL);
-    SimEntity sent = (SimEntity) src.opaqueModelObject;
-    pclc.setSource(sent);
 
+    pclc.setListener(target.opaqueModelObject);
+    pclc.setSource(src.opaqueModelObject);
 
     assEdgeCache.put(pclc, pce);
     jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
