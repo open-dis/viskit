@@ -240,6 +240,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      vp = new VariablesPanel(300,85);
     stateVariablesPanel.add(vp);
     stateVariablesPanel.add(Box.createVerticalStrut(5));
+    stateVariablesPanel.setMinimumSize(new Dimension(20,20));
 
     // Wire handlers for stateVariable adds, deletes and edits
     vp.addMinusListener(ActionIntrospector.getAction((ViskitController)getController(),"deleteStateVariable"));
@@ -268,6 +269,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       pp = new ParametersPanel(300);
     parametersPanel.add(pp);
     parametersPanel.add(Box.createVerticalStrut(5));
+    pp.setMinimumSize(new Dimension(20,20));
 
     // Wire handlers for parameter adds, deletes and edits
     pp.addMinusListener(ActionIntrospector.getAction((ViskitController)getController(),"deleteSimParameter"));
@@ -283,7 +285,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     });
 
     // Split pane that has state variables on top, parameters on bottom.
-    stateParameterSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stateVariablesPanel, parametersPanel);
+    stateParameterSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(stateVariablesPanel),
+                                                                    new JScrollPane(parametersPanel));
+    stateParameterSplit.setMinimumSize(new Dimension(20,20));
 
     // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
     stateDrawingSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(graphPane), stateParameterSplit);
