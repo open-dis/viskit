@@ -29,7 +29,7 @@
     </Event>
     <Event name="Review">
         <Schedule condition="inventoryPosition + amountOnOrder &lt; triggerPoint" delay="0.0" event="PlaceOrder">
-            <EdgeParameter value="new Double(orderUpTo - inventoryPosition - amountOnOrder)"/>
+            <EdgeParameter value="(orderUpTo - inventoryPosition - amountOnOrder)"/>
         </Schedule>
         <Schedule delay="timeBetweenReviews" event="Review"/>
         <Coordinate y="140" x="80"/>
@@ -40,7 +40,7 @@
             <Assignment value="amountOnOrder + newOrderAmount"/>
         </StateTransition>
         <Schedule delay="leadTime.generate()" event="ReceiveOrder">
-            <EdgeParameter value="new Double(newOrderAmount)"/>
+            <EdgeParameter value="newOrderAmount"/>
         </Schedule>
         <Coordinate y="150" x="190"/>
     </Event>

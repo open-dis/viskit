@@ -28,7 +28,7 @@
         <StateTransition state="numberFailedMachines">
             <Assignment value="numberFailedMachines + 1"/>
         </StateTransition>
-        <Schedule condition="numberAvailableRepairPeople &gt; 0" delay="0'0" event="StartRepair"/>
+        <Schedule condition="numberAvailableRepairPeople &gt; 0" delay="0.0" event="StartRepair"/>
         <Coordinate y="160" x="80"/>
     </Event>
     <Event name="StartRepair">
@@ -46,7 +46,7 @@
             <Assignment value="numberFailedMachines - 1"/>
         </StateTransition>
         <Schedule condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="1.0" delay="0.0" event="StartRepair"/>
-        <Schedule delay="timeToFailure.generae()" event="Failure"/>
+        <Schedule delay="timeToFailure.generate()" event="Failure"/>
         <Coordinate y="10" x="280"/>
     </Event>
 </SimEntity>
