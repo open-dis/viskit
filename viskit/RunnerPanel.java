@@ -77,7 +77,7 @@ public class RunnerPanel extends JPanel
     vcrToolBar.add(vcrStop);
 
     vcrRewind = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Rewind24.gif")));
-    vcrRewind.setToolTipText("Rewind the simulation run");
+    vcrRewind.setToolTipText("Reset the simulation run");
     vcrRewind.setEnabled(false);
     vcrRewind.setBorder(BorderFactory.createEtchedBorder());
     vcrRewind.setText(null);

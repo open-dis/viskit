@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -857,11 +859,28 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public File compileJavaClass(String src)
   {
+    // Find the package subdirectory
+    Pattern pat = Pattern.compile("package.+;");
+    Matcher mat = pat.matcher(src);
+    boolean fnd = mat.find();
+
+    String packagePath = "";
+    if(fnd) {
+      int st = mat.start();
+      int end = mat.end();
+      String s = src.substring(st,end);
+      s = s.replace(';','/');
+      String[] sa = s.split("\\s");
+      sa[1] = sa[1].replace('.','/');
+      packagePath = sa[1].trim();
+    }
+    // done finding the package subdir (just to mark the file as "deleteOnExit")
     try {
       String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
       File f = VGlobals.instance().getWorkDirectory();
       f = new File(f,baseName+".java");
       f.createNewFile();
+      f.deleteOnExit();
 
       FileWriter fw = new FileWriter(f);
       fw.write(src);
@@ -870,9 +889,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
       int reti =  com.sun.tools.javac.Main.compile(new String[]{/*"-verbose", */"-d", f.getParent(), f.getCanonicalPath()});
 
-      //System.out.println("got "+reti+" on compile of "+f.getCanonicalPath() +" to "+f.getParent());
       if(reti == 0)
-        return new File(f.getParentFile().getAbsoluteFile(),baseName+".class");
+        return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
     }
     catch(Exception e) {
       e.printStackTrace();

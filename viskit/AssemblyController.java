@@ -481,7 +481,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         String[] sa = nuts.split("\\s");
         packageFromLastCompile = sa[1];
       }
-      return ((ViskitAssemblyModel)getModel()).compileJavaClass(source);
+      File f = ((ViskitAssemblyModel)getModel()).compileJavaClass(source);
+      f.deleteOnExit();
+      return f;
     }
     return null;
   }

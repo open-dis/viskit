@@ -614,10 +614,24 @@ public class VGlobals
 
   private void setupWorkDirectory()
   {
-    String uHome = System.getProperty("user.home");
-    workDirectory = new File(uHome,"viskitWork/");
-    if(workDirectory.exists())
+    try {
+      workDirectory = File.createTempFile("viskit","work");   // actually creates
+      String p = workDirectory.getAbsolutePath();   // just want the name part of it
+      workDirectory.delete();        // Don't want the file to be made yet
+      workDirectory = new File(p);
+      workDirectory.mkdir();
+      workDirectory.deleteOnExit();
+      
+      File nf = new File(workDirectory,"simkit");     // most go here
+      nf.mkdir();
+      nf.deleteOnExit();
+      nf = new File(nf,"examples");
+      nf.mkdir();
+      nf.deleteOnExit();
       return;
+    }
+    catch (IOException e) {}
+
     if(workDirectory.mkdir()==false)
         JOptionPane.showMessageDialog(null,"The directory "+ workDirectory.getPath()+
                     " could not be created.  Correct permissions before proceeding.",
