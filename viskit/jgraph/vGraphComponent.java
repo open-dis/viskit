@@ -57,6 +57,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     this.setAntiAliased(true);
     this.addGraphSelectionListener(new myGraphSelectionListener());
     model.addGraphModelListener(this);
+
+    //this.setMarqueeColor(Color.red);
+    this.setLockedHandleColor(Color.red);
+    this.setHighlightColor(Color.red);
+    //this.setHandleColor(Color.orange);
+
   }
 
   public void updateUI()
