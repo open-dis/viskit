@@ -55,7 +55,7 @@
 
 <!ELEMENT Schedule EMPTY>
 <!ATTLIST Schedule
-    stopTime CDATA #IMPLIED
+    stopTime CDATA "0.0"
     verbose  (true|false) "true"
 >
 
