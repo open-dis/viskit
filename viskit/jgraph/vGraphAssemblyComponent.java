@@ -172,6 +172,16 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             ((ViskitAssemblyModel) parent.getModel()).changeEvGraphNode(en);
           }
         }
+        else if (ch[i] instanceof AssemblyPropListCell) {
+          AssemblyPropListCell plc = (AssemblyPropListCell) ch[i];
+          Map m = plc.getAttributes();
+          Rectangle r = (Rectangle) m.get("bounds");
+          if (r != null) {
+            PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
+            pcln.setPosition(new Point(r.x, r.y));
+            ((ViskitAssemblyModel) parent.getModel()).changePclNode(pcln);
+          }
+        }
       }
     }
   }

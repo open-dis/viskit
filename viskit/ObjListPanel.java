@@ -3,8 +3,11 @@ package viskit;
 import viskit.model.VInstantiator;
 
 import javax.swing.*;
+import javax.swing.event.CaretListener;
+import javax.swing.event.CaretEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -19,7 +22,7 @@ import java.util.Vector;
  * Time: 3:03:09 PM
  */
 
-public class ObjListPanel extends JPanel implements ActionListener
+public class ObjListPanel extends JPanel implements ActionListener, CaretListener
 {
   private JLabel label[];
   private JTextField field[];
@@ -31,6 +34,13 @@ public class ObjListPanel extends JPanel implements ActionListener
     setLayout(new SpringLayout());
     this.changeListener = changeListener;
   }
+  public void setDialogInfo(JFrame parent, Component locComp)
+  {
+    this.parent = parent;
+    this.locComp = locComp;
+  }
+  private JFrame parent;
+  private Component locComp;
 
   public void setData(List lis, boolean showLabels)  // of Vinstantiators
   {
@@ -47,6 +57,7 @@ public class ObjListPanel extends JPanel implements ActionListener
        if(showLabels)
          add(label[i]);
        field[i] = new JTextField(inst.toString());
+       field[i].addCaretListener(this);
        Vstatics.clampHeight(field[i]);
 
        Class c = Vstatics.ClassForName(inst.getType());
@@ -82,6 +93,12 @@ public class ObjListPanel extends JPanel implements ActionListener
        SpringUtilities.makeCompactGrid(this, field.length, 1, 5, 5, 5, 5);
    }
 
+  public void caretUpdate(CaretEvent e)
+  {
+    if (changeListener != null)
+      changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
+  }
+
   /* returns a list of instantiators */
    public List getData()
    {
@@ -101,30 +118,30 @@ public class ObjListPanel extends JPanel implements ActionListener
     VInstantiator vinst = shadow[idx];
     Class c = Vstatics.ClassForName(vinst.getType());
     if (c.isArray()) {
-      ArrayInspector ai = new ArrayInspector(null, this);
+      ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
       ai.setType(vinst.getType());
       ai.setData(((VInstantiator.Array) vinst).getInstantiators());
 
       ai.setVisible(true); // blocks
-      if (ai.modified)
+      if (ai.modified) {
         shadow[idx] = ai.getData();
+        field[idx].setText(shadow[idx].toString());
+        if (changeListener != null)
+          changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
+      }
     }
     else {
-      ObjectInspector oi = new ObjectInspector(null, this);
+      ObjectInspector oi = new ObjectInspector(parent, this);     // "this" could be locComp
       oi.setType(vinst.getType());
-      //VConstructor vcon = new VConstructor();
-      //con.setType(vinst.getType());
-      //vcon.getInstantiators().add(vinst);
-      //oi.setData(vcon);
       oi.setData(vinst);
       oi.setVisible(true); // blocks
       if (oi.modified) {
-        //shadow[idx] = (VInstantiator) oi.getData().getInstantiators().get(0);   // put the instantiator on the list
         shadow[idx] = oi.getData();
         field[idx].setText(oi.getData().toString());
         if (changeListener != null)
           changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
       }
     }
+
   }
 }

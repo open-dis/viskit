@@ -33,6 +33,7 @@ public class ObjectInspector  extends JDialog implements ActionListener
     locationComp = comp;
     contentP = new JPanel();
     contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
+    contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setContentPane(contentP);
 
     buttPan = new JPanel();
@@ -54,11 +55,12 @@ public class ObjectInspector  extends JDialog implements ActionListener
   {
     contentP.removeAll();
 
-    ip = new InstantiationPanel(lis);
+    ip = new InstantiationPanel(this,lis);
     ip.setBorder(null);
 
     contentP.add(ip);
-    contentP.add(Box.createVerticalGlue());
+    //contentP.add(Box.createVerticalGlue());
+    contentP.add(Box.createVerticalStrut(5));
     contentP.add(buttPan);
 
     pack();     // do this prior to next

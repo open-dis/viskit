@@ -19,11 +19,11 @@ public class PropChangeEdge extends AssemblyEdge
     setComment("Property change listener connection");
   }
 
-  protected String type;
+  //protected String type;
   protected String property;
   
-  public String getType(){return type;}
-  public void   setType(String t){type=t;}
+  //public String getType(){return type;}
+  //public void   setType(String t){type=t;}
   public String getProperty(){return property;}
   public void   setProperty(String p){property=p;}
 }

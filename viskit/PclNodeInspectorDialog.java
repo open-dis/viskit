@@ -14,6 +14,7 @@ import viskit.model.PropChangeListenerNode;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
@@ -67,7 +68,12 @@ public class PclNodeInspectorDialog extends JDialog
 
     JPanel content = new JPanel();
     setContentPane(content);
-    content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+    // this is a nop
+    content.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+        BorderFactory.createLineBorder(Color.green,2)));
+
+    //content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     handleField = new JTextField();
     Vstatics.clampHeight(handleField);
@@ -135,18 +141,27 @@ public class PclNodeInspectorDialog extends JDialog
       handleField.setText(pclNode.getName());
       typeField.setText(pclNode.getType());
 
-      ip = new InstantiationPanel(lis);
+      ip = new InstantiationPanel(this,lis,true);
       setupIP();
+      ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+                      "Object creation",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
+      
       JPanel content = new JPanel();
       content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
-      content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      //content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      content.setBorder(BorderFactory.createCompoundBorder(
+          BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+          BorderFactory.createLineBorder(new Color(0xff,0xc8,0xc8),4)));
 
       JPanel cont = new JPanel(new SpringLayout());
       cont.add(handleLab);
       cont.add(handleField);
+
       cont.add(typeLab);
       cont.add(typeField);
       SpringUtilities.makeCompactGrid(cont, 2 , 2, 10, 10, 5, 5);
+
+ //     SpringUtilities.makeCompactGrid(cont,1,2,10,10,5,5);
       content.add(cont);
 
       content.add(ip);

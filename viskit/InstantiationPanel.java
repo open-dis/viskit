@@ -37,16 +37,28 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
   private JPanel instPane;
   private CardLayout instPaneLayMgr;
-  //private ArrayPanel arrPan;
   private FFPanel ffPan;
   private ConstrPanel conPan;
   private FactoryPanel factPan;
 
   private ActionListener modifiedListener;
+  private JDialog packMe;
+  boolean constructorOnly = false;
 
   public InstantiationPanel(ActionListener changedListener)
   {
+    this(null,changedListener);
+  }
+  public InstantiationPanel(JDialog ownerDialog,ActionListener changedListener)
+  {
+    this(ownerDialog,changedListener,false);
+  }
+  public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener, boolean onlyConstr)
+  {
     modifiedListener = changedListener;
+    packMe = ownerDialog;
+    constructorOnly = onlyConstr;
+
     setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
     JPanel topP = new JPanel(new SpringLayout());
@@ -56,14 +68,23 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     typeLab.setLabelFor(typeTF);
 
     methodLab = new JLabel("method",JLabel.TRAILING);
+
     methodCB = new JComboBox(new String[]{"free form","constructor","factory"});
-    methodLab.setLabelFor(methodCB);
+    //or
+    JTextField onlyConstrTF = new JTextField("Constructor");
+    onlyConstrTF.setEditable(false);
 
     topP.add(typeLab);
     topP.add(typeTF);
     topP.add(methodLab);
-    topP.add(methodCB);
-
+    if(onlyConstr) {
+      methodLab.setLabelFor(onlyConstrTF);
+      topP.add(onlyConstrTF);
+    }
+    else {
+      methodLab.setLabelFor(methodCB);
+      topP.add(methodCB);
+    }
     SpringUtilities.makeCompactGrid(topP,2,2,10,10,5,5);
     add(topP);
 
@@ -71,23 +92,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     instPaneLayMgr = new CardLayout();
     instPane.setLayout(instPaneLayMgr);
 
-    //instPane.setPreferredSize(new Dimension(150,100));
     instPane.setBorder(BorderFactory.createEtchedBorder());
     instPane.setAlignmentX(Box.CENTER_ALIGNMENT);
 
-    //arrPan   = new ArrayPanel(this);
     ffPan    = new FFPanel(this);
     conPan   = new ConstrPanel(this);
     factPan  = new FactoryPanel(this);
 
 /*
-    instPaneLayMgr.addLayoutComponent(arrPan,"arrPan");
     instPaneLayMgr.addLayoutComponent(ffPan,"ffPan");
     instPaneLayMgr.addLayoutComponent(conPan,"conPan");
     instPaneLayMgr.addLayoutComponent(factPan,"factPan");
     //false advertising
 */
-    //instPane.add(arrPan,"arrPan");
     instPane.add(ffPan,"ffPan");
     instPane.add(conPan,"conPan");
     instPane.add(factPan,"factPan");
@@ -128,7 +145,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
   VInstantiator getData()
   {
-    //VInstantiator vi = null;
     switch(methodCB.getSelectedIndex())
     {
     case FF:
@@ -141,71 +157,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       System.err.println("bad data Inst. panel getData()");
       return null;
     }
-/*
-    myVcon.getInstantiators().clear();
-    myVcon.getInstantiators().add(vi);
-    return myVcon;
-*/
   }
   VInstantiator myVi;
   public void setData(VInstantiator vi)
   {
     myVi = vi.vcopy();
-    //myVcon = vc.vcopy();
-    //String typ = myVcon.getType();
     String typ = vi.getType();
     typeTF.setText(typ);
 
-/*   We don't get here...arrays are not handled by the IP
-    // Array is special
-    Class c = Vstatics.ClassForName(typ);
-    if(c != null && c.isArray()) {
-      arrPan.setType(typ);
-      arrPan.setData(myVi); //myVcon);
-      instPaneLayMgr.show(instPane,"arrPan");
-
-    }
-*/
     // inform all panels of the type of the object
     conPan.setType(typ);
     factPan.setType(typ);
     ffPan.setType(typ);
 
-    // pass the real data to the panel which reflects the current data
-    //List lis = myVcon.getInstantiators();
-    //List lis = vi.getInstantiators();
-
-
-/*
-    switch(lis.size())
-    {
-    case 1:
-      Object o = lis.get(0);
-      if(o instanceof VInstantiator.Constr) {
-        conPan.setData((VInstantiator.Constr)o);
-        methodCB.setSelectedIndex(CONSTR);
-      }
-      else if(o instanceof VInstantiator.Factory) {
-        factPan.setData((VInstantiator.Factory)o);
-        methodCB.setSelectedIndex(FACT);
-      }
-      else if(o instanceof VInstantiator.FreeF) {
-        ffPan.setData((VInstantiator.FreeF)o);
-        methodCB.setSelectedIndex(FF);
-      }
-      break;
-
-    case 0:
-      methodCB.setSelectedIndex(FF);
-      break;
-    default:  // > 0
-      methodLab.setVisible(false);
-      methodCB.setVisible(false);
-      break;
-    }
-*/
-
-    // do differently
     if(vi instanceof VInstantiator.Constr) {
       conPan.setData((VInstantiator.Constr)vi);
       methodCB.setSelectedIndex(CONSTR);
@@ -224,6 +188,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     }
 
   }
+  
   public void actionPerformed(ActionEvent e)
   {
     if(modifiedListener != null)
@@ -235,15 +200,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     actionPerformed(null);
   }
 
-  class FFPanel extends JPanel
+  /***********************************************************************/
+  class FFPanel extends JPanel implements CaretListener
   {
     private JTextField value;
+    private InstantiationPanel ip;
     public FFPanel(InstantiationPanel ip)
     {
+      this.ip = ip;
       setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
       setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
       value = new JTextField("");
+      value.addCaretListener(this);
       value.setAlignmentX(Box.CENTER_ALIGNMENT);
       Vstatics.clampHeight(value);
 
@@ -265,15 +234,21 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     {
       return new VInstantiator.FreeF(typ,value.getText().trim());
     }
+
+    public void caretUpdate(CaretEvent e)
+    {
+      if(ip.modifiedListener != null)
+        ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"Textfield touched"));
+    }
   }
 
+  /***********************************************************************/
   class ConstrPanel extends JPanel implements ActionListener,CaretListener
   {
     private Class clazz;
     private JTabbedPane tp;
     private Constructor[] construct;
     private ConstructorPanel[] constructorPanels;
-    //private ObjListPanel[] constructPanels;     // *
 
     private String noParamString = "(no parameters)";
     private ImageIcon checkMark;
@@ -299,18 +274,16 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         clazz = Class.forName(clName);
         construct = clazz.getConstructors();
         constructorPanels = new ConstructorPanel[construct.length];
-       // constructPanels   = new ObjListPanel[construct.length];     // *
       }
       catch (ClassNotFoundException e) {
       }
 
       if (construct == null || construct.length <= 0) {
-        // here if their is no way to directly build an object of this class.
+        // here if there is no way to directly build an object of this class.
         tp.addTab("0", null, new JLabel("Abstract class of some kind.  Use free-form construction."));
       }
       else {
         for (int i = 0; i < construct.length; ++i) {
-          //constructorPanels[i] = new ConstructorPanel(construct[i], this, this, construct.length != 1);
           constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this);
           constructorPanels[i].setData(buildDummyInstantiators(construct[i]));
           String sign = ConstructorPanel.getSignature(construct[i].getParameterTypes());
@@ -370,6 +343,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       // tell mommy
       ip.actionPerformed(e);
     }
+
     public void setData(VInstantiator.Constr vi)
     {
       if(vi == null)
@@ -407,7 +381,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     }
   }
 
-
+  /***********************************************************************/
   class FactoryPanel extends JPanel
   {
     private InstantiationPanel ip;
@@ -455,6 +429,26 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       add(topP);
 
       factClassTF.addActionListener(new MyClassListener());
+      MyCaretListener myCarListener = new MyCaretListener();
+      factClassTF.addCaretListener(myCarListener);
+      factMethodButt.addActionListener(new MyChangedListener());
+      factMethodTF.addCaretListener(myCarListener);
+    }
+    class MyChangedListener implements ActionListener
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        if(ip.modifiedListener != null)
+          ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"Button pressed"));
+      }
+    }
+    class MyCaretListener implements CaretListener
+    {
+      public void caretUpdate(CaretEvent e)
+      {
+        if(ip.modifiedListener != null)
+          ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"TF edited pressed"));
+      }
     }
     class MyClassListener implements ActionListener
     {
@@ -479,19 +473,18 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
           factClassTF.selectAll();
           return;
         }
-        //Vector v = new Vector();
         Vector vn = new Vector();
         HashMap hm = new HashMap();
 // test
 
-/*
+
 try {
 myObjClass = Class.forName("simkit.random.RandomVariate");
 }
 catch (ClassNotFoundException e1) {
 e1.printStackTrace();
 }
-*/
+
 
         for(int i=0;i<statMeths.length;i++) {
           int mods = statMeths[i].getModifiers();
@@ -541,7 +534,10 @@ e1.printStackTrace();
 
         add(Box.createVerticalGlue());
 
-        olp.revalidate();   // required?
+        if(packMe != null)
+          packMe.pack();
+        if(ip.modifiedListener != null)
+          ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"Factory method chosen"));
       }
     }
 
@@ -589,62 +585,14 @@ e1.printStackTrace();
 
     public VInstantiator getData()
     {
-      return new VInstantiator.Factory(typ,factClassTF.getText().trim(),
-                                         factMethodTF.getText().trim(),
-                                         olp.getData());
+      String fc = factClassTF.getText();if(fc==null)fc="";else fc=fc.trim();
+      String m  = factMethodTF.getText();if(m==null)m ="";else m = m.trim();
+      List lis;
+      if(olp != null)
+        lis = olp.getData();
+      else
+        lis = new Vector();
+      return new VInstantiator.Factory(typ,fc,m,lis);
     }
   }
-
-/*
-  class ArrayPanel extends JPanel
-  {
-    private JLabel[] label;
-    private JTextField[] field;
-    private InstantiationPanel ip;
-    private JLabel typeLab;
-    private JTextField typeTF;
-    private JPanel typePan;
-
-    public ArrayPanel(InstantiationPanel ip)
-    {
-      this.ip = ip;
-      setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-      typePan = new JPanel(new SpringLayout());
-      typeLab = new JLabel("Array type",JLabel.TRAILING);
-      typeTF = new JTextField();
-      typeLab.setLabelFor(typeTF);
-      typePan.add(typeLab);
-      typePan.add(typeTF);
-      SpringUtilities.makeCompactGrid(typePan,1,2,5,5,5,5);
-    }
-    public void setType(String clName)
-    {
-      //doLayout();
-    }
-    public void setData(VConstructor vc)
-    {
-      if(vc == null)
-        return;
-
-      removeAll();
-      ip.methodCB.setVisible(false);      // whoa!
-      ip.methodLab.setVisible(false);
-      typeTF.setText(vc.getType());
-      add(typePan);
-      add(Box.createVerticalStrut(5));
-
-      ObjListPanel olp = new ObjListPanel(ip);
-      olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                      "Array elements",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
-
-      olp.setData(vc.getInstantiators(),false);
-
-      add(olp);
-
-      add(Box.createVerticalGlue());
-      revalidate();
-    }
-  }
-*/
-
 }

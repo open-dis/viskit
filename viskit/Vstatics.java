@@ -88,8 +88,11 @@ public class Vstatics
     }
     catch (ClassNotFoundException e) {
       c = tryPrimsAndArrays(s);
-      if(c == null)
-        System.err.println("what to do here... "+s);
+      if(c == null) {
+        c = tryCommonClasses(s);
+        if(c == null)
+          System.err.println("what to do here... "+s);
+      }
       return c;
   }
 
@@ -98,7 +101,27 @@ public class Vstatics
   {
     char c;
   }
-
+  static Class tryCommonClasses(String s) {
+    String conv = commonExpansions(s);
+    if(conv == null)
+      return null;
+    try {
+      return Class.forName(conv);
+    }
+    catch(Exception e) {
+      return null;
+    }
+  }
+  static String commonExpansions(String s)
+  {
+    if(s.equals("String"))
+      return "java.lang.String";
+    if(s.equals("Object"))
+      return "java.lang.Object";
+    if(s.equals("Queue"))
+      return "java.util.Queue";
+    return null;
+  }
   static Class tryPrimitive(String s) {
     return tryPrimitive(s,new retrnChar());
   }
@@ -170,13 +193,18 @@ public class Vstatics
     sb.append(prefix);
     sb.append(name);
     sb.append(suffix);
-    s = sb.toString().trim();
+    String ns = sb.toString().trim();
 
     try {
-      c = Class.forName(s,false,null);
+      c = Class.forName(ns,false,Vstatics.class.getClassLoader());
       return c;
     }
     catch (ClassNotFoundException e) {
+      // one last check
+      if(commonExpansions(name) != null)
+      {
+        return tryPrimsAndArrays(s.replaceFirst(name,commonExpansions(name)));
+      }
       return null;
     }
 

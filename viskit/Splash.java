@@ -38,6 +38,27 @@ public class Splash extends JFrame
 
   public static void main(String[] args)
   {
+/*
+
+    String s[]  = { "[Ljava.util.List;",
+                    "java.util.List[2]",
+                    "java.util.List[]",
+                    "simkit.smdx.WayPoint",
+                    "simkit.smdx.WayPoint[3]",
+                    "simkit.smdx.WayPoint[]",
+                    "[Lsimkit.smdx.WayPoint;"};
+    Class c = null;
+    for(int i=0;i<s.length;i++) {
+    try {
+      c = Class.forName(s[i]);
+    }
+    catch (ClassNotFoundException e) {
+      System.out.println("doh: "+s[i]);
+    }
+    }
+
+*/
+
     Splash spl = new Splash();
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     spl.setLocation((d.width-spl.getWidth())/2,(d.height-spl.getHeight())/2);

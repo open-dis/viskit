@@ -10,6 +10,7 @@ import viskit.images.SimEventListenerIcon;
 import viskit.images.PropChangeListenerIcon;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
@@ -70,6 +71,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JPanel canvasPanel;
   private LegosTree lTree, pclTree;
+
+  private JTextField vcrStopTime;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
@@ -134,7 +137,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     //jsp.setDividerLocation(0.5d);
     top.add(jsp,BorderLayout.CENTER);
     top.add(vcrToolBar,BorderLayout.SOUTH);
-    top.setBorder(BorderFactory.createEmptyBorder(5,5,0,5));
+    top.setBorder(BorderFactory.createEmptyBorder(5,5,2,5));
 
     getContentPane().add(top);
   }
@@ -247,6 +250,23 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     vcrToolBar.add(Box.createHorizontalStrut(20));
 
+    JLabel vcrSimTimeLab = new JLabel("Sim. time:");
+    JTextField vcrSimTime = new JTextField(10);
+    vcrSimTime.setEditable(false);
+    clampSize(vcrSimTime);
+
+    vcrToolBar.add(vcrSimTimeLab);
+    vcrToolBar.add(vcrSimTime);
+    vcrToolBar.add(Box.createHorizontalStrut(10));
+
+    JLabel vcrStopTimeLabel = new JLabel("Stop time:");
+    vcrStopTime = new JTextField(10);
+    clampSize(vcrStopTime);
+
+    vcrToolBar.add(vcrStopTimeLabel);
+    vcrToolBar.add(vcrStopTime);
+    vcrToolBar.add(Box.createHorizontalStrut(10));
+
     vcrVerbose = new JCheckBox("verbose output",false);
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     vcrToolBar.add(vcrVerbose);
@@ -275,16 +295,30 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     selectMode             = makeJTButton(null, "viskit/images/selectNode.png",
                                        "Select items on the graph");
+    Border defBor = selectMode.getBorder();
+    selectMode.setBorder(BorderFactory.createCompoundBorder(
+        defBor,BorderFactory.createLineBorder(Color.lightGray,2)));
+
     //adapterMode          = makeJTButton(null, "viskit/images/adapter.png",
     adapterMode            = makeJTButton(null,new AdapterIcon(24,24),
                                        "Connect assemblies with adapter pattern");
+    defBor = adapterMode.getBorder();
+    adapterMode.setBorder(BorderFactory.createCompoundBorder(
+        defBor,BorderFactory.createLineBorder(new Color(0xce,0xce,0xff),2)));
 
     //simEventListenerMode = makeJTButton(null, "viskit/images/bridge.png",
     simEventListenerMode   = makeJTButton(null,new SimEventListenerIcon(24,24),
                                        "Connect assemblies through a SimEvent listener pattern");
+    defBor = simEventListenerMode.getBorder();
+    simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(
+        defBor,BorderFactory.createLineBorder(new Color(0xce,0xce,0xff),2)));
+    
     //propChangeListenerMode = makeJTButton(null, "viskit/images/bridge.png",
     propChangeListenerMode = makeJTButton(null,new PropChangeListenerIcon(24,24),
                                        "Connect a property change listener to a SimEntity");
+    defBor = propChangeListenerMode.getBorder();
+    propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(
+        defBor,BorderFactory.createLineBorder(new Color(0xff,0xc8,0xc8),2)));
 
     zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                                         "Zoom in on the graph");
@@ -587,6 +621,26 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     this.setTitle("Viskit Assembly: "+s);
   }
 
+  public void setStopTime(String s)
+  {
+    vcrStopTime.setText(s);
+  }
+
+  public void setVerbose(boolean v)
+  {
+    vcrVerbose.setSelected(v);
+  }
+
+  public String getStopTime()
+  {
+    return vcrStopTime.getText().trim();
+  }
+
+  public boolean getVerbose()
+  {
+    return vcrVerbose.isSelected();
+  }
+
   public int genericAsk(String title, String msg)
   //---------------------------------------------
   {
@@ -637,6 +691,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     f.setTitle("Generated source from "+filename);
     f.setVisible(true);
   }
+
+  void clampHeight(JComponent comp)
+  {
+    Dimension d = comp.getPreferredSize();
+    comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
+    comp.setMinimumSize(new Dimension(Integer.MAX_VALUE,d.height));
+  }
+  void clampSize(JComponent comp)
+  {
+    Dimension d = comp.getPreferredSize();
+    comp.setMaximumSize(d);
+    comp.setMinimumSize(d);
+  }
+
 }
 
 interface DragStartListener

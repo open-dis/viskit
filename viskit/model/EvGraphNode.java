@@ -20,45 +20,34 @@ import java.util.Vector;
 /**
  * An event as seen by the model (not the view)
  */
-public class EvGraphNode extends ViskitElement
+public class EvGraphNode extends AssemblyNode
 {
-  private String name;
-  private String type;
-
-  private Vector    connections = new Vector();
-  //private ArrayList constructorArguments = new ArrayList();
-  private ArrayList comments = new ArrayList();
-/*
-  private ArrayList transitions = new ArrayList();
-  private Vector    localVariables = new Vector();
-  private ArrayList arguments = new ArrayList();
-*/
-  private Point     position = new Point(0,0);
-
-  private VInstantiator instantiator;
+  protected boolean outputMarked = false;
   EvGraphNode(String name, String type)      // package access on constructor
   {
-    this.name = name;
-    this.type = type;
-    instantiator = new VInstantiator.FreeF(type,"");
+    super(name,type);
   }
-  public String toString()
-  {
-    return name;
-  }
+
+/*
   public EvGraphNode shallowCopy()
   {
     EvGraphNode en   = (EvGraphNode)super.shallowCopy(new EvGraphNode(name+"-copy",type));
     en.connections = connections;
     en.comments    = comments;
-/*
-    en.transitions = transitions;
-    en.localVariables = localVariables;
-    en.arguments   = arguments;
-*/
     en.connections = connections;
     return en;
   }
+*/
+  public boolean isOutputMarked()
+  {
+    return outputMarked;
+  }
+
+  public void setOutputMarked(boolean outputMarked)
+  {
+    this.outputMarked = outputMarked;
+  }
+
   public String getName()
   {
     /*
@@ -66,67 +55,14 @@ public class EvGraphNode extends ViskitElement
       return ((Event)opaqueModelObject).getName();
     else
     */
-      return name;
+      return super.getName();
   }
   public void setName(String s)
   {
     if(this.opaqueModelObject != null)
       ((SimEntity)opaqueModelObject).setName(s);
 
-    this.name = s;
+    super.setName(s);
   }
-  public String getType()
-  {
-    return type;
-  }
-  public void setType(String typ)
-  {
-   //todo if(this.opaqueModelObject != null)
-   //   ((Event)opaqueModelObject).setName(s);
-
-    this.type = typ;
-
-  }
-
-  public ArrayList getComments()
-  {
-    return comments;
-  }
-
-  public void setComments(ArrayList comments)
-  {
-    this.comments = comments;
-  }
-
-  public Vector getConnections()
-  {
-    return connections;
-  }
-
-  public void setConnections(Vector connections)
-  {
-    this.connections = connections;
-  }
-
-  public Point getPosition()
-  {
-    return position;
-  }
-
-  public void setPosition(Point position)
-  {
-    this.position = position;
-  }
-  
-  public VInstantiator getInstantiator()
-  {
-    return instantiator;
-  }
-
-  public void setInstantiator(VInstantiator instantiator)
-  {
-    this.instantiator = instantiator;
-  }
-
 
 }

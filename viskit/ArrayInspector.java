@@ -7,6 +7,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.*;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,11 +37,13 @@ public class ArrayInspector  extends JDialog
     locationComp = comp;
     contentP = new JPanel();
     contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
+    contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setContentPane(contentP);
 
     upPan = new JPanel(new SpringLayout());
     JLabel typeLab = new JLabel("Array type",JLabel.TRAILING);
     typeTF = new JTextField();
+    typeTF.setEditable(false);
     Vstatics.clampHeight(typeTF);
     typeLab.setLabelFor(typeTF);
     JLabel countLab = new JLabel("Array size (1-d)",JLabel.TRAILING);
@@ -48,12 +51,20 @@ public class ArrayInspector  extends JDialog
     Vstatics.clampHeight(sizeTF);
     countLab.setLabelFor(sizeTF);
 
+  JLabel helpLab = new JLabel("");
+  JLabel helpTextLabel = new JLabel("Press return to resize list");
+    helpTextLabel.setFont(sizeTF.getFont());
+  helpLab.setLabelFor(helpTextLabel);
+
     upPan.add(typeLab);
     upPan.add(typeTF);
     upPan.add(countLab);
     upPan.add(sizeTF);
+  upPan.add(helpLab);
+  upPan.add(helpTextLabel);
 
-    SpringUtilities.makeCompactGrid(upPan,2,2,5,5,5,5);
+    //SpringUtilities.makeCompactGrid(upPan,2,2,5,5,5,5);
+  SpringUtilities.makeCompactGrid(upPan,3,2,5,5,5,5);
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -66,7 +77,7 @@ public class ArrayInspector  extends JDialog
     // attach listeners
     listnr = new enableApplyButtonListener();
     typeTF.addCaretListener(listnr);
-    sizeTF.addCaretListener(listnr); // need to do something else here // todo
+    sizeTF.addCaretListener(listnr);
     sizeTF.addActionListener(new sizeListener());
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
@@ -81,10 +92,14 @@ public class ArrayInspector  extends JDialog
     contentP.removeAll();
     contentP.add(upPan);
     contentP.add(Box.createVerticalStrut(5));
-    contentP.add(olp);
+   JScrollPane jsp = new JScrollPane(olp);
+   jsp.getViewport().setPreferredSize(new Dimension(Integer.MAX_VALUE,240));
+   contentP.add(jsp);
+    //contentP.add(olp);
     contentP.add(Box.createVerticalStrut(5));
     contentP.add(buttPan);
 
+    sizeTF.setText(""+lis.size());
     pack();
     this.setLocationRelativeTo(locationComp);
   }
@@ -106,6 +121,12 @@ public class ArrayInspector  extends JDialog
   {
     public void actionPerformed(ActionEvent e)
     {
+      setSize();
+    }
+  }
+    public void setSize()
+    {
+System.out.println("setSize()");
       String s = sizeTF.getText().trim();
       int sz;
       try {
@@ -122,7 +143,7 @@ public class ArrayInspector  extends JDialog
         v.add(new VInstantiator.FreeF(myTyp,""));
       setData(v);
     }
-  }
+
   class cancelButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
@@ -138,10 +159,6 @@ public class ArrayInspector  extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
-      //if(checkBlankFields())
-       // return;
-      //if (modified)
-        //unloadWidgets();
       setVisible(false);
     }
   }

@@ -38,8 +38,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   private GraphMetaData metaData;
   HashMap nodeCache = new HashMap();
   HashMap assEdgeCache = new HashMap();
-  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/simkit.xsd";
-
+  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
+  private Point pointLess = new Point(100,100);
   public void init()
   {
     try {
@@ -62,7 +62,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
      try {
        FileWriter fw = new FileWriter(f);
        Marshaller m = jc.createMarshaller();
-       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
+       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(false)); //todo test true));
        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,schemaLoc);
 
        String nm = f.getName();
@@ -73,6 +73,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        jaxbRoot.setName(nIe(metaData.name));
        jaxbRoot.setVersion(nIe(metaData.version));
        jaxbRoot.setPackage(nIe(metaData.pkg));
+       jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+       jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
 /*
        jaxbRoot.setAuthor(nIe(metaData.author));
 
@@ -369,24 +371,17 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     coor.setY(""+pclNode.getPosition().y);
     jaxBPcl.setCoordinate(coor);
 
-    List lis = jaxBPcl.getTerminalParameter();
+
+    List lis = jaxBPcl.getParameters();
     lis.clear();
-    //todo redo
-/*
-    for (Iterator itr = pclNode.getConstructorArguments().iterator(); itr.hasNext();) {
-      ConstructorArgument ca = (ConstructorArgument) itr.next();
-      TerminalParameter tp = null;
-      try {
-        tp = oFactory.createTerminalParameter();
-      }
-      catch (JAXBException e) {
-        e.printStackTrace();
-      }
-      tp.setType(ca.getType());
-      tp.setValue(ca.getValue());
-      lis.add(tp);
+
+    VInstantiator inst = pclNode.getInstantiator();
+
+    List jlistt = getJaxbParamList(inst);
+    for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      lis.add(o);
     }
-*/
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
@@ -411,24 +406,170 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     List lis = jaxbSE.getParameters();
     lis.clear();
-    //todo redo
-    /*
-    for (Iterator itr = evNode.getConstructorArguments().iterator(); itr.hasNext();) {
-      ConstructorArgument ca = (ConstructorArgument) itr.next();
-      TerminalParameter tp = null;
-      try {
-        tp = oFactory.createTerminalParameter();
-      }
-      catch (JAXBException e) {
-        e.printStackTrace();
-      }
-      tp.setType(ca.getType());
-      tp.setValue(ca.getValue());
-      lis.add(tp);
+
+    VInstantiator inst = evNode.getInstantiator();
+
+    List jlistt = getJaxbParamList(inst);
+    for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      lis.add(o);
     }
-   */
+    List ouTL = jaxbRoot.getOutput();
+    if(evNode.isOutputMarked())
+      ouTL.add(jaxbSE);
+    else
+      ouTL.remove(jaxbSE);
+    
     modelDirty = true;
     this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
+  }
+  private List xgetInstantiatorsFromJaxb(String typ, List lis)
+  {
+    Vector v = new Vector();
+    if(lis.size()==1) {
+      v.add(buildInstantiatorFromJaxbParameter(lis.get(0)));
+      return v;
+    }
+
+    for (Iterator itr = lis.iterator(); itr.hasNext();) {
+      v.add(buildInstantiatorFromJaxbParameter(itr.next()));
+    }
+    VInstantiator.Constr vic = new VInstantiator.Constr(typ,v);
+    v = new Vector();
+    v.add(vic);
+    return v;
+  }
+  private List getInstantiatorListFromJaxbParmList(String typ, List lis)
+  {
+    Vector v = new Vector();
+
+    for (Iterator itr = lis.iterator(); itr.hasNext();) {
+      v.add(buildInstantiatorFromJaxbParameter(itr.next()));
+    }
+    return v;
+  }
+  private VInstantiator buildInstantiatorFromJaxbParameter(Object o)
+  {
+    if(o instanceof TerminalParameter)
+      return buildFreeFormFromTermParameter((TerminalParameter)o);
+    if(o instanceof MultiParameter)
+      return buildArrayFromMultiParameter((MultiParameter)o);
+    if(o instanceof FactoryParameter)
+      return buildFactoryInstFromFactoryParameter((FactoryParameter)o);
+    else
+      //assert false: "bad object, buildInstantiatorFromJaxbParameter
+      return null;
+  }
+  private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o)
+  {
+    //return new VInstantiator.Array(o.getType(),getInstantiatorsFromJaxb(o.getType(),o.getParameters()));
+    return new VInstantiator.Array(o.getType(),getInstantiatorListFromJaxbParmList(o.getType(),o.getParameters()));
+  }
+  private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o)
+  {
+    return new VInstantiator.Factory(o.getType(),o.getFactory(),
+        //"getInstance",getInstantiatorsFromJaxb(o.getType(),o.getParameters()));
+        "getInstance",getInstantiatorListFromJaxbParmList(o.getType(),o.getParameters()));
+  }
+  private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp)
+  {
+    return new VInstantiator.FreeF(tp.getType(),tp.getValue());
+  }
+
+  private List getJaxbParamList(VInstantiator vi)
+  {
+    Object o = buildParam(vi);
+    if(o instanceof List)
+      return (List)o;
+    Vector v = new Vector();
+    v.add(o);
+    return v;
+  }
+
+  private Object buildParam(VInstantiator vi)
+  {
+    if(vi instanceof VInstantiator.FreeF)
+      return buildParmFromFreeF((VInstantiator.FreeF)vi);      //TerminalParm
+    if(vi instanceof VInstantiator.Constr)
+      return buildParmFromConstr((VInstantiator.Constr)vi);     // List of Parms
+    if(vi instanceof VInstantiator.Factory)
+      return buildParmFromFactory((VInstantiator.Factory)vi);   // FactoryParam
+    if(vi instanceof VInstantiator.Array)
+      return buildParmFromArray((VInstantiator.Array)vi);       // MultiParam
+
+    //assert false : AssemblyModel.buildJaxbParameter() received null;
+    return null; //
+
+  }
+
+  private TerminalParameter buildParmFromFreeF(VInstantiator.FreeF viff)
+  {
+    TerminalParameter tp = null;
+    try {
+      tp = oFactory.createTerminalParameter();
+    }
+    catch (JAXBException e) {
+      System.err.println("jaxb error buildParmFromFreeF");
+      return null;
+    }
+    tp.setType(viff.getType());
+    tp.setValue(viff.getValue());
+    return tp;
+  }
+
+  private Parameters buildParmFromConstr(VInstantiator.Constr vicon)
+  {
+    Parameters p = null;
+    try {
+      p = oFactory.createParameters();
+    }
+    catch (JAXBException e) {
+      System.err.println("jaxb error buildParmFromConstr");
+      return null;
+    }
+    for (Iterator itr = vicon.getArgs().iterator(); itr.hasNext();) {
+      VInstantiator vi = (VInstantiator) itr.next();
+      p.getContent().add(buildParam(vi));
+    }
+    return p;
+  }
+
+  private FactoryParameter buildParmFromFactory(VInstantiator.Factory vifact)
+  {
+    FactoryParameter fp = null;
+    try {
+      fp = oFactory.createFactoryParameter();
+    }
+    catch (JAXBException e) {
+      System.err.println("jaxb error buildParmFromFactory");
+      return null;
+    }
+    fp.setType(vifact.getType());
+    fp.setFactory(vifact.getFactoryClass()+"."+vifact.getMethod()+"()");
+    for (Iterator itr = vifact.getParams().iterator(); itr.hasNext();) {
+      VInstantiator vi = (VInstantiator) itr.next();
+      fp.getParameters().add(buildParam(vi));
+    }
+    return fp;
+  }
+
+  private MultiParameter buildParmFromArray(VInstantiator.Array viarr)
+  {
+    MultiParameter mp = null;
+    try {
+      mp = oFactory.createMultiParameter();
+    }
+    catch (JAXBException e) {
+      System.err.println("jaxb error buildParmFromArray");
+      return null;
+
+    }
+    mp.setType(viarr.getType());
+    for (Iterator itr = viarr.getInstantiators().iterator(); itr.hasNext();) {
+      VInstantiator vi = (VInstantiator) itr.next();
+      mp.getParameters().add(buildParam(vi));
+    }
+    return mp;
   }
 
   public void newModel(File f)
@@ -448,6 +589,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       VGlobals.instance().assemblyReset();
       nodeCache.clear();
       assEdgeCache.clear();
+      pointLess = new Point(100,100);
       metaData = new GraphMetaData(); //todo need new object?
       metaData.name = "Assembly_name"; // override
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
@@ -464,6 +606,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         metaData.version = jaxbRoot.getVersion();
         metaData.name = jaxbRoot.getName();
         metaData.pkg = jaxbRoot.getPackage();
+
+        ScheduleType sch = jaxbRoot.getSchedule();
+        metaData.stopTime = sch.getStopTime();
+        metaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
 /*
         List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
@@ -477,13 +623,14 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         VGlobals.instance().assemblyReset();
         nodeCache.clear();
         assEdgeCache.clear();
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
-        buildEGsFromJaxb(jaxbRoot.getSimEntity());
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New model loaded from file"));
+        buildEGsFromJaxb(jaxbRoot.getSimEntity(),jaxbRoot.getOutput());
         buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
-        // may not need these:
-        //buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
-        //buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
-        //buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
+
+        buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
+        buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
+        buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
+
       }
       catch (JAXBException e) {
         JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
@@ -499,15 +646,136 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     currentFile = f;
     modelDirty = false;
   }
+  private void buildPCConnectionsFromJaxb(List pcconnsList)
+  {
+    for (Iterator itr = pcconnsList.iterator(); itr.hasNext();) {
+      PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) itr.next();
+      PropChangeEdge pce = new PropChangeEdge();
+      pce.setProperty(pclc.getProperty());
+      AssemblyNode toNode = (AssemblyNode)nodeCache.get(pclc.getListener());
+      AssemblyNode frNode = (AssemblyNode)nodeCache.get(pclc.getSource());
+      pce.setTo(toNode);
+      pce.setFrom(frNode);
+      pce.opaqueModelObject = pclc;
+      toNode.getConnections().add(pce);
+      frNode.getConnections().add(pce);
 
-  private void buildEGsFromJaxb(List simEntities)
+      assEdgeCache.put(pclc, pce);
+      this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
+    }
+  }
+
+  private void buildSimEvConnectionsFromJaxb(List simevconnsList)
+  {
+    for (Iterator itr = simevconnsList.iterator(); itr.hasNext();) {
+      SimEventListenerConnection selc =  (SimEventListenerConnection)itr.next();
+      SimEvListenerEdge sele = new SimEvListenerEdge();
+      AssemblyNode toNode = (AssemblyNode)nodeCache.get(selc.getListener());
+      AssemblyNode frNode = (AssemblyNode)nodeCache.get(selc.getSource());
+      sele.setTo(toNode);
+      sele.setFrom(frNode);
+      sele.opaqueModelObject = selc;
+      toNode.getConnections().add(sele);
+      frNode.getConnections().add(sele);
+      assEdgeCache.put(selc,sele);
+      this.notifyChanged(new ModelEvent(sele,ModelEvent.SIMEVLISTEDGEADDED, "Sim event listener connection added"));
+    }
+  }
+  private void buildAdapterConnectionsFromJaxb(List adaptersList)
+  {
+    for (Iterator itr = adaptersList.iterator(); itr.hasNext();) {
+      Adapter jaxbAdapter = (Adapter) itr.next();
+      AdapterEdge ae = new AdapterEdge();
+      AssemblyNode toNode = (AssemblyNode)nodeCache.get(jaxbAdapter.getTo());
+      AssemblyNode frNode = (AssemblyNode)nodeCache.get(jaxbAdapter.getFrom());
+      ae.setTo(toNode);
+      ae.setFrom(frNode);
+      ae.setSourceEvent(jaxbAdapter.getEventSent());
+      ae.setTargetEvent(jaxbAdapter.getEventHeard());
+      ae.opaqueModelObject = jaxbAdapter;
+      toNode.getConnections().add(ae);
+      frNode.getConnections().add(ae);
+      assEdgeCache.put(jaxbAdapter,ae);
+      this.notifyChanged(new ModelEvent(ae,ModelEvent.ADAPTEREDGEADDED, "Adapter connection added"));
+    }
+  }
+  private void buildPCLsFromJaxb(List pcLs)
+  {
+    for (Iterator itr = pcLs.iterator(); itr.hasNext();) {
+      PropertyChangeListener pcl = (PropertyChangeListener) itr.next();
+      PropChangeListenerNode pNode = buildPclNodeFromJaxbPCL(pcl);
+    }
+
+  }
+
+  private void buildEGsFromJaxb(List simEntities, List outputList)
   {
     for (Iterator itr = simEntities.iterator(); itr.hasNext();) {
       SimEntity se = (SimEntity) itr.next();
       EvGraphNode egn = buildEvgNodeFromJaxbSimEntity(se);
-
-      buildEdgesFromEvGraphNode(egn, egn.getConnections());
+      for (Iterator outIt = outputList.iterator(); outIt.hasNext();) {
+        Output o = (Output) outIt.next();
+        SimEntity simE = (SimEntity)o.getEntity();
+        if(simE == se) {
+          egn.setOutputMarked(true);
+          break;
+        }
+      }
+      // done separately buildEdgesFromEvGraphNode(egn, egn.getConnections());
     }
+  }
+
+  private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl)
+  {
+    PropChangeListenerNode pNode = (PropChangeListenerNode)nodeCache.get(pcl);
+    if(pNode != null) {
+      return pNode;
+    }
+    pNode = new PropChangeListenerNode(pcl.getName(),pcl.getType());
+    CoordinateType coor = pcl.getCoordinate();
+    if(coor == null) {
+      pNode.setPosition(pointLess);
+      pointLess = new Point(pointLess.x+15,pointLess.y+15);
+    }
+    else
+      pNode.setPosition(new Point(Integer.parseInt(coor.getX()),
+                             Integer.parseInt(coor.getY())));
+    List lis = pcl.getParameters();
+    if(lis.size() == 0)
+      pNode.setInstantiator(new VInstantiator.Constr(pcl.getType(),getInstantiatorListFromJaxbParmList(pcl.getType(), new Vector())));      //todo is this right
+
+/*
+    else if (lis.size() == 1) {
+      // fact instantiator, array instantiator, terminal Parm
+      Object o = lis.get(0);
+      if(o instanceof TerminalParameter) {
+        TerminalParameter tp = (TerminalParameter)o;
+        pNode.setInstantiator(new VInstantiator.FreeF(tp.getType(),tp.getValue()));
+      }
+      else if(o instanceof FactoryParameter) {
+        FactoryParameter fp = (FactoryParameter)o;
+        //todo following is not complete...separate fact class and fact method  and convert params
+        pNode.setInstantiator(new VInstantiator.Factory(fp.getType(),fp.getFactory(),
+                                 "getInstance()",getInstantiatorsFromJaxb(fp.getType(),fp.getParameters())));
+      }
+      else if(o instanceof MultiParameter) {
+        MultiParameter mp = (MultiParameter)o;
+        pNode.setInstantiator(new VInstantiator.Array(mp.getType(),getInstantiatorsFromJaxb(mp.getType(),mp.getParameters())));
+      }
+    }
+*/
+    else {
+      VInstantiator.Constr vc = new VInstantiator.Constr(pcl.getType(),getInstantiatorListFromJaxbParmList(pcl.getType(), lis));
+      pNode.setInstantiator(vc);
+    }
+
+
+    pNode.opaqueModelObject = pcl;
+    nodeCache.put(pcl,pNode);   // key = se
+
+    notifyChanged(new ModelEvent(pNode,ModelEvent.PCLADDED, "PCL added"));
+
+    return pNode;
   }
 
   private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se)
@@ -517,28 +785,60 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return en;
     }
     en = new EvGraphNode(se.getName(),se.getType());
-    //en.setName(se.getName());
+
     CoordinateType coor = se.getCoordinate();
-    if(coor == null)
-      en.setPosition(new Point(100,100));
+    if(coor == null) {
+      en.setPosition(pointLess);
+      pointLess = new Point(pointLess.x+15,pointLess.y+15);
+    }
     else
       en.setPosition(new Point(Integer.parseInt(coor.getX()),
                              Integer.parseInt(coor.getY())));
 
     List lis = se.getParameters();
-    for (Iterator itr = lis.iterator(); itr.hasNext();) {
-      Object o =  itr.next();
-
+    if(lis.size() == 0) {
+      en.setInstantiator(new VInstantiator.Constr(se.getType(),new Vector())); // todo is this right?
     }
+/*
+    else if (lis.size() == 1) {
+      // fact instantiator, array instantiator, terminal Parm
+      Object o = lis.get(0);
+      if(o instanceof TerminalParameter) {
+        TerminalParameter tp = (TerminalParameter)o;
+        en.setInstantiator(new VInstantiator.FreeF(tp.getType(),tp.getValue()));
+      }
+      else if(o instanceof FactoryParameter) {
+        FactoryParameter fp = (FactoryParameter)o;
+        //todo following is not complete...separate fact class and fact method  and convert params
+        en.setInstantiator(new VInstantiator.Factory(fp.getType(),fp.getFactory(),"getInstance",
+              getInstantiatorsFromJaxb(fp.getType(),fp.getParameters())));
+      }
+      else if(o instanceof MultiParameter) {
+        MultiParameter mp = (MultiParameter)o;
+        // todo ditto
+        en.setInstantiator(new VInstantiator.Array(mp.getType(),
+                                 getInstantiatorsFromJaxb(mp.getType(),mp.getParameters())));
+      }
+    }
+*/
+    else
+    {
+      // todo ditto
+      VInstantiator.Constr vc = new VInstantiator.Constr(se.getType(),getInstantiatorListFromJaxbParmList(se.getType(),lis));
+      en.setInstantiator(vc);
+    }
+
+
     en.opaqueModelObject = se;
     nodeCache.put(se,en);   // key = se
 
-    notifyChanged(new ModelEvent(en,ModelEvent.EVENTADDED, "Event added"));
+    notifyChanged(new ModelEvent(en,ModelEvent.EVENTGRAPHADDED, "Event added"));
 
     return en;
 
   }
 
+/*
   private void buildEdgesFromEvGraphNode(EvGraphNode egn, Vector connections)
   {
     for (Iterator itr = connections.iterator(); itr.hasNext();) {
@@ -554,6 +854,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       }
     }
   }
+
 
   private AdapterEdge buildAdapterEdgeFromJaxb(EvGraphNode egn, Adapter a)
   {
@@ -601,12 +902,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     this.notifyChanged(new ModelEvent(sele,ModelEvent.SIMEVLISTEDGEADDED,"SimEvList Edge added"));
     return sele;
   }
-  private void buildPCLsFromJaxb(List pcLs)
-  {
-    //todo implement
-
-  }
-
+ */
   /**
     * Boolean to signify whether the model has been changed since last disk save.
     *

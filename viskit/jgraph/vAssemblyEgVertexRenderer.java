@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -245,7 +246,7 @@ public class vAssemblyEgVertexRenderer
     DefaultGraphCell cell = (DefaultGraphCell)view.getCell();
     String nm = cell.getUserObject().toString();
     FontMetrics metrics = g2.getFontMetrics();
-
+ nm=breakName(nm,50,metrics);
     String[] lns = nm.split("\n");       // handle multi-line titles
 
     int hgt = metrics.getHeight();  // height of a line of text
@@ -257,6 +258,90 @@ public class vAssemblyEgVertexRenderer
       g2.drawString(lns[i],(54-xp)/2,y);
     }
   }
+private String breakName(String name, int maxW, FontMetrics metrics)
+{
+  StringBuffer sb = new StringBuffer();
+  String[] n = name.split("\n");
+  for(int i=0;i<n.length;i++) {
+    String[] nn = splitIfNeeded(n[i],maxW,metrics);
+    for(int j=0;j<nn.length;j++) {
+      sb.append(nn[j]);
+      sb.append("\n");
+    }
+  }
+  sb.setLength(sb.length()-1);
+  return sb.toString();
+}
+/*
+  public static void main(String[] args)
+  {
+    JLabel j = new JLabel("yup");
+    JFrame jf = new JFrame();
+    jf.getContentPane().add(j);
+    jf.pack();
+    jf.show();
+
+    Image ii = j.createImage(500,500); //"viskit/images/eventNode.png") ;
+    Graphics gr = ii.getGraphics();
+    FontMetrics fm = gr.getFontMetrics();
+
+    vAssemblyEgVertexRenderer.splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia",50,fm);
+    vAssemblyEgVertexRenderer.splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA",50,fm);
+    vAssemblyEgVertexRenderer.splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia",50,fm);
+    vAssemblyEgVertexRenderer.splitIfNeeded("mynameismikebaileyandiliveincalifornia",50,fm);
+  }
+*/
+
+private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
+  String[] nuts = new String[2];
+  nuts[1]=s;
+  Vector v = new Vector();
+  do {
+    nuts = splitOnce(nuts[1],maxW,metrics);
+    v.add(nuts[0]);
+  }
+  while(nuts[1] != null);
+  String[] ra = new String[v.size()];
+  ra = (String[])v.toArray(ra);
+  return ra;
+}
+  private String[] splitOnce(String s, int maxW, FontMetrics metrics)
+{
+  String[]ra = new String[2];
+  ra[0] = s;
+
+  int w = metrics.stringWidth(s);
+  if(w < maxW){
+    return ra;
+  }
+
+  String ws = s;
+  int fw;
+  int i;
+  for(i=s.length()-1;i>0;i--) {
+    ws = s.substring(0,i);
+    fw = metrics.stringWidth(ws);
+    if(fw <= maxW)
+      break;
+  }
+  if (i<=0)
+    return ra;    // couldn't get small enough...?
+
+  // ws is now a small piece of string less than our max
+
+    int j;
+  for(j=ws.length()-1;j>0;j--) {
+
+    if(Character.isUpperCase(s.charAt(j+1)))
+      break;
+  }
+  if (j<=0)
+    return ra; // couldn't find a break
+
+  ra[0] = ws.substring(0,j+1);
+  ra[1] = ws.substring(j+1) + s.substring(i);
+  return ra;
+}
 
   protected void paintBorder(Graphics g)
   {

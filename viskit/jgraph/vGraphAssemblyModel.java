@@ -246,7 +246,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   public void addPclEdge(PropChangeEdge pce)
   {
     EvGraphNode egn = (EvGraphNode)pce.getFrom();
-    PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();
+    //PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
+    AssemblyNode pcln = (AssemblyNode)pce.getTo();
     DefaultGraphCell from = (DefaultGraphCell)egn.opaqueViewObject;
     DefaultGraphCell to = (DefaultGraphCell)pcln.opaqueViewObject;
     vAssemblyEdgeCell edge = new vAssemblyEdgeCell();

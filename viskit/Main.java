@@ -8,6 +8,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.geom.PathIterator;
+import java.io.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -28,6 +29,7 @@ public class Main
 {
   public static void main(String[] args)
   {
+    System.out.println(System.getProperty("java.class.path"));
     //System.out.println(System.getProperty("user.dir"));
     String laf = "javax.swing.plaf.metal.MetalLookAndFeel";          //default
 
@@ -58,7 +60,7 @@ public class Main
     Controller cont = new Controller();
     VGlobals.instance().buildEventGraphViewFrame(cont,mod);
     VGlobals.instance().runEventGraphView();
-    
+
     cont.newEventGraph();
 /*
     Controller controller = new Controller();

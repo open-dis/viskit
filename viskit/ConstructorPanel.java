@@ -12,9 +12,7 @@ package viskit;
 
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 public class ConstructorPanel extends JPanel
@@ -180,27 +178,6 @@ public class ConstructorPanel extends JPanel
     }
 */
   }
-/*
-  public void xsetData(ArrayList arl)
-  {
-    for(int i=0;i<arl.size();i++) {
-      ConstructorArgument ca = (ConstructorArgument)arl.get(i);
-      field[i].setText(ca.getValue());
-    }
-  }
-  public ArrayList xgetData()
-  {
-    ArrayList retAL = new ArrayList(field.length);
-    for(int i=0;i<field.length;i++) {
-      ConstructorArgument ca = new ConstructorArgument();
-      ca.setType(label[i].getText());
-      ca.setValue(field[i].getText().trim());
-      retAL.add(i,ca);
-    }
-    return retAL;
-  }
-*/
-
 
   /**
    * @param clazz Class[] array, tyoically from constructor signature

@@ -11,6 +11,7 @@ package viskit;
  */
 
 import viskit.model.EvGraphNode;
+import viskit.model.VInstantiator;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -26,21 +27,20 @@ import java.awt.event.WindowEvent;
 
 public class EvGraphNodeInspectorDialog extends JDialog
 {
-  private JLabel handleLab;
-  //private JLabel typeLab;
-  private JTextField handleField;    // Text field that holds the parameter name
-  //private JTextField typeField;
+  private JLabel handleLab; //,outputLab;
+  private JTextField handleField;
+  private JCheckBox outputCheck;
   private InstantiationPanel ip;
-  private Class myClass;
   private static EvGraphNodeInspectorDialog dialog;
   private static boolean modified = false;
   private EvGraphNode egNode;
   private Component locationComp;
   private JButton okButt, canButt;
   private enableApplyButtonListener lis;
-  JPanel  buttPan;
+  private JPanel  buttPan;
 
-  public static String newName, newConstrValue;
+  public static String newName;
+  public static VInstantiator newInstantiator;
 
   public static boolean showDialog(JFrame f, Component comp, EvGraphNode parm)
   {
@@ -66,21 +66,15 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
     JPanel content = new JPanel();
     setContentPane(content);
-    content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+    content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
     handleField = new JTextField();
     Vstatics.clampHeight(handleField);
     handleField.addCaretListener(lis);
     handleLab = new JLabel("handle",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
-
-/*
-    typeLab = new JLabel("type",JLabel.TRAILING);
-    typeField = new JTextField();
-    Vstatics.clampHeight(typeField);
-    typeField.setEditable(false);
-    typeLab.setLabelFor(typeField);
-*/
+    //outputLab = new JLabel("detailed output",JLabel.TRAILING);
+    outputCheck = new JCheckBox("detailed output");
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -123,22 +117,13 @@ public class EvGraphNodeInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if (egNode != null) {
-
-/*
-      try {
-        myClass = Class.forName(egNode.getType());
-        Constructor[] cons = myClass.getConstructors();
-      }
-      catch (ClassNotFoundException e) {
-        e.printStackTrace();
-      }
-*/
-
       handleField.setText(egNode.getName());
+      outputCheck.setSelected(egNode.isOutputMarked());
 
-      ip = new InstantiationPanel(lis);
-      setupIP();
-
+      ip = new InstantiationPanel(this,lis,true);
+      ip.setData(egNode.getInstantiator());
+      ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+                      "Object creation",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
 
       JPanel content = new JPanel();
       content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
@@ -147,7 +132,9 @@ public class EvGraphNodeInspectorDialog extends JDialog
       JPanel cont = new JPanel(new SpringLayout());
       cont.add(handleLab);
       cont.add(handleField);
-      SpringUtilities.makeCompactGrid(cont, 1 , 2, 10, 10, 5, 5);
+      //cont.add(outputLab);
+      cont.add(outputCheck);
+      SpringUtilities.makeCompactGrid(cont, 1 , 3, 10, 10, 5, 5);
       content.add(cont);
 
       ip.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -168,30 +155,18 @@ public class EvGraphNodeInspectorDialog extends JDialog
     if (egNode != null) {
       egNode.setName(nm);
       egNode.setInstantiator(ip.getData());
-  //    ArrayList arl = ip.getData();
-  //    egNode.setConstructorArguments(ip.getData());
+      egNode.setOutputMarked(outputCheck.isSelected());
     }
     else {
       newName = nm;
-   //   newConstrValue = constrParmFields[0].getText().trim();
+      newInstantiator = ip.getData();
     }
   }
 
-  /**
-   * Initialize the InstantiationsPanel with the data from the pclnode
-   */
-  private void setupIP()
-  {
-    ip.setData(egNode.getInstantiator());
-    ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    "Object creation",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));
-  }
   class cancelButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
     {
-      if(checkBlankFields())
-        return;
       modified = false;    // for the caller
       setVisible(false);
     }
@@ -201,10 +176,11 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
-      if(checkBlankFields())
-        return;
-      if (modified)
+      if (modified) {
         unloadWidgets();
+        if(checkBlankFields())
+          return;
+      }
       setVisible(false);
     }
   }
@@ -229,24 +205,21 @@ public class EvGraphNodeInspectorDialog extends JDialog
    */
   boolean checkBlankFields()
   {
-/*
-    ArrayList constr = ip.getData();
+    VInstantiator vi=null;
+
+    if (egNode != null)
+      vi = egNode.getInstantiator();
+    else
+      vi = newInstantiator;
+
     testLp:
     {
       if(handleField.getText().trim().length() <= 0)
         break testLp;
-      if(typeField.getText().trim().length() <= 0)
+      if(!vi.isValid())
         break testLp;
-      if(!constr.isEmpty()) {
-        for (Iterator itr = constr.iterator(); itr.hasNext();) {
-          ConstructorArgument ca = (ConstructorArgument) itr.next();
-          if(ca.getValue().trim().length() <= 0)
-            break testLp;
-        }
-      }
 
       return false; // no blank fields , don't cancel close
-
     }   // testLp
 
     // Here if we found a problem
@@ -256,7 +229,6 @@ public class EvGraphNodeInspectorDialog extends JDialog
       return false;  // don't cancel
     else
       return true;  // cancel close
-*/return false;
   }
 
   class myCloseListener extends WindowAdapter
