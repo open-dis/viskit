@@ -41,6 +41,8 @@ public class ExternalAssemblyRunner extends JFrame
 
     this.outputs = outputEntities;
 
+    closer = new closeListener();
+    
     doMenus();
 
     setTitle("Running "+className);
@@ -54,7 +56,6 @@ public class ExternalAssemblyRunner extends JFrame
   //  runPanel.setVerboseListener(new verboseListener());
     // not needed.just check eachtime
 
-    closer = new closeListener();
     runPanel.closeButt.addActionListener(closer);
 
     Class targetClass = null;
