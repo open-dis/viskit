@@ -4,7 +4,7 @@
  * Created on September 16, 2004, 11:58 AM
  */
 
-package diskit;
+package examples.diskit;
 
 import mil.navy.nps.math.Vec4f;
 import mil.navy.nps.math.Vec3f;
@@ -274,4 +274,9 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
         destination = new Vec4f();
       
     }
+    
+    public float getCruisingSpeed() {
+        return cruisingSpeed;
+    }
+    
 }
