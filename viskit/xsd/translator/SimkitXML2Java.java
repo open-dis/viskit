@@ -157,9 +157,22 @@ public class SimkitXML2Java {
 	    }
 
 	    if ( c != null ) {
-		pw.println(sp4 + "protected" + sp + s.getType() + sp 
+                java.lang.reflect.Constructor cst = null;
+            
+                try {
+                    cst = c.getDeclaredConstructor(new Class[] {});
+                } catch (Exception e) { // no null constructors
+                    ;
+                }
+                
+		if ( cst != null ) pw.println(sp4 + "protected" + sp + s.getType() + sp 
 			+ s.getName() + sp + eq + sp + "new" + sp 
-			+ s.getType() + lp + rp + sc ) ;	
+			+ s.getType() + lp + rp + sc ) ;
+                else { // really not a bad case, most likely will be set by the reset()
+                    pw.println(sp4 + "protected" + sp + s.getType() + sp
+                        + s.getName() + sp + eq + sp + "null" + sc
+                    );
+                }
 	    }
 
 	    buildStateVariableAccessor(s,accessorBlock);
