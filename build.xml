@@ -225,6 +225,8 @@
     <target depends="build.init, jar" description="Build a complete, double-clickable jar file with all dependencies included." name="buildapp">                                                               
         <jar destfile="${dir.build}/viskitapp.jar">
             <zipfileset src="${dir.build.lib}/viskit.jar"/>
+            <zipfileset src="${dir.lib}/simkit.jar"/>
+            <zipfileset src="${dir.src}/examples/diskit/lib/dis.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="viskit.Splash2"/>
                 <attribute name="Class-Path" value="../lib/simkit.jar ../lib/actions.jar ../lib/jhall.jar ../lib/bsh-2.0b1.jar ../lib/jdom.jar ../lib/jgraph.jar ../lib/simkit.jar ../lib/tools.jar ../lib/jwsdp-1.4/jax-qname.jar ../lib/jwsdp-1.4/jaxb-api.jar ../lib/jwsdp-1.4/jaxb-impl.jar ../lib/jwsdp-1.4/jaxb-libs.jar ../lib/jwsdp-1.4/jaxp-api.jar ../lib/jwsdp-1.4/namespace.jar ../lib/jwsdp-1.4/relaxngDatatype.jar ../lib/jwsdp-1.4/xsdlib.jar"/>                                                                   
