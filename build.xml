@@ -64,6 +64,7 @@
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/jhall.jar"/>
         <pathelement location="${dir.lib}/tools.jar"/>
+	<pathelement location="${dir.lib}/jdom.jar"/>
         <path refid="jaxb.classes"/>
         <path refid="runtime.extension.classes"/>
     </path>
