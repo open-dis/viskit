@@ -8,10 +8,7 @@ import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import org.jgraph.graph.PortView;
 
-import viskit.EventGraphViewFrame;
-import viskit.ModelEvent;
-import viskit.ViskitController;
-import viskit.AssemblyViewFrame;
+import viskit.*;
 import viskit.model.*;
 import viskit.model.Edge;
 
@@ -325,7 +322,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
           selected.add(((DefaultGraphCell) oa[i]).getUserObject());
         else
           selected.remove(((DefaultGraphCell) oa[i]).getUserObject());
-      ((ViskitController) parent.getController()).selectNodeOrEdge(selected);
+      ((ViskitAssemblyController) parent.getController()).selectNodeOrEdge(selected);
     }
   }
 

@@ -1,6 +1,7 @@
 package viskit;
 
 import java.awt.*;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -18,5 +19,6 @@ public interface ViskitAssemblyController
   public void newAssembly();
   public void editGraphMetaData  ();
   
+  public void selectNodeOrEdge(Vector v);
 
 }

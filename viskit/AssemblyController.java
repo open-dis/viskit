@@ -5,6 +5,9 @@ import viskit.model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Vector;
+
+import actions.ActionIntrospector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -93,4 +96,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       if(modified)
         ((ViskitAssemblyModel)getModel()).changeMetaData(gmd);
     }
+  Vector selectionVector;
+  public void selectNodeOrEdge(Vector v)
+  //------------------------------------
+  {
+    selectionVector = v;
+    boolean ccbool = (selectionVector.size() > 0 ? true : false);
+// todo   ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
+//    ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
+//    ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
+  }
+
 }
