@@ -119,7 +119,7 @@
         </copy>
     </target>
 <!--  === TARGET: jar === -->
-    <target depends="compile" name="jar">
+    <target depends="compile,javahelp" name="jar">
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
     </target>
 
