@@ -204,9 +204,10 @@ public class SimkitAssemblyXML2Java {
 
     void doFactoryParameter(FactoryParameterType fact, String indent, PrintWriter pw) {
 	String factory = fact.getFactory();
+        String method = fact.getMethod();
 	List facts = fact.getParameters();
 	ListIterator facti = facts.listIterator();
-	pw.println(indent + sp4 + factory + pd + "getInstance" + lp);
+	pw.println(indent + sp4 + factory + pd + method + lp);
 	while ( facti.hasNext() ) {
 	    doParameter(facts, facti.next(), indent + sp8, pw);
 	}
@@ -221,9 +222,10 @@ public class SimkitAssemblyXML2Java {
 	    pw.print(indent + sp4 + value); 
 	} else if ( isString(type) ) {
 	    pw.print(indent + sp4 + qu + value + qu);
-	} else { // some Object
-	    pw.print(indent + sp4 + nw + sp + type + lp);
-	    pw.print(value + rp);
+	} else { // some Expression
+	    //pw.print(indent + sp4 + nw + sp + type + lp);
+	    //pw.print(value + rp);
+            pw.print(indent + value);
 	}
 
     }

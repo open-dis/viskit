@@ -14,6 +14,7 @@
 <!ELEMENT FactoryParameter (%Parameters;)* >
 <!ATTLIST FactoryParameter
     factory CDATA #REQUIRED
+    method  CDATA "getInstance"
     type    CDATA #REQUIRED
 >
 
