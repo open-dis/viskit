@@ -721,7 +721,7 @@ cancelArcMode.setIcon(new CanArcIcon());
   public boolean doMetaGraphEdit(GraphMetaData gmd)
   //-----------------------------------------------
   {
-    return MetaDataDialog.showDialog(this,this.graphPane,gmd);
+    return EvGraphMetaDataDialog.showDialog(this,this.graphPane,gmd);
   }
 
   public int genericAsk(String title, String msg)

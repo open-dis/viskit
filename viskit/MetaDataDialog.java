@@ -19,31 +19,21 @@ import java.awt.event.ActionListener;
  * Time: 3:52:05 PM
  */
 
-public class MetaDataDialog extends JDialog
+abstract public class MetaDataDialog extends JDialog
 {
   protected static MetaDataDialog dialog;
   protected static boolean modified = false;
 
+  protected JComponent runtimePanel;
   private JButton canButt;
   private JButton okButt;
-
-  public static boolean showDialog(JFrame f, Component comp, GraphMetaData gmd)
-  {
-
-    if(dialog == null)
-      dialog = new MetaDataDialog(f,comp,gmd);
-    else
-      dialog.setParams(comp,gmd);
-
-    dialog.setVisible(true);
-      // above call blocks
-    return modified;
-  }
 
   JFrame parentFrame;
   Component locationComp;
   GraphMetaData param;
   JTextField nameTf, packageTf, authorTf, versionTf, extendTf;
+  JTextField stopTimeTf;
+  JCheckBox verboseCb;
   JTextArea commentTa;
 
   public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd)
@@ -102,10 +92,30 @@ public class MetaDataDialog extends JDialog
                                     6, 6,        //initX, initY
                                     6, 6);       //xPad, yPad
 
-    // Don't make the
     Dimension d = textFieldPanel.getPreferredSize();
     textFieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
     c.add(textFieldPanel);
+
+    runtimePanel = new JPanel(new SpringLayout());
+    runtimePanel.setBorder(BorderFactory.createTitledBorder("Runtime defaults"));
+
+      JLabel stopTimeLab = new JLabel("stop time",JLabel.TRAILING);
+      stopTimeTf = new JTextField(20);
+      stopTimeLab.setLabelFor(stopTimeTf);
+      runtimePanel.add(stopTimeLab);
+      runtimePanel.add(stopTimeTf);
+
+      JLabel verboseLab = new JLabel("verbose output",JLabel.TRAILING);
+      verboseCb = new JCheckBox();
+      verboseLab.setLabelFor(verboseCb);
+      runtimePanel.add(verboseLab);
+      runtimePanel.add(verboseCb);
+
+      SpringUtilities.makeCompactGrid(runtimePanel,
+                                      2,2, 6,6, 6,6 );
+      d = runtimePanel.getPreferredSize();
+      runtimePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
+    c.add(runtimePanel);
 
     commentTa = new JTextArea(6,40);
     commentTa.setWrapStyleWord(true);
@@ -161,6 +171,8 @@ public class MetaDataDialog extends JDialog
     versionTf.setText(param.version);
     commentTa.setText(param.comment);
     extendTf.setText(param.extend);
+    stopTimeTf.setText(param.stopTime);
+    verboseCb.setSelected(param.verbose);
     nameTf.selectAll();
   }
   private void unloadWidgets()
@@ -171,6 +183,8 @@ public class MetaDataDialog extends JDialog
     param.pkg = packageTf.getText().trim();
     param.version = versionTf.getText().trim();
     param.extend = extendTf.getText().trim();
+    param.stopTime = stopTimeTf.getText().trim();
+    param.verbose = verboseCb.isSelected();
   }
   class cancelButtonListener implements ActionListener
   {
