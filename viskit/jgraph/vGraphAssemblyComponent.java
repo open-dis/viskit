@@ -257,7 +257,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         else if (c instanceof AssemblyCircleCell) {
           AssemblyCircleCell cc = (AssemblyCircleCell) c;
           EvGraphNode en = (EvGraphNode) cc.getUserObject();
-          tt += "<center>" + en.getName() + "</center>";
+          tt += "<center><u>" + en.getType() + "</u>" +
+                "<br>"+ en.getName() + "</center>";
 
 /*
           ArrayList st = en.getTransitions();
@@ -306,8 +307,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         else if (c instanceof AssemblyPropListCell) {
           AssemblyPropListCell cc = (AssemblyPropListCell) c;
            PropChangeListenerNode en = (PropChangeListenerNode) cc.getUserObject();
-           tt += "<center>" + en.getName() + "</center>";
-
+           tt += "<center><u>" + en.getType() + "</u><br>" +
+                  en.getName() + "</center>";
+           return "<HTML>" + tt + "</HTML>";
         }
       }
     }
@@ -323,9 +325,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     if (view instanceof AssemblyCircleView) {
       AssemblyCircleCell cc = (AssemblyCircleCell) view.getCell();
       Object en = cc.getUserObject();
-      if (en instanceof EvGraphNode) //EventNode)  // should always be, except for our prototype examples
-        return ((EvGraphNode) en).getName();
+      if (en instanceof EvGraphNode)
+        return ((EvGraphNode) en).getName();    // label name is actually gotten in paintComponent
     }
+/*
     else if (view instanceof vAssemblyEdgeView) {
       vAssemblyEdgeCell aec = (vAssemblyEdgeCell)view.getCell();
       Object e = aec.getUserObject();
@@ -339,6 +342,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         return " AdapterEdge";
       }
     }
+*/
 /*         old
     else if (view instanceof vEdgeView) {
       vEdgeCell cc = (vEdgeCell) view.getCell();
@@ -632,11 +636,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       ViskitAssemblyController controller = (ViskitAssemblyController) parent.getController();
 
       if(parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE)
-        /*controller.newAdapterArc(oa)*/;
+        controller.newAdapterArc(oa);
       else if(parent.getCurrentMode() == AssemblyViewFrame.SIMEVLIS_MODE)
-        /* controller.newSimEvListArc(oa)*/;
+        controller.newSimEvListArc(oa);
       else if(parent.getCurrentMode() == AssemblyViewFrame.PCL_MODE)
-        /* controller.newPropChangeListArc(oa)*/;
+        controller.newPropChangeListArc(oa);
     }
 
     public JPopupMenu createPopupMenu(final Point pt, final Object cell)
@@ -929,10 +933,23 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing
 
   private Object getKey(PortView pv)
   {
-    CircleView cv = (CircleView) pv.getParentView();
-    CircleCell cc = (CircleCell) cv.getCell();
-    EventNode en = (EventNode) cc.getUserObject();
-    return en.getModelKey();
+    Object o = pv.getParentView();
+    if(o instanceof AssemblyCircleView) {
+      AssemblyCircleView cv = (AssemblyCircleView) o;
+      AssemblyCircleCell cc = (AssemblyCircleCell) cv.getCell();
+      EvGraphNode egn = (EvGraphNode) cc.getUserObject();
+      return egn.getModelKey();
+    }
+    else if (o instanceof AssemblyPropListView) {
+      AssemblyPropListView apv = (AssemblyPropListView) o;
+      AssemblyPropListCell apc = (AssemblyPropListCell) apv.getCell();
+      PropChangeListenerNode pn = (PropChangeListenerNode) apc.getUserObject();
+      return pn.getModelKey();
+    }
+    else {
+      System.err.println("bad state vGraphAssemblyComponent.getKey()");
+      return null;
+    }
   }
 
   static HashMap nodePairs = new HashMap();
@@ -946,9 +963,8 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing
       masterKey = fromStr + "-" + toStr;
     else
       masterKey = toStr + "-" + fromStr;
-
-    vEdgeCell vec = (vEdgeCell) ev.getCell();
-    Edge edg = (Edge) vec.getUserObject();
+    vAssemblyEdgeCell vec = (vAssemblyEdgeCell) ev.getCell();
+    AssemblyEdge edg = (AssemblyEdge) vec.getUserObject();
     Object edgeKey = edg.getModelKey();
 
     Vector lis = (Vector) nodePairs.get(masterKey);

@@ -257,22 +257,25 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // not under control of the application controller (Controller.java).  Small, simple anonymous inner classes
     // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
-    selectMode.addActionListener(new ActionListener()
+    class PortsVisibleListener implements ActionListener
     {
+      private boolean tOrF;
+      PortsVisibleListener(boolean tOrF)
+      {
+        this.tOrF = tOrF;
+      }
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setPortsVisible(false);
+        graphPane.setPortsVisible(tOrF);
       }
-    });
-    adapterMode.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        graphPane.setPortsVisible(true);
-      }
-    });
 
-
+    };
+    PortsVisibleListener portsOn = new PortsVisibleListener(true);
+    PortsVisibleListener portsOff = new PortsVisibleListener(false);
+    selectMode.addActionListener(portsOff);
+    adapterMode.addActionListener(portsOn);
+    simEventListenerMode.addActionListener(portsOn);
+    propChangeListenerMode.addActionListener(portsOn);
   }
 
   private JToggleButton makeJTButton(Action a, String icPath, String tt)
@@ -369,6 +372,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   //  lTree.setTransferHandler(new JTreeToJgraphTransferHandler());
    // lTree.addMouseListener( new DragMouseAdapter());
     return panJsp;
+  }
+  
+  public void genericErrorReport(String title, String msg)
+  //-----------------------------------------------------
+  {
+    JOptionPane.showMessageDialog(this,msg,title,JOptionPane.ERROR_MESSAGE);
   }
 
   // Two classes to support dragging and dropping on the graph

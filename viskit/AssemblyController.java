@@ -8,6 +8,7 @@ import java.awt.*;
 import java.util.Vector;
 
 import actions.ActionIntrospector;
+import org.jgraph.graph.DefaultGraphCell;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -108,5 +109,50 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 //    ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
 //    ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
   }
+  public void newAdapterArc(Object[]nodes)
+  {
+    ((ViskitAssemblyModel)getModel()).newAdapterEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
+                                                     ((DefaultGraphCell)nodes[1]).getUserObject());
+  }
+  public void newSimEvListArc(Object[]nodes)
+  {
+    ((ViskitAssemblyModel)getModel()).newSimEvLisEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
+                                                      ((DefaultGraphCell)nodes[1]).getUserObject()); 
+  }
+  public void newPropChangeListArc(Object[]nodes)
+  {
+    // One has to be a prop change listener
+    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
+    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    if(oA instanceof PropChangeListenerNode && !(oB instanceof PropChangeListenerNode)) {
+      ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oB,(PropChangeListenerNode)oA);
+      return;
+    }
+    if(oB instanceof PropChangeListenerNode && !(oA instanceof PropChangeListenerNode)) {
+      ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oA,(PropChangeListenerNode)oB);
+      return;
+    }
+
+    ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","One of the two nodes must be an instance of a PropertyChangeListener.");
+  }
+/*
+  public void newArc(Object[] nodes)
+  //--------------------------------
+  {
+    // My node view objects hold node model objects and vice versa
+    EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
+    EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+    ((ViskitModel) getModel()).newEdge(src, tar);
+  }
+
+  public void newCancelArc(Object[] nodes)
+  //--------------------------------------
+  {
+    // My node view objects hold node model objects and vice versa
+    EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
+    EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+    ((ViskitModel) getModel()).newCancelEdge(src, tar);
+  }
+*/
 
 }

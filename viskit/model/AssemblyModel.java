@@ -1,10 +1,7 @@
 package viskit.model;
 
 import viskit.mvc.mvcAbstractModel;
-import viskit.xsd.bindings.assembly.ObjectFactory;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.bindings.assembly.SimEntity;
-import viskit.xsd.bindings.assembly.PropertyChangeListener;
+import viskit.xsd.bindings.assembly.*;
 import viskit.ModelEvent;
 
 import javax.swing.*;
@@ -82,6 +79,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       pcNode.setPosition(new Point(100,100));
     else
       pcNode.setPosition(p);
+    
     PropertyChangeListener jaxbPCL = null;
     try {
       jaxbPCL = oFactory.createPropertyChangeListener();
@@ -92,13 +90,132 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return;
     }
     jaxbPCL.setName(nIe(widgetName));
-    pcNode.opaqueModelObject = jaxbPCL;
     jaxbPCL.setType(className);
+    pcNode.opaqueModelObject = jaxbPCL;
     nodeCache.put(jaxbPCL,pcNode);
     jaxbRoot.getSimEntity().add(jaxbPCL);
 
     modelDirty = true;
     notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
+  }
+
+  public void newAdapterEdge (Object src, Object target)
+  {
+    AdapterEdge ae = new AdapterEdge();
+    ae.from = src;
+    ae.to   = target;
+    Object srcOMO,targetOMO;
+    if(src instanceof EvGraphNode) {
+      ((EvGraphNode)src).getConnections().add(ae);
+      srcOMO = ((EvGraphNode)src).opaqueModelObject;
+    }
+    else {
+      ((PropChangeListenerNode)src).getConnections().add(ae);
+      srcOMO = ((PropChangeListenerNode)src).opaqueModelObject;
+    }
+    if(target instanceof EvGraphNode) {
+      ((EvGraphNode)target).getConnections().add(ae);
+      targetOMO = ((EvGraphNode)target).opaqueModelObject;
+    }
+    else {
+      ((PropChangeListenerNode)target).getConnections().add(ae);
+      targetOMO = ((PropChangeListenerNode)target).opaqueModelObject;
+    }
+
+    SimEventListenerConnection selc; // no such thing as "AdapterConnection"?
+    try {
+      selc = oFactory.createSimEventListenerConnection();
+    }
+    catch (JAXBException e) {
+      //assert false : "AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.";
+      System.err.println("AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.");
+      return;
+    }
+    ae.opaqueModelObject = selc;
+
+    selc.setListener(targetOMO);
+    selc.setSource(srcOMO);
+
+    assEdgeCache.put(selc,ae);
+    modelDirty = true;
+
+    this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter edge added"));
+  }
+
+  public void newPclEdge(EvGraphNode src, PropChangeListenerNode target)
+  {
+    PropChangeEdge pce = new PropChangeEdge();
+    pce.from = src;
+    pce.to = target;
+
+    src.getConnections().add(pce);
+    target.getConnections().add(pce);
+
+    PropertyChangeListenerConnection pclc;
+    try {
+      pclc = oFactory.createPropertyChangeListenerConnection();
+    }
+    catch (JAXBException e) {
+      //assert false : "AssemblyModel.newPclEdge, error creating viskit.xsd.bindings.assembly.PropertyChangeListenerConnection.";
+      System.err.println("AssemblyModel.newPclEdge, error creating viskit.xsd.bindings.assembly.PropertyChangeListenerConnection.");
+      return;
+    }
+    pce.opaqueModelObject = pclc;
+    PropertyChangeListener targL = (PropertyChangeListener) target.opaqueModelObject;
+    pclc.setListener(targL);
+    SimEntity sent = (SimEntity) src.opaqueModelObject;
+    pclc.setSource(sent);
+
+
+    assEdgeCache.put(pclc, pce);
+    modelDirty = true;
+
+    this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
+
+  }
+
+  public void newSimEvLisEdge (Object src, Object target){
+    SimEvListenerEdge sele = new SimEvListenerEdge();
+    //AdapterEdge ae = new AdapterEdge();
+    sele.from = src;
+    sele.to   = target;
+    Object srcOMO,targetOMO;
+    if(src instanceof EvGraphNode) {
+      ((EvGraphNode)src).getConnections().add(sele);
+      srcOMO = ((EvGraphNode)src).opaqueModelObject;
+    }
+    else {
+      ((PropChangeListenerNode)src).getConnections().add(sele);
+      srcOMO = ((PropChangeListenerNode)src).opaqueModelObject;
+    }
+    if(target instanceof EvGraphNode) {
+      ((EvGraphNode)target).getConnections().add(sele);
+      targetOMO = ((EvGraphNode)target).opaqueModelObject;
+    }
+    else {
+      ((PropChangeListenerNode)target).getConnections().add(sele);
+      targetOMO = ((PropChangeListenerNode)target).opaqueModelObject;
+    }
+
+    SimEventListenerConnection selc; // no such thing as "AdapterConnection"?
+    try {
+      selc = oFactory.createSimEventListenerConnection();
+    }
+    catch (JAXBException e) {
+      //assert false : "AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.";
+      System.err.println("AssemblyModel.newSimEvLisEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.");
+      return;
+    }
+    sele.opaqueModelObject = selc;
+
+    selc.setListener(targetOMO);
+    selc.setSource(srcOMO);
+
+    assEdgeCache.put(selc,sele);
+    modelDirty = true;
+
+    this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
+
   }
 
   public void changeEvGNode(EvGraphNode node)

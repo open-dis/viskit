@@ -26,53 +26,42 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     initViskitStyle();
   }
 
-  Map viskitEdgeStyle, viskitCancelEdgeStyle;
-  Map viskitSelfRefEdge, viskitSelfRefCancel;
+  Map viskitAssyAdapterEdgeStyle;
+  Map viskitAssyPclEdgeStyle;
+  Map viskitAssySimEvLisEdgeStyle;
 
   public void initViskitStyle() {
 
-    viskitEdgeStyle = GraphConstants.createMap();
-    GraphConstants.setDisconnectable(viskitEdgeStyle,false);
-    GraphConstants.setLineEnd  (viskitEdgeStyle,GraphConstants.ARROW_TECHNICAL);
-    GraphConstants.setEndFill  (viskitEdgeStyle, true);
-    GraphConstants.setEndSize  (viskitEdgeStyle, 10);
-    GraphConstants.setFont       (viskitEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
-    GraphConstants.setBendable   (viskitEdgeStyle, true);
-    GraphConstants.setLineStyle  (viskitEdgeStyle, GraphConstants.STYLE_BEZIER);
-    GraphConstants.setLineWidth  (viskitEdgeStyle, 1);
-    GraphConstants.setOpaque     (viskitEdgeStyle, true);
-    GraphConstants.setBackground (viskitEdgeStyle, new Color(255,255,255,180));
-    // comment out for no border GraphConstants.setBorderColor(viskitEdgeStyle, Color.gray);
-    GraphConstants.setForeground (viskitEdgeStyle, Color.black);
-    GraphConstants.setRouting    (viskitEdgeStyle, new ViskitRouting());
+    viskitAssyAdapterEdgeStyle = GraphConstants.createMap();
 
-    viskitCancelEdgeStyle = GraphConstants.createMap();
-    GraphConstants.setDisconnectable(viskitCancelEdgeStyle,false);
-    GraphConstants.setLineEnd  (viskitCancelEdgeStyle,GraphConstants.ARROW_TECHNICAL);
-    GraphConstants.setEndFill  (viskitCancelEdgeStyle, true);
-    GraphConstants.setEndSize  (viskitCancelEdgeStyle, 10);
-    GraphConstants.setFont       (viskitCancelEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
-    GraphConstants.setBendable   (viskitCancelEdgeStyle, true);
-    GraphConstants.setLineStyle  (viskitCancelEdgeStyle, GraphConstants.STYLE_BEZIER);
-    GraphConstants.setLineWidth  (viskitCancelEdgeStyle, 1);
-    GraphConstants.setOpaque     (viskitCancelEdgeStyle, true);
-    GraphConstants.setBackground (viskitCancelEdgeStyle, new Color(255,255,255,180));
-    // comment out for no border GraphConstants.setBorderColor(viskitCancelEdgeStyle, Color.gray);
-    GraphConstants.setForeground (viskitCancelEdgeStyle, Color.black);
-    GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[] { 3, 3 });
-    GraphConstants.setRouting    (viskitCancelEdgeStyle, new ViskitRouting());
+    GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle,false);
+    GraphConstants.setLineEnd  (viskitAssyAdapterEdgeStyle,GraphConstants.ARROW_TECHNICAL);
+    GraphConstants.setEndFill  (viskitAssyAdapterEdgeStyle, true);
+    GraphConstants.setEndSize  (viskitAssyAdapterEdgeStyle, 10);
+    GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
+    GraphConstants.setBendable   (viskitAssyAdapterEdgeStyle, true);
+    GraphConstants.setLineStyle  (viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
+    GraphConstants.setLineWidth  (viskitAssyAdapterEdgeStyle, 2.0f);
+    GraphConstants.setOpaque     (viskitAssyAdapterEdgeStyle, true);
+    GraphConstants.setBackground (viskitAssyAdapterEdgeStyle, new Color(255,255,255,180));
+    //GraphConstants.setBorderColor(viskitAssyAdapterEdgeStyle, Color.red);
+    GraphConstants.setForeground (viskitAssyAdapterEdgeStyle, Color.black);
+    GraphConstants.setRouting    (viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
+    GraphConstants.setLineColor  (viskitAssyAdapterEdgeStyle, Color.lightGray); //new Color(0xA2,0xD9,0x9F));              // green
 
-    viskitSelfRefEdge = GraphConstants.createMap();
-    viskitSelfRefEdge.putAll    (viskitEdgeStyle);
-    GraphConstants.setLineStyle (viskitSelfRefEdge, GraphConstants.STYLE_ORTHOGONAL);
-    //GraphConstants.setLineEnd   (viskitSelfRefEdge, GraphConstants.ARROW_SIMPLE);
-    viskitSelfRefEdge.remove    (GraphConstants.ROUTING);
+    viskitAssyPclEdgeStyle = GraphConstants.createMap();
+    viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
-    viskitSelfRefCancel = GraphConstants.createMap();
-    viskitSelfRefCancel.putAll  (viskitCancelEdgeStyle);
-    GraphConstants.setLineStyle (viskitSelfRefCancel, GraphConstants.STYLE_ORTHOGONAL);
-    //GraphConstants.setLineEnd   (viskitSelfRefCancel, GraphConstants.ARROW_CIRCLE);
-    viskitSelfRefCancel.remove  (GraphConstants.ROUTING);
+    //GraphConstants.setDashPattern(viskitAssyPclEdgeStyle, new float[] { 3, 3 });
+    GraphConstants.setLineColor(viskitAssyPclEdgeStyle,new Color(0xff,0xc8,0xc8));
+    GraphConstants.setLineWidth(viskitAssyPclEdgeStyle,1.5f);
+
+
+    viskitAssySimEvLisEdgeStyle = GraphConstants.createMap();
+    viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
+
+    GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle,Color.black);
+    GraphConstants.setLineWidth(viskitAssySimEvLisEdgeStyle, 1.0f);
   }
 
   public void changeEvent(EventNode en)
@@ -164,6 +153,31 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void addAdapterEdge(AdapterEdge ae)
   {
+    Object frO = ae.from;
+    Object toO = ae.to;
+    DefaultGraphCell from,to;
+    if(frO instanceof EvGraphNode) {
+      from = (DefaultGraphCell)((EvGraphNode)frO).opaqueViewObject;
+    }
+    else {
+      from = (DefaultGraphCell)((PropChangeListenerNode)frO).opaqueViewObject;
+    }
+    if(toO instanceof EvGraphNode) {
+      to = (DefaultGraphCell)((EvGraphNode)toO).opaqueViewObject;
+    }
+    else {
+      to = (DefaultGraphCell)((PropChangeListenerNode)toO).opaqueViewObject;
+    }
+
+    vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+    ae.opaqueViewObject = edge;
+    edge.setUserObject(ae);
+    ConnectionSet cs = new ConnectionSet();
+    cs.connect(edge,from.getChildAt(0),to.getChildAt(0));
+    Map attributes = new Hashtable();
+    attributes.put(edge,this.viskitAssyAdapterEdgeStyle);
+
+    this.insert(new Object[]{edge},attributes,cs,null,null);
 
   }
   public void deleteAdapterEdge(AdapterEdge ae)
@@ -176,17 +190,37 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void addSimEvListEdge(SimEvListenerEdge sele)
   {
+    Object frO = sele.from;
+    Object toO = sele.to;
+    DefaultGraphCell from,to;
+    if(frO instanceof EvGraphNode) {
+      from = (DefaultGraphCell)((EvGraphNode)frO).opaqueViewObject;
+    }
+    else {
+      from = (DefaultGraphCell)((PropChangeListenerNode)frO).opaqueViewObject;
+    }
+    if(toO instanceof EvGraphNode) {
+      to = (DefaultGraphCell)((EvGraphNode)toO).opaqueViewObject;
+    }
+    else {
+      to = (DefaultGraphCell)((PropChangeListenerNode)toO).opaqueViewObject;
+    }
 
+    vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+    sele.opaqueViewObject = edge;
+    edge.setUserObject(sele);
+    ConnectionSet cs = new ConnectionSet();
+    cs.connect(edge,from.getChildAt(0),to.getChildAt(0));
+    Map attributes = new Hashtable();
+    attributes.put(edge,this.viskitAssySimEvLisEdgeStyle);
+
+    this.insert(new Object[]{edge},attributes,cs,null,null);
   }
   public void deleteSimEvListEdge(SimEvListenerEdge sele)
   {
 
   }
   public void changeSimEvListEdge(SimEvListenerEdge sele)
-  {
-
-  }
-  public void addPclEdge(PropChangeEdge pce)
   {
 
   }
@@ -252,13 +286,31 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     graph.graphDidChange(); // needed for redraw
 
   }
+  */
+  public void addPclEdge(PropChangeEdge pce)
+  {
+    EvGraphNode egn = (EvGraphNode)pce.from;
+    PropChangeListenerNode pcln = (PropChangeListenerNode)pce.to;
+    DefaultGraphCell from = (DefaultGraphCell)egn.opaqueViewObject;
+    DefaultGraphCell to = (DefaultGraphCell)pcln.opaqueViewObject;
+    vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+    pce.opaqueViewObject = edge;
+    edge.setUserObject(pce);
+    ConnectionSet cs = new ConnectionSet();
+    cs.connect(edge,from.getChildAt(0),to.getChildAt(0));
+    Map attributes = new Hashtable();
+    attributes.put(edge,this.viskitAssyPclEdgeStyle);
+
+    this.insert(new Object[]{edge},attributes,cs,null,null);
+  }
+  /*
   public void addEdge(SchedulingEdge se)
   {
-    _addEdgeCommon(se,viskitEdgeStyle);
+    _addEdgeCommon(se,viskitAssyAdapterEdgeStyle);
   }
   public void addCancelEdge(CancellingEdge ce)
   {
-    _addEdgeCommon(ce,viskitCancelEdgeStyle);
+    _addEdgeCommon(ce,viskitAssyPclEdgeStyle);
   }
   private void _addEdgeCommon(Edge ed, Map edgeStyle)
   {
@@ -284,7 +336,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
 
     if(enfrom == ento) {// self referential overwrite
       if(ed instanceof SchedulingEdge)
-        attributes.put(edge,this.viskitSelfRefEdge);
+        attributes.put(edge,this.viskitAssySimEvLisEdgeStyle);
       else
         attributes.put(edge,this.viskitSelfRefCancel);
     }
@@ -303,5 +355,4 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     GraphConstants.setOpaque(map, true);
     return map;
   }
-
 }

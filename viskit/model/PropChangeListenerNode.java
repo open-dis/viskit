@@ -99,7 +99,7 @@ public class PropChangeListenerNode extends ViskitElement
   {
     this.comments = comments;
   }
-
+  */
   public Vector getConnections()
   {
     return connections;
@@ -109,7 +109,7 @@ public class PropChangeListenerNode extends ViskitElement
   {
     this.connections = connections;
   }
-
+  /*
   public Vector getLocalVariables()
   {
     return localVariables;

@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 abstract public class AssemblyEdge extends ViskitElement
 {
-  public EventNode to;
-  public EventNode from;
+  public Object to; //PropChangeListenerNode to;
+  public Object from;
   public ArrayList parameters;
   public String    conditional;
   public String    conditionalsComment;

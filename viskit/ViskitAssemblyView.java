@@ -26,8 +26,9 @@ public interface ViskitAssemblyView
   public boolean doEditStateVariable( vStateVariable var);
 
   public int     genericAsk             ( String title, String prompt );      // returns JOptionPane constants
+*/
   public void    genericErrorReport     ( String title, String message );
-  public String  promptForStringOrCancel( String title, String message, String initval);
+/*  public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
   public File    saveFileAsk();

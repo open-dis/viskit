@@ -44,7 +44,7 @@ public class vGraphModel extends DefaultGraphModel
     GraphConstants.setLineWidth  (viskitEdgeStyle, 1);
     GraphConstants.setOpaque     (viskitEdgeStyle, true);
     GraphConstants.setBackground (viskitEdgeStyle, new Color(255,255,255,180));
-    // comment out for no border GraphConstants.setBorderColor(viskitEdgeStyle, Color.gray);
+    // comment out for no border GraphConstants.setBorderColor(viskitAssyAdapterEdgeStyle, Color.gray);
     GraphConstants.setForeground (viskitEdgeStyle, Color.black);
     GraphConstants.setRouting    (viskitEdgeStyle, new ViskitRouting());
 
@@ -59,7 +59,7 @@ public class vGraphModel extends DefaultGraphModel
     GraphConstants.setLineWidth  (viskitCancelEdgeStyle, 1);
     GraphConstants.setOpaque     (viskitCancelEdgeStyle, true);
     GraphConstants.setBackground (viskitCancelEdgeStyle, new Color(255,255,255,180));
-    // comment out for no border GraphConstants.setBorderColor(viskitCancelEdgeStyle, Color.gray);
+    // comment out for no border GraphConstants.setBorderColor(viskitAssyPclEdgeStyle, Color.gray);
     GraphConstants.setForeground (viskitCancelEdgeStyle, Color.black);
     GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[] { 3, 3 });
     GraphConstants.setRouting    (viskitCancelEdgeStyle, new ViskitRouting());
@@ -67,7 +67,7 @@ public class vGraphModel extends DefaultGraphModel
     viskitSelfRefEdge = GraphConstants.createMap();
     viskitSelfRefEdge.putAll    (viskitEdgeStyle);
     GraphConstants.setLineStyle (viskitSelfRefEdge, GraphConstants.STYLE_ORTHOGONAL);
-    //GraphConstants.setLineEnd   (viskitSelfRefEdge, GraphConstants.ARROW_SIMPLE);
+    //GraphConstants.setLineEnd   (viskitAssySimEvLisEdgeStyle, GraphConstants.ARROW_SIMPLE);
     viskitSelfRefEdge.remove    (GraphConstants.ROUTING);
 
     viskitSelfRefCancel = GraphConstants.createMap();

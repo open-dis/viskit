@@ -21,4 +21,8 @@ public interface ViskitAssemblyController
   
   public void selectNodeOrEdge(Vector v);
 
+  public void newAdapterArc(Object[]nodes);
+  public void newSimEvListArc(Object[]nodes);
+  public void newPropChangeListArc(Object[]nodes);
+  
 }

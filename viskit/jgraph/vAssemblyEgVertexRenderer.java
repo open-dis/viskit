@@ -158,7 +158,7 @@ public class vAssemblyEgVertexRenderer
 			if (graph.getEditingCell() != view.getCell()) {
 				Object label = graph.convertValueToString(view);
 				if (label != null)
-				;// jmb	setText(label.toString());
+				  ;//setText(label.toString());
 				else
 					; //jmb setText(null);
 			} else

@@ -61,6 +61,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
         return;
 
     ((ViskitModel) getModel()).newModel(null);
+
     editGraphMetaData();
   }
 
@@ -352,6 +353,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     boolean modified = MetaDataDialog.showDialog((EventGraphViewFrame)getView(),(EventGraphViewFrame)getView(),gmd);
     if(modified)
       ((ViskitModel)getModel()).changeMetaData(gmd);
+
+    // update title bar
+    ((ViskitView)getView()).fileName(gmd.name);    
   }
   
   public void nodeEdit(viskit.model.EventNode node)      // shouldn't be required

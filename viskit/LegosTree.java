@@ -321,20 +321,17 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
     {
       Object uo = ((DefaultMutableTreeNode) value).getUserObject();
-/*  try
-      if (uo instanceof Class)
-        setLeafIcon(myLeafIcon);
-      else
-        setLeafIcon(standardClosedIcon);
-*/
 
       super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
       if (uo instanceof Class) {
         Class c = (Class) uo;
         String nm = c.getName();
-        setText(nm.substring(nm.lastIndexOf('.') + 1));
         setToolTipText(nm);
+        nm = nm.substring(nm.lastIndexOf('.') + 1);
+        if(sel)
+          nm = "<html><b>"+nm+"</b></html>";
+        setText(nm);
         // We changed the text, so the following is required
         setPreferredSize(getPreferredSize());
       }
