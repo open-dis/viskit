@@ -4,7 +4,6 @@ import actions.ActionIntrospector;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
-import viskit.xsd.translator.SimkitXML2Java;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,7 +78,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
         if(((Model)getModel()).isDirty())
           return false; // we cancelled
        // else
-          return true;
+        return true;
         //break;
       case JOptionPane.NO_OPTION:
         return true;
@@ -260,7 +259,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void generateJavaClass()
   //-----------------------------
   {
-    if(((ViskitModel)getModel()).isDirty()) {
+    if(((ViskitModel)getModel()).isDirty() || lastFile == null) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
         return;
@@ -270,16 +269,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     String source = ((ViskitModel)getModel()).buildJavaSource();
     if(source != null && source.length() > 0)
       ((ViskitView)getView()).showAndSaveSource(source);
-  }
-
-  public boolean syntaxCheck(EventNode node)
-  {
-    return false;
-  }
-
-  public boolean syntaxCheck(Edge ed)
-  {
-    return false;
   }
 
   public void runAssemblyEditor()

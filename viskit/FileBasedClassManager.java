@@ -1,15 +1,11 @@
 package viskit;
 
-import viskit.xsd.translator.SimkitXML2Java;
-import viskit.model.ViskitAssemblyModel;
-import viskit.model.AssemblyModel;
-
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.*;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

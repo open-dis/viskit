@@ -42,7 +42,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       simEvLisClass   = Vstatics.classForName("simkit.SimEventListener");
       propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
       propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
-      if(simEvSrcClass == null | simEvLisClass == null | propChgSrcClass == null | propChgLisClass == null)
+      if(simEvSrcClass == null || simEvLisClass == null || propChgSrcClass == null || propChgLisClass == null)
         throw new ClassNotFoundException();
     }
     catch (ClassNotFoundException e) {
@@ -319,7 +319,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     else if(propChgLisClass.isAssignableFrom(ca))
       obArr[1] = a;
 
-    if(obArr[0] == null | obArr[1] == null || obArr[0]==obArr[1])
+    if(obArr[0] == null || obArr[1] == null || obArr[0]==obArr[1])
       return null;
     return obArr;
   }
@@ -336,7 +336,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     else if(simEvLisClass.isAssignableFrom(ca))
       obArr[1] = a;
 
-    if(obArr[0] == null | obArr[1] == null || obArr[0]==obArr[1])
+    if(obArr[0] == null || obArr[1] == null || obArr[0]==obArr[1])
       return null;
     return obArr;
   }
@@ -498,7 +498,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   private String produceJavaClass()
   {
-    if(((ViskitAssemblyModel)getModel()).isDirty()) {
+    if(((ViskitAssemblyModel)getModel()).isDirty() || lastFile == null) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
         return null;

@@ -58,8 +58,4 @@ public interface ViskitController
 
   void eventList();
   void generateJavaClass();
-  boolean syntaxCheck(EventNode node);
-  boolean syntaxCheck(Edge ed);
-
-
 }
