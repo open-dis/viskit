@@ -26,6 +26,9 @@ public interface ViskitAssemblyView
   public boolean doEditAdapterEdge(AdapterEdge aEdge);
   public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge);
 
+  public Object  getSelectedPropChangeListener();
+  public Object  getSelectedEventGraph();
+  
   public int     genericAsk             ( String title, String prompt );      // returns JOptionPane constants
   public void    genericErrorReport     ( String title, String message );
   public String  promptForStringOrCancel( String title, String message, String initval);
