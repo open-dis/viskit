@@ -13,8 +13,8 @@ import viskit.mvc.mvcModelEvent;
  */
 
 /**
- * This defines every event with which the application Model informs its listeners .. typically
- * the view.
+ * This defines every event with which the application Model informs its listeners. Typically
+ * this is the view.
  */
 
 public class ModelEvent extends mvcModelEvent
