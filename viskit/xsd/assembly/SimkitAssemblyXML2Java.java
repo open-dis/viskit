@@ -80,7 +80,7 @@ public class SimkitAssemblyXML2Java {
     public SimkitAssemblyXML2Java(File f) throws Exception {
         this.fileBaseName = baseNameOf(f.getName());
 	this.inputFile = f;
-        this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.assembly.bindings");
+        this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
         this.fileInputStream = new FileInputStream(f);
     }
 
