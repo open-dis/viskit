@@ -31,7 +31,7 @@ import viskit.xsd.bindings.*;
 
 public class SimkitXML2Java {
 
-    private SimkitModule root;
+    private SimEntity root;
 
     InputStream fileInputStream;
     String fileBaseName;
@@ -83,7 +83,7 @@ public class SimkitXML2Java {
 	Unmarshaller u;
 	try {
 	    u = jaxbCtx.createUnmarshaller();
-	    this.root = (SimkitModule) u.unmarshal(fileInputStream);
+	    this.root = (SimEntity) u.unmarshal(fileInputStream);
 	} catch (Exception e) { e.printStackTrace(); }
     }  
 
@@ -111,6 +111,7 @@ public class SimkitXML2Java {
 
 	PrintWriter pw = new PrintWriter(head);
 	String name = this.root.getName();
+        String pkg  = this.root.getPackage();
 	
 	pw.println("package examples;");
 	pw.println();
