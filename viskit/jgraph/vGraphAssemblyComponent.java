@@ -140,36 +140,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         model.changePclEdge((PropChangeEdge)ev.getSource());
         break;
 
-
-/*
-      case ModelEvent.EVENTADDED:
-        model.addEventNode((EventNode) ev.getSource());
-        break;
-      case ModelEvent.EDGEADDED:
-        model.addEdge((SchedulingEdge) ev.getSource());
-        break;
-      case ModelEvent.CANCELLINGEDGEADDED:
-        model.addCancelEdge((CancellingEdge) ev.getSource());
-        break;
-      case ModelEvent.EVENTCHANGED:
-        model.changeEvent((EventNode) ev.getSource());
-        break;
-      case ModelEvent.EVENTDELETED:
-        model.deleteEventNode((EventNode) ev.getSource());
-        break;
-      case ModelEvent.EDGECHANGED:
-        model.changeEdge((SchedulingEdge) ev.getSource());
-        break;
-      case ModelEvent.EDGEDELETED:
-        model.deleteEdge((SchedulingEdge) ev.getSource());
-        break;
-      case ModelEvent.CANCELLINGEDGECHANGED:
-        model.changeCancellingEdge((CancellingEdge) ev.getSource());
-        break;
-      case ModelEvent.CANCELLINGEDGEDELETED:
-        model.deleteCancellingEdge((CancellingEdge) ev.getSource());
-        break;
-*/
       default:
         //System.out.println("duh")
         ;

@@ -54,7 +54,6 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
   }
 
-  /* from other model...*/
   public void saveModel(File f)
   {
 
@@ -93,7 +92,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
      catch (JAXBException e) {
        JOptionPane.showMessageDialog(null,"Exception on JAXB marshalling" +
                                   "\n"+ f.getName() +
-                                  "\n"+ e.getMessage(),
+                                  "\n"+ e.getMessage() +
+                                  "\n(check for blank data fields)",
                                   "XML I/O Error",JOptionPane.ERROR_MESSAGE);
        return;
      }
@@ -469,7 +469,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
         metaData.comment = sb.toString().trim();
 */
-        VGlobals.instance().reset();
+        VGlobals.instance().assemblyReset();
         nodeCache.clear();
         assEdgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
@@ -512,11 +512,19 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return en;
     }
     en = new EvGraphNode(se.getName(),se.getType());
-    en.setName(se.getName());
+    //en.setName(se.getName());
     CoordinateType coor = se.getCoordinate();
-    en.setPosition(new Point(Integer.parseInt(coor.getX()),
+    if(coor == null)
+      en.setPosition(new Point(100,100));
+    else
+      en.setPosition(new Point(Integer.parseInt(coor.getX()),
                              Integer.parseInt(coor.getY())));
 
+    List lis = se.getParameters();
+    for (Iterator itr = lis.iterator(); itr.hasNext();) {
+      Object o =  itr.next();
+
+    }
     en.opaqueModelObject = se;
     nodeCache.put(se,en);   // key = se
 

@@ -261,6 +261,19 @@ public class vAssemblyEgVertexRenderer
   protected void paintBorder(Graphics g)
   {
     // jmb lose the rectangle super.paintBorder(g);
+
+    // To put a red border around "incompletely-specified" nodes, establish
+    // some connection to the user object, and do a conditional here
+    /*
+    if(userobject shows incomplete) {
+      Graphics2D g2 = (Graphics2D)g;
+      Rectangle r = view.getBounds();
+      g2.setColor(Color.red);
+      g2.drawRoundRect(2,2,r.width-4,r.height-4,20,20);
+    }
+    else
+      ;  // Do nothing
+    */
   }
 
 	/**

@@ -182,11 +182,20 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void deleteAdapterEdge(AdapterEdge ae)
   {
+    this.remove(new Object[]{ae.opaqueViewObject});
+  }
+  public void changeAnyEdge(AssemblyEdge asEd)
+  {
+    DefaultGraphCell c = (DefaultGraphCell)asEd.opaqueViewObject;
+    c.setUserObject(asEd);
+
+    graph.getUI().stopEditing(graph);
+    graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
 
   }
   public void changeAdapterEdge(AdapterEdge ae)
   {
-
+    changeAnyEdge(ae);
   }
   public void addSimEvListEdge(SimEvListenerEdge sele)
   {
@@ -218,75 +227,22 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void deleteSimEvListEdge(SimEvListenerEdge sele)
   {
-
+    this.remove(new Object[]{sele.opaqueViewObject});
   }
+
   public void changeSimEvListEdge(SimEvListenerEdge sele)
   {
-
+    changeAnyEdge(sele);
   }
   public void deletePclEdge(PropChangeEdge pce)
   {
+    this.remove(new Object[]{pce.opaqueViewObject});
 
   }
   public void changePclEdge(PropChangeEdge pce)
   {
-
+    changeAnyEdge(pce);
   }
-/*
-  public void addEventNode(EventNode en)
-  {
-    DefaultGraphCell c = new CircleCell(en.getName());
-    en.opaqueViewObject = c;
-    c.setUserObject(en);
-
-    Map attributes = new Hashtable();
-    attributes.put(c,createBounds(en.getPosition().x, en.getPosition().y,Color.black));
-    //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
-    
-    //c.add(new DefaultPort(en.getName()+"/Center"));
-    c.add(new vPortCell(en.getName()+"/Center"));
-    this.insert(new Object[]{c},attributes,null,null,null);
-  }
-*/
-/*
-  public void deleteEdge(SchedulingEdge edge)
-  {
-    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
-    this.remove(new Object[]{e});
-  }
-
-  public void deleteCancellingEdge(CancellingEdge edge)
-  {
-    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
-    this.remove(new Object[]{e});
-  }
-  public void changeEdge(SchedulingEdge ed)
-  {
-    changeEitherEdge(ed);
-  }
-  public void changeCancellingEdge(CancellingEdge ed)
-  {
-    changeEitherEdge(ed);
-  }
-
-  // I don't think this is required anymore.  We don't change src/targets...we rebuild the edge
-  private void changeEitherEdge(Edge ed)
-  {
-    CircleCell newFromCC = (CircleCell)ed.from.opaqueViewObject;
-    vEdgeCell  edgeC = (vEdgeCell)ed.opaqueViewObject;
-
-    DefaultPort dpFrom = (DefaultPort)edgeC.getSource();
-    Object dpCC = dpFrom.getParent();
-    if(dpCC == newFromCC)
-      return; // no change
-    edgeC.setSource(edgeC.getTarget());
-    edgeC.setTarget(dpFrom);
-
-    graph.getUI().stopEditing(graph);    // this does it, but label is screwed
-    graph.graphDidChange(); // needed for redraw
-
-  }
-  */
   public void addPclEdge(PropChangeEdge pce)
   {
     EvGraphNode egn = (EvGraphNode)pce.getFrom();
@@ -303,48 +259,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
 
     this.insert(new Object[]{edge},attributes,cs,null,null);
   }
-  /*
-  public void addEdge(SchedulingEdge se)
-  {
-    _addEdgeCommon(se,viskitAssyAdapterEdgeStyle);
-  }
-  public void addCancelEdge(CancellingEdge ce)
-  {
-    _addEdgeCommon(ce,viskitAssyPclEdgeStyle);
-  }
-  private void _addEdgeCommon(Edge ed, Map edgeStyle)
-  {
-    EventNode enfrom = ed.from;
-    EventNode ento   = ed.to;
-    DefaultGraphCell from = (DefaultGraphCell)enfrom.opaqueViewObject;
-    DefaultGraphCell to   = (DefaultGraphCell)ento.opaqueViewObject;
 
-    DefaultEdge edge = null;
-    if(enfrom == ento)
-      edge = new vSelfEdgeCell(null);
-    else
-      edge = new vEdgeCell(null);
-
-    ed.opaqueViewObject = edge;
-    edge.setUserObject(ed);
-    ConnectionSet cs = new ConnectionSet();
-    cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
-
-    Map attributes = new Hashtable();
-
-    attributes.put(edge, edgeStyle);
-
-    if(enfrom == ento) {// self referential overwrite
-      if(ed instanceof SchedulingEdge)
-        attributes.put(edge,this.viskitAssySimEvLisEdgeStyle);
-      else
-        attributes.put(edge,this.viskitSelfRefCancel);
-    }
-
-    this.insert(new Object[]{edge},attributes,cs,null,null);
-
-  }
-*/
   public Map createBounds(int x, int y, Color c) {
     Map map = GraphConstants.createMap();
     GraphConstants.setBounds(map, new Rectangle(x, y, 54, 54)); //90, 30));

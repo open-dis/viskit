@@ -10,8 +10,8 @@ package viskit;
  * Time: 9:19:41 AM
  */
 
-import viskit.model.PropChangeListenerNode;
 import viskit.model.EvGraphNode;
+import viskit.model.ConstructorArgument;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class EvGraphNodeInspectorDialog extends JDialog
@@ -166,6 +167,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     nm = nm.replaceAll("\\s", "");
     if (egNode != null) {
       egNode.setName(nm);
+      ArrayList arl = ip.getData();
       egNode.setConstructorArguments(ip.getData());
     }
     else {
@@ -189,6 +191,8 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
+      if(checkBlankFields())
+        return;
       modified = false;    // for the caller
       setVisible(false);
     }
@@ -198,6 +202,8 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
+      if(checkBlankFields())
+        return;
       if (modified)
         unloadWidgets();
       setVisible(false);
@@ -218,22 +224,37 @@ public class EvGraphNodeInspectorDialog extends JDialog
       caretUpdate(null);
     }
   }
-
-  class OneLinePanel extends JPanel
+  /**
+   * Check for blank fields and return true if user wants to cancel close
+   * @return true = cancel close
+   */
+  boolean checkBlankFields()
   {
-    OneLinePanel(JLabel lab, int w, JComponent comp)
+    ArrayList constr = ip.getData();
+    testLp:
     {
-      setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-      add(Box.createHorizontalStrut(5));
-      add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-      add(lab);
-      add(Box.createHorizontalStrut(5));
-      add(comp);
+      if(handleField.getText().trim().length() <= 0)
+        break testLp;
+      if(typeField.getText().trim().length() <= 0)
+        break testLp;
+      if(!constr.isEmpty()) {
+        for (Iterator itr = constr.iterator(); itr.hasNext();) {
+          ConstructorArgument ca = (ConstructorArgument) itr.next();
+          if(ca.getValue().trim().length() <= 0)
+            break testLp;
+        }
+      }
 
-      Dimension d = getPreferredSize();
-      d.width = Integer.MAX_VALUE;
-      setMaximumSize(d);
-    }
+      return false; // no blank fields , don't cancel close
+    }   // testLp
+
+    // Here if we found a problem
+    int ret = JOptionPane.showConfirmDialog(EvGraphNodeInspectorDialog.this, "All fields must be completed. Close anyway?",
+        "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    if (ret == JOptionPane.YES_OPTION)
+      return false;  // don't cancel
+    else
+      return true;  // cancel close
   }
 
   class myCloseListener extends WindowAdapter

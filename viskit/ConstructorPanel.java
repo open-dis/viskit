@@ -49,48 +49,113 @@ public class ConstructorPanel extends JPanel
     label = new JLabel[signature.length];
 
     JPanel innerP = null;
-    setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     add(Box.createVerticalGlue());
-    if(signature.length > 0) {
+    if (signature.length > 0) {
       innerP = new JPanel(new SpringLayout());
       innerP.setBorder(BorderFactory.createEtchedBorder());
       innerP.setLayout(new SpringLayout());
       for (int i = 0; i < label.length; ++i) {
-        label[i] = new JLabel(signature[i].getName(),JLabel.TRAILING);
+        label[i] = new JLabel(convertClassName(signature[i].getName()), JLabel.TRAILING);
         innerP.add(label[i]);
         field[i] = new JTextField(10);
-        if(modifiedListener != null)
+        if (modifiedListener != null)
           field[i].addCaretListener(modifiedListener);
-        innerP.add(field[i]);
-        label[i].setLabelFor(field[i]);
         clampHeight(field[i]);
+        // Do the extended constructor game
+        // Terminal Param, MultiParam, Factoryparm
+        Class c = null;
+        c = signature[i];
+
+        if (c != null) {
+          if (!c.isPrimitive() || c.isArray()) {
+            JPanel tinyP = new JPanel();
+            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
+            tinyP.add(field[i]);
+            JButton b = new JButton("...");
+            b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+            clampSize(b, field[i], b);
+            tinyP.add(b);
+            innerP.add(tinyP);
+            label[i].setLabelFor(tinyP);
+            if (c.isArray())
+              b.setToolTipText("Edit with array wizard");
+            else
+              b.setToolTipText("Edit with new object wizard");
+          }
+          else {
+            innerP.add(field[i]);
+            label[i].setLabelFor(field[i]);
+          }
+        }
       }
-      SpringUtilities.makeCompactGrid(innerP,signature.length,2,5,5,5,5);
+      SpringUtilities.makeCompactGrid(innerP, signature.length, 2, 5, 5, 5, 5);
     }
     else {
       innerP = new JPanel(new BorderLayout());
-      innerP.add(new JLabel("<no parameters>",JLabel.CENTER),BorderLayout.CENTER);
+      innerP.add(new JLabel("<no parameters>", JLabel.CENTER), BorderLayout.CENTER);
     }
     add(innerP);
     add(Box.createVerticalStrut(5));
     add(Box.createVerticalGlue());
 
-      JPanel buttPan = new JPanel();
-      buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
-      buttPan.add(Box.createHorizontalGlue());
-      selectButt = new JButton("Select this constructor");
-      buttPan.add(selectButt);
-      buttPan.add(Box.createHorizontalGlue());
+    JPanel buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    buttPan.add(Box.createHorizontalGlue());
+    selectButt = new JButton("Select this constructor");
+    buttPan.add(selectButt);
+    buttPan.add(Box.createHorizontalGlue());
 
     add(buttPan);
     add(Box.createVerticalStrut(5));
 
-    if(selectListener != null)
+    if (selectListener != null)
       selectButt.addActionListener(selectListener);
 
     setSelected(false);
   }
-  JPanel cont = new JPanel(new SpringLayout());
+
+  String convertClassName(String s)
+  {
+    if(s.charAt(0) != '[')
+      return s;
+
+    int dim = 0;
+    StringBuffer sb = new StringBuffer();
+    for(int i=0;i<s.length();i++) {
+      if(s.charAt(i) == '['){
+        dim ++;
+        sb.append("[]");
+      }
+      else
+        break;
+    }
+
+    String brackets = sb.toString();
+
+    char ty = s.charAt(dim);
+    s = s.substring(dim+1);
+    switch(ty)
+    {
+      case 'Z': return "boolean" + brackets;
+      case 'B': return "byte" + brackets;
+      case 'C': return "char" + brackets;
+      case 'L': return s.substring(0,s.length()-1) + brackets;  // lose the ;
+      case 'D': return "double" + brackets;
+      case 'F': return "float" + brackets;
+      case 'I': return "int" + brackets;
+      case 'J': return "long" + brackets;
+      case 'S': return "short" + brackets;
+      default:
+        return "bad parse";
+    }
+  }
+  void clampSize(JComponent c, JComponent h, JComponent w)
+  {
+    Dimension d = new Dimension(h.getPreferredSize().height,w.getPreferredSize().width);
+    c.setMaximumSize(d);
+    c.setMinimumSize(d);
+  }
   void clampHeight(JComponent comp)
   {
     Dimension d = comp.getPreferredSize();

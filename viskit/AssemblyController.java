@@ -66,6 +66,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   File lastFile;
   public void open()
   {
+    if (((AssemblyModel)getModel()).isDirty())
+      if(askToSaveAndContinue() == false)
+        return;
+
+    lastFile = ((ViskitAssemblyView) getView()).openFileAsk();
+    if (lastFile != null) {
+      ((ViskitAssemblyModel) getModel()).newModel(lastFile);
+      ((ViskitAssemblyView) getView()).fileName(lastFile.getName());
+    }
 
   }
   public void save()
@@ -161,7 +170,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       AdapterEdge ae = ((ViskitAssemblyModel)getModel()).newAdapterEdge((EvGraphNode)oA,(EvGraphNode)oB);
       // edit right away
       if(ae != null)     // shouldn't happen
-        ((ViskitAssemblyView)getView()).doEditAdapterEdge(ae);
+        adapterEdgeEdit(ae);
     }
   }
   public void newSimEvListArc(Object[]nodes)
@@ -190,7 +199,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","One of the two nodes must be an instance of a PropertyChangeListener.");
     // edit right away
     if(pce != null)
-      ((ViskitAssemblyView)getView()).doEditPclEdge(pce);
+      pcListenerEdgeEdit(pce);
   }
 
   public void pcListenerEdit(PropChangeListenerNode pclNode)
