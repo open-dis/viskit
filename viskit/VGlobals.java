@@ -434,8 +434,8 @@ public class VGlobals
   private String[] morePackages = {"primitives","java.lang","java.util","simkit.random","cancel"};
   private String[][] moreClasses =
   {
-    {"boolean","byte","char","float","long","short"},
-    {"Boolean","Byte","Character","Float","Long","Short"},
+    {"boolean","char","byte","short","int","long","float","double"},
+    {"Boolean","Character","Byte","Short","Integer","Long","Float","Double","String","StringBuffer"},
     {"HashMap","HashSet","LinkedList","Properties","Random","TreeMap","TreeSet","Vector"},
     {"RandomNumber","RandomVariate"},
     {}
