@@ -14,19 +14,20 @@
     name="TransferLineComponent"
     version="0.0.1" >
 
-    <Parameter name="totalNumberServers" type="int[]" shortName="tns" />
-    <Parameter name="serviceTime" type="simkit.random.RandomVariate[]" shortName="st" />
+    <Parameter name="totalNumberServers" type="int[]" />
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate[]" />
     
     <StateVariable name="numberAvailableServers" type="int[]" />
     <StateVariable name="numberInQueue" type="int[]" />
     
     <Event name="Run" >
+	<LocalVariable name="j" type="int" />
     
-        <StateTransition state="numberAvailableServers" >
-            <Assignment value="totalNumberServers" />
+        <StateTransition state="numberAvailableServers" index="j" >
+            <Assignment value="totalNumberServers[j]" />
         </StateTransition>
     
-        <StateTransition state="numberInQueue" >
+        <StateTransition state="numberInQueue" index="j">
             <Assignment value="0" />
         </StateTransition>
         
@@ -40,11 +41,11 @@
         
         <Argument name="i" type="int" />
         
-        <StateTransition state="numberInQueue[i]" >
+        <StateTransition state="numberInQueue" index="i" >
             <Assignment value="0" />
         </StateTransition>
         
-        <StateTransition state="numberAvailableServers[i]" >
+        <StateTransition state="numberAvailableServers" index="i" >
             <Assignment value="totalNumberServers[i]" />
         </StateTransition>
 
@@ -57,7 +58,7 @@
     <Event name="Arrival" >
 	<Argument name="i" type="int" />
 	
-	<StateTransition state="numberInQueue[i]" >
+	<StateTransition state="numberInQueue" index="i" >
 	    <Assignment value="numberInQueue[i] + 1" />
 	</StateTransition>
 
@@ -71,12 +72,12 @@
         
         <Argument name="i" type="int" />
         
-        <StateTransition state="numberInQueue[i]" >
+        <StateTransition state="numberInQueue" index="i" >
             <Assignment value="numberInQueue[i] + 1" />
         </StateTransition>
         
         
-        <StateTransition state="numberAvailableServers[i]" >
+        <StateTransition state="numberAvailableServers" index="i" >
             <Assignment value="numberAvailableServers[i] - 1" />
         </StateTransition>
         
@@ -91,7 +92,7 @@
     
         <Argument name="i" type="int" />
         
-        <StateTransition state="numberAvailableServers[i]" >
+        <StateTransition state="numberAvailableServers" index="i" >
             <Assignment value="numberAvailableServers[i]+1" />
         </StateTransition>
         
