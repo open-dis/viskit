@@ -36,7 +36,7 @@
     <javac srcdir="${src}" destdir="${build}" verbose="${javac.verbose}" debug="${javac.debug}">
         <classpath>
             <pathelement location="${lib}/dis.jar"/>
-            <pathelement location="${lib}/simkit.jar"/>
+            <pathelement location="../../lib/simkit.jar"/>
         </classpath>
     </javac>
   </target>
