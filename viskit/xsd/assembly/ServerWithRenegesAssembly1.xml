@@ -14,7 +14,7 @@
     version="0.1"
 >
 
-    <SimEntity name="arrival" type="examples.ArrivalProcess">
+    <SimEntity name="arrival" type="simkit.examples.ArrivalProcess">
         <FactoryParameter type="simkit.random.RandomVariate" 
                 factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential" />
@@ -25,7 +25,7 @@
         </FactoryParameter>
     </SimEntity>
     
-    <SimEntity name="server" type="examples.ServerWithReneges" >
+    <SimEntity name="server" type="simkit.examples.ServerWithReneges" >
         <TerminalParameter type="int" value="2" />
         <FactoryParameter type="simkit.random.RandomVariate" 
                 factory="simkit.random.RandomVariateFactory">
@@ -47,31 +47,31 @@
         </FactoryParameter>
     </SimEntity>
         
-    <SimEntity name="csl" type="examples.CollectionSizeListener" />
-    <SimEntity name="ial" type="examples.IntegerArrivalListener" />
-    <SimEntity name="time" type="examples.TimeListener" />
+    <SimEntity name="csl" type="simkit.examples.CollectionSizeListener" />
+    <SimEntity name="ial" type="simkit.examples.IntegerArrivalListener" />
+    <SimEntity name="time" type="simkit.examples.TimeListener" />
         
-    <PropertyChangeListener name="numInQueueStat" type="simkit.random.SimpleStateTimeVarying">
+    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberInQueue" />
     </PropertyChangeListener>
         
-    <PropertyChangeListener name="numAvailableServerStat" type="simkit.random.SimpleStateTimeVarying">
+    <PropertyChangeListener name="numAvailableServerStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberAvailableServers" />
     </PropertyChangeListener>
         
-    <PropertyChangeListener name="timeInSystemStat" type="simkit.random.SimpleStateTally">
+    <PropertyChangeListener name="timeInSystemStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="timeInSystem" />
     </PropertyChangeListener>
         
-    <PropertyChangeListener name="delayInQueueStat" type="simkit.random.SimpleStateTally">
+    <PropertyChangeListener name="delayInQueueStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="delayInQueue" />
     </PropertyChangeListener>
 
-    <PropertyChangeListener name="delayInQueueRenegeStat" type="simkit.random.SimpleStateTally">
+    <PropertyChangeListener name="delayInQueueRenegeStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="delayInQueueRenege" />
     </PropertyChangeListener>
 
-    <PropertyChangeListener name="delayInQueueServedStat" type="simkit.random.SimpleStateTally">
+    <PropertyChangeListener name="delayInQueueServedStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="delayInQueueServed" />
     </PropertyChangeListener>
 
