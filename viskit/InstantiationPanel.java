@@ -303,7 +303,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
       if (construct == null || construct.length <= 0) {
         // here if there is no way to directly build an object of this class.
-        tp.addTab("0", null, new JLabel("Abstract class of some kind.  Use free-form construction."));
+        tp.addTab("Constructor 0", null, new JLabel("Abstract class of some kind.  Use free-form construction."));
       }
       else {
         for (int i = 0; i < construct.length; ++i) {
@@ -314,7 +314,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
           if (construct[i].getParameterTypes().length == 0)
             sign = noParamString;
 
-          tp.addTab("" + i, null, constructorPanels[i], sign);
+          tp.addTab("Constructor " + i, null, constructorPanels[i], sign);
         }
       }
       add(tp);
