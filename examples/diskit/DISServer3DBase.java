@@ -16,8 +16,8 @@ import mil.navy.nps.dis.EntityStatePdu;
 import simkit.SimEntityBase;
 
 /**
- *
- * @author  Rick Goldberg
+ * Base "server" class which listens on a multicast address and port, creating a reading thread. Viskit will keep the class instance active even if the simulation is not running, so no need for a run/wait. Tries to correlate sim-real-time of packet arrival.
+ * @author Rick Goldberg
  */
 public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF {
     
@@ -28,7 +28,12 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
     long time;
     double millisecsToSimTime; // eg. 1000 ms => 1.0 sim time -> msst eq. .001
     
-    /** Creates a new instance of DISServer3DBase */
+    /**
+     * Creates a new instance of DISServer3DBase
+     * @param inetAddr the multicast address
+     * @param port port to listen to
+     * @param msst milliseconds to sim-time correalation factor. Eg. .001 means 1.0 sim-time is 1000 milliseconds.
+     */
     public DISServer3DBase(String inetAddr, int port, double msst) {
        
         try {
@@ -57,6 +62,11 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
         
     }
     
+    /**
+     * implements consumer
+     * @param pdu in pdu
+     * @param producer from producer
+     */    
     public void receivePdu(ProtocolDataUnit pdu, BehaviorProducerIF producer) {
         if ( pdu instanceof EntityStatePdu ) {
             long dt = (new java.util.Date()).getTime() - time; 
@@ -82,11 +92,20 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
         }
     }
     
+    /**
+     * implements consumer interface for pdu's
+     * @param pdu in pdu
+     * @param producer from producer
+     * @param data with Object data
+     */    
     public void receivePdu(ProtocolDataUnit pdu, BehaviorProducerIF producer, Object data) {
         receivePdu(pdu,producer);
         System.out.println("Also got some data: " + data );
     }
     
+    /**
+     * clear the time reference. In Viskit this would be when you hit the rewind button, useful for matching sender's data, if done at the right time can correlate closely to sender's sim-time.
+     */    
     public void reset() {
         time = (new java.util.Date()).getTime();
         super.reset();
