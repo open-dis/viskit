@@ -17,13 +17,23 @@ import java.io.File;
  */
 public interface ViskitAssemblyController
 {
+  // user has clicked a menu item
+  public void newEventGraphNode();
+  public void newPropChangeListenerNode();
+
+  // user has established some parameter, model can create object
   public void newEventGraphNode(String name, Point p);
   public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
   public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
   public void newPropChangeListenerNode(String name, Point p);
-  public void newAssembly();
+
   public void editGraphMetaData  ();
   
+  public void newAssembly();
+
+  void runEventGraphEditor();
+  void showXML();
+ 
   public void selectNodeOrEdge(Vector v);
 
   public void newAdapterArc(Object[]nodes);
@@ -45,11 +55,9 @@ public interface ViskitAssemblyController
   void save();
   void saveAs();
 
-  void showXML();  
   void generateJavaSource();
   //File compileJavaClass();
   void runAssembly();
 
-  void runEventGraphEditor();
   void captureWindow();
 }
