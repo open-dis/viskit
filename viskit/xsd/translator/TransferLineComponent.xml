@@ -8,8 +8,6 @@
         Advanced Simkit application.
 -->
 
-<!--<!DOCTYPE SimkitModule PUBLIC '-//NPS Simkit//DTD Web Application//EN' 'http://bloak.com/home/rmgold/CVS/Simkit/simkit/xsd/translator/simkit.dtd'>
--->
 <SimkitModule
     name="TransferLineComponent"
     version="0.0.1" >
