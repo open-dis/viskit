@@ -549,6 +549,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       lis.startingDrag(ss);
       xfer = ss;
     }
+    else
+      return; // 24 Nov 04
+    
     e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
       new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
   }
