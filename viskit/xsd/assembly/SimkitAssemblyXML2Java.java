@@ -18,13 +18,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.ListIterator;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Marshaller;
-
+import java.util.Iterator;
+import java.util.HashMap;
+import javax.xml.bind.JAXBContext; 
+import javax.xml.bind.JAXBException; 
+import javax.xml.bind.Unmarshaller; 
+import javax.xml.bind.Marshaller; 
 import viskit.xsd.bindings.assembly.*;
 
 /**
@@ -41,6 +43,7 @@ public class SimkitAssemblyXML2Java {
     String fileBaseName;
     File inputFile;
     JAXBContext jaxbCtx;
+    GridTaskGetter tasker;
 
     /* convenience Strings for formatting */
 
@@ -75,6 +78,8 @@ public class SimkitAssemblyXML2Java {
 	} catch ( Exception e ) {
 	    e.printStackTrace();
 	} 
+        
+        tasker = new GridTaskGetter(this);
 	
     }
     
@@ -100,6 +105,20 @@ public class SimkitAssemblyXML2Java {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                 new Boolean(true));
             m.marshal(this.root,System.out);
+
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    public void marshal(File f) {
+        System.out.println("marshal to "+f);
+        Marshaller m;
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(f);
+            m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                new Boolean(true));
+            m.marshal(this.root,fos);
 
         } catch (Exception e) { e.printStackTrace(); }
     }
@@ -371,16 +390,16 @@ public class SimkitAssemblyXML2Java {
 	        pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
 	    }
 	}            
-  pw.println();
-  connects = this.root.getAdapter().listIterator();
-  while (connects.hasNext()) {
-    AdapterType a = (AdapterType) connects.next();
-    pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
-    pw.println(a.getName() + rp + sc);
-    pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
-    pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
-    pw.println();    
-  }
+        pw.println();
+        connects = this.root.getAdapter().listIterator();
+        while (connects.hasNext()) {
+            AdapterType a = (AdapterType) connects.next();
+            pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
+            pw.println(a.getName() + rp + sc);
+            pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
+            pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
+            pw.println();    
+        }
         pw.println(sp4 + cb);
 	pw.println();
     }
@@ -442,7 +461,6 @@ public class SimkitAssemblyXML2Java {
 	File fDest;
 	char[] pchars;
 	int j;
-	// this doesn't work! : path.replaceAll(pd,File.separator);
 	pchars = path.toCharArray();
 	for (j = 0; j<pchars.length; j++) {
 	    if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
@@ -491,44 +509,194 @@ public class SimkitAssemblyXML2Java {
      * args[0] - XML file to translate
      * args[1] - flag stdout ouput
      * follow this pattern to use this class from another,
-     * otherwise this can be used stand alone from CLI
+     * otherwise this can be used stand alone from command line
      */
 
     public static void main(String[] args) {
-
-        System.out.println("Generating Java Source...");
-
-	SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(args[0]);
-	sax2j.unmarshal();
-        sax2j.marshal();
-	String dotJava = sax2j.translate();
+        String fileName = args[0];
+        SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(fileName);
         
-	if ( args.length > 1 ) sax2j.writeOut(dotJava,System.out);
+        sax2j.tasker.start();
+        Thread.yield();
+    }
+    
+    public void doGridTask(int taskID) {
+        System.out.println("Task ID "+taskID);
+    }
+    
+    public void doLocalTask() {
+        boolean batch;
+        java.util.List params = root.getTerminalParameter();
+        batch = !params.isEmpty();
+        
+        if ( batch ) {
+            
+            try { 
+                ObjectFactory of = new ObjectFactory();
+                root.setExperiment(of.createExperiment());
+                root.getExperiment().setRunID(fileBaseName+": "+(new java.util.Date()).toString());
+                java.util.HashMap values = new java.util.HashMap();
+                Iterator it = params.iterator();
+                
+                while (it.hasNext()) {
+                    
+                    TerminalParameterType t = (TerminalParameterType) (it.next());
+                    System.out.println("Batch Mode "+t);
+                    List exprList = t.getContent();
+                    Iterator itex = exprList.iterator();
+                    Object returns = null;
+                    while (itex.hasNext()) {
+                        String expr = (String)itex.next();
+                        bsh.Interpreter bsh = new bsh.Interpreter();
+                        try {
+                            bsh.eval(expr); 
+                            returns = bsh.eval(t.getName()+"();");
+                            System.out.println(expr+" returns "+returns);
+                            values.put(t,returns);
+                            
+                        } catch (bsh.EvalError ee) {
+                            ee.printStackTrace();
+                        } 
+                    }
+                }
+                if (values.size() > 0) {
+                    iterate(values,values.size()-1);
+                }
+                String experimentsFileName = fileBaseName + "Exp.xml";
+                System.out.println("Creating experiements: "+experimentsFileName);
+                marshal(new File(experimentsFileName));
+                try {
+                    Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+getCount(),"-S","/bin/bash","./gridrun.sh",fileBaseName+"Exp.xml"});
+                } catch (java.io.IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
+        } else {
+            System.out.println("Generating Java Source...");
 
-        System.out.println("Done.");
-        System.out.println("Generating Java Bytecode...");
+            marshal();
+            String dotJava = translate();
+        
+            writeOut(dotJava,System.out);
 
-	try {
-            String fileName = sax2j.fileBaseName + ".java";
-            FileOutputStream fout =
-                new FileOutputStream(fileName);
-            PrintStream ps = new PrintStream(fout,true);
-            sax2j.writeOut(dotJava,ps);
-            if ( !sax2j.compileCode(fileName) )
-                sax2j.error("Compile error " + fileName);
-            else {
-                System.out.println("Done.");
+            System.out.println("Done.");
+            System.out.println("Generating Java Bytecode...");
 
-		System.out.println("Running Assembly " + sax2j.fileBaseName + "...");
-		System.out.println();
+            try {
+                String fileName = fileBaseName + ".java";
+                FileOutputStream fout =
+                    new FileOutputStream(fileName);
+                PrintStream ps = new PrintStream(fout,true);
+                writeOut(dotJava,ps);
+                if ( !compileCode(fileName) )
+                    error("Compile error " + fileName);
+                else {
+                    System.out.println("Done.");
 
-		sax2j.runIt();
-	    }
-        } catch (FileNotFoundException fnfe) {
-                sax2j.error("Bad filename " + sax2j.fileBaseName);
+                    System.out.println("Running Assembly " + fileBaseName + "...");
+                    System.out.println();
+
+                    runIt();
+                }
+            } catch (FileNotFoundException fnfe) {
+                error("Bad filename " + fileBaseName);
+            }
         }
-
 
     }
     
+    private int cnt = 0;
+    private void incrementCount() {
+        ++this.cnt;
+    }
+    
+    private int getCount() {
+        return cnt;
+    }
+    
+    void iterate(HashMap values, int depth) {
+        Object[] terms = ((values.keySet()).toArray());
+        Object params = (values.get((TerminalParameter)(terms[depth])));
+        Object[] paramValues = (Object[])params;
+        for ( int i = 0; i < paramValues.length; i++ ) {
+            TerminalParameter tp = (TerminalParameter)(terms[depth]);
+            tp.setValue(paramValues[i].toString());
+            incrementCount();
+            if ( depth > 0) {
+                iterate(values, depth - 1);
+            } else {
+                ObjectFactory of = new ObjectFactory();
+                try {
+                    ExperimentType experiment = root.getExperiment();
+                    List designPoints = experiment.getDesignPoint();
+                    DesignPointType designPoint = of.createDesignPoint();
+                    List terminalParams = designPoint.getTerminalParameter();
+                    for (int j = 0; j<terms.length; j++) {
+                        TerminalParameterType termCopy = of.createTerminalParameter();
+                        termCopy.setValue(((TerminalParameterType)terms[j]).getValue());
+                        termCopy.setType(((TerminalParameterType)terms[j]).getType());
+                        terminalParams.add(termCopy);
+                    }
+                    designPoints.add(designPoint);
+                } catch (javax.xml.bind.JAXBException jaxe) {jaxe.printStackTrace();}
+            }
+        }
+        
+        
+        
+    }
+    
+    void evaluate(int taskID) {
+            try {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    PrintStream log = new PrintStream(baos);
+                    System.setOut(log);
+                    bsh.Interpreter bsh = new bsh.Interpreter();
+                    bsh.eval(translate());
+                    bsh.eval("sim = new "+ fileBaseName +"();");
+                    bsh.eval("sim.main(new String[0])");
+                
+                    ExperimentType experiment = root.getExperiment();
+                    //experiement.
+                } catch (bsh.EvalError ee) {
+                    ee.printStackTrace();
+                }
+    }
+    
+    class GridTaskGetter extends Thread implements Runnable {
+        InputStream is;
+        java.util.Properties p = System.getProperties();
+        SimkitAssemblyXML2Java inst;
+        boolean isTask;
+        int task;
+        
+        public GridTaskGetter(SimkitAssemblyXML2Java instance) {
+            inst = instance;
+            try {
+                Process pr = Runtime.getRuntime().exec("env"); 
+                is = pr.getInputStream();
+                
+            } catch (java.io.IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        
+        public void run() {
+            try {
+                p.load(is);
+                if (isTask=p.getProperty("SGE_TASK_ID")!=null) {
+                    task=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
+                }
+            } catch (IOException ioe) {
+                    ioe.printStackTrace();
+            }
+            inst.unmarshal();
+            if (isTask) {
+                inst.doGridTask(task);
+            } else {
+                inst.doLocalTask();
+            }
+        }
+
+    }
 }
