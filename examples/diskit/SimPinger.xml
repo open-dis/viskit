@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity package="diskit" name="SimPinger" version="1.0" extend="diskit.DISPinger" author="rmgold" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>This is the control harness for the base class, which includes thread waiting via the pause() method. Alternatively use the Code tag directly in the XML.</Comment>
+    <Parameter type="double" name="duration">
+        <Comment/>
+    </Parameter>
+    <Parameter type="long" name="stms">
+        <Comment>sim time to clock in milliseconds, eg. 1000 : 1.0 sim time is 1.0 sim time per second clock time</Comment>
+    </Parameter>
+    <StateVariable type="boolean" name="running">
+        <Comment/>
+    </StateVariable>
+    <Event name="Ping">
+        <Comment/>
+        <StateTransition state="running">
+            <Assignment value="pause()"/>
+        </StateTransition>
+        <Schedule priority="0" delay="duration" event="Ping" condition="running">
+            <Comment/>
+        </Schedule>
+        <Coordinate y="30" x="180"/>
+    </Event>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="running">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule event="Ping"/>
+        <Coordinate y="30" x="30"/>
+    </Event>
+    <Event name="Stop">
+        <Comment/>
+        <StateTransition state="running">
+            <Assignment value="false"/>
+        </StateTransition>
+        <Cancel event="Ping"/>
+        <Coordinate y="30" x="310"/>
+    </Event>
+</SimEntity>
+

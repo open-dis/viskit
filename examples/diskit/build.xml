@@ -1,0 +1,80 @@
+<project name="diskit" default="compile" basedir=".">
+    <description>
+        DISkit demo
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="."/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="doc"   location="doc"/>
+  <property name="lib"   location="lib"/>
+  
+  <!-- Temporary build directories -->
+  <property name="build.classes" value="${build}/classes"/>
+  <property name="build.doc" value="${build}/doc"/>
+  <property name="build.lib" value="${build}/lib"/>
+  <property name="doc.api" value="${doc}/api"/>
+  
+  <!-- compiler switches -->
+  <property name="javac.debug" value="off"/>
+  <property name="javac.verbose" value="off"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- This directory shouldn't be here, but it has to be kept around on checkout as a -->
+    <!-- CVS artifact. Get rid of it right away to reduce confustion. -->
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${doc}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" verbose="${javac.verbose}" debug="${javac.debug}">
+        <classpath>
+            <pathelement location="${lib}/dis.jar"/>
+            <pathelement location="${lib}/simkit.jar"/>
+        </classpath>
+    </javac>
+  </target>
+
+
+  <!-- Create distribution -->
+  <target name="dist" depends="compile"
+        description="generate the jar file" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+    <!-- 
+    <copy todir="${build}">
+        <fileset dir="${src}"> 
+            <include name="*.xml"/>
+        </fileset>
+    </copy>
+    -->
+
+    <!-- Put everything in ${build} into the dis.jar file -->
+    <jar jarfile="${dist}/lib/diskit.jar" basedir="${build}"/>
+  </target>
+  
+  <!-- Generates javadocs for the source code -->
+  <target name="javadoc">
+    <javadoc packagenames="diskit.*" sourcepath="${src}" destdir="${doc}/api" author="yes" version="yes">
+      
+    </javadoc>
+      
+  </target>
+
+  <!-- Clean up directories and other things we create as part of the build process -->
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${doc}"/>
+  </target>
+</project>
+
+

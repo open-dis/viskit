@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity package="diskit" name="SimMover3DLite" version="1.0" extend="diskit.DISMover3DBase" author="rmgoldbe" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Unencumbered math version</Comment>
+    <Parameter type="mil.navy.nps.math.Vec4f" name="start">
+        <Comment>would be nice to have a clone method</Comment>
+    </Parameter>
+    <Parameter type="float" name="speedLimit">
+        <Comment/>
+    </Parameter>
+    <Parameter type="short[]" name="id">
+        <Comment/>
+    </Parameter>
+    <Parameter type="float" name="tol">
+        <Comment>floating point roundoff error tolerance</Comment>
+    </Parameter>
+    <StateVariable type="mil.navy.nps.math.Vec4f" name="startPosition">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="float" name="maxSpeed">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="mil.navy.nps.math.Vec4f" name="velocity">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="boolean" name="isMoving">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="mil.navy.nps.math.Vec4f" name="destination">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="float" name="currentSpeed">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="float" name="duration">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>initialize the mover3D</Comment>
+        <StateTransition state="startPosition">
+            <Operation method="set(start)"/>
+        </StateTransition>
+        <StateTransition state="maxSpeed">
+            <Assignment value="speedLimit"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Assignment value="new mil.navy.nps.math.Vec4f()"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="false"/>
+        </StateTransition>
+        <Schedule priority="0" delay="0.0" event="Init" condition="true">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Coordinate y="82" x="40"/>
+    </Event>
+    <Event name="Init">
+        <Comment>send this</Comment>
+        <Argument type="diskit.SimMover3DLite" name="me"/>
+        <Coordinate y="282" x="43"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <LocalVariable type="float[]" name="v" value="new float[4]; velocity.get(v)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable type="float[]" name="d" value="new float[4]; destination.get(d)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable type="float" name="distSquare" value="0.0f">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable type="float[]" name="s" value="new float[4]; startPosition.get(s)">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="velocity">
+            <Operation method="set(d[0]-s[0], d[1]-s[1], d[2]-s[2], d[3]-s[3])"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="(distSquare = (v[0]*v[0] + v[1]*v[1] + v[2]*v[2])) &gt; tol &amp;&amp; v[3] &gt; tol"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="(float) Math.sqrt((double)distSquare)/v[3]"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="v[3]"/>
+        </StateTransition>
+        <Schedule priority="0" delay="0.0" event="SpeedLimit" condition="currentSpeed - maxSpeed &gt; tol">
+            <Comment/>
+        </Schedule>
+        <Schedule priority="0" delay="(double)duration" event="ArrivePoint" condition="isMoving">
+            <Comment/>
+        </Schedule>
+        <Coordinate y="157" x="140"/>
+    </Event>
+    <Event name="SpeedLimit">
+        <Comment/>
+        <LocalVariable type="float[]" name="d" value="new float[4]; destination.get(d)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable type="float[]" name="s" value="new float[4]; startPosition.get(s)">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="destination">
+            <Operation method="set(d[0], d[1], d[2], (float)Schedule.getSimTime() + ((currentSpeed/maxSpeed)*(d[3]-s[3])))"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="maxSpeed"/>
+        </StateTransition>
+        <Cancel event="ArrivePoint"/>
+        <Schedule event="StartMove"/>
+        <Coordinate y="381" x="144"/>
+    </Event>
+    <Event name="ArrivePoint">
+        <Comment/>
+        <StateTransition state="startPosition">
+            <Operation method="set(destination)"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="set(0.0f,0.0f,0.0f,0.0f)"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="false"/>
+        </StateTransition>
+        <Coordinate y="198" x="297"/>
+    </Event>
+    <Event name="UpdateDestination">
+        <Comment/>
+        <Argument type="mil.navy.nps.math.Vec4f" name="newDestination"/>
+        <StateTransition state="destination">
+            <Operation method="set(newDestination)"/>
+        </StateTransition>
+        <Schedule event="StartMove"/>
+        <Cancel event="ArrivePoint"/>
+        <Coordinate y="36" x="144"/>
+    </Event>
+</SimEntity>
+
