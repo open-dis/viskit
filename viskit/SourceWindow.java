@@ -182,24 +182,26 @@ public class SourceWindow extends JFrame
   private String addLineNums(String src)
   {
     // Choose the right line ending
-    String le = "\n";
-    String le2 = "\r";
-    String le3 = "\r\n";
+    String le = "\r\n";
+    String le2 = "\n";
+    String le3 = "\r";
 
     String[] sa = src.split(le);
     String[] sa2 = src.split(le2);
     String[] sa3 = src.split(le3);
 
     // Whichever broke the string up into the most pieces is our boy
-    if(sa2.length > sa.length) {
-      sa = sa2;
-      le = le2;
+    // unless the windoze one works
+    if (sa.length <= 1) {
+      if (sa2.length > sa.length) {
+        sa = sa2;
+        le = le2;
+      }
+      if (sa3.length > sa.length) {
+        sa = sa3;
+        le = le3;
+      }
     }
-    if(sa3.length > sa.length) {
-      sa = sa3;
-      le = le3;
-    }
-
     StringBuffer sb = new StringBuffer();
     for(int i=0;i<sa.length;i++) {
       String n = ""+(i+1);
