@@ -156,7 +156,7 @@ public class SimkitAssemblyXML2Java {
 	    List pl = se.getParameters();
 	    ListIterator pli = pl.listIterator();
 	    
-	    pw.print(sp8 + se.getType() + sp + se.getName() + sp + eq);
+	    pw.print(sp8 + "public" + sp + se.getType() + sp + se.getName() + sp + eq);
 	    pw.print(sp + nw + sp + se.getType() + lp);
 
 	    if ( pli.hasNext() ) {
