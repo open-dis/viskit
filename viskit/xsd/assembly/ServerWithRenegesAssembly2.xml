@@ -4,6 +4,7 @@
     Document   : ServerWithRenegesAssembly1.xml
     Created on : March 29, 2004, 2:58 PM
     Author     : ahbuss
+    Author     : rickg  - modified parameters, added schedule, added dumper
     Description:
         Purpose of the document follows.
 -->
@@ -11,7 +12,7 @@
 <SimkitAssembly 
     name="ServerWithRenegesAssembly2"
     package="simkit.examples"
-    version="0.1"
+    version="0.2"
 >
 
     <SimEntity name="arrival" type="simkit.examples.ArrivalProcess">
