@@ -17,8 +17,8 @@ public class DISMover3DBase extends SimEntityBase {
     // these are required to harness an event graph;
     // some are for internal diskit use from the harness, see getters
     // while the others are for external event graph useage
-    Vec4f startPosition;
-    Vec4f velocity;
+    protected Vec4f startPosition;
+    protected Vec4f velocity;
     float maxSpeed;
     float duration;
     float tol;
@@ -55,20 +55,6 @@ public class DISMover3DBase extends SimEntityBase {
     
     
     /**
-     * return the Vec4f of what the position would be at time t
-     * @param t time in sim time units
-     * @return the position
-     */    
-    public Vec4f positionAtTime(float t) {
-        startPosition.get(stp);
-        velocity.get(v);
-        System.out.println("duration " + duration);
-        float scale = (t-stp[3])/duration;
-        return new Vec4f(scale*v[0]+stp[0],scale*v[1]+stp[1],scale*v[2]+stp[2],scale*v[3]+stp[3]);
-        
-    }
-    
-    /**
      * gets the velocity
      * @return current velocity for the mover
      */    
@@ -85,5 +71,6 @@ public class DISMover3DBase extends SimEntityBase {
      * @return x,y,z and time to be there
      */    
     public Vec4f getStartPosition() { return startPosition; }
+    
   
 }

@@ -85,8 +85,10 @@ public class DISMover3DSender extends SimEntityBase {
         
         EntityStatePdu espdu;
         DISMover3DBase mover;
-        float[] velocity = new float[4];
-        float[] position = new float[4];
+        Vec4f position;
+        Vec4f velocity;
+        Vec4f startPosition;
+        
         float time = (float) Schedule.getSimTime();
         
         for ( int i = 0; i < movers.size(); i++ ) {
@@ -96,35 +98,38 @@ public class DISMover3DSender extends SimEntityBase {
             
             // math here : see http://web.nps.navy.mil/~brutzman/vrtp/demo/auv/AuvPduGenerator.java
             
-            (mover.getVelocity()).get(velocity);
+            velocity = mover.getVelocity();
+            startPosition = mover.getStartPosition();
             
             // note: Don says xzDistance is not properly named.
             
-            double xzDistance = Math.sqrt(velocity[0]*velocity[0] + velocity[2]*velocity[2]);
-            double pitch = Math.atan(velocity[1]/xzDistance);
-            double direction = Math.atan2(velocity[2],velocity[0]);
+            double xzDistance = Math.sqrt(velocity.get(0)*velocity.get(0) + velocity.get(2)*velocity.get(2));
+            double pitch = Math.atan(velocity.get(1)/xzDistance);
+            double direction = Math.atan2(velocity.get(2),velocity.get(0));
         
-            // math here: done by the mover3dbase
+            // math here: was mover3d
+            
+            System.out.println("start (" + startPosition.get(0) + " " + startPosition.get(1) + " " + startPosition.get(2) + " " + startPosition.get(3) + ")");
+            System.out.println("velocity (" + velocity.get(0) + " " + velocity.get(1) + " " + velocity.get(2) + " " + velocity.get(3) + ")");
         
-            espdu.setEntityLinearVelocityX((float)velocity[0]);
-            espdu.setEntityLinearVelocityY((float)velocity[1]);
-            espdu.setEntityLinearVelocityZ((float)velocity[2]);
+            float scale = (time-startPosition.get(3))/velocity.get(3);
+            position = new Vec4f(scale*velocity.get(0)+startPosition.get(0),scale*velocity.get(1)+startPosition.get(1),scale*velocity.get(2)+startPosition.get(2),scale*velocity.get(3)+startPosition.get(3));
+            
+        
+            espdu.setEntityLinearVelocityX(velocity.get(0));
+            espdu.setEntityLinearVelocityY(velocity.get(1));
+            espdu.setEntityLinearVelocityZ(velocity.get(2));
             espdu.setEntityOrientationTheta((float)pitch);
             espdu.setEntityOrientationPsi((float)direction); 
-        
-            // positionAtTime(t) gives the theoretical but mostly exact position at any
-            // time in particular; does not update the position of the mover.
-            
-            (mover.positionAtTime(time)).get(position);
-            
-            espdu.setEntityLocationX(position[0]);
-            espdu.setEntityLocationY(position[1]);
-            espdu.setEntityLocationZ(position[2]);
+                        
+            espdu.setEntityLocationX(position.get(0));
+            espdu.setEntityLocationY(position.get(1));
+            espdu.setEntityLocationZ(position.get(2));
         
             bpUDP.write(espdu);
             System.out.println(espdu);
-            System.out.println("(x,y,x,t) -> (" + position[0] + " " + position[1] + " " + position[2] + " " + position[3] + ")");
-            System.out.println("(vx,vy,vz,vt) -> (" + velocity[0] + " " + velocity[1] + " " + velocity[2] + " " + velocity[3] + ")");
+            System.out.println("(x,y,x,t) -> (" + position.get(0) + " " + position.get(1) + " " + position.get(2) + " " + position.get(3) + ")");
+            System.out.println("(vx,vy,vz,vt) -> (" + velocity.get(0) + " " + velocity.get(1) + " " + velocity.get(2) + " " + velocity.get(3) + ")");
 
         }
         
