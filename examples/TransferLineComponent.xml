@@ -10,13 +10,14 @@
 
 <SimEntity
     name="TransferLineComponent"
-    version="0.0.1" >
+    package="examples"
+    version="0.0.2" >
 
     <Parameter name="totalNumberServers" type="int[]" />
     <Parameter name="serviceTime" type="simkit.random.RandomVariate[]" />
     
-    <StateVariable name="numberAvailableServers" type="int[]" />
-    <StateVariable name="numberInQueue" type="int[]" />
+    <StateVariable name="numberAvailableServers" type="int[totalNumberServers.length]" />
+    <StateVariable name="numberInQueue" type="int[totalNumberServers.length]" />
     
     <Event name="Run" >
 	<LocalVariable name="j" type="int" />
