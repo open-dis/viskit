@@ -5,10 +5,12 @@
     type  CDATA #REQUIRED
 >
 
-<!ELEMENT TerminalParameter EMPTY >
+<!ELEMENT TerminalParameter (#PCDATA) >
 <!ATTLIST TerminalParameter
-    value CDATA #REQUIRED
-    type  CDATA #REQUIRED
+    nameRef IDREF #IMPLIED
+    name    ID    #IMPLIED
+    value   CDATA #IMPLIED
+    type    CDATA #REQUIRED
 >
 
 <!ELEMENT FactoryParameter (%Parameters;)* >
@@ -28,6 +30,7 @@
 <!ATTLIST SimEntity
     type CDATA #REQUIRED
     name ID    #REQUIRED
+    url  CDATA #IMPLIED
 >
 
 <!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?)) >
@@ -69,7 +72,28 @@
     to      IDREF    #REQUIRED
 >
 
-<!ELEMENT SimkitAssembly ( SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule? ) >
+<!ELEMENT PropertyChange EMPTY>
+<!ATTLIST PropertyChange
+    name CDATA  #IMPLIED
+    type CDATA  #IMPLIED
+    value CDATA #IMPLIED
+    timestamp CDATA #IMPLIED
+>
+
+<!ELEMENT Log (#PCDATA) >
+<!ELEMENT Errors (#PCDATA) >
+
+<!ELEMENT Results (#PCDATA | PropertyChange | Errors )* >
+<!ELEMENT DesignPoint (TerminalParameter*,Results?) >
+
+
+<!ELEMENT Experiment (DesignPoint)* >
+<!ATTLIST Experiment
+    runID CDATA #REQUIRED
+>
+
+
+<!ELEMENT SimkitAssembly ( (TerminalParameter)*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
