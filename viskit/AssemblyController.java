@@ -103,14 +103,24 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void saveAs()
   {
-    lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name,false);
-    if(lastFile != null) {
-      updateGMD();
-      ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
-      ((ViskitAssemblyView)getView()).fileName(lastFile.getName());
-    }
+    ViskitAssemblyModel model = (ViskitAssemblyModel)getModel();
+    ViskitAssemblyView  view  = (ViskitAssemblyView)getView();
+    GraphMetaData gmd         = model.getMetaData();
 
+    lastFile = view.saveFileAsk(gmd.name+".xml",false);
+
+    if(lastFile != null) {
+      String n = lastFile.getName();
+      if(n.endsWith(".xml") || n.endsWith(".XML"))
+        n = n.substring(0,n.length()-4);
+      gmd.name = n;
+
+      updateGMD();
+      model.saveModel(lastFile);
+      view.fileName(lastFile.getName());
+    }
   }
+
   private void updateGMD()
   {
     GraphMetaData gmd = ((ViskitAssemblyModel)getModel()).getMetaData();
@@ -140,6 +150,33 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
     return shortname + egNodeCount++;
   }
+
+  private Point nextPoint = new Point(25,25);
+  private Point getNextPoint()
+  {
+    nextPoint.x = nextPoint.x >= 200 ? 25 : nextPoint.x + 25;
+    nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
+    return nextPoint;
+  }
+
+  public void newEventGraphNode()   // menu click
+  {
+    Object o = ((ViskitAssemblyView)getView()).getSelectedEventGraph();
+
+    if(o != null) {
+      if(o instanceof Class) {
+        newEventGraphNode(((Class)o).getName(),getNextPoint());
+        return;
+      }
+      else if(o instanceof FileBasedAssyNode) {
+        newFileBasedEventGraphNode((FileBasedAssyNode)o,getNextPoint());
+        return;
+      }
+    }
+    // Nothing selected or non-leaf
+    ((ViskitAssemblyView)getView()).genericErrorReport("Can't create","You must first select an Event Graph from the panel on the left.");
+  }
+
   public void newEventGraphNode(String typeName, Point p)
   {
     String shName = shortEgName(typeName);
@@ -165,6 +202,25 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
     return shortname + egNodeCount++; // use same counter
   }
+
+  public void newPropChangeListenerNode() // menu click
+  {
+    Object o = ((ViskitAssemblyView)getView()).getSelectedPropChangeListener();
+
+    if(o != null) {
+      if(o instanceof Class) {
+        newPropChangeListenerNode(((Class)o).getName(),getNextPoint());
+        return;
+      }
+      else if(o instanceof FileBasedAssyNode) {
+        newFileBasedPropChangeListenerNode((FileBasedAssyNode)o,getNextPoint());
+        return;
+      }
+    }
+    // If nothing selected or a non-leaf
+    ((ViskitAssemblyView)getView()).genericErrorReport("Can't create","You must first select a Property Change Listener from the panel on the left.");
+  }
+
   public void newPropChangeListenerNode(String name, Point p)
   {
     String shName = shortPCLName(name);
