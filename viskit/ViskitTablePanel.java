@@ -388,9 +388,12 @@ public abstract class ViskitTablePanel extends JPanel
       if (w > maxWidth) maxWidth = w;
       for (int r = 0; r < tab.getRowCount(); r++) {
         String s = (String) mod.getValueAt(r, c);
-        w = fm.stringWidth(s);
-        if (w > maxWidth)
-          maxWidth = w;
+        // shouldn't happen, but:
+        if(s != null) {
+          w = fm.stringWidth(s);
+          if (w > maxWidth)
+            maxWidth = w;
+        }
       }
       if (c != tab.getColumnCount() - 1) {    // leave the last one alone
         // its important to set maxwidth before preferred with because the latter
