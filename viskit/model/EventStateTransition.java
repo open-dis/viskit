@@ -17,6 +17,14 @@ public class EventStateTransition extends ViskitElement
   private boolean isOperation=false;
   private ArrayList comments=new ArrayList();
 
+  public String toString()
+  {
+    if(isOperation)
+      return stateVarName + "." + operationOrAssignment;
+    else
+      return stateVarName + "=" + operationOrAssignment;
+  }
+  
   public ArrayList getComments()
   {
     return comments;

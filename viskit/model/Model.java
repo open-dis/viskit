@@ -46,6 +46,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   HashMap evNodeCache = new HashMap();
   HashMap edgeCache = new HashMap();
   Vector stateVariables = new Vector();
+  Vector simParameters = new Vector();
 
   public void init()
   {
@@ -352,6 +353,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       }
       vParameter vp = new vParameter(p.getName(), p.getType(),c.trim());
       vp.opaqueModelObject = p;
+      this.simParameters.add(vp);
       notifyChanged(new ModelEvent(vp,ModelEvent.SIMPARAMETERADDED,"New sim parameter"));
     }
 
@@ -367,9 +369,9 @@ public class Model extends mvcAbstractModel implements ViskitModel
     return (Vector)stateVariables.clone();
   }
 
-  public ArrayList getSimParameters()
+  public Vector getSimParameters()
   {
-    return new ArrayList(jaxbRoot.getParameter());
+    return (Vector)simParameters.clone();
   }
 
   // Source building
@@ -404,17 +406,10 @@ public class Model extends mvcAbstractModel implements ViskitModel
     p.getComment().add(comment);
 
     vp.opaqueModelObject = p;
+    this.simParameters.add(vp);
     jaxbRoot.getParameter().add(p);
 
     this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
-  }
-  
-  public void newSimParameter(vParameter p)
-  {
-    // put code to do it here
-
-    modelDirty = true;
-    this.notifyChanged(new ModelEvent(p, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
   }
 
   public void deleteSimParameter(vParameter vp)
@@ -422,6 +417,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     // remove jaxb variable
     jaxbRoot.getParameter().remove(vp.opaqueModelObject);
     modelDirty = true;
+    this.simParameters.remove(vp);
     this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
   }
 

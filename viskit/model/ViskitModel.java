@@ -54,9 +54,9 @@ public interface ViskitModel
   
   /**
    * Messaged by controller to get all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
-   * @return ArrayList of vParameter objects.
+   * @return Vector of vParameter objects.
    */
-  public ArrayList getSimParameters();
+  public Vector getSimParameters();
 
 
   /**
