@@ -62,7 +62,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
      try {
        FileWriter fw = new FileWriter(f);
        Marshaller m = jc.createMarshaller();
-       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(false)); //todo test true));
+       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,schemaLoc);
 
        String nm = f.getName();
@@ -73,8 +73,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        jaxbRoot.setName(nIe(metaData.name));
        jaxbRoot.setVersion(nIe(metaData.version));
        jaxbRoot.setPackage(nIe(metaData.pkg));
-       jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
-       jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
+       if(jaxbRoot.getSchedule() != null) {
+         jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+         jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
+       }
 /*
        jaxbRoot.setAuthor(nIe(metaData.author));
 
@@ -608,10 +610,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         metaData.pkg = jaxbRoot.getPackage();
 
         ScheduleType sch = jaxbRoot.getSchedule();
-        metaData.stopTime = sch.getStopTime();
-        metaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
-/*
-        List lis = jaxbRoot.getComment();
+        if(sch != null) {
+          metaData.stopTime = sch.getStopTime();
+          metaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+        }
+/*        List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
           sb.append((String)itr.next());
