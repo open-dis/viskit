@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Rick Goldberg" package="diskit" version="1.0" name="SimServer3DTest" extend="diskit.DISServer3DBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Rick Goldberg" package="examples.diskit" version="1.0" name="SimServer3DTest" extend="examples.diskit.DISServer3DBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Simple test to count number of EntityStatePdu's received</Comment>
     <Parameter name="ipAddr" type="String">
         <Comment/>

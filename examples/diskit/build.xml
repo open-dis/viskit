@@ -57,7 +57,7 @@
   
   <!-- Generates javadocs for the source code -->
   <target name="javadoc">
-    <javadoc packagenames="diskit.*" sourcepath="${src}" destdir="${doc}/api" author="yes" version="yes">
+    <javadoc packagenames="examples.diskit.*" sourcepath="${src}" destdir="${doc}/api" author="yes" version="yes">
       
     </javadoc>
       

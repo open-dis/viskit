@@ -4,7 +4,7 @@
  * Created on September 16, 2004, 11:58 AM
  */
 
-package diskit;
+package examples.diskit;
 
 import mil.navy.nps.math.Vec4f;
 import simkit.SimEntityBase;

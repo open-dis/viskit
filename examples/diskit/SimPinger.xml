@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity package="diskit" name="SimPinger" version="1.0" extend="diskit.DISPinger" author="rmgold" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity package="examples.diskit" name="SimPinger" version="1.0" extend="examples.diskit.DISPinger" author="rmgold" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This is the control harness for the base class, which includes thread waiting via the pause() method. Alternatively use the Code tag directly in the XML.</Comment>
     <Parameter type="double" name="duration">
         <Comment/>

@@ -4,7 +4,7 @@
  * Created on September 7, 2004, 1:07 PM
  */
 
-package diskit;
+package examples.diskit;
 
 
 import mil.navy.nps.math.Vec4f;

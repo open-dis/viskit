@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="rickg" package="diskit" version="1.0" name="Destinator3D" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="rickg" package="examples.diskit" version="1.0" name="Destinator3D" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="random" type="simkit.random.RandomVariate">
         <Comment/>
     </Parameter>

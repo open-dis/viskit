@@ -4,7 +4,7 @@
  * Created on September 22, 2004, 9:55 AM
  */
 
-package diskit;
+package examples.diskit;
 
 import java.net.MulticastSocket;
 import java.net.InetAddress;

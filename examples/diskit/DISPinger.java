@@ -1,4 +1,4 @@
-package diskit;
+package examples.diskit;
 
 import simkit.*;
 import java.lang.Thread;

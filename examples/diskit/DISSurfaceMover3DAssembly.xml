@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly package="diskit" version="1.0" name="DISMultiMover3DAssembly" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="Destinator2D_0" type="diskit.Destinator2D">
+<SimkitAssembly package="examples.diskit" version="1.0" name="DISMultiMover3DAssembly" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity name="Destinator2D_0" type="examples.diskit.Destinator2D">
         <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential"/>
             <MultiParameter type="Object[]">
@@ -11,7 +11,7 @@
         <TerminalParameter type="float" value="0.0f" />
         <Coordinate y="494" x="63"/>
     </SimEntity>
-    <SimEntity name="Destinator2D_1" type="diskit.Destinator2D">
+    <SimEntity name="Destinator2D_1" type="examples.diskit.Destinator2D">
         <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential"/>
             <MultiParameter type="Object[]">
@@ -22,7 +22,7 @@
         <TerminalParameter type="float" value="0.0f" />
         <Coordinate y="514" x="243"/>
     </SimEntity>
-    <SimEntity name="Destinator2D_2" type="diskit.Destinator2D">
+    <SimEntity name="Destinator2D_2" type="examples.diskit.Destinator2D">
         <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential"/>
             <MultiParameter type="Object[]">
@@ -33,7 +33,7 @@
         <TerminalParameter type="float" value="0.0f" />
         <Coordinate y="494" x="333"/>
     </SimEntity>
-    <SimEntity name="Destinator2D_3" type="diskit.Destinator2D">
+    <SimEntity name="Destinator2D_3" type="examples.diskit.Destinator2D">
         <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential"/>
             <MultiParameter type="Object[]">
@@ -44,7 +44,7 @@
         <TerminalParameter type="float" value="0.0f" />
         <Coordinate y="504" x="463"/>
     </SimEntity>
-    <SimEntity name="SimMover3DLite_1" type="diskit.SimMover3DLite">
+    <SimEntity name="SimMover3DLite_1" type="examples.diskit.SimMover3DLite">
         <MultiParameter type="mil.navy.nps.math.Vec4f">
             <TerminalParameter type="float" value="1.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
@@ -60,17 +60,17 @@
         <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="268" x="180"/>
     </SimEntity>
-    <SimEntity name="SimPinger_2" type="diskit.SimPinger">
+    <SimEntity name="SimPinger_2" type="examples.diskit.SimPinger">
         <TerminalParameter type="double" value="1.0"/>
         <TerminalParameter type="long" value="1000"/>
         <Coordinate y="21" x="223"/>
     </SimEntity>
-    <SimEntity name="SimSender3D_3" type="diskit.SimSender3D">
+    <SimEntity name="SimSender3D_3" type="examples.diskit.SimSender3D">
         <TerminalParameter type="java.lang.String" value="239.0.0.5"/>
         <TerminalParameter type="int" value="1500"/>
         <Coordinate y="139" x="225"/>
     </SimEntity>
-    <SimEntity name="SimMover3DLite_4" type="diskit.SimMover3DLite">
+    <SimEntity name="SimMover3DLite_4" type="examples.diskit.SimMover3DLite">
         <MultiParameter type="mil.navy.nps.math.Vec4f">
             <TerminalParameter type="float" value="0.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
@@ -86,7 +86,7 @@
         <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="289" x="41"/>
     </SimEntity>
-    <SimEntity name="SimMover3DLite_5" type="diskit.SimMover3DLite">
+    <SimEntity name="SimMover3DLite_5" type="examples.diskit.SimMover3DLite">
         <MultiParameter type="mil.navy.nps.math.Vec4f">
             <TerminalParameter type="float" value="2.0f"/>
             <TerminalParameter type="float" value="0.0f"/>
@@ -102,7 +102,7 @@
         <TerminalParameter type="float" value=".01f"/>
         <Coordinate y="278" x="301"/>
     </SimEntity>
-    <SimEntity name="SimMover3DLite_6" type="diskit.SimMover3DLite">
+    <SimEntity name="SimMover3DLite_6" type="examples.diskit.SimMover3DLite">
         <MultiParameter type="mil.navy.nps.math.Vec4f">
             <TerminalParameter type="float" value="3.0f"/>
             <TerminalParameter type="float" value="0.0f"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity package="diskit" name="SimSender3D" version="1.0" extend="diskit.DISMover3DSender" author="rmgoldbe" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity package="examples.diskit" name="SimSender3D" version="1.0" extend="examples.diskit.DISMover3DSender" author="rmgoldbe" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>does 3 things
 listen for inits to add a mover to the ping group
 listen for pings to send
@@ -15,7 +15,7 @@ count pings sent per send</Comment>
     </StateVariable>
     <Event name="Init">
         <Comment>add a mover3D</Comment>
-        <Argument type="diskit.DISMover3DBase" name="mover"/>
+        <Argument type="examples.diskit.DISMover3DBase" name="mover"/>
         <StateTransition state="totalMovers">
             <Assignment value="addMover3D(mover)"/>
         </StateTransition>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="rmgoldbe" package="diskit" version="1.0" name="SimMover3DLite" extend="diskit.DISMover3DBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="rmgoldbe" package="examples.diskit" version="1.0" name="SimMover3DLite" extend="examples.diskit.DISMover3DBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Unencumbered math version</Comment>
     <Parameter name="start" type="mil.navy.nps.math.Vec4f">
         <Comment>would be nice to have a clone method</Comment>
@@ -56,7 +56,7 @@
     </Event>
     <Event name="Init">
         <Comment>send this</Comment>
-        <Argument type="diskit.SimMover3DLite" name="me"/>
+        <Argument type="examples.diskit.SimMover3DLite" name="me"/>
         <Coordinate x="43" y="282"/>
     </Event>
     <Event name="StartMove">
