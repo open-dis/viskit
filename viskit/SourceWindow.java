@@ -28,10 +28,10 @@ public class SourceWindow extends JFrame
     this.main = main;
     this.src = source;
 
-    Container con = getContentPane();
-
+    JPanel con = new JPanel();
+    setContentPane(con);
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-
+    con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     JToolBar tb = new JToolBar();
     JButton fontPlus = new JButton("Larger");
     JButton fontMinus=new JButton("Smaller");
