@@ -1,6 +1,7 @@
 package viskit;
 
 import java.io.*;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -25,7 +26,9 @@ public class AssemblyRunner
   String arguments;
   Thread thr;
   private Runtime rt = Runtime.getRuntime();
-  private String execString;
+  private String filesep = System.getProperty("file.separator");
+  //private String fileext = "";
+  private String[] execString;
   private boolean isJar = false;
   private Process proc;
   private PipedReader outPipe;
@@ -40,7 +43,9 @@ public class AssemblyRunner
   {
     if(className.endsWith(".jar"))
       isJar = true;
-
+    //String platform = System.getProperty("os.name");
+    //if(platform.indexOf("Win") != -1)
+      //fileext=".exe";
     clsName = className;
     classpath = System.getProperty("java.class.path");  //default
     outPipe = new PipedReader();
@@ -66,19 +71,21 @@ public class AssemblyRunner
     thr = new Thread(new myRunnable());
     thr.start();
   }
-  private String buildExecString()
+  private String[] buildExecString()
   {
-    StringBuffer sb = new StringBuffer();
-    sb.append(System.getProperty("java.home"));
-    sb.append("/bin/java -cp ");
-    // doesn't work to remove spacessb.append("\"" + classpath + "\"");
-    classpath = classpath.replace(' ','_');
-    sb.append(classpath);
-    sb.append(" ");
+    Vector v = new Vector();
+     StringBuffer sb = new StringBuffer();
+     sb.append(System.getProperty("java.home"));
+     sb.append(filesep+"bin"+filesep+"java");
+     //sb.append(fileext);
+    v.add(sb.toString());
+    v.add("-cp");
+    v.add(classpath);
     if(isJar)
-      sb.append("-jar ");
-    sb.append(clsName);
-    return sb.toString();
+      v.add("-jar");
+    v.add(clsName);
+    String[] ra = new String[v.size()];
+    return (String[])v.toArray(ra);
   }
 
   private void closePipes()
