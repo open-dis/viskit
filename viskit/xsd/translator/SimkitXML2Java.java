@@ -327,7 +327,7 @@ public class SimkitXML2Java {
 	pw.print(sp4 + "public " + this.root.getName() + lp);
 
 	List pList = this.root.getParameter();
-	li = this.root.getParameter().listIterator();
+	li = pList.listIterator();
 
 	while ( li.hasNext() ) {
 
@@ -346,7 +346,22 @@ public class SimkitXML2Java {
 
 	pw.println(rp + sp + ob);
 	pw.println();
+        
+        if (!this.root.getExtend().equals("SimEntityBase")) {
+            pList = this.root.getParameter();
+            li = pList.listIterator();
+            pw.print(sp8 + "super" + lp);
+            while ( li.hasNext() ) {
+                Parameter pt = (Parameter) li.next();
+                pw.print(shortinate(pt.getName()));
+                if ((pList.size() > 1) && (pList.indexOf(pt) < pList.size() - 1)) {
+                    pw.print(cm);
+                }
+	    
+            }
+            pw.println(rp + sc);
 
+        }
 	li = this.root.getParameter().listIterator();
 
 	while ( li.hasNext() ) {
