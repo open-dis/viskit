@@ -6,6 +6,7 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+import org.jgraph.graph.PortView;
 
 import viskit.EventGraphViewFrame;
 import viskit.ModelEvent;
@@ -277,6 +278,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     return super.createEdgeView(e, cm);
   }
 
+  protected PortView createPortView(Object p, CellMapper cm)
+  {
+    if (p instanceof vPortCell)
+      return new vPortView(p,this,cm);
+    return super.createPortView(p, cm);
+  }
+
   /**
    * This class informs the controller that the selected set has changed.  Since we're only useing this
    * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
@@ -440,6 +448,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       if (e != null && getSourcePortAt(e.getPoint()) != null &&
           !e.isConsumed() && vGraphComponent.this.isPortsVisible()) {
         // Set Cusor on Graph (Automatically Reset)
+PortView p = getSourcePortAt(e.getPoint());
         vGraphComponent.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
         // Consume Event
         e.consume();
@@ -600,6 +609,44 @@ class vSelfEdgeCell extends vEdgeCell
     super(userObject);
   }
 }
+
+class vPortCell extends DefaultPort
+{
+  public vPortCell()
+  {
+    this(null);
+  }
+
+  public vPortCell(Object o)
+  {
+    this(o,null);
+  }
+
+  public vPortCell(Object o, Port port)
+  {
+    super(o, port);
+  }
+}
+
+class vPortView extends PortView
+{
+  static int mysize = 54;   // same as the circle
+
+  public vPortView(Object o, JGraph jGraph, CellMapper cellMapper)
+  {
+    super(o, jGraph, cellMapper);
+  }
+
+	public Rectangle getBounds() {
+		Rectangle bounds = new Rectangle(getLocation(null));
+		bounds.x = bounds.x - mysize / 2;
+		bounds.y = bounds.y - mysize / 2;
+		bounds.width = bounds.width + mysize;
+		bounds.height = bounds.height + mysize;
+		return bounds;
+	}
+}
+
 
 /**
  * Sub class EdgeView to install our own renderer.
@@ -883,7 +930,6 @@ class vSelfEdgeRenderer extends vEdgeRenderer
   }
 
 }
-
 
 
 
