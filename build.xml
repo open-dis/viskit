@@ -122,6 +122,17 @@
         	</classpath>
         	<src path="${dir.src}/viskit/"/>
         </javac>
+
+        <copy todir="${dir.build.classes}">
+            <fileset dir="${dir.src}">
+            	<include name="**/*.txt" />
+            	<include name="**/*.png" />
+            	<include name="**/*.gif" />
+            	<include name="**/*.jpg" />
+        	<include name="*.txt" />
+        	<exclude name="build/" />
+            </fileset>
+        </copy>
 	</target>
 <!--  === TARGET: jar === -->
     <target name="jar"
