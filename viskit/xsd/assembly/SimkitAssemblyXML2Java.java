@@ -131,6 +131,7 @@ public class SimkitAssemblyXML2Java {
 	PrintWriter pw = new PrintWriter(head);
 	String name = this.root.getName();
 	String pkg  = this.root.getPackage();
+        String extend = this.root.getExtend();
 	
 	pw.println("package " + pkg + sc);
 	pw.println();
@@ -140,7 +141,12 @@ public class SimkitAssemblyXML2Java {
 	pw.println("import simkit.util.*;");
 	pw.println("import java.text.*;");
 	pw.println();
-	pw.println("public class " + name + sp + ob);
+        if ( extend.equals("java.lang.Object") ) {
+            extend = "";
+        } else {
+            extend = "extends" + sp + extend + sp;
+        }
+	pw.println("public class " + name + sp + extend + ob);
 	pw.println();
 	pw.println();
 
@@ -156,7 +162,7 @@ public class SimkitAssemblyXML2Java {
 	    List pl = se.getParameters();
 	    ListIterator pli = pl.listIterator();
 	    
-	    pw.print(sp8 + "public" + sp + se.getType() + sp + se.getName() + sp + eq);
+	    pw.print(sp4 + "public" + sp + se.getType() + sp + se.getName() + sp + eq);
 	    pw.print(sp + nw + sp + se.getType() + lp);
 
 	    if ( pli.hasNext() ) {
