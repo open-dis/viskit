@@ -14,10 +14,11 @@ public class FindClassesForInterface
 {
   /**
    * Added by Mike Bailey
-   * @param f file to read from
+   * @param f Class file to read from
    * @param implementing
    * @return Class object
    */
+
   public static Class classFromFile(File f, Class implementing)
   {
     Class c = null;
@@ -26,11 +27,20 @@ public class FindClassesForInterface
       if(c.isInterface() || !implementing.isAssignableFrom(c) || !isConcrete(c))
         c = null;
     }
-    catch(Throwable t) {
-    }
+    catch (Throwable t){}
     return c;
   }
-  
+
+  /**
+   * Added by Mike Bailey.  Same test as above.
+   * @param questionable
+   * @param target
+   * @return
+   */
+  public static boolean matchClass(Class questionable, Class target)
+  {
+    return (!questionable.isInterface() && target.isAssignableFrom(questionable) && isConcrete(questionable));
+  }
   /**
    * Simple method to try to load a .class file
    */
