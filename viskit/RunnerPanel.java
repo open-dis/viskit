@@ -142,13 +142,13 @@ public class RunnerPanel extends JPanel
       piErr = new PipedInputStream();
       poErr = new PipedOutputStream(piErr);
       System.setErr(new PrintStream(poErr, true));
+
+      new ReaderThread(piOut, soutTA).start();
+      new ReaderThread(piErr, serrTA).start();
     }
     catch (IOException e) {
-      e.printStackTrace();
+      JOptionPane.showMessageDialog(null,"exep in setupPipes "+e.getMessage());
     }
-
-    new ReaderThread(piOut, soutTA).start();
-    new ReaderThread(piErr, serrTA).start();
   }
 
   class ReaderThread extends Thread
