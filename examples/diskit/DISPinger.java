@@ -5,6 +5,7 @@ import java.lang.Thread;
 
 /**
  * DISPinger simply holds the main running thread for an interval, to simulate simulated time. Extensions call the <CODE>pause()</CODE> method, typically via a self-scheduled queue delay of the same virtual duration. Note the clock and the queue may be out of phase by a small number of milliseconds each pause(), and events that transpire upon termination of the self-scheduling may be as much as <i>interval - epsilon</i> out of phase with the real time clock.
+ * @author Rick Goldberg
  */
 public class DISPinger extends SimEntityBase {
 
