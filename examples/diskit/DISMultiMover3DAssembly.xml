@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly package="diskit" version="1.0" name="DISMover3DAssembly" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly package="diskit" version="1.0" name="DISMultiMover3DAssembly" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="Destinator3D_0" type="diskit.Destinator3D">
         <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
             <TerminalParameter type="String" value="Exponential"/>
