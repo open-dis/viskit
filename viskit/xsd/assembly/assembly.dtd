@@ -83,7 +83,12 @@
 <!ELEMENT Log (#PCDATA) >
 <!ELEMENT Errors (#PCDATA) >
 
-<!ELEMENT Results (#PCDATA | PropertyChange | Errors )* >
+<!ELEMENT Results (PropertyChange | Log | Errors )* >
+<!ATTLIST Results 
+    index CDATA #REQUIRED
+    job   CDATA #REQUIRED
+>
+
 <!ELEMENT DesignPoint (TerminalParameter*,Results?) >
 
 
@@ -92,12 +97,12 @@
     runID CDATA #REQUIRED
 >
 
-<!ELEMENT Depends EMPTY >
-<!ATTLIST Depends
-    file CDATA #REQUIRED
+<!ELEMENT EventGraph (#PCDATA) >
+<!ATTLIST EventGraph
+    fileName CDATA #IMPLIED
 >
 
-<!ELEMENT SimkitAssembly ( Depends*, TerminalParameter*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
+<!ELEMENT SimkitAssembly ( TerminalParameter*, EventGraph*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
