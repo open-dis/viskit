@@ -142,7 +142,6 @@ public class SimkitAssemblyXML2Java {
 	pw.println();
 	pw.println("public class " + name + sp + ob);
 	pw.println();
-	pw.println(sp4 + "public static void main(String[] args) {");
 	pw.println();
 
     }
@@ -295,6 +294,9 @@ public class SimkitAssemblyXML2Java {
     void buildListeners(StringWriter listeners) {
 	
 	PrintWriter pw = new PrintWriter(listeners);
+        
+        
+        
 	ListIterator lili = this.root.getPropertyChangeListener().listIterator();
 
 	while ( lili.hasNext() ) {
@@ -334,6 +336,11 @@ public class SimkitAssemblyXML2Java {
     void buildConnectors(StringWriter connectors) {
 	
 	PrintWriter pw = new PrintWriter(connectors);
+        
+        // listeners get attached upon instantiation
+        
+        pw.println(sp4 + "public" + sp + this.root.getName() + lp + rp + sp + ob);
+        
 	ListIterator connects = this.root.getSimEventListenerConnection().listIterator();
 	
 	while ( connects.hasNext() ) {
@@ -341,6 +348,7 @@ public class SimkitAssemblyXML2Java {
 	    pw.print(sp8 + ((SimEntityType)simcon.getSource()).getName() + pd + "addSimEventListener" );
 	    pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc); 
 	}
+        
 	pw.println();
 
 	connects = this.root.getPropertyChangeListenerConnection().listIterator();
@@ -358,16 +366,25 @@ public class SimkitAssemblyXML2Java {
 	    } else {
 	        pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
 	    }
-	}
+	}            
+        
+        pw.println(sp4 + cb);
 	pw.println();
     }
 
     void buildOutput(StringWriter out) {
-	PrintWriter pw = new PrintWriter(out);
+	PrintWriter pw = new PrintWriter(out);	
+        
+        // main method moved, so buildOutput also supplies that
+        
+        pw.println(sp4 + "public static void main(String[] args) {");
+        pw.print(sp8 + this.root.getName() + sp + "asm" + sp);
+        pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
+
 	ListIterator outputs = this.root.getOutput().listIterator();
 	while ( outputs.hasNext() ) {
 	    SimEntityType entity = (SimEntityType)((OutputType)outputs.next()).getEntity();
-	    pw.println(sp8 + "System.out.println" + lp + entity.getName() + rp + sc);
+	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + entity.getName() + rp + sc);
 	}
     }
 
@@ -472,10 +489,10 @@ public class SimkitAssemblyXML2Java {
 	sax2j.unmarshal();
         sax2j.marshal();
 	String dotJava = sax2j.translate();
+        
 	if ( args.length > 1 ) sax2j.writeOut(dotJava,System.out);
 
         System.out.println("Done.");
-
         System.out.println("Generating Java Bytecode...");
 
 	try {
