@@ -94,6 +94,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         ((AssemblyController)getController()).quit();
       }
     });
+
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+    setIconImage(icon.getImage());
   }
 
   /**
