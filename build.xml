@@ -101,6 +101,7 @@
                 <pathelement location="${dir.lib}/actions.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
                 <pathelement location="${dir.lib}/tools.jar"/>
+                <pathelement location="${dir.lib}/jhall.jar"/>
                 <pathelement location="${dir.build.classes}"/>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
