@@ -198,7 +198,7 @@ public class EventInspectorDialog extends JDialog
       public void mouseClicked(MouseEvent e)
       {
         EventStateTransition est = (EventStateTransition) e.getSource();
-        boolean modified = EventTransitionDialog.showDialog(fr, locationComponent, est);
+        boolean modified = EventTransitionDialog.showDialog((EventGraphViewFrame)fr, locationComponent, est);
         if (modified) {
           /*
           // experiment
@@ -302,18 +302,22 @@ public class EventInspectorDialog extends JDialog
     {
       if (modified) {
 
-        // Parse the state transitions
-        StringBuffer parseThis = new StringBuffer();
-        for (Iterator itr = transitions.getTransitions().iterator(); itr.hasNext();) {
-          parseThis.append(((EventStateTransition) itr.next()).toString());
-          parseThis.append(";");
-        }
         // Our node object hasn't been updated yet (see unloadWidgets) and won't if
         // we cancel out below.  But to do the beanshell parse test, a node needs to be supplied
         // so the context can be set up properly.
         // Build a temp one;
-        EventNode evn = node.shallowCopy();
+        EventNode evn = node.shallowCopy();   // temp copy
         unloadWidgets(evn);  // put our pending edits in place
+        
+        // Parse the state transitions
+        StringBuffer parseThis = new StringBuffer();
+        for (Iterator itr = transitions.getTransitions().iterator(); itr.hasNext();) {
+          EventStateTransition est = (EventStateTransition)itr.next();
+          parseThis.append(est.toString());
+          parseThis.append(";");
+          addPotentialLocalIndexVariable(evn,est.getIndexingExpression());
+        }
+
         String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
         if (parseResults != null) {
           int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
@@ -325,6 +329,11 @@ public class EventInspectorDialog extends JDialog
         unloadWidgets(node);
       }
       setVisible(false);
+    }
+    private void addPotentialLocalIndexVariable(EventNode n, String lvName)
+    {
+      Vector locVars = n.getLocalVariables();
+      locVars.add(new EventLocalVariable(lvName,"int","0"));
     }
   }
 
