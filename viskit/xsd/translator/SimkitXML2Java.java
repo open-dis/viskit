@@ -112,6 +112,7 @@ public class SimkitXML2Java {
 	PrintWriter pw = new PrintWriter(head);
 	String name = this.root.getName();
         String pkg  = this.root.getPackage();
+        String extend = this.root.getExtend();
 	
 	pw.println("package " + pkg + sc);
 	pw.println();
@@ -119,7 +120,7 @@ public class SimkitXML2Java {
 	pw.println("import simkit.random.*;");
 	pw.println("import java.util.*;");
 	pw.println();
-	pw.println("public class " + name + sp + "extends SimEntityBase" + sp + ob);
+	pw.println("public class " + name + sp + "extends" + sp + extend + sp + ob);
 	pw.println();
     }
 

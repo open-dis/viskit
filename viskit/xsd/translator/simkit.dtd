@@ -4,6 +4,7 @@
         package         CDATA   "examples"
 	version		CDATA	#REQUIRED
         author          CDATA   #IMPLIED
+        extend          CDATA   "SimEntityBase"
 >
 
 <!ELEMENT Comment ( #PCDATA ) >
