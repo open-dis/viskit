@@ -62,7 +62,8 @@ public class SourceWindow extends JFrame
 
     jta = new JTextArea(); //src);
     jta.setText(addLineNums(src));
-
+    jta.setCaretPosition(0);
+    
     jta.setEditable(false);
     jta.setFont(new Font("Monospaced",Font.PLAIN,12));
     JScrollPane jsp = new JScrollPane(jta);
