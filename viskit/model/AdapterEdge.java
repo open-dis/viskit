@@ -16,9 +16,9 @@ public class AdapterEdge extends AssemblyEdge
 {
   AdapterEdge()       // package-limited
   {
-    parameters = new ArrayList();
   }
   
+/*
   Object copyShallow()
   {
     AdapterEdge se = new AdapterEdge();
@@ -31,4 +31,5 @@ public class AdapterEdge extends AssemblyEdge
     se.conditionalsComment = conditionalsComment;
     return se;
   }
+*/
 }

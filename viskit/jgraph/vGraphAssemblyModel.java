@@ -153,8 +153,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void addAdapterEdge(AdapterEdge ae)
   {
-    Object frO = ae.from;
-    Object toO = ae.to;
+    Object frO = ae.getFrom();
+    Object toO = ae.getTo();
     DefaultGraphCell from,to;
     if(frO instanceof EvGraphNode) {
       from = (DefaultGraphCell)((EvGraphNode)frO).opaqueViewObject;
@@ -190,8 +190,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   }
   public void addSimEvListEdge(SimEvListenerEdge sele)
   {
-    Object frO = sele.from;
-    Object toO = sele.to;
+    Object frO = sele.getFrom();
+    Object toO = sele.getTo();
     DefaultGraphCell from,to;
     if(frO instanceof EvGraphNode) {
       from = (DefaultGraphCell)((EvGraphNode)frO).opaqueViewObject;
@@ -289,8 +289,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel
   */
   public void addPclEdge(PropChangeEdge pce)
   {
-    EvGraphNode egn = (EvGraphNode)pce.from;
-    PropChangeListenerNode pcln = (PropChangeListenerNode)pce.to;
+    EvGraphNode egn = (EvGraphNode)pce.getFrom();
+    PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();
     DefaultGraphCell from = (DefaultGraphCell)egn.opaqueViewObject;
     DefaultGraphCell to = (DefaultGraphCell)pcln.opaqueViewObject;
     vAssemblyEdgeCell edge = new vAssemblyEdgeCell();

@@ -16,19 +16,14 @@ public class PropChangeEdge extends AssemblyEdge
 {
   PropChangeEdge()       // package-limited
   {
-    parameters = new ArrayList();
+    setComment("Property change listener connection");
   }
+
+  protected String type;
+  protected String property;
   
-  Object copyShallow()
-  {
-    PropChangeEdge se = new PropChangeEdge();
-    se.opaqueViewObject = opaqueViewObject;
-    se.to = to;
-    se.from = from;
-    se.parameters = parameters;
-    se.delay = delay;
-    se.conditional = conditional;
-    se.conditionalsComment = conditionalsComment;
-    return se;
-  }
+  public String getType(){return type;}
+  public void   setType(String t){type=t;}
+  public String getProperty(){return property;}
+  public void   setProperty(String p){property=p;}
 }

@@ -6,6 +6,7 @@ import viskit.model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
+import java.io.File;
 
 import actions.ActionIntrospector;
 import org.jgraph.graph.DefaultGraphCell;
@@ -28,12 +29,61 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     //newEventGraph();
   }
 
+  /* menu selections */
+  public void copy()
+  {
+  }
+
+  public void generateJavaClass()
+  {
+    if(((ViskitAssemblyModel)getModel()).isDirty()) {
+      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
+      if(ret != JOptionPane.YES_OPTION)
+        return;
+      this.saveAs();
+    }
+
+    String source = ((ViskitAssemblyModel)getModel()).buildJavaSource();
+    if(source != null && source.length() > 0)
+      ((ViskitAssemblyView)getView()).showAndSaveSource(source);
+
+  }
+
+  public void runEventGraphEditor()
+  {
+    if (VGlobals.instance().getEventGraphEditor() == null)
+      VGlobals.instance().buildEventGraphViewFrame();
+    VGlobals.instance().runEventGraphView();
+  }
+
+  public void saveAs()
+  {
+    lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name);
+    if(lastFile != null) {
+      ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
+      ((ViskitAssemblyView)getView()).fileName(lastFile.getName());
+    }
+
+  }
+
   public void quit()
   //----------------
   {
     
   }
+  public void cut()
+  {
 
+  }
+  public void paste()
+  {
+
+  }
+  File lastFile;
+  public void open()
+  {
+
+  }
   public void save()
   //----------------
   {
@@ -53,18 +103,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   private int egNodeCount=0;
   public void newEventGraphNode(String typeName, Point p)
   {
-    System.out.println("new eg node "+typeName+" at "+p.x+" "+p.y);
     String fauxName = "evgr_" + egNodeCount++;
     ((viskit.model.AssemblyModel) getModel()).newEventGraph(fauxName, typeName, p);
-
   }
 
   public void newPropChangeListenerNode(String name, Point p)
   {
-    System.out.println("new prop change node "+name+" at "+p.x+" "+p.y);
     String fauxName = "lstnr_"+egNodeCount++; // use same counter
     ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(fauxName,name,p);
-
   }
   /**
    *
@@ -154,5 +200,35 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     ((ViskitModel) getModel()).newCancelEdge(src, tar);
   }
 */
+  public void pcListenerEdit(PropChangeListenerNode pclNode)
+  //---------------------------------------
+  {
+    boolean modified = ((ViskitAssemblyView) getView()).doEditPclNode(pclNode);
+    if (modified) {
+      ((ViskitAssemblyModel) getModel()).changePclNode(pclNode);
+    }
+  }
+  public void pcListenerEdgeEdit(PropChangeEdge pclEdge)
+  {
+    boolean modified = ((ViskitAssemblyView) getView()).doEditPclEdge(pclEdge);
+    if (modified) {
+      ((ViskitAssemblyModel) getModel()).changePclEdge(pclEdge);
+    }
+  }
 
+  public void adapterEdgeEdit(AdapterEdge aEdge)
+  {
+    boolean modified = ((ViskitAssemblyView) getView()).doEditAdapterEdge(aEdge);
+    if (modified) {
+      ((ViskitAssemblyModel)getModel()).changeAdapterEdge(aEdge);
+    }
+  }
+
+  public void simEvListenerEdgeEdit(SimEvListenerEdge seEdge)
+  {
+    boolean modified = ((ViskitAssemblyView)getView()).doEditSimEvListEdge(seEdge);
+    if (modified) {
+      ((ViskitAssemblyModel)getModel()).changeSimEvEdge(seEdge);
+    }
+  }
 }

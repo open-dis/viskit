@@ -3,11 +3,15 @@ package viskit.jgraph;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.ViskitController;
-import viskit.model.CancellingEdge;
-import viskit.model.Edge;
-import viskit.model.EventNode;
-import viskit.model.SchedulingEdge;
+import viskit.ViskitAssemblyController;
+import viskit.model.AdapterEdge;
+import viskit.model.PropChangeEdge;
+import viskit.model.SimEvListenerEdge;
+import viskit.model.PropChangeListenerNode;
+//import viskit.model.CancellingEdge;
+//import viskit.model.Edge;
+//import viskit.model.EventNode;
+//import viskit.model.SchedulingEdge;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,17 +65,35 @@ public class vGraphAssemblyUI extends BasicGraphUI
     {
       public void run()
       {
-        ViskitController cntl = (ViskitController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
-        if (cell instanceof vEdgeCell) {
-          Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
-          if (e instanceof SchedulingEdge)
-            cntl.arcEdit((SchedulingEdge)e);
-          else //if(e instanceof CancellingEdge)
-            cntl.canArcEdit((CancellingEdge)e);
+        ViskitAssemblyController cntl = (ViskitAssemblyController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
+        if (cell instanceof vAssemblyEdgeCell) {
+          Object edgeObj = ((vAssemblyEdgeCell)cell).getUserObject();
+          if(edgeObj instanceof AdapterEdge)
+            cntl.adapterEdgeEdit((AdapterEdge)edgeObj);
+          else if (edgeObj instanceof PropChangeEdge) {
+            cntl.pcListenerEdgeEdit((PropChangeEdge)edgeObj);
+          }
+          else //if (edgeObj instanceof SimEvListenerEdge)
+            cntl.simEvListenerEdgeEdit((SimEvListenerEdge)edgeObj);
+
+//          Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
+//          if (e instanceof SchedulingEdge)
+//            cntl.arcEdit((SchedulingEdge)e);
+//          else //if(e instanceof CancellingEdge)
+//            cntl.canArcEdit((CancellingEdge)e);
+//        }
+//        else if (cell instanceof CircleCell) {
+//          EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
+//          cntl.nodeEdit(en);
+//        }
         }
-        else if (cell instanceof CircleCell) {
-          EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
-          cntl.nodeEdit(en);
+        else if (cell instanceof AssemblyCircleCell) {
+          Object nodeObj = ((AssemblyCircleCell)cell).getUserObject();
+
+        }
+        else if(cell instanceof AssemblyPropListCell) {
+          Object nodeObj = ((AssemblyPropListCell)cell).getUserObject();
+          cntl.pcListenerEdit((PropChangeListenerNode)nodeObj);
         }
       }
     });

@@ -289,14 +289,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     VGlobals.instance().runAssemblyView();
   }
 
-  public void runEventGraphEditor()
-  {
-    if (VGlobals.instance().getEventGraphEditor() == null)
-      VGlobals.instance().buildEventGraphViewFrame();
-    VGlobals.instance().runEventGraphView();
-
-  }
-
   public void eventList()
   {
     // todo implement
@@ -384,5 +376,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((viskit.model.ViskitModel) getModel()).changeCancelEdge(ed);
     }
   }
+
 
 }

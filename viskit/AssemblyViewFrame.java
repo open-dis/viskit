@@ -2,9 +2,7 @@ package viskit;
 
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModelEvent;
-import viskit.model.Model;
-import viskit.model.AssemblyModel;
-import viskit.model.ViskitAssemblyModel;
+import viskit.model.*;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.jgraph.vGraphAssemblyComponent;
 import viskit.images.AdapterIcon;
@@ -21,6 +19,12 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
+
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -45,6 +49,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public static final int SIMEVLIS_MODE = 2;
   public static final int PCL_MODE = 3;
 
+   private JMenuBar menuBar;
+   private JMenu fileMenu, editMenu;
+
+  private String filename;
 
   /**
    * Toolbar for dropping icons, connecting, etc.
@@ -137,8 +145,70 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private void buildMenus()
   {
+    ViskitAssemblyController controller = (ViskitAssemblyController)getController();
+    int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
+    // Set up file menu
+    fileMenu = new JMenu("File");
+    fileMenu.setMnemonic(KeyEvent.VK_F);
+    fileMenu.add(buildMenuItem(controller,"newAssembly",    "New Assembly", new Integer(KeyEvent.VK_N),
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
+    fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
+    fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
+    fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
+    fileMenu.addSeparator();
+    fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
+    fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
+    fileMenu.addSeparator();
+    fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+
+    // Set up edit menu
+    editMenu = new JMenu("Edit");
+    editMenu.setMnemonic(KeyEvent.VK_E);
+    // the next three are disabled until something is selected
+    editMenu.add(buildMenuItem(controller,"cut",  "Cut",  new Integer(KeyEvent.VK_T),
+                                                   KeyStroke.getKeyStroke(KeyEvent.VK_X,accelMod)));
+    editMenu.add(buildMenuItem(controller,"copy", "Copy", new Integer(KeyEvent.VK_C),
+                                                   KeyStroke.getKeyStroke(KeyEvent.VK_C,accelMod)));
+    editMenu.add(buildMenuItem(controller,"paste","Paste",new Integer(KeyEvent.VK_P),
+                                                   KeyStroke.getKeyStroke(KeyEvent.VK_V,accelMod)));
+
+    // These 3 start off being disabled, until something is selected
+    ActionIntrospector.getAction(controller,"cut").setEnabled(false);
+    ActionIntrospector.getAction(controller,"copy").setEnabled(false);
+    ActionIntrospector.getAction(controller,"paste").setEnabled(false);
+
+    editMenu.addSeparator();
+    editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Assembly Properties...",null,null));
+
+    // Create a new menu bar and add the menus we created above to it
+    menuBar = new JMenuBar();
+    menuBar.add(fileMenu);
+    menuBar.add(editMenu);
+    //menuBar.add(simulationMenu);
+
+    this.setJMenuBar(menuBar);
   }
+
+  // Use the actions package
+  private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel)
+  {
+    Action a = ActionIntrospector.getAction(source,method);
+    Map map = new HashMap();
+    if(mn != null)
+      map.put(Action.MNEMONIC_KEY,mn);
+    if(accel != null)
+      map.put(Action.ACCELERATOR_KEY,accel);
+    if(name != null)
+      map.put(Action.NAME,name);
+    if(!map.isEmpty())
+      ActionUtilities.decorateAction(a,map);
+
+    return ActionUtilities.createMenuItem(a);
+  }
+
   /**
    * Returns the current mode--select, add, arc, cancelArc
    */
@@ -517,7 +587,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public void modelChanged(mvcModelEvent event)
   //-------------------------------------------
   {
-    System.out.println("AssView got "+event.toString());
+    //System.out.println("AssView got "+event.toString());
     switch(event.getID())
     {
 /*
@@ -534,7 +604,89 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
   }
 
+  // permit user to edit existing entities
+  public boolean doEditPclNode(PropChangeListenerNode pclNode)
+  {
+    return PclNodeInspectorDialog.showDialog(this,this,pclNode); // blocks
+  }
+
+  public boolean doEditPclEdge(PropChangeEdge pclEdge)
+  {
+    return PclEdgeInspectorDialog.showDialog(this,this,pclEdge);
+  }
+
+  public boolean doEditAdapterEdge(AdapterEdge aEdge)
+  {
+    //todo implement return AdapterEdgeInspectorDialog.showDialog(this,this,aEdge);
+    System.out.println("doEditAdapterEdge() unimplemented");
+    return false;
+  }
+
+  public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge)
+  {
+    //todo implement return SimEvListenerEdgeInspectorDialog.showDialog(this,this,seEdge);
+    System.out.println("doEditSimEvListEdge() unimplemented");
+    return false;
+  }
+
+  public void fileName(String s)    // informative, tells view what we're working on
+  {
+    this.filename = s;
+    this.setTitle("Viskit Assembly: "+s);
+  }
+
+  public int genericAsk(String title, String msg)
+  //---------------------------------------------
+  {
+    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_OPTION);
+  }
+
+  public String promptForStringOrCancel(String title, String message, String initval)
+  //---------------------------------------------------------------------------------
+  {
+    return (String)JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
+                                               null, null, initval);
+  }
+
+  // ViskitView-required methods:
+  private JFileChooser jfc;
+  public File openFileAsk()
+  //-----------------------
+  {
+    if (jfc == null)
+      jfc = new JFileChooser(System.getProperty("user.dir"));
+
+    int retv = jfc.showOpenDialog(this);
+    if (retv == JFileChooser.APPROVE_OPTION)
+      return jfc.getSelectedFile();
+    return null;
+  }
+
+  public File saveFileAsk(String suggNameNoType)
+  //-----------------------
+  {
+    if(jfc == null)
+      jfc = new JFileChooser(System.getProperty("user.dir"));
+    jfc.setSelectedFile(new File(suggNameNoType+".xml"));
+    int retv = jfc.showSaveDialog(this);
+    if(retv == JFileChooser.APPROVE_OPTION)
+      return jfc.getSelectedFile();
+    return null;
+  }
+
+    /**
+   * Called by the controller after source has been generated.  Show to the user and provide him with the option
+   * to save.
+   * @param s Java source
+   */
+  public void showAndSaveSource(String s)
+  {
+    JFrame f = new SourceWindow(this,s);
+    f.setTitle("Generated source from "+filename);
+    f.setVisible(true);
+  }
 }
+
 interface DragStartListener
 {
   public void startingDrag(Transferable trans);

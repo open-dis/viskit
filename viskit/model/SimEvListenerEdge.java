@@ -16,8 +16,8 @@ public class SimEvListenerEdge extends AssemblyEdge
 {
   SimEvListenerEdge()       // package-limited
   {
-    parameters = new ArrayList();
   }
+/*
 
   Object copyShallow()
   {
@@ -31,4 +31,5 @@ public class SimEvListenerEdge extends AssemblyEdge
     se.conditionalsComment = conditionalsComment;
     return se;
   }
+*/
 }

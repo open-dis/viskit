@@ -2,14 +2,21 @@ package viskit.model;
 
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.assembly.*;
+import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.ModelEvent;
+import viskit.VGlobals;
 
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.io.File;
-import java.util.HashMap;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -30,6 +37,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   private GraphMetaData metaData;
   HashMap nodeCache = new HashMap();
   HashMap assEdgeCache = new HashMap();
+
   public void init()
   {
     try {
@@ -42,6 +50,56 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
                                  "\n"+ e.getMessage(),
                                  "XML Error",JOptionPane.ERROR_MESSAGE);
     }
+  }
+
+  /* from other model...*/
+  public void saveModel(File f)
+  {
+/*
+    if(f == null)
+      f = currentFile;
+     try {
+       FileWriter fw = new FileWriter(f);
+       Marshaller m = jc.createMarshaller();
+       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
+       m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,schemaLoc);
+
+       String nm = f.getName();
+       int dot=-1;
+       if((dot=nm.indexOf('.')) != -1)
+         nm = nm.substring(0,dot);
+
+       jaxbRoot.setName(nIe(metaData.name));
+       jaxbRoot.setVersion(nIe(metaData.version));
+       jaxbRoot.setAuthor(nIe(metaData.author));
+       jaxbRoot.setPackage(nIe(metaData.pkg));
+
+       java.util.List clis = jaxbRoot.getComment();
+       clis.clear();;
+       String cmt = nIe(metaData.comment);
+       if(cmt != null)
+         clis.add(cmt.trim());
+
+       m.marshal(jaxbRoot,fw);
+       fw.close();
+
+       modelDirty = false;
+       currentFile = f;
+     }
+     catch (JAXBException e) {
+       JOptionPane.showMessageDialog(null,"Exception on JAXB marshalling" +
+                                  "\n"+ f.getName() +
+                                  "\n"+ e.getMessage(),
+                                  "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+       return;
+     }
+     catch (IOException ex) {
+       JOptionPane.showMessageDialog(null,"Exception on writing "+ f.getName() +
+                                  "\n"+ ex.getMessage(),
+                                  "File I/O Error",JOptionPane.ERROR_MESSAGE);
+       return;
+     }
+*/
   }
 
   public void newEventGraph(String widgetName, String className, Point  p)
@@ -102,8 +160,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public void newAdapterEdge (Object src, Object target)
   {
     AdapterEdge ae = new AdapterEdge();
-    ae.from = src;
-    ae.to   = target;
+    ae.setFrom(src);
+    ae.setTo(target);
     Object srcOMO,targetOMO;
     if(src instanceof EvGraphNode) {
       ((EvGraphNode)src).getConnections().add(ae);
@@ -145,8 +203,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public void newPclEdge(EvGraphNode src, PropChangeListenerNode target)
   {
     PropChangeEdge pce = new PropChangeEdge();
-    pce.from = src;
-    pce.to = target;
+    pce.setFrom(src);
+    pce.setTo(target);
 
     src.getConnections().add(pce);
     target.getConnections().add(pce);
@@ -177,8 +235,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public void newSimEvLisEdge (Object src, Object target){
     SimEvListenerEdge sele = new SimEvListenerEdge();
     //AdapterEdge ae = new AdapterEdge();
-    sele.from = src;
-    sele.to   = target;
+    sele.setFrom(src);
+    sele.setTo(target);
     Object srcOMO,targetOMO;
     if(src instanceof EvGraphNode) {
       ((EvGraphNode)src).getConnections().add(sele);
@@ -216,6 +274,43 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
 
+  }
+  public void changePclEdge(PropChangeEdge pclEdge)
+  {
+    //todo implement
+    System.out.println("changePclEdge...todo");
+  }
+
+  public void changeAdapterEdge(AdapterEdge aEdge)
+  {
+    //todo implement
+    System.out.println("changeAdapterEdge...todo");
+  }
+
+  public void changeSimEvEdge(SimEvListenerEdge seEdge)
+  {
+    //todo implement
+    System.out.println("changeSimEvEdge...todo");
+  }
+
+  public void changePclNode(PropChangeListenerNode pclNode)
+  {
+    viskit.xsd.bindings.assembly.PropertyChangeListener jaxBPcl =  (viskit.xsd.bindings.assembly.PropertyChangeListener)pclNode.opaqueModelObject;
+    jaxBPcl.setName(pclNode.getName());
+    jaxBPcl.setType(pclNode.getType());
+    viskit.xsd.bindings.assembly.Coordinate coor = null;
+    try {
+      coor = oFactory.createCoordinate();
+    } catch(JAXBException e) {
+      System.err.println("Exc AssemblyModel.changePclNode()");
+      return;
+    }
+    coor.setX(""+pclNode.getPosition().x);
+    coor.setY(""+pclNode.getPosition().y);
+    jaxBPcl.setCoordinate(coor);
+    
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
   }
 
   public void changeEvGNode(EvGraphNode node)
@@ -264,15 +359,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
         return;
       }
-/* todo
-      VGlobals.instance().reset();
-      stateVariables.removeAllElements();
-      simParameters.removeAllElements();
-      done..evNodeCache.clear();
-      done..edgeCache.clear();
-      done ..metaData = new GraphMetaData();
-      done..this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
-*/
+
+      VGlobals.instance().assemblyReset();
       nodeCache.clear();
       assEdgeCache.clear();
       metaData = new GraphMetaData(); //todo need new object?
@@ -280,36 +368,37 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
     }
     else {
-/*      try {
+      try {
         Unmarshaller u = jc.createUnmarshaller();
         // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
         // see u.isValidating()
         // Unmarshaller does NOT validate by default
-        jaxbRoot = (SimEntity) u.unmarshal(f);
+        jaxbRoot = (SimkitAssembly) u.unmarshal(f);
         metaData = new GraphMetaData();
-        metaData.author = jaxbRoot.getAuthor();
+      //  metaData.author = jaxbRoot.getAuthor();
         metaData.version = jaxbRoot.getVersion();
         metaData.name = jaxbRoot.getName();
         metaData.pkg = jaxbRoot.getPackage();
+/*
         List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
           sb.append((String)itr.next());
           sb.append(" ");
         }
+
         metaData.comment = sb.toString().trim();
-
+*/
         VGlobals.instance().reset();
-        stateVariables.removeAllElements();
-        simParameters.removeAllElements();
-        evNodeCache.clear();
-        edgeCache.clear();
+        nodeCache.clear();
+        assEdgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
-
-        buildEventsFromJaxb(jaxbRoot.getEvent());
-        buildParametersFromJaxb(jaxbRoot.getParameter());
-        buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
-
+        buildEGsFromJaxb(jaxbRoot.getSimEntity());
+        buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
+        // may not need these:
+        //buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
+        //buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
+        //buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
       }
       catch (JAXBException e) {
         JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
@@ -320,11 +409,111 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         return;
       }
 
-*/
+
     }
     currentFile = f;
     modelDirty = false;
   }
+
+  private void buildEGsFromJaxb(List simEntities)
+  {
+    for (Iterator itr = simEntities.iterator(); itr.hasNext();) {
+      SimEntity se = (SimEntity) itr.next();
+      EvGraphNode egn = buildEvgNodeFromJaxbSimEntity(se);
+
+      buildEdgesFromEvGraphNode(egn, egn.getConnections());
+    }
+  }
+
+  private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se)
+  {
+    EvGraphNode en = (EvGraphNode)nodeCache.get(se);
+    if(en != null) {
+      return en;
+    }
+    en = new EvGraphNode(se.getName(),se.getType());
+    en.setName(se.getName());
+    CoordinateType coor = se.getCoordinate();
+    en.setPosition(new Point(Integer.parseInt(coor.getX()),
+                             Integer.parseInt(coor.getY())));
+
+    en.opaqueModelObject = se;
+    nodeCache.put(se,en);   // key = se
+
+    notifyChanged(new ModelEvent(en,ModelEvent.EVENTADDED, "Event added"));
+
+    return en;
+
+  }
+
+  private void buildEdgesFromEvGraphNode(EvGraphNode egn, Vector connections)
+  {
+    for (Iterator itr = connections.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      if(o instanceof Adapter) {
+        buildAdapterEdgeFromJaxb(egn,(Adapter)o);
+      }
+      else if (o instanceof PropertyChangeListenerConnection) {
+        buildPCEdgeFromJaxb(egn,(PropertyChangeListenerConnection)o);
+      }
+      else if (o instanceof SimEventListenerConnection) {
+        buildSEvLisEdgeFromJaxb(egn,(SimEventListenerConnection)o);
+      }
+    }
+  }
+
+  private AdapterEdge buildAdapterEdgeFromJaxb(EvGraphNode egn, Adapter a)
+  {
+    AdapterEdge ae = new AdapterEdge();
+    ae.opaqueModelObject = a;
+    ae.setFrom(egn);
+    EvGraphNode targ = buildEvgNodeFromJaxbSimEntity((SimEntity)a.getTo());
+    ae.setTo(egn);
+    egn.getConnections().add(ae);
+    targ.getConnections().add(ae);
+
+    assEdgeCache.put(a,ae);
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter Edge added"));
+    return ae;
+
+  }
+  private PropChangeEdge buildPCEdgeFromJaxb(EvGraphNode egn, PropertyChangeListenerConnection pclc)
+  {
+    PropChangeEdge pce = new PropChangeEdge();
+    pce.opaqueModelObject = pclc;
+    pce.setFrom(egn);
+    EvGraphNode targ = buildEvgNodeFromJaxbSimEntity((SimEntity)pclc.getListener());     //todo wrong
+    pce.setTo(targ);
+    egn.getConnections().add(pce);
+    targ.getConnections().add(pce);
+
+    assEdgeCache.put(pclc,pce);
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(pce,ModelEvent.PCLEDGEADDED,"PCL Edge added"));
+    return pce;
+  }
+  private SimEvListenerEdge buildSEvLisEdgeFromJaxb(EvGraphNode egn, SimEventListenerConnection selcon)
+  {
+    SimEvListenerEdge sele = new SimEvListenerEdge();
+    sele.opaqueModelObject = selcon;
+    sele.setFrom(egn);
+    EvGraphNode targ = buildEvgNodeFromJaxbSimEntity((SimEntity)selcon.getListener());
+    sele.setTo(targ);
+    egn.getConnections().add(sele);
+    targ.getConnections().add(sele);
+
+    assEdgeCache.put(selcon,sele);
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(sele,ModelEvent.SIMEVLISTEDGEADDED,"SimEvList Edge added"));
+    return sele;
+  }
+  private void buildPCLsFromJaxb(List pcLs)
+  {
+    //todo implement
+
+  }
+
   /**
     * Boolean to signify whether the model has been changed since last disk save.
     *
@@ -342,6 +531,19 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public void changeMetaData   (GraphMetaData gmd)
   {
     metaData = gmd;
+  }
+
+  public String buildJavaSource()
+  {
+    try {
+      SimkitAssemblyXML2Java x2j = new SimkitAssemblyXML2Java(currentFile);
+      x2j.unmarshal();
+      return x2j.translate();
+     }
+     catch (Exception e) {
+       e.printStackTrace();
+     }
+     return null;
   }
 
   /**

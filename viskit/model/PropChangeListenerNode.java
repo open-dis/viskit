@@ -23,13 +23,19 @@ public class PropChangeListenerNode extends ViskitElement
 {
   private String name;
   private String type;
+  private String paramType;
+  private String paramValue;
+  private Vector connections = new Vector();
 
+/*
   private Vector    connections = new Vector();
-  private ArrayList comments = new ArrayList();
   private ArrayList transitions = new ArrayList();
   private Vector    localVariables = new Vector();
   private ArrayList arguments = new ArrayList();
+  */
   private Point     position = new Point(0,0);
+  //private ArrayList comments = new ArrayList();
+
 
   PropChangeListenerNode(String name, String type)      // package access on constructor
   {
@@ -40,6 +46,7 @@ public class PropChangeListenerNode extends ViskitElement
   {
     return name;
   }
+/*
   public PropChangeListenerNode shallowCopy()
   {
     PropChangeListenerNode en   = (PropChangeListenerNode)super.shallowCopy(new PropChangeListenerNode(name+"-copy",type));
@@ -51,21 +58,30 @@ public class PropChangeListenerNode extends ViskitElement
     en.connections = connections;
     return en;
   }
+*/
+  public void setParamType(String s)
+  {
+    paramType = s;
+  }
+  public String getParamType()
+  {
+    return paramType;
+  }
+  public void setParamValue(String s)
+  {
+    paramValue = s;
+  }
+  public String getParamValue()
+  {
+    return paramValue;
+  }
   public String getName()
   {
-    /*
-    if(this.opaqueModelObject != null)
-      return ((Event)opaqueModelObject).getName();
-    else
-    */
-      return name;
+    return name;
   }
   public void setName(String s)
   {
-    if(this.opaqueModelObject != null)
-      ((Event)opaqueModelObject).setName(s);
-
-    this.name = s;
+    name = s;
   }
   public String getType()
   {
@@ -73,24 +89,9 @@ public class PropChangeListenerNode extends ViskitElement
   }
   public void setType(String typ)
   {
-   //todo if(this.opaqueModelObject != null)
-   //   ((Event)opaqueModelObject).setName(s);
-
-    this.type = typ;
-
+    type = typ;
   }
-/*
-  public ArrayList getArguments()
-  {
-    return arguments;
-  }
-
-  public void setArguments(ArrayList arguments)
-  {
-    this.arguments = arguments;
-  }
-
-  public ArrayList getComments()
+  /*public ArrayList getComments()
   {
     return comments;
   }
@@ -100,36 +101,6 @@ public class PropChangeListenerNode extends ViskitElement
     this.comments = comments;
   }
   */
-  public Vector getConnections()
-  {
-    return connections;
-  }
-
-  public void setConnections(Vector connections)
-  {
-    this.connections = connections;
-  }
-  /*
-  public Vector getLocalVariables()
-  {
-    return localVariables;
-  }
-
-  public void setLocalVariables(Vector localVariables)
-  {
-    this.localVariables = localVariables;
-  }
-
-  public ArrayList getTransitions()
-  {
-    return transitions;
-  }
-
-  public void setTransitions(ArrayList transitions)
-  {
-    this.transitions = transitions;
-  }
-*/
 
   public Point getPosition()
   {
@@ -140,5 +111,8 @@ public class PropChangeListenerNode extends ViskitElement
   {
     this.position = position;
   }
-
+  public Vector getConnections()
+  {
+    return connections;
+  }
 }

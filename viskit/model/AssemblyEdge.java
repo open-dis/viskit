@@ -14,11 +14,23 @@ import java.util.ArrayList;
 
 abstract public class AssemblyEdge extends ViskitElement
 {
-  public Object to; //PropChangeListenerNode to;
-  public Object from;
-  public ArrayList parameters;
-  public String    conditional;
-  public String    conditionalsComment;
-  public String    delay;
-  abstract Object  copyShallow();
+  private Object to; //PropChangeListenerNode to;
+  private Object from;
+  private String comment;
+
+/*
+  private String name;
+
+  public String getName(){return name;}
+  public void   setName(String n){name=n;}
+*/
+
+  public String getComment(){return comment;}
+  public void   setComment(String c){comment=c;}
+
+  public Object getTo(){return to;}
+  public void   setTo(Object t){to=t;}
+
+  public Object getFrom(){return from;}
+  public void   setFrom(Object f){from=f;}
 }

@@ -1,5 +1,7 @@
 package viskit.model;
 
+import viskit.ViskitAssemblyView;
+
 import java.awt.Point;
 import java.io.File;
 /**
@@ -25,6 +27,8 @@ public interface ViskitAssemblyModel
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
    */
   public void newModel      (File f);
+  public void saveModel     (File f);
+  
   public GraphMetaData getMetaData();
   public void changeMetaData   (GraphMetaData gmd);
   public void changeEvGNode      (EvGraphNode ev);
@@ -33,5 +37,12 @@ public interface ViskitAssemblyModel
   public void newPclEdge      (EvGraphNode src, PropChangeListenerNode target);
   public void newSimEvLisEdge (Object src, Object target);
 
+  public void changePclNode(PropChangeListenerNode pclNode);
+
+  public void changePclEdge     (PropChangeEdge pclEdge);
+  public void changeAdapterEdge (AdapterEdge aEdge);
+  public void changeSimEvEdge   (SimEvListenerEdge seEdge);
+
+  public String buildJavaSource();
 
 }

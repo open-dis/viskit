@@ -17,29 +17,23 @@ import java.io.File;
 
 public interface ViskitAssemblyView
 {
-/*
+
   // permit user to edit existing entities
-  public boolean doEditCancelEdge   ( CancellingEdge edge );
-  public boolean doEditEdge         ( SchedulingEdge edge );
-  public boolean doEditNode         ( EventNode node );
-  public boolean doEditParameter    ( vParameter param );
-  public boolean doEditStateVariable( vStateVariable var);
+  public boolean doEditPclNode(PropChangeListenerNode pclNode);
+
+  public boolean doEditPclEdge(PropChangeEdge pclEdge);
+  public boolean doEditAdapterEdge(AdapterEdge aEdge);
+  public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge);
 
   public int     genericAsk             ( String title, String prompt );      // returns JOptionPane constants
-*/
   public void    genericErrorReport     ( String title, String message );
-/*  public String  promptForStringOrCancel( String title, String message, String initval);
+  public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
-  public File    saveFileAsk();
+  public File    saveFileAsk(String suggNameNoType);
 
   public void    fileName(String s);    // informative, tells view what we're working on
 
   public void    showAndSaveSource(String s);
 
-  // The following 2 may be implemented by the view in someother way that an official GUI Dialog
-  public String addParameterDialog();          // returns param name
-  public String addStateVariableDialog();      // returns statevar name
-
-*/
 }

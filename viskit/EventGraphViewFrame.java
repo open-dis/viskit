@@ -399,12 +399,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     editMenu.addSeparator();
     editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Graph Properties...",null,null));
 
-
-    // Set up simulation menu for controlling the simulation
-    //simulationMenu = new JMenu("Simulation");
-    //simulationMenu.setMnemonic(KeyEvent.VK_S);
-    //simulationMenu.add(buildMenuItem(controller,"eventList","Event List...",new Integer(KeyEvent.VK_L),null));
-
     // Create a new menu bar and add the menus we created above to it
     menuBar = new JMenuBar();
     menuBar.add(fileMenu);

@@ -491,7 +491,7 @@ public class VGlobals
   }
 
   Vector existingNames = new Vector();
-
+  Vector existingAssemblyNames = new Vector();
   /**
    * Returns true if the data is valid, eg we have a valid parameter name
    * and a valid type.
@@ -556,7 +556,10 @@ public class VGlobals
     stateVars.clear();
     simParms.clear();
   }
-
+  public void assemblyReset()
+  {
+    existingAssemblyNames.clear();
+  }
   /**
    * Small class to hold on to the fully-qualified class name, while displaying only the
    * un-qualified name;
