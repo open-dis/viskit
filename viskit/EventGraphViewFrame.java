@@ -139,6 +139,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         // else, the controller will Sys.exit()
       }
     });
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+    this.setIconImage(icon.getImage());
   }
 
   /**
