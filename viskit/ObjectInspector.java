@@ -69,7 +69,6 @@ public class ObjectInspector  extends JDialog implements ActionListener
 
   public void actionPerformed(ActionEvent e)
   {
-    // enable ok butt
   }
 
   public void setData(VInstantiator vi) throws ClassNotFoundException
@@ -119,6 +118,7 @@ public class ObjectInspector  extends JDialog implements ActionListener
 
     public void actionPerformed(ActionEvent event)
     {
+      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom
       caretUpdate(null);
     }
   }

@@ -120,10 +120,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     if (((AssemblyModel)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
-
-    ((ViskitAssemblyModel) getModel()).newModel(null);
+    
+    lastFile=null;
+    ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
+    vmod.newModel(null);
     editGraphMetaData();
-
+    ((ViskitAssemblyView) getView()).fileName(vmod.getMetaData().name);
   }
 
   private int egNodeCount=0;

@@ -155,7 +155,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
    */
   public void graphChanged(GraphModelEvent e)
   {
-    if(currentModelEvent!= null && currentModelEvent.getID() == ModelEvent.NEWMODEL)
+ //   if(currentModelEvent!= null && currentModelEvent.getID() == ModelEvent.NEWMODEL)
+    if(currentModelEvent != null && currentModelEvent.getSource() != this.model)
+      // bail if this came from outside
       return;  // this came in from outside, we don't have to inform anybody..prevent reentry
     //todo confirm anyother events that should cause us to bail here
     GraphModelEvent.GraphModelChange c = e.getChange();

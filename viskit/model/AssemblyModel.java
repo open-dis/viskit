@@ -433,9 +433,21 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     VInstantiator inst = pclNode.getInstantiator();
 
     List jlistt = getJaxbParamList(inst);
+/*
     for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
       Object o = itr.next();
       lis.add(o);
+    }
+*/
+    // this will be a list of one...a MultiParameter....get its list, but throw away the
+    // object itself.  This is because the PropertyChangeListener object serves as "its own" MultiParameter,
+    if(jlistt.size() != 1)
+      throw new RuntimeException("Design error in AssemblyModel");
+
+    MultiParameter mp = (MultiParameter)jlistt.get(0);
+
+    for (Iterator itr = mp.getParameters().iterator(); itr.hasNext();) {
+      lis.add(itr.next());
     }
 
     modelDirty = true;
@@ -465,15 +477,27 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     VInstantiator inst = evNode.getInstantiator();
 
     List jlistt = getJaxbParamList(inst);
+    /*
     for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
       Object o = itr.next();
       lis.add(o);
+    }
+    */
+    // this will be a list of one...a MultiParameter....get its list, but throw away the
+    // object itself.  This is because the SimEntity object serves as "its own" MultiParameter,
+    if(jlistt.size() != 1)
+      throw new RuntimeException("Design error in AssemblyModel");
+
+    MultiParameter mp = (MultiParameter)jlistt.get(0);
+
+    for (Iterator itr = mp.getParameters().iterator(); itr.hasNext();) {
+      lis.add(itr.next());
     }
     if(evNode.isOutputMarked())
       addToOutputList(jaxbSE);
     else
       removeFromOutputList(jaxbSE);
-    
+
     modelDirty = true;
     this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
   }
@@ -539,8 +563,13 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   {
     if(o instanceof TerminalParameter)
       return buildFreeFormFromTermParameter((TerminalParameter)o);
-    if(o instanceof MultiParameter)
-      return buildArrayFromMultiParameter((MultiParameter)o);
+    if(o instanceof MultiParameter) {           // used for both arrays and Constr arg lists
+      MultiParameter mu = (MultiParameter)o;
+      if(mu.getType().indexOf('[') != -1)
+        return buildArrayFromMultiParameter(mu);
+      else
+        return buildConstrFromMultiParameter(mu);
+    }
     if(o instanceof FactoryParameter)
       return buildFactoryInstFromFactoryParameter((FactoryParameter)o);
     else
@@ -552,7 +581,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   {
     return new VInstantiator.Array(o.getType(),getInstantiatorListFromJaxbParmList(o.getParameters()));
   }
-
+  private VInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o)
+  {
+    return new VInstantiator.Constr(o.getType(),getInstantiatorListFromJaxbParmList(o.getParameters()));
+  }
   private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o)
   {
     return new VInstantiator.Factory(o.getType(),o.getFactory(),
@@ -605,7 +637,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     return tp;
   }
 
-  private Object buildParmFromConstr(VInstantiator.Constr vicon)
+/*
+  private Object oldbuildParmFromConstr(VInstantiator.Constr vicon)
   {
     Vector v = new Vector();
     for (Iterator itr = vicon.getArgs().iterator(); itr.hasNext();) {
@@ -614,7 +647,24 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     return v;
   }
+*/
 
+  private MultiParameter buildParmFromConstr(VInstantiator.Constr vicon)
+  {
+    MultiParameter mp = null;
+    try {
+      mp = oFactory.createMultiParameter();
+    }
+    catch (JAXBException e) {
+      System.err.println("jaxb error buildParmFromConstr");
+    }
+    mp.setType(vicon.getType());
+    for (Iterator itr = vicon.getArgs().iterator(); itr.hasNext();) {
+      VInstantiator vi = (VInstantiator) itr.next();
+      mp.getParameters().add(buildParam(vi));
+    }
+    return mp;
+  }
   private FactoryParameter buildParmFromFactory(VInstantiator.Factory vifact)
   {
     FactoryParameter fp = null;
