@@ -133,7 +133,7 @@
 
 <!--  === TARGET: doc === -->
     <target name="doc"
-            depends="build.init"
+            depends="build.init,compile"
             description="Create the javadoc for Viskit." >
         
         <javadoc access="private"
@@ -151,6 +151,10 @@
             
             <package name="viskit" />
             <package name="viskit.xsd" />
+            <package name="viskit.xsd.bindings" />
+            <package name="viskit.xsd.bindings.assembly" />
+            <package name="viskit.xsd.assembly" />
+            <package name="viskit.xsd.translator" />
         </javadoc>
     </target>
     
