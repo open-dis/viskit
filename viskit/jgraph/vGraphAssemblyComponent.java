@@ -6,21 +6,20 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
-import org.jgraph.graph.PortView;
-
-import viskit.*;
+import viskit.AssemblyViewFrame;
+import viskit.ModelEvent;
+import viskit.ViskitAssemblyController;
 import viskit.model.*;
-import viskit.model.Edge;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
-import java.awt.geom.AffineTransform;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -57,11 +56,66 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     this.addGraphSelectionListener(new myGraphSelectionListener());
     model.addGraphModelListener(this);
 
+    setupCutCopyPaste();
+    
     //this.setMarqueeColor(Color.red);
     this.setLockedHandleColor(Color.red);
     this.setHighlightColor(Color.red);
     //this.setHandleColor(Color.orange);
     this.setDropEnabled(true);
+  }
+  private void setupCutCopyPaste()
+  {
+    // Handle keystrokes
+    AbstractAction cutAction = new myCutKeyHandler();
+    Action copyAction = new myCopyKeyHandler();
+    Action pasteAction = new myPasteKeyHandler();
+
+    int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X,accelMod),
+                  cutAction.getValue(Action.NAME));
+    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C,accelMod),
+                  copyAction.getValue(Action.NAME));
+    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V,accelMod),
+                  pasteAction.getValue(Action.NAME));
+    this.getActionMap().put(cutAction.getValue(Action.NAME),cutAction);
+    this.getActionMap().put(copyAction.getValue(Action.NAME),copyAction);
+    this.getActionMap().put(pasteAction.getValue(Action.NAME),pasteAction);
+  }
+
+  class myCopyKeyHandler extends AbstractAction
+  {
+    myCopyKeyHandler()
+    {
+      super("copy");
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+      ((ViskitAssemblyController) parent.getController()).copy();
+    }
+  }
+  class myCutKeyHandler extends AbstractAction
+  {
+    myCutKeyHandler()
+    {
+      super("cut");
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+      ((ViskitAssemblyController) parent.getController()).cut();
+    }
+  }
+  class myPasteKeyHandler extends AbstractAction
+  {
+    myPasteKeyHandler()
+    {
+      super("paste");
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+      ((ViskitAssemblyController) parent.getController()).paste();
+    }
   }
 
   public void updateUI()
