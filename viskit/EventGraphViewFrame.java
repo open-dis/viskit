@@ -404,7 +404,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     menuBar.add(fileMenu);
     menuBar.add(editMenu);
     //menuBar.add(simulationMenu);
-
+    
+    Help help = new Help(this);
+    JMenu helpMenu = new JMenu("Help");
+    
+    helpMenu.add( buildMenuItem(help, "about", "About...", null, null) );
+    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null) );
+    menuBar.add(helpMenu);
+    
     this.setJMenuBar(menuBar);
   }
 
