@@ -64,7 +64,7 @@
         value   CDATA	#REQUIRED
 >
 
-<!ELEMENT Schedule ( EdgeParameter )* >
+<!ELEMENT Schedule ((Comment*),(EdgeParameter)*) >
 <!ATTLIST Schedule
 	delay	CDATA	"0.0"
 	event	IDREF	#REQUIRED
@@ -72,7 +72,7 @@
         priority  CDATA  "0.0"	
 >
 
-<!ELEMENT Cancel ( EdgeParameter )* >
+<!ELEMENT Cancel ((Comment*),(EdgeParameter)*) >
 <!ATTLIST Cancel
 	event	IDREF	#REQUIRED
 	condition CDATA	#IMPLIED 	
