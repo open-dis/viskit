@@ -110,6 +110,17 @@ public class vVertexRenderer
 		defaultBackground = UIManager.getColor("Tree.textBackground");
 	}
 
+  private float[] dash = { 5f, 5f };
+
+  private BasicStroke mySelectionStroke =
+    new BasicStroke(
+      2,                     // change from default of 1
+      BasicStroke.CAP_BUTT,
+      BasicStroke.JOIN_MITER,
+      10.0f,
+      dash,
+      0.0f);
+      
 	/**
 	 * Constructs a renderer that may be used to render vertices.
 	 */
@@ -255,7 +266,8 @@ public class vVertexRenderer
 	 * Provided for subclassers to paint a selection border.
 	 */
 	protected void paintSelectionBorder(Graphics g) {
-		((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
+		//((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
+    ((Graphics2D)g).setStroke(this.mySelectionStroke);
 		if (childrenSelected)
 			g.setColor(graph.getGridColor());
 		else if (hasFocus && selected)
