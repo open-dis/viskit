@@ -139,4 +139,10 @@ public class DISMover3DSender extends SimEntityBase {
         
         return movers.size();
     }
+    
+    public void reset() {
+        pdus.clear();
+        movers.clear();
+        super.reset();
+    }
 }
