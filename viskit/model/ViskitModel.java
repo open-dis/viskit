@@ -88,4 +88,5 @@ public interface ViskitModel
 
   public GraphMetaData getMetaData();
 
+  public void setDirty (boolean dirty);
 }
