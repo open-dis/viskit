@@ -92,8 +92,12 @@
     runID CDATA #REQUIRED
 >
 
+<!ELEMENT Depends EMPTY >
+<!ATTLIST Depends
+    file CDATA #REQUIRED
+>
 
-<!ELEMENT SimkitAssembly ( (TerminalParameter)*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
+<!ELEMENT SimkitAssembly ( Depends*, TerminalParameter*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
