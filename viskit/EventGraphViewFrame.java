@@ -13,6 +13,8 @@ import viskit.images.CanArcIcon;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
@@ -600,17 +602,96 @@ cancelArcMode.setIcon(new CanArcIcon());
     vCursorHandler()
     {
       super();
-      select    = Cursor.getDefaultCursor();
+      select = Cursor.getDefaultCursor();
       //select    = new Cursor(Cursor.MOVE_CURSOR);
-      arc       = new Cursor(Cursor.CROSSHAIR_CURSOR);
-
+      arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
       Image img = new ImageIcon(ClassLoader.getSystemResource("viskit/images/canArcCursor.png")).getImage();
-      cancel    = Toolkit.getDefaultToolkit().createCustomCursor(img,new Point(0,0),"CancelArcCursor");
+
+      // Check if we should size the cursor
+      Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
+      if (d.width != 0 && d.height != 0) {
+        buildCancelCursor(img);
+      }
+      else
+        cancel = Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(0, 0), "CancelArcCursor");
+    }
+
+    /**
+     * This is a lot of work to build a cursor.
+     *
+     * @param img
+     */
+    private void buildCancelCursor(Image img)
+    {
+      new Thread(new cursorBuilder(img)).start();
+    }
+
+    class cursorBuilder implements Runnable, ImageObserver
+    {
+      Image img;
+
+      cursorBuilder(Image img)
+      {
+        this.img = img;
+      }
+
+      int infoflags;
+
+      public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+      {
+        this.infoflags = infoflags;
+        return (infoflags & ImageObserver.ALLBITS) == 0;
+      }
+
+      public void run()
+      {
+        infoflags = 0;
+        int w = img.getWidth(this);
+        int h = img.getHeight(this);    // set image observer
+        if (w == -1 || h == -1)
+          waitForIt();
+/*
+        int newwid = (int) (1.3 * img.getWidth(null));
+        int newhei = (int) (1.3 * img.getHeight(null));
+        infoflags = 0;
+        img = img.getScaledInstance(newwid, newhei, Image.SCALE_DEFAULT);
+        w = img.getWidth(this);
+        h = img.getHeight(this);
+        if(w == -1 || h == -1)
+          waitForIt();
+*/
+        BufferedImage bi = null;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gs = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gs.getDefaultConfiguration();
+        Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
+        bi = gc.createCompatibleImage(d.width, d.height, Transparency.BITMASK);
+        infoflags = 0;
+        w = bi.getWidth(this);
+        h = bi.getHeight(this);
+        if (w == -1 || h == -1)
+          waitForIt();
+
+        Graphics g = bi.createGraphics();
+        infoflags = 0;
+        if (g.drawImage(img, 0, 0, this) == false)
+          waitForIt();
+
+        cancel = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0, 0), "CancelArcCursor");
+        g.dispose();
+      }
+
+      private void waitForIt()
+      {
+        while ((infoflags & ImageObserver.ALLBITS) == 0) {
+          Thread.yield();
+        }
+      }
     }
 
     public void mouseEntered(MouseEvent e)
     {
-      switch(getCurrentMode()) {
+      switch (getCurrentMode()) {
         case SELECT_MODE:
         case SELF_REF_MODE:
           graphPane.setCursor(select);
@@ -627,6 +708,7 @@ cancelArcMode.setIcon(new CanArcIcon());
       }
     }
   }
+
   final static int NODE_DRAG = 0;
   final static int SELF_REF_DRAG = 1;
   private int dragger;
@@ -732,18 +814,21 @@ cancelArcMode.setIcon(new CanArcIcon());
   public boolean doEditNode(EventNode node)
   //---------------------------------------
   {
+    selectMode.doClick();     // always go back into select mode
     return EventInspectorDialog.showDialog(this,this,node); // blocks
   }
 
   public boolean doEditEdge(SchedulingEdge edge)
   //--------------------------------------------
   {
+    selectMode.doClick();     // always go back into select mode
     return EdgeInspectorDialog.showDialog(this,this.graphPane,edge); // blocks
   }
 
   public boolean doEditCancelEdge(CancellingEdge edge)
   //--------------------------------------------------
   {
+    selectMode.doClick();     // always go back into select mode
     return EdgeInspectorDialog.showDialog(this,this.graphPane,edge); // blocks
   }
 
