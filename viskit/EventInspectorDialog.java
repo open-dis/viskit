@@ -296,6 +296,7 @@ public class EventInspectorDialog extends JDialog
     public void actionPerformed(ActionEvent event)
     {
       modified = false;
+      VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();  // To start numbering over next time
       setVisible(false);
     }
   }
@@ -319,7 +320,9 @@ public class EventInspectorDialog extends JDialog
           EventStateTransition est = (EventStateTransition)itr.next();
           parseThis.append(est.toString());
           parseThis.append(";");
-          addPotentialLocalIndexVariable(evn,est.getIndexingExpression());
+          String idxv = est.getIndexingExpression();
+          if(idxv != null && idxv.length()>0)
+            addPotentialLocalIndexVariable(evn,est.getIndexingExpression());
         }
 
         String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
