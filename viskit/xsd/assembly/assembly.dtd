@@ -1,4 +1,5 @@
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter" >
+<!ENTITY % DesignParameters "TerminalParameter" >
 
 <!ELEMENT MultiParameter (%Parameters;)* >
 <!ATTLIST MultiParameter
@@ -72,29 +73,34 @@
     to      IDREF    #REQUIRED
 >
 
-<!ELEMENT PropertyChange EMPTY>
-<!ATTLIST PropertyChange
-    name CDATA  #IMPLIED
-    type CDATA  #IMPLIED
-    value CDATA #IMPLIED
-    timestamp CDATA #IMPLIED
->
-
 <!ELEMENT Log (#PCDATA) >
 <!ELEMENT Errors (#PCDATA) >
 
 <!ELEMENT Results (PropertyChange | Log | Errors )* >
 <!ATTLIST Results 
-    index CDATA #REQUIRED
-    job   CDATA #REQUIRED
+    design  CDATA #REQUIRED
+    run     CDATA #REQUIRED
+    job     CDATA #IMPLIED
 >
 
-<!ELEMENT DesignPoint (TerminalParameter*,Results?) >
+<!ELEMENT DesignPoint (TerminalParameter*,Script?,Run*) >
+<!ATTLIST DesignPoint
+    index CDATA #IMPLIED
+>
 
+<!ELEMENT Run (Results?,Script?) >
+<!ATTLIST Run
+    index CDATA #IMPLIED
+>
 
-<!ELEMENT Experiment (DesignPoint)* >
+<!ELEMENT Script (#PCDATA) >
+
+<!ELEMENT Experiment (Script?,DesignPoint*) >
 <!ATTLIST Experiment
-    runID CDATA #REQUIRED
+    batchID CDATA #IMPLIED
+    type (latin-hypercube | full-factorial)  "latin-hypercube"
+    runsPerDesignPoint CDATA #IMPLIED
+    totalSamples CDATA #IMPLIED
 >
 
 <!ELEMENT EventGraph (#PCDATA) >
@@ -102,11 +108,11 @@
     fileName CDATA #IMPLIED
 >
 
-<!ELEMENT SimkitAssembly ( TerminalParameter*, EventGraph*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
+<!ELEMENT SimkitAssembly ( (%DesignParameters;)*, EventGraph*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
 	package CDATA   #REQUIRED
-        extend  CDATA   "java.lang.Object"
+        extend  CDATA   "simkit.SimEntityBase"
 >
 
