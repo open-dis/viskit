@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity extend="simkit.smd.BasicMover" name="TypedBasicMover" package="examples.movers.wpfsim" author="rmgoldbe" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity extend="simkit.smdx.UniformLinearMover" name="TypedBasicMover" package="examples.movers.wpfsim" author="rmgoldbe" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Base Class for PatrolBoat, SmartBadGuy, DumbBadGuy,Loiterer,PassserBy</Comment>
     <Parameter type="String" name="basicMoverType">
         <Comment/>
+    </Parameter>
+    <Parameter type="double" name="maxSpeed">
+	<Comment/>
+    </Parameter>
+    <Parameter type="java.awt.geom.Point2D" name="location">
+	<Comment/>
     </Parameter>
 </SimEntity>
 
