@@ -244,6 +244,11 @@ public class TransitionsPanel extends JPanel
     {
       if (lis.getSelectionModel().getValueIsAdjusting())
         return;
+
+      int reti = JOptionPane.showConfirmDialog(TransitionsPanel.this,"Are you sure?","Confirm delete",JOptionPane.YES_NO_OPTION);
+      if(reti != JOptionPane.YES_OPTION)
+        return;
+
       int[] sel = lis.getSelectedIndices();
       if (sel.length != 0)
         for (int i = 0; i < sel.length; i++) {

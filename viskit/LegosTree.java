@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarFile;
 
 /**
@@ -30,10 +31,12 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private Color background = new Color(0xFB, 0xFB, 0xE5);
   //private Icon standardClosedIcon;
   private ImageIcon myLeafIcon;
+  private Icon standardNonLeafIcon;
   private Image myLeafIconImage;
   DefaultTreeModel mod;
   private DragStartListener lis;
   private AssemblyController controller;
+  private Vector recurseNogoList;
 
   public LegosTree(String className, String iconPath, DragStartListener dslis, AssemblyController controller)
   {
@@ -76,6 +79,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     myLeafIcon = icon;
     myLeafIconImage = myLeafIcon.getImage();
+    standardNonLeafIcon = rendr.getOpenIcon();
 
     rendr.setLeafIcon(myLeafIcon);
     //standardClosedIcon = rendr.getClosedIcon();
@@ -125,8 +129,16 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     directoryRoots = new HashMap();
     classNodeCount = 0;
 
+    if(recurse == true)
+      recurseNogoList = new Vector();
+    else
+      recurseNogoList = null;
+
     addContentRoot(f, recurse, v);
 
+    if(recurseNogoList != null && recurseNogoList.size()>0) {
+      JOptionPane.showMessageDialog(this,recurseNogoList.toArray(new String[0]),"Classes or files not added:",JOptionPane.INFORMATION_MESSAGE);
+    }
     if (classNodeCount != 0)
       return;
 
@@ -226,6 +238,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       }
       catch (Throwable throwable) {
         System.err.println("Couldn't handle "+f.getName()+". "+throwable.getMessage());
+        if(recurseNogoList != null)
+          recurseNogoList.add(f.getName());
         return;
       }
       myNode = new DefaultMutableTreeNode(fban);
@@ -442,6 +456,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
     {
       Object uo = ((DefaultMutableTreeNode) value).getUserObject();
+      setLeafIcon(LegosTree.this.myLeafIcon); // default
 
       if (uo instanceof Class) {
         Class c = (Class) uo;
@@ -468,6 +483,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         value = nm;
       }
       else {
+        if(leaf)        // don't show a leaf icon for a directory in the filesys which doesn't happen to have contents
+          setLeafIcon(LegosTree.this.standardNonLeafIcon);
         setToolTipText(uo.toString());
         value = value.toString();
         sel = false;

@@ -440,6 +440,10 @@ public abstract class ViskitTablePanel extends JPanel
           addRow();
       }
       else if (event.getActionCommand() == "m") {
+        int reti = JOptionPane.showConfirmDialog(ViskitTablePanel.this,"Are you sure?","Confirm delete",JOptionPane.YES_NO_OPTION);
+        if(reti != JOptionPane.YES_OPTION)
+          return;
+              
         if (myMinusLis != null) {
           event.setSource(shadow.get(tab.getSelectedRow()));
           myMinusLis.actionPerformed(event);

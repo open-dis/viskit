@@ -265,7 +265,6 @@ public class VGlobals
         return bshErr + "\n" + evalError.getMessage();
       } // else fall through the catch
     }
-
     clearNamespace();
     return null;    // null means good parse!
   }
@@ -288,7 +287,8 @@ public class VGlobals
     if (!handlePrimitive(name, typ)) {
         try {
           Object o = instantiateType(typ);
-          interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
+          //interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
+          interpreter.eval(typ+" "+ name +" = "+o);
         }
         catch (Exception ex) {
           clearNamespace();
@@ -329,67 +329,83 @@ public class VGlobals
   {
     try {
       if(typ.equals("int")) {
-        interpreter.set(name,(int)0);
+        interpreter.eval("int " + name + " = 0");
+        //interpreter.set(name,(int)0);
         return true;
       }
       if(typ.equals("int[]")) {
-        interpreter.set(name,new int[0]);
+        interpreter.eval("int[] " + name + " = new int[0]");
+        //interpreter.set(name,new int[0]);
         return true;
       }
       if(typ.equals("boolean")) {
-        interpreter.set(name,true);
+        interpreter.eval("boolean " + name + " = false");  // 17Aug04, should have always defaulted to false
+        //interpreter.set(name,true);
         return true;
       }
       if(typ.equals("boolean[]")) {
-        interpreter.set(name,new boolean[0]);
+        interpreter.eval("boolean[] " + name + " = new boolean[0]");
+        //interpreter.set(name,new boolean[0]);
         return true;
       }
       if(typ.equals("double")) {
-        interpreter.set(name,0.0d);
+        interpreter.eval("double " + name + " = 0.0d");
+        //interpreter.set(name,0.0d);
         return true;
       }
       if(typ.equals("double[]")) {
-        interpreter.set(name,new double[0]);
+        interpreter.eval("double[] " + name + " = new double[0]");
+        //interpreter.set(name,new double[0]);
         return true;
       }
       if(typ.equals("float")) {
-        interpreter.set(name,0.0f);
+        interpreter.eval("float " + name + " = 0.0f");
+        //interpreter.set(name,0.0f);
         return true;
       }
       if(typ.equals("float[]")) {
-        interpreter.set(name,new float[0]);
+        interpreter.eval("float[] " + name + " = new float[0]");
+        //interpreter.set(name,new float[0]);
         return true;
       }
       if(typ.equals("byte")) {
-        interpreter.set(name,(byte)0);
+        interpreter.eval("byte " + name + " = 0");
+        //interpreter.set(name,(byte)0);
         return true;
        }
       if(typ.equals("byte[]")) {
-        interpreter.set(name,new byte[0]);
+        interpreter.eval("byte[] " + name + " = new byte[0]");
+        //interpreter.set(name,new byte[0]);
         return true;
        }
       if(typ.equals("char")) {
-        interpreter.set(name,(char)0);
+        interpreter.eval("char " + name + " = 0");
+        //interpreter.set(name,(char)0);
         return true;
       }
       if(typ.equals("char[]")) {
-        interpreter.set(name,new char[0]);
+        interpreter.eval("char[] " + name + " = new char[0]");
+        //interpreter.set(name,new char[0]);
         return true;
       }
       if(typ.equals("short")) {
-        interpreter.set(name,(short)0);
+        interpreter.eval("short " + name + " = 0");
+        //interpreter.set(name,(short)0);
         return true;
       }
       if(typ.equals("short[]")) {
-        interpreter.set(name,new short[0]);
+        interpreter.eval("short[] " + name + " = new short[0]");
+        //interpreter.set(name,new short[0]);
         return true;
       }
       if(typ.equals("long")) {
-        interpreter.set(name,(long)0);
+        interpreter.eval("long " + name + " = 0");
+        //interpreter.set(name,(long)0);
         return true;
       }
       if(typ.equals("long[]")) {
-        interpreter.set(name,new long[0]);
+        interpreter.eval("long[] "+ name + " = new long[0]");
+        //interpreter.set(name,new long[0]);
         return true;
       }
     }

@@ -1,9 +1,6 @@
 package viskit.model;
 
-import viskit.ModelEvent;
-import viskit.VGlobals;
-import viskit.AssemblyRunner;
-import viskit.FileBasedAssyNode;
+import viskit.*;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
@@ -136,9 +133,12 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
           sb.append(node.getName() + ", ");
       }
     }
+
     if(sb.length() > 2) {
       sb.setLength(sb.length()-2); // lose last comma and space
-      JOptionPane.showMessageDialog(null,"The classes underlying assembly nodes(es) "+sb.toString()+" have been modified.\n"+
+      //todo get rid of view code in model
+      JFrame view = VGlobals.instance().getAssemblyEditor();       // use this to try to fix the option pane below showing up inaccessibly between the 2 frams
+      JOptionPane.showMessageDialog(view,"The classes underlying assembly nodes(es) "+sb.toString()+" have been modified.\n"+
         "The nodes may be in an inconsistent state.",
         "Data modification alert",JOptionPane.WARNING_MESSAGE);
     }

@@ -39,6 +39,7 @@ public class EventInspectorDialog extends JDialog
   private LocalVariablesPanel localVariables;
   private JFrame fr;
   private myChangeActionListener myChangeListener;
+
   /**
    * Set up and show the dialog.  The first Component argument
    * determines which frame the dialog depends on; it should be
@@ -299,8 +300,6 @@ public class EventInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
-      // test
-      modified = true;
       if (modified) {
 
         // Parse the state transitions
