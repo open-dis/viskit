@@ -64,8 +64,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return;
     }
 
-    addJarFile("simkit.SimEntity", "lib/simkit.jar");
-    addJarFile("diskit.DISEntity", "lib/ext/diskit.jar");
+    /* It doesn't look like this was done correctly initially.  Forget looking for the classes. */
+    addJarFile(/*"simkit.SimEntity",*/ "lib/simkit.jar");
+    addJarFile(/*"diskit.DISEntity",*/ "lib/ext/diskit.jar");
     
     setModel(mod);
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
