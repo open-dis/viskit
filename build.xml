@@ -272,6 +272,7 @@
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+                <pathelement location="${dir.lib}/simkit.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
