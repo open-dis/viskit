@@ -4,9 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -41,8 +39,11 @@ jta.setEditable(false);
     buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
     buttPan.add(Box.createHorizontalGlue());
 
+    JButton compileButt = new JButton("Compile test");
+    buttPan.add(compileButt);
+
     JButton saveButt = new JButton("Save source and close");
-//    buttPan.add(saveButt);
+    buttPan.add(saveButt);
 
     JButton closeButt = new JButton("Close");
     buttPan.add(closeButt);
@@ -62,7 +63,56 @@ jta.setEditable(false);
         SourceWindow.this.dispose();
       }
     });
-    
+
+    compileButt.addActionListener( new ActionListener()
+    {
+      StringBuffer sb = new StringBuffer();
+      BufferedReader br;
+      String nl = System.getProperty("line.separator");
+      public void actionPerformed(ActionEvent e)
+      {
+        PrintStream origSysOut = System.out;
+         PipedOutputStream pos = new PipedOutputStream();
+         PrintStream newSysOut = new PrintStream(pos);
+         PipedInputStream pis = new PipedInputStream();
+         try {pos.connect(pis);}catch (IOException e1) {JOptionPane.showMessageDialog(null,"bad pos.connect!");}
+         br = new BufferedReader(new InputStreamReader(pis));
+
+        new Thread(new Runnable() {
+          public void run()
+          {
+            try {
+              while(true) {
+                sb.append(br.readLine());
+                sb.append(nl);
+              }
+            }
+            catch (IOException e1) {
+              // normal termination
+            }
+          }
+        }).start();
+
+        System.setOut(newSysOut);
+        System.setErr(newSysOut);
+
+        AssemblyController.compileJavaClassFromString(src);
+        System.out.flush();
+
+        System.setOut(origSysOut);
+
+        newSysOut.close();
+        try {
+          br.close();
+        }
+        catch (IOException e1) {
+          e1.printStackTrace();
+        }
+
+        sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
+      }
+    });
+
     saveButt.addActionListener( new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -109,5 +159,89 @@ jta.setEditable(false);
       }
     }
     return "unnamed.java";
+  }
+}
+
+class sysOutDialog extends JDialog implements ActionListener
+{
+  private static sysOutDialog dialog;
+  private static String value = "";
+  private JList list;
+  private JTextArea jta;
+  private JScrollPane jsp;
+
+  /**
+   * Set up and show the dialog.  The first Component argument
+   * determines which frame the dialog depends on; it should be
+   * a component in the dialog's controlling frame. The second
+   * Component argument should be null if you want the dialog
+   * to come up with its left corner in the center of the screen;
+   * otherwise, it should be the component on top of which the
+   * dialog should appear.
+   */
+  public static String showDialog(Component frameComp,
+                                  Component locationComp,
+                                  String labelText,
+                                  String title)
+  {
+    Frame frame = JOptionPane.getFrameForComponent(frameComp);
+    dialog = new sysOutDialog(frame,
+        locationComp,
+        labelText,
+        title);
+    dialog.setVisible(true);
+    return value;
+  }
+
+  private sysOutDialog(Frame frame,
+                       Component locationComp,
+                       String text,
+                       String title)
+  {
+    super(frame, title, true);
+
+    //Create and initialize the buttons.
+    JButton cancelButton = new JButton("OK");
+    cancelButton.addActionListener(this);
+    getRootPane().setDefaultButton(cancelButton);
+
+    //main part of the dialog
+    jta = new JTextArea(text);
+    jsp = new JScrollPane(jta);
+    jsp.setPreferredSize(new Dimension(frame.getWidth()-50,frame.getHeight()-50));
+    jsp.setAlignmentX(LEFT_ALIGNMENT);
+    jsp.setBorder(BorderFactory.createEtchedBorder());
+    //Create a container so that we can add a title around
+    //the scroll pane.  Can't add a title directly to the
+    //scroll pane because its background would be white.
+    //Lay out the label and scroll pane from top to bottom.
+    JPanel listPane = new JPanel();
+    listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
+    JLabel label = new JLabel("Compiler results");
+    label.setLabelFor(list);
+    listPane.add(label);
+    listPane.add(Box.createRigidArea(new Dimension(0, 5)));
+    listPane.add(jsp); //listScroller);
+    listPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    //Lay out the buttons from left to right.
+    JPanel buttonPane = new JPanel();
+    buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+    buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+    buttonPane.add(Box.createHorizontalGlue());
+    buttonPane.add(cancelButton);
+
+    //Put everything together, using the content pane's BorderLayout.
+    Container contentPane = getContentPane();
+    contentPane.add(listPane, BorderLayout.CENTER);
+    contentPane.add(buttonPane, BorderLayout.PAGE_END);
+    pack();
+    setLocationRelativeTo(locationComp);
+  }
+
+  //Handle clicks on the Set and Cancel buttons.
+  public void actionPerformed(ActionEvent e)
+  {
+    sysOutDialog.dialog.setVisible(false);
   }
 }
