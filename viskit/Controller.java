@@ -59,6 +59,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       if(askToSaveAndContinue() == false)
         return;
 
+    lastFile = null;
     ((ViskitModel) getModel()).newModel(null);
 
     editGraphMetaData();
