@@ -209,6 +209,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     }
   }
 
+  private String escapeLTGT(String s)
+  {
+    s = s.replaceAll("<","&lt;");
+    s = s.replaceAll(">","&gt;");
+    return s;
+  }
+
   public String getToolTipText(MouseEvent event)
   {
     if (event != null) {
@@ -223,7 +230,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
           if (vc.getUserObject() instanceof SchedulingEdge) {
             tt = "<center>Schedule</center>";
             if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
-              tt += "<br><u>description</u><br>" + "&nbsp;" + se.conditionalsComment + "<br>";
+              tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(se.conditionalsComment) + "<br>";
             }
             if (se.delay != null && se.delay.length() > 0)
               tt += "<u>delay</u><br>&nbsp;" + se.delay + "<br>";
@@ -232,12 +239,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener
           {
             tt = "<center>Cancel</center>";
             if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
-              tt += "<br><u>description</u><br>" + "&nbsp;" + se.conditionalsComment + "<br>";
+              tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(se.conditionalsComment) + "<br>";
             }
           }
 
           if (se.conditional != null && se.conditional.length() > 0)
-            tt += "<u>condition</u><br>&nbsp;if( " + se.conditional + " )<br>";
+            tt += "<u>condition</u><br>&nbsp;if( " + escapeLTGT(se.conditional) + " )<br>";
 
           StringBuffer epSt = new StringBuffer();
           int idx = 1;
@@ -265,13 +272,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener
             EventStateTransition est = (EventStateTransition) itr.next();
 
             if (!est.isOperation())
-              sttrans += "&nbsp;" + est.getStateVarName() + "=" + est.getOperationOrAssignment() + "<br>";
+              sttrans += "&nbsp;" + est.getStateVarName() + "=" + escapeLTGT(est.getOperationOrAssignment()) + "<br>";
             else
-              sttrans += "&nbsp;" + est.getStateVarName() + "." + est.getOperationOrAssignment() + "<br>";
+              sttrans += "&nbsp;" + est.getStateVarName() + "." + escapeLTGT(est.getOperationOrAssignment()) + "<br>";
           }
           if (!en.getComments ().isEmpty() ) {
             String stripBrackets = new String ((String)en.getComments().get(0));
-            tt += "<br><u>description</u><br>" + "&nbsp;" + stripBrackets + "<br>";
+            tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(stripBrackets) + "<br>";
           }
           if (sttrans.length() > 0) {
             sttrans = sttrans.substring(0, sttrans.length() - 4);
