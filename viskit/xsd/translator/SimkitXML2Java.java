@@ -73,6 +73,15 @@ public class SimkitXML2Java {
 	} 
 	
     }
+    
+    public SimkitXML2Java(InputStream stream) {
+        try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+            fileInputStream = stream;
+        } catch ( Exception e ) {
+	    e.printStackTrace();
+	} 
+    }
 
     public SimkitXML2Java(File f) throws Exception {
 	fileBaseName = baseNameOf(f.getName());
