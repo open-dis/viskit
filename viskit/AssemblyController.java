@@ -366,7 +366,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     return ((ViskitAssemblyModel)getModel()).buildJavaSource();
   }
-  String hack;
+  String packageFromLastCompile;
+
   public File compileJavaClass()
   {
     String source = produceJavaClass();
@@ -379,19 +380,67 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
           nuts=nuts.substring(0,nuts.length()-1);
 
         String[] sa = nuts.split("\\s");
-        hack = sa[1];
+        packageFromLastCompile = sa[1];
       }
       return ((ViskitAssemblyModel)getModel()).compileJavaClass(source);
     }
     return null;
   }
-
-  public void vcrPlay()
+  public void runAssembly()
   {
     File f = compileJavaClass();
     if(f != null) {
       String clNam = f.getName().substring(0,f.getName().indexOf('.'));
-      clNam = hack + "." + clNam;
+      clNam = packageFromLastCompile + "." + clNam;
+      String classPath = System.getProperty("java.class.path");
+      String sourceDir = f.getParent();
+      if(classPath.indexOf(sourceDir) == -1)
+        classPath = sourceDir + Vstatics.getPathSeparator() + classPath;
+
+      String[] execStrings = buildExecStrings(clNam,classPath);
+      Process proc = null;
+      try {
+        proc = Runtime.getRuntime().exec(execStrings);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    else
+      JOptionPane.showMessageDialog(null,"Error on compile");
+  }
+  private String[] buildExecStrings(String className, String classPath)
+  {
+    Vector v = new Vector();
+    String fsep = Vstatics.getFileSeparator();
+
+     StringBuffer sb = new StringBuffer();
+     sb.append(System.getProperty("java.home"));
+     sb.append(fsep+"bin"+fsep+"java");
+    v.add(sb.toString());
+
+    v.add("-cp");
+    v.add(classPath);
+    v.add("viskit.ExternalAssemblyRunner");
+    v.add(className);
+
+    //todo get global defaultVerbose boolean from graphmetadata
+    v.add("true");
+    //todo get stoptime from graphmetadata
+    v.add("22.2");
+    // todo add names of entities which should be defaultVerbose
+    //v.add("arrival");
+    // etc
+    String[] ra = new String[v.size()];
+    return (String[])v.toArray(ra);
+  }
+
+  public void xvcrPlay()
+  {
+    File f = compileJavaClass();
+    if(f != null) {
+      String clNam = f.getName().substring(0,f.getName().indexOf('.'));
+      clNam = packageFromLastCompile + "." + clNam;
       //((ViskitAssemblyModel) getModel()).startAssemblyRun(clNam,f.getParent());
       AssemblyRunner runner = new AssemblyRunner(clNam);
       String cp = runner.getClasspath();
@@ -403,15 +452,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     else
       JOptionPane.showMessageDialog(null,"Error on compile");
   }
-  public void vcrPause()
+  public void xvcrPause()
   {
-    System.out.println("vcrPause");
+    System.out.println("vcrRewind");
   }
-  public void vcrStop()
+  public void xvcrStop()
   {
     System.out.println("vcrStop");
   }
-  public void vcrStep()
+  public void xvcrStep()
   {
     System.out.println("vcrStep");
   }

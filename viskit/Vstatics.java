@@ -63,7 +63,7 @@ public class Vstatics
    */
   public static void clampSize(JComponent c, JComponent h, JComponent w)
   {
-    Dimension d = new Dimension(h.getPreferredSize().height,w.getPreferredSize().width);
+    Dimension d = new Dimension(h.getPreferredSize().width,w.getPreferredSize().height);
     c.setMaximumSize(d);
     c.setMinimumSize(d);
   }
@@ -209,5 +209,12 @@ public class Vstatics
     }
 
   }
-
+  static String getPathSeparator()
+  {
+    return System.getProperty("path.separator");
+  }
+  static String getFileSeparator()
+  {
+    return System.getProperty("file.separator");
+  }
 }

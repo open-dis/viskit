@@ -72,12 +72,12 @@ public class VsimkitObjects
   public static Object get_random_ConvolutionVariate ()      { return new  ConvolutionVariate (); }
   public static Object get_random_DiscreteUniformVariate ()  { return new  DiscreteUniformVariate (); }
   public static Object get_random_DiscreteVariate ()         { return new  DiscreteVariate (); }
-  public static Object get_random_ExponentialTransform ()    { return new  ExponentialTransform ((RandomVariate)get_random_RandomVariate());}
+  public static Object get_random_ExponentialTransform ()    { return new  ExponentialTransform (); }
   public static Object get_random_ExponentialVariate ()      { return new  ExponentialVariate (); }
   public static Object get_random_GammaVariate ()            { return new  GammaVariate (); }
   public static Object get_random_GeometricVariate ()        { return new  GeometricVariate (); }
   public static Object get_random_InverseGaussianVariate ()  { return new  InverseGaussianVariate (); }
-  public static Object get_random_LogTransform ()            { return new  LogTransform ((RandomVariate)get_random_RandomVariate()); }
+  public static Object get_random_LogTransform ()            { return new  LogTransform (); }
   public static Object get_random_MersenneTwister ()         { return new  MersenneTwister (); }
   public static Object get_random_MixedVariate ()            { return new  MixedVariate (); }
   public static Object get_random_Mother ()                  { return new  Mother (); }

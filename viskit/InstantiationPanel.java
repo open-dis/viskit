@@ -370,8 +370,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         } // nomatch
       } // next Constructor
+
+      // If a new node is dragged onto the canvas, there are no constructor arguments specified.
+      // Therefore, it's not an error if we don't find a match.
+
       //assert false: "Internal error ConstrPanel.setData";
-      System.err.println("assert false: \"Internal error ConstrPanel.setData\"");
+      //System.err.println("assert false: \"Internal error ConstrPanel.setData\"");
     }
 
     public VInstantiator getData()

@@ -29,6 +29,29 @@ public class Main
 {
   public static void main(String[] args)
   {
+    setLandFandFonts();
+
+    Model mod = new Model();
+    Controller cont = new Controller();
+    VGlobals.instance().buildEventGraphViewFrame(cont,mod);
+    VGlobals.instance().runEventGraphView();
+
+    cont.newEventGraph();
+/*
+    Controller controller = new Controller();
+    Model model = new Model();
+    EventGraphViewFrame view = new EventGraphViewFrame(model, controller);
+    controller.setModel(model);   // registers cntl as model listener
+    controller.setView(view);
+
+    model.init();
+
+    view.setVisible(true);
+    controller.begin();
+*/
+  }
+  public static void setLandFandFonts()
+  {
     //System.out.println(System.getProperty("java.class.path"));
     //System.out.println(System.getProperty("user.dir"));
     String laf = "javax.swing.plaf.metal.MetalLookAndFeel";          //default
@@ -51,32 +74,14 @@ public class Main
       UIManager.setLookAndFeel(laf);
       UIDefaults def = UIManager.getDefaults();
       def.put("Tree.font", new Font("Verdana", Font.PLAIN, 12));
-      setAllFonts(null);
+      setAllFonts(/*null*/);
     }
     catch (Exception e) {
       System.err.println("Could not enable " + laf);
     }
-    Model mod = new Model();
-    Controller cont = new Controller();
-    VGlobals.instance().buildEventGraphViewFrame(cont,mod);
-    VGlobals.instance().runEventGraphView();
-
-    cont.newEventGraph();
-/*
-    Controller controller = new Controller();
-    Model model = new Model();
-    EventGraphViewFrame view = new EventGraphViewFrame(model, controller);
-    controller.setModel(model);   // registers cntl as model listener
-    controller.setView(view);
-
-    model.init();
-
-    view.setVisible(true);
-    controller.begin();
-*/
   }
-
-  private static void setAllFonts(JFrame f)
+  
+  private static void setAllFonts(/*JFrame f*/)
   {
     try {
 

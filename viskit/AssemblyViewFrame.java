@@ -136,8 +136,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     canvas.setMinimumSize(new Dimension(20,20));
     //jsp.setDividerLocation(0.5d);
     top.add(jsp,BorderLayout.CENTER);
-    top.add(vcrToolBar,BorderLayout.SOUTH);
-    top.setBorder(BorderFactory.createEmptyBorder(5,5,2,5));
+    // uncomment following to put the vcr toolbar back in place.
+    // It's now in ExternalAssemblyRunner
+    //top.add(vcrToolBar,BorderLayout.SOUTH);
+    top.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
     getContentPane().add(top);
   }
@@ -161,6 +163,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
+    fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
     //fileMenu.add(buildMenuItem(controller,"compileJavaClass","Compile Java Class",new Integer(KeyEvent.VK_M),null));
     fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
     fileMenu.addSeparator();
@@ -278,7 +281,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     ViskitAssemblyController controller = (ViskitAssemblyController)getController();
 
     vcrStop.addActionListener(ActionIntrospector.getAction(controller,"vcrStop"));
-    vcrPause.addActionListener(ActionIntrospector.getAction(controller,"vcrPause"));
+    vcrPause.addActionListener(ActionIntrospector.getAction(controller,"vcrRewind"));
     vcrPlay.addActionListener(ActionIntrospector.getAction(controller,"vcrPlay"));
     vcrStep.addActionListener(ActionIntrospector.getAction(controller,"vcrStep"));
   }

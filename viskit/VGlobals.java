@@ -18,6 +18,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -52,6 +54,7 @@ public class VGlobals
     cbMod = new DefaultComboBoxModel(new Vector(Arrays.asList(defaultTypeStrings)));
     myListener = new myTypeListener();
     buildTypePopup();
+    setupWorkDirectory();
   }
 
   /* routines to manage the singleton-aspect of the views. */
@@ -600,5 +603,24 @@ public class VGlobals
     {
       return fullName;
     }
+  }
+
+  public File getWorkDirectory()
+  {
+    return workDirectory;
+  }
+
+  private File workDirectory;
+
+  private void setupWorkDirectory()
+  {
+    String uHome = System.getProperty("user.home");
+    workDirectory = new File(uHome,"viskitWork/");
+    if(workDirectory.exists())
+      return;
+    if(workDirectory.mkdir()==false)
+        JOptionPane.showMessageDialog(null,"The directory "+ workDirectory.getPath()+
+                    " could not be created.  Correct permissions before proceeding.",
+                                      "Error",JOptionPane.ERROR_MESSAGE);
   }
 }

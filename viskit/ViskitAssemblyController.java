@@ -45,11 +45,7 @@ public interface ViskitAssemblyController
 
   void generateJavaClass();
   File compileJavaClass();
-
-  public void vcrPlay();
-  public void vcrPause();
-  public void vcrStop();
-  public void vcrStep();
-
+  void runAssembly();
+  
   void runEventGraphEditor();
 }

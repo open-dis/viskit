@@ -74,7 +74,9 @@ public abstract class VInstantiator
 
     public String toString()
     {
-      return "new "+getType()+ "("+((VInstantiator)args.get(0)).getType()+",...)";
+      String rets = "new "+getType()+ "(";
+      rets = rets + (args.size()>0?((VInstantiator)args.get(0)).getType()+",...":"");
+      return rets+")";
     }
     public VInstantiator vcopy()
     {

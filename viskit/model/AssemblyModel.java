@@ -132,6 +132,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbEG.setName(nIe(widgetName));
     node.opaqueModelObject = jaxbEG;
     jaxbEG.setType(className);
+
+    VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(),new Vector());
+    node.setInstantiator(vc);
+
     nodeCache.put(jaxbEG,node);   // key = ev
     jaxbRoot.getSimEntity().add(jaxbEG);
 
@@ -159,6 +163,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     jaxbPCL.setName(nIe(widgetName));
     jaxbPCL.setType(className);
+
+    VInstantiator.Constr vc = new VInstantiator.Constr(jaxbPCL.getType(),new Vector());
+    pcNode.setInstantiator(vc);    
+
     pcNode.opaqueModelObject = jaxbPCL;
     nodeCache.put(jaxbPCL,pcNode);
     jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
@@ -614,6 +622,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         // see u.isValidating()
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimkitAssembly) u.unmarshal(f);
+        pointLess = new Point(100,100);
         metaData = new GraphMetaData();
       //  metaData.author = jaxbRoot.getAuthor();
         metaData.version = jaxbRoot.getVersion();
@@ -837,8 +846,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   {
     try {
       String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
-      File f = new File("work");
-      f.mkdir();
+      File f = VGlobals.instance().getWorkDirectory();
       f = new File(f,baseName+".java");
       f.createNewFile();
 
