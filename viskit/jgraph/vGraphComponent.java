@@ -222,11 +222,19 @@ public class vGraphComponent extends JGraph implements GraphModelListener
 
           if (vc.getUserObject() instanceof SchedulingEdge) {
             tt = "<center>Schedule</center>";
+            if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
+              tt += "<br><u>description</u><br>" + "&nbsp;" + se.conditionalsComment + "<br>";
+            }
             if (se.delay != null && se.delay.length() > 0)
               tt += "<u>delay</u><br>&nbsp;" + se.delay + "<br>";
           }
           else
+          {
             tt = "<center>Cancel</center>";
+            if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
+              tt += "<br><u>description</u><br>" + "&nbsp;" + se.conditionalsComment + "<br>";
+            }
+          }
 
           if (se.conditional != null && se.conditional.length() > 0)
             tt += "<u>condition</u><br>&nbsp;if( " + se.conditional + " )<br>";
@@ -260,6 +268,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener
               sttrans += "&nbsp;" + est.getStateVarName() + "=" + est.getOperationOrAssignment() + "<br>";
             else
               sttrans += "&nbsp;" + est.getStateVarName() + "." + est.getOperationOrAssignment() + "<br>";
+          }
+          if (!en.getComments ().isEmpty() ) {
+            tt += "<br><u>description</u><br>" + "&nbsp;" + en.getComments () + "<br>";
           }
           if (sttrans.length() > 0) {
             sttrans = sttrans.substring(0, sttrans.length() - 4);
