@@ -113,7 +113,7 @@ public class SimkitXML2Java {
 	String name = this.root.getName();
         String pkg  = this.root.getPackage();
 	
-	pw.println("package examples;");
+	pw.println("package " + pkg + sc);
 	pw.println();
 	pw.println("import simkit.*;");
 	pw.println("import simkit.random.*;");
