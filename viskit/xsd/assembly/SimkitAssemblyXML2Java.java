@@ -301,7 +301,16 @@ public class SimkitAssemblyXML2Java {
 	    pw.println(rp + sc);
 	    pw.println();
 	} 
-	
+
+	lili = this.root.getAdapter().listIterator();
+        
+        while ( lili.hasNext() ) {
+            AdapterType a = (AdapterType)lili.next();
+            String n = a.getName();
+            pw.print(sp8 + "simkit.util.Bridge" + sp + n + sp + eq + sp + nw + "simkit.util.Bridge");
+            pw.println(sp8 + lp + qu + a.getFrom() + cm + sp + a.getTo() + rp + sc);
+        }
+        
     }
 
     void buildConnectors(StringWriter connectors) {
