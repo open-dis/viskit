@@ -16,7 +16,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import simkit.xsd.bindings.assembly.*;
+import viskit.xsd.bindings.assembly.*;
 
 /**
  *
@@ -58,8 +58,8 @@ public class SimkitAssemblyXML2Java {
 
     public SimkitAssemblyXML2Java(String xmlFile) {
 	try {
-            jaxbCtx = JAXBContext.newInstance("simkit.xsd.bindings.assembly");
-            fileInputStream = Class.forName("simkit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
 	} catch ( Exception e ) {
 	    e.printStackTrace();
 	} 
