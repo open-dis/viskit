@@ -20,11 +20,7 @@
   <property name="javac.verbose" value="off"/>
 
   <target name="init">
-    <!-- Create the time stamp -->
     <tstamp/>
-    <!-- This directory shouldn't be here, but it has to be kept around on checkout as a -->
-    <!-- CVS artifact. Get rid of it right away to reduce confustion. -->
-    <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
     <mkdir dir="${dist}"/>
     <mkdir dir="${doc}"/>
@@ -55,7 +51,7 @@
     </copy>
     -->
 
-    <!-- Put everything in ${build} into the dis.jar file -->
+    <!-- Put everything in ${build} into the diskit.jar file -->
     <jar jarfile="${dist}/lib/diskit.jar" basedir="${build}"/>
   </target>
   
