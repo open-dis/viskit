@@ -270,7 +270,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener
               sttrans += "&nbsp;" + est.getStateVarName() + "." + est.getOperationOrAssignment() + "<br>";
           }
           if (!en.getComments ().isEmpty() ) {
-            tt += "<br><u>description</u><br>" + "&nbsp;" + en.getComments () + "<br>";
+            String stripBrackets = new String ((String)en.getComments().get(0));
+            tt += "<br><u>description</u><br>" + "&nbsp;" + stripBrackets + "<br>";
           }
           if (sttrans.length() > 0) {
             sttrans = sttrans.substring(0, sttrans.length() - 4);
