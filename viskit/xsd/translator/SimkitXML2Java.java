@@ -12,6 +12,9 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.ListIterator;
 import javax.xml.bind.JAXBContext;
@@ -31,6 +34,7 @@ public class SimkitXML2Java {
     private SimkitModule root;
 
     InputStream fileInputStream;
+    String fileBaseName;
     JAXBContext jaxbCtx;
 
     /* convenience Strings for formatting */
@@ -59,6 +63,7 @@ public class SimkitXML2Java {
      */
 
     public SimkitXML2Java(String xmlFile) {
+	fileBaseName = baseNameOf(xmlFile);
 	try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
 	    fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
@@ -69,6 +74,7 @@ public class SimkitXML2Java {
     }
 
     public SimkitXML2Java(File f) throws Exception {
+	fileBaseName = baseNameOf(f.getName());
 	jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
 	fileInputStream = new FileInputStream(f);
     }
@@ -248,16 +254,18 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(sw);
 	String clStr = "";
+	String tyStr = "";
 
 	// check for cloneable 
 
 	if (isCloneable(s.getType())) {
 	    clStr = ".clone()";
+	    tyStr = lp + s.getType() + rp;
 	}
 
         pw.print(sp4 + "public " + s.getType() + sp + "get" + capitalize(s.getName()) );
         pw.println(lp + rp + sp + ob);
-	pw.println(sp8 + "return" + sp + s.getName() + clStr + sc);
+	pw.println(sp8 + "return" + sp + tyStr + sp + s.getName() + clStr + sc);
 	pw.println(sp4 + cb);
 	pw.println();
 
@@ -642,6 +650,14 @@ public class SimkitXML2Java {
         return s.substring(0,1).toUpperCase() + s.substring(1);
     }
 
+    boolean compileCode (String fileName) {
+	return ( 
+	    com.sun.tools.javac.Main.compile(
+                 new String[] {fileName}
+	    ) == 0
+	);
+    }
+
     private String indexFrom(StateTransitionType st) {
 	String index = "i"; // fallback guess
 
@@ -672,11 +688,15 @@ public class SimkitXML2Java {
     }
 
     private String baseOf( String s ) {
-	return s.substring(0,s.indexOf("["));
+	return s.substring(0,s.indexOf(lb));
     }
 
     private String indexIn( String s ) {
-	return s.substring(s.indexOf("[")+1, s.indexOf("]")-1);
+	return s.substring(s.indexOf(lb)+1, s.indexOf(rb)-1);
+    }
+
+    private String baseNameOf( String s ) {
+	return s.substring(0,s.indexOf(pd));
     }
 
     private boolean isCloneable( String c ) {
@@ -720,10 +740,35 @@ public class SimkitXML2Java {
      */
 
     public static void main(String[] args) {
+
+	System.out.println("Generating Java Source...");
+
 	SimkitXML2Java sx2j = new SimkitXML2Java(args[0]);
 	sx2j.unmarshal();
+
 	String dotJava = sx2j.translate();
-	sx2j.writeOut(dotJava,System.out);
+	if (args.length > 1) sx2j.writeOut(dotJava,System.out);
+
+	System.out.println("Done.");
+	
+	// also write out the .java to a file and compile it
+	// to a .class
+	System.out.println("Generating Java Bytecode...");
+	try {
+	    String fileName = sx2j.fileBaseName + ".java";
+	    FileOutputStream fout = 
+		new FileOutputStream(fileName);
+	    PrintStream ps = new PrintStream(fout,true);
+	    sx2j.writeOut(dotJava,ps);
+	    if ( !sx2j.compileCode(fileName) ) 
+		sx2j.error("Compile error " + fileName);
+	    else 
+		System.out.println("Done.");
+	} catch (FileNotFoundException fnfe) { 
+		sx2j.error("Bad filename " + sx2j.fileBaseName); 
+	}
+
+	
     }
     
 }
