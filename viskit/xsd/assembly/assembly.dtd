@@ -59,7 +59,7 @@
     to      CDATA   #REQUIRED
 >
 
-<!ELEMENT SimkitAssembly ( SimEntity+ , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Output*, Schedule? ) >
+<!ELEMENT SimkitAssembly ( SimEntity+ , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
