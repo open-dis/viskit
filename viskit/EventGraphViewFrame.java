@@ -365,7 +365,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
     fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
+    fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
