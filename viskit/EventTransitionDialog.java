@@ -25,7 +25,7 @@ import java.awt.event.WindowEvent;
 
 public class EventTransitionDialog extends JDialog
 {
-  private JTextField nameField;    // Text field that holds the parameter name
+  //private JTextField nameField;    // Text field that holds the parameter name
   private JTextField actionField;
   private JTextField arrayIndexField;
   private JTextField commentField;          // Text field that holds the comment
@@ -37,10 +37,12 @@ public class EventTransitionDialog extends JDialog
   private EventStateTransition param;
   private Component locationComp;
   private JButton okButt, canButt;
+  private JButton newSVButt;
 
   public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
   public static boolean newIsOperation;
 
+  private JFrame parentFrame;
   public static boolean showDialog(JFrame f, Component comp, EventStateTransition parm)
   {
     if(dialog == null)
@@ -58,6 +60,7 @@ public class EventTransitionDialog extends JDialog
     super(parent, "State Transition", true);
     this.param = param;
     this.locationComp = comp;
+    this.parentFrame = parent;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
@@ -84,18 +87,18 @@ public class EventTransitionDialog extends JDialog
           JLabel commLab = new JLabel("state var. comment");
           int w = maxWidth(new JComponent[]{nameLab,assTo,opOn,actionLab,commLab});
 
-          nameField = new JTextField(15);   setMaxHeight(nameField);
+          //nameField = new JTextField(15);   setMaxHeight(nameField);
 
           stateVarsCB = new JComboBox(VGlobals.instance().getStateVarsCBModel());
             setMaxHeight(stateVarsCB);
             stateVarsCB.setBackground(Color.white);
-
+          newSVButt = new JButton("new");
           commentField       = new JTextField(25);   setMaxHeight(commentField);
             commentField.setEditable(false);
           actionField        = new JTextField(25);   setMaxHeight(actionField);
           arrayIndexField    = new JTextField(25);   setMaxHeight(arrayIndexField);
 
-        fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarsCB));
+        fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarsCB,newSVButt));
         fieldsPanel.add(new OneLinePanel(arrayIdxLab,w,arrayIndexField));
         fieldsPanel.add(new OneLinePanel(null,w,assTo));
         fieldsPanel.add(new OneLinePanel(null,w,opOn));
@@ -132,7 +135,7 @@ public class EventTransitionDialog extends JDialog
     okButt .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener();
-    nameField.addCaretListener(lis);
+    //nameField.addCaretListener(lis);
     arrayIndexField.addCaretListener(lis);
     actionField.addCaretListener(lis);
     commentField.      addCaretListener(lis);
@@ -147,6 +150,24 @@ public class EventTransitionDialog extends JDialog
         modified=true;
       }
     });
+    newSVButt.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        String nm = ((EventGraphViewFrame)parentFrame).addStateVariableDialog();
+        if(nm != null) {
+          stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+          for(int i=0;i<stateVarsCB.getItemCount();i++) {
+            vStateVariable vsv = (vStateVariable)stateVarsCB.getItemAt(i);
+            if(vsv.getName().indexOf(nm) != -1) {
+              stateVarsCB.setSelectedIndex(i);
+              break;
+            }
+          }
+        }
+      }
+    });
+
     // to start off:
     if(stateVarsCB.getItemCount() > 0)
       commentField.setText(((vStateVariable)stateVarsCB.getItemAt(0)).getComment());
@@ -206,7 +227,7 @@ public class EventTransitionDialog extends JDialog
       stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());   // get new ones
     }
     else {
-      nameField.setText("");
+      //nameField.setText("");
       actionField.setText("");
       arrayIndexField.setText("");
       stateVarsCB.setSelectedIndex(0);
@@ -309,67 +330,23 @@ public class EventTransitionDialog extends JDialog
       d.width = Integer.MAX_VALUE;
       setMaximumSize(d);
     }
-  }
-  /**
-   * Returns true if the data is valid, eg we have a valid parameter name
-   * and a valid type.
-   */
-/*
-jmb..this is good regex checking.  put in a single utility class
-  private boolean preflightData()
-  {
-    String parameterName =  nameField.getText();
-    String javaVariableNameRegExp;
-
-    // Do a REGEXP to confirm that the variable name fits the criteria for
-    // a Java variable. We don't want to allow something like "2f", which
-    // Java will misinterpret as a number literal rather than a variable. This regexp
-    // is slightly more restrictive in that it demands that the variable name
-    // start with a lower case letter (which is not demanded by Java but is
-    // a strong convention) and disallows the underscore. "^" means it
-    // has to start with a lower case letter in the leftmost position.
-
-    javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
-    if(!Pattern.matches(javaVariableNameRegExp, parameterName))
+    OneLinePanel(JLabel lab, int w, JComponent comp1, JComponent comp2)
     {
-      JOptionPane.showMessageDialog(this,
-                                    "vParameter names must start with a lower case letter and conform to the Java variable naming conventions",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
+      setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+      if(lab == null) lab = new JLabel("");
+      add(Box.createHorizontalStrut(5));
+      add(Box.createHorizontalStrut(w-lab.getPreferredSize().width));
+      add(lab);
+      add(Box.createHorizontalStrut(5));
+      add(comp1);
+      add(comp2);
+
+      Dimension d = getPreferredSize();
+      d.width = Integer.MAX_VALUE;
+      setMaximumSize(d);
     }
-
-    // Check to make sure the name the user specified isn't already used by a state variable
-    // or parameter.
-
-    for(int idx = 0; idx < existingNames.size(); idx++)
-    {
-      if(parameterName.equals(existingNames.get(idx)))
-      {
-        JOptionPane.showMessageDialog(null,
-                                    "vParameter names must be unique and not match any existing parameter or state variable name",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-        return false;
-      }
-    }
-
-
-
-    // Check to make sure the class or type exists
-    if(!ClassUtility.classExists(parameterTypeCombo.getSelectedItem().toString()))
-    {
-      JOptionPane.showMessageDialog(null,
-                                    "The class name " + parameterTypeCombo.getSelectedItem().toString() + "  does not exist on the classpath",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    return true;
   }
 
-*/
   class myCloseListener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)

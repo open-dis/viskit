@@ -218,66 +218,7 @@ public class EdgeParameterDialog extends JDialog
       setMaximumSize(d);
     }
   }
-  /**
-   * Returns true if the data is valid, eg we have a valid parameter name
-   * and a valid type.
-   */
-/*
-jmb..this is good regex checking.  put in a single utility class
-  private boolean preflightData()
-  {
-    String parameterName =  parameterNameField.getText();
-    String javaVariableNameRegExp;
 
-    // Do a REGEXP to confirm that the variable name fits the criteria for
-    // a Java variable. We don't want to allow something like "2f", which
-    // Java will misinterpret as a number literal rather than a variable. This regexp
-    // is slightly more restrictive in that it demands that the variable name
-    // start with a lower case letter (which is not demanded by Java but is
-    // a strong convention) and disallows the underscore. "^" means it
-    // has to start with a lower case letter in the leftmost position.
-
-    javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
-    if(!Pattern.matches(javaVariableNameRegExp, parameterName))
-    {
-      JOptionPane.showMessageDialog(this,
-                                    "vParameter names must start with a lower case letter and conform to the Java variable naming conventions",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    // Check to make sure the name the user specified isn't already used by a state variable
-    // or parameter.
-
-    for(int idx = 0; idx < existingNames.size(); idx++)
-    {
-      if(parameterName.equals(existingNames.get(idx)))
-      {
-        JOptionPane.showMessageDialog(null,
-                                    "vParameter names must be unique and not match any existing parameter or state variable name",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-        return false;
-      }
-    }
-
-
-
-    // Check to make sure the class or type exists
-    if(!ClassUtility.classExists(typeLabel.getSelectedItem().toString()))
-    {
-      JOptionPane.showMessageDialog(null,
-                                    "The class name " + typeLabel.getSelectedItem().toString() + "  does not exist on the classpath",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    return true;
-  }
-
-*/
   class myCloseListener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)

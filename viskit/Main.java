@@ -47,6 +47,7 @@ public class Main
       UIManager.setLookAndFeel(laf);
       UIDefaults def = UIManager.getDefaults();
       def.put("Tree.font", new Font("Verdana", Font.PLAIN, 12));
+      setAllFonts(null);
     }
     catch (Exception e) {
       System.err.println("Could not enable " + laf);
@@ -60,7 +61,6 @@ public class Main
 
     model.init();
 
-    //setAllFonts(view);
     view.setVisible(true);
     controller.begin();
   }
@@ -84,7 +84,7 @@ public class Main
       UIManager.put("CheckBox.font", fontBold12);
       UIManager.put("ComboBox.font", fontPlain12); //fontBold12);
       UIManager.put("DesktopIcon.font", fontBold12);
-      UIManager.put("Label.font", fontPlain12); //fontBold12);
+      UIManager.put("Label.font", fontBold12);
       UIManager.put("List.font", fontPlain12); //fontBold12);
       UIManager.put("ProgressBar.font", fontBold12);
       UIManager.put("RadioButton.font", fontBold12);
@@ -116,7 +116,7 @@ public class Main
       UIManager.put("RadioButtonMenuItem.font", fontBold12);
       UIManager.put("ToolBar.font", fontBold12);
 
-      SwingUtilities.updateComponentTreeUI(f);
+      //SwingUtilities.updateComponentTreeUI(f);
     }
     catch (Exception e) {
       System.err.println("error setting UI fonts " + e.getMessage());

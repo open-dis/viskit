@@ -79,21 +79,6 @@ public abstract class ViskitSmallDialog extends JDialog
     return maxw;
   }
 
-  protected void setType(String nm, JComboBox cb)
-   {
-     ComboBoxModel mod = cb.getModel();
-     for(int i=0;i<mod.getSize(); i++) {
-       if(nm.equals(mod.getElementAt(i))) {
-         cb.setSelectedIndex(i);
-         return;
-       }
-     }
-     VGlobals.instance().addType(nm);
-     mod = VGlobals.instance().getTypeCBModel();
-     cb.setModel(mod);
-     cb.setSelectedIndex(mod.getSize()-1);
-   }
-
   class cancelButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)

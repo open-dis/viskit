@@ -79,10 +79,12 @@ public class ParameterDialog extends JDialog
         parameterNameField = new JTextField(15);   setMaxHeight(parameterNameField);
         expressionField    = new JTextField(25);   setMaxHeight(expressionField);
         commentField       = new JTextField(25);   setMaxHeight(commentField);
-        parameterTypeCombo = new JComboBox(VGlobals.instance().getTypeCBModel());
-                                               setMaxHeight(parameterTypeCombo);
 
-        parameterTypeCombo.setEditable(true);
+        parameterTypeCombo = VGlobals.instance().getTypeCB(); setMaxHeight(parameterTypeCombo);
+        //parameterTypeCombo = new JComboBox();
+        //parameterTypeCombo.setModel(VGlobals.instance().getTypeCBModel(parameterTypeCombo));
+        //                                       setMaxHeight(parameterTypeCombo);
+        //parameterTypeCombo.setEditable(true);
 
         fieldsPanel.add(new OneLinePanel(nameLab,w,parameterNameField));
         fieldsPanel.add(new OneLinePanel(typeLab,w,parameterTypeCombo));
@@ -152,27 +154,12 @@ public class ParameterDialog extends JDialog
 
     this.setLocationRelativeTo(c);
   }
-  private void setType(vParameter p)
-  {
-    String nm = p.getType();
-    ComboBoxModel mod = parameterTypeCombo.getModel();
-    for(int i=0;i<mod.getSize(); i++) {
-      if(nm.equals(mod.getElementAt(i))) {
-        parameterTypeCombo.setSelectedIndex(i);
-        return;
-      }
-    }
-    VGlobals.instance().addType(nm);
-    mod = VGlobals.instance().getTypeCBModel();
-    parameterTypeCombo.setModel(mod);
-    parameterTypeCombo.setSelectedIndex(mod.getSize()-1);
-  }
 
   private void fillWidgets()
   {
     if(param != null) {
       parameterNameField.setText(param.getName());
-      setType(param);
+      parameterTypeCombo.setSelectedItem(param.getType());
       this.commentField.setText(param.getComment());
     }
     else {
@@ -184,14 +171,18 @@ public class ParameterDialog extends JDialog
 
   private void unloadWidgets()
   {
+    String ty = (String)parameterTypeCombo.getSelectedItem();
+    ty = VGlobals.instance().typeChosen(ty);
+    String nm = parameterNameField.getText();
+    nm = nm.replaceAll("\\s","");
     if(param != null) {
-      param.setName(this.parameterNameField.getText());
-      param.setType(((String)(this.parameterTypeCombo.getSelectedItem())).trim());
-      param.setComment(this.commentField.getText());
+      param.setName(nm);
+      param.setType(ty);
+      param.setComment(commentField.getText());
     }
     else {
-      newName = parameterNameField.getText().trim();
-      newType = ((String)(this.parameterTypeCombo.getSelectedItem())).trim();
+      newName = nm;
+      newType = ty;
       newComment = commentField.getText().trim();
     }
   }
@@ -246,66 +237,7 @@ public class ParameterDialog extends JDialog
       setMaximumSize(d);
     }
   }
-  /**
-   * Returns true if the data is valid, eg we have a valid parameter name
-   * and a valid type.
-   */
-/*
-jmb..this is good regex checking.  put in a single utility class
-  private boolean preflightData()
-  {
-    String parameterName =  parameterNameField.getText();
-    String javaVariableNameRegExp;
 
-    // Do a REGEXP to confirm that the variable name fits the criteria for
-    // a Java variable. We don't want to allow something like "2f", which
-    // Java will misinterpret as a number literal rather than a variable. This regexp
-    // is slightly more restrictive in that it demands that the variable name
-    // start with a lower case letter (which is not demanded by Java but is
-    // a strong convention) and disallows the underscore. "^" means it
-    // has to start with a lower case letter in the leftmost position.
-
-    javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
-    if(!Pattern.matches(javaVariableNameRegExp, parameterName))
-    {
-      JOptionPane.showMessageDialog(this,
-                                    "vParameter names must start with a lower case letter and conform to the Java variable naming conventions",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    // Check to make sure the name the user specified isn't already used by a state variable
-    // or parameter.
-
-    for(int idx = 0; idx < existingNames.size(); idx++)
-    {
-      if(parameterName.equals(existingNames.get(idx)))
-      {
-        JOptionPane.showMessageDialog(null,
-                                    "vParameter names must be unique and not match any existing parameter or state variable name",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-        return false;
-      }
-    }
-
-
-
-    // Check to make sure the class or type exists
-    if(!ClassUtility.classExists(parameterTypeCombo.getSelectedItem().toString()))
-    {
-      JOptionPane.showMessageDialog(null,
-                                    "The class name " + parameterTypeCombo.getSelectedItem().toString() + "  does not exist on the classpath",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    return true;
-  }
-
-*/
   class myCloseListener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)

@@ -1,17 +1,17 @@
 package viskit.model;
 
 import viskit.ModelEvent;
-import viskit.Controller;
+import viskit.VGlobals;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.*;
 import viskit.xsd.bindings.Event;
 import viskit.xsd.translator.SimkitXML2Java;
 
+import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -91,6 +91,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
         return;
       }
+      VGlobals.instance().reset();
       stateVariables.removeAllElements();
       simParameters.removeAllElements();
       evNodeCache.clear();
@@ -105,6 +106,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimkitModule) u.unmarshal(f);
 
+        VGlobals.instance().reset();
         stateVariables.removeAllElements();
         simParameters.removeAllElements();
         evNodeCache.clear();

@@ -1,7 +1,6 @@
 package viskit;
 
 import viskit.model.*;
-
 import java.io.File;
 
 /**
@@ -37,7 +36,7 @@ public interface ViskitView
   public void    showAndSaveSource(String s);
 
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
-  public void addParameterDialog();
-  public void addStateVariableDialog();
+  public String addParameterDialog();          // returns param name
+  public String addStateVariableDialog();      // returns statevar name
 
 }

@@ -10,7 +10,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.regex.Pattern;
 import java.lang.reflect.Array;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,8 +30,9 @@ public class VGlobals
   private static VGlobals me;
   private Interpreter interpreter;
   private JPopupMenu moreTypesMenu;
-  private ComboBoxModel cbMod;
-
+  private DefaultComboBoxModel cbMod;
+  private JPopupMenu popup;
+  private myTypeListener myListener;
 
   public static synchronized VGlobals instance()
   {
@@ -38,52 +45,12 @@ public class VGlobals
   private VGlobals()
   {
     initBeanShell();
-    moreTypesMenu = new JPopupMenu("more...");
-    moreTypesMenu.add("java.lang.String");
-    typesVector = new Vector(Arrays.asList(defaultTypes));
-    //typesVector.add(moreTypesMenu);
-    cbMod = new DefaultComboBoxModel(typesVector);
+
+    cbMod = new DefaultComboBoxModel(new Vector(Arrays.asList(defaultTypeStrings)));
+    myListener = new myTypeListener();
+    buildTypePopup();
   }
 
-/*
-  public String[] getTypes()
-  {
-    return defaultTypes;
-  }
-*/
-
-  private String[] defaultTypes = {
-    "char",
-    "boolean",
-    "byte",
-    "double",
-    "float",
-    "int",
-    "short",
-    "long",
-    "java.lang.String",
-  };
-
-  private Vector typesVector;
-
-  public void addType(String ty)
-  {
-    if (Arrays.binarySearch(defaultTypes, ty) < 0) {
-// todo      moreTypesMenu.add(new JMenuItem(ty));
-
-      String[] newArr = new String[defaultTypes.length + 1];
-      System.arraycopy(defaultTypes, 0, newArr, 0, defaultTypes.length);
-      newArr[newArr.length - 1] = ty;
-      defaultTypes = newArr;
-      Arrays.sort(defaultTypes);
-      cbMod = new DefaultComboBoxModel(defaultTypes);
-    }
-  }
-
-  public ComboBoxModel getTypeCBModel()
-  {
-    return cbMod;
-  }
 
   public void setStateVarsList(Collection svs)
   {
@@ -311,10 +278,194 @@ public class VGlobals
     }
     catch (EvalError evalError) {
       //assert false:"BeanShell eval error ";
-      System.err.println("BeanShell evel error");
+      System.err.println("BeanShell eval error");
       evalError.printStackTrace();
       return false;
     }
     return false;
   }
+
+  /*
+    Dynamic variable type list processing.  Build Type combo boxes and manage user-typed object types.
+  */
+  private String   moreTypesString = "more...";
+  private String[] defaultTypeStrings = {
+    "int",
+    "double",
+    "Integer",
+    "Double",
+    "String",
+    moreTypesString
+  };
+
+  private String[] morePackages = {"primitives","java.lang","java.util","simkit.random"};
+  private String[][] moreClasses =
+  {
+    {"boolean","byte","char","float","long","short"},
+    {"Boolean","Byte","Character","Float","Long","Short"},
+    {"HashMap","HashSet","LinkedList","Properties","Random","TreeMap","TreeSet","Vector"},
+    {"RandomNumber","RandomVariate"}
+  };
+
+  /**
+   * This is messaged by dialogs, etc. when a user has selected a type for a new variable, etc.  We look
+   * around to see if we've already got it covered.  If not, we add it to the end of the list.
+   * @param ty
+   */
+  public String typeChosen(String ty)
+  {
+    ty = ty.replaceAll("\\s","");              // every whitespace removed
+    for(int i=0;i<cbMod.getSize();i++) {
+      if(cbMod.getElementAt(i).toString().equals(ty))
+        return ty;
+    }
+
+    // else, put it at the end, but before the "more"
+    cbMod.insertElementAt(ty,cbMod.getSize()-1);
+    return ty;
+  }
+
+  public JComboBox getTypeCB()
+  {
+    JComboBox cb = new JComboBox(cbMod);
+    cb.addActionListener(myListener);
+    cb.addItemListener(myListener);
+    cb.setRenderer(new myTypeListRenderer());
+    cb.setEditable(true);
+    return cb;
+  }
+
+  private void buildTypePopup()
+  {
+
+    popup = new JPopupMenu();
+    JMenu m;
+    JMenuItem mi;
+/*
+    for(Iterator itr = VsimkitObjects.hashmap.keySet().iterator(); itr.hasNext();) {
+      String s = (String)itr.next();
+      mi = new JMenuItem(s);
+      mi.addActionListener(myListener);
+      popup.add(mi);
+    }
+*/
+   for(int i=0;i<morePackages.length;i++) {
+     m = new JMenu(morePackages[i]);
+     for(int j=0;j<moreClasses[i].length;j++) {
+       mi = new JMenuItem(moreClasses[i][j]);
+       mi.addActionListener(myListener);
+       m.add(mi);
+     }
+     popup.add(m);
+   }
+  }
+  JComboBox pending;
+  Object lastSelected = "void";
+
+  class myTypeListener implements ActionListener, ItemListener
+  {
+    public void itemStateChanged(ItemEvent e)
+    {
+      if(e.getStateChange() == ItemEvent.DESELECTED)
+        lastSelected = e.getItem();
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+      Object o = e.getSource();
+      if(o instanceof JComboBox) {
+        JComboBox cb = (JComboBox)o;
+        pending = cb;
+        if(cb.getSelectedItem().toString().equals(moreTypesString))     // == moreTypesLabel)
+           popup.show(cb,0,0); //cb.getLocation().x,cb.getLocation().y); //cb.getX(),cb.getY());
+      }
+      else {
+        JMenuItem mi = (JMenuItem)o;
+        if(!mi.getText().equals("cancel"))
+          pending.setSelectedItem(mi.getText());
+        else
+          pending.setSelectedItem(lastSelected);
+      }
+    }
+  }
+  class myTypeListRenderer extends JLabel implements ListCellRenderer
+  {
+    Font specialFont = getFont().deriveFont(Font.ITALIC);
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+    {
+      JLabel lab = new JLabel(value.toString());
+      if(value.toString().equals(moreTypesString))
+        lab.setBorder(BorderFactory.createRaisedBevelBorder()); //createEtchedBorder());
+        lab.setFont(specialFont);
+      return lab;
+    }
+  }
+
+  Vector existingNames = new Vector();
+
+  /**
+   * Returns true if the data is valid, eg we have a valid parameter name
+   * and a valid type.
+   */
+
+  private boolean checkLegalJavaName(String nm)
+  {
+
+    String javaVariableNameRegExp;
+
+    // Do a REGEXP to confirm that the variable name fits the criteria for
+    // a Java variable. We don't want to allow something like "2f", which
+    // Java will misinterpret as a number literal rather than a variable. This regexp
+    // is slightly more restrictive in that it demands that the variable name
+    // start with a lower case letter (which is not demanded by Java but is
+    // a strong convention) and disallows the underscore. "^" means it
+    // has to start with a lower case letter in the leftmost position.
+
+    javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
+    if(!Pattern.matches(javaVariableNameRegExp, nm))
+    {
+      JOptionPane.showMessageDialog(null,
+                                    "variable names must start with a lower case letter and conform to the Java variable naming conventions",
+                                    "alert",
+                                    JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+
+    // Check to make sure the name the user specified isn't already used by a state variable
+    // or parameter.
+
+    for(int idx = 0; idx < existingNames.size(); idx++)
+    {
+      if(nm.equals(existingNames.get(idx)))
+      {
+        JOptionPane.showMessageDialog(null,
+                                    "variable names must be unique and not match any existing parameter or state variable name",
+                                    "alert",
+                                    JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
+    }
+
+/*
+    // Check to make sure the class or type exists
+    if(!ClassUtility.classExists(typeLabel.getSelectedItem().toString()))
+    {
+      JOptionPane.showMessageDialog(null,
+                                    "The class name " + typeLabel.getSelectedItem().toString() + "  does not exist on the classpath",
+                                    "alert",
+                                    JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+*/
+    existingNames.add(nm);
+    return true;
+  }
+
+  public void reset()
+  {
+    existingNames.clear();
+    stateVars.clear();
+    simParms.clear();
+  }
+
 }

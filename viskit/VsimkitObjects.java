@@ -30,6 +30,7 @@ public class VsimkitObjects
 
   static {
     try {
+      System.out.println("VsimkitObjects init");
       Class c = Class.forName("viskit.VsimkitObjects");
       Method[] meths = c.getDeclaredMethods();
       for(int i=0;i<meths.length;i++) {

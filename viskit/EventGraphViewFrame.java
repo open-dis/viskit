@@ -332,7 +332,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   /**
    * run the add parameter dialog
    */
-  public void addParameterDialog()
+  public String addParameterDialog()
   {
 
     if( ParameterDialog.showDialog(this,this,null)) {      // blocks here
@@ -340,22 +340,22 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                                                           ParameterDialog.newType,
                                                           "new value here",
                                                           ParameterDialog.newComment);
+      return ParameterDialog.newName;
     }
+    return null;
   }
 
-  /**
-   * run the add state variable dialog
-   */
-  public void addStateVariableDialog()
+  public String addStateVariableDialog()
   {
     if( StateVariableDialog.showDialog(this,this,null)) {      // blocks here
       ((ViskitController)getController()).newStateVariable(StateVariableDialog.newName,
                                                           StateVariableDialog.newType,
                                                           "new value here",
                                                           StateVariableDialog.newComment);
+      return StateVariableDialog.newName;
     }
+    return null;
   }
-
   /**
    * Do menu layout work here.  These menus, and the toggle buttons which follow, make use of the "actions"
    * package, which

@@ -4,13 +4,7 @@ import viskit.model.vStateVariable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * A dialog class that lets the user add a new state variable to the document.
@@ -65,10 +59,12 @@ public class StateVariableDialog extends ViskitSmallDialog
 
         stateVarNameField = new JTextField(15);   setMaxHeight(stateVarNameField);
         commentField       = new JTextField(25);   setMaxHeight(commentField);
-        stateVarTypeCombo = new JComboBox(VGlobals.instance().getTypeCBModel());
-                                                   setMaxHeight(stateVarTypeCombo);
+        //stateVarTypeCombo = new JComboBox();
+        //stateVarTypeCombo.setModel(VGlobals.instance().getTypeCBModel(stateVarTypeCombo));
+        //
 
-        stateVarTypeCombo.setEditable(true);
+        //stateVarTypeCombo.setEditable(true);
+        stateVarTypeCombo = VGlobals.instance().getTypeCB(); setMaxHeight(stateVarTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarNameField));
         // no init val...fieldsPanel.add(new OneLinePanel(initLab,w,expressionField));
@@ -130,7 +126,8 @@ public class StateVariableDialog extends ViskitSmallDialog
   {
     if(stVar != null) {
       stateVarNameField.setText(stVar.getName());
-      setType(stVar.getType(),stateVarTypeCombo);
+      stateVarTypeCombo.setSelectedItem(stVar.getType());
+      //setType(stVar.getType(),stateVarTypeCombo);
       commentField.setText(stVar.getComment());
     }
     else {
@@ -146,7 +143,7 @@ public class StateVariableDialog extends ViskitSmallDialog
   {
     // make sure there are no spaces
     String ty = (String)stateVarTypeCombo.getSelectedItem();
-    ty = ty.replaceAll("\\s","");              // every whitespace removed
+    ty = VGlobals.instance().typeChosen(ty);
     String nm = stateVarNameField.getText();
     nm = nm.replaceAll("\\s","");
 
