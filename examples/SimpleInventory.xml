@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitModule name="SimpleInventory" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter type="simkit.random.RandomVariate" name="timeBetweenDemands"/>
+    <Parameter type="simkit.random.RandomVariate" name="demand"/>
+    <Parameter type="simkit.random.RandomVariate" name="leadTime"/>
+    <Parameter type="double" name="timeBetweenReviews"/>
+    <Parameter type="double" name="initialInventory"/>
+    <Parameter type="double" name="triggerPoint"/>
+    <Parameter type="double" name="orderUpTo"/>
+    <StateVariable name="inventoryPosition" type="double" shortName="I"/>
+    <StateVariable name="amountOnOrder" type="double" shortName="O"/>
+    <Event name="Run">
+        <StateTransition state="inventoryPosition">
+            <Assignment value="initialInventory"/>
+        </StateTransition>
+        <StateTransition state="amountOnOrder">
+            <Assignment value="0"/>
+        </StateTransition>
+        <Schedule delay="timeBetweenReviews" event="Review"/>
+        <Schedule delay="timeBetweenDemands.generate()" event="Demand"/>
+        <Coordinate y="20" x="10"/>
+    </Event>
+    <Event name="Demand">
+        <StateTransition state="inventoryPosition">
+            <Assignment value="inventoryPosition - demand.generate()"/>
+        </StateTransition>
+        <Schedule delay="timeBetweenDemands.generate()" event="Demand"/>
+        <Coordinate y="20" x="160"/>
+    </Event>
+    <Event name="Review">
+        <Schedule condition="inventoryPosition + amountOnOrder &lt; triggerPoint" delay="0.0" event="PlaceOrder">
+            <EdgeParameter value="new Double(orderUpTo - inventoryPosition - amountOnOrder)"/>
+        </Schedule>
+        <Schedule delay="timeBetweenReviews" event="Review"/>
+        <Coordinate y="140" x="80"/>
+    </Event>
+    <Event name="PlaceOrder">
+        <Argument name="newOrderAmount" type="double"/>
+        <StateTransition state="amountOnOrder">
+            <Assignment value="amountOnOrder + newOrderAmount"/>
+        </StateTransition>
+        <Schedule delay="leadTime.generate()" event="ReceiveOrder">
+            <EdgeParameter value="new Double(newOrderAmount)"/>
+        </Schedule>
+        <Coordinate y="150" x="190"/>
+    </Event>
+    <Event name="ReceiveOrder">
+        <Argument name="receivedOrderAmount" type="double"/>
+        <StateTransition state="amountOnOrder">
+            <Assignment value="amountOnOrder - receivedOrderAmount"/>
+        </StateTransition>
+        <StateTransition state="inventoryPosition">
+            <Assignment value="inventoryPosition + receivedOrderAmount"/>
+        </StateTransition>
+        <Coordinate y="150" x="310"/>
+    </Event>
+</SimkitModule>
+
