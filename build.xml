@@ -169,7 +169,7 @@
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
-                <fileset dir="${dir.lib}/jwsdp-1.4" includes="*.jar"/>
+                <fileset dir="${dir.lib}/jwsdp-1.5" includes="*.jar"/>
             </classpath>
             <package name="viskit"/>
             <package name="viskit.xsd"/>
@@ -205,8 +205,12 @@
     </taskdef>   
 
     <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
-        <xjc package="viskit.xsd.bindings" schema="${dir.src.simtran.util}/simkit.xsd" target="${dir.src}"/>
-        <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}"/>
+        <xjc package="viskit.xsd.bindings" schema="${dir.src.simtran.util}/simkit.xsd" target="${dir.src}">
+            <produces dir="dir.src.simtran" includes="* impl/* impl/runtime/*" />
+        </xjc>
+        <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}">
+            <produces dir="dir.src.simasm" includes="* impl/* impl/runtime/*" />
+        </xjc>
     </target>
     
     <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
@@ -259,7 +263,7 @@
     <!-- just add new modules to the depends variable here -->
     <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples"/>
     
-    <target depends="jar" description="diskit module" name="examples.diskit">
+    <target description="diskit module" name="examples.diskit">
 	<echo message="Building DISkit:"/>
         <ant dir="${dir.examples}/diskit" target="dist"/>
 	<echo message="Building DISKIT:"/>
