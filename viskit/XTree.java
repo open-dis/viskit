@@ -224,6 +224,7 @@ public class XTree extends JTree
       else {
         value = "<html><font color='maroon' style='bold'>" + wrap(value.toString());
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
         setIcon(null);
         setToolTipText(value.toString());
       }
@@ -233,9 +234,11 @@ public class XTree extends JTree
   }
   static int wrapSiz = 50;//100;
   static String nl = System.getProperty("line.separator");
+  static boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
   static private String wrap(String s)
   {
-
+    if(isWindows)
+      return s;     // can't get it to work
     StringBuffer sb = new StringBuffer();
     String[]sa = new String[]{"",""};
     sa[1] = s;
