@@ -48,7 +48,7 @@
             <Assignment value="totalNumberServers[i]" />
         </StateTransition>
 
-        <Schedule event="InitializeWorkcenter" condition="i < totalNumberServers.length - 1" >
+        <Schedule event="InitializeWorkcenter" condition="i &lt; totalNumberServers.length - 1" >
             <EdgeParameter value="i+1" />
         </Schedule>
         
@@ -96,7 +96,7 @@
         </StateTransition>
         
         <Schedule event="StartService" condition="getNumberInQueue(i) > 0" />
-        <Schedule event="Arrival" condition="i < totalNumberServers.length - 1" />
+        <Schedule event="Arrival" condition="i &lt; totalNumberServers.length - 1" />
         
     </Event>
     
