@@ -31,7 +31,7 @@ public interface ViskitAssemblyView
   public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
-  public File    saveFileAsk(String suggNameNoType);
+  public File    saveFileAsk(String suggName, boolean suggUniqueName);
 
   public void    fileName(String s);    // informative, tells view what we're working on
   //public void    setStopTime(String s);

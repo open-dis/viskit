@@ -167,6 +167,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", null,null));
     fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
+    fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
     //fileMenu.add(buildMenuItem(controller,"compileJavaClass","Compile Java Class",new Integer(KeyEvent.VK_M),null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
@@ -716,12 +717,50 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return null;
   }
 
-  public File saveFileAsk(String suggNameNoType)
+  //todo remove:
+  public File oldsaveFileAsk(String suggNameNoType)
   //-----------------------
   {
     if(jfc == null)
       jfc = new JFileChooser(System.getProperty("user.dir"));
     jfc.setSelectedFile(new File(suggNameNoType+".xml"));
+    int retv = jfc.showSaveDialog(this);
+    if(retv == JFileChooser.APPROVE_OPTION)
+      return jfc.getSelectedFile();
+    return null;
+  }
+  private File getUniqueName(String suggName)
+  {
+    String appnd = "";
+    String suffix = "";
+
+    int lastDot = suggName.lastIndexOf('.');
+    if(lastDot != -1) {
+      suffix = suggName.substring(lastDot);
+      suggName = suggName.substring(0,lastDot);
+    }
+    int count = -1;
+    File fil = null;
+    do {
+      fil = new File(suggName + appnd + suffix);
+      appnd = "" + ++count;
+    }
+    while (fil.exists());
+
+    return fil;
+  }
+
+  public File saveFileAsk(String suggName, boolean showUniqueName)
+  //-----------------------
+  {
+    if(jfc == null)
+      jfc = new JFileChooser(System.getProperty("user.dir"));
+
+    File fil = new File(suggName);
+    if(showUniqueName)
+      fil = getUniqueName(suggName);
+
+    jfc.setSelectedFile(fil);
     int retv = jfc.showSaveDialog(this);
     if(retv == JFileChooser.APPROVE_OPTION)
       return jfc.getSelectedFile();

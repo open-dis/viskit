@@ -59,4 +59,5 @@ public interface ViskitController
 
   void eventList();
   void generateJavaClass();
+  void captureWindow();
 }

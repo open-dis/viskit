@@ -122,7 +122,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void saveAs()
   //------------------
   {
-    lastFile = ((ViskitView)getView()).saveFileAsk(((ViskitModel)getModel()).getMetaData().name);
+    lastFile = ((ViskitView)getView()).saveFileAsk(((ViskitModel)getModel()).getMetaData().name+".xml",false);
     if(lastFile != null) {
       ((ViskitModel)getModel()).saveModel(lastFile);
       ((ViskitView)getView()).fileName(lastFile.getName());
@@ -383,29 +383,26 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((viskit.model.ViskitModel) getModel()).changeCancelEdge(ed);
     }
   }
-
+  private String imgSaveCount= "";
+  private int    imgSaveInt = -1;
   public void captureWindow()
-      //-------------------------
+  //-------------------------
   {
     String fileName = "ViskitScreenCapture";
     if (lastFile != null)
       fileName = lastFile.getName();
 
-    // get a unique filename
-    File fil;
-    String appnd = "";
-    int count = -1;
-    do {
-      fil = new File(fileName + appnd + ".png");
-      appnd = "" + ++count;
-    }
-    while (fil.exists());
+    File fil = ((ViskitView)getView()).saveFileAsk(fileName+imgSaveCount+".png",true);
+    if(fil == null)
+      return;
 
     final Timer tim = new Timer(100,new timerCallback(fil));
     tim.setRepeats(false);
     tim.start();
 
+    imgSaveCount = ""+ (++imgSaveInt);
   }
+
   class timerCallback implements ActionListener
   {
     File fil;

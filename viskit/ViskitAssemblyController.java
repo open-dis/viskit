@@ -51,4 +51,5 @@ public interface ViskitAssemblyController
   void runAssembly();
 
   void runEventGraphEditor();
+  void captureWindow();
 }

@@ -6,7 +6,11 @@ import viskit.xsd.translator.SimkitXML2Java;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 
 import javax.swing.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.Collection;
@@ -99,7 +103,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void saveAs()
   {
-    lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name);
+    lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name,false);
     if(lastFile != null) {
       updateGMD();
       ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
@@ -796,6 +800,65 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     String[] ra = new String[v.size()];
     return (String[])v.toArray(ra);
   }
+
+  private String imgSaveCount= "";
+  private int    imgSaveInt = -1;
+  public void captureWindow()
+  //-------------------------
+  {
+    String fileName = "AssemblyScreenCapture";
+    if (lastFile != null)
+      fileName = lastFile.getName();
+
+    File fil = ((ViskitAssemblyView)getView()).saveFileAsk(fileName+imgSaveCount+".png",true);
+    if(fil == null)
+      return;
+
+    final Timer tim = new Timer(100,new timerCallback(fil));
+    tim.setRepeats(false);
+    tim.start();
+
+    imgSaveCount = ""+ (++imgSaveInt);
+  }
+
+  class timerCallback implements ActionListener
+  {
+    File fil;
+    timerCallback(File f)
+    {
+      fil = f;
+    }
+    public void actionPerformed(ActionEvent ev)
+    {
+      // create and save the image
+      Component component = (Component) getView();
+      Point p = new Point(0, 0);
+      SwingUtilities.convertPointToScreen(p, component);
+      Rectangle region = component.getBounds();
+      region.x = p.x;
+      region.y = p.y;
+      BufferedImage image = null;
+      try {
+        image = new Robot().createScreenCapture(region);
+        ImageIO.write(image, "png", fil);
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      // display a scaled version
+      JFrame frame = new JFrame("Saved as " + fil.getName());
+      ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
+      JLabel lab = new JLabel(ii);
+      frame.getContentPane().setLayout(new BorderLayout());
+      frame.getContentPane().add(lab, BorderLayout.CENTER);
+      frame.pack();
+      frame.setLocationRelativeTo((Component) getView());
+      frame.setVisible(true);
+    }
+  }
+
+
 }
 class PkgAndFile
 {

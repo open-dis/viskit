@@ -29,7 +29,7 @@ public interface ViskitView
   public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
-  public File    saveFileAsk(String suggNameNoType);
+  public File    saveFileAsk(String suggName,boolean showUniqueName);
 
   public void    fileName(String s);    // informative, tells view what we're working on
 
