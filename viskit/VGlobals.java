@@ -150,6 +150,11 @@ public class VGlobals
 
     return egvf;
   }
+
+  public ViskitModel getActiveEventGraphModel()
+  {
+    return  (ViskitModel)egvf.getModel();
+  }
   public void quitEventGraphEditor()
   {
     if(egvf != null) {
