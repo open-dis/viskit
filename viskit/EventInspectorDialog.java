@@ -172,6 +172,15 @@ public class EventInspectorDialog extends JDialog
         EventStateTransition est = (EventStateTransition) e.getSource();
         boolean modified = EventTransitionDialog.showDialog(fr, locationComponent, est);
         if (modified) {
+          /*
+          // experiment
+          EventLocalVariable nuts = new EventLocalVariable("__01","int",est.getIndexingExpression());
+          localVariables.addRow(nuts);
+          est.setIndexingExpression(nuts.getName());
+          // works...
+          // //todo resolve how to sync
+          */
+
           transitions.updateTransition(est);
           okButt.setEnabled(true);
         }

@@ -204,7 +204,14 @@ public class TransitionsPanel extends JPanel
   {
     public void actionPerformed(ActionEvent event)
     {
-      model.addElement("int i = 0");
+      if(VGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
+        JOptionPane.showMessageDialog(TransitionsPanel.this,
+                  "No state variables have been defined,"+
+                  "\ntherefore no state transitions are possible.",
+                  "Error",JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      model.addElement("double click to edit");
       lis.setVisibleRowCount(Math.max(model.getSize(), 3));
       lis.ensureIndexIsVisible(model.getSize() - 1);
       TransitionsPanel.this.invalidate();

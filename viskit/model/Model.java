@@ -48,6 +48,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
   Vector stateVariables = new Vector();
   Vector simParameters = new Vector();
 
+  private String privateLocVarPrefix = "_idxvar_";
+
   public void init()
   {
     try {
@@ -223,11 +225,13 @@ public class Model extends mvcAbstractModel implements ViskitModel
     node.getLocalVariables().clear();
     for(Iterator itr = ev.getLocalVariable().iterator(); itr.hasNext();) {
       LocalVariable lv = (LocalVariable)itr.next();
-      EventLocalVariable elv = new EventLocalVariable(
-                  lv.getName(),lv.getType(),lv.getValue());
-      elv.setComment(concatStrings(lv.getComment()));
-      elv.opaqueModelObject = lv;
-      node.getLocalVariables().add(elv);
+      if(!lv.getName().startsWith(privateLocVarPrefix)) {    // only if it's a "public" one
+        EventLocalVariable elv = new EventLocalVariable(
+                                 lv.getName(),lv.getType(),lv.getValue());
+        elv.setComment(concatStrings(lv.getComment()));
+        elv.opaqueModelObject = lv;
+        node.getLocalVariables().add(elv);
+      }
     }
 
     node.getArguments().clear();
@@ -250,7 +254,20 @@ public class Model extends mvcAbstractModel implements ViskitModel
       StateVariable   sv = (StateVariable)st.getState();
       est.setStateVarName(sv.getName());
       est.setStateVarType(sv.getType());
-      est.setIndexingExpression((String)st.getIndex());     // todo remove cast when/if Rick updates
+
+      if(sv.getType().indexOf('[') != -1) {
+        Object o = st.getIndex();
+        if(o instanceof LocalVariable)
+          est.setIndexingExpression(((LocalVariable)o).getValue());
+        // todo confirm the following
+        else if(o instanceof Parameter)
+          est.setIndexingExpression(((Parameter)o).getName());
+        else if(o instanceof Argument)
+          est.setIndexingExpression(((Argument)o).getName());
+        else if(o instanceof StateVariable)
+          est.setIndexingExpression(((StateVariable)o).getName());
+      }
+
       est.setOperation(st.getOperation() != null);
       if(est.isOperation())
         est.setOperationOrAssignment(st.getOperation().getMethod());
@@ -548,7 +565,13 @@ public class Model extends mvcAbstractModel implements ViskitModel
     return null;
   }
 
-  private void cloneTransitions(List targ, ArrayList local)
+  private int locVarNameSequence = 0;
+  /**
+   * Here we convert indexing expressions into local variable references
+   * @param targ
+   * @param local
+   */
+  private void cloneTransitions(List targ, ArrayList local, List locVarList)
   {
     try {
       targ.clear();
@@ -557,8 +580,20 @@ public class Model extends mvcAbstractModel implements ViskitModel
         StateTransition st =  oFactory.createStateTransition();
          StateVariable sv = findStateVariable(est.getStateVarName());
         st.setState(sv);
-        st.setIndex(est.getIndexingExpression());
+        if(sv.getType() != null && sv.getType().indexOf('[') != -1) {
+          // build a local variable
 
+          LocalVariable lvar = oFactory.createLocalVariable();
+
+          lvar.setName(privateLocVarPrefix + locVarNameSequence++);
+          lvar.setType("int");
+          lvar.setValue(est.getIndexingExpression());
+          lvar.getComment().clear();
+          lvar.getComment().add("used internally");
+          locVarList.add(lvar);
+
+          st.setIndex(lvar);
+        }
         if(est.isOperation()) {
           Operation o = oFactory.createOperation();
           o.setMethod(est.getOperationOrAssignment());
@@ -643,12 +678,11 @@ public class Model extends mvcAbstractModel implements ViskitModel
     coor.setY(""+node.getPosition().y);
     jaxbEv.setCoordinate(coor);
 
-    cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions());
     cloneComments(jaxbEv.getComment(),node.getComments());
     cloneArguments(jaxbEv.getArgument(),node.getArguments());
     cloneLocalVariables(jaxbEv.getLocalVariable(),node.getLocalVariables());
-
-    // todo connections?
+    // following must follow above
+    cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));

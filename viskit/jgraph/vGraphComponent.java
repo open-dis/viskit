@@ -81,10 +81,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       return (ViskitElement)((CircleCell)cell).getUserObject();
     return null;
   }
-  
+
+  private ModelEvent currentModelEvent = null;
+
   public void viskitModelChanged(ModelEvent ev)
   {
-    //System.out.println("in vGraphComponent.viskitModelChanged() with ModelEvent "+ev);
+    currentModelEvent = ev;
+
     switch (ev.getID()) {
       case ModelEvent.NEWMODEL:
         model.deleteAll();
@@ -120,6 +123,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
         //System.out.println("duh")
         ;
     }
+    currentModelEvent = null;
   }
 
   /**
@@ -130,6 +134,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener
    */
   public void graphChanged(GraphModelEvent e)
   {
+    if(currentModelEvent!= null && currentModelEvent.getID() == ModelEvent.NEWMODEL)
+      return;  // this came in from outside, we don't have to inform anybody..prevent reentry
+    //todo confirm anyother events that should cause us to bail here
     GraphModelEvent.GraphModelChange c = e.getChange();
     Object[] ch = c.getChanged();
     if (ch != null) {

@@ -38,6 +38,7 @@ public class EventTransitionDialog extends JDialog
   private Component locationComp;
   private JButton okButt, canButt;
   private JButton newSVButt;
+  private JLabel actionLab;
 
   public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
   public static boolean newIsOperation;
@@ -76,14 +77,19 @@ public class EventTransitionDialog extends JDialog
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel,BoxLayout.Y_AXIS));
 
           JLabel nameLab = new JLabel("state variable");
-          JLabel arrayIdxLab = new JLabel("array indexing expression");
+          JLabel arrayIdxLab = new JLabel("index expression");
 
           assTo = new JRadioButton("assign to (\"=\")");
           opOn  = new JRadioButton("invoke on (\".\")");
           ButtonGroup bg = new ButtonGroup();
             bg.add(assTo);bg.add(opOn);
 
-          JLabel actionLab = new JLabel("action");
+          actionLab = new JLabel("invoke");
+          Dimension dx = actionLab.getPreferredSize();
+          actionLab.setText("=");
+          actionLab.setPreferredSize(dx);
+          actionLab.setHorizontalAlignment(JLabel.TRAILING);
+
           JLabel commLab = new JLabel("state var. comment");
           int w = maxWidth(new JComponent[]{nameLab,assTo,opOn,actionLab,commLab});
 
@@ -147,6 +153,7 @@ public class EventTransitionDialog extends JDialog
         vStateVariable sv = (vStateVariable)cb.getSelectedItem();
         commentField.setText(sv.getComment());
         okButt.setEnabled(true);
+        arrayIndexField.setEditable(sv.getType().indexOf('[') != -1);
         modified=true;
       }
     });
@@ -224,7 +231,8 @@ public class EventTransitionDialog extends JDialog
         commentField.setText((String)param.getComments().get(0));
       else
         commentField.setText("");
-      stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());   // get new ones
+      vStateVariable vsv = (vStateVariable)stateVarsCB.getSelectedItem();
+      arrayIndexField.setEditable(vsv.getType().indexOf('[') != -1);
     }
     else {
       //nameField.setText("");
@@ -238,18 +246,21 @@ public class EventTransitionDialog extends JDialog
 
   private void setVarNameComboBox(EventStateTransition est)
   {
-    for(int i = 0; i< stateVarsCB.getItemCount();i++) {
-      vStateVariable sv = (vStateVariable)stateVarsCB.getItemAt(i);
-      if(est.getStateVarName().equalsIgnoreCase(sv.getName())) {
+    stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+    stateVarsCB.setSelectedIndex(0);
+    for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
+      vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
+      if (est.getStateVarName().equalsIgnoreCase(sv.getName())) {
         stateVarsCB.setSelectedIndex(i);
         return;
       }
     }
-    if(!est.getStateVarName().equals(""))     // for first time
-      JOptionPane.showMessageDialog(this,"State variable "+est.getStateVarName() +"not found.",
-                                         "alert", JOptionPane.ERROR_MESSAGE);
-   // stateVarsCB.setSelectedIndex(0);
+
+    if (!est.getStateVarName().equals(""))     // for first time
+      JOptionPane.showMessageDialog(this, "State variable " + est.getStateVarName() + "not found.",
+          "alert", JOptionPane.ERROR_MESSAGE);
   }
+
   private void unloadWidgets()
   {
     if(param != null) {
@@ -287,14 +298,40 @@ public class EventTransitionDialog extends JDialog
     {
       modified = true;
       okButt.setEnabled(true);
+
+      Dimension d = actionLab.getPreferredSize();
+      if(assTo.isSelected())
+        actionLab.setText("=");
+      else
+        actionLab.setText("invoke");
+      actionLab.setPreferredSize(d);
     }
   }
   class applyButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
     {
-      if(modified)
+      if(modified) {
+        // check for array index
+        if(((vStateVariable)stateVarsCB.getSelectedItem()).getType().indexOf('[') != -1) {
+          if(arrayIndexField.getText().trim().length() <= 0) {
+            int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "Using a state variable which is an array"+
+                      "\nrequires an indexing expression.\nIgnore and continue?",
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (ret != JOptionPane.YES_OPTION)
+              return;
+          }
+        }
+        // check for null action
+        if(actionField.getText().trim().length() <= 0) {
+          int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "No transition (action) has been entered."+
+                    "\nIgnore and continue?",
+              "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+          if (ret != JOptionPane.YES_OPTION)
+            return;
+        }
         unloadWidgets();
+      }
       setVisible(false);
     }
   }

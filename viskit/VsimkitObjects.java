@@ -30,11 +30,12 @@ public class VsimkitObjects
 
   static {
     try {
-      System.out.println("VsimkitObjects init");
       Class c = Class.forName("viskit.VsimkitObjects");
       Method[] meths = c.getDeclaredMethods();
       for(int i=0;i<meths.length;i++) {
         String nm = meths[i].getName();
+        if(!nm.startsWith("get_"))
+          continue;
         nm = nm.substring(4); // lose the 'get_'
         nm = "simkit."+nm.replace('_','.');
         String nm2 = nm.substring(nm.lastIndexOf('.')+1);  // with no package
@@ -58,6 +59,7 @@ public class VsimkitObjects
   }
 
   // Here are all the objects in the random package that could be used:
+  // Each must start with "get_"
   public static Object get_random_Antithetic ()              { return new  Antithetic (); }
   public static Object get_random_AR1Variate ()              { return new  AR1Variate (); }
   public static Object get_random_BernoulliDistribution ()   { return new  BernoulliDistribution (); }
