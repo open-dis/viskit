@@ -486,16 +486,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
     lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png", this, (AssemblyController)getController());
     LegosPanel lPan = new LegosPanel(lTree);
+    lPan.setToolTipText("Drag Event Graphs onto canvas");
 
-    //PropChangeListenersList pcList = new PropChangeListenersList(this);
     pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20), this, (AssemblyController)getController());
     PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree); //pcList);
+    pcPan.setToolTipText("Drag Property Change Listeners onto canvas");
 
     lTree.setBackground(background);
     pclTree.setBackground(background);
 
     panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pcPan);
-
     panJsp.setBorder(null);
     panJsp.setOneTouchExpandable(true);
     pcPan.setMinimumSize(new Dimension(20, 80));
