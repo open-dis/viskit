@@ -287,7 +287,7 @@ public class SimkitAssemblyXML2Java {
 
 	while ( lili.hasNext() ) {
 	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)lili.next();
-	    List tparam = pcl.getTerminalParameter(); 
+	    List tparam = pcl.getParameters(); 
 	    ListIterator tparami = tparam.listIterator();
 	    pw.println(sp8 + "java.beans.PropertyChangeListener" + sp + pcl.getName() + sp + eq + sp);
 	    pw.print(sp12 + nw + sp + pcl.getType() + lp);
@@ -295,6 +295,7 @@ public class SimkitAssemblyXML2Java {
 	        while ( tparami.hasNext() ) {
 		    // note, check if PropertyChangeListeners can have more than one
 		    // String param, if so, do a maybeComma() 
+		    // see bug #36, this should now check all other parameter types
 		    doSimpleStringParameter((TerminalParameter)tparami.next(), pw);
 	        }
 	    } 
