@@ -33,7 +33,7 @@ public abstract class ViskitTablePanel extends JPanel
   private JButton plusButt, minusButt, edButt;
   private ThisTableModel mod;
 
-  private int defaultWidth=0, defaultHeight=0;
+  private int defaultWidth=0, defaultNumRows=3;
   private ArrayList shadow = new ArrayList();
 
   private ActionListener myEditLis,myPlusLis,myMinusLis;
@@ -49,11 +49,11 @@ public abstract class ViskitTablePanel extends JPanel
     this.defaultWidth = defaultWidth;
   }
 
-  public ViskitTablePanel(int defaultWidth, int defaultHeight)
+  public ViskitTablePanel(int defaultWidth, int numRows)
   //==========================================================
   {
     this.defaultWidth = defaultWidth;
-    this.defaultHeight = defaultHeight;
+    this.defaultNumRows = numRows;
   }
 
   public void init(boolean wantAddDelButts)
@@ -82,12 +82,12 @@ public abstract class ViskitTablePanel extends JPanel
     // the table
      tab = new ThisToolTipTable(mod = new ThisTableModel(getColumnTitles()));
      adjustColumnWidths();
-     if(defaultHeight == 0) {
-       defaultHeight = tab.getRowHeight();
-       defaultHeight *= getNumVisibleRows()+1 + 1; // want 3 rows + header and one more for extra
-     }
-     tab.setPreferredScrollableViewportSize(new Dimension(defaultWidth, defaultHeight));
+     int rowHeight = tab.getRowHeight();
+     int defaultHeight = rowHeight * (defaultNumRows+1);
+
+     tab.setPreferredScrollableViewportSize(new Dimension(defaultWidth, rowHeight*2));
      JScrollPane jsp = new JScrollPane(tab);
+     jsp.setMinimumSize(new Dimension(defaultWidth,defaultHeight));       // jmb test
     add(jsp);
     add(Box.createVerticalStrut(5));
 
@@ -415,6 +415,16 @@ public abstract class ViskitTablePanel extends JPanel
     mod.addRow(rowData);
   }
 
+  private boolean shouldDoAddsAndDeletes = true;
+  /**
+   * Whether this class should add and delete rows on plus-minus clicks.  Else that's left to
+   * a listener
+   * @param boo How to play it
+   */
+  protected void doAddsAndDeletes(boolean boo)
+  {
+    shouldDoAddsAndDeletes = boo;
+  }
   /**
    * The local listener for plus, minus and edit clicks
    */
@@ -424,16 +434,18 @@ public abstract class ViskitTablePanel extends JPanel
     public void actionPerformed(ActionEvent event)
     {
       if (event.getActionCommand() == "p") {
-        addRow();
         if (myPlusLis != null)
           myPlusLis.actionPerformed(event);
+        if(shouldDoAddsAndDeletes)
+          addRow();
       }
       else if (event.getActionCommand() == "m") {
         if (myMinusLis != null) {
           event.setSource(shadow.get(tab.getSelectedRow()));
           myMinusLis.actionPerformed(event);
         }
-        removeRow(tab.getSelectedRow());
+        if(shouldDoAddsAndDeletes)
+          removeRow(tab.getSelectedRow());
       }
       else {// if(event.getActionCommand() == "e")
         doEdit();

@@ -21,10 +21,15 @@ public class ParametersPanel extends ViskitTablePanel
 
   ParametersPanel(int wid)
   {
-    super(wid);            // separate constructor from initialization
-    init(true);
+    this(wid,0);
   }
 
+  ParametersPanel(int wid, int numRows)
+  {
+    super(wid,numRows);             // separate constructor from initialization
+    init(true);
+  }
+  
   public String[] getColumnTitles()
   {
     return mytitles;

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+import java.lang.reflect.Array;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,6 +23,9 @@ public class VGlobals
 {
   private static VGlobals me;
   private Interpreter interpreter;
+  private JPopupMenu moreTypesMenu;
+  private ComboBoxModel cbMod;
+
 
   public static synchronized VGlobals instance()
   {
@@ -34,12 +38,19 @@ public class VGlobals
   private VGlobals()
   {
     initBeanShell();
+    moreTypesMenu = new JPopupMenu("more...");
+    moreTypesMenu.add("java.lang.String");
+    typesVector = new Vector(Arrays.asList(defaultTypes));
+    //typesVector.add(moreTypesMenu);
+    cbMod = new DefaultComboBoxModel(typesVector);
   }
 
+/*
   public String[] getTypes()
   {
     return defaultTypes;
   }
+*/
 
   private String[] defaultTypes = {
     "char",
@@ -53,19 +64,22 @@ public class VGlobals
     "java.lang.String",
   };
 
+  private Vector typesVector;
+
   public void addType(String ty)
   {
     if (Arrays.binarySearch(defaultTypes, ty) < 0) {
+      moreTypesMenu.add(new JMenuItem(ty));
+/*
       String[] newArr = new String[defaultTypes.length + 1];
       System.arraycopy(defaultTypes, 0, newArr, 0, defaultTypes.length);
       newArr[newArr.length - 1] = ty;
       defaultTypes = newArr;
       Arrays.sort(defaultTypes);
       cbMod = new DefaultComboBoxModel(defaultTypes);
+*/
     }
   }
-
-  ComboBoxModel cbMod = new DefaultComboBoxModel(defaultTypes);
 
   public ComboBoxModel getTypeCBModel()
   {
@@ -157,13 +171,17 @@ public class VGlobals
       }
     }
 
+    // see if we can parse it.  We've initted all arrays to size = 1, so ignore
+    // outofbounds exceptions
     try {
       String noCRs = s.replace('\n',' ');
       Object o = interpreter.eval(noCRs);
     }
     catch (EvalError evalError) {
-      clearNamespace();
-      return bshErr + "\n" + evalError.getMessage();
+      if(evalError.getMessage().indexOf("java.lang.ArrayIndexOutOfBoundsException") == -1) {
+        clearNamespace();
+        return bshErr + "\n" + evalError.getMessage();
+      } // else fall through the catch
     }
 
     clearNamespace();
@@ -186,10 +204,8 @@ public class VGlobals
   private String handleNameType(String name, String typ)
   {
     if (!handlePrimitive(name, typ)) {
-     // if (!handleJavaDotLang(name, typ)) {
         try {
           interpreter.set(name,instantiateType(typ));      // the 2nd param will be null if nogo and cause exc
-         // interpreter.set(name, Class.forName(typ).newInstance());
         }
         catch (Exception ex) {
           clearNamespace();
@@ -204,8 +220,17 @@ public class VGlobals
   private Object instantiateType(String typ)
   {
     Object o = null;
+    boolean isArr = false;
+    if(typ.indexOf('[') != -1) {
+      typ = typ.substring(0,typ.length()-2);
+      isArr = true;
+    }
     try {
-      o = Class.forName(typ).newInstance();
+      Class c = Class.forName(typ);
+      if(isArr)
+        o = Array.newInstance(c,1);
+      else
+        o = c.newInstance();
     }
     catch (Exception e) {
       o = null;
@@ -224,32 +249,64 @@ public class VGlobals
         interpreter.set(name,(int)0);
         return true;
       }
+      if(typ.equals("int[]")) {
+        interpreter.set(name,new int[0]);
+        return true;
+      }
       if(typ.equals("boolean")) {
         interpreter.set(name,true);
+        return true;
+      }
+      if(typ.equals("boolean[]")) {
+        interpreter.set(name,new boolean[0]);
         return true;
       }
       if(typ.equals("double")) {
         interpreter.set(name,0.0d);
         return true;
       }
+      if(typ.equals("double[]")) {
+        interpreter.set(name,new double[0]);
+        return true;
+      }
       if(typ.equals("float")) {
         interpreter.set(name,0.0f);
+        return true;
+      }
+      if(typ.equals("float[]")) {
+        interpreter.set(name,new float[0]);
         return true;
       }
       if(typ.equals("byte")) {
         interpreter.set(name,(byte)0);
         return true;
        }
+      if(typ.equals("byte[]")) {
+        interpreter.set(name,new byte[0]);
+        return true;
+       }
       if(typ.equals("char")) {
         interpreter.set(name,(char)0);
+        return true;
+      }
+      if(typ.equals("char[]")) {
+        interpreter.set(name,new char[0]);
         return true;
       }
       if(typ.equals("short")) {
         interpreter.set(name,(short)0);
         return true;
       }
+      if(typ.equals("short[]")) {
+        interpreter.set(name,new short[0]);
+        return true;
+      }
       if(typ.equals("long")) {
         interpreter.set(name,(long)0);
+        return true;
+      }
+      if(typ.equals("long[]")) {
+        interpreter.set(name,new long[0]);
         return true;
       }
     }
@@ -261,5 +318,4 @@ public class VGlobals
     }
     return false;
   }
-
 }

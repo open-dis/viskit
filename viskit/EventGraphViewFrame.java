@@ -44,6 +44,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public final static int ADD_NODE_MODE = 1;
   public final static int ARC_MODE = 2;
   public final static int CANCEL_ARC_MODE = 3;
+  public final static int SELF_REF_MODE = 4;
 
   /**
    * Menu bar for the application
@@ -85,10 +86,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private ButtonGroup modeButtonGroup;
 
   // Mode buttons on the toolbar
-  private JToggleButton selectMode;
   private JLabel addEvent;
+  private JLabel addSelfRef;
+
+  private JToggleButton selectMode;
   private JToggleButton arcMode;
   private JToggleButton cancelArcMode;
+  //private JToggleButton selfRefMode;
   private JButton zoomIn, zoomOut;
 
   /**
@@ -175,6 +179,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     //if (addEvent.isSelected() == true) return ADD_NODE_MODE;
     if (arcMode.isSelected() == true) return ARC_MODE;
     if (cancelArcMode.isSelected() == true) return CANCEL_ARC_MODE;
+    //if (selfRefMode.isSelected() == true) return SELF_REF_MODE;
     // If none of them are selected we're in serious trouble.
     //assert false : "getCurrentMode()";
     System.err.println("assert false : \"getCurrentMode()\"");
@@ -237,16 +242,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      p.add(Box.createHorizontalGlue());
     stateVariablesPanel.add(p);
 
-     vp = new VariablesPanel(300,85);
+     vp = new VariablesPanel(300,5);
     stateVariablesPanel.add(vp);
     stateVariablesPanel.add(Box.createVerticalStrut(5));
     stateVariablesPanel.setMinimumSize(new Dimension(20,20));
 
-    // Wire handlers for stateVariable adds, deletes and edits
-    vp.addMinusListener(ActionIntrospector.getAction((ViskitController)getController(),"deleteStateVariable"));
+    // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
+    vp.doAddsAndDeletes(false);
     vp.addPlusListener (ActionIntrospector.getAction((ViskitController)getController(),"newStateVariable"));
 
     // Introspector can't handle a param to the method....?
+    vp.addMinusListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent event)
+      {
+        ((ViskitController)getController()).deleteStateVariable((vStateVariable)event.getSource());
+      }
+    });
+
     vp.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent event)
@@ -266,16 +279,23 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      p.add(Box.createHorizontalGlue());
     parametersPanel.add(p);
 
-      pp = new ParametersPanel(300);
+      pp = new ParametersPanel(300,5);
     parametersPanel.add(pp);
     parametersPanel.add(Box.createVerticalStrut(5));
     pp.setMinimumSize(new Dimension(20,20));
 
-    // Wire handlers for parameter adds, deletes and edits
-    pp.addMinusListener(ActionIntrospector.getAction((ViskitController)getController(),"deleteSimParameter"));
+    // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
+    pp.doAddsAndDeletes(false);
     pp.addPlusListener (ActionIntrospector.getAction((ViskitController)getController(),"newSimParameter"));
 
     // Introspector can't handle a param to the method....?
+    pp.addMinusListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent event)
+      {
+        ((ViskitController)getController()).deleteSimParameter((vParameter)event.getSource());
+      }
+    });
     pp.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent event)
@@ -456,18 +476,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // Buttons for what mode we are in
 
     addEvent = makeJLabel("viskit/images/eventNode.png",
-                         "Drag onto canvas to add new nodes to the event graph");
+                         "Drag onto canvas to add new events to the event graph");
     addEvent.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(),
                         BorderFactory.createEmptyBorder(4,4,4,4)));
 
+    addSelfRef = makeJLabel("viskit/images/selfArc.png",
+                            "Drag onto an existing event node to add a self-referential edge");
 
+    addSelfRef.setBorder(BorderFactory.createCompoundBorder(
+                         BorderFactory.createEtchedBorder(),
+                         BorderFactory.createEmptyBorder(4,4,4,4)));
     selectMode    = makeJTButton(null, "viskit/images/selectNode.png",
                                        "Select items on the graph");
     arcMode       = makeJTButton(null, "viskit/images/schedArc.png",
                                        "Connect nodes with scheduling arcs");
     cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
                                        "Connect nodes with a canceling arc");
+//    selfRefMode   = makeJTButton(null, "viskit/images/selfArc.png",
+//                                       "Add a self-referential edge to a node");
 
     zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                                         "Zoom in on the graph");
@@ -478,12 +505,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     modeButtonGroup.add(selectMode);
     modeButtonGroup.add(arcMode);
     modeButtonGroup.add(cancelArcMode);
+    //modeButtonGroup.add(selfRefMode);
 
     // Make selection mode the default mode
     selectMode.setSelected(true);
 
     toolBar.add(new JLabel("Add: "));
     toolBar.add(addEvent);
+    toolBar.addSeparator(new Dimension(5,24));
+    toolBar.add(addSelfRef);
+
     toolBar.addSeparator(new Dimension(24,24));
 
     toolBar.add(new JLabel("Mode: "));
@@ -492,6 +523,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     toolBar.add(arcMode);
     toolBar.addSeparator(new Dimension(5,24));
     toolBar.add(cancelArcMode);
+    //toolBar.addSeparator(new Dimension(5,24));
+    //toolBar.add(selfRefMode);
 
     toolBar.addSeparator(new Dimension(24,24));
     toolBar.add(new JLabel("Zoom: "));
@@ -516,6 +549,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     addEvent.setTransferHandler(new TransferHandler("text"));
     addEvent.addMouseListener(new DragMouseAdapter());
+    addSelfRef.setTransferHandler(new TransferHandler("text"));
+    addSelfRef.addMouseListener(new DragMouseAdapter());
 
     // These buttons perform operations that are internal to our view class, and therefore their operations are
     // not under control of the application controller (Controller.java).  Small, simple anonymous inner classes
@@ -566,10 +601,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public void mouseEntered(MouseEvent e)
     {
       switch(getCurrentMode()) {
-        case  SELECT_MODE:
+        case SELECT_MODE:
+        case SELF_REF_MODE:
           graphPane.setCursor(select);
           break;
-        case  ARC_MODE:
+        case ARC_MODE:
           graphPane.setCursor(arc);
           break;
         case CANCEL_ARC_MODE:
@@ -581,13 +617,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       }
     }
   }
-
+  final static int NODE_DRAG = 0;
+  final static int SELF_REF_DRAG = 1;
+  private int dragger;
   // Two classes to support dragging and dropping on the graph
   class DragMouseAdapter extends MouseAdapter
   {
     public void mousePressed(MouseEvent e)
     {
       JComponent c = (JComponent) e.getSource();
+      if(c == EventGraphViewFrame.this.addSelfRef)
+        dragger = SELF_REF_DRAG;
+      else
+        dragger = NODE_DRAG;
+
       TransferHandler handler = c.getTransferHandler();
       handler.exportAsDrag(c, e, TransferHandler.COPY);
     }
@@ -598,10 +641,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public void drop(DropTargetDropEvent dtde)
     {
       Point p = dtde.getLocation();  // subtract the size of the label
-      p.x -= addEvent.getWidth();
-      p.y -= addEvent.getHeight();
-
-      ((ViskitController)getController()).newNode(p);
+      if(dragger == NODE_DRAG) {
+        Point pp = new Point(
+          p.x - addEvent.getWidth(),
+          p.y - addEvent.getHeight());
+        ((ViskitController)getController()).newNode(pp);
+      }
+      else {
+        // get the node in question from the graph
+        Object o = graphPane.getViskitElementAt(p);
+        if(o != null && o instanceof EventNode) {
+          EventNode en = (EventNode)o;
+          // We're making a self-referential arc
+          ((ViskitController)getController()).newArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
+        }
+      }
     }
   }
 
@@ -729,6 +783,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       case ModelEvent.NEWMODEL:
         vp.setData(null);
         pp.setData(null);
+        VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         // fall through
 
       // Changes the graph needs to know about

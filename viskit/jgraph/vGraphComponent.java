@@ -74,7 +74,14 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     invalidate();
   }
 
-
+  public ViskitElement getViskitElementAt(Point p)
+  {
+    Object cell = vGraphComponent.this.getFirstCellForLocation(p.x, p.y);
+    if(cell != null && cell instanceof CircleCell)
+      return (ViskitElement)((CircleCell)cell).getUserObject();
+    return null;
+  }
+  
   public void viskitModelChanged(ModelEvent ev)
   {
     //System.out.println("in vGraphComponent.viskitModelChanged() with ModelEvent "+ev);

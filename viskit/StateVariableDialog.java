@@ -22,39 +22,31 @@ import java.awt.event.WindowEvent;
  * @author DMcG
  */
  
-public class StateVariableDialog extends JDialog
+public class StateVariableDialog extends ViskitSmallDialog
 {
-  private JTextField parameterNameField;    // Text field that holds the parameter name
+  private JTextField stateVarNameField;    // Text field that holds the parameter name
   private JTextField commentField;          // Text field that holds the comment
-  private JComboBox  parameterTypeCombo;    // Editable combo box that lets us select a type
+  private JComboBox  stateVarTypeCombo;    // Editable combo box that lets us select a type
 
-  private static StateVariableDialog dialog;
-  private static boolean modified = false;
   private vStateVariable stVar;
   private Component locationComp;
   private JButton okButt, canButt;
+  static private int count = 0;
 
   public static String newName, newType, newComment;
 
   public static boolean showDialog(JFrame f, Component comp, vStateVariable var)
   {
-    if(dialog == null)
-      dialog = new StateVariableDialog(f,comp,var);
-    else
-      dialog.setParams(comp,var);
-
-    dialog.setVisible(true);
-      // above call blocks
-    return modified;
+    return ViskitSmallDialog.showDialog("StateVariableDialog",f,comp,var);
   }
 
-  private StateVariableDialog(JFrame parent, Component comp, vStateVariable param)
+  protected StateVariableDialog(JFrame parent, Component comp, Object param)
   {
     super(parent, "State Variable Inspector", true);
-    this.stVar = param;
+    this.stVar = (vStateVariable)param;
     this.locationComp = comp;
+
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new myCloseListener());
 
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
@@ -73,16 +65,16 @@ public class StateVariableDialog extends JDialog
         JLabel commLab = new JLabel("comment");
         int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,commLab});
 
-        parameterNameField = new JTextField(15);   setMaxHeight(parameterNameField);
+        stateVarNameField = new JTextField(15);   setMaxHeight(stateVarNameField);
         commentField       = new JTextField(25);   setMaxHeight(commentField);
-        parameterTypeCombo = new JComboBox(VGlobals.instance().getTypeCBModel());
-                                                   setMaxHeight(parameterTypeCombo);
+        stateVarTypeCombo = new JComboBox(VGlobals.instance().getTypeCBModel());
+                                                   setMaxHeight(stateVarTypeCombo);
 
-        parameterTypeCombo.setEditable(true);
+        stateVarTypeCombo.setEditable(true);
 
-        fieldsPanel.add(new OneLinePanel(nameLab,w,parameterNameField));
+        fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarNameField));
         // no init val...fieldsPanel.add(new OneLinePanel(initLab,w,expressionField));
-        fieldsPanel.add(new OneLinePanel(typeLab,w,parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(typeLab,w,stateVarTypeCombo));
         fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
        con.add(fieldsPanel);
        con.add(Box.createVerticalStrut(5));
@@ -112,31 +104,18 @@ public class StateVariableDialog extends JDialog
     canButt.addActionListener(new cancelButtonListener());
     okButt .addActionListener(new applyButtonListener());
 
-    enableApplyButtonListener lis = new enableApplyButtonListener();
-    this.parameterNameField.addCaretListener(lis);
+    enableApplyButtonListener lis = new enableApplyButtonListener(okButt);
+    this.stateVarNameField.addCaretListener(lis);
     this.commentField.      addCaretListener(lis);
-    this.parameterTypeCombo.addActionListener(lis);
+    this.stateVarTypeCombo.addActionListener(lis);
+
+    this.addWindowListener(new myCloseListener(this,okButt,canButt));
+
   }
 
-  private int maxWidth(JComponent[] c)
+  void setParams(Component c, Object p)
   {
-    int tmpw=0,maxw=0;
-    for(int j=0; j<c.length; j++) {
-      tmpw = c[j].getPreferredSize().width;
-      if(tmpw > maxw)
-        maxw = tmpw;
-    }
-    return maxw;
-  }
-  private void setMaxHeight(JComponent c)
-  {
-    Dimension d = c.getPreferredSize();
-    d.width = Integer.MAX_VALUE;
-    c.setMaximumSize(d);
-  }
-  public void setParams(Component c, vStateVariable p)
-  {
-    stVar = p;
+    stVar = (vStateVariable)p;
     locationComp = c;
 
     fillWidgets();
@@ -152,170 +131,36 @@ public class StateVariableDialog extends JDialog
   private void fillWidgets()
   {
     if(stVar != null) {
-      parameterNameField.setText(stVar.getName());
-      setType(stVar);
+      stateVarNameField.setText(stVar.getName());
+      setType(stVar.getType(),stateVarTypeCombo);
       commentField.setText(stVar.getComment());
     }
     else {
-      parameterNameField.setText("stVar name");
-      //expressionField.setText("type");
-      commentField.setText("comments here");
+      stateVarNameField.setText("state_"+count++);
+      commentField.setText("");
     }
+    stateVarNameField.requestFocus();
+    stateVarNameField.selectAll();
   }
-  private void setType(vStateVariable sv)
+
+
+  void unloadWidgets()
   {
-    String nm = sv.getType();
-    ComboBoxModel mod = parameterTypeCombo.getModel();
-    for(int i=0;i<mod.getSize(); i++) {
-      if(nm.equals(mod.getElementAt(0))) {
-        parameterTypeCombo.setSelectedIndex(i);
-        return;
-      }
-    }
-    VGlobals.instance().addType(nm);
-    mod = VGlobals.instance().getTypeCBModel();
-    parameterTypeCombo.setModel(mod);
-    parameterTypeCombo.setSelectedIndex(mod.getSize()-1);
-  }
-  private void unloadWidgets()
-  {
+    // make sure there are no spaces
+    String ty = (String)stateVarTypeCombo.getSelectedItem();
+    ty = ty.replaceAll("\\s","");              // every whitespace removed
+    String nm = stateVarNameField.getText();
+    nm = nm.replaceAll("\\s","");
+
     if(stVar != null) {
-      stVar.setName(this.parameterNameField.getText().trim());
-      stVar.setType(((String)(this.parameterTypeCombo.getSelectedItem())).trim());
+      stVar.setName(nm);
+      stVar.setType(ty);
       stVar.setComment(this.commentField.getText().trim());
     }
     else {
-      newName = parameterNameField.getText().trim();
-      newType = ((String)(this.parameterTypeCombo.getSelectedItem())).trim();
+      newName = nm;
+      newType = ty;
       newComment = commentField.getText().trim();
     }
   }
-
-  class cancelButtonListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent event)
-    {
-      modified = false;    // for the caller
-      setVisible(false);
-    }
-  }
-
-  class applyButtonListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent event)
-    {
-      if(modified)
-        unloadWidgets();
-      setVisible(false);
-    }
-  }
-
-  class enableApplyButtonListener implements CaretListener,ActionListener
-  {
-    public void caretUpdate(CaretEvent event)
-    {
-      modified = true;
-      okButt.setEnabled(true);
-      getRootPane().setDefaultButton(okButt);
-    }
-
-    public void actionPerformed(ActionEvent event)
-    {
-      caretUpdate(null);
-    }
-  }
-
-  class OneLinePanel extends JPanel
-  {
-    OneLinePanel(JLabel lab, int w, JComponent comp)
-    {
-      setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
-      add(Box.createHorizontalStrut(5));
-      add(Box.createHorizontalStrut(w-lab.getPreferredSize().width));
-      add(lab);
-      add(Box.createHorizontalStrut(5));
-      add(comp);
-
-      Dimension d = getPreferredSize();
-      d.width = Integer.MAX_VALUE;
-      setMaximumSize(d);
-    }
-  }
-  /**
-   * Returns true if the data is valid, eg we have a valid parameter name
-   * and a valid type.
-   */
-/*
-  private boolean preflightData()
-  {
-    String parameterName =  nameField.getText();
-    String javaVariableNameRegExp;
-    
-    // Do a REGEXP to confirm that the variable name fits the criteria for
-    // a Java variable. We don't want to allow something like "2f", which
-    // Java will misinterpret as a number literal rather than a variable. This regexp
-    // is slightly more restrictive in that it demands that the variable name
-    // start with a lower case letter (which is not demanded by Java but is
-    // a strong convention) and disallows the underscore. "^" means it
-    // has to start with a lower case letter in the leftmost position.
-
-    javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
-    if(!Pattern.matches(javaVariableNameRegExp, parameterName))
-    {
-      JOptionPane.showMessageDialog(this,
-                                    "State variable names must start with a lower case letter and conform to the Java variable naming conventions",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-    
-    // Check to make sure the name the user specified isn't already used by a state variable
-    // or parameter.
-    
-    for(int idx = 0; idx < existingNames.size(); idx++)
-    {
-      if(parameterName.equals(existingNames.get(idx)))
-      {
-        JOptionPane.showMessageDialog(null,
-                                    "State variable names must be unique and not match any existing parameter or state variable name",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-        return false;
-      }
-    }
-
-    
-    
-    // Check to make sure the class or type exists
-    if(!ClassUtility.classExists(typeCombo.getSelectedItem().toString()))
-    {
-      JOptionPane.showMessageDialog(null,
-                                    "The class name " + typeCombo.getSelectedItem().toString() + "  does not exist on the classpath",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-
-    return true;
-  }
-*/
-  class myCloseListener extends WindowAdapter
-  {
-    public void windowClosing(WindowEvent e)
-    {
-      if(modified == true) {
-        int ret = JOptionPane.showConfirmDialog(StateVariableDialog.this,"Apply changes?",
-            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-        if(ret == JOptionPane.YES_OPTION)
-          okButt.doClick();
-        else
-          canButt.doClick();
-        }
-      else
-        canButt.doClick();
-    }
-  }
-
 }
-
-

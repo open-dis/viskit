@@ -16,13 +16,17 @@ import java.util.ArrayList;
 public class ArgumentsPanel extends ViskitTablePanel
 {
   private String[] mytitles = {"name","type","comment"};
+  private static int count=0;
 
   ArgumentsPanel(int wid)
   {
-    super(wid);            // separate constructor from initialization
-    init(true);
+    this(wid,0);
   }
-
+  ArgumentsPanel(int wid, int numRows)
+  {
+    super(wid,numRows);
+    init(true);                       // separate constructor from initialization
+  }
   public String[] getColumnTitles()
   {
     return mytitles;
@@ -37,14 +41,14 @@ public class ArgumentsPanel extends ViskitTablePanel
     if(ar.size() > 0)
       sa[2] = (String)((EventArgument)o).getComments().get(0);
     else
-      sa[2] = "comment";
+      sa[2] = "";
     return sa;
   }
 
   public Object newRowObject()
   {
     EventArgument ea = new EventArgument();
-    ea.setName("name");
+    ea.setName("arg_"+count++);
     ea.setType("int");
     return ea;
   }

@@ -15,11 +15,17 @@ import viskit.model.EventLocalVariable;
 public class LocalVariablesPanel extends ViskitTablePanel
 {
   private String[] mytitles = {"name","type","initial value","comment"};
-
+  private static int count = 0;
+  
   LocalVariablesPanel(int wid)
   {
-    super(wid);            // separate constructor from initialization
-    init(true);
+    this(wid,0);
+  }
+
+  LocalVariablesPanel(int wid, int numRows)
+  {
+    super(wid,numRows);
+    init(true);            // separate constructor from initialization
   }
 
   public String[] getColumnTitles()
@@ -39,7 +45,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
 
   public Object newRowObject()
   {
-    return new EventLocalVariable("locvar name","int","0");
+    return new EventLocalVariable("locvar_"+count++,"int","0");
   }
 
   public int getNumVisibleRows()

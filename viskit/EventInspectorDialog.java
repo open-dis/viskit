@@ -75,10 +75,10 @@ public class EventInspectorDialog extends JDialog
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
-    JPanel con = new JPanel();
-    con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
-    con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-    con.add(Box.createVerticalStrut(5));
+    JPanel threePanels = new JPanel();
+    threePanels.setLayout(new BoxLayout(threePanels, BoxLayout.Y_AXIS));
+    threePanels.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+    threePanels.add(Box.createVerticalStrut(5));
 
     // name
     JPanel namePan = new JPanel();
@@ -95,8 +95,8 @@ public class EventInspectorDialog extends JDialog
     d.width = Integer.MAX_VALUE;
     namePan.setMaximumSize(d);
 
-    con.add(namePan);
-    con.add(Box.createVerticalStrut(5));
+    threePanels.add(namePan);
+    threePanels.add(Box.createVerticalStrut(5));
 
 /*
       // delay
@@ -108,27 +108,26 @@ public class EventInspectorDialog extends JDialog
         delay.setOpaque(true);
         delay.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
       delayPan.add(delay);
-    con.add(delayPan);
-    con.add(Box.createVerticalStrut(5));
+    threePanels.add(delayPan);
+    threePanels.add(Box.createVerticalStrut(5));
 */
+    // Event arguments
+    arguments = new ArgumentsPanel(300,2);
+    arguments.setBorder(BorderFactory.createTitledBorder("Event arguments"));
+    threePanels.add(arguments);
+    threePanels.add(Box.createVerticalStrut(5));
 
+    // local vars
+    localVariables = new LocalVariablesPanel(300,2);
+    localVariables.setBorder(BorderFactory.createTitledBorder("Local variables"));
+    threePanels.add(localVariables);
+    threePanels.add(Box.createVerticalStrut(5));
+ 
     // state transitions
     transitions = new TransitionsPanel();
     transitions.setBorder(BorderFactory.createTitledBorder("State transitions"));
-    con.add(transitions);
-    con.add(Box.createVerticalStrut(5));
-
-    // local vars
-    localVariables = new LocalVariablesPanel(300);
-    localVariables.setBorder(BorderFactory.createTitledBorder("Local variables"));
-    con.add(localVariables);
-    con.add(Box.createVerticalStrut(5));
-
-    // Event arguments
-    arguments = new ArgumentsPanel(300);
-    arguments.setBorder(BorderFactory.createTitledBorder("Event arguments"));
-    con.add(arguments);
-    con.add(Box.createVerticalStrut(5));
+    threePanels.add(transitions);
+    threePanels.add(Box.createVerticalStrut(5));
 
     // buttons
     JPanel buttPan = new JPanel();
@@ -138,9 +137,9 @@ public class EventInspectorDialog extends JDialog
     buttPan.add(Box.createHorizontalGlue());
     buttPan.add(canButt);
     buttPan.add(okButt);
-    con.add(buttPan);
+    threePanels.add(buttPan);
 
-    cont.add(con);
+    cont.add(threePanels);
 
     fillWidgets();     // put the data into the widgets
     sizeAndPosition();

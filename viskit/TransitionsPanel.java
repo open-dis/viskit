@@ -23,7 +23,7 @@ import java.util.Iterator;
  * Time: 2:56:21 PM
  */
 
-public class TransitionsPanel extends JPanel implements ActionListener
+public class TransitionsPanel extends JPanel //implements ActionListener
 {
   JTextArea jta;
   JList lis;
@@ -50,9 +50,6 @@ public class TransitionsPanel extends JPanel implements ActionListener
     p.add(Box.createHorizontalGlue());
     add(p);
 
-    //jta = new JTextArea(5,1);
-    //JScrollPane jsp = new JScrollPane(jta);
-    //add(jsp);
     model = new myListModel();
     model.addElement("1");model.addElement("2"); model.addElement("3");
     lis = new JList(model);
@@ -93,18 +90,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
 
     dd = this.getPreferredSize();
     this.setMinimumSize(dd);
-/*   do test on "apply changes"
-    JPanel bp = new JPanel();
-    bp.setLayout(new BoxLayout(bp,BoxLayout.X_AXIS));
-    bp.add(Box.createHorizontalGlue());
 
-    testButt = new JButton("test");
-    bp.add(testButt);
-    bp.add(Box.createHorizontalGlue());
-
-    add(bp);
-    testButt.addActionListener(this);
-*/
     plusButt.addActionListener(new plusButtonListener());
     minusButt.addActionListener(new minusButtonListener());
     lis.addListSelectionListener(new myListSelectionListener());
@@ -116,7 +102,6 @@ public class TransitionsPanel extends JPanel implements ActionListener
             if(myMouseLis != null) {
             int idx = lis.getSelectedIndex();
               EventStateTransition est = (EventStateTransition)arLis.get(idx);
-              //EventStateTransition est = (EventStateTransition)model.get(lis.getSelectedIndex()); //.getSelectedRow());
               event.setSource(est);
               myMouseLis.mouseClicked(event);
             }
@@ -143,17 +128,17 @@ public class TransitionsPanel extends JPanel implements ActionListener
   }
   private String transitionString(EventStateTransition est)
   {
-    String tstring = "";
-    if(est.isOperation()) {
-      //tstring += "(" + est.getStateVarType() +") ";
-      tstring += est.getStateVarName();
+    String tstring = est.getStateVarName();
+    if(est.getStateVarType().indexOf('[') != -1) {
+      tstring += "[";
+      tstring += est.getIndexingExpression();
+      tstring += "]";
+    }
+    if(est.isOperation())
       tstring += "." + est.getOperationOrAssignment() + "\n";
-    }
-    else {
-      //tstring += "(" + est.getStateVarType() + ") ";
-      tstring += est.getStateVarName() + " = ";
-      tstring += est.getOperationOrAssignment() + "\n";
-    }
+    else
+      tstring += " = " + est.getOperationOrAssignment() + "\n";
+
     return tstring;
   }
   public void clearTransitions()
@@ -161,16 +146,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
     model.removeAllElements();
     arLis.clear();
   }
-  public void xsetString(String s)
-  {
-    model.removeAllElements();
-    if(s.length() <= 0) return;   // this is important.  Don't put an empty string on a list and expect normal behavior
-    String[] elems = s.split("\n");
-    for(int i=0;i<elems.length;i++) {
-      model.addElement(elems[i]);
-    }
-    //lis.setVisibleRowCount(Math.max(elems.length,3));
-  }
+
   public String getString()
   {
     String s = "";
@@ -184,6 +160,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
     }
     return s.substring(0,s.length()-1);     // lose last cr
   }
+/*
   public void actionPerformed(ActionEvent event)
   {
     try {
@@ -210,6 +187,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
     }
 
   }
+*/
   private ActionListener myPlusListener;
   public void addPlusListener(ActionListener al)
   {
@@ -250,10 +228,18 @@ public class TransitionsPanel extends JPanel implements ActionListener
       lis.ensureIndexIsVisible(model.getSize()-1);
       TransitionsPanel.this.invalidate();
       minusButt.setEnabled(true);
-      arLis.add(new EventStateTransition());
-      //testButt.setEnabled(true);
+      EventStateTransition est = new EventStateTransition();
+      arLis.add(est);
       if(myPlusListener != null)
         myPlusListener.actionPerformed(event);
+/*
+      // This does an edit immediately, and doesn't require a separate double click
+      if(myMouseLis != null) {
+        MouseEvent me = new MouseEvent(plusButt,0,0,0,0,0,2,false);   // plusButt temporarily used
+        me.setSource(est);
+        myMouseLis.mouseClicked(me);
+      }
+*/
     }
   }
   class minusButtonListener implements ActionListener
@@ -270,7 +256,6 @@ public class TransitionsPanel extends JPanel implements ActionListener
         }
       if(lis.getModel().getSize() <= 0) {
         minusButt.setEnabled(false);
-        //testButt.setEnabled(false);
       }
       lis.setVisibleRowCount(model.getSize());
       TransitionsPanel.this.invalidate();
@@ -288,14 +273,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
       if(lis.getModel().getSize() != 0) {
         boolean b = lis.getSelectedValue() != null;
         minusButt.setEnabled(b);
-        //testButt.setEnabled(b);
       }
     }
-  }
-
-  public boolean testJavaCode()
-  {
-    actionPerformed(null);
-    return true;            // todo putup a JOptionPane w/ ok/nogo etc.
   }
 }

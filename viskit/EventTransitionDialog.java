@@ -27,9 +27,9 @@ public class EventTransitionDialog extends JDialog
 {
   private JTextField nameField;    // Text field that holds the parameter name
   private JTextField actionField;
+  private JTextField arrayIndexField;
   private JTextField commentField;          // Text field that holds the comment
-  private JComboBox  parameterTypeCombo;    // Editable combo box that lets us select a type
-  private JComboBox  testVars;
+  private JComboBox  stateVarsCB;
   private JRadioButton assTo,opOn;
 
   private static EventTransitionDialog dialog;
@@ -38,7 +38,8 @@ public class EventTransitionDialog extends JDialog
   private Component locationComp;
   private JButton okButt, canButt;
 
-  public static String newName, newType, newComment;
+  public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
+  public static boolean newIsOperation;
 
   public static boolean showDialog(JFrame f, Component comp, EventStateTransition parm)
   {
@@ -63,54 +64,57 @@ public class EventTransitionDialog extends JDialog
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
 
-     JPanel con = new JPanel();
-     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-     con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+      JPanel con = new JPanel();
+      con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
+      con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
       con.add(Box.createVerticalStrut(5));
-      JPanel fieldsPanel = new JPanel();
+        JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel,BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("state variable");
-        //JLabel initLab = new JLabel("initial value");
-        assTo = new JRadioButton("assign to (\"=\")");
-        opOn  = new JRadioButton("invoke on (\".\")");
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(assTo);bg.add(opOn);
+          JLabel nameLab = new JLabel("state variable");
+          JLabel arrayIdxLab = new JLabel("array indexing expression");
 
-        JLabel actionLab = new JLabel("action");
-        JLabel commLab = new JLabel("state var. comment");
-        int w = maxWidth(new JComponent[]{nameLab,assTo,opOn,actionLab,commLab});
+          assTo = new JRadioButton("assign to (\"=\")");
+          opOn  = new JRadioButton("invoke on (\".\")");
+          ButtonGroup bg = new ButtonGroup();
+            bg.add(assTo);bg.add(opOn);
 
-        nameField = new JTextField(15);   setMaxHeight(nameField);
+          JLabel actionLab = new JLabel("action");
+          JLabel commLab = new JLabel("state var. comment");
+          int w = maxWidth(new JComponent[]{nameLab,assTo,opOn,actionLab,commLab});
 
- testVars = new JComboBox(VGlobals.instance().getStateVarsCBModel());
-        setMaxHeight(testVars);
-    testVars.setBackground(Color.white);
+          nameField = new JTextField(15);   setMaxHeight(nameField);
 
-        commentField       = new JTextField(25);   setMaxHeight(commentField);
-          commentField.setEditable(false);
-        actionField        = new JTextField(25);   setMaxHeight(actionField);
+          stateVarsCB = new JComboBox(VGlobals.instance().getStateVarsCBModel());
+            setMaxHeight(stateVarsCB);
+            stateVarsCB.setBackground(Color.white);
 
-        fieldsPanel.add(new OneLinePanel(nameLab,w,testVars));
+          commentField       = new JTextField(25);   setMaxHeight(commentField);
+            commentField.setEditable(false);
+          actionField        = new JTextField(25);   setMaxHeight(actionField);
+          arrayIndexField    = new JTextField(25);   setMaxHeight(arrayIndexField);
+
+        fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarsCB));
+        fieldsPanel.add(new OneLinePanel(arrayIdxLab,w,arrayIndexField));
         fieldsPanel.add(new OneLinePanel(null,w,assTo));
         fieldsPanel.add(new OneLinePanel(null,w,opOn));
         fieldsPanel.add(new OneLinePanel(actionLab,w,actionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
 
-       con.add(fieldsPanel);
-       con.add(Box.createVerticalStrut(5));
+      con.add(fieldsPanel);
+      con.add(Box.createVerticalStrut(5));
 
-       JPanel buttPan = new JPanel();
+        JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+          canButt = new JButton("Cancel");
+          okButt = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttPan.add(canButt);
         buttPan.add(okButt);
-       con.add(buttPan);
-       con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+      con.add(buttPan);
+      con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
       cont.add(con);
 
     fillWidgets();     // put the data into the widgets
@@ -128,11 +132,11 @@ public class EventTransitionDialog extends JDialog
     okButt .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener();
-    this.nameField.addCaretListener(lis);
+    nameField.addCaretListener(lis);
+    arrayIndexField.addCaretListener(lis);
     actionField.addCaretListener(lis);
-    this.commentField.      addCaretListener(lis);
-    //this.parameterTypeCombo.addActionListener(lis);
-    testVars.addActionListener(new ActionListener()
+    commentField.      addCaretListener(lis);
+    stateVarsCB.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
@@ -144,8 +148,8 @@ public class EventTransitionDialog extends JDialog
       }
     });
     // to start off:
-    if(testVars.getItemCount() > 0)
-      commentField.setText(((vStateVariable)testVars.getItemAt(0)).getComment());
+    if(stateVarsCB.getItemCount() > 0)
+      commentField.setText(((vStateVariable)stateVarsCB.getItemAt(0)).getComment());
     else
       commentField.setText("");
     
@@ -190,7 +194,7 @@ public class EventTransitionDialog extends JDialog
     if(param != null) {
       //nameField.setText(param.getStateVarName());//getName());
       actionField.setText(param.getOperationOrAssignment());
-
+      arrayIndexField.setText(param.getIndexingExpression());
       opOn.setSelected(param.isOperation());
       assTo.setSelected(!param.isOperation());
 
@@ -199,35 +203,38 @@ public class EventTransitionDialog extends JDialog
         commentField.setText((String)param.getComments().get(0));
       else
         commentField.setText("");
-      testVars.setModel(VGlobals.instance().getStateVarsCBModel());   // get new ones
+      stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());   // get new ones
     }
     else {
-      nameField.setText("param name");
-      actionField.setText("action here");
-      testVars.setSelectedIndex(0);
-      commentField.setText("comments here");
+      nameField.setText("");
+      actionField.setText("");
+      arrayIndexField.setText("");
+      stateVarsCB.setSelectedIndex(0);
+      commentField.setText("");
       assTo.setSelected(true);
     }
   }
 
   private void setVarNameComboBox(EventStateTransition est)
   {
-    for(int i = 0; i< testVars.getItemCount();i++) {
-      vStateVariable sv = (vStateVariable)testVars.getItemAt(i);
+    for(int i = 0; i< stateVarsCB.getItemCount();i++) {
+      vStateVariable sv = (vStateVariable)stateVarsCB.getItemAt(i);
       if(est.getStateVarName().equalsIgnoreCase(sv.getName())) {
-        testVars.setSelectedIndex(i);
+        stateVarsCB.setSelectedIndex(i);
         return;
       }
     }
     if(!est.getStateVarName().equals(""))     // for first time
       JOptionPane.showMessageDialog(this,"State variable "+est.getStateVarName() +"not found.",
                                          "alert", JOptionPane.ERROR_MESSAGE);
-   // testVars.setSelectedIndex(0);
+   // stateVarsCB.setSelectedIndex(0);
   }
   private void unloadWidgets()
   {
     if(param != null) {
-      param.setStateVarName(((vStateVariable)testVars.getSelectedItem()).getName()); //nameField.getText().trim());
+      param.setStateVarName(((vStateVariable)stateVarsCB.getSelectedItem()).getName());
+      param.setStateVarType(((vStateVariable)stateVarsCB.getSelectedItem()).getType());
+      param.setIndexingExpression(arrayIndexField.getText().trim());
       param.setOperationOrAssignment(actionField.getText().trim());
       param.setOperation(opOn.isSelected());
       param.getComments().clear();
@@ -236,9 +243,12 @@ public class EventTransitionDialog extends JDialog
         param.getComments().add(0,cs);
     }
     else {
-      newName    = nameField.getText().trim();
-      // todo complete this
-      newComment = commentField.getText().trim();
+      newStateVarName    = ((vStateVariable)stateVarsCB.getSelectedItem()).getName();
+      newStateVarType    = ((vStateVariable)stateVarsCB.getSelectedItem()).getType();
+      newIndexExpression = arrayIndexField.getText().trim();
+      newAction          = actionField.getText().trim();
+      newIsOperation     = opOn.isSelected();
+      newComment         = commentField.getText().trim();
     }
   }
 

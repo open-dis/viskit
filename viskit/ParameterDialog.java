@@ -37,6 +37,8 @@ public class ParameterDialog extends JDialog
 
   public static String newName, newType, newComment;
 
+  private static int count = 0;
+
   public static boolean showDialog(JFrame f, Component comp, vParameter parm)
   {
     if(dialog == null)
@@ -174,9 +176,9 @@ public class ParameterDialog extends JDialog
       this.commentField.setText(param.getComment());
     }
     else {
-      parameterNameField.setText("param name");
+      parameterNameField.setText("param_"+count++);
       //expressionField.setText("type");
-      commentField.setText("comments here");
+      commentField.setText("");
     }
   }
 
