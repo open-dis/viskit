@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="PBMM" extend="simkit.smdx.PathMoverManager" package="examples.movers.wfpsim" author="rmgoldbe" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity extend="simkit.smdx.PathMoverManager" author="rmgoldbe" version="1.0" package="examples.movers.wfpsim" name="PBMM" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>PatrolBoatMoverManager ( PBMM for short )</Comment>
     <Parameter name="patrolBoatMover" type="simkit.smdx.UniformLinearMover">
         <Comment/>
@@ -7,13 +7,13 @@
     <Parameter name="path" type="java.awt.geom.Point2D[]">
         <Comment/>
     </Parameter>
-    <StateVariable name="wayPoint" type="int">
+    <StateVariable type="int" name="wayPoint">
         <Comment/>
     </StateVariable>
-    <StateVariable name="patrolling" type="boolean">
+    <StateVariable type="boolean" name="patrolling">
         <Comment/>
     </StateVariable>
-    <StateVariable name="patrolBoat" type="simkit.smdx.UniformLinearMover">
+    <StateVariable type="simkit.smdx.UniformLinearMover" name="patrolBoat">
         <Comment/>
     </StateVariable>
     <Event name="Run">
@@ -24,36 +24,40 @@
         <StateTransition state="patrolBoat">
             <Assignment value="patrolBoatMover"/>
         </StateTransition>
-        <Coordinate y="55" x="46"/>
+        <Coordinate x="46" y="55"/>
     </Event>
     <Event name="StartPatrolling">
         <Comment/>
         <StateTransition state="patrolling">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule event="NextWayPt" delay="0.0" condition="patrolling" priority="0">
+        <Schedule delay="0.0" event="NextWayPt" priority="0" condition="patrolling">
             <Comment/>
         </Schedule>
-        <Coordinate y="175" x="48"/>
+        <Coordinate x="48" y="175"/>
     </Event>
     <Event name="NextWayPt">
         <Comment/>
         <StateTransition state="patrolBoat">
             <Operation method="moveTo(path[wayPoint])"/>
         </StateTransition>
-        <Schedule event="StartMove"/>
-        <Coordinate y="203" x="219"/>
+        <Schedule delay="0.0" event="StartMove" priority="0" condition="true">
+            <Comment/>
+            <EdgeParameter value="getPatrolBoat()"/>
+        </Schedule>
+        <Coordinate x="219" y="203"/>
     </Event>
     <Event name="StartMove">
         <Comment/>
-        <LocalVariable value="null" name="tgt" type="simkit.smdx.UniformLinearMover">
+        <Argument name="m" type="simkit.smdx.UniformLinearMover"/>
+        <LocalVariable type="simkit.smdx.UniformLinearMover" value="m" name="tgt">
             <Comment/>
         </LocalVariable>
-        <Schedule event="EndMove" delay="patrolBoat.getMoveTime()" condition="true" priority="0">
+        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="0" condition="true">
             <Comment/>
             <EdgeParameter value="tgt"/>
         </Schedule>
-        <Coordinate y="114" x="419"/>
+        <Coordinate x="419" y="114"/>
     </Event>
     <Event name="EndMove">
         <Comment/>
@@ -62,11 +66,11 @@
             <Assignment value="wayPoint + ((wayPoint &gt;= (path.length-1))?1:-wayPoint)"/>
         </StateTransition>
         <Schedule event="NextWayPt"/>
-        <Schedule event="EndIntercept" delay="0.0" condition="(!patrolling) &amp;&amp; (tgt != null)" priority="0">
+        <Schedule delay="0.0" event="EndIntercept" priority="0" condition="(!patrolling) &amp;&amp; (tgt != null)">
             <Comment/>
             <EdgeParameter value="tgt"/>
         </Schedule>
-        <Coordinate y="319" x="424"/>
+        <Coordinate x="424" y="319"/>
     </Event>
     <Event name="Intercept">
         <Comment>Notes: the thesis shows a schedule from EndMove if another Intercept is immediately ready</Comment>
@@ -79,11 +83,11 @@
             <Assignment value="false"/>
         </StateTransition>
         <Cancel event="EndMove"/>
-        <Schedule event="EndMove" delay="patrolBoat.getMoveTime()" condition="true" priority="0">
+        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="0" condition="true">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
-        <Coordinate y="324" x="50"/>
+        <Coordinate x="50" y="324"/>
     </Event>
     <Event name="EndIntercept">
         <Comment/>
@@ -91,7 +95,7 @@
         <StateTransition state="patrolling">
             <Assignment value="true"/>
         </StateTransition>
-        <Coordinate y="460" x="417"/>
+        <Coordinate x="417" y="460"/>
     </Event>
     <Event name="Stop">
         <Comment/>
@@ -102,7 +106,7 @@
             <Operation method="stop()"/>
         </StateTransition>
         <Cancel event="EndMove"/>
-        <Coordinate y="462" x="58"/>
+        <Coordinate x="58" y="462"/>
     </Event>
 </SimEntity>
 
