@@ -1,6 +1,7 @@
 package viskit;
 
 import viskit.model.vStateVariable;
+import viskit.model.ViskitModel;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -35,6 +36,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 
   private myFocusListener focList;
   private Component       myTyperComponent;       // i.e., the editor of the type JComboBox
+  private EventGraphViewFrame parent;             // todo fix this, this class need ref to method in model
 
   public static boolean showDialog(JFrame f, Component comp, vStateVariable var)
   {
@@ -44,6 +46,8 @@ public class StateVariableDialog extends ViskitSmallDialog
   protected StateVariableDialog(JFrame parent, Component comp, Object param)
   {
     super(parent, "State Variable Declaration", true);
+    this.parent = (EventGraphViewFrame)parent;
+
     focList = new myFocusListener();
 
     this.stVar = (vStateVariable)param;
@@ -182,7 +186,7 @@ public class StateVariableDialog extends ViskitSmallDialog
       arrSizeLab.setEnabled(isArray);
     }
     else {
-      stateVarNameField.setText("state_"+count++);
+      stateVarNameField.setText(((ViskitModel)parent.getModel()).generateStateVariableName()); //"state_"+count++);
       String ty = (String)stateVarTypeCombo.getSelectedItem();
       boolean isArray = ty.indexOf('[') != -1;
       commentField.setText("");
