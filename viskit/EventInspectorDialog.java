@@ -73,12 +73,13 @@ public class EventInspectorDialog extends JDialog
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
-    Container cont = getContentPane();
+    JPanel cont = new JPanel();
+    setContentPane(cont);
+    cont.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
     JPanel threePanels = new JPanel();
     threePanels.setLayout(new BoxLayout(threePanels, BoxLayout.Y_AXIS));
-    threePanels.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
     threePanels.add(Box.createVerticalStrut(5));
 
     // name
