@@ -38,7 +38,8 @@ import javax.xml.bind.Marshaller;
 import viskit.xsd.bindings.assembly.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import simkit.random.RandomNumber;
+import simkit.random.MersenneTwister;
 
 /**
  *
@@ -388,14 +389,16 @@ public class SimkitAssemblyXML2Java {
         
         
         
-	ListIterator lili = this.root.getPropertyChangeListener().listIterator();
+	ListIterator li = this.root.getPropertyChangeListener().listIterator();
 
-	while ( lili.hasNext() ) {
-	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)lili.next();
+	while ( li.hasNext() ) {
+	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)li.next();
 	    List tparam = pcl.getParameters(); 
 	    ListIterator tparami = tparam.listIterator();
-	    pw.println(sp8 + "java.beans.PropertyChangeListener" + sp + pcl.getName() + sp + eq + sp);
-	    pw.print(sp12 + nw + sp + pcl.getType() + lp);
+            
+            
+	    pw.println(sp4 + "java.beans.PropertyChangeListener" + sp + pcl.getName() + sp + eq + sp);
+	    pw.print(sp8 + nw + sp + pcl.getType() + lp);
 	    if ( tparami.hasNext() ) {
 	        while ( tparami.hasNext() ) {
 		    // note, check if PropertyChangeListeners can have more than one
@@ -408,12 +411,12 @@ public class SimkitAssemblyXML2Java {
 	    pw.println();
 	} 
 
-	lili = this.root.getAdapter().listIterator();
+	li = this.root.getAdapter().listIterator();
         
-        while ( lili.hasNext() ) {
-            AdapterType a = (AdapterType)lili.next();
+        while ( li.hasNext() ) {
+            AdapterType a = (AdapterType)li.next();
             String n = a.getName();
-            pw.print(sp8 + "simkit.Bridge" + sp + n + sp + eq + sp + nw + sp + "simkit.Bridge");
+            pw.print(sp4 + "simkit.Bridge" + sp + n + sp + eq + sp + nw + sp + "simkit.Bridge");
             pw.println(lp + qu + a.getEventHeard() + qu + cm + sp + qu + a.getEventSent() + qu + rp + sc);
             pw.println();
         }
@@ -464,6 +467,9 @@ public class SimkitAssemblyXML2Java {
             pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
             pw.println();    
         }
+        
+
+        
         pw.println(sp4 + cb);
 	pw.println();
     }
@@ -479,8 +485,15 @@ public class SimkitAssemblyXML2Java {
 
 	ListIterator outputs = this.root.getOutput().listIterator();
 	while ( outputs.hasNext() ) {
-	    SimEntityType entity = (SimEntityType)((OutputType)outputs.next()).getEntity();
-	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + entity.getName() + rp + sc);
+            Object elem = ((OutputType)outputs.next()).getEntity();
+            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
+            
+            if ( elem instanceof SimEntityType ) {
+                name = ((SimEntityType)elem).getName();
+            } else if ( elem instanceof PropertyChangeListenerType ) {
+                name = ((PropertyChangeListenerType)elem).getName();
+            }
+	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + name + rp + sc);
 	}
     }
 
@@ -498,7 +511,18 @@ public class SimkitAssemblyXML2Java {
 
 	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
 	    pw.println(sp8 + "Schedule" + pd + "startSimulation" + lp + rp + sc);
+
 	}
+        
+        List pclList = this.root.getPropertyChangeListener();
+        Iterator it = pclList.iterator();
+            
+        while ( it.hasNext() ) {
+            String name;
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType)(it.next());
+            pw.println(sp8 + "System.out.println"+lp+"asm"+pd+pcl.getName()+pd+"toString"+lp+rp+rp+sc);
+        }
+        
 	pw.println();
 	pw.println(sp4 + cb);
 	pw.println(cb);
@@ -634,12 +658,12 @@ public class SimkitAssemblyXML2Java {
         unmarshal();
         
         ExperimentType exp = root.getExperiment();
-        exp.setRunID(fileBaseName+" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
+        exp.setBatchID(fileBaseName+" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
         
         List designPoints = exp.getDesignPoint();
         DesignPointType designPoint = (DesignPointType)(designPoints.get(taskID-1));
         List designParams = designPoint.getTerminalParameter();
-        List params = root.getTerminalParameter();
+        List params = root.getDesignParameters();
         Iterator itd = designParams.iterator();
         Iterator itp = params.iterator();
         
@@ -745,51 +769,46 @@ public class SimkitAssemblyXML2Java {
     public void doLocalTask() {
         boolean batch;
         
-        java.util.List params = root.getTerminalParameter();
+        java.util.List params = root.getDesignParameters();
         batch = !params.isEmpty();
         
         if ( batch ) {
             
-            try { 
-                ObjectFactory of = new ObjectFactory();
-                root.setExperiment(of.createExperiment());
-                root.getExperiment().setRunID(fileBaseName+": "+(new java.util.Date()).toString());
-                java.util.HashMap values = new java.util.HashMap();
-                Iterator it = params.iterator();
+            if (root.getExperiment() == null) { // in test mode
                 
-                while (it.hasNext()) {
-                    
-                    TerminalParameterType t = (TerminalParameterType) (it.next());
-                    System.out.println("Batch Mode "+t);
-                    List exprList = t.getContent();
-                    Iterator itex = exprList.iterator();
-                    Object returns = null;
-                    while (itex.hasNext()) {
-                        String expr = (String)itex.next();
-                        bsh.Interpreter bsh = new bsh.Interpreter();
-                        try {
-                            bsh.eval(expr); 
-                            returns = bsh.eval(t.getName()+"();");
-                            System.out.println(expr+" returns "+returns);
-                            values.put(t,returns);
-                            
-                        } catch (bsh.EvalError ee) {
-                            ee.printStackTrace();
-                        } 
-                    }
-                }
-                if (values.size() > 0) {
-                    iterate(values,values.size()-1);
-                }
-                String experimentsFileName = fileBaseName + "Exp.xml";
-                System.out.println("Creating experiments: "+experimentsFileName);
-                marshal(new File(experimentsFileName));
                 try {
-                    Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+getCount(),"-S","/bin/bash","./gridrun.sh",experimentsFileName});
-                } catch (java.io.IOException ioe) {
-                    ioe.printStackTrace();
+                    ObjectFactory of = new ObjectFactory();
+                    ExperimentType e = of.createExperiment();
+                    e.setBatchID(fileBaseName+": "+(new java.util.Date()).toString());
+                    e.setType("full-factorial");
+                    root.setExperiment(e);
+                    doFullFactorial();
+                } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
+
+            } else { // take a Script or use built ins
+                
+                String expType = root.getExperiment().getType();
+                bsh.Interpreter bsh = new bsh.Interpreter();
+                
+                if (expType.equals("full-factorial")) {
+                    doFullFactorial();
+                } else if (expType.equals("latin-hypercube")) {
+                    doLatinHypercube();
                 }
-            } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
+
+                //bsh.eval(root.getExperiment().getScript());
+                
+            }
+            
+            String experimentsFileName = fileBaseName + "Exp.xml";
+            System.out.println("Creating experiments: "+experimentsFileName);
+            marshal(new File(experimentsFileName));
+            try {
+                Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+getCount(),"-S","/bin/bash","./gridrun.sh",experimentsFileName});
+            } catch (java.io.IOException ioe) {
+                ioe.printStackTrace();
+            }
+
         } else {
             System.out.println("Generating Java Source...");
 
@@ -824,21 +843,42 @@ public class SimkitAssemblyXML2Java {
 
     }
     
-    private void incrementCount() {
-        ++this.count;
-    }
     
-    private int getCount() {
-        return count;
-    }
-    
-    private void incrementTotalResults() {
-        ++this.totalResults;
-        System.out.println(totalResults+" of "+count);
-    }
-    
-    private int getTotalResults() {
-        return totalResults;
+    public void doFullFactorial() {
+        try { 
+            List params = root.getDesignParameters();
+            ObjectFactory of = new ObjectFactory();
+            root.setExperiment(of.createExperiment());
+            root.getExperiment().setBatchID(fileBaseName+": "+(new java.util.Date()).toString());
+            java.util.HashMap values = new java.util.HashMap();
+            Iterator it = params.iterator();
+            
+            while (it.hasNext()) {
+                
+                TerminalParameterType t = (TerminalParameterType) (it.next());
+                System.out.println("Batch Mode "+t);
+                List exprList = t.getContent();
+                Iterator itex = exprList.iterator();
+                Object returns = null;
+                while (itex.hasNext()) {
+                    String expr = (String)itex.next();
+                    bsh.Interpreter bsh = new bsh.Interpreter();
+                    try {
+                        bsh.eval(expr);
+                        returns = bsh.eval(t.getName()+"();");
+                        System.out.println(expr+" returns "+returns);
+                        values.put(t,returns);
+                        
+                    } catch (bsh.EvalError ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+            if (values.size() > 0) {
+                iterate(values,values.size()-1);
+            }
+        } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
+
     }
     
     void iterate(HashMap values, int depth) {
@@ -883,6 +923,418 @@ public class SimkitAssemblyXML2Java {
         
     }
     
+    // really "doStochasticallyJitteredRandomLatinHyperCube()
+    public void doLatinHypercube() {
+        ExperimentType experiment = root.getExperiment();
+        int runs = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+        String initScript = experiment.getScript();
+        bsh.Interpreter bsh = new bsh.Interpreter();
+        
+        // here we can use initScript to optionally set values before each set of Runs.
+        // eg.
+        // <Script> server.getServiceTime().getRandomNumber().resetSeed(); </Script>
+        // so, the script should get copied into each DesignPoint instance.
+        
+        // the DesignParameters return a range of values as per the FullFactorial
+        // each range is divided into runs bins of equal probability. Each bin is
+        // numbered from 0 to runs-1. runs should be the number of DesignParameters.
+        // An index runs x runs matrix is created in the form of of a
+        // Random Latin Square. A Random Latin Square is one whose first row and
+        // column contain a random permutation of {sequence 0...runs-1} .
+        // Each sub matrix is created by selecting values that are not in the
+        // row or column of the super matrix. To improve randomization, rather
+        // than take the value of the range at the bin number in the stratification,
+        // a uniformly chosen sample is taken from the bin for each design point,
+        // which stochastically jitters the sample points. The Latin
+        // part is that the index matrix is Latin, which represent probabiliy bins
+        // to select from, not interpolated values of the ranges. For small number
+        // of variates, more samples from each Latin square should be run per per
+        // Experiment. That is, each Latin square is capable of generating an infinite
+        // number of similar jittered DesignPoints, and there are finite Latin square
+        // combinations. In general, the number of Latin square combinations is far
+        // less than the number of FullFactorial combinations and converges as fast,
+        // even so, there can be a large number of Latin squares, so in the case of
+        // a large number of variates, it may not be essential to select more than
+        // one sample set from each Latin square.
+        
+        int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
+        int size = root.getDesignParameters().size();
+        LatinSquares latinSquares = new LatinSquares(size);
+        List designParams = root.getDesignParameters();
+        List designPoints = root.getExperiment().getDesignPoint();
+        ObjectFactory of = new ObjectFactory();
+        HashMap values = new java.util.HashMap();
+        MersenneTwister rnd = new MersenneTwister();
+        
+        for ( int i = 0; i < totalSamples; i++ ) {
+            
+            int[] matrixRows = latinSquares.getRandomLatinSquare();
+            int[] row;
+            
+            for ( int j = 0 ; j < matrixRows.length; j++) {
+                try {
+                    DesignPointType designPt = of.createDesignPoint();
+                    Iterator it = designParams.iterator();
+                    row = latinSquares.getRow(matrixRows[j]);
+                    int ct = 0;
+                    
+                    while ( it.hasNext() ) {
+                        
+                        TerminalParameterType tp = of.createTerminalParameter();
+                        TerminalParameterType dp = (TerminalParameterType)it.next();
+                        List exprList = dp.getContent();
+                        Iterator itex = exprList.iterator();
+                        Object returns = null;
+                        
+                        while (itex.hasNext()) {
+                            String expr = (String)itex.next();
+                            bsh = new bsh.Interpreter();
+                            try {
+                                bsh.eval(expr);
+                                returns = bsh.eval(dp.getName()+"();");
+                                System.out.println(expr+" returns "+returns);
+                                values.put(dp,returns);
+                                
+                            } catch (bsh.EvalError ee) {
+                                ee.printStackTrace();
+                            }
+                        }
+                        
+                        Object[] range = (Object[]) values.get(dp);
+                        
+                        // create sample "stratified" from n=size equal probability bins
+                        // over range; this will "jitter" the sample if used repeatedly,
+                        // while maintaining proximity to the same hypersurface anchor points
+                        
+                        if (range[0] instanceof Double) { // right now accept Double[2], spline TBD
+                            
+                            double dt = ((Double)(range[0])).doubleValue() -
+                                    ((Double)(range[1])).doubleValue();
+                            double ddt = dt/(double)size;
+                            double sampleOffset = ddt*rnd.draw(); // fits in bin
+                            double sample = ddt*row[ct] + sampleOffset;
+                            
+                            tp.setValue(""+sample);
+                            tp.setType(dp.getType());
+                            
+                            
+                        } else if (range[0] instanceof Integer) { // or accept Integer[size]
+                            
+                            tp.setValue(range[row[ct]].toString());
+                            tp.setType(dp.getType());
+                            
+                        }
+                        
+                        designPt.getTerminalParameter().add(tp);
+                        ct++; //
+                    }
+                    
+                    designPoints.add(designPt);
+                    
+                } catch (javax.xml.bind.JAXBException jaxbe) { jaxbe.printStackTrace(); }
+                
+            }
+        }
+        
+    }
+    
+    
+     // given the complete set of permutations, find unique LatinSquares
+     // can also generate a nearest random LHS, given a random long.
+    
+     public class LatinSquares {
+	public Permutator p;
+        ArrayList squares; // represented by arrays of indices to permutations
+        int[][] permutations; // all n! permutations of 1..n wide alphabet
+	int size;
+
+	//to test outside of GridKit
+	//public static void main(String args[]) {
+	    //LatinSquares l = new LatinSquares(Integer.parseInt(args[0]));
+            //
+	    //l.search();
+	    //l.report();
+        //}
+
+        LatinSquares(int size) {
+	    p = new Permutator(size);
+            squares = new ArrayList();
+            this.permutations = p.getPermutations();
+	    this.size = size;
+        }
+
+	void search() {
+
+	    while ( p.hasNextMatrix() ) {
+		if ( p.unique() ) {
+		    int[] matrix = p.getNextMatrix();
+	 	    if ( isLatin(matrix) ) {
+		        outputArray(matrix);
+		        squares.add(matrix);
+		    }	
+		}
+	    }
+	    
+	}
+        
+        int[] getRandomLatinSquare() {
+            int[] matrix = new int[size];
+            
+            p.randomSquare();
+            
+            while ( !isLatin(matrix) ) {
+                if ( p.hasNextMatrix() ) {
+                    matrix = p.getNextMatrix();
+                } else {
+                    while ( !p.hasNextMatrix() ) { // in rare cases
+                        p.randomSquare();
+                        matrix=p.getNextMatrix();
+                    }
+                }
+            }
+       
+            return matrix;
+        }
+        
+        // row should be used READ ONLY
+        int[] getRow(int i) {
+            return p.perms[i];
+        }
+
+	void report() {
+	    System.out.println("-------------------");
+	    System.out.println("generating complete");
+	    java.util.Iterator i = squares.iterator();
+	    while ( i.hasNext() ) {
+		outputArray((int[])i.next());
+	    }
+	}
+        
+        boolean isLatin(int[] rows) {
+            for ( int i = 0; i < rows.length; i++ ) {
+		for ( int j = i+1; j < rows.length; j++ ) {
+			if (!uniqueColumns(i,j,rows)) {
+			    return false;
+			}
+		}
+
+	    }
+	    return true;
+        }
+        
+        boolean uniqueColumns(int i, int j, int[] rows) {
+            for ( int k = 0; k< rows.length; k++) {
+                if (permutations[rows[i]][k] == permutations[rows[j]][k])
+		    return false;
+            }
+
+            return true;
+            
+        }
+
+	void output(int row) {
+
+	    System.out.println("Row: "+row);
+	    if(row>-1)
+	    for ( int i = 0 ; i < permutations[row].length; i++ ) {
+		
+
+		System.out.print(permutations[row][i]+" ");
+	    }
+	    System.out.println();
+	}
+	
+	void outputArray(int[] array) {
+	    for ( int i = 0; i < array.length; i++ ) {
+		for ( int j = 0; j < array.length; j++ ) {
+		    if ( array[i] == -1 ) System.out.print("-1");
+		    else System.out.print(permutations[array[i]][j]);
+		    System.out.print(" ");
+		}
+		System.out.println();
+	    }
+
+	    System.out.println("-----------------");
+	}
+
+	void outputMutation(int[] array) {
+	    for ( int j = 0; j < array.length; j++ ) 
+		System.out.print(array[j]+" ");
+	
+	    System.out.println();
+	}
+
+    }
+     
+    public class Permutator {
+        MersenneTwister rnd;
+        ArrayList set;
+        int size;
+        int totalSize;
+        int[][] perms;
+        int count = 0;
+	boolean hasNext;
+	int next = 0;
+	int[] dials;
+        
+        public Permutator(int size) {
+            rnd = new MersenneTwister();
+            this.size=size;
+            totalSize = factorial(size);
+            perms=new int[totalSize][size];
+	    set = new ArrayList();
+            init();
+            permute(set);
+            //output();
+	
+	    dials = new int[size];
+        }
+
+        int factorial(int f) {
+            if ( f == 0 ) return 1;
+            else return f * factorial(f-1);
+        }
+
+        void init() {
+            for ( int i = 0; i < size; i++ ) {
+                set.add(new Integer(i));
+                perms[0][i]=i;
+            }
+        }
+
+        void permute(ArrayList s) {
+            Integer j;
+
+            if ( s.size() == 0 ) {
+                count ++;
+                fill();
+            }
+
+            for ( int i = 0; i < s.size(); i++ ) {
+                ArrayList subset = (ArrayList)s.clone();
+                j = (Integer)subset.remove(i);
+                perms[count][size-s.size()] = j.intValue();
+                permute(subset);
+            }
+        }
+        
+        void fill() {
+            if ( count < totalSize && count > 0 ) {
+                for ( int j = 0; j < size; j++) {
+                    perms[count][j] = perms[count-1][j];
+                }
+            }
+        }
+
+        void output() {
+            for ( int i = 0;  i < totalSize; i++ ) {
+                System.out.println();
+                for ( int j = 0; j < size; j++ ) {
+                    System.out.print(perms[i][j]+" ");
+                }
+            }
+            System.out.println();
+        }
+
+	void dialOut() {
+	    System.out.print("Dial :");
+	    for ( int i = 0; i<size; i++ ) {
+		System.out.print(dials[i]+" ");
+	    }
+	    System.out.println();
+	}
+        
+        public int[][] getPermutations() { 
+            return perms;
+        }
+
+	public boolean hasNextMatrix() {
+	    boolean next = false;
+	    next = flip(size-1);
+	    //System.out.println();
+	    //System.out.println("nextMatrix:");
+	    //dialOut();
+	
+    	    return next; 
+	}
+
+	public int[] getNextMatrix() {
+	    int[] ret = new int[dials.length];
+	    System.arraycopy(dials,0,ret,0,dials.length);
+	    return ret;
+	}
+
+	boolean flip(int i) {
+	   //System.out.println();
+	   //dialOut();
+	   //System.out.println("flipping "+i);
+	   //System.out.println();
+	   if ( i >= 0 ) {
+		dials[i]++;
+		if ( dials[i] > totalSize - 1 ) {
+		    dials[i] = 0;
+		    return flip(i-1);
+		}
+	   } else {
+	       return false; 
+	   }
+
+	   return true;
+	}
+
+	boolean unique() {
+	   boolean unique = true;
+	   for ( int i = 0; i < size; i++ ) {
+		for ( int j = i+1; j < size; j++ ) {
+		    if ( dials[i] == dials[j] ) {
+			return false;
+		    } 
+		}
+	   }
+
+	   return true;
+	}
+        
+        
+        // usage:
+        // randomSquare();
+        // while ( !hasNextSquare() ) {
+        //     randomSquare();
+        // }
+        // matrix=getNextSquare();
+        // 
+        void randomSquare() {
+            for ( int i = 0 ; i < size; i ++ ) {
+                dials[i] = (int)(((double)totalSize)*rnd.draw());
+            }
+            
+        }
+
+        void setSeed(long seed) {
+            rnd.setSeed(seed);
+        }
+
+    }
+
+    
+    private void incrementCount() {
+        ++this.count;
+    }
+    
+    private int getCount() {
+        return count;
+    }
+    
+    private void incrementTotalResults() {
+        ++this.totalResults;
+        System.out.println(totalResults+" of "+count);
+    }
+    
+    private int getTotalResults() {
+        return totalResults;
+    }
+    
+
  
     
     class AssemblyReader extends Thread implements Runnable {
@@ -909,7 +1361,6 @@ public class SimkitAssemblyXML2Java {
                 } else { // in local mode, accept Results XML from nodes
                     int index;
                     ResultsType r;
-                    //BufferedInputStream bufIn = new BufferedInputStream(s.getInputStream());
                     InputStreamReader inptRead = new InputStreamReader(s.getInputStream());
                     BufferedReader bufRead = new BufferedReader(inptRead);
                     StringBuffer buf = new StringBuffer();
@@ -918,26 +1369,17 @@ public class SimkitAssemblyXML2Java {
                     while ( (line=bufRead.readLine()) != null) {
                         buf.append(line);
                     }
-                    
-                    //
-                    
-                    
+ 
                     synchronized(inst.fileInputStream) {
                         inst.fileInputStream = new ByteArrayInputStream(buf.toString().getBytes());
-                        //inst.fileInputStream = bufIn;
                         javax.xml.transform.stream.StreamSource strsrc = 
                                 new javax.xml.transform.stream.StreamSource(inst.fileInputStream);
                         
                         JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
                         Unmarshaller u = jc.createUnmarshaller();
                         r = (ResultsType) ( u.unmarshal(strsrc) );
-       
-                        //Object o = u.unmarshal( new StreamSource( new StringReader( xmlStr.toString() ) ) );
-                                
-                        //r = (ResultsType) unmarshalAny("viskit.xsd.bindings.assembly");
-                    
-                        index = Integer.parseInt(r.getIndex());
-                    
+
+                        index = Integer.parseInt(r.getDesign());
                     }
                     
                     List designPoints = Collections.synchronizedList(inst.root.getExperiment().getDesignPoint());
@@ -945,8 +1387,9 @@ public class SimkitAssemblyXML2Java {
                     synchronized(designPoints) {
                     
                         DesignPointType designPoint = (DesignPointType) designPoints.get(index);
-                        designPoint.setResults(r);
-                    
+                        List runList = designPoint.getRun();
+                        RunType run = (RunType)runList.get(Integer.parseInt(r.getRun()));
+                        run.setResults(r);
                         inst.incrementTotalResults();
                     
                     }
@@ -993,6 +1436,11 @@ public class SimkitAssemblyXML2Java {
         public void run() {
             try {
                 p.load(is);
+                
+                // note: will probably want to define platform
+                // independent properties that map to the platform
+                // dependent properties.
+                
                 if (isTask=p.getProperty("SGE_TASK_ID")!=null) {
                     task=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
                     jobID=Integer.parseInt(p.getProperty("JOB_ID"));
