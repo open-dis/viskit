@@ -38,6 +38,7 @@ public class SimkitAssemblyXML2Java {
 
     InputStream fileInputStream;
     String fileBaseName;
+    File inputFile;
     JAXBContext jaxbCtx;
 
     /* convenience Strings for formatting */
@@ -66,10 +67,10 @@ public class SimkitAssemblyXML2Java {
      */
 
     public SimkitAssemblyXML2Java(String xmlFile) {
-	fileBaseName = baseNameOf(xmlFile);
+	this.fileBaseName = baseNameOf(xmlFile);
 	try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-            fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            this.fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
 	} catch ( Exception e ) {
 	    e.printStackTrace();
 	} 
@@ -77,9 +78,10 @@ public class SimkitAssemblyXML2Java {
     }
     
     public SimkitAssemblyXML2Java(File f) throws Exception {
-        fileBaseName = baseNameOf(f.getName());
-        jaxbCtx = JAXBContext.newInstance("viskit.xsd.assembly.bindings");
-        fileInputStream = new FileInputStream(f);
+        this.fileBaseName = baseNameOf(f.getName());
+	this.inputFile = f;
+        this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.assembly.bindings");
+        this.fileInputStream = new FileInputStream(f);
     }
 
     public void unmarshal() {
@@ -368,9 +370,26 @@ public class SimkitAssemblyXML2Java {
     }
 
     boolean compileCode(String fileName) {
+	String path = this.root.getPackage();
+	File fDest;
+	char[] pchars;
+	int j;
+	// this doesn't work! : path.replaceAll(pd,File.separator);
+	pchars = path.toCharArray();
+	for (j = 0; j<pchars.length; j++) {
+	    if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
+	}
+	path = new String(pchars);
+	try {
+	    File f = new File(pd + File.separator + path);
+	    f.mkdirs();
+	    fDest = new File(path + File.separator + fileName);
+	    f = new File(fileName);
+	    f.renameTo(fDest);
+	} catch (Exception e) { e.printStackTrace(); }	
         return (
             com.sun.tools.javac.Main.compile(
-                 new String[] {fileName}
+                 new String[] {"-verbose","-sourcepath",path,"-d",pd,path+File.separator+fileName}
             ) == 0
         );
     }
@@ -379,7 +398,7 @@ public class SimkitAssemblyXML2Java {
 	try {
 	    File f = new File(pd);
 	    ClassLoader cl = new URLClassLoader(new URL[] {f.toURL()});
-	    Class assembly = cl.loadClass(fileBaseName);
+	    Class assembly = cl.loadClass(this.root.getPackage()+pd+fileBaseName);
 	    Object params[] = { new String[]{} };
             Class classParams[] = { params[0].getClass() };
             Method mainMethod = assembly.getDeclaredMethod("main", classParams);
@@ -432,7 +451,8 @@ public class SimkitAssemblyXML2Java {
                 System.out.println("Done.");
 
 		System.out.println("Running Assembly " + sax2j.fileBaseName + "...");
-		
+		System.out.println();
+
 		sax2j.runIt();
 	    }
         } catch (FileNotFoundException fnfe) {
