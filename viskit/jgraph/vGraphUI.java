@@ -36,6 +36,11 @@ public class vGraphUI extends BasicGraphUI
 
   private vGraphComponent parent;
 
+
+  // This will force snap-to-grid, but it won't make the lines straight: that's
+  // due to the bezier line drawing code.
+  // protected boolean snapSelectedView = true;
+
   public vGraphUI(vGraphComponent parent)
   {
     this.parent = parent;
