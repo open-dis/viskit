@@ -2,6 +2,7 @@ package viskit;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.print.PrinterJob;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.*;
@@ -21,7 +22,7 @@ public class SourceWindow extends JFrame
   final String src;
 
   Thread sysOutThread;
-
+  JTextArea jta;
   public SourceWindow(JFrame main, String source)
   {
     this.main = main;
@@ -31,7 +32,33 @@ public class SourceWindow extends JFrame
 
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
 
-    JTextArea jta = new JTextArea(src);
+    JToolBar tb = new JToolBar();
+    JButton fontPlus = new JButton("Larger");
+    JButton fontMinus=new JButton("Smaller");
+    JButton printB = new JButton("Print");
+    tb.add(new JLabel("Font:"));
+    tb.add(fontPlus);
+    tb.add(fontMinus);
+    tb.add(new JLabel("     "));
+    tb.add(printB);
+    fontPlus.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        jta.setFont(jta.getFont().deriveFont(jta.getFont().getSize2D()+1.0f));
+      }
+    });
+    fontMinus.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        jta.setFont(jta.getFont().deriveFont(Math.max(jta.getFont().getSize2D()-1.0f,1.0f)));
+      }
+    });
+
+    con.add(tb);
+
+    /*JTextArea*/ jta = new JTextArea(src);
     jta.setEditable(false);
     jta.setFont(new Font("Monospaced",Font.PLAIN,12));
     JScrollPane jsp = new JScrollPane(jta);
