@@ -68,7 +68,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JToggleButton selectMode;
   private JToggleButton adapterMode, simEventListenerMode, propChangeListenerMode;
-  private JButton zoomIn, zoomOut;
+  private JButton zoomIn, zoomOut, runButt;
 
   private JPanel canvasPanel;
   private LegosTree lTree, pclTree;
@@ -286,7 +286,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     defBor = simEventListenerMode.getBorder();
     simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(
         defBor,BorderFactory.createLineBorder(new Color(0xce,0xce,0xff),2)));
-    
+
     //propChangeListenerMode = makeJTButton(null, "viskit/images/bridge.png",
     propChangeListenerMode = makeJTButton(null,new PropChangeListenerIcon(24,24),
                                        "Connect a property change listener to a SimEntity");
@@ -300,6 +300,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
                                         "Zoom out on the graph");
 
+    Action runAction = ActionIntrospector.getAction(getController(),"runAssembly");
+    runButt = makeButton(runAction, "viskit/images/Play24.gif",
+                                        "Run the assembly");
     modeButtonGroup.add(selectMode);
     modeButtonGroup.add(adapterMode);
     modeButtonGroup.add(simEventListenerMode);
@@ -323,6 +326,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     toolBar.add(zoomIn);
     toolBar.addSeparator(new Dimension(5,24));
     toolBar.add(zoomOut);
+
+    toolBar.addSeparator(new Dimension(24,24));
+    toolBar.add(new JLabel("  Run: "));
+    toolBar.add(runButt);
 
     zoomIn.addActionListener(new ActionListener()
     {

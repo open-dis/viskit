@@ -106,6 +106,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
    */
   public void newModel(File f)
   {
+    GraphMetaData mymetaData;
     if (f == null) {
       try {
         jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
@@ -122,7 +123,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       simParameters.removeAllElements();
       evNodeCache.clear();
       edgeCache.clear();
-      metaData = new GraphMetaData();
+      mymetaData = new GraphMetaData();
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
     }
     else {
@@ -132,19 +133,19 @@ public class Model extends mvcAbstractModel implements ViskitModel
         // see u.isValidating()
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimEntity) u.unmarshal(f);
-        metaData = new GraphMetaData();
-        metaData.author = jaxbRoot.getAuthor();
-        metaData.version = jaxbRoot.getVersion();
-        metaData.name = jaxbRoot.getName();
-        metaData.pkg = jaxbRoot.getPackage();
-        metaData.extend = jaxbRoot.getExtend();
+        mymetaData = new GraphMetaData();
+        mymetaData.author = jaxbRoot.getAuthor();
+        mymetaData.version = jaxbRoot.getVersion();
+        mymetaData.name = jaxbRoot.getName();
+        mymetaData.pkg = jaxbRoot.getPackage();
+        mymetaData.extend = jaxbRoot.getExtend();
         List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
           sb.append((String)itr.next());
           sb.append(" ");
         }
-        metaData.comment = sb.toString().trim();
+        mymetaData.comment = sb.toString().trim();
 
         VGlobals.instance().reset();
         stateVariables.removeAllElements();
@@ -158,16 +159,27 @@ public class Model extends mvcAbstractModel implements ViskitModel
         buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
 
       }
-      catch (JAXBException e) {
+      catch (JAXBException ee) {
+        // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
+        try {
+          JAXBContext assyCtx  = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+          Unmarshaller um = assyCtx.createUnmarshaller();
+          um.unmarshal(f);
+          // If we get here, they've tried to load an assembly.
+          JOptionPane.showMessageDialog(null,"Use the assembly editor to"+
+                                        "\n"+"work with this file.",
+                                        "Wrong File Format",JOptionPane.ERROR_MESSAGE);
+        }
+        catch(JAXBException e) {
         JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
                                    "\n"+ f.getName() +
                                    "\n"+ e.getMessage(),
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
-
-        return;
+        }
+        return;    // from either error case
       }
-
     }
+    metaData = mymetaData;
     currentFile = f;
     modelDirty = false;
   }

@@ -51,7 +51,7 @@ public class ExternalAssemblyRunner extends JFrame
 
     doMenus();
 
-    setTitle("Running "+className);
+    setTitle("Assembly Run Panel -- "+className);
     runPanel = new RunnerPanel(verbose);
     this.setContentPane(runPanel);
 
@@ -308,18 +308,22 @@ public class ExternalAssemblyRunner extends JFrame
     JMenu edit = new JMenu("Edit");
     JMenuItem copy = new JMenuItem("Copy");
     JMenuItem selAll = new JMenuItem("Select all");
+    JMenuItem clrAll = new JMenuItem("Clear all");
 
     save.addActionListener(saver);
     close.addActionListener(closer);
     copy.addActionListener(new copyListener());
     selAll.addActionListener(new selectAllListener());
-    
+    clrAll.addActionListener(new clearListener());
+
     file.add(save);
     file.add(close);
     edit.add(copy);
     edit.add(selAll);
+    edit.add(clrAll);
     mb.add(file);
     mb.add(edit);
+    
     setJMenuBar(mb);
   }
 
@@ -339,6 +343,14 @@ public class ExternalAssemblyRunner extends JFrame
     {
       runPanel.soutTA.selectAll();
       runPanel.serrTA.selectAll();
+    }
+  }
+  class clearListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      runPanel.soutTA.setText(null);
+      runPanel.serrTA.setText(null);
     }
   }
   class timekeeper extends simkit.SimEntityBase

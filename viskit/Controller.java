@@ -109,7 +109,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     lastFile = ((ViskitView) getView()).openFileAsk();
     if (lastFile != null) {
       ((ViskitModel) getModel()).newModel(lastFile);
-      ((ViskitView) getView()).fileName(lastFile.getName());
+      // may not have been a good open, but gmd will be accurate
+      GraphMetaData gmd = ((ViskitModel)getModel()).getMetaData();
+      ((ViskitView) getView()).fileName(gmd.name); //lastFile.getName());
     }
   }
 

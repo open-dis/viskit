@@ -153,10 +153,12 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       recurseNogoList = null;
 
     addContentRoot(f, recurse, v);
-
+    /* Skip the bad news reporting
     if(recurseNogoList != null && recurseNogoList.size()>0) {
       JOptionPane.showMessageDialog(this,recurseNogoList.toArray(new String[0]),"Classes or files not added:",JOptionPane.INFORMATION_MESSAGE);
     }
+    */
+    
     if (classNodeCount != 0)
       return;
 

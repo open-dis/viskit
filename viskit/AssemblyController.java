@@ -83,10 +83,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     lastFile = ((ViskitAssemblyView) getView()).openFileAsk();
     if (lastFile != null) {
       ((ViskitAssemblyModel) getModel()).newModel(lastFile);
-      ((ViskitAssemblyView) getView()).fileName(lastFile.getName());
+      // May not have been a good open, but gmd  will be accurate
       GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
-      //((ViskitAssemblyView) getView()).setStopTime(gmd.stopTime);
-      //((ViskitAssemblyView) getView()).setVerbose(gmd.verbose);
+      ((ViskitAssemblyView) getView()).fileName(gmd.name); //lastFile.getName());
     }
 
   }

@@ -707,6 +707,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public void newModel(File f)
   {
+    GraphMetaData mymetaData;
     if (f == null) {
       try {
         jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
@@ -723,30 +724,30 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       nodeCache.clear();
       assEdgeCache.clear();
       pointLess = new Point(100,100);
-      metaData = new GraphMetaData(this); //todo need new object?
-      metaData.name = "Assembly_name"; // override
+      mymetaData = new GraphMetaData(this); //todo need new object?
+      mymetaData.name = "Assembly_name"; // override
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
     }
     else {
       try {
+        mymetaData = new GraphMetaData();
         Unmarshaller u = jc.createUnmarshaller();
         // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
         // see u.isValidating()
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimkitAssembly) u.unmarshal(f);
         pointLess = new Point(100,100);
-        metaData = new GraphMetaData();
-      //  metaData.author = jaxbRoot.getAuthor();
-        metaData.version = jaxbRoot.getVersion();
-        metaData.name = jaxbRoot.getName();
-        metaData.pkg = jaxbRoot.getPackage();
+      //  mymetaData.author = jaxbRoot.getAuthor();
+        mymetaData.version = jaxbRoot.getVersion();
+        mymetaData.name = jaxbRoot.getName();
+        mymetaData.pkg = jaxbRoot.getPackage();
 
         ScheduleType sch = jaxbRoot.getSchedule();
         if(sch != null) {
           String stpTime = sch.getStopTime();
           if(stpTime != null && stpTime.trim().length()>0)
-            metaData.stopTime = stpTime.trim();
-          metaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+            mymetaData.stopTime = stpTime.trim();
+          mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
         }
 /*        List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
@@ -770,16 +771,29 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
       }
       catch (JAXBException e) {
-        JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
-                                   "\n"+ f.getName() +
-                                   "\n"+ e.getMessage(),
-                                   "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+        // want a clear way to know if they're trying to load an event graph
+        try {
+          JAXBContext egCtx  = JAXBContext.newInstance("viskit.xsd.bindings");
 
-        return;
+          Unmarshaller um = egCtx.createUnmarshaller();
+          um.unmarshal(f);
+          // If we get here, they've tried to load an event graph.
+          JOptionPane.showMessageDialog(null,"Use the event graph editor to"+
+                                        "\n"+"work with this file.",
+                                        "Wrong File Format",JOptionPane.ERROR_MESSAGE);
+        }
+        catch (JAXBException ee) {
+          JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
+                                     "\n"+ f.getName() +
+                                     "\n"+ e.getMessage(),
+                                     "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+        }
+        return; // from both exceptions
       }
 
 
     }
+    metaData = mymetaData;
     currentFile = f;
     modelDirty = false;
   }
