@@ -23,7 +23,7 @@ import java.util.HashMap;
 public class VsimkitObjects
 {
   /**
-   * VGlobals uses this, not the indiv. methods below.
+   * VGlobals uses this, not the individual methods below.
    */
   public static HashMap hashmap = new HashMap();
 
