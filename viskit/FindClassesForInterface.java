@@ -14,9 +14,9 @@ public class FindClassesForInterface
 {
   /**
    * Added by Mike Bailey
-   * @param f
+   * @param f file to read from
    * @param implementing
-   * @return
+   * @return Class object
    */
   public static Class classFromFile(File f, Class implementing)
   {
@@ -202,7 +202,7 @@ public class FindClassesForInterface
     }
 
     /**
-     * Determine if given class can be instantiated (i.e. is concrete)
+     * Determine if given class can be instantiated (ie is concrete).
      * @return true if class is concrete, false if class is abstract
      * @param c The class to be tested
      */
