@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity package="diskit" name="Destinator3D" version="1.0" extend="SimEntityBase" author="rickg" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter type="simkit.random.RandomVariate" name="random">
+<SimEntity author="rickg" package="diskit" version="1.0" name="Destinator3D" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="random" type="simkit.random.RandomVariate">
         <Comment/>
     </Parameter>
     <Event name="ArrivePoint">
         <Comment/>
         <Schedule event="NewDestination"/>
-        <Coordinate y="55" x="85"/>
+        <Coordinate x="85" y="55"/>
     </Event>
     <Event name="NewDestination">
         <Comment/>
-        <LocalVariable type="mil.navy.nps.math.Vec4f" name="randomDest" value="new mil.navy.nps.math.Vec4f((float)random.generate(),(float)random.generate(),(float)random.generate(),(float)Schedule.getSimTime()+(float)random.generate())">
+        <LocalVariable type="mil.navy.nps.math.Vec4f" name="randomDest" value="new mil.navy.nps.math.Vec4f((float)random.generate(),(float)random.generate(),(float)random.generate(),(float)Math.abs(Schedule.getSimTime()+(float)random.generate()))">
             <Comment/>
         </LocalVariable>
-        <Schedule priority="0" delay="0.0" event="UpdateDestination" condition="true">
+        <LocalVariable type="boolean" name="locvar_0" value="true; System.out.println(&quot;NewDestination is &quot; + randomDest.get(0) + &quot; &quot; + randomDest.get(1) + &quot; &quot; + randomDest.get(2) + &quot; &quot; + randomDest.get(3))">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="true" priority="0" delay="0.0" event="UpdateDestination">
             <Comment/>
             <EdgeParameter value="randomDest"/>
         </Schedule>
-        <Coordinate y="70" x="192"/>
+        <Coordinate x="232" y="70"/>
     </Event>
     <Event name="UpdateDestination">
         <Comment/>
         <Argument type="mil.navy.nps.math.Vec4f" name="newDestination"/>
-        <Coordinate y="207" x="195"/>
+        <Coordinate x="195" y="207"/>
     </Event>
     <Event name="Run">
         <Comment>set rv</Comment>
         <Schedule event="NewDestination"/>
-        <Coordinate y="159" x="36"/>
+        <Coordinate x="36" y="159"/>
     </Event>
 </SimEntity>
 
