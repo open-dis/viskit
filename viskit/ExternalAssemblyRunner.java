@@ -217,7 +217,7 @@ public class ExternalAssemblyRunner extends JFrame
    * @param args
    */
 
-  public static void testmain(String[] args)
+  public static void main(String[] args)
   {
      if(args.length < 2) {
       JOptionPane.showMessageDialog(null,"Wrong number of parameters to ExternalAssemblyRunner.main().",
@@ -236,7 +236,7 @@ public class ExternalAssemblyRunner extends JFrame
 
     new ExternalAssemblyRunner(args[0],Boolean.valueOf(args[1]).booleanValue(),Double.valueOf(args[2]).doubleValue(), v);
   }
-  public static void main(String[] args)
+  public static void testmain(String[] args)
   {
     testmain(new String[]{"simkit.examples.ServerWithRenegesAssembly1_mikeTest","true","29.3"});
   }
