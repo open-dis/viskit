@@ -309,7 +309,7 @@ public class VGlobals
   };
 
   /**
-   * This is messaged by dialogs, etc. when a user has selected a type for a new variable, etc.  We look
+   * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
    * around to see if we've already got it covered.  If not, we add it to the end of the list.
    * @param ty
    */
