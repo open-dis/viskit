@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 /**
  * a multicast socket manger for 3D entities
- * @author rmgold
+ * @author Rick Goldberg
  */
 public class DISMover3DSender extends SimEntityBase {
     

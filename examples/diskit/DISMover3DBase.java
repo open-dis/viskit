@@ -11,10 +11,11 @@ import simkit.SimEntityBase;
 
 /**
  * mainly to pull out a position at a time
- * @author rmgoldbe
+ * @author Rick Goldberg
  */
 public class DISMover3DBase extends SimEntityBase {
-    // these are required to harness an event graph;
+    // these are required to harness an event graph; other base
+    // classes have no way of knowing otherwise.
     // some are for internal diskit use from the harness, see getters
     // while the others are for external event graph useage
     protected Vec4f startPosition;
@@ -27,7 +28,7 @@ public class DISMover3DBase extends SimEntityBase {
     float[] v;
     
     /**
-     * Creates a new instance of DISMover3DBase, a linear 3D momver
+     * Creates a new instance of DISMover3DBase, a linear 3D momver. "All your base are belong to us."
      * @param start initial positiono
      * @param speedLimit mover's limit of speed
      * @param id DIS entity id for this mover
