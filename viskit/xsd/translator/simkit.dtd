@@ -16,21 +16,20 @@
 <!ELEMENT Argument ( Comment )* >
 <!ATTLIST Argument
 	type	    CDATA	#REQUIRED
-        name        CDATA       #REQUIRED
+        name        ID          #REQUIRED
 >
 
 <!ELEMENT Parameter ( Comment )* >
 <!ATTLIST Parameter
 	type        CDATA	#REQUIRED
 	name        ID  	#REQUIRED
-        shortName   CDATA       #REQUIRED
 >
 
 <!ELEMENT LocalVariable ( Comment )* >
 <!ATTLIST LocalVariable
         type        CDATA       #REQUIRED
-        name        CDATA       #REQUIRED
-        value       CDATA       #REQUIRED
+        name        ID          #REQUIRED
+        value       CDATA       #IMPLIED
 >
 
 <!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Coordinate? ) > 
@@ -57,6 +56,7 @@
 <!ELEMENT StateTransition ( Assignment|Operation ) >
 <!ATTLIST StateTransition
         state           IDREF   #REQUIRED
+	index		IDREF	#IMPLIED
 >
   
 <!ELEMENT EdgeParameter EMPTY >
