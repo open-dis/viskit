@@ -1,9 +1,8 @@
 To build DISkit, first obtain dis.jar from the disjava project on sourceforge 
 and simkit.jar and place them in the diskit/lib directory. If you got this from
 Viskit's cvs, you should already have simkit.jar elsewhere and dis.jar has been
-provided. Using ant with build.xml, target dist deposits a diskit.jar to the 
-diskit/dist/lib directory, move this to your Viskit/lib installation when 
-complete. 
+provided. From there the easiest way to build is the ant build-run target from 
+the toplevel build.xml in the main Viskit directory.
 
 To run the examples, bring up Viskit->Assembly, click + on the SimEntities
 panel, filedialog select the Viskit/examples/diskit directory. It should
@@ -41,3 +40,6 @@ You should see numbers and vectors indicating positions of the movers in 3-space
 and the corresponding numbers and vectors appearing on the server side. Multiple
 mover sources can also be run, the server side should not need to be restarted
 once launched.
+
+See also DiskSurfaceMover3DAssembly, which does about the same, just you specify
+a constant Z for your movers' Destinator2D. 
