@@ -7,7 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.io.File;
+import java.io.Reader;
+import java.io.IOException;
 
 import actions.ActionIntrospector;
 import org.jgraph.graph.DefaultGraphCell;
@@ -28,21 +32,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   //-----------------
   {
     //newEventGraph();
-  }
-
-  public void generateJavaClass()
-  {
-    if(((ViskitAssemblyModel)getModel()).isDirty()) {
-      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
-      if(ret != JOptionPane.YES_OPTION)
-        return;
-      this.saveAs();
-    }
-
-    String source = ((ViskitAssemblyModel)getModel()).buildJavaSource();
-    if(source != null && source.length() > 0)
-      ((ViskitAssemblyView)getView()).showAndSaveSource(source);
-
   }
 
   public void runEventGraphEditor()
@@ -358,4 +347,72 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
   }
 
+  public void generateJavaClass()
+  {
+    String source = produceJavaClass();
+    if(source != null && source.length() > 0)
+      ((ViskitAssemblyView)getView()).showAndSaveSource(source);
+  }
+
+  private String produceJavaClass()
+  {
+    if(((ViskitAssemblyModel)getModel()).isDirty()) {
+      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
+      if(ret != JOptionPane.YES_OPTION)
+        return null;
+
+      this.saveAs();
+    }
+
+    return ((ViskitAssemblyModel)getModel()).buildJavaSource();
+  }
+  String hack;
+  public File compileJavaClass()
+  {
+    String source = produceJavaClass();
+    if(source != null && source.length() > 0) {
+       Pattern p = Pattern.compile("package.*;");
+      Matcher m = p.matcher(source);
+      if(m.find()){
+        String nuts = m.group();
+        if(nuts.endsWith(";"))
+          nuts=nuts.substring(0,nuts.length()-1);
+
+        String[] sa = nuts.split("\\s");
+        hack = sa[1];
+      }
+      return ((ViskitAssemblyModel)getModel()).compileJavaClass(source);
+    }
+    return null;
+  }
+
+  public void vcrPlay()
+  {
+    File f = compileJavaClass();
+    if(f != null) {
+      String clNam = f.getName().substring(0,f.getName().indexOf('.'));
+      clNam = hack + "." + clNam;
+      //((ViskitAssemblyModel) getModel()).startAssemblyRun(clNam,f.getParent());
+      AssemblyRunner runner = new AssemblyRunner(clNam);
+      String cp = runner.getClasspath();
+      String pathSep = System.getProperty("path.separator");
+      runner.setClasspath(f.getParent()+pathSep+cp);
+
+      new RunWindow((JFrame)getView(),runner).setVisible(true);   // blocks
+    }
+    else
+      JOptionPane.showMessageDialog(null,"Error on compile");
+  }
+  public void vcrPause()
+  {
+    System.out.println("vcrPause");
+  }
+  public void vcrStop()
+  {
+    System.out.println("vcrStop");
+  }
+  public void vcrStep()
+  {
+    System.out.println("vcrStep");
+  }
 }

@@ -4,6 +4,7 @@ import viskit.model.*;
 
 import java.awt.*;
 import java.util.Vector;
+import java.io.File;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -43,5 +44,12 @@ public interface ViskitAssemblyController
   void saveAs();
 
   void generateJavaClass();
+  File compileJavaClass();
+
+  public void vcrPlay();
+  public void vcrPause();
+  public void vcrStop();
+  public void vcrStep();
+
   void runEventGraphEditor();
 }

@@ -49,5 +49,6 @@ public interface ViskitAssemblyModel
   public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
 
   public String buildJavaSource();
-
+  public File   compileJavaClass(String src);
+  
 }

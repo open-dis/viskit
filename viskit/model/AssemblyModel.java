@@ -2,6 +2,7 @@ package viskit.model;
 
 import viskit.ModelEvent;
 import viskit.VGlobals;
+import viskit.AssemblyRunner;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
@@ -12,9 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -559,7 +558,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return null;
     }
     fp.setType(vifact.getType());
-    fp.setFactory(vifact.getFactoryClass()+"."+vifact.getMethod()+"()");
+    fp.setFactory(vifact.getFactoryClass()); //todo when method supported +"."+vifact.getMethod()+"()");
     for (Iterator itr = vifact.getParams().iterator(); itr.hasNext();) {
       VInstantiator vi = (VInstantiator) itr.next();
       fp.getParameters().add(buildParam(vi));
@@ -832,6 +831,32 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
        e.printStackTrace();
      }
      return null;
+  }
+
+  public File compileJavaClass(String src)
+  {
+    try {
+      String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
+      File f = new File("work");
+      f.mkdir();
+      f = new File(f,baseName+".java");
+      f.createNewFile();
+
+      FileWriter fw = new FileWriter(f);
+      fw.write(src);
+      fw.flush();
+      fw.close();
+
+      int reti =  com.sun.tools.javac.Main.compile(new String[]{/*"-verbose", */"-d", f.getParent(), f.getCanonicalPath()});
+
+      //System.out.println("got "+reti+" on compile of "+f.getCanonicalPath() +" to "+f.getParent());
+      if(reti == 0)
+        return new File(f.getParentFile().getAbsoluteFile(),baseName+".class");
+    }
+    catch(Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**

@@ -32,6 +32,7 @@ public class SourceWindow extends JFrame
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
 
     JTextArea jta = new JTextArea(src);
+jta.setEditable(false);
     jta.setFont(new Font("Monospaced",Font.PLAIN,12));
     JScrollPane jsp = new JScrollPane(jta);
     con.add(jsp);
@@ -41,7 +42,7 @@ public class SourceWindow extends JFrame
     buttPan.add(Box.createHorizontalGlue());
 
     JButton saveButt = new JButton("Save source and close");
-    buttPan.add(saveButt);
+//    buttPan.add(saveButt);
 
     JButton closeButt = new JButton("Close");
     buttPan.add(closeButt);

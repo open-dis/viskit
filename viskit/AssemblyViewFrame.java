@@ -161,6 +161,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java Class",new Integer(KeyEvent.VK_G),null));
+    //fileMenu.add(buildMenuItem(controller,"compileJavaClass","Compile Java Class",new Integer(KeyEvent.VK_M),null));
     fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
@@ -273,18 +274,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     vcrToolBar.add(Box.createHorizontalGlue());
     vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    
+    ViskitAssemblyController controller = (ViskitAssemblyController)getController();
 
-    ActionListener temp = new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        JOptionPane.showMessageDialog(AssemblyViewFrame.this,"Not yet implemented.");
-      }
-    };
-    vcrStop.addActionListener(temp);
-    vcrPause.addActionListener(temp);
-    vcrPlay.addActionListener(temp);
-    vcrStep.addActionListener(temp);     
+    vcrStop.addActionListener(ActionIntrospector.getAction(controller,"vcrStop"));
+    vcrPause.addActionListener(ActionIntrospector.getAction(controller,"vcrPause"));
+    vcrPlay.addActionListener(ActionIntrospector.getAction(controller,"vcrPlay"));
+    vcrStep.addActionListener(ActionIntrospector.getAction(controller,"vcrStep"));
   }
   private void buildToolbar()
   {
