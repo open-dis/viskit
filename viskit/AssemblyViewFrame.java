@@ -717,18 +717,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return null;
   }
 
-  //todo remove:
-  public File oldsaveFileAsk(String suggNameNoType)
-  //-----------------------
-  {
-    if(jfc == null)
-      jfc = new JFileChooser(System.getProperty("user.dir"));
-    jfc.setSelectedFile(new File(suggNameNoType+".xml"));
-    int retv = jfc.showSaveDialog(this);
-    if(retv == JFileChooser.APPROVE_OPTION)
-      return jfc.getSelectedFile();
-    return null;
-  }
   private File getUniqueName(String suggName)
   {
     String appnd = "";
