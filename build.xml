@@ -187,7 +187,7 @@
 
     <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
          <classpath>
-             <fileset dir="${dir.lib.xml}" excludes="dom.jar" includes="*.jar"/>
+             <fileset dir="${dir.lib.xml}" includes="*.jar"/>
          </classpath>
     </taskdef>
     
@@ -273,7 +273,7 @@
     
     <!-- TARGET: Run, include extensions such as diskit module -->
     <target depends="jar, examples" description="Run Viskit, include example modules if any" name="build-run">
-        <java classpathref="runtime.classpath" classname="viskit.Splash2" fork="true" />
+        <java classpathref="runtime.classpath" classname="viskit.Main" fork="true" />
     </target>
     
     <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
