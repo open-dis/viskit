@@ -6,6 +6,7 @@
 
 package viskit.xsd.translator;
 
+import java.lang.reflect.Constructor;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -129,6 +130,8 @@ public class SimkitXML2Java {
 	PrintWriter pw = new PrintWriter(vars);
 
 	ListIterator li = this.root.getParameter().listIterator();
+	List superParams = resolveSuperParams(this.root.getParameter());
+	boolean extend = (this.root.getExtend().indexOf("SimEntityBase") < 0);
 
 	while ( li.hasNext() ) {
 
@@ -136,7 +139,11 @@ public class SimkitXML2Java {
 	    
 	    pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
 
-	    buildParameterAccessor(p,accessorBlock);
+	    
+	    if ( !extend ) 
+		buildParameterAccessor(p,accessorBlock);
+	    else if ( !superParams.contains(p) )
+		buildParameterAccessor(p,accessorBlock);
 
 	} 
 	
@@ -332,6 +339,7 @@ public class SimkitXML2Java {
 	ListIterator li;
 	List sched = run.getScheduleOrCancel();
 	ListIterator schi = sched.listIterator();
+	List superPList;
 	
 
 	pw.println();
@@ -362,7 +370,8 @@ public class SimkitXML2Java {
         
         if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
             pList = this.root.getParameter();
-            li = pList.listIterator();
+	    superPList = resolveSuperParams(pList);
+            li = superPList.listIterator();
             pw.print(sp8 + "super" + lp);
             while ( li.hasNext() ) {
                 Parameter pt = (Parameter) li.next();
@@ -746,6 +755,67 @@ public class SimkitXML2Java {
         right = s.indexOf(rb);
         return s.substring(0,left + 1) + s.substring(right);
         
+    }
+
+    // find the maximal set that the subclass parameters
+    // can cover of the superclass's available constructors
+    // note a subclass should have at least the superclass's
+    // parameters and maybe some more
+    private List resolveSuperParams(List params) {
+	List superParams = new java.util.Vector();
+	try { 
+	    Class c = Class.forName(this.root.getExtend());
+	    Constructor[] ca = c.getConstructors();
+	    int maxIndex = 0;
+	    int maxParamCount = 0;
+	    for ( int i = 0; i < ca.length; i++ ) {
+	        int tmpCount = (paramsInSuper(ca[i],params)).size();
+ 	        if ( tmpCount > maxParamCount ) {
+		    maxParamCount = tmpCount;
+		    maxIndex = i;
+	        }
+	    }
+	    superParams = paramsInSuper(ca[maxIndex],params);
+
+	} catch ( java.lang.ClassNotFoundException cnfe ) {
+	    String extend = this.root.getExtend();
+	    if (extend.equals("SimEntityBase")) {
+	        System.out.println(extend + " not in classpath ");
+	    }
+	}
+
+	return superParams;
+
+    }
+
+    // returns List of params from super that match
+    // should be the number of params for the constructor,
+    // or 0 for an oddball constructor. typically constructor
+    // list size should be at minimum the same set as the super
+    private List paramsInSuper(Constructor c, List params) {
+	Class[] cTypes = c.getParameterTypes();
+	java.util.Vector pTypes = new java.util.Vector();
+	java.util.Vector superPTypes = new java.util.Vector();
+	java.util.Vector subset = new java.util.Vector();
+	ListIterator li = params.listIterator();
+	while ( li.hasNext() ) {
+	    Parameter p = (Parameter) li.next();
+	    pTypes.addElement(p.getType());
+	}
+	for ( int i = 0; i < cTypes.length; i++ ) {
+	    superPTypes.addElement(cTypes[i].getName());
+	}
+	if ( pTypes.containsAll(superPTypes) ) {
+	    li = params.listIterator();
+	    while ( li.hasNext() ) {
+		Parameter p = (Parameter) li.next();
+		if ( superPTypes.contains(p.getType()) ) {
+		    subset.addElement(p);
+		}
+	    }
+	}
+
+	return subset;
     }
 
     boolean compileCode (String fileName) {
