@@ -210,6 +210,17 @@ public class TransitionsPanel extends JPanel implements ActionListener
     }
 
   }
+  private ActionListener myPlusListener;
+  public void addPlusListener(ActionListener al)
+  {
+    myPlusListener = al;
+  }
+
+  private ActionListener myMinusListener;
+  public void addMinusListener(ActionListener al)
+  {
+    myMinusListener = al;
+  }
   public void addDoubleClickedListener(MouseListener ml)
   {
     myMouseLis = ml;
@@ -241,6 +252,8 @@ public class TransitionsPanel extends JPanel implements ActionListener
       minusButt.setEnabled(true);
       arLis.add(new EventStateTransition());
       //testButt.setEnabled(true);
+      if(myPlusListener != null)
+        myPlusListener.actionPerformed(event);
     }
   }
   class minusButtonListener implements ActionListener
@@ -261,6 +274,9 @@ public class TransitionsPanel extends JPanel implements ActionListener
       }
       lis.setVisibleRowCount(model.getSize());
       TransitionsPanel.this.invalidate();
+      
+      if(myMinusListener != null)
+        myMinusListener.actionPerformed(event);
     }
   }
   class myListSelectionListener implements ListSelectionListener

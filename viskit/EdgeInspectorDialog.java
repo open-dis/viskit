@@ -14,6 +14,8 @@ import javax.swing.event.CaretEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -78,7 +80,9 @@ public class EdgeInspectorDialog extends JDialog
     //this.edgeCopy = (Edge)edge; //.copyShallow();                   // todo jmb comfirm
 
     this.locationComp = locationComp;
+
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new myCloseListener());
 
     mod = (Model)((EventGraphViewFrame)frame).getModel();       // todo fix this
    // nodeList = mod.getAllNodes();
@@ -427,5 +431,21 @@ public class EdgeInspectorDialog extends JDialog
       targEvent.setToolTipText(sb.toString());
     }
 
+  }
+  class myCloseListener extends WindowAdapter
+  {
+    public void windowClosing(WindowEvent e)
+    {
+      if(modified == true) {
+        int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Apply changes?",
+            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        if(ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
+        else
+          canButt.doClick();
+        }
+      else
+        canButt.doClick();
+    }
   }
 }

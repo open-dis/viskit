@@ -38,7 +38,7 @@ public class EventInspectorDialog extends JDialog
   private LocalVariablesPanel localVariables;
   private JFrame fr;
   private JButton lvPlus, lvMinus;
-
+  private myChangeActionListener myChangeListener;
   /**
    * Set up and show the dialog.  The first Component argument
    * determines which frame the dialog depends on; it should be
@@ -68,7 +68,9 @@ public class EventInspectorDialog extends JDialog
     this.fr = frame;
     this.node = node;
     this.locationComponent = locationComp;
+
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new myCloseListener());
 
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
@@ -146,9 +148,12 @@ public class EventInspectorDialog extends JDialog
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
-    myChangeActionListener chlis = new myChangeActionListener();
+    myChangeListener = new myChangeActionListener();
     //name.addActionListener(chlis);
     name.addKeyListener(new myKeyListener());
+
+    arguments.addPlusListener(myChangeListener);
+    arguments.addMinusListener(myChangeListener);
     arguments.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -160,6 +165,9 @@ public class EventInspectorDialog extends JDialog
         }
       }
     });
+
+    transitions.addPlusListener(myChangeListener);
+    transitions.addMinusListener(myChangeListener);
     transitions.addDoubleClickedListener(new MouseAdapter()
     {
       public void mouseClicked(MouseEvent e)
@@ -168,10 +176,14 @@ public class EventInspectorDialog extends JDialog
         boolean modified = EventTransitionDialog.showDialog(fr, locationComponent, est);
         if (modified) {
           transitions.updateTransition(est);
+          okButt.setEnabled(true);
         }
       }
     });
-    this.localVariables.addDoubleClickedListener(new ActionListener()
+
+    localVariables.addPlusListener(myChangeListener);
+    localVariables.addMinusListener(myChangeListener);
+    localVariables.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
@@ -179,6 +191,7 @@ public class EventInspectorDialog extends JDialog
         boolean modified = LocalVariableDialog.showDialog(fr, locationComponent, elv);
         if (modified) {
           localVariables.updateRow(elv);
+          okButt.setEnabled(true);
         }
       }
     });
@@ -210,7 +223,7 @@ public class EventInspectorDialog extends JDialog
     arguments.setData(node.getArguments());
     localVariables.setData(node.getLocalVariables());
     modified = false;
-// test    okButt.setEnabled(false);
+    okButt.setEnabled(false);
     getRootPane().setDefaultButton(canButt);
   }
 
@@ -276,16 +289,30 @@ public class EventInspectorDialog extends JDialog
   {
     public void stateChanged(ChangeEvent event)
     {
-      System.out.println("stateChanged");
       modified = true;
       okButt.setEnabled(true);
       getRootPane().setDefaultButton(okButt);
-
     }
 
     public void actionPerformed(ActionEvent event)
     {
       stateChanged(null);
+    }
+  }
+  class myCloseListener extends WindowAdapter
+  {
+    public void windowClosing(WindowEvent e)
+    {
+      if(modified == true) {
+        int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this,"Apply changes?",
+            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        if(ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
+        else
+          canButt.doClick();
+        }
+      else
+        canButt.doClick();
     }
   }
 }

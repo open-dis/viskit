@@ -424,18 +424,16 @@ public abstract class ViskitTablePanel extends JPanel
     public void actionPerformed(ActionEvent event)
     {
       if (event.getActionCommand() == "p") {
+        addRow();
         if (myPlusLis != null)
           myPlusLis.actionPerformed(event);
-        else
-          addRow();
       }
       else if (event.getActionCommand() == "m") {
         if (myMinusLis != null) {
           event.setSource(shadow.get(tab.getSelectedRow()));
           myMinusLis.actionPerformed(event);
         }
-        else
-          removeRow(tab.getSelectedRow());
+        removeRow(tab.getSelectedRow());
       }
       else {// if(event.getActionCommand() == "e")
         doEdit();
