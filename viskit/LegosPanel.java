@@ -55,10 +55,17 @@ public class LegosPanel extends JPanel
         minus.setMinimumSize(dd);
         minus.setMaximumSize(dd);
         minus.setActionCommand("m");
-        minus.setEnabled(false);
+        //minus.setEnabled(false);
       buttPan.add(minus);
       buttPan.add(Box.createHorizontalGlue());
     add(buttPan);
+    minus.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        tree.removeSelected();
+      }
+    });
 
     plus.addActionListener( new ActionListener()
     {
@@ -69,6 +76,7 @@ public class LegosPanel extends JPanel
           jfc.setAcceptAllFileFilterUsed(false);
           jfc.setMultiSelectionEnabled(true);
           jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
           int retv = jfc.showOpenDialog(LegosPanel.this);
           if (retv == JFileChooser.APPROVE_OPTION) {
             File[] fa = jfc.getSelectedFiles();

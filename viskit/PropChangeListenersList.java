@@ -37,7 +37,7 @@ public class PropChangeListenersList extends JList
   private DefaultListModel buildSampleData()
   {
     DefaultListModel mod = new DefaultListModel();
-    String jarFileName = "src/lib/simkit.jar";
+    String jarFileName = "lib/simkit.jar";
     JarFile jarFile = null;
     try {
       jarFile = new JarFile(jarFileName);

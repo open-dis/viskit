@@ -20,4 +20,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     //newEventGraph();
   }
 
+  public void quit()
+  //----------------
+  {
+    
+  }
+
 }

@@ -124,7 +124,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     this.setEditable(true);
 
-    // Won't want to do this in final version...need to check for save
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new WindowAdapter()
     {
@@ -186,7 +185,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
    */
   private void initUI()
   {
-    this.setFont(new Font("Courier",Font.PLAIN,12));
     // Layout menus
     this.setupMenus();
 

@@ -28,6 +28,7 @@ public class Main
 {
   public static void main(String[] args)
   {
+    //System.out.println(System.getProperty("user.dir"));
     String laf = "javax.swing.plaf.metal.MetalLookAndFeel";          //default
 
     String os = System.getProperty("os.name").toLowerCase();
