@@ -69,15 +69,14 @@ public class VGlobals
   public void addType(String ty)
   {
     if (Arrays.binarySearch(defaultTypes, ty) < 0) {
-      moreTypesMenu.add(new JMenuItem(ty));
-/*
+// todo      moreTypesMenu.add(new JMenuItem(ty));
+
       String[] newArr = new String[defaultTypes.length + 1];
       System.arraycopy(defaultTypes, 0, newArr, 0, defaultTypes.length);
       newArr[newArr.length - 1] = ty;
       defaultTypes = newArr;
       Arrays.sort(defaultTypes);
       cbMod = new DefaultComboBoxModel(defaultTypes);
-*/
     }
   }
 

@@ -83,7 +83,7 @@ public abstract class ViskitSmallDialog extends JDialog
    {
      ComboBoxModel mod = cb.getModel();
      for(int i=0;i<mod.getSize(); i++) {
-       if(nm.equals(mod.getElementAt(0))) {
+       if(nm.equals(mod.getElementAt(i))) {
          cb.setSelectedIndex(i);
          return;
        }
@@ -148,13 +148,13 @@ public abstract class ViskitSmallDialog extends JDialog
       setMaximumSize(d);
     }
   }
-  class myCloseListener extends WindowAdapter
+  class WindowClosingListener extends WindowAdapter
   {
     private Component parent;
     private JButton okButt;
     private JButton cancelButt;
 
-    myCloseListener(Component parent, JButton okButt, JButton cancelButt)
+    WindowClosingListener(Component parent, JButton okButt, JButton cancelButt)
     {
       this.parent = parent;
       this.okButt = okButt;

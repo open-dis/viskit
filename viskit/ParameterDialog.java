@@ -157,7 +157,7 @@ public class ParameterDialog extends JDialog
     String nm = p.getType();
     ComboBoxModel mod = parameterTypeCombo.getModel();
     for(int i=0;i<mod.getSize(); i++) {
-      if(nm.equals(mod.getElementAt(0))) {
+      if(nm.equals(mod.getElementAt(i))) {
         parameterTypeCombo.setSelectedIndex(i);
         return;
       }

@@ -46,8 +46,6 @@ public class StateVariableDialog extends ViskitSmallDialog
     this.stVar = (vStateVariable)param;
     this.locationComp = comp;
 
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
 
@@ -109,8 +107,8 @@ public class StateVariableDialog extends ViskitSmallDialog
     this.commentField.      addCaretListener(lis);
     this.stateVarTypeCombo.addActionListener(lis);
 
-    this.addWindowListener(new myCloseListener(this,okButt,canButt));
-
+    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new WindowClosingListener(this,okButt,canButt));
   }
 
   void setParams(Component c, Object p)

@@ -125,7 +125,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   //====================================================
   {
     super("Viskit");
-
     this.initMVC(mod,ctrl);   // set up mvc linkages
     this.initUI();            // build widgets
 
