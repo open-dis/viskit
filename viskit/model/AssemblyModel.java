@@ -393,6 +393,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbAE.setEventHeard(ae.getSourceEvent());
     jaxbAE.setEventSent(ae.getTargetEvent());
 
+    jaxbAE.setName(ae.getName());
+
     modelDirty = true;
     notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGECHANGED, "Adapter edge changed"));
   }
