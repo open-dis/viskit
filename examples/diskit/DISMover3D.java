@@ -10,6 +10,7 @@ import mil.navy.nps.math.Vec4f;
 import mil.navy.nps.math.Vec3f;
 import simkit.SimEntityBase;
 import simkit.Schedule;
+import simkit.smdx.MovementState;
 
 /**
  * mainly to pull out a position at a time
@@ -27,6 +28,7 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
     protected Vec4f startPosition;
     protected Vec4f velocity;
     protected Vec4f destination;
+    protected MovementState movementState;
     private Vec3f tp;
     float maxSpeed;
     float duration;
@@ -37,8 +39,10 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
                                      // a ref here, and reuse it to avoid lots of gc. Really the
                                      // only one using this would be the DIS sender which is a 
                                      // single thread.
-     private float scale;
-     private float dt;
+    private Vec4f originalStart; // for reset()
+    private float scale;
+    private float dt;
+    private double eps = 0.01; // change when converted to double precision vecs 
     
     /**
      * Creates a new instance of DISMover3DBase, a linear 3D momver. 
@@ -49,6 +53,7 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
      */
     public DISMover3D(Vec4f start, float speedLimit, short[] id) {
         startPosition = new Vec4f(start);
+        originalStart = new Vec4f(start);
         startPosition.set(3,(float)Schedule.getSimTime());
         velocity = new Vec4f();
         destination = new Vec4f();
@@ -56,6 +61,7 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
         cruisingSpeed = 0.0f;
         tp = new Vec3f(); // temporary gc free 
         currentPosition = new Vec4f(); // now the sender knows simtime, may be useful for clock pdu
+        movementState = MovementState.STOPPED;
         
         if (id.length < 1 ) {
             System.out.println("Setting dis-entity Id to (1,0,0)");
@@ -84,22 +90,59 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
      */    
     public void setVelocity(Vec4f v) {
         velocity.set(v);
+        setEndMove();
+    }
+    
+    private void setEndMove() {
+        setMovementState(MovementState.CRUISING);
         interrupt("EndMove",new Object[]{this});
         waitDelay("EndMove",velocity.get(3),new Object[]{this});
     }
         
-    // warp factor 11 Scotty! could Mr. Scott's reaction be considered an Event?
-    // maybe, but here the speed is just clipped. 
+    public void doEndMove(Mover3D mover) {
+        if (mover == this) {
+            stopHere();
+            setMovementState(MovementState.PAUSED);
+        }
+    }
+    
+     public void stop() {
+        stopHere();
+        setMovementState(MovementState.STOPPED);
+    }
+     
+   
+    public void pause() {
+        stopHere();
+        setMovementState(MovementState.PAUSED);
+    }
+    
+    public boolean isMoving() {
+        // if checking movementState wasn't enough:
+        if( Math.sqrt(Math.pow(velocity.get(0),2)+Math.pow(velocity.get(1),2)+Math.pow(velocity.get(2),2)) - eps > 0.0 )
+            return true;
+        else 
+            return false;
+    }
+     
+    // updates next StartPosition to whatever happens to be CurrentPosition
+    protected void stopHere() {
+        setStartPosition(getCurrentPosition());
+        velocity.sub(velocity);
+    }
+    
     /**
      * set desired cruisingSpeed, gets compared to maxSpeed and clipped
      * @param speed desired cruising speed, checked against maxSpeed
      */    
     public void setCruisingSpeed(float speed) {
+        float oldSpeed = cruisingSpeed;
         if ( speed > maxSpeed ) {
             cruisingSpeed = maxSpeed;
         } else {
             cruisingSpeed = speed;
         }
+        firePropertyChange("cruisingSpeed",oldSpeed,cruisingSpeed);
     }
     
     /**
@@ -115,7 +158,11 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
         setCruisingSpeed(cruisingSpeed); // checks if over limit
         destination.set(wp.get(0),wp.get(1),wp.get(2),tp.length()/cruisingSpeed); // arrive time now correctly set
         velocity.set(tp.get(0),tp.get(1),tp.get(2),destination.get(3)-(float)Schedule.getSimTime());
-        setVelocity(velocity); // schedule the event
+        setEndMove(); // schedule the event
+        setMovementState(MovementState.CRUISING);
+        firePropertyChange("destination",null,destination);
+        firePropertyChange("velocity",null,velocity);
+        waitDelay("StartMove",0.0,new Object[]{this});
     }
     
     /**
@@ -130,7 +177,11 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
             tp.set(wp.get(0)-startPosition.get(0),wp.get(1)-startPosition.get(1),wp.get(2)-startPosition.get(2));
             setCruisingSpeed(tp.length()/dt);
             velocity.set(tp.get(0),tp.get(1),tp.get(2),dt);
-            setVelocity(velocity); // schedule the event
+            setEndMove(); // schedule the event
+            setMovementState(MovementState.CRUISING);
+            firePropertyChange("velocity",null,velocity);
+            firePropertyChange("destination",null,startPosition);
+            waitDelay("StartMove",0.0,new Object[]{this});
         }
     }
     
@@ -164,6 +215,11 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
         return new Vec4f(startPosition); 
     }
     
+    public Vec3f getLocation() {
+        Vec4f t = getCurrentPosition();
+        return new Vec3f(t.get(0),t.get(1),t.get(2));
+    }
+    
     /**
      * sets startPostition of a move, which should be set at the beginning of a move, time component of position vector is set to current simtime, which would be at the start of a move.
      * @param sp startposition of a move, set usually at an EndMove event to the destination which is usually set by nextWayPoint.
@@ -171,6 +227,15 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
     public void setStartPosition(Vec4f sp) {
         startPosition.set(sp);
         startPosition.set(3,(float)(Schedule.getSimTime()));
+        firePropertyChange("startPosition",null,startPosition);
+    }
+    
+    public void setStartPosition(Vec3f sp) {
+        startPosition.set(0,sp.get(0));
+        startPosition.set(1,sp.get(1));
+        startPosition.set(2,sp.get(2));
+        startPosition.set(3,(float)Schedule.getSimTime());
+        firePropertyChange("startPosition",null,startPosition);
     }
     
     /**
@@ -187,5 +252,26 @@ public class DISMover3D extends SimEntityBase implements DISEntity, Mover3D {
                 (float)Schedule.getSimTime());
         
         return currentPosition;
+    }
+    
+    // right from UniformLinearMover
+    protected void setMovementState(MovementState state) {
+        MovementState oldState = getMovementState();
+        movementState = state;
+        firePropertyChange("movementState", oldState, movementState);
+    }
+    
+    
+    public MovementState getMovementState() {
+        return movementState;
+    }
+    
+    public void reset() {
+        super.reset();
+        setMovementState(MovementState.STOPPED);
+        startPosition = new Vec4f(originalStart);
+        startPosition.set(3,(float)Schedule.getSimTime());
+        destination = new Vec4f();
+      
     }
 }
