@@ -1,6 +1,6 @@
 package viskit;
 
-import simkit.viskit.model.EventArgument;
+import viskit.model.EventArgument;
 import java.util.ArrayList;
 
 /**

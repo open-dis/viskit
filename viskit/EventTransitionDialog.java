@@ -1,7 +1,7 @@
 package viskit;
 
-import simkit.viskit.model.EventStateTransition;
-import simkit.viskit.model.vStateVariable;
+import viskit.model.EventStateTransition;
+import viskit.model.vStateVariable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -141,8 +141,11 @@ public class EventTransitionDialog extends JDialog
       }
     });
     // to start off:
-    commentField.setText(((vStateVariable)testVars.getItemAt(0)).getComment());
-
+    if(testVars.getItemCount() > 0)
+      commentField.setText(((vStateVariable)testVars.getItemAt(0)).getComment());
+    else
+      commentField.setText("");
+    
     RadButtListener rbl = new RadButtListener();
     this.assTo.addActionListener(rbl);
     this.opOn.addActionListener(rbl);
@@ -215,7 +218,7 @@ public class EventTransitionDialog extends JDialog
     if(!est.getStateVarName().equals(""))     // for first time
       JOptionPane.showMessageDialog(this,"State variable "+est.getStateVarName() +"not found.",
                                          "alert", JOptionPane.ERROR_MESSAGE);
-    testVars.setSelectedIndex(0);
+   // testVars.setSelectedIndex(0);
   }
   private void unloadWidgets()
   {

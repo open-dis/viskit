@@ -1,9 +1,9 @@
 package viskit;
 
-import simkit.viskit.model.*;
+import viskit.model.*;
 
-import java.util.Vector;
 import java.awt.*;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,6 +14,9 @@ import java.awt.*;
  */
 public interface ViskitController
 {
+  /* start app */
+  void begin();
+
   /* user has clicked a button or menu item: */
   void newNode();
   void newSimParameter();
@@ -46,13 +49,13 @@ public interface ViskitController
   void saveAs();
   void selectNodeOrEdge(Vector v);
 
-  void xdeleteSimParameter();
   void deleteSimParameter(vParameter p);
-  void xdeleteStateVariable();
   void deleteStateVariable(vStateVariable var);
 
   void eventList();
   void generateJavaClass();
+  boolean syntaxCheck(EventNode node);
+  boolean syntaxCheck(Edge ed);
 
 
 }

@@ -1,6 +1,6 @@
 package viskit;
 
-import simkit.viskit.mvc.mvcModelEvent;
+import viskit.mvc.mvcModelEvent;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

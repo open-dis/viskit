@@ -1,19 +1,17 @@
 package viskit;
 
-import bsh.Interpreter;
 import bsh.EvalError;
+import bsh.Interpreter;
+import viskit.model.EventStateTransition;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import java.awt.event.*;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.ArrayList;
-
-import simkit.viskit.model.EventStateTransition;
-import simkit.viskit.model.EventArgument;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -71,15 +69,15 @@ public class TransitionsPanel extends JPanel implements ActionListener
     JPanel buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
     buttPan.add(Box.createHorizontalGlue());
-    plusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/plus.png")));
+    plusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
     plusButt.setBorder(null);
     plusButt.setText(null);
     Dimension d = plusButt.getPreferredSize();
     //plusButt.setFont(plusButt.getFont().deriveFont(plusButt.getFont().getSize2D() + 5f));
     plusButt.setMinimumSize(d);plusButt.setMaximumSize(d);
     buttPan.add(plusButt);
-    minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/minus.png")));
-    minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/minusGrey.png")));
+    minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
+    minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minusGrey.png")));
     d = plusButt.getPreferredSize();
     //minusButt.setFont(plusButt.getFont()); //.deriveFont(plusButt.getFont().getSize2D()+5f));
     minusButt.setMinimumSize(d);minusButt.setMaximumSize(d);
@@ -236,7 +234,7 @@ public class TransitionsPanel extends JPanel implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
     {
-      model.addElement("todo: transition statement");
+      model.addElement("int i = 0");
       lis.setVisibleRowCount(Math.max(model.getSize(),3));
       lis.ensureIndexIsVisible(model.getSize()-1);
       TransitionsPanel.this.invalidate();

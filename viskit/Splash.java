@@ -28,7 +28,7 @@ public class Splash extends JFrame
     super();
     this.setUndecorated(true);
     this.setBackground(new Color(255,255,255,128));
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/ViskitSplash.png"));
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash.png"));
     label = new JLabel(icon);
     label.setOpaque(false);
     this.getContentPane().add(label, BorderLayout.CENTER);
@@ -50,7 +50,7 @@ public class Splash extends JFrame
       Object[] arguments = new Object[]{args};
       Class[] parameterTypes = new Class[]{args.getClass()};
 
-      Class mainClass = Class.forName("simkit.viskit.Main");
+      Class mainClass = Class.forName("viskit.Main");
 
       Method mainMethod = mainClass.getMethod("main",parameterTypes);
       mainMethod.invoke(null, arguments);

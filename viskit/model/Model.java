@@ -1,14 +1,17 @@
 package viskit.model;
 
-import simkit.viskit.ModelEvent;
-import simkit.viskit.mvc.mvcAbstractModel;
-import simkit.xsd.bindings.*;
-import simkit.xsd.bindings.Event;
+import viskit.ModelEvent;
+import viskit.Controller;
+import viskit.mvc.mvcAbstractModel;
+import viskit.xsd.bindings.*;
+import viskit.xsd.bindings.Event;
+import viskit.xsd.translator.SimkitXML2Java;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,16 +46,18 @@ public class Model extends mvcAbstractModel implements ViskitModel
   HashMap evNodeCache = new HashMap();
   HashMap edgeCache = new HashMap();
   Vector stateVariables = new Vector();
+
   public void init()
   {
     try {
-      jc = JAXBContext.newInstance("simkit.xsd.bindings");
+      jc = JAXBContext.newInstance("viskit.xsd.bindings");
       oFactory = new ObjectFactory();
       jaxbRoot = oFactory.createSimkitModule(); // to start with empty graph
     }
     catch (JAXBException e) {
-      //assert false : "Model.java -- error on JAXBContext instantiation";
-      System.out.println("assert false : Model.java -- error on JAXBContext instantiation");
+      JOptionPane.showMessageDialog(null,"Exception on JAXBContext instantiation" +
+                                 "\n"+ e.getMessage(),
+                                 "XML Error",JOptionPane.ERROR_MESSAGE);
     }
   }
 
@@ -68,7 +73,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   private boolean modelDirty = false;
 
   /**
-   * Replace existing model with one contained in the existing file.
+   * Replace current model with one contained in the passed file.
    *
    * @param f
    */
@@ -82,14 +87,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
         jaxbRoot = oFactory.createSimkitModule(); // to start with empty graph
       }
       catch (JAXBException e) {
-        //assert false : "Model.java -- error on JAXBContext instantiation";
-        System.out.println("assert false : Model.java -- error on JAXBContext instantiation");
+        JOptionPane.showMessageDialog(null,"Exception on JAXBContext instantiation" +
+                                   "\n"+ f.getName() +
+                                   "\n"+ e.getMessage(),
+                                   "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+        return;
       }
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
     }
     else {
-      this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
-
       try {
         Unmarshaller u = jc.createUnmarshaller();
         // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
@@ -97,16 +103,22 @@ public class Model extends mvcAbstractModel implements ViskitModel
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimkitModule) u.unmarshal(f);
 
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
+
         buildEventsFromJaxb(jaxbRoot.getEvent());
         buildParametersFromJaxb(jaxbRoot.getParameter());
         buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
 
       }
       catch (JAXBException e) {
-        //assert false : "Model.java -- error on JAXBContext instantiation";
-        System.out.println("assert false : Model.java -- error unmarshalling " + f.getName());
+        JOptionPane.showMessageDialog(null,"Exception on JAXB unmarshalling" +
+                                   "\n"+ f.getName() +
+                                   "\n"+ e.getMessage(),
+                                   "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+
         return;
       }
+
     }
     currentFile = f;
     modelDirty = false;
@@ -133,22 +145,26 @@ public class Model extends mvcAbstractModel implements ViskitModel
        fw.close();
 
        modelDirty = false;
+       currentFile = f;
      }
      catch (JAXBException e) {
-       //assert false : "Model.java -- error on JAXBContext instantiation";
-       System.err.println("assert false : Model.java -- error marshalling "+f.getName()+"\n"+e);
-       modelDirty = true;
+       JOptionPane.showMessageDialog(null,"Exception on JAXB marshalling" +
+                                  "\n"+ f.getName() +
+                                  "\n"+ e.getMessage(),
+                                  "XML I/O Error",JOptionPane.ERROR_MESSAGE);
+       return;
      }
      catch (IOException ex) {
-       System.err.println("Error writing the file...");   // todo, access view and put up error dialog
-       modelDirty = true;
+       JOptionPane.showMessageDialog(null,"Exception on writing "+ f.getName() +
+                                  "\n"+ ex.getMessage(),
+                                  "File I/O Error",JOptionPane.ERROR_MESSAGE);
+       return;
      }
   }
 
   private void buildEventsFromJaxb(List lis)
   //----------------------------------------
   {
-   // xdim = ydim = 1; // init...temp
     for(Iterator itr = lis.iterator(); itr.hasNext();) {
       Event ev = (Event)itr.next();
       EventNode en = buildNodeFromJaxbEvent(ev);
@@ -168,11 +184,11 @@ public class Model extends mvcAbstractModel implements ViskitModel
     en.opaqueModelObject = ev;
     evNodeCache.put(ev,en);   // key = ev
 
-    //notifyChanged(new ModelEvent(new Object[]{en,p},ModelEvent.EVENTADDED, "Event added"));
     notifyChanged(new ModelEvent(en,ModelEvent.EVENTADDED, "Event added"));
 
     return en;
   }
+
   private String concatStrings(List lis)
   {
     StringBuffer sb = new StringBuffer();
@@ -239,28 +255,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
   }
 
-/*
-  int xdim = 1, ydim=1;
-  int factor = 50;
-  private Point tempPositionPoint(String name)
-  {
-    if(name.equalsIgnoreCase("run"))
-      return new Point(20,20);
-    else if(name.equalsIgnoreCase("arrival"))
-      return new Point(120,20);
-    else if(name.equalsIgnoreCase("startservice"))
-      return new Point(250,20);
-    else if(name.equalsIgnoreCase("renege"))
-      return new Point(120,150);
-    else if(name.equalsIgnoreCase("endservice"))
-      return new Point(250,150);
-
-    return new Point(factor*xdim++,factor*ydim++);
-  }
-*/
   private void buildEdgesFromJaxb(EventNode src,List lis)
   {
-
     for(Iterator itr = lis.iterator(); itr.hasNext();) {
       Object o = itr.next();
       if( o instanceof Schedule) {
@@ -271,6 +267,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       }
     }
   }
+
   private SchedulingEdge buildScheduleEdgeFromJaxb(EventNode src, Schedule ed)
   {
     SchedulingEdge se = new SchedulingEdge();
@@ -342,6 +339,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       notifyChanged(new ModelEvent(v,ModelEvent.STATEVARIABLEADDED,"New state variable"));
     }
   }
+
   private void buildParametersFromJaxb(List lis)
   {
     for(Iterator itr = lis.iterator(); itr.hasNext();) {
@@ -359,21 +357,6 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   }
 
-
-
-  /**
-   * Replace existing model with one contained in the existing reader source.
-   *
-   * //@param reader
-   */
-  public void newModel()//EventGraphXMLReader reader, boolean pIsEditable)
-  {
-    // put code to do it here
-
-    modelDirty = false;
-    this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
-  }
-
   public Vector getAllNodes()
   {
     return new Vector(evNodeCache.values());
@@ -388,6 +371,22 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     return new ArrayList(jaxbRoot.getParameter());
   }
+
+  // Source building
+  // ---------------
+  public String buildJavaSource()
+  {
+   try {
+     SimkitXML2Java x2j = new SimkitXML2Java(currentFile);
+     x2j.unmarshal();
+     return x2j.translate();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
 
   // parameter mods
   // --------------
@@ -504,8 +503,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
       jaxbEv = oFactory.createEvent();
     }
     catch (JAXBException e) {
-      //assert false : "Model.newEvent, error creating simkit.xsd.bindings.Event.";
-      System.err.println("Model.newEvent, error creating simkit.xsd.bindings.Event.");
+      //assert false : "Model.newEvent, error creating viskit.xsd.bindings.Event.";
+      System.err.println("Model.newEvent, error creating viskit.xsd.bindings.Event.");
       return;
     }
 
@@ -517,6 +516,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     modelDirty = true;
     notifyChanged(new ModelEvent(node,ModelEvent.EVENTADDED, "Event added"));
   }
+
   /**
    * Delete the referenced event, also deleting attached edges.
    *
@@ -531,6 +531,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     modelDirty = true;
     this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
   }
+
   private StateVariable findStateVariable(String nm)
   {
     List lis = jaxbRoot.getStateVariable();
@@ -539,9 +540,9 @@ public class Model extends mvcAbstractModel implements ViskitModel
       if(st.getName().equals(nm))
         return st;
     }
-    //assert false : Model.findStateVariable, missing stateVar
     return null;
   }
+
   private void cloneTransitions(List targ, ArrayList local)
   {
     try {
@@ -569,11 +570,13 @@ public class Model extends mvcAbstractModel implements ViskitModel
       e.printStackTrace();
     }
   }
+
   private void cloneComments(List targ, ArrayList local)
   {
     targ.clear();
     targ.addAll(local);
   }
+
   private void cloneArguments(List targ, ArrayList local)
   {
     try {
@@ -593,6 +596,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       System.err.println("Exc Model.cloneArguments() "+e);
     }
   }
+
   private void cloneLocalVariables(List targ, Vector local)
   {
     try {
@@ -614,6 +618,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
 
   }
+
   public void changeEvent(EventNode node)
   {
     Event jaxbEv = (Event)node.opaqueModelObject;
@@ -656,8 +661,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
       sch = oFactory.createSchedule();
     }
     catch (JAXBException e) {
-      //assert false : "Model.newEdge, error createing simkit.xsd.bindings.Schedule.";
-      System.err.println("Model.newEdge, error createing simkit.xsd.bindings.Schedule.");
+      //assert false : "Model.newEdge, error creating viskit.xsd.bindings.Schedule.";
+      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.Schedule.");
       return;
     }
     se.opaqueModelObject = sch;
@@ -694,8 +699,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
       can = oFactory.createCancel();
     }
     catch (JAXBException e) {
-      //assert false : "Model.newEdge, error createing simkit.xsd.bindings.Cancel.";
-      System.err.println("Model.newEdge, error createing simkit.xsd.bindings.Cancel.");
+      //assert false : "Model.newEdge, error creating viskit.xsd.bindings.Cancel.";
+      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.Cancel.");
       return;
     }
     ce.opaqueModelObject = can;
@@ -818,6 +823,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     testNodes.clear();
   }
+
   private void tempRemoveAllEdges()
   {
     for(Iterator itr = testEdges.iterator(); itr.hasNext();) {
@@ -829,104 +835,4 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     testEdges.clear();
   }
-  
-  public void changeCancelEdge(simkit.viskit.model.Edge e) {
-  }
-  
-  public void changeEdge(simkit.viskit.model.Edge e) {
-  }
-  
-  public void changeEvent(simkit.viskit.model.EventNode ev) {
-  }
-  
-  public void changeSimParameter(simkit.viskit.model.vParameter p) {
-  }
-  
-  public void changeStateVariable(simkit.viskit.model.vStateVariable st) {
-  }
-  
-  public void deleteCancelEdge(simkit.viskit.model.CancellingEdge edge) {
-  }
-  
-  public void deleteEdge(simkit.viskit.model.SchedulingEdge edge) {
-  }
-  
-  public void deleteEvent(simkit.viskit.model.EventNode node) {
-  }
-  
-  public void deleteSimParameter(simkit.viskit.model.vParameter p) {
-  }
-  
-  public void deleteStateVariable(simkit.viskit.model.vStateVariable sv) {
-  }
-  
-  public void newCancelEdge(simkit.viskit.model.EventNode src, simkit.viskit.model.EventNode target) {
-  }
-  
-  public void newEdge(simkit.viskit.model.EventNode src, simkit.viskit.model.EventNode target) {
-  }
-  
-  /*
-  private void initTestData()
-  {
-    modelDirty = true;
-    EventNode run_en = new EventNode("Run");  testNodes.add(run_en);
-    announceNewNode(run_en,new Point(20,50));
-
-    EventNode arr_en = new EventNode("Arrival"); testNodes.add(arr_en);
-    arr_en.stateTrans = "Q++";
-    announceNewNode(arr_en,new Point(120,50));
-
-    EventNode st_en = new EventNode("Start\nService");  testNodes.add(st_en);
-    st_en.stateTrans = "Q--, S--";
-    announceNewNode(st_en,new Point(270,50));
-
-    EventNode endSvc_en = new EventNode("End\nService");  testNodes.add(endSvc_en);
-    endSvc_en.stateTrans = "S++";
-    announceNewNode(endSvc_en,new Point(420,50));
-
-    EventNode endR_en = new EventNode("End\nRepair");    testNodes.add(endR_en);
-    endR_en.stateTrans = "F--";
-    announceNewNode(endR_en,new Point(270,200));
-
-    EventNode fail_en = new EventNode("Failure");       testNodes.add(fail_en);
-    fail_en.stateTrans = "F++,<br>Q += 1-S,<br>S = 0";
-    announceNewNode(fail_en,new Point(420,200));
-
-    SchedulingEdge sEdge           = tempNewEdge(run_en,arr_en);      testEdges.add(sEdge);
-    SchedulingEdge seArrToSvc      = tempNewEdge(arr_en,st_en);       testEdges.add(seArrToSvc);
-    SchedulingEdge seSTStoEnds     = tempNewEdge(st_en,endSvc_en);    testEdges.add(seSTStoEnds);
-    SchedulingEdge seEndToSt       = tempNewEdge(endSvc_en,st_en);    testEdges.add(seEndToSt);
-    SchedulingEdge seEndRprToStSvc = tempNewEdge(endR_en,st_en);      testEdges.add(seEndRprToStSvc);
-    CancellingEdge cEdge           = tempNewCancelEdge(fail_en,endSvc_en);  testEdges.add(cEdge);
-    SchedulingEdge seEndRprToFail  = tempNewEdge(endR_en,fail_en);    testEdges.add(seEndRprToFail);
-    SchedulingEdge seFailToEndRpt  = tempNewEdge(fail_en,endR_en);    testEdges.add(seFailToEndRpt);
-
-    nodes.put(run_en.getModelKey(),    run_en);
-    nodes.put(arr_en.getModelKey(),    arr_en);
-    nodes.put(st_en.getModelKey(),     st_en);
-    nodes.put(endSvc_en.getModelKey(), endSvc_en);
-    nodes.put(endR_en.getModelKey(),   endR_en);
-    nodes.put(fail_en.getModelKey(),   fail_en);
-
-    edges.put(sEdge.getModelKey(),sEdge);
-    edges.put(seArrToSvc.getModelKey(),seArrToSvc);
-    edges.put(seSTStoEnds.getModelKey(),seSTStoEnds);
-    edges.put(seEndToSt.getModelKey(),seEndToSt);
-    edges.put(seEndRprToStSvc.getModelKey(),seEndRprToStSvc);
-    edges.put(cEdge.getModelKey(),cEdge);
-    edges.put(seEndRprToFail.getModelKey(),seEndRprToFail);
-    edges.put(seFailToEndRpt.getModelKey(),seFailToEndRpt);
-
-    announceNewEdge(sEdge);
-    announceNewEdge(seArrToSvc);
-    announceNewEdge(seSTStoEnds);
-    announceNewEdge(seEndToSt);
-    announceNewEdge(seEndRprToStSvc);
-    announceNewEdge(seEndRprToFail);
-    announceNewEdge(seFailToEndRpt);
-
-    announceCancelEdge(cEdge);
-  }
-*/
 }

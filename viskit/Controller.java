@@ -2,8 +2,9 @@ package viskit;
 
 import actions.ActionIntrospector;
 import org.jgraph.graph.DefaultGraphCell;
-import simkit.viskit.mvc.mvcAbstractController;
-import simkit.viskit.model.*;
+import viskit.model.*;
+import viskit.mvc.mvcAbstractController;
+import viskit.xsd.translator.SimkitXML2Java;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,33 +37,63 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //=================
   {
   }
+  public void begin()
+  //-----------------
+  {
+    newEventGraph();
+  }
 
   public void quit()
   //----------------
   {
-    // todo implement
+    if (((Model)getModel()).isDirty())
+      if(askToSaveAndContinue() == false)
+        return;
     System.exit(0);
+  }
+
+  public void newEventGraph()
+  //-------------------------
+  {
+    if (((Model)getModel()).isDirty())
+      if(askToSaveAndContinue() == false)
+        return;
+
+    ((ViskitModel) getModel()).newModel(null);
+  }
+
+/**
+ *
+ * @return true = continue, false = don't (i.e., we cancelled)
+ */
+  private boolean askToSaveAndContinue()
+  {
+    int yn = (((ViskitView) getView()).genericAsk("Question", "Save current graph?"));
+
+    switch (yn) {
+      case JOptionPane.YES_OPTION:
+        save();
+        if(((Model)getModel()).isDirty())
+          return false; // we cancelled
+       // else
+          return true;
+        //break;
+      case JOptionPane.NO_OPTION:
+        return true;
+        //break;
+      case JOptionPane.CANCEL_OPTION:
+      default:
+        return false;
+    }
   }
 
   File lastFile;
   public void open()
   //----------------
   {
-    if (((Model)getModel()).isDirty()) {
-      // Ask to save
-      int yn = (((ViskitView) getView()).genericAsk("Question", "Save current graph?"));
-
-      switch (yn) {
-        case JOptionPane.YES_OPTION:
-          ((Model)getModel()).saveModel(null);       // null means use original file
-          break;
-        case JOptionPane.NO_OPTION:
-          break;
-        case JOptionPane.CANCEL_OPTION:
-        default:
-          return;
-      }
-    }
+    if (((Model)getModel()).isDirty())
+      if(askToSaveAndContinue() == false)
+        return;
 
     lastFile = ((ViskitView) getView()).openFileAsk();
     if (lastFile != null) {
@@ -84,10 +115,10 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //------------------
   {
     lastFile = ((ViskitView)getView()).saveFileAsk();
-    if(lastFile != null)
+    if(lastFile != null) {
       ((ViskitModel)getModel()).saveModel(lastFile);
-
-    ((ViskitView)getView()).fileName(lastFile.getName());
+      ((ViskitView)getView()).fileName(lastFile.getName());
+    }
   }
 
   public void newSimParameter()
@@ -105,17 +136,18 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   {
     boolean modified = ((ViskitView) getView()).doEditParameter(param);
     if (modified) {
-      ((simkit.viskit.model.ViskitModel) getModel()).changeSimParameter(param);
+      ((viskit.model.ViskitModel) getModel()).changeSimParameter(param);
     }
   }
+
   public void stateVariableEdit(vStateVariable var)
   {
     boolean modified = ((ViskitView) getView()).doEditStateVariable(var);
     if (modified) {
-      ((simkit.viskit.model.ViskitModel) getModel()).changeStateVariable(var);
+      ((viskit.model.ViskitModel) getModel()).changeStateVariable(var);
     }
-
   }
+  
   public void newStateVariable()
   {
     ((ViskitView) getView()).addStateVariableDialog();
@@ -123,7 +155,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void newStateVariable(String name, String type, String initVal, String comment)
   //----------------------------
   {
-    ((simkit.viskit.model.ViskitModel)getModel()).newStateVariable(name,type,initVal,comment);
+    ((viskit.model.ViskitModel)getModel()).newStateVariable(name,type,initVal,comment);
   }
 
   private Vector selectionVector = new Vector();
@@ -135,6 +167,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     boolean ccbool = (selectionVector.size() > 0 ? true : false);
     ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
     ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
+    ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
   }
 
   private Vector copyVector = new Vector();
@@ -159,8 +192,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       Object o = itr.next();
       if(o instanceof Edge)
         continue;
-      String nm = ((simkit.viskit.model.EventNode)o).getName();
-      ((simkit.viskit.model.ViskitModel) getModel()).newEvent(nm+"-copy", new Point(x+(20*n),y+(20*n)));
+      String nm = ((viskit.model.EventNode)o).getName();
+      ((viskit.model.ViskitModel) getModel()).newEvent(nm+"-copy", new Point(x+(20*n),y+(20*n)));
       n++;
     }
   }
@@ -211,30 +244,11 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((ViskitModel) getModel()).deleteCancelEdge((CancellingEdge) e);
   }
 
-  public void xdeleteSimParameter()
-  //---------------------------
-  {
-    String ret = ((ViskitView) getView()).promptForStringOrCancel("Delete vParameter", "Enter parameter name:", "");
-
-    if (ret == null || ret.trim().length() <= 0)
-      return;
-  // x  ((ViskitModel) getModel()).deleteSimParameter(ret.trim());
-  }
   public void deleteSimParameter(vParameter p)
   {
     ((ViskitModel) getModel()).deleteSimParameter(p);    
   }
 
-  public void xdeleteStateVariable()
-  //-------------------------------
-  {
-    String ret = ((ViskitView) getView()).promptForStringOrCancel("Delete State Variable", "Enter variable name:", "");
-
-    if (ret == null || ret.trim().length() <= 0)
-      return;
-
-  //x  ((ViskitModel) getModel()).deleteStateVariable(ret.trim());
-  }
   public void deleteStateVariable(vStateVariable var)
   {
     ((ViskitModel)getModel()).deleteStateVariable(var);
@@ -243,20 +257,32 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void generateJavaClass()
   //-----------------------------
   {
-    // todo implement
-    System.out.println("generateJavaClass in " + this);
+    if(((ViskitModel)getModel()).isDirty()) {
+      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
+      if(ret != JOptionPane.YES_OPTION)
+        return;
+      this.saveAs();
+    }
+
+    String source = ((ViskitModel)getModel()).buildJavaSource();
+    if(source != null && source.length() > 0)
+      ((ViskitView)getView()).showAndSaveSource(source);
+  }
+
+  public boolean syntaxCheck(EventNode node)
+  {
+    return false;
+  }
+
+  public boolean syntaxCheck(Edge ed)
+  {
+    return false;
   }
 
   public void newAssembly()
   {
     // todo implement
     System.out.println("newAssembly in " + this);
-  }
-
-  public void newEventGraph()
-  {
-    // todo implement
-    System.out.println("newEventGraph in " + this);
   }
 
   public void eventList()
@@ -274,7 +300,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //--------------------------
   {
     String fauxName = "evnt " + nodeCount++;
-    ((simkit.viskit.model.ViskitModel) getModel()).newEvent(fauxName, p);
+    ((viskit.model.ViskitModel) getModel()).newEvent(fauxName, p);
   }
 
   public void newArc(Object[] nodes)
@@ -295,30 +321,43 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel) getModel()).newCancelEdge(src, tar);
   }
 
-  public void nodeEdit(simkit.viskit.model.EventNode node)      // shouldn't be required
+  public void newSelfRefEdge()
+  //--------------------------
+  {
+    if (selectionVector != null && selectionVector.size() > 0) {
+      for (Iterator itr = selectionVector.iterator(); itr.hasNext();) {
+        Object o = itr.next();
+        if(o instanceof EventNode) {
+          ((ViskitModel) getModel()).newEdge((EventNode)o,(EventNode)o);
+        }
+      }
+    }
+  }
+  
+  public void nodeEdit(viskit.model.EventNode node)      // shouldn't be required
   //----------------------------------
   {
     boolean modified = ((ViskitView) getView()).doEditNode(node);
     if (modified) {
-      ((simkit.viskit.model.ViskitModel) getModel()).changeEvent(node);
+      ((viskit.model.ViskitModel) getModel()).changeEvent(node);
     }
   }
 
-  public void arcEdit(simkit.viskit.model.SchedulingEdge ed)
+  public void arcEdit(viskit.model.SchedulingEdge ed)
   //------------------------------------
   {
     boolean modified = ((ViskitView) getView()).doEditEdge(ed);
     if (modified) {
-      ((simkit.viskit.model.ViskitModel) getModel()).changeEdge(ed);
+      ((viskit.model.ViskitModel) getModel()).changeEdge(ed);
     }
   }
 
-  public void canArcEdit(simkit.viskit.model.CancellingEdge ed)
+  public void canArcEdit(viskit.model.CancellingEdge ed)
   //---------------------------------------
   {
     boolean modified = ((ViskitView) getView()).doEditCancelEdge(ed);
     if (modified) {
-      ((simkit.viskit.model.ViskitModel) getModel()).changeCancelEdge(ed);
+      ((viskit.model.ViskitModel) getModel()).changeCancelEdge(ed);
     }
   }
 

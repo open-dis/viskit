@@ -1,21 +1,19 @@
 package viskit;
 
-import bsh.Interpreter;
 import bsh.EvalError;
+import bsh.Interpreter;
+import viskit.model.Edge;
+import viskit.model.vParameter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
-
-import simkit.viskit.model.Edge;
-import simkit.viskit.model.vParameter;
-import simkit.xsd.bindings.EdgeParameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -150,6 +148,14 @@ public class ConditionalsPanel extends JPanel implements ActionListener
   public String getText()
   {
     return jta.getText();
+  }
+  public void setComment(String s)
+  {
+    jtaComments.setText(s);
+  }
+  public String getComment()
+  {
+    return jtaComments.getText().trim();
   }
   private ChangeListener lis;
   public void addChangeListener(ChangeListener lis)

@@ -1,6 +1,7 @@
 package viskit;
 
-import simkit.viskit.model.*;
+import viskit.model.*;
+
 import java.io.File;
 
 /**
@@ -32,7 +33,9 @@ public interface ViskitView
   public File    saveFileAsk();
 
   public void    fileName(String s);    // informative, tells view what we're working on
-  
+
+  public void    showAndSaveSource(String s);
+
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
   public void addParameterDialog();
   public void addStateVariableDialog();

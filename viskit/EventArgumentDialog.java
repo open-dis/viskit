@@ -1,19 +1,14 @@
 package viskit;
 
-import simkit.viskit.model.Edge;
-import simkit.viskit.model.vParameter;
-import simkit.viskit.model.EventArgument;
-import simkit.viskit.model.vStateVariable;
+import viskit.model.EventArgument;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
 import javax.swing.border.EtchedBorder;
-import java.util.regex.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.

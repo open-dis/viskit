@@ -1,19 +1,21 @@
 package viskit;
 
-import simkit.viskit.model.*;
-import simkit.xsd.bindings.Schedule;
-import simkit.xsd.bindings.Cancel;
+import viskit.model.*;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.CaretListener;
+import javax.swing.event.CaretEvent;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.Collections;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.border.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -247,7 +249,15 @@ public class EdgeInspectorDialog extends JDialog
     conditionals.addChangeListener(chlis);
     //ActionListener ttArgLis = new ArgumentsToolTipUpdater();
     //targEvent.addActionListener(ttArgLis);
-    
+    delay.addCaretListener(new CaretListener()
+    {
+      public void caretUpdate(CaretEvent e)
+      {
+        modified = true;
+        okButt.setEnabled(true);
+        getRootPane().setDefaultButton(okButt);        
+      }
+    });
 
     parameters.addDoubleClickedListener(new ActionListener()
     {
@@ -307,6 +317,7 @@ public class EdgeInspectorDialog extends JDialog
 
     if(edge instanceof SchedulingEdge) {
       conditionals.setText(edge.conditional);
+      conditionals.setComment(edge.conditionalsComment);
       //conditionals.setText(((Schedule)((SchedulingEdge)edgeCopy).opaqueModelObject).getCondition());
       delay.setText(""+edge.delay);
       //delay.setText((((Schedule)((SchedulingEdge)edgeCopy).opaqueModelObject).getDelay()));
@@ -315,6 +326,7 @@ public class EdgeInspectorDialog extends JDialog
   }
     else {
       conditionals.setText(edge.conditional);
+      conditionals.setComment(edge.conditionalsComment);
       //conditionals.setText(((Cancel)((CancellingEdge)edgeCopy).opaqueModelObject).getCondition());
       delay.setText("n/a");
       delay.setEnabled(false);
@@ -328,7 +340,7 @@ public class EdgeInspectorDialog extends JDialog
     //edge.to   = (EventNode)targEvent.getSelectedItem(); //edgeCopy.to;
     edge.delay = delay.getText();
     edge.conditional = conditionals.getText();
-
+    edge.conditionalsComment = conditionals.getComment();
     edge.parameters.clear();
     for(Iterator itr = parameters.getData().iterator(); itr.hasNext(); ) {
       edge.parameters.add(itr.next());
@@ -361,9 +373,17 @@ public class EdgeInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
-      if(modified)
+      if(modified) {
+        String parseResults = VGlobals.instance().parseCode(edge.from,conditionals.getText());
+        if(parseResults != null) {
+          int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
+                                        "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+          if(ret != JOptionPane.YES_OPTION)
+            return;
+        }
         unloadWidgets();
       setVisible(false);
+      }
     }
   }
   class myChangeListener implements ChangeListener

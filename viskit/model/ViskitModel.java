@@ -59,9 +59,14 @@ public interface ViskitModel
   public ArrayList getSimParameters();
 
 
+  /**
+   * Message by the controller to create JavaSource from the model.
+   * @return The generated source as a String, or null if error.
+   */
+  public String buildJavaSource();
+
+
   // todo further comments...
-
-
   public void newEvent      (String nodeName, Point p);
   public void newEdge       (EventNode src, EventNode target);
   public void newCancelEdge (EventNode src, EventNode target);

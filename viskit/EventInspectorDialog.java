@@ -1,19 +1,17 @@
 package viskit;
 
-import bsh.Interpreter;
-import bsh.EvalError;
+import viskit.model.EventArgument;
+import viskit.model.EventLocalVariable;
+import viskit.model.EventNode;
+import viskit.model.EventStateTransition;
 
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
 import java.util.Vector;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.border.EtchedBorder;
-
-import simkit.viskit.model.*;
-import simkit.xsd.bindings.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

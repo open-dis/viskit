@@ -1,19 +1,19 @@
 package viskit;
 
-import simkit.viskit.model.*;
-import simkit.xsd.bindings.Schedule;
-import simkit.xsd.bindings.Cancel;
+import viskit.model.*;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.Collections;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.border.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

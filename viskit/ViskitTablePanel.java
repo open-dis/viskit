@@ -4,8 +4,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -98,7 +98,7 @@ public abstract class ViskitTablePanel extends JPanel
      buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
      buttPan.add(Box.createHorizontalGlue());
       // add button
-      plusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/plus.png")));
+      plusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
       plusButt.setBorder(null);
       plusButt.setText(null);
       plusButt.setToolTipText(getPlusToolTip());
@@ -108,8 +108,8 @@ public abstract class ViskitTablePanel extends JPanel
       plusButt.setActionCommand("p");
      buttPan.add(plusButt);
       // delete button
-      minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/minus.png")));
-      minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/minusGrey.png")));
+      minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
+      minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minusGrey.png")));
       minusButt.setBorder(null);
       minusButt.setText(null);
       minusButt.setToolTipText(getMinusToolTip());

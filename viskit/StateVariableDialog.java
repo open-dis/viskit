@@ -1,15 +1,14 @@
 package viskit;
 
-import simkit.viskit.model.vParameter;
-import simkit.viskit.model.vStateVariable;
+import viskit.model.vStateVariable;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
 import javax.swing.border.EtchedBorder;
-import java.util.regex.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * A dialog class that lets the user add a new state variable to the document.

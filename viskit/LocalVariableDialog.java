@@ -10,7 +10,7 @@ package viskit;
  * Time: 9:19:41 AM
  */
 
-import simkit.viskit.model.EventLocalVariable;
+import viskit.model.EventLocalVariable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

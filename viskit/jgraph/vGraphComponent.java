@@ -7,11 +7,11 @@ import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 
-import simkit.viskit.EventGraphViewFrame;
-import simkit.viskit.ModelEvent;
-import simkit.viskit.ViskitController;
-import simkit.viskit.model.*;
-import simkit.viskit.model.Edge;
+import viskit.EventGraphViewFrame;
+import viskit.ModelEvent;
+import viskit.ViskitController;
+import viskit.model.*;
+import viskit.model.Edge;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.util.*;
 
 /**
@@ -722,21 +723,20 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing
     if (sig == 0)
       adjustFactor *= -1;
 
-    int adjustment = 40 * adjustFactor;
+    int adjustment = 0  + 35 * adjustFactor;       // little bias
 
     int dx = Math.abs(from.x - to.x);
     int dy = Math.abs(from.y - to.y);
-    int x2 = from.x + ((to.x - from.x) / 3); //2);
-    int y2 = from.y + ((to.y - from.y) / 3); //2);
-
+    int x2 = from.x + ((to.x - from.x) / 2);
+    int y2 = from.y + ((to.y - from.y) / 2);
     Point[] routed = new Point[2];
     if (dx > dy) {
-      routed[0] = new Point(x2, from.y + adjustment);
-      routed[1] = new Point(x2, to.y - adjustment);
+      routed[0] = new Point(x2, from.y+adjustment);
+      routed[1] = new Point(x2, to.y-adjustment);
     }
     else {
-      routed[0] = new Point(from.x - adjustment, y2);
-      routed[1] = new Point(to.x + adjustment, y2);
+      routed[0] = new Point(from.x-adjustment, y2);
+      routed[1] = new Point(to.x+adjustment, y2);
     }
 
 
@@ -774,7 +774,7 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing
       masterKey = toStr + "-" + fromStr;
 
     vEdgeCell vec = (vEdgeCell) ev.getCell();
-    simkit.viskit.model.Edge edg = (simkit.viskit.model.Edge) vec.getUserObject();
+    viskit.model.Edge edg = (viskit.model.Edge) vec.getUserObject();
     Object edgeKey = edg.getModelKey();
 
     Vector lis = (Vector) nodePairs.get(masterKey);
@@ -797,7 +797,6 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing
 
 /**
  * Class to draw the self-referential edges as an arc attached to the node.
- * todo: support multiple self-refs per node
  */
 class vSelfEdgeRenderer extends vEdgeRenderer
 {
@@ -809,14 +808,19 @@ class vSelfEdgeRenderer extends vEdgeRenderer
    */
   private int circleDiam = 30;
   private Arc2D arc;
-
   protected Shape createShape()
   {
     CircleView myCircle = (CircleView) view.getSource().getParentView();
     Rectangle circBnds = myCircle.getBounds();
+    int circCenterX = circBnds.x + circBnds.width /2;
+    int circCenterY = circBnds.y + circBnds.height / 2;
 
     int topCenterX = circBnds.x + circBnds.width / 2 - circleDiam / 2;
     int topCenterY = circBnds.y + circBnds.height - 7;  // 7 pixels up
+
+    AffineTransform rotater = new AffineTransform();
+    rotater.setToRotation(getAngle(),(double)circCenterX,(double)circCenterY);
+
     if (view.sharedPath == null) {
       double ex = 0.0d + topCenterX;
       double ey = 0.0d + topCenterY;
@@ -824,6 +828,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer
       double eh = 0.0d + circleDiam;
       arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start , extent
       view.sharedPath = new GeneralPath(arc);
+      view.sharedPath = new GeneralPath(view.sharedPath.createTransformedShape(rotater));
     }
     else {
       view.sharedPath.reset();
@@ -838,9 +843,11 @@ class vSelfEdgeRenderer extends vEdgeRenderer
 
     if (beginDeco != GraphConstants.ARROW_NONE) {
       view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point(pstrt.x + 15, pstrt.y + 15));
+      view.beginShape = rotater.createTransformedShape(view.beginShape);
     }
     if (endDeco != GraphConstants.ARROW_NONE) {
       view.endShape = createLineEnd(endSize, endDeco, new Point(pend.x + 15, pend.y + 25), pend);
+      view.endShape = rotater.createTransformedShape(view.endShape);
     }
 
     view.lineShape = (GeneralPath) view.sharedPath.clone();
@@ -852,6 +859,40 @@ class vSelfEdgeRenderer extends vEdgeRenderer
 
     return view.sharedPath;
   }
+
+  /**
+   * Defines how much we increment the angle calculated in getAngle() for each self-referential edge discovered.
+   * Since we want to advance 3/8 of a circle for each edge, the value below should be 2Pi * 3/8.
+   * But since the iterator in getAngle discovers each edge twice (since the node has a connection to
+   * both its head and tail, the math works out to rotate only half that much.
+   */
+  private static double rotIncr = Math.PI * 3.d / 8.d;
+
+  /**
+   * This class will determine if there are other self-referential edges attached to this
+   * node, and try to return a different angle for different edges, so they will be rendered
+   * at different "clock" points around the node circle.  The
+   * @return
+   */
+  private double getAngle()
+  {
+    vEdgeCell vec = (vEdgeCell)view.getCell();
+    Edge edg = (Edge)vec.getUserObject();
+
+    CircleCell vcc = (CircleCell)view.getSource().getParentView().getCell();
+    EventNode en = (EventNode)vcc.getUserObject();
+    double retd = -rotIncr;
+    for(Iterator itr = en.getConnections().iterator(); itr.hasNext();) {
+      Edge e = (Edge)itr.next();
+      if(e.to == en && e.from == en) {
+        retd += rotIncr;
+        if(e == edg)
+          return retd;
+      }
+    }
+    return 0.0d;      // should always find one
+  }
+
 }
 
 

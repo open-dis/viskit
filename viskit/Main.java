@@ -1,14 +1,12 @@
 package viskit;
 
-import simkit.viskit.model.Model;
+import viskit.model.Model;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.Map;
+import java.awt.geom.PathIterator;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -39,6 +37,7 @@ public class Main
       //laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
       //laf = "apple.laf.AquaLookAndFeel";
       laf = "javax.swing.plaf.metal.MetalLookAndFeel";
+      //laf = QuaquaManager.getLookAndFeelClassName();
       //System.setProperty("apple.awt.brushMetalLook","true");
       System.setProperty("apple.awt.antialiasing", "true");
       //System.setProperty("apple.awt.showGrowBox","true");     // only for aqua
@@ -63,6 +62,7 @@ public class Main
 
     //setAllFonts(view);
     view.setVisible(true);
+    controller.begin();
   }
 
   private static void setAllFonts(JFrame f)
@@ -123,4 +123,4 @@ public class Main
     }
 
   }
-}
+ }

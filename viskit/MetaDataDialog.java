@@ -1,6 +1,6 @@
 package viskit;
 
-import simkit.viskit.model.GraphMetaData;
+import viskit.model.GraphMetaData;
 
 import javax.swing.*;
 import java.awt.*;

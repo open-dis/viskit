@@ -3,11 +3,11 @@ package viskit.jgraph;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import simkit.viskit.ViskitController;
-import simkit.viskit.model.CancellingEdge;
-import simkit.viskit.model.Edge;
-import simkit.viskit.model.EventNode;
-import simkit.viskit.model.SchedulingEdge;
+import viskit.ViskitController;
+import viskit.model.CancellingEdge;
+import viskit.model.Edge;
+import viskit.model.EventNode;
+import viskit.model.SchedulingEdge;
 
 import javax.swing.*;
 import java.awt.*;

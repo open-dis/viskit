@@ -1,15 +1,14 @@
 package viskit;
 
-import simkit.viskit.model.vEdgeParameter;
-import simkit.viskit.model.EventArgument;
+import viskit.model.EventArgument;
+import viskit.model.vEdgeParameter;
 
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.util.ArrayList;
+import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

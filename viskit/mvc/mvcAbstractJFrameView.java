@@ -54,14 +54,4 @@ public class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelLi
   public void modelChanged(mvcModelEvent event)
   {
   }
-  
-  public void modelChanged(simkit.viskit.mvc.mvcModelEvent event) {
-  }
-  
-  public void setController(simkit.viskit.mvc.mvcController controller) {
-  }
-  
-  public void setModel(simkit.viskit.mvc.mvcModel model) {
-  }
-  
 }

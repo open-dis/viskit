@@ -2,8 +2,11 @@ package viskit;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 
 /**
@@ -33,7 +36,7 @@ class Splash2 extends JFrame
     super();
     setUndecorated(true);
 
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("simkit/viskit/images/ViskitSplash.png"));
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash.png"));
     JLabel label = new JLabel(icon);
     label.setOpaque(false);
     contentPanel.add(label,BorderLayout.CENTER);
@@ -132,7 +135,7 @@ contentPanel.setPreferredSize(label.getPreferredSize());
       Object[] arguments = new Object[]{args};
       Class[] parameterTypes = new Class[]{args.getClass()};
 
-      Class mainClass = Class.forName("simkit.viskit.Main");
+      Class mainClass = Class.forName("viskit.Main");
 
       Method mainMethod = mainClass.getMethod("main",parameterTypes);
       mainMethod.invoke(null, arguments);

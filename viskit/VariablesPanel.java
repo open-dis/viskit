@@ -1,7 +1,6 @@
 package viskit;
 
-import simkit.viskit.model.vStateVariable;
-import java.util.ArrayList;
+import viskit.model.vStateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

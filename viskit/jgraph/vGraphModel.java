@@ -2,10 +2,10 @@ package viskit.jgraph;
 
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
-import simkit.viskit.model.CancellingEdge;
-import simkit.viskit.model.Edge;
-import simkit.viskit.model.EventNode;
-import simkit.viskit.model.SchedulingEdge;
+import viskit.model.CancellingEdge;
+import viskit.model.Edge;
+import viskit.model.EventNode;
+import viskit.model.SchedulingEdge;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,6 +144,7 @@ public class vGraphModel extends DefaultGraphModel
     Map attributes = new Hashtable();
     attributes.put(c,createBounds(en.getPosition().x, en.getPosition().y,Color.black));
     //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
+    
     c.add(new DefaultPort(en.getName()+"/Center"));
     this.insert(new Object[]{c},attributes,null,null,null);
   }
@@ -155,7 +156,7 @@ public class vGraphModel extends DefaultGraphModel
   {
     _addEdgeCommon(ce,viskitCancelEdgeStyle);
   }
-  private void _addEdgeCommon(simkit.viskit.model.Edge ed, Map edgeStyle)
+  private void _addEdgeCommon(viskit.model.Edge ed, Map edgeStyle)
   {
     EventNode enfrom = ed.from;
     EventNode ento   = ed.to;

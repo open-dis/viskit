@@ -1,6 +1,6 @@
 package viskit.model;
 
-import simkit.xsd.bindings.Event;
+import viskit.xsd.bindings.Event;
 
 import java.awt.*;
 import java.util.ArrayList;
