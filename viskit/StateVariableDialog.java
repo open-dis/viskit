@@ -334,9 +334,15 @@ public class StateVariableDialog extends ViskitSmallDialog
 
           String result = VGlobals.instance().parseCode(null, s);
           if (result != null) {
-            JOptionPane.showMessageDialog(StateVariableDialog.this, result,
-                "Data entry error", JOptionPane.ERROR_MESSAGE);
-            return;
+            //JOptionPane.showMessageDialog(StateVariableDialog.this, result,
+            //    "Data entry error", JOptionPane.ERROR_MESSAGE);
+            //return;
+
+
+            int ret = JOptionPane.showConfirmDialog(StateVariableDialog.this, "Java language error:\n" + result + "\nIgnore and continue?",
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (ret != JOptionPane.YES_OPTION)
+              return;
           }
         }
         // ok, we passed
