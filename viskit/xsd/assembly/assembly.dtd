@@ -51,5 +51,6 @@
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
+	package CDATA   #REQUIRED
 >
 
