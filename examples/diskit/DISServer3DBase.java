@@ -72,7 +72,8 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
             System.out.println("ID: " + espdu.getEntityID());
             System.out.println("(x,y,z): ("+espdu.getEntityLocationX() + ", " + espdu.getEntityLocationY() + ", " + espdu.getEntityLocationZ() + ")" );
             System.out.println("(vx,vy,vz): ("+espdu.getEntityLinearVelocityX() + ", " + espdu.getEntityLinearVelocityY() + ", " + espdu.getEntityLinearVelocityZ() + ")" );
-            
+            System.out.println("Orientation theta: "+espdu.getEntityOrientationTheta());
+            System.out.println("Orientation psi: "+espdu.getEntityOrientationPsi()); 
             //not really workable without a ping, or really needed.
             //waitDelay("ESPDU_in",(double)dt*millisecsToSimTime,new Object[]{espdu},0.0);
             
