@@ -183,10 +183,13 @@ public class StateVariableDialog extends ViskitSmallDialog
     }
     else {
       stateVarNameField.setText("state_"+count++);
+      String ty = (String)stateVarTypeCombo.getSelectedItem();
+      boolean isArray = ty.indexOf('[') != -1;
       commentField.setText("");
-      arraySizeField.setEditable(false); // grays out background
-      arraySizeField.setEnabled(false);
-      arrSizeLab.setEnabled(false);
+      arraySizeField.setText("");
+      arraySizeField.setEditable(isArray); // grays out background
+      arraySizeField.setEnabled(isArray);
+      arrSizeLab.setEnabled(isArray);
     }
     stateVarNameField.requestFocus();
     stateVarNameField.selectAll();
@@ -311,6 +314,10 @@ public class StateVariableDialog extends ViskitSmallDialog
             (isArray(typ) && arsz.length() <= 0)) {
           JOptionPane.showMessageDialog(StateVariableDialog.this, "Name, type and (if array) array size must be entered.",
               "Data entry error", JOptionPane.ERROR_MESSAGE);
+          arrSizeLab.setEnabled(true);
+          arraySizeField.setEnabled(true);
+          arraySizeField.setEditable(true);
+          arraySizeField.requestFocus();
           return;
         }
         else if (isArray(typ) && !isGoodArray(typ)) {
