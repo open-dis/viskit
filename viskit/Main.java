@@ -31,24 +31,19 @@ public class Main
   {
     setLandFandFonts();
 
-    Model mod = new Model();
-    Controller cont = new Controller();
-    VGlobals.instance().buildEventGraphViewFrame(cont,mod);
-    VGlobals.instance().runEventGraphView();
+    final Model mod = new Model();
+    final Controller cont = new Controller();
 
-    cont.newEventGraph();
-/*
-    Controller controller = new Controller();
-    Model model = new Model();
-    EventGraphViewFrame view = new EventGraphViewFrame(model, controller);
-    controller.setModel(model);   // registers cntl as model listener
-    controller.setView(view);
+    //Latest thinking is to do EVERYTHING involving the GUI in the GUI thread.  See recent Sun doc.
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run()
+      {
+        VGlobals.instance().buildEventGraphViewFrame(cont,mod);
+        VGlobals.instance().runEventGraphView();
 
-    model.init();
-
-    view.setVisible(true);
-    controller.begin();
-*/
+        cont.newEventGraph();
+      }
+    });
   }
   public static void setLandFandFonts()
   {
