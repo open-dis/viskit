@@ -53,6 +53,12 @@
     verbose  (true|false) "true"
 >
 
+<!ELEMENT Adapter EMPTY>
+<!ATTLIST Adapter
+    from    CDATA   #REQUIRED
+    to      CDATA   #REQUIRED
+>
+
 <!ELEMENT SimkitAssembly ( SimEntity+ , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Output*, Schedule? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
