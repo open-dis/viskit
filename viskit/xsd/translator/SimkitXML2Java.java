@@ -430,7 +430,11 @@ public class SimkitXML2Java {
 	    }
 	}
 	
-        pw.println(sp4 + run.getCode());
+        String x = "";
+        if ( run.getCode() != null ) {
+            x = run.getCode();
+        }
+        pw.println(sp4 + x);
 	pw.println(sp4 + cb);
 	pw.println();
     }
@@ -507,7 +511,11 @@ public class SimkitXML2Java {
 	    }
 	}
         
-        pw.println(sp4 + e.getCode());
+        String x = "";
+        if ( e.getCode() != null ) { 
+            x = e.getCode();
+        }
+        pw.println(sp4 + x);
 	pw.println(sp4 + cb);
 	pw.println();
 	
@@ -651,7 +659,12 @@ public class SimkitXML2Java {
 	    }
             
             pw.println(rp + sp + ob);
-            pw.println(sp4 + f.getCode());
+            
+            String x = "";
+            if ( f.getCode() != null ) {
+                x = f.getCode();
+            }
+            pw.println(sp4 + x);
             pw.println(sp4 + cb);
             pw.println();
         }
