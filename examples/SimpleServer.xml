@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitModule name="SimpleServer" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleServer" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter type="simkit.random.RandomVariate" name="serviceTime"/>
     <Parameter type="int" name="totalNumberServers"/>
     <StateVariable name="numberInQueue" type="int"/>
@@ -37,5 +37,5 @@
         <Schedule condition="numberInQueue &gt; 0" priority="1.0" delay="0.0" event="StartService"/>
         <Coordinate y="100" x="320"/>
     </Event>
-</SimkitModule>
+</SimEntity>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitModule name="ArrivalProcess" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ArrivalProcess" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter type="simkit.random.RandomVariate" name="interarrivalTime"/>
     <StateVariable name="numberArrivals" type="int"/>
     <Event name="Run">
@@ -16,5 +16,5 @@
         <Schedule priority="0.0" delay="interarrivalTime.generate()" event="Arrival"/>
         <Coordinate y="60" x="250"/>
     </Event>
-</SimkitModule>
+</SimEntity>
 

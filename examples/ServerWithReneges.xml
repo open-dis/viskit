@@ -9,9 +9,9 @@
         Advanced Simkit application.
 -->
 
-<SimkitModule
+<SimEntity
     name="ServerWithReneges"
-    version="0.1.4" >
+    version="0.1.5" >
 
     <Parameter name="numberServers" type="int" shortName="servers" />
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" shortName="service" />
@@ -114,4 +114,4 @@
         
     </Event>
     
-</SimkitModule>
+</SimEntity>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitModule name="SimpleMachineFailure" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleMachineFailure" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter type="int" name="totalNumberMachines"/>
     <Parameter type="int" name="totalNumberRepairPeople"/>
     <Parameter type="simkit.random.RandomVariate" name="timeToFailure"/>
     <Parameter type="simkit.random.RandomVariate" name="repairTime"/>
-    <StateVariable name="numberFailedMachines" type="int" shortName="F"/>
-    <StateVariable name="numberAvailableRepairPeople" type="int" shortName="R"/>
+    <StateVariable name="numberFailedMachines" type="int" />
+    <StateVariable name="numberAvailableRepairPeople" type="int" />
     <Event name="Run">
         <StateTransition state="numberFailedMachines">
             <Assignment value="totalNumberMachines"/>
@@ -49,5 +49,5 @@
         <Schedule delay="timeToFailure.generae()" event="Failure"/>
         <Coordinate y="10" x="280"/>
     </Event>
-</SimkitModule>
+</SimEntity>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitModule name="SimpleInventory" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleInventory" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter type="simkit.random.RandomVariate" name="timeBetweenDemands"/>
     <Parameter type="simkit.random.RandomVariate" name="demand"/>
     <Parameter type="simkit.random.RandomVariate" name="leadTime"/>
@@ -7,8 +7,8 @@
     <Parameter type="double" name="initialInventory"/>
     <Parameter type="double" name="triggerPoint"/>
     <Parameter type="double" name="orderUpTo"/>
-    <StateVariable name="inventoryPosition" type="double" shortName="I"/>
-    <StateVariable name="amountOnOrder" type="double" shortName="O"/>
+    <StateVariable name="inventoryPosition" type="double" />
+    <StateVariable name="amountOnOrder" type="double" />
     <Event name="Run">
         <StateTransition state="inventoryPosition">
             <Assignment value="initialInventory"/>
@@ -54,5 +54,5 @@
         </StateTransition>
         <Coordinate y="150" x="310"/>
     </Event>
-</SimkitModule>
+</SimEntity>
 
