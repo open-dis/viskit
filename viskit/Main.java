@@ -59,6 +59,10 @@ public class Main
       //laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
       //laf = "apple.laf.AquaLookAndFeel";
       laf = "javax.swing.plaf.metal.MetalLookAndFeel";
+
+      //com.jgoodies.plaf.plastic.Plastic3DLookAndFeel.setMyCurrentTheme(new com.jgoodies.plaf.plastic.theme.DesertGreen());
+      //laf = "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel";
+
       //laf = QuaquaManager.getLookAndFeelClassName();
       //System.setProperty("apple.awt.brushMetalLook","true");
       System.setProperty("apple.awt.antialiasing", "true");
