@@ -125,6 +125,25 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   }
 
+  public void externalClassesChanged(Vector v)
+  {
+    StringBuffer sb = new StringBuffer();
+    for (Iterator itr = v.iterator(); itr.hasNext();) {
+      String className = (String) itr.next();
+      for (Iterator ir = nodeCache.values().iterator(); ir.hasNext();) {
+        AssemblyNode node = (AssemblyNode)ir.next();
+        if(node.getType().equals(className))
+          sb.append(node.getName() + ", ");
+      }
+    }
+    if(sb.length() > 2) {
+      sb.setLength(sb.length()-2); // lose last comma and space
+      JOptionPane.showMessageDialog(null,"The classes underlying assembly nodes(es) "+sb.toString()+" have been modified.\n"+
+        "The nodes may be in an inconsistent state.",
+        "Data modification alert",JOptionPane.WARNING_MESSAGE);
+    }
+  }
+
   public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p)
   {
     // This is not needed

@@ -20,6 +20,7 @@ public class FileBasedAssyNode
   public File  classFile;
   public boolean isXML;
   public String pkg;
+  public long lastModified;
 
   public FileBasedAssyNode(File classFile, String loadedClass, File xml, String pkg)
   {
@@ -28,6 +29,7 @@ public class FileBasedAssyNode
     this.loadedClass = loadedClass;
     this.pkg = pkg;
     isXML = true;
+    lastModified = xml.lastModified();
   }
   public FileBasedAssyNode(File classFile, String loadedClass, String pkg)
   {
@@ -36,6 +38,7 @@ public class FileBasedAssyNode
     this.loadedClass = loadedClass;
     this.pkg = pkg;
     isXML = false;
+    lastModified = classFile.lastModified();
   }
   public String toString()
   {

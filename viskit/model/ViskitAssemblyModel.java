@@ -58,4 +58,5 @@ public interface ViskitAssemblyModel
   //public File   compileJavaClass(String src);
 
   public Vector getVerboseEntityNames();
+  public void externalClassesChanged(Vector v);
 }

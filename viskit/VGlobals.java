@@ -88,6 +88,14 @@ public class VGlobals
 
     return avf;
   }
+  public AssemblyModel getAssemblyModel()
+  {
+    return amod;
+  }
+  public AssemblyController getAssemblyController()
+  {
+    return acont;
+  }
 
   public void runAssemblyView()
   {

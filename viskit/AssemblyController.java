@@ -663,6 +663,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     return null;
   }
 
+
   // From menu
   public void runAssembly()
   {

@@ -50,6 +50,5 @@ public interface ViskitAssemblyController
   //File compileJavaClass();
   void runAssembly();
 
-
   void runEventGraphEditor();
 }

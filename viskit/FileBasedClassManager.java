@@ -6,9 +6,7 @@ import viskit.model.AssemblyModel;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Collection;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.File;
@@ -23,7 +21,7 @@ import java.io.File;
  * Time: 12:53:36 PM
  */
 
-public class FileBasedClassManager
+public class FileBasedClassManager implements Runnable
 {
   // Singleton:
   private static FileBasedClassManager me;
@@ -40,6 +38,7 @@ public class FileBasedClassManager
   {
     classMap = new HashMap();
     fileMap = new HashMap();
+    new Thread(this).start();
   }
 
   public void addFileClass(Class c)
@@ -76,12 +75,50 @@ public class FileBasedClassManager
       throw new Exception ("Unsupported file type.");
     }
     addFileClass(fclass);
-    fileMap.put(fclass.getName(),fban);
+    synchronized (fileMap) {
+      fileMap.put(fclass.getName(),fban);
+    }
     return fban;
   }
 
   public Collection getFileLoadedClasses()
   {
-    return fileMap.values();
+    Collection c;
+    synchronized (fileMap) {
+      c = fileMap.values();
+    }
+    return c;
+  }
+
+  public void run()
+  {
+    final Vector v = new Vector();
+
+    while(true) { // forever
+      v.clear();
+      synchronized (fileMap) {
+        for (Iterator itr = fileMap.values().iterator(); itr.hasNext();) {
+          FileBasedAssyNode fban = (FileBasedAssyNode)itr.next();
+          File f = fban.isXML ? fban.xmlSource : fban.classFile;
+          if(f.lastModified() != fban.lastModified) {
+            v.add(fban.loadedClass);
+            fban.lastModified = f.lastModified();
+          }
+
+          if(v.size() > 0) {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+              public void run()
+              {
+                VGlobals.instance().getAssemblyModel().externalClassesChanged(v);
+              }
+            });
+          }
+        }
+      }
+      // Goal: sleep for the max estimated between when a user edits and saves an
+      // event graph, and when he switches back and tries to run his assembly
+      try {Thread.sleep(5000);}catch (InterruptedException e) {}
+    }
   }
 }
