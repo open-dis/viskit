@@ -103,14 +103,21 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   private int egNodeCount=0;
   public void newEventGraphNode(String typeName, Point p)
   {
-    String fauxName = "evgr_" + egNodeCount++;
-    ((viskit.model.AssemblyModel) getModel()).newEventGraph(fauxName, typeName, p);
+    String shortname = "evgr_";
+    if(typeName.lastIndexOf('.') != -1)
+      shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
+    shortname = shortname + egNodeCount++;
+    ((viskit.model.AssemblyModel) getModel()).newEventGraph(shortname, typeName, p);
   }
 
   public void newPropChangeListenerNode(String name, Point p)
   {
-    String fauxName = "lstnr_"+egNodeCount++; // use same counter
-    ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(fauxName,name,p);
+    String shortname = "lstnr_";
+    if(name.lastIndexOf('.') != -1)
+      shortname = name.substring(name.lastIndexOf('.')+1) + "_";
+
+    shortname = shortname + egNodeCount++; // use same counter
+    ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(shortname,name,p);
   }
   /**
    *
@@ -157,17 +164,27 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   }
   public void newAdapterArc(Object[]nodes)
   {
+    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
+    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
+    else
     ((ViskitAssemblyModel)getModel()).newAdapterEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
                                                      ((DefaultGraphCell)nodes[1]).getUserObject());
   }
   public void newSimEvListArc(Object[]nodes)
   {
+    Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
+    Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+    if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
+    else
     ((ViskitAssemblyModel)getModel()).newSimEvLisEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
                                                       ((DefaultGraphCell)nodes[1]).getUserObject()); 
   }
   public void newPropChangeListArc(Object[]nodes)
   {
-    // One has to be a prop change listener
+    // One and only one has to be a prop change listener
     Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
     Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
     if(oA instanceof PropChangeListenerNode && !(oB instanceof PropChangeListenerNode)) {
@@ -208,6 +225,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel) getModel()).changePclNode(pclNode);
     }
   }
+
+  public void evGraphEdit(EvGraphNode evNode)
+  {
+    boolean modified = ((ViskitAssemblyView)getView()).doEditEvGraphNode(evNode);
+    if(modified) {
+      ((ViskitAssemblyModel)getModel()).changeEvGraphNode(evNode);
+    }
+  }
+
   public void pcListenerEdgeEdit(PropChangeEdge pclEdge)
   {
     boolean modified = ((ViskitAssemblyView) getView()).doEditPclEdge(pclEdge);

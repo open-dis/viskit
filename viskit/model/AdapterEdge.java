@@ -14,22 +14,16 @@ import java.util.ArrayList;
 
 public class AdapterEdge extends AssemblyEdge
 {
+  private String targetEvent;
+  private String sourceEvent;
+
   AdapterEdge()       // package-limited
   {
   }
   
-/*
-  Object copyShallow()
-  {
-    AdapterEdge se = new AdapterEdge();
-    se.opaqueViewObject = opaqueViewObject;
-    se.to = to;
-    se.from = from;
-    se.parameters = parameters;
-    se.delay = delay;
-    se.conditional = conditional;
-    se.conditionalsComment = conditionalsComment;
-    return se;
-  }
-*/
+  public String getTargetEvent() { return targetEvent;}
+  public void   setTargetEvent(String ev) { targetEvent = ev;}
+  
+  public String getSourceEvent() { return sourceEvent;}
+  public void   setSourceEvent(String ev) { sourceEvent = ev;}
 }

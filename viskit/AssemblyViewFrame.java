@@ -605,6 +605,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   }
 
   // permit user to edit existing entities
+  public boolean doEditEvGraphNode(EvGraphNode evNode)
+  {
+    return EvGraphNodeInspectorDialog.showDialog(this,this,evNode);
+  }
+
   public boolean doEditPclNode(PropChangeListenerNode pclNode)
   {
     return PclNodeInspectorDialog.showDialog(this,this,pclNode); // blocks
@@ -617,16 +622,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   public boolean doEditAdapterEdge(AdapterEdge aEdge)
   {
-    //todo implement return AdapterEdgeInspectorDialog.showDialog(this,this,aEdge);
-    System.out.println("doEditAdapterEdge() unimplemented");
-    return false;
+    return AdapterConnectionInspectorDialog.showDialog(this,this,aEdge);
   }
 
   public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge)
   {
-    //todo implement return SimEvListenerEdgeInspectorDialog.showDialog(this,this,seEdge);
-    System.out.println("doEditSimEvListEdge() unimplemented");
-    return false;
+    return SimEventListenerConnectionInspectorDialog.showDialog(this,this,seEdge);
   }
 
   public void fileName(String s)    // informative, tells view what we're working on

@@ -25,10 +25,13 @@ public class EvGraphNode extends ViskitElement
   private String type;
 
   private Vector    connections = new Vector();
+  private ArrayList constructorArguments = new ArrayList();
   private ArrayList comments = new ArrayList();
+/*
   private ArrayList transitions = new ArrayList();
   private Vector    localVariables = new Vector();
   private ArrayList arguments = new ArrayList();
+*/
   private Point     position = new Point(0,0);
 
   EvGraphNode(String name, String type)      // package access on constructor
@@ -45,9 +48,11 @@ public class EvGraphNode extends ViskitElement
     EvGraphNode en   = (EvGraphNode)super.shallowCopy(new EvGraphNode(name+"-copy",type));
     en.connections = connections;
     en.comments    = comments;
+/*
     en.transitions = transitions;
     en.localVariables = localVariables;
     en.arguments   = arguments;
+*/
     en.connections = connections;
     return en;
   }
@@ -79,17 +84,15 @@ public class EvGraphNode extends ViskitElement
     this.type = typ;
 
   }
-/*
-  public ArrayList getArguments()
+  public ArrayList getConstructorArguments()
   {
-    return arguments;
+    return constructorArguments;
   }
-
-  public void setArguments(ArrayList arguments)
+  public void setConstructorArguments(ArrayList lis)
   {
-    this.arguments = arguments;
+    constructorArguments = lis;
   }
-
+ 
   public ArrayList getComments()
   {
     return comments;
@@ -99,7 +102,7 @@ public class EvGraphNode extends ViskitElement
   {
     this.comments = comments;
   }
-  */
+
   public Vector getConnections()
   {
     return connections;
@@ -109,27 +112,6 @@ public class EvGraphNode extends ViskitElement
   {
     this.connections = connections;
   }
-  /*
-  public Vector getLocalVariables()
-  {
-    return localVariables;
-  }
-
-  public void setLocalVariables(Vector localVariables)
-  {
-    this.localVariables = localVariables;
-  }
-
-  public ArrayList getTransitions()
-  {
-    return transitions;
-  }
-
-  public void setTransitions(ArrayList transitions)
-  {
-    this.transitions = transitions;
-  }
-*/
 
   public Point getPosition()
   {

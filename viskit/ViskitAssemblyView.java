@@ -20,6 +20,7 @@ public interface ViskitAssemblyView
 
   // permit user to edit existing entities
   public boolean doEditPclNode(PropChangeListenerNode pclNode);
+  public boolean doEditEvGraphNode(EvGraphNode evNode);
 
   public boolean doEditPclEdge(PropChangeEdge pclEdge);
   public boolean doEditAdapterEdge(AdapterEdge aEdge);

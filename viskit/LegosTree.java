@@ -52,7 +52,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     MyRenderer rendr = new MyRenderer();
     setCellRenderer(rendr);
 
-    collapseRow(1);
+ //   collapseRow(1);
 
     setToolTipText("mama");  // needs to be done first to enable tt below
     setRootVisible(false);

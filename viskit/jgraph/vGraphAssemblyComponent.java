@@ -199,7 +199,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
           if (r != null) {
             EvGraphNode en = (EvGraphNode) cc.getUserObject();
             en.setPosition(new Point(r.x, r.y));
-            ((ViskitAssemblyModel) parent.getModel()).changeEvGNode(en);
+            ((ViskitAssemblyModel) parent.getModel()).changeEvGraphNode(en);
           }
         }
       }

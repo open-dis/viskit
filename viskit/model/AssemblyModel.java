@@ -313,7 +313,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
   }
 
-  public void changeEvGNode(EvGraphNode node)
+  public void changeEvGraphNode(EvGraphNode node)
   {
     SimEntity jaxbSE = (SimEntity)node.opaqueModelObject;
 

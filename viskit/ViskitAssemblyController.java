@@ -1,9 +1,6 @@
 package viskit;
 
-import viskit.model.PropChangeListenerNode;
-import viskit.model.PropChangeEdge;
-import viskit.model.AdapterEdge;
-import viskit.model.SimEvListenerEdge;
+import viskit.model.*;
 
 import java.awt.*;
 import java.util.Vector;
@@ -31,7 +28,7 @@ public interface ViskitAssemblyController
   public void newPropChangeListArc(Object[]nodes);
 
   public void pcListenerEdit(PropChangeListenerNode pclNode);
-  
+  public void evGraphEdit(EvGraphNode evNode);
   public void pcListenerEdgeEdit(PropChangeEdge pclEdge);
   public void adapterEdgeEdit(AdapterEdge edgeObj);
   public void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);

@@ -11,6 +11,7 @@ package viskit;
  */
 
 import viskit.model.PropChangeListenerNode;
+import viskit.model.EvGraphNode;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -25,7 +26,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 
-public class PclNodeInspectorDialog extends JDialog
+public class EvGraphNodeInspectorDialog extends JDialog
 {
   private JLabel handleLab;
   private JLabel typeLab;
@@ -33,9 +34,9 @@ public class PclNodeInspectorDialog extends JDialog
   private JTextField typeField;
   private InstantiationPanel ip;
   private Class myClass;
-  private static PclNodeInspectorDialog dialog;
+  private static EvGraphNodeInspectorDialog dialog;
   private static boolean modified = false;
-  private PropChangeListenerNode pclNode;
+  private EvGraphNode pclNode;
   private Component locationComp;
   private JButton okButt, canButt;
   private enableApplyButtonListener lis;
@@ -43,10 +44,10 @@ public class PclNodeInspectorDialog extends JDialog
 
   public static String newName, newConstrValue;
 
-  public static boolean showDialog(JFrame f, Component comp, PropChangeListenerNode parm)
+  public static boolean showDialog(JFrame f, Component comp, EvGraphNode parm)
   {
     if (dialog == null)
-      dialog = new PclNodeInspectorDialog(f, comp, parm);
+      dialog = new EvGraphNodeInspectorDialog(f, comp, parm);
     else
       dialog.setParams(comp, parm);
 
@@ -55,7 +56,7 @@ public class PclNodeInspectorDialog extends JDialog
     return modified;
   }
 
-  private PclNodeInspectorDialog(JFrame parent, Component comp, PropChangeListenerNode lv)
+  private EvGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv)
   {
     super(parent, "Property Change Listener", true);
     this.pclNode = lv;
@@ -76,7 +77,6 @@ public class PclNodeInspectorDialog extends JDialog
     handleLab.setLabelFor(handleField);
 
     typeLab = new JLabel("type",JLabel.TRAILING);
-    //typeField = new JLabel("bogus",JLabel.CENTER);
     typeField = new JTextField();
     clampHeight(typeField);
     typeField.setEditable(false);
@@ -105,7 +105,7 @@ public class PclNodeInspectorDialog extends JDialog
     okButt.addActionListener(new applyButtonListener());
   }
 
-  public void setParams(Component c, PropChangeListenerNode p)
+  public void setParams(Component c, EvGraphNode p)
   {
     pclNode = p;
     locationComp = c;
@@ -241,7 +241,7 @@ public class PclNodeInspectorDialog extends JDialog
     public void windowClosing(WindowEvent e)
     {
       if (modified == true) {
-        int ret = JOptionPane.showConfirmDialog(PclNodeInspectorDialog.this, "Apply changes?",
+        int ret = JOptionPane.showConfirmDialog(EvGraphNodeInspectorDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (ret == JOptionPane.YES_OPTION)
           okButt.doClick();

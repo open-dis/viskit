@@ -30,7 +30,7 @@ public class LegosPanel extends JPanel
     lab.setAlignmentX(Box.CENTER_ALIGNMENT);
     add(lab);
     JScrollPane jsp = new JScrollPane(tree);
-    jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     add(jsp);
       JPanel buttPan = new JPanel();

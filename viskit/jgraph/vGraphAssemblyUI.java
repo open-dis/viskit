@@ -4,10 +4,7 @@ import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.ViskitAssemblyController;
-import viskit.model.AdapterEdge;
-import viskit.model.PropChangeEdge;
-import viskit.model.SimEvListenerEdge;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.*;
 //import viskit.model.CancellingEdge;
 //import viskit.model.Edge;
 //import viskit.model.EventNode;
@@ -89,7 +86,7 @@ public class vGraphAssemblyUI extends BasicGraphUI
         }
         else if (cell instanceof AssemblyCircleCell) {
           Object nodeObj = ((AssemblyCircleCell)cell).getUserObject();
-
+          cntl.evGraphEdit((EvGraphNode)nodeObj);
         }
         else if(cell instanceof AssemblyPropListCell) {
           Object nodeObj = ((AssemblyPropListCell)cell).getUserObject();

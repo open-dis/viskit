@@ -27,30 +27,11 @@ import java.lang.reflect.Constructor;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-
-/**
- * A dialog class that lets the user add a new parameter to the document.
- * After the user clicks "OK", "Cancel", or closes the dialog via the
- * close box, the caller retrieves the "buttonChosen" variable from
- * the object to determine the choice. If the user clicked "OK", the
- * caller can retrieve various choices from the object.
- *
- * @author DMcG
- */
+import java.util.Arrays;
+import java.util.Vector;
 
 public class PclEdgeInspectorDialog extends JDialog
 {
-/*
-  private JLabel handleLab;
-  private JLabel typeLab;
-  private JTextField handleField;    // Text field that holds the parameter name
-  //private JLabel typeField;
-  private JTextField typeField;
-  private JLabel[] constrParmLabels;
-  private JTextField[] constrParmFields;
-  private int numParms;
-*/
-
   private JLabel sourceLab, targetLab, propertyLab;
   private JTextField sourceTF, targetTF, propertyTF;
   private JPanel propertyTFPan;
@@ -257,10 +238,20 @@ public class PclEdgeInspectorDialog extends JDialog
           JOptionPane.showMessageDialog(PclEdgeInspectorDialog.this,"No properties found in "+classname+".");
           return;
         }
-        String[][]nms = new String[pds.length][2];
+        Vector nams = new Vector();
+        Vector typs = new Vector();
         for(int i=0;i<pds.length;i++) {
-          nms[i][0] = pds[i].getName();
-          nms[i][1] = pds[i].getPropertyType().getName();
+          if(pds[i].getWriteMethod() != null)         // want getters but no setters
+            continue;
+          Class pc = pds[i].getClass();
+          //todo continue filtering    don't want to show everything
+          nams.add(pds[i].getName());
+          typs.add(pds[i].getPropertyType().getName());
+        }
+        String[][]  nms = new String[nams.size()][2];
+        for(int i=0;i<nams.size(); i++) {
+          nms[i][0] = (String)nams.get(i);
+          nms[i][1] = (String)typs.get(i);
         }
         int which = PropertyListDialog.showDialog(PclEdgeInspectorDialog.this,PclEdgeInspectorDialog.this,
                                                   classname+" Properties",nms);

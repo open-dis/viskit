@@ -23,16 +23,9 @@ public class PropChangeListenerNode extends ViskitElement
 {
   private String name;
   private String type;
-  private String paramType;
-  private String paramValue;
   private Vector connections = new Vector();
+  private ArrayList constructorArguments = new ArrayList();
 
-/*
-  private Vector    connections = new Vector();
-  private ArrayList transitions = new ArrayList();
-  private Vector    localVariables = new Vector();
-  private ArrayList arguments = new ArrayList();
-  */
   private Point     position = new Point(0,0);
   //private ArrayList comments = new ArrayList();
 
@@ -46,35 +39,8 @@ public class PropChangeListenerNode extends ViskitElement
   {
     return name;
   }
-/*
-  public PropChangeListenerNode shallowCopy()
-  {
-    PropChangeListenerNode en   = (PropChangeListenerNode)super.shallowCopy(new PropChangeListenerNode(name+"-copy",type));
-    en.connections = connections;
-    en.comments    = comments;
-    en.transitions = transitions;
-    en.localVariables = localVariables;
-    en.arguments   = arguments;
-    en.connections = connections;
-    return en;
-  }
-*/
-  public void setParamType(String s)
-  {
-    paramType = s;
-  }
-  public String getParamType()
-  {
-    return paramType;
-  }
-  public void setParamValue(String s)
-  {
-    paramValue = s;
-  }
-  public String getParamValue()
-  {
-    return paramValue;
-  }
+
+
   public String getName()
   {
     return name;
@@ -91,16 +57,14 @@ public class PropChangeListenerNode extends ViskitElement
   {
     type = typ;
   }
-  /*public ArrayList getComments()
+  public ArrayList getConstructorArguments()
   {
-    return comments;
+    return constructorArguments;
   }
-
-  public void setComments(ArrayList comments)
+  public void setConstructorArguments(ArrayList lis)
   {
-    this.comments = comments;
+    constructorArguments = lis;
   }
-  */
 
   public Point getPosition()
   {
