@@ -93,7 +93,7 @@ public class EventStateTransition extends ViskitElement
 
   public String getIndexingExpression()
   {
-    return null;
+    return indexingExpression;
   }
 
   public void setIndexingExpression(String idxExpr)
