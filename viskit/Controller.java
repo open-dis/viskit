@@ -62,6 +62,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel) getModel()).newModel(null);
   }
 
+  public void newAssembly()
+  //-----------------------
+  {
+    //todo implement
+  }
+
 /**
  *
  * @return true = continue, false = don't (i.e., we cancelled)
@@ -279,10 +285,26 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     return false;
   }
 
-  public void newAssembly()
+  public void  newAssemblyEditor()
   {
-    // todo implement
-    System.out.println("newAssembly in " + this);
+    AssemblyViewFrame avf = VGlobals.instance().getAssemblyEditor();
+    if(avf == null) {
+      avf = new AssemblyViewFrame((viskit.model.Model)getModel(),this);
+      VGlobals.instance().setAssemblyEditor(avf);
+    }
+    avf.setVisible(true);
+    avf.toFront();
+  }
+
+  public void newEventGraphEditor()
+  {
+    EventGraphViewFrame egvf = VGlobals.instance().getEventGraphEditor();
+    if(egvf == null) {
+      egvf = new EventGraphViewFrame((viskit.model.Model)getModel(),this);
+      VGlobals.instance().setEventGraphEditor(egvf);
+    }
+    egvf.setVisible(true);
+    egvf.toFront();
   }
 
   public void eventList()

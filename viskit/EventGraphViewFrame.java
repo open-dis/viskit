@@ -100,19 +100,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
    */
   private boolean isEditable;
 
-  /**
-   * StateVariables panel
-   */
-  private JButton varMinusButt;
-  private JButton varPlusButt;
-  private JButton varEdButt;
-
-  /**
-   * SimParameters panel
-   */
-  private JButton parmMinusButt;
-  private JButton parmPlusButt;
-  private JButton parmEdButt;
   private ParametersPanel pp;
   private VariablesPanel vp;
 
@@ -371,7 +358,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     fileMenu.setMnemonic(KeyEvent.VK_F);
     fileMenu.add(buildMenuItem(controller,"newEventGraph",    "New Event Graph", new Integer(KeyEvent.VK_N),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
-    fileMenu.add(buildMenuItem(controller,"newAssembly",      "New Assembly", null,null));
+    fileMenu.add(buildMenuItem(controller,"newAssemblyEditor", "Assembly Editor", null,null));
     fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
     fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
