@@ -68,6 +68,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel) getModel()).newModel(null);
 
     editGraphMetaData();
+
+    newNode(new Point(30,30),"Run");   // always start with a run event
   }
 
 /**
@@ -304,14 +306,19 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   private int nodeCount = 0;
   public void newNode()
+  //-------------------
   {
     newNode(new Point(100,100));
   }
   public void newNode(Point p)
   //--------------------------
   {
-    String fauxName = "evnt_" + nodeCount++;
-    ((viskit.model.ViskitModel) getModel()).newEvent(fauxName, p);
+    newNode(p,"evnt_"+nodeCount++);
+  }
+  public void newNode(Point p,String nm)
+  //------------------------------------
+  {
+    ((viskit.model.ViskitModel) getModel()).newEvent(nm, p);
   }
 
   public void newArc(Object[] nodes)

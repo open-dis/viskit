@@ -25,6 +25,7 @@ public interface ViskitController
 
   /* user has established some entity parameters, model can create objects */
   void newNode         (Point p);
+  void newNode         (Point p, String name);
   void newSimParameter (String name, String type, String initVal, String comment);
   void newStateVariable(String name, String type, String initVal, String comment);
   void newArc          (Object[] nodes);
