@@ -55,6 +55,7 @@
 
 <!ELEMENT Adapter EMPTY>
 <!ATTLIST Adapter
+    name    ID      #REQUIRED
     from    CDATA   #REQUIRED
     to      CDATA   #REQUIRED
 >
