@@ -12,6 +12,7 @@ import viskit.images.PropChangeListenerIcon;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.StringSelection;
@@ -39,8 +40,8 @@ import actions.ActionUtilities;
 
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
 {
-  private ViskitAssemblyModel model;
-  private ViskitAssemblyController controller;
+  //private ViskitAssemblyModel model;
+  //private ViskitAssemblyController controller;
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
 
@@ -194,6 +195,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     ActionIntrospector.getAction(controller,"paste").setEnabled(false);
 
     editMenu.addSeparator();
+
+    editMenu.add(buildMenuItem(controller,"newEventGraphNode",   "Add Event Graph...",
+                                           new Integer(KeyEvent.VK_E),null));
+    editMenu.add(buildMenuItem(controller,"newPropChangeListenerNode","Add Property Change Listener...",
+                                           new Integer(KeyEvent.VK_P),null));
+
+    editMenu.addSeparator();
+
     editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Assembly Properties...",null,null));
 
     // Create a new menu bar and add the menus we created above to it
@@ -542,14 +551,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
           // Check for XML-based node
 
-          try {
-            FileBasedAssyNode xn = FileBasedAssyNode.fromString(sa[1]);
+          FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
+          if(xn != null) {
             if(sa[0].equals("simkit.BasicSimEntity"))
               ((ViskitAssemblyController)getController()).newFileBasedEventGraphNode(xn,p);
             else if(sa[0].equals("java.beans.PropertyChangeListener"))
               ((ViskitAssemblyController)getController()).newFileBasedPropChangeListenerNode(xn,p);
           }
-          catch (FileBasedAssyNode.exception exception) {
+          else {
             // Else class-based node
             if(sa[0].equals("simkit.BasicSimEntity")) {
               ((ViskitAssemblyController)getController()).newEventGraphNode(sa[1],p);
@@ -575,6 +584,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
   }
 
+  private FileBasedAssyNode isFileBasedAssyNode(String s)
+  {
+    try {
+      return FileBasedAssyNode.fromString(s);
+    }
+    catch (FileBasedAssyNode.exception exception) {
+      return null;
+    }
+  }
   private boolean firstShown = false;
 
   public void setVisible(boolean b)
@@ -675,27 +693,25 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     this.setTitle("Viskit Assembly: "+s);
   }
 
-/*
-  public void setStopTime(String s)
+  private Object getLeafUO(JTree tree)
   {
-    vcrStopTime.setText(s);
+    TreePath[] oa = tree.getSelectionPaths();
+    if(oa != null) {
+      DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode)oa[0].getLastPathComponent();
+      return dmtn.getUserObject();
+    }
+    return null;
+
+  }
+  public Object getSelectedEventGraph()
+  {
+    return getLeafUO(lTree);
   }
 
-  public void setVerbose(boolean v)
+  public Object getSelectedPropChangeListener()
   {
-    vcrVerbose.setSelected(v);
+    return getLeafUO(pclTree);
   }
-
-  public String getStopTime()
-  {
-    return vcrStopTime.getText().trim();
-  }
-
-  public boolean getVerbose()
-  {
-    return vcrVerbose.isSelected();
-  }
-*/
 
   public int genericAsk(String title, String msg)
   //---------------------------------------------
