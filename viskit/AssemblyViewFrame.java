@@ -71,6 +71,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JPanel canvasPanel;
   private LegosTree lTree, pclTree;
+  
+  private Help help;
 
   //private JTextField vcrStopTime;
 
@@ -193,7 +195,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     menuBar.add(fileMenu);
     menuBar.add(editMenu);
     //menuBar.add(simulationMenu);
-
+    
+    help = new Help(this);
+    JMenu helpMenu = new JMenu("Help");
+    helpMenu.setMnemonic(KeyEvent.VK_H);
+    
+    helpMenu.add( buildMenuItem(help, "aboutAssemblyEditor", "About...", null, null ) );
+    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
+    menuBar.add(helpMenu);
+    
     this.setJMenuBar(menuBar);
   }
 

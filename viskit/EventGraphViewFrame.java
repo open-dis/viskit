@@ -107,6 +107,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private VariablesPanel vp;
 
   private String filename = "unnamed";
+  
+  private Help help;
 
   /**
    * Constructor; lays out initial GUI objects
@@ -405,11 +407,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     menuBar.add(editMenu);
     //menuBar.add(simulationMenu);
     
-    Help help = new Help(this);
+    help = new Help(this);
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic(KeyEvent.VK_H);
     
-    helpMenu.add( buildMenuItem(help, "about", "About...", null, null ) );
+    helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
     helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
     menuBar.add(helpMenu);
     
