@@ -1,4 +1,4 @@
-<!ELEMENT SimkitModule ( Comment*, Parameter*, StateVariable*, Event+ ) >
+<!ELEMENT SimkitModule ( Comment*, Parameter*, StateVariable*, Event* ) >
 <!ATTLIST SimkitModule
         name            CDATA   #REQUIRED
 	version		CDATA	#REQUIRED
