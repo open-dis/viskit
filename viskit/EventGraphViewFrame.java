@@ -653,7 +653,8 @@ cancelArcMode.setIcon(new CanArcIcon());
   //-----------------------
   {
     if (jfc == null)
-      jfc = new JFileChooser(System.getProperty("user.dir"));
+      jfc = new JFileChooser(System.getProperty("user.dir")+
+                             System.getProperty("file.separator")+"examples");
 
     int retv = jfc.showOpenDialog(this);
     if (retv == JFileChooser.APPROVE_OPTION)
