@@ -339,7 +339,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener
         // Create PopupMenu for the Cell
         JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
         // Display PopupMenu
-        menu.show(vGraphComponent.this, e.getX(), e.getY());
+
+        // jmb...not today
+        //menu.show(vGraphComponent.this, e.getX(), e.getY());
 
         // Else if in ConnectMode and Remembered Port is Valid
       }
@@ -523,25 +525,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       else
         controller.newArc(oa);
 
-      /*
-        // Connections that will be inserted into the Model
-        ConnectionSet cs = new ConnectionSet();
-        // Construct Edge with no label
-        DefaultEdge edge = new DefaultEdge();
-        // Create Connection between source and target using edge
-        cs.connect(edge, source, target);
-        // Create a Map thath holds the attributes for the edge
-        Map map = GraphConstants.createMap();
-        // Add a Line End Attribute
-      // jmb what her  GraphConstants.setLineEnd(map, GraphConstants.SIMPLE);
-        // Construct a Map from cells to Maps (for insert)
-        Hashtable attributes = new Hashtable();
-        // Associate the Edge with its Attributes
-        attributes.put(edge, map);
-        // Insert the Edge and its Attributes
-        //graphPane.getModel().insert(new Object[]{edge}, cs, null, attributes);
-        System.out.println("!!!!!!!!!!!connect");
-      */
     }
 
     public JPopupMenu createPopupMenu(final Point pt, final Object cell)
