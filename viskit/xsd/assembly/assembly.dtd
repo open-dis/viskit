@@ -29,7 +29,7 @@
     name ID    #REQUIRED
 >
 
-<!ELEMENT PropertyChangeListener ((TerminalParameter)*, (Coordinate?)) >
+<!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?)) >
 <!ATTLIST PropertyChangeListener
     type CDATA #REQUIRED
     name ID    #REQUIRED
