@@ -47,7 +47,13 @@
     entity   IDREF #REQUIRED
 >
 
-<!ELEMENT SimkitAssembly ( SimEntity+ , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Output* ) >
+<!ELEMENT Schedule EMPTY>
+<!ATTLIST Schedule
+    stopTime CDATA #IMPLIED
+    verbose  (true|false) "true"
+>
+
+<!ELEMENT SimkitAssembly ( SimEntity+ , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Output*, Schedule? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
