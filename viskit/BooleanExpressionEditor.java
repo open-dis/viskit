@@ -7,10 +7,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -61,6 +58,7 @@ public class BooleanExpressionEditor extends JDialog
     this.node = node;
     this.locationComp = locationComp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new myCloseListener());
 
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
@@ -203,4 +201,22 @@ public class BooleanExpressionEditor extends JDialog
       stateChanged(null);
     }
   }
+  class myCloseListener extends WindowAdapter
+  {
+    public void windowClosing(WindowEvent e)
+    {
+      if(modified == true) {
+        int ret = JOptionPane.showConfirmDialog(BooleanExpressionEditor.this,"Apply changes?",
+            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        if(ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
+        else
+          canButt.doClick();
+        }
+      else
+        canButt.doClick();
+    }
+  }
+
+
 }

@@ -9,6 +9,8 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -52,6 +54,7 @@ public class EventArgumentDialog extends JDialog
     this.myEA = param;
     this.locationComp = comp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new myCloseListener());
 
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
@@ -301,6 +304,22 @@ jmb..this is good regex checking.  put in a single utility class
   }
 
 */
+  class myCloseListener extends WindowAdapter
+  {
+    public void windowClosing(WindowEvent e)
+    {
+      if(modified == true) {
+        int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this,"Apply changes?",
+            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        if(ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
+        else
+          canButt.doClick();
+        }
+      else
+        canButt.doClick();
+    }
+  }
 }
 
 
