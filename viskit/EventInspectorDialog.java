@@ -212,6 +212,7 @@ public class EventInspectorDialog extends JDialog
 
           transitions.updateTransition(est);
           okButt.setEnabled(true);
+          EventInspectorDialog.modified = true;
         }
       }
     });

@@ -60,7 +60,9 @@ public class SourceWindow extends JFrame
 
     outerPan.add(tb,BorderLayout.NORTH);
 
-    /*JTextArea*/ jta = new JTextArea(src);
+    jta = new JTextArea(); //src);
+    jta.setText(addLineNums(src));
+
     jta.setEditable(false);
     jta.setFont(new Font("Monospaced",Font.PLAIN,12));
     JScrollPane jsp = new JScrollPane(jta);
@@ -175,6 +177,40 @@ public class SourceWindow extends JFrame
 
       }
     });
+  }
+  private String addLineNums(String src)
+  {
+    // Choose the right line ending
+    String le = "\n";
+    String le2 = "\r";
+    String le3 = "\r\n";
+
+    String[] sa = src.split(le);
+    String[] sa2 = src.split(le2);
+    String[] sa3 = src.split(le3);
+
+    // Whichever broke the string up into the most pieces is our boy
+    if(sa2.length > sa.length) {
+      sa = sa2;
+      le = le2;
+    }
+    if(sa3.length > sa.length) {
+      sa = sa3;
+      le = le3;
+    }
+
+    StringBuffer sb = new StringBuffer();
+    for(int i=0;i<sa.length;i++) {
+      String n = ""+(i+1);
+      int diff = 3-n.length();        // right align number, 3 digits, pad w/ spaces on left
+      for(int j=0;j<diff;j++)
+        sb.append(" ");
+      sb.append(n);
+      sb.append(": ");
+      sb.append(sa[i]);
+      sb.append(le);
+    }
+    return sb.toString();
   }
 
   /**
