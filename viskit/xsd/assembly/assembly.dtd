@@ -17,13 +17,19 @@
     type    CDATA #REQUIRED
 >
 
-<!ELEMENT SimEntity (%Parameters;)* >
+<!ELEMENT Coordinate EMPTY >
+<!ATTLIST Coordinate
+        x       CDATA   #REQUIRED
+        y       CDATA   #REQUIRED
+>
+
+<!ELEMENT SimEntity ((%Parameters;)*, (Coordinate?)) >
 <!ATTLIST SimEntity
     type CDATA #REQUIRED
     name ID    #REQUIRED
 >
 
-<!ELEMENT PropertyChangeListener (TerminalParameter)* >
+<!ELEMENT PropertyChangeListener ((TerminalParameter)*, (Coordinate?)) >
 <!ATTLIST PropertyChangeListener
     type CDATA #REQUIRED
     name ID    #REQUIRED
@@ -53,7 +59,7 @@
     verbose  (true|false) "true"
 >
 
-<!ELEMENT Adapter EMPTY>
+<!ELEMENT Adapter (Coordinate?) >
 <!ATTLIST Adapter
     name    CDATA    #REQUIRED
     eventHeard CDATA #REQUIRED
