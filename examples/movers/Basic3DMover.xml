@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity version="1.0" name="Basic3DMover" package="examples.movers" author="rmgold" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="name" type="String">
+        <Comment/>
+    </Parameter>
+    <Parameter name="start" type="javax.vecmath.Point4d">
+        <Comment/>
+    </Parameter>
+    <Parameter name="speedLimit" type="double">
+        <Comment/>
+    </Parameter>
+    <Parameter name="frameInterval" type="double">
+        <Comment>optional updatePosition at intervals</Comment>
+    </Parameter>
+    <StateVariable type="javax.vecmath.Point4d" name="startPosition">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="javax.vecmath.Point4d" name="destination">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="javax.vecmath.Point4d" name="cantReach">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="javax.vecmath.Vector4d" name="velocity">
+        <Comment>w component stores time span through vector</Comment>
+    </StateVariable>
+    <StateVariable type="double" name="maxSpeed">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="double" name="currentSpeed">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="double" name="duration">
+        <Comment>time duration of move in velocity.w</Comment>
+    </StateVariable>
+    <StateVariable type="boolean" name="isMoving">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="javax.vecmath.Point4d" name="currentPosition">
+        <Comment/>
+    </StateVariable>
+    <StateVariable type="boolean" name="abort">
+        <Comment>if EndMove event happens before ArrivePoint</Comment>
+    </StateVariable>
+    <StateVariable type="double" name="distanceYet">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="startPosition">
+            <Assignment value="new javax.vecmath.Point4d(start.x,start.y,start.z, Schedule.getSimTime())"/>
+        </StateTransition>
+        <StateTransition state="destination">
+            <Assignment value="new javax.vecmath.Point4d(start.x,start.y,start.z, Schedule.getSimTime() + Double.POSITIVE_INFINITY)"/>
+        </StateTransition>
+        <StateTransition state="maxSpeed">
+            <Assignment value="speedLimit"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Assignment value="new javax.vecmath.Vector4d(0.0, 0.0, 0.0,0.0)"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="cantReach">
+            <Assignment value="new javax.vecmath.Point4d()"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="0.0"/>
+        </StateTransition>
+        <StateTransition state="abort">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="currentPosition">
+            <Operation method="set(startPosition.x,startPosition.y,startPosition.z,startPosition.w)"/>
+        </StateTransition>
+        <Coordinate y="314" x="200"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <LocalVariable name="distSquare" value="0" type="double">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="velocity">
+            <Assignment value="new javax.vecmath.Vector4d(destination.x - startPosition.x, destination.y - startPosition.y, destination.z - startPosition.z, destination.w - startPosition.w )"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="(distSquare = (velocity.x*velocity.x + velocity.y*velocity.y +velocity.z*velocity.z)) &gt; 0.0001 &amp;&amp; velocity.w &gt; 0.0001"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="Math.sqrt(distSquare)/velocity.w"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="velocity.w"/>
+        </StateTransition>
+        <Schedule delay="velocity.w" condition="isMoving" event="ArrivePoint" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule delay="0.0" condition="currentSpeed - maxSpeed &gt; .001 " event="SpeedLimit" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule event="UpdatePosition"/>
+        <Coordinate y="199" x="84"/>
+    </Event>
+    <Event name="ArrivePoint">
+        <Comment/>
+        <StateTransition state="startPosition">
+            <Operation method="set(destination)"/>
+        </StateTransition>
+        <StateTransition state="isMoving">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="currentPosition">
+            <Operation method="set(destination)"/>
+        </StateTransition>
+        <Cancel event="UpdatePosition"/>
+        <Coordinate y="147" x="202"/>
+    </Event>
+    <Event name="UpdatePosition">
+        <Comment>get a snapshot frame of where the mover currentPosition should be</Comment>
+        <StateTransition state="currentPosition">
+            <Operation method="scaleAdd((Schedule.getSimTime()-startPosition.w)/(destination.w-startPosition.w),velocity,startPosition)"/>
+        </StateTransition>
+        <StateTransition state="distanceYet">
+            <Assignment value="Math.sqrt(Math.pow((destination.x-currentPosition.x),2)+Math.pow((destination.y-currentPosition.y),2) +Math.pow((destination.z-currentPosition.z),2))"/>
+        </StateTransition>
+        <Schedule delay="frameInterval" condition="frameInterval &gt; 0.0" event="UpdatePosition" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule delay="0.0" condition="abort" event="Unreachable" priority="0">
+            <Comment/>
+        </Schedule>
+        <Coordinate y="98" x="56"/>
+    </Event>
+    <Event name="UpdateDestination">
+        <Comment/>
+        <Argument type="javax.vecmath.Point4d" name="newDestination"/>
+        <StateTransition state="destination">
+            <Operation method="set(newDestination)"/>
+        </StateTransition>
+        <Cancel event="ArrivePoint"/>
+        <Schedule delay="0.0" condition="destination.w &gt; startPosition.w" event="StartMove" priority="0">
+            <Comment/>
+        </Schedule>
+        <Cancel event="UpdatePosition"/>
+        <Coordinate y="229" x="309"/>
+    </Event>
+    <Event name="SpeedLimit">
+        <Comment>If requested destination time breaks speed limit</Comment>
+        <StateTransition state="destination">
+            <Operation method="set(destination.x,destination.y,destination.z,Schedule.getSimTime()+((currentSpeed/maxSpeed)*(destination.w-startPosition.w)))"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="maxSpeed"/>
+        </StateTransition>
+        <Schedule event="StartMove"/>
+        <Cancel event="ArrivePoint"/>
+        <Cancel event="UpdatePosition"/>
+        <Coordinate y="328" x="40"/>
+    </Event>
+    <Event name="Unreachable">
+        <Comment>set cantReach to destination</Comment>
+        <StateTransition state="cantReach">
+            <Operation method="set(destination)"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="set(0.0,0.0,0.0,0.0)"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="Double.POSITIVE_INFINITY"/>
+        </StateTransition>
+        <StateTransition state="currentSpeed">
+            <Assignment value="0.0"/>
+        </StateTransition>
+        <StateTransition state="startPosition">
+            <Operation method="set(currentPosition)"/>
+        </StateTransition>
+        <Cancel event="ArrivePoint"/>
+        <Coordinate y="50" x="202"/>
+    </Event>
+    <Event name="EndMove">
+        <Comment/>
+        <StateTransition state="abort">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule event="UpdatePosition"/>
+        <Coordinate y="10" x="60"/>
+    </Event>
+</SimEntity>
+
