@@ -3,6 +3,8 @@ package viskit;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -98,25 +100,42 @@ public abstract class ViskitSmallDialog extends JDialog
     }
   }
 
-  class enableApplyButtonListener implements CaretListener,ActionListener
+  class enableApplyButtonListener implements ActionListener,DocumentListener
   {
     private JButton applyButt;
     enableApplyButtonListener(JButton applyButton)
     {
       this.applyButt = applyButton;
     }
-    public void caretUpdate(CaretEvent event)
+
+    public void changedUpdate(DocumentEvent e)
+    {
+      enableButt();
+    }
+
+    public void insertUpdate(DocumentEvent e)
+    {
+      enableButt();
+    }
+
+    public void removeUpdate(DocumentEvent e)
+    {
+      enableButt();
+    }
+
+    public void actionPerformed(ActionEvent event)
+    {
+      enableButt();
+    }
+    
+    private void enableButt()
     {
       modified = true;
       applyButt.setEnabled(true);
       getRootPane().setDefaultButton(applyButt);       // in JDialog
     }
-
-    public void actionPerformed(ActionEvent event)
-    {
-      caretUpdate(null);
-    }
   }
+
   class OneLinePanel extends JPanel
   {
     OneLinePanel(JLabel lab, int w, JComponent comp)
