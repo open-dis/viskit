@@ -75,6 +75,10 @@ public class DISMover3DSender extends SimEntityBase {
         return movers.size();
     }
     
+    protected boolean removeMover3D(DISMover3DBase mover) {
+        pdus.remove(movers.indexOf(mover));
+        return movers.remove(mover);
+    }
     
     // note: coordinate space is already DIS's
     /**
