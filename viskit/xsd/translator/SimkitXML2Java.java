@@ -376,7 +376,7 @@ public class SimkitXML2Java {
             while ( li.hasNext() ) {
                 Parameter pt = (Parameter) li.next();
                 pw.print(shortinate(pt.getName()));
-                if ((pList.size() > 1) && (pList.indexOf(pt) < pList.size() - 1)) {
+                if ((superPList.size() > 1) && (superPList.indexOf(pt) < superPList.size() - 1)) {
                     pw.print(cm);
                 }
 	    
