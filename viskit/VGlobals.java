@@ -19,12 +19,15 @@ import java.awt.event.ItemEvent;
 import java.awt.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mike
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey CA
+ * www.nps.navy.mil
+ * By:   Mike Bailey
  * Date: Apr 5, 2004
  * Time: 3:20:33 PM
- * To change this template use File | Settings | File Templates.
  */
+
 public class VGlobals
 {
   private static VGlobals me;
@@ -50,6 +53,28 @@ public class VGlobals
     buildTypePopup();
   }
 
+  AssemblyViewFrame avf;
+  public AssemblyViewFrame getAssemblyEditor()
+  {
+    return avf;
+  }
+
+  public void setAssemblyEditor(AssemblyViewFrame avf)
+  {
+    this.avf = avf;
+  }
+
+  EventGraphViewFrame egvf;
+  public EventGraphViewFrame getEventGraphEditor()
+  {
+    return egvf;
+  }
+
+  public void setEventGraphEditor(EventGraphViewFrame fr)
+  {
+    this.egvf = fr;
+  }
+  
 
   public void setStateVarsList(Collection svs)
   {

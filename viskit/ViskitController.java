@@ -31,7 +31,9 @@ public interface ViskitController
 
   void newEventGraph();
   void newAssembly();
-
+  void newEventGraphEditor();
+  void newAssemblyEditor();
+  
   /* requests to the controller to perform editing operations on existing entities */
   void nodeEdit         (EventNode node);
   void arcEdit          (SchedulingEdge ed);
