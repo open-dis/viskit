@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : TransferLineComponent.xml
+    Created on : April 30, 2004, 12:55 PM
+    Author     : Rick Goldberg
+    Description:
+        Advanced Simkit application.
+-->
+
+<!--<!DOCTYPE SimkitModule PUBLIC '-//NPS Simkit//DTD Web Application//EN' 'http://bloak.com/home/rmgold/CVS/Simkit/simkit/xsd/translator/simkit.dtd'>
+-->
+<SimkitModule
+    name="TransferLineComponent"
+    version="0.0.1" >
+
+    <Parameter name="totalNumberServers" type="int[]" shortName="tns" />
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate[]" shortName="st" />
+    
+    <StateVariable name="numberAvailableServers" type="int[]" />
+    <StateVariable name="numberInQueue" type="int[]" />
+    
+    <Event name="Run" >
+    
+        <StateTransition state="numberAvailableServers" >
+            <Assignment value="totalNumberServers" />
+        </StateTransition>
+    
+        <StateTransition state="numberInQueue" >
+            <Assignment value="0" />
+        </StateTransition>
+        
+        <Schedule event="InitializeWorkcenter" delay="0.0" > 
+	    <EdgeParameter value="0" />
+	</Schedule>
+
+    </Event>
+
+    <Event name="InitializeWorkcenter" >
+        
+        <Argument name="i" type="int" />
+        
+        <StateTransition state="numberInQueue[i]" >
+            <Assignment value="0" />
+        </StateTransition>
+        
+        <StateTransition state="numberAvailableServers[i]" >
+            <Assignment value="totalNumberServers[i]" />
+        </StateTransition>
+
+        <Schedule event="InitializeWorkcenter" condition="i < totalNumberServers.length - 1" >
+            <EdgeParameter value="i+1" />
+        </Schedule>
+        
+    </Event>
+
+    <Event name="Arrival" >
+	<Argument name="i" type="int" />
+	
+	<StateTransition state="numberInQueue[i]" >
+	    <Assignment value="numberInQueue[i] + 1" />
+	</StateTransition>
+
+	<Schedule event="StartService" condition="getNumberAvailableServers(i) > 0" >
+	    <EdgeParameter value="i" />
+	</Schedule>
+
+    </Event>
+    
+    <Event name="StartService" >
+        
+        <Argument name="i" type="int" />
+        
+        <StateTransition state="numberInQueue[i]" >
+            <Assignment value="numberInQueue[i] + 1" />
+        </StateTransition>
+        
+        
+        <StateTransition state="numberAvailableServers[i]" >
+            <Assignment value="numberAvailableServers[i] - 1" />
+        </StateTransition>
+        
+        
+        <Schedule event="EndService" delay="serviceTime[i].generate()" >
+            <EdgeParameter value="i" />
+        </Schedule>
+        
+    </Event>
+    
+    <Event name="EndService" >
+    
+        <Argument name="i" type="int" />
+        
+        <StateTransition state="numberAvailableServers[i]" >
+            <Assignment value="numberAvailableServers[i]+1" />
+        </StateTransition>
+        
+        <Schedule event="StartService" condition="getNumberInQueue(i) > 0" />
+        <Schedule event="Arrival" condition="i < totalNumberServers.length - 1" />
+        
+    </Event>
+    
+</SimkitModule>
