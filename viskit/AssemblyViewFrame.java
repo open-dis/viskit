@@ -42,10 +42,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private ButtonGroup modeButtonGroup;
 
   private JToggleButton selectMode;
-  private JToggleButton arcMode;
+  private JToggleButton adapterMode,bridgeMode;
   private JButton zoomIn, zoomOut;
 
-
+  private JPanel canvasPanel;
 
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
@@ -88,6 +88,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     buildMenus();
     buildToolbar();
+    buildVCRToolbar();
 
     // Set up a top level pane that will be the content pane. This
     // has a border layout, and contains the toolbar on the top and
@@ -96,7 +97,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // top level panel
     JPanel top = new JPanel();
     top.setLayout(new BorderLayout());
-    top.add(toolBar, BorderLayout.NORTH);
+    //top.add(toolBar, BorderLayout.NORTH);
 
     JComponent canvas = buildCanvas();
     JComponent trees = buildTreePanels();
@@ -105,12 +106,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     JScrollPane leftsp = new JScrollPane(trees);
     leftsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
     //leftsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,trees,new JScrollPane(canvas));
+    jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,trees,new JScrollPane(canvasPanel)); //canvas));
     jsp.setOneTouchExpandable(true);
     trees.setMinimumSize(new Dimension(20,20));
     canvas.setMinimumSize(new Dimension(20,20));
     //jsp.setDividerLocation(0.5d);
     top.add(jsp,BorderLayout.CENTER);
+    top.add(vcrToolBar,BorderLayout.SOUTH);
     getContentPane().add(top);
   }
 
@@ -121,6 +123,35 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   }
 
+  private JPanel vcrToolBar;
+  private JButton vcrStop, vcrPause, vcrPlay, vcrStep;
+  private JCheckBox  vcrVerbose;
+  private void buildVCRToolbar()
+  {
+    vcrToolBar = new JPanel();
+    vcrToolBar.setLayout(new BoxLayout(vcrToolBar,BoxLayout.X_AXIS));
+    vcrToolBar.add(Box.createHorizontalGlue());
+
+    vcrStop = makeButton(null, "viskit/images/Stop24.gif", "Stop the simulation run");
+    vcrStop.setEnabled(false);
+    vcrToolBar.add(vcrStop);
+    vcrPlay = makeButton(null, "viskit/images/Play24.gif", "Begin or resume the simulation run");
+    vcrToolBar.add(vcrPlay);
+    vcrPause = makeButton(null, "viskit/images/Pause24.gif", "Pause the simulation run");
+    vcrToolBar.add(vcrPause);
+    vcrPause.setEnabled(false);
+    vcrStep = makeButton(null, "viskit/images/StepForward24.gif", "Step the simulation");
+    vcrToolBar.add(vcrStep);
+
+    vcrToolBar.add(Box.createHorizontalStrut(20));
+
+    vcrVerbose = new JCheckBox("verbose output",false);
+    vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
+    vcrToolBar.add(vcrVerbose);
+
+    vcrToolBar.add(Box.createHorizontalGlue());
+
+  }
   private void buildToolbar()
   {
     modeButtonGroup = new ButtonGroup();
@@ -130,9 +161,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     selectMode    = makeJTButton(null, "viskit/images/selectNode.png",
                                        "Select items on the graph");
-    arcMode       = makeJTButton(null, "viskit/images/schedArc.png",
-                                       "Connect nodes with scheduling arcs");
-
+    adapterMode       = makeJTButton(null, "viskit/images/adapter.png",
+                                       "Connect assemblies with adapter pattern");
+    bridgeMode        = makeJTButton(null, "viskit/images/bridge.png",
+                                       "Connect assemblies with bridge pattern");
     zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                                         "Zoom in on the graph");
 
@@ -140,7 +172,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                                         "Zoom out on the graph");
 
     modeButtonGroup.add(selectMode);
-    modeButtonGroup.add(arcMode);
+    modeButtonGroup.add(adapterMode);
+    modeButtonGroup.add(bridgeMode);
 
     // Make selection mode the default mode
     selectMode.setSelected(true);
@@ -148,8 +181,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     toolBar.add(new JLabel("Mode: "));
     toolBar.add(selectMode);
     toolBar.addSeparator(new Dimension(5,24));
-    toolBar.add(arcMode);
+    toolBar.add(adapterMode);
     toolBar.addSeparator(new Dimension(5,24));
+    toolBar.add(bridgeMode);
 
     toolBar.addSeparator(new Dimension(24,24));
     toolBar.add(new JLabel("Zoom: "));
@@ -183,7 +217,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         graphPane.setPortsVisible(false);
       }
     });
-    arcMode.addActionListener(new ActionListener()
+    adapterMode.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
@@ -237,6 +271,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       System.err.println("assert false : \"Drop target init. error\"");
     }
 
+    canvasPanel = new JPanel();
+    canvasPanel.setLayout(new BorderLayout());
+    canvasPanel.add(graphPane,BorderLayout.CENTER);
+    canvasPanel.add(toolBar,BorderLayout.NORTH);
     return graphPane;
   }
   private JSplitPane panJsp;
