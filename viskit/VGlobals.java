@@ -199,6 +199,7 @@ public class VGlobals
     ns.importPackage("simkit.smdx.*");
     ns.importPackage("simkit.stat.*");
     ns.importPackage("simkit.util.*");
+    ns.importPackage("diskit.*");         // 17 Nov 2004
   }
   String bshErr = "BeanShell eval error";
   private Vector nsSets = new Vector();
@@ -217,9 +218,9 @@ public class VGlobals
       vStateVariable sv = (vStateVariable) itr.next();
       String result;
       if(sv.getType().indexOf('[') != -1)
-        result = handleNameType(sv.getName(),sv.getArrayType());
+        result = handleNameType(sv.getName(),sv.getArrayType(),false);
       else
-        result = handleNameType(sv.getName(),sv.getType());
+        result = handleNameType(sv.getName(),sv.getType(),false);
       if(result != null) {
         clearNamespace();
         return bshErr +"\n" + result;
@@ -231,9 +232,9 @@ public class VGlobals
       vParameter par = (vParameter) itr.next();
       String result;
       if(par.getType().indexOf('[') != -1)
-        result = handleNameType(par.getName(),par.getArrayType());
+        result = handleNameType(par.getName(),par.getArrayType(),false);
       else
-        result = handleNameType(par.getName(),par.getType());
+        result = handleNameType(par.getName(),par.getType(),false);
       if(result != null) {
         clearNamespace();
         return bshErr +"\n" + result;
@@ -246,9 +247,9 @@ public class VGlobals
         EventLocalVariable elv = (EventLocalVariable)itr.next();
         String result;
         if(elv.getType().indexOf('[') != -1)
-          result = handleNameType(elv.getName(),elv.getArrayType());
+          result = handleNameType(elv.getName(),elv.getArrayType(),false);
         else
-          result = handleNameType(elv.getName(),elv.getType());
+          result = handleNameType(elv.getName(),elv.getType(),false);
         if(result != null) {
           clearNamespace();
           return bshErr +"\n" + result;
@@ -258,7 +259,7 @@ public class VGlobals
       // Event arguments
       for(Iterator itr = node.getArguments().iterator(); itr.hasNext(); ) {
         EventArgument ea = (EventArgument)itr.next();
-        String result = handleNameType(ea.getName(),ea.getType());
+        String result = handleNameType(ea.getName(),ea.getType(),false);
         if(result != null) {
           clearNamespace();
           return bshErr +"\n" + result;
@@ -295,25 +296,39 @@ public class VGlobals
     }
     nsSets.clear();
   }
-  private String handleNameType(String name, String typ)
-  {
+  private String handleNameType(String name, String typ, boolean doInstantiate)      // I don't think the instant part
+  {                                                                                  // is or should be used here
     if (!handlePrimitive(name, typ)) {
-        try {
-          Object o = instantiateType(typ);
-          //interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
-          interpreter.eval(typ+" "+ name +" = "+o);
-        }
-        catch (Exception ex) {
-          clearNamespace();
-          return bshErr + "\n" + ex.getMessage();
-        }
-      //}
+      if (!doInstantiate)
+        return (findType(name,typ));
+
+      try {
+        Object o = instantiateType(typ);
+        if (o == null)
+          throw new Exception("Class not found: " + typ);
+        //interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
+        interpreter.eval(typ + " " + name + " = " + o);
+      }
+      catch (Exception ex) {
+        clearNamespace();
+        return ex.getMessage();
+      }
     }
     return null; // this is good
   }
 
-
-  private Object instantiateType(String typ)
+  private String findType(String name, String typ) {
+    try {
+      Class c = Vstatics.classForName(typ);
+      interpreter.eval(typ + " " + name + ";");
+    }
+    catch (Exception e) {
+      clearNamespace();
+      return e.getMessage();
+    }
+    return null;
+  }
+  private Object instantiateType(String typ) throws Exception
   {
     Object o = null;
     boolean isArr = false;
@@ -323,6 +338,8 @@ public class VGlobals
     }
     try {
       Class c = Vstatics.classForName(typ);
+      if(c == null)
+        throw new Exception("Class not found: "+typ);
       if(isArr)
         o = Array.newInstance(c,1);
       else
@@ -335,7 +352,13 @@ public class VGlobals
       return o;
 
     // OK. See if we've got a dummy one in our HashMap
-    return VsimkitObjects.getInstance(typ);
+    try {
+      o = VsimkitObjects.getInstance(typ);
+    }
+    catch (Exception e) {
+      throw new Exception(e);
+    }
+    return o;
   }
 
   private boolean handlePrimitive(String name, String typ)
@@ -446,6 +469,8 @@ public class VGlobals
 
   private String[] morePackages = {"primitives","java.lang","java.util","simkit.random","cancel"};
   private final int primitivesIndex = 0; // for above array
+  private final int packagesStart = 1;
+  private final int packagesEnd = 3;
 
   private String[][] moreClasses =
   {
@@ -462,6 +487,13 @@ public class VGlobals
         return true;
     }
     return false;
+  }
+  public boolean isPrimitiveOrPrimitiveArray(String ty)
+  {
+    int idx;
+    if((idx = ty.indexOf('[')) != -1)
+      ty = ty.substring(0,idx);
+    return isPrimitive(ty);
   }
 
   Pattern bracketsPattern = Pattern.compile("\\[.*?\\]");
