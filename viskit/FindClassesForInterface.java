@@ -207,13 +207,7 @@ public class FindClassesForInterface
      * @param c The class to be tested
      */
     public static boolean isConcrete(Class c)  {
-        Constructor[] constructor = c.getConstructors();
-        for (int i = 0; i < constructor.length; ++i) {
-            if (!Modifier.isAbstract(constructor[i].getModifiers())) {
-                return true;
-            }
-        }
-        return false;
+        return (c.getModifiers() & Modifier.ABSTRACT) != Modifier.ABSTRACT;
     }
 
 }
