@@ -32,7 +32,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void generateJavaClass()
   {
-if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if(((ViskitAssemblyModel)getModel()).isDirty()) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
@@ -67,7 +66,6 @@ if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
   File lastFile;
   public void open()
   {
-if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if (((AssemblyModel)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
@@ -76,30 +74,41 @@ if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if (lastFile != null) {
       ((ViskitAssemblyModel) getModel()).newModel(lastFile);
       ((ViskitAssemblyView) getView()).fileName(lastFile.getName());
+      GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
+      ((ViskitAssemblyView) getView()).setStopTime(gmd.stopTime);
+      ((ViskitAssemblyView) getView()).setVerbose(gmd.verbose);
     }
 
   }
   public void save()
   //----------------
   {
-if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     if(lastFile == null)
       saveAs();
-    else
+    else {
+      updateGMD();
       ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
+    }
   }
 
   public void saveAs()
   {
-if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
     lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name);
     if(lastFile != null) {
+      updateGMD();
       ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
       ((ViskitAssemblyView)getView()).fileName(lastFile.getName());
     }
 
   }
+  private void updateGMD()
+  {
+    GraphMetaData gmd = ((ViskitAssemblyModel)getModel()).getMetaData();
+    gmd.stopTime = ((ViskitAssemblyView)getView()).getStopTime();
+    gmd.verbose = ((ViskitAssemblyView)getView()).getVerbose();
+    ((ViskitAssemblyModel)getModel()).changeMetaData(gmd);
 
+  }
   public void newAssembly()
   {
     if (((AssemblyModel)getModel()).isDirty())
@@ -309,7 +318,7 @@ if(true){JOptionPane.showMessageDialog(null,"Not yet implemented.");return;}
         msg += ", \n" + s;
       }
       String specialNodeMsg = (nodeCount > 0 ? "\n(All unselected but attached edges will also be deleted.)" : "");
-      if (((ViskitView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg)
+      if (((ViskitAssemblyView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg)
        == JOptionPane.YES_OPTION) {
         // do edges first?
         Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
