@@ -127,7 +127,7 @@ public class TransitionsPanel extends JPanel
     return (ArrayList) arLis.clone();
   }
 
-  public void addTransition(EventStateTransition est)
+  private void addTransition(EventStateTransition est)
   {
     model.addElement(transitionString(est));
     arLis.add(est);
@@ -214,20 +214,27 @@ public class TransitionsPanel extends JPanel
       model.addElement("double click to edit");
       lis.setVisibleRowCount(Math.max(model.getSize(), 3));
       lis.ensureIndexIsVisible(model.getSize() - 1);
+      lis.setSelectedIndex(model.getSize()-1);
       TransitionsPanel.this.invalidate();
       minusButt.setEnabled(true);
       EventStateTransition est = new EventStateTransition();
       arLis.add(est);
       if (myPlusListener != null)
         myPlusListener.actionPerformed(event);
-/*
+
       // This does an edit immediately, and doesn't require a separate double click
       if(myMouseLis != null) {
         MouseEvent me = new MouseEvent(plusButt,0,0,0,0,0,2,false);   // plusButt temporarily used
         me.setSource(est);
         myMouseLis.mouseClicked(me);
+
+        // If they cancelled, kill it
+        if(model.get(model.getSize()-1) == "double click to edit") {  // remove it
+          ActionEvent ae = new ActionEvent(minusButt,0,"delete");  // dummy
+          minusButt.getActionListeners()[0].actionPerformed(ae);
+        }
       }
-*/
+
     }
   }
 
