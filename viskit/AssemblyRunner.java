@@ -27,7 +27,7 @@ public class AssemblyRunner
   Thread thr;
   private Runtime rt = Runtime.getRuntime();
   private String filesep = System.getProperty("file.separator");
-  //private String fileext = "";
+
   private String[] execString;
   private boolean isJar = false;
   private Process proc;
