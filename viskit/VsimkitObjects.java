@@ -51,9 +51,12 @@ public class VsimkitObjects
     }
   }
 
-  public static Object getInstance(String nm)
+  public static Object getInstance(String nm) throws Exception
   {
-    return ((FullNameAndInstance)hashmap.get(nm)).instance;
+    Object o = hashmap.get(nm);
+    if(o == null)
+      throw new Exception("Class not found: "+nm);
+    return ((FullNameAndInstance)o).instance;
   }
 
   public static Object getFullName(String nm)
