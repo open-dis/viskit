@@ -26,7 +26,7 @@
           
     <property description="Location of Viskit's dependencies" location="${basedir}/lib" name="dir.lib"/>
           
-    <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.4" name="dir.lib.xml"/>
+    <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.5" name="dir.lib.xml"/>
     
     <property description="Runtime module extension libraries." location="${dir.lib}/ext" name="dir.lib.ext"/>
           
@@ -121,17 +121,18 @@
 
 <!--  === TARGET: compile === -->
     <target depends="init,compile.simxml.util" name="compile">
-        <javac destdir="${dir.build.classes}" excludes="xsd/**">
+        <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**">
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
                 <pathelement location="${dir.lib}/jgraph.jar"/>
                 <pathelement location="${dir.lib}/actions.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
-                <pathelement location="${dir.lib}/tools.jar"/>
+                <!-- <pathelement location="${dir.lib}/tools.jar"/> -->
                 <pathelement location="${dir.lib}/trang.jar"/>
                 <pathelement location="${dir.lib}/trangtask.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
+		<pathelement location="${dir.lib}/viskit.jar"/>
                 <pathelement location="${dir.build.classes}"/>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -151,6 +152,10 @@
 <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
+    </target>
+
+    <target depends="compile.bindings" name="jar-stage1">
+        <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
     </target>
 
     <target name="splashy">
@@ -232,20 +237,19 @@
         </copy>
     </target>
     
-    <target depends="compile.bindings" description="Build xml2java utils" name="compile.simxml.util">
+    <!-- depend create stage 1 visxml.jar which later includes stuff from this compile to make viskit.jar -->
+    <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
         <javac destdir="${dir.build.classes}">
             <classpath>
-                <fileset dir="${dir.build.classes}"/>
+                <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                <pathelement location="${dir.lib}/tools.jar"/>
             </classpath>
             <src path="${dir.src.simtran.util}"/>
         </javac>
         <javac destdir="${dir.build.classes}">
             <classpath>
-                <fileset dir="${dir.build.classes}"/>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                <pathelement location="${dir.lib}/tools.jar"/>
+                <pathelement location="${dir.lib}/visxml.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
