@@ -6,17 +6,11 @@
         <TerminalParameter type="double" value=".001"/>
         <Coordinate y="189" x="285"/>
     </SimEntity>
-    <SimEntity name="SimPinger_1" type="diskit.SimPinger">
-        <TerminalParameter type="double" value="1.0"/>
-        <TerminalParameter type="long" value="1000"/>
-        <Coordinate y="81" x="133"/>
-    </SimEntity>
     <PropertyChangeListener name="SimplePropertyDumper_1" type="simkit.util.SimplePropertyDumper">
         <Coordinate y="300" x="100"/>
     </PropertyChangeListener>
     <PropertyChangeListenerConnection property="" listener="SimplePropertyDumper_1" source="SimServer3DTest_0"/>
     <Output entity="SimServer3DTest_0"/>
-    <Output entity="SimPinger_1"/>
     <Schedule verbose="false" stopTime="100."/>
 </SimkitAssembly>
 
