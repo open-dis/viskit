@@ -37,7 +37,7 @@ public abstract class ViskitSmallDialog extends JDialog
         Class[] args = new Class[] {Class.forName("javax.swing.JFrame"),
                                     Class.forName("java.awt.Component"),
                                     Class.forName("java.lang.Object")};
-        Class c = Class.forName("viskit."+className);
+        Class c = Vstatics.classForName("viskit."+className);
         Constructor constr = c.getDeclaredConstructor(args);
         dialog = (ViskitSmallDialog)constr.newInstance(new Object[]{f,comp,var});
       }

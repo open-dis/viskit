@@ -295,7 +295,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       tp.removeAll();
       //modifiedListener = changedListener;
 
-      //clazz = Class.forName(clName);
       clazz = Vstatics.classForName(clName);
       if(clazz == null)
         throw new ClassNotFoundException(clName);
@@ -494,7 +493,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         //String cName = factClassCB.getText().trim();
         String cName = factClassCB.getSelectedItem().toString();
         try {
-          c = Class.forName(cName);
+          c = Vstatics.classForName(cName);
+          if(c == null)throw new ClassNotFoundException();
         }
         catch (ClassNotFoundException e1) {
           JOptionPane.showMessageDialog(ip,cName + " class not found");

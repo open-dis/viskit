@@ -60,7 +60,8 @@ public class ExternalAssemblyRunner extends JFrame
 
     Class targetClass = null;
     try {
-      targetClass = Class.forName(targetClassName);
+      targetClass = Vstatics.classForName(targetClassName);
+        if(targetClass == null) throw new ClassNotFoundException();
       targetObject = targetClass.newInstance();
     }
 

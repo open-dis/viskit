@@ -281,7 +281,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
     Class c = null;
     String classname = node.getType();
     try {
-      c = Vstatics.classForName(classname); //Class.forName(classname);
+      c = Vstatics.classForName(classname);
       if(c == null)
         throw new ClassNotFoundException("classname not found");
       Method[] methods = c.getMethods();

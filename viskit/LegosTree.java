@@ -343,7 +343,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   }
 
   /**
-   * Get the jar file which is in our classpath, which contains the class in question
    *
    * @param classInJarFile
    * @param jarFileName

@@ -511,7 +511,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public void drop(DropTargetDropEvent dtde)
     {
-      System.out.println("drop");
       if(dragged != null) {
         try {
           Point p = dtde.getLocation();

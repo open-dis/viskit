@@ -38,10 +38,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     // The following comments were an attempt to solve classloader issues that needed to be solved
     // a different way
     try {
-      simEvSrcClass   = Class.forName("simkit.SimEventSource");
-      simEvLisClass   = Class.forName("simkit.SimEventListener");
-      propChgSrcClass = Class.forName("simkit.PropertyChangeSource");
-      propChgLisClass = Class.forName("java.beans.PropertyChangeListener");
+      simEvSrcClass   = Vstatics.classForName("simkit.SimEventSource");
+      simEvLisClass   = Vstatics.classForName("simkit.SimEventListener");
+      propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
+      propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
+      if(simEvSrcClass == null | simEvLisClass == null | propChgSrcClass == null | propChgLisClass == null)
+        throw new ClassNotFoundException();
     }
     catch (ClassNotFoundException e) {
       ((ViskitAssemblyView)getView()).genericErrorReport("Internal error","simkit.jar not in classpath");
@@ -303,14 +305,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   Class findClass(AssemblyNode o)
   {
     return Vstatics.classForName(o.getType());
-/*
-    try {
-      return Class.forName(o.getType());
-    }
-    catch(Exception e) {}
-    return null;
-*/
   }
+  
   AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
   {
     AssemblyNode[] obArr = new AssemblyNode[2];

@@ -231,7 +231,7 @@ public class PclEdgeInspectorDialog extends JDialog
         classname = ((PropChangeListenerNode)o).getType();
 
       try {
-        Class c = Vstatics.classForName(classname); //Class.forName(classname);
+        Class c = Vstatics.classForName(classname);
         if(c == null)
           throw new ClassNotFoundException(classname+" not found");
         Class stopClass = Class.forName("simkit.BasicSimEntity");

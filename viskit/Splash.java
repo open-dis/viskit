@@ -36,36 +36,35 @@ public class Splash extends JFrame
     this.pack();
   }
 
+  /**
+   * Do this to put all GUI access in Event thread.  Play the array game to deal with final var restrictions.
+   * @return
+   */
+  private static Splash makeSplash()
+  {
+    final Splash[] spl=new Splash[1];
+    try {
+      SwingUtilities.invokeAndWait(new Runnable()
+      {
+        public void run()
+        {
+          spl[0]=new Splash();
+          Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+          spl[0].setLocation((d.width-spl[0].getWidth())/2,(d.height-spl[0].getHeight())/2);
+          spl[0].setVisible(true);
+        }
+      });
+    }
+    catch (Exception ex){}
+    return spl[0];
+  }
+
   public static void main(String[] args)
   {
-/*
-
-    String s[]  = { "[Ljava.util.List;",
-                    "java.util.List[2]",
-                    "java.util.List[]",
-                    "simkit.smdx.WayPoint",
-                    "simkit.smdx.WayPoint[3]",
-                    "simkit.smdx.WayPoint[]",
-                    "[Lsimkit.smdx.WayPoint;"};
-    Class c = null;
-    for(int i=0;i<s.length;i++) {
-    try {
-      c = Class.forName(s[i]);
-    }
-    catch (ClassNotFoundException e) {
-      System.out.println("doh: "+s[i]);
-    }
-    }
-
-*/
-
-    Splash spl = new Splash();
-    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    spl.setLocation((d.width-spl.getWidth())/2,(d.height-spl.getHeight())/2);
-    spl.setVisible(true);
+    Splash spl = makeSplash();
 
     try{Thread.sleep(2000);}catch(Exception e){}  // this is used to give us some min splash viewing
-    
+
     try {
       // Call the main() method of the application using reflection
       Object[] arguments = new Object[]{args};

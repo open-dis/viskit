@@ -309,7 +309,7 @@ public class VGlobals
       isArr = true;
     }
     try {
-      Class c = Class.forName(typ);
+      Class c = Vstatics.classForName(typ);
       if(isArr)
         o = Array.newInstance(c,1);
       else
