@@ -303,7 +303,7 @@ public class EventTransitionDialog extends JDialog
       if(assTo.isSelected())
         actionLab.setText("=");
       else
-        actionLab.setText("invoke");
+        actionLab.setText(".");
       actionLab.setPreferredSize(d);
     }
   }
