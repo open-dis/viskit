@@ -88,7 +88,7 @@ public class DISSender3D extends SimEntityBase {
     public int sendPings() {
         
         EntityStatePdu espdu;
-        DISMover3DBase mover;
+        DISMover3D mover;
         Vec4f position;
         Vec4f velocity;
         Vec4f startPosition;
@@ -111,23 +111,24 @@ public class DISSender3D extends SimEntityBase {
             double pitch = Math.atan(velocity.get(1)/xzDistance);
             double direction = Math.atan2(velocity.get(2),velocity.get(0));
         
-            // math here: was mover3d
+            // math here: mover3d
             
             System.out.println("start (" + startPosition.get(0) + " " + startPosition.get(1) + " " + startPosition.get(2) + " " + startPosition.get(3) + ")");
             System.out.println("velocity (" + velocity.get(0) + " " + velocity.get(1) + " " + velocity.get(2) + " " + velocity.get(3) + ")");
         
-            position = mover.getCurrentPosition();
         
             espdu.setEntityLinearVelocityX(velocity.get(0));
             espdu.setEntityLinearVelocityY(velocity.get(1));
             espdu.setEntityLinearVelocityZ(velocity.get(2));
-            espdu.setEntityOrientationTheta((float)pitch);
-            espdu.setEntityOrientationPsi((float)direction); 
-                        
+            
+            position = mover.getCurrentPosition();           
             espdu.setEntityLocationX(position.get(0));
             espdu.setEntityLocationY(position.get(1));
             espdu.setEntityLocationZ(position.get(2));
-        
+            
+            espdu.setEntityOrientationTheta((float)pitch);
+            espdu.setEntityOrientationPsi((float)direction);       
+            
             bpUDP.write(espdu);
             System.out.println(espdu);
             System.out.println("(x,y,x,t) -> (" + position.get(0) + " " + position.get(1) + " " + position.get(2) + " " + position.get(3) + ")");
