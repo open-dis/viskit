@@ -6,6 +6,9 @@
 
 package viskit.xsd.assembly;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -113,8 +116,9 @@ public class SimkitAssemblyXML2Java {
 
 	PrintWriter pw = new PrintWriter(head);
 	String name = this.root.getName();
+	String pkg  = this.root.getPackage();
 	
-	pw.println("package examples;");
+	pw.println("package " + pkg + sc);
 	pw.println();
 	pw.println("import simkit.*;");
 	pw.println("import simkit.random.*;");
@@ -371,6 +375,18 @@ public class SimkitAssemblyXML2Java {
         );
     }
 
+    void runIt() {
+	try {
+	    File f = new File(pd);
+	    ClassLoader cl = new URLClassLoader(new URL[] {f.toURL()});
+	    Class assembly = cl.loadClass(fileBaseName);
+	    Object params[] = { new String[]{} };
+            Class classParams[] = { params[0].getClass() };
+            Method mainMethod = assembly.getDeclaredMethod("main", classParams);
+            mainMethod.invoke(null, params);
+	} catch (Exception e) { error(e.toString()); }
+    }
+
     void error(String desc) {
 
 	StringWriter sw = new StringWriter();
@@ -412,8 +428,13 @@ public class SimkitAssemblyXML2Java {
             sax2j.writeOut(dotJava,ps);
             if ( !sax2j.compileCode(fileName) )
                 sax2j.error("Compile error " + fileName);
-            else
+            else {
                 System.out.println("Done.");
+
+		System.out.println("Running Assembly " + sax2j.fileBaseName + "...");
+		
+		sax2j.runIt();
+	    }
         } catch (FileNotFoundException fnfe) {
                 sax2j.error("Bad filename " + sax2j.fileBaseName);
         }
