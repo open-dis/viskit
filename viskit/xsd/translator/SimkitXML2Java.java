@@ -289,18 +289,28 @@ public class SimkitXML2Java {
 	List events = this.root.getEvent();
 	ListIterator li = events.listIterator();
 	Event e = null;
-
+        boolean didRun = false;
+        
 	while ( li.hasNext() ) {
 
 	    e = (Event) li.next();
 	
 	    if ( e.getName().equals("Run") ) {
 		doRunBlock(e,runBlock);
+                didRun = true;
 	    } else {
 		doEventBlock(e,eventBlock);
-	    }
-
+	    } 
+            
 	}
+        
+        if (!didRun) {
+            try {
+                EventType r = (new ObjectFactory()).createEventType();
+                r.setName("Run");
+                doRunBlock(e,runBlock);
+            } catch (javax.xml.bind.JAXBException ex) { ex.printStackTrace(); }
+        }
     }
 	
     void doRunBlock(Event run, StringWriter runBlock) {
