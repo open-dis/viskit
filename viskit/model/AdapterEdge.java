@@ -16,6 +16,7 @@ public class AdapterEdge extends AssemblyEdge
 {
   private String targetEvent;
   private String sourceEvent;
+  private String name;
 
   AdapterEdge()       // package-limited
   {
@@ -26,4 +27,7 @@ public class AdapterEdge extends AssemblyEdge
   
   public String getSourceEvent() { return sourceEvent;}
   public void   setSourceEvent(String ev) { sourceEvent = ev;}
+
+  public String getName() { return name; }
+  public void   setName(String n) { name = n; }
 }

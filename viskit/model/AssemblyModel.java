@@ -221,11 +221,12 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     newPropChangeListener(widgetName,node.loadedClass,p);
   }
 
-  public AdapterEdge newAdapterEdge (AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target)
+  public AdapterEdge newAdapterEdge (String adName, AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target)
   {
     AdapterEdge ae = new AdapterEdge();
     ae.setFrom(src);
     ae.setTo(target);
+    ae.setName(adName);
     src.getConnections().add(ae);
     target.getConnections().add(ae);
 
@@ -242,7 +243,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbAdapter.setTo(target.opaqueModelObject);
     jaxbAdapter.setFrom(src.opaqueModelObject);
 
-    jaxbAdapter.setName("requiredadaptername");
+    jaxbAdapter.setName(adName);
 
     assEdgeCache.put(jaxbAdapter,ae);
     jaxbRoot.getAdapter().add(jaxbAdapter);
@@ -774,6 +775,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       ae.setFrom(frNode);
       ae.setSourceEvent(jaxbAdapter.getEventSent());
       ae.setTargetEvent(jaxbAdapter.getEventHeard());
+      ae.setName(jaxbAdapter.getName());
       ae.opaqueModelObject = jaxbAdapter;
       toNode.getConnections().add(ae);
       frNode.getConnections().add(ae);

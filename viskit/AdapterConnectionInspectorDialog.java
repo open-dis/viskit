@@ -35,8 +35,8 @@ import java.util.Vector;
 
 public class AdapterConnectionInspectorDialog extends JDialog
 {
-  private JLabel sourceLab, targetLab;
-  private JTextField sourceTF, targetTF;
+  private JLabel sourceLab, targetLab, nameLab;
+  private JTextField sourceTF, targetTF, nameTF;
 
   private JTextField sourceEventTF, targetEventTF;
   private JLabel sourceEventLab, targetEventLab;
@@ -77,10 +77,11 @@ public class AdapterConnectionInspectorDialog extends JDialog
 
     lis = new enableApplyButtonListener();
 
-
+    nameLab = new JLabel("adapter name",JLabel.TRAILING);
     sourceLab = new JLabel("source event graph",JLabel.TRAILING);
     targetLab = new JLabel("target event graph",JLabel.TRAILING);
 
+    nameTF = new JTextField();
     sourceTF = new JTextField();
     targetTF = new JTextField();
     sourceEventTF = new JTextField();
@@ -105,10 +106,12 @@ public class AdapterConnectionInspectorDialog extends JDialog
     targetEventPan.add(targetEventTF);
     targetEventPan.add(evTargetNavButt);
 
+    pairWidgets(nameLab,nameTF,true);
     pairWidgets(sourceLab,sourceTF,false);
     pairWidgets(targetLab,targetTF,false);
     pairWidgets(sourceEventLab,sourceEventPan,true);
     pairWidgets(targetEventLab,targetEventPan,true);
+    nameTF.addCaretListener(lis);
     sourceEventTF.addCaretListener(lis);
     targetEventTF.addCaretListener(lis);
 
@@ -167,6 +170,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if(adapterEdge != null) {
+      nameTF.setText(adapterEdge.getName());
       sourceEVG = (EvGraphNode)adapterEdge.getFrom();
       sourceTF.setText(sourceEVG.getName() + " (" + sourceEVG.getType()+")");
       sourceEventTF.setText(adapterEdge.getSourceEvent());
@@ -186,12 +190,13 @@ public class AdapterConnectionInspectorDialog extends JDialog
     content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     JPanel cont = new JPanel(new SpringLayout());
+    cont.add(nameLab);        cont.add(nameTF);
     cont.add(sourceLab);      cont.add(sourceTF);
     cont.add(sourceEventLab); cont.add(sourceEventPan);
     cont.add(targetLab);      cont.add(targetTF);
     cont.add(targetEventLab); cont.add(targetEventPan);
 
-    SpringUtilities.makeCompactGrid(cont,4,2,10,10,5,5);
+    SpringUtilities.makeCompactGrid(cont,5,2,10,10,5,5);
     content.add(cont);
     content.add(buttPan);
     content.add(Box.createVerticalStrut(5));
@@ -201,6 +206,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
   private void unloadWidgets()
   {
     if(adapterEdge != null) {
+      adapterEdge.setName(nameTF.getText().trim());
       adapterEdge.setSourceEvent(sourceEventTF.getText().trim());
       adapterEdge.setTargetEvent(targetEventTF.getText().trim());
     }
@@ -275,7 +281,9 @@ public class AdapterConnectionInspectorDialog extends JDialog
     Class c = null;
     String classname = node.getType();
     try {
-      c = Class.forName(classname);
+      c = Vstatics.classForName(classname); //Class.forName(classname);
+      if(c == null)
+        throw new ClassNotFoundException("classname not found");
       Method[] methods = c.getMethods();
       //assert (methods != null && methods.length > 0);
       Vector evsv = new Vector();

@@ -231,7 +231,9 @@ public class PclEdgeInspectorDialog extends JDialog
         classname = ((PropChangeListenerNode)o).getType();
 
       try {
-        Class c = Class.forName(classname);
+        Class c = Vstatics.classForName(classname); //Class.forName(classname);
+        if(c == null)
+          throw new ClassNotFoundException(classname+" not found");
         Class stopClass = Class.forName("simkit.BasicSimEntity");
         BeanInfo binf = Introspector.getBeanInfo(c,stopClass);
         PropertyDescriptor[] pds = binf.getPropertyDescriptors();

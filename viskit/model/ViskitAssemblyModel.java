@@ -38,7 +38,7 @@ public interface ViskitAssemblyModel
   public GraphMetaData getMetaData();
   public void changeMetaData    (GraphMetaData gmd);
 
-  public AdapterEdge    newAdapterEdge    (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
+  public AdapterEdge    newAdapterEdge    (String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
   public PropChangeEdge newPclEdge        (AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
   public void           newSimEvLisEdge   (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 

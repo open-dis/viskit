@@ -150,6 +150,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     return shortname + egNodeCount++; // use same counter
   }
+  private String shortAdapterName(String typeName)
+  {
+    String shortname = "adptr_";
+    if(typeName.lastIndexOf('.') != -1)
+      shortname = typeName.substring(typeName.lastIndexOf('.')+1) + "_";
+    return shortname + egNodeCount++; // use same counter
+  }
   public void newPropChangeListenerNode(String name, Point p)
   {
     String shName = shortPCLName(name);
@@ -202,12 +209,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     AssemblyNode oA = (AssemblyNode)((DefaultGraphCell)nodes[0]).getUserObject();
     AssemblyNode oB = (AssemblyNode)((DefaultGraphCell)nodes[1]).getUserObject();
 
-    AssemblyNode[] oArr = checkLegalForSEListenerArc(oA,oB);
+    AssemblyNode[] oArr = null;
+    try {
+      oArr = checkLegalForSEListenerArc(oA,oB);
+    }
+    catch (Exception e) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("Connection error.","Possible class not found.  All referenced entities must be in a list at left.");
+      return;
+    }
     if(oArr == null) {
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","The nodes must be a SimEventListener and SimEventSource combination.");
       return;
     }
-    adapterEdgeEdit(((ViskitAssemblyModel)getModel()).newAdapterEdge(oArr[0],oArr[1]));
+    adapterEdgeEdit(((ViskitAssemblyModel)getModel()).newAdapterEdge(shortAdapterName(""),oArr[0],oArr[1]));
 
 /*
     if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
@@ -288,11 +302,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   }
   Class findClass(AssemblyNode o)
   {
+    return Vstatics.classForName(o.getType());
+/*
     try {
       return Class.forName(o.getType());
     }
     catch(Exception e) {}
     return null;
+*/
   }
   AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
   {

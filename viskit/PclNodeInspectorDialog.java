@@ -138,14 +138,12 @@ public class PclNodeInspectorDialog extends JDialog
   private void fillWidgets() throws ClassNotFoundException
   {
     if (pclNode != null) {
-
-      try {
-        myClass = Class.forName(pclNode.getType());
-        Constructor[] cons = myClass.getConstructors();
+      myClass = Vstatics.classForName(pclNode.getType()); //Class.forName(pclNode.getType());
+      if(myClass == null) {
+        JOptionPane.showMessageDialog(this,"Class "+pclNode.getType() + " not found.");
+        return;
       }
-      catch (ClassNotFoundException e) {
-        e.printStackTrace();
-      }
+      Constructor[] cons = myClass.getConstructors();
 
       handleField.setText(pclNode.getName());
       typeField.setText(pclNode.getType());
