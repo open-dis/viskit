@@ -422,7 +422,6 @@ public class SimkitXML2Java {
 	while( li.hasNext() ) {
 	    StateTransition st = (StateTransition) li.next();
 	    StateVariable sv = (StateVariable) st.getState();
-	    // no fireIndexedPropertyChanged in doRun?
 	    pw.print(sp8 + "firePropertyChange(" + qu + sv.getName() + qu); 
 	    pw.println(cm + sv.getName() + rp + sc);
 	}
@@ -483,7 +482,7 @@ public class SimkitXML2Java {
 
 	    pw.print(sp8 + sv.getName());
 
-	    pw.print(lb + indexFrom(st) + rb);
+	    if (st.getIndex() != null) pw.print(lb + indexFrom(st) + rb);
 
 	    if (ops != null) {
 		pw.println(pd + ops.getMethod() + sc);
