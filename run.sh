@@ -1,5 +1,3 @@
-java -version
-#
-# This assumes that '$ ant jar' or '$ ant compilt' has already been executed.
-#
-java -classpath lib/actions.jar:lib/bsh-2.0b1.jar:lib/jdom.jar:lib/jgraph.jar:lib/simkit.jar:lib/tools.jar:lib/trang.jar:lib/trangtask.jar:lib/jwsdp-1.3/dom.jar:lib/jwsdp-1.3/jax-qname.jar:lib/jwsdp-1.3/jaxb-api.jar:lib/jwsdp-1.3/jaxb-impl.jar:lib/jwsdp-1.3/jaxb-libs.jar:lib/jwsdp-1.3/jaxb-xjc.jar:lib/jwsdp-1.3/jaxp-api.jar:lib/jwsdp-1.3/namespace.jar:lib/jwsdp-1.3/relaxngDatatype.jar:lib/jwsdp-1.3/sax.jar:lib/jwsdp-1.3/xalan.jar:lib/jwsdp-1.3/xercesImpl.jar:lib/jwsdp-1.3/xsdlib.jar:lib/jwsdp-1.3/xsltc.jar:build/classes viskit.Splash2
+#!/bin/bash
+# This doesn't work 15 Mar 2005, needs classpath adjustment.  Should generate from build.xml.
+java -classpath build/classes:lib/simkit.jar:lib/bsh-2.0b1.jar:lib/jgraph.jar:lib/actions.jar:lib/jhall.jar:lib/tools.jar:lib/jdom.jar:lib/commons-lang-2.0.jar:lib/commons-configuration-1.1RC1.jar:lib/commons-collections-3.1.jar:lib/commons-beanutils-1.7.0.jar:lib/commons-logging-1.0.4.jar:lib/commons-digester-1.6.jar:lib/log4j-1.2.8.jar:lib/xerces.jar:lib/jwsdp-1.5/jaxb-impl.jar:lib/jwsdp-1.5/jaxb-libs.jar:lib/jwsdp-1.5/jaxb-xjc.jar:lib/jwsdp-1.5/xercesImpl.jar:lib/jwsdp-1.5/xsdlib.jar:lib/jwsdp-1.5/jaxb-api.jar:lib/jwsdp-1.5/jax-qname.jar:lib/jwsdp-1.5/relaxngDatatype.jar:lib/jwsdp-1.5/namespace.jar:lib/ext/dis.jar:lib/ext/diskit.jar viskit.Splash
