@@ -73,5 +73,6 @@
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
 	package CDATA   #REQUIRED
+        extend  CDATA   "java.lang.Object"
 >
 
