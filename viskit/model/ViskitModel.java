@@ -89,6 +89,12 @@ public interface ViskitModel
   public GraphMetaData getMetaData();
 
   public void   setDirty (boolean dirty);
+
   public String generateLocalVariableName();
+  public String generateIndexVariableName();
+
+  public void   resetLVNameGenerator();
+  public void   resetIdxNameGenerator();
+  
   public String generateStateVariableName();
 }

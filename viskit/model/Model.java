@@ -49,7 +49,9 @@ public class Model extends mvcAbstractModel implements ViskitModel
   Vector stateVariables = new Vector();
   Vector simParameters = new Vector();
 
-  private String privateLocVarPrefix = "_idxvar_";
+  private String privateIdxVarPrefix = "_idxvar_";
+  private String privateLocVarPrefix = "locvar_";
+
   private String stateVarPrefix      = "state_";
 
   private GraphMetaData metaData;
@@ -270,7 +272,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     node.getLocalVariables().clear();
     for(Iterator itr = ev.getLocalVariable().iterator(); itr.hasNext();) {
       LocalVariable lv = (LocalVariable)itr.next();
-      if(!lv.getName().startsWith(privateLocVarPrefix)) {    // only if it's a "public" one
+      if(!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
         EventLocalVariable elv = new EventLocalVariable(
                                  lv.getName(),lv.getType(),lv.getValue());
         elv.setComment(concatStrings(lv.getComment()));
@@ -630,24 +632,48 @@ public class Model extends mvcAbstractModel implements ViskitModel
   }
 
   private int locVarNameSequence = 0;
-
   public String generateLocalVariableName()
   {
     String nm = null;
-    int seqNum=locVarNameSequence;
     do {
-      nm = privateLocVarPrefix + seqNum++; // always start at 0 //locVarNameSequence++;
-    }while(!isUniqueLVname(nm));
+      nm = privateLocVarPrefix + locVarNameSequence++;
+    }while(!isUniqueLVorIdxVname(nm));
     return nm;
+
+  }
+  public void resetLVNameGenerator()
+  {
+    locVarNameSequence = 0;
   }
 
-  private boolean isUniqueLVname(String nm)
+  private int idxVarNameSequence = 0;
+
+  public String generateIndexVariableName()
+  {
+    String nm = null;
+    do {
+      nm = privateIdxVarPrefix + idxVarNameSequence++;
+    }while(!isUniqueLVorIdxVname(nm));
+    return nm;
+  }
+  public void resetIdxNameGenerator()
+  {
+    idxVarNameSequence = 0;
+  }
+
+  private boolean isUniqueLVorIdxVname(String nm)
   {
     for (Iterator itr = evNodeCache.values().iterator(); itr.hasNext();) {
       EventNode event = (EventNode) itr.next();
       for (Iterator itt = event.getLocalVariables().iterator(); itt.hasNext();) {
-        LocalVariable lv = (LocalVariable) itt.next();
+        EventLocalVariable lv = (EventLocalVariable)itt.next();
         if(lv.getName().equals(nm))
+          return false;
+      }
+      for (Iterator it2 = event.getTransitions().iterator();it2.hasNext();) {
+        EventStateTransition est = (EventStateTransition)it2.next();
+        String ie = est.getIndexingExpression();
+        if(ie != null && ie.equals(nm))
           return false;
       }
     }
@@ -692,11 +718,9 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
           LocalVariable lvar = oFactory.createLocalVariable();
 
-
-          lvar.setName(privateLocVarPrefix + locVarNameSequence++);
           lvar.setName(est.getIndexingExpression());
           lvar.setType("int");
-          lvar.setValue("0"); //jmb est.getIndexingExpression());
+          lvar.setValue("0");
           lvar.getComment().clear();
           lvar.getComment().add("used internally");
           locVarList.add(lvar);
