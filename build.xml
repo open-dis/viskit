@@ -38,7 +38,10 @@
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
               
-    <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>         
+    <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
+
+    <property name="javahelp"       location="${dir.src}/viskit/javahelp"           description="where the help source sits"/>
+    <property name="build.javahelp" location="${dir.build.classes}/viskit/javahelp" description="where the generated and copied help files go"/>
 
 <!--  === TARGET: help === -->
     <target name="help">
@@ -64,6 +67,21 @@
         <mkdir dir="${dir.src.simtran}"/>
         <mkdir dir="${dir.src.simasm}"/>
     </target>
+
+  <target name="javahelp" depends="init" description="build the help search database">
+    <java classname="com.sun.java.help.search.Indexer">
+      <arg value="-db"/>
+      <arg value="${build.javahelp}/JavaHelpSearch"/>
+      <arg value="${javahelp}/Pages"/>
+      <classpath>
+        <pathelement location="${dir.lib}/jhall.jar"/>
+      </classpath>
+    </java>
+    <copy todir="${build.javahelp}">
+      <fileset dir="${javahelp}"/>
+    </copy>
+
+  </target>
 
 <!--  === TARGET: clean === -->
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
