@@ -67,12 +67,10 @@ public class EventTransitionDialog extends JDialog
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
-    Container cont = getContentPane();
-    cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
-
       JPanel con = new JPanel();
+      setContentPane(con);
       con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-      con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+      con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //createEtchedBorder(EtchedBorder.RAISED));
 
       con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
@@ -126,7 +124,6 @@ public class EventTransitionDialog extends JDialog
         buttPan.add(okButt);
       con.add(buttPan);
       con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-      cont.add(con);
 
     fillWidgets();     // put the data into the widgets
 
@@ -236,7 +233,7 @@ public class EventTransitionDialog extends JDialog
 
       setVarNameComboBox(param);
       if(stateVarsCB.getItemCount() > 0)
-        commentField.setText(((vStateVariable)stateVarsCB.getItemAt(0)).getComment());
+        commentField.setText(((vStateVariable)stateVarsCB.getSelectedItem()).getComment()); //getItemAt(0)).getComment());
       else
         commentField.setText("");
       vStateVariable vsv = (vStateVariable)stateVarsCB.getSelectedItem();
