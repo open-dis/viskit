@@ -116,6 +116,7 @@
         		<pathelement location="${dir.lib}/jdom.jar" />
         		<pathelement location="${dir.lib}/jgraph.jar" />
         		<pathelement location="${dir.lib}/actions.jar" />
+        		<pathelement location="${dir.lib}/simkit.jar" />
         		<pathelement location="${dir.build.classes}" />
         		<fileset dir="${dir.lib.xml}" includes="*.jar" />
         	</classpath>
