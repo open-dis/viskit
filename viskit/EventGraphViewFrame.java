@@ -407,9 +407,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     
     Help help = new Help(this);
     JMenu helpMenu = new JMenu("Help");
+    helpMenu.setMnemonic(KeyEvent.VK_H);
     
-    helpMenu.add( buildMenuItem(help, "about", "About...", null, null) );
-    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null) );
+    helpMenu.add( buildMenuItem(help, "about", "About...", null, null ) );
+    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
     menuBar.add(helpMenu);
     
     this.setJMenuBar(menuBar);
