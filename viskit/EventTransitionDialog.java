@@ -77,7 +77,7 @@ public class EventTransitionDialog extends JDialog
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel,BoxLayout.Y_AXIS));
 
           JLabel nameLab = new JLabel("state variable");
-          JLabel arrayIdxLab = new JLabel("index expression");
+          JLabel arrayIdxLab = new JLabel("index variable");
 
           assTo = new JRadioButton("assign to (\"=\")");
           opOn  = new JRadioButton("invoke on (\".\")");
