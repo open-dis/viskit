@@ -74,7 +74,7 @@
     </target>
 
 <!--  === TARGET: init === -->
-    <target description="Preparatory actions required for all targets." name="init">
+    <target depends="splashy" description="Preparatory actions required for all targets." name="init">
         <tstamp/>
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
         <echo message="Buildfile version ${CVSId}"/>
@@ -118,7 +118,7 @@
     </target>
 
 <!--  === TARGET: compile === -->
-    <target depends="compile.simxml.util" name="compile">
+    <target depends="init,compile.simxml.util" name="compile">
         <javac destdir="${dir.build.classes}" excludes="xsd/**">
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
@@ -151,6 +151,9 @@
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
     </target>
 
+    <target name="splashy" >
+        <splash imageurl="file:${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
+    </target>
 <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target depends="build.init,compile" description="Create the javadoc for Viskit." name="doc">
         <javadoc access="private" author="true" destdir="${dir.build.doc}" excludepackagenames="*.test.*" sourcepath="${dir.src}" version="true">
@@ -159,7 +162,7 @@
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
-                <fileset dir="${dir.lib}/jwsdp-1.3" includes="*.jar"/>
+                <fileset dir="${dir.lib}/jwsdp-1.4" includes="*.jar"/>
             </classpath>
             <package name="viskit"/>
             <package name="viskit.xsd"/>
