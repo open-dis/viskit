@@ -491,6 +491,25 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
 
   /* from menu:*/
+  public void showXML()
+  {
+    if(checkSave() == false || lastFile == null)
+      return;
+
+    ((ViskitAssemblyView)getView()).displayXML(lastFile);
+  }
+
+  private boolean checkSave()
+  {
+    if(((ViskitAssemblyModel)getModel()).isDirty() || lastFile == null) {
+      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
+      if(ret != JOptionPane.YES_OPTION)
+        return false;
+      this.saveAs();
+    }
+    return true;
+  }
+
   public void generateJavaSource()
   {
     String source = produceJavaClass();
@@ -500,13 +519,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   private String produceJavaClass()
   {
-    if(((ViskitAssemblyModel)getModel()).isDirty() || lastFile == null) {
-      int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
-      if(ret != JOptionPane.YES_OPTION)
-        return null;
+    if(checkSave() == false || lastFile == null)
+      return null;
 
-      this.saveAs();
-    }
     return buildJavaAssemblySource(((ViskitAssemblyModel)getModel()).getFile());
   }
 

@@ -35,6 +35,7 @@ public interface ViskitController
   void newEventGraph();
 
   void runAssemblyEditor();
+  void showXML();
   
   /* requests to the controller to perform editing operations on existing entities */
   void nodeEdit         (EventNode node);

@@ -432,6 +432,8 @@ public class VGlobals
   };
 
   private String[] morePackages = {"primitives","java.lang","java.util","simkit.random","cancel"};
+  private final int primitivesIndex = 0; // for above array
+
   private String[][] moreClasses =
   {
     {"boolean","char","byte","short","int","long","float","double"},
@@ -440,7 +442,14 @@ public class VGlobals
     {"RandomNumber","RandomVariate"},
     {}
   };
-
+  public boolean isPrimitive(String ty)
+  {
+    for(int i=0;i<moreClasses[primitivesIndex].length;i++) {
+      if(ty.equals(moreClasses[primitivesIndex][i]))
+        return true;
+    }
+    return false;
+  }
   /**
    * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
    * around to see if we've already got it covered.  If not, we add it to the end of the list.
@@ -491,7 +500,10 @@ public class VGlobals
      else {
        m = new JMenu(morePackages[i]);
        for(int j=0;j<moreClasses[i].length;j++) {
-         mi = new MyJMenuItem(moreClasses[i][j],morePackages[i]+"."+moreClasses[i][j]);
+         if(i == primitivesIndex)
+           mi = new MyJMenuItem(moreClasses[i][j],moreClasses[i][j]); // no package
+         else
+           mi = new MyJMenuItem(moreClasses[i][j],morePackages[i]+"."+moreClasses[i][j]);
          mi.addActionListener(myListener);
          m.add(mi);
        }

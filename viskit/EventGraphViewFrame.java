@@ -367,7 +367,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
     fileMenu.addSeparator();
+    fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", null,null));
     fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java",new Integer(KeyEvent.VK_G),null));
+    fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
@@ -803,6 +805,49 @@ cancelArcMode.setIcon(new CanArcIcon());
     JFrame f = new SourceWindow(this,s);
     f.setTitle("Generated source from "+filename);
     f.setVisible(true);
+  }
+
+  public void displayXML(File f)
+  {
+    JComponent xt = null;
+    try {
+      xt = XTree.getTreeInPanel(f);
+    }
+    catch (Exception e) {
+      JOptionPane.showMessageDialog(this,e.getMessage());
+      return;
+    }
+    //xt.setVisibleRowCount(25);
+    xt.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
+
+    final JFrame jf = new JFrame(f.getName());
+
+    JPanel content = new JPanel();
+    jf.setContentPane(content);
+
+    content.setLayout(new BorderLayout());
+    content.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
+    content.add(xt,BorderLayout.CENTER);
+      JPanel buttPan = new JPanel();
+      buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
+      buttPan.setBorder(BorderFactory.createEmptyBorder(0,4,4,4));
+      JButton closeButt = new JButton("Close");
+      buttPan.add(Box.createHorizontalGlue());
+      buttPan.add(closeButt);
+    content.add(buttPan,BorderLayout.SOUTH);
+
+    //jf.pack();
+    jf.setSize(475,500);
+    jf.setLocationRelativeTo(this);
+    jf.setVisible(true);
+
+    closeButt.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        jf.setVisible(false);
+      }
+    });
   }
 }
 

@@ -257,19 +257,31 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel)getModel()).deleteStateVariable(var);
   }
 
-  public void generateJavaClass()
-  //-----------------------------
+  private boolean checkSave()
   {
     if(((ViskitModel)getModel()).isDirty() || lastFile == null) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
-        return;
+        return false;
       this.saveAs();
     }
-
+    return true;
+  }
+  public void generateJavaClass()
+  {
+    if(checkSave() == false || lastFile == null)
+      return;
     String source = ((ViskitModel)getModel()).buildJavaSource();
     if(source != null && source.length() > 0)
       ((ViskitView)getView()).showAndSaveSource(source);
+  }
+
+  public void showXML()
+  {
+    if(checkSave() == false || lastFile == null)
+      return;
+
+    ((ViskitView)getView()).displayXML(lastFile); 
   }
 
   public void runAssemblyEditor()

@@ -45,7 +45,7 @@ public interface ViskitAssemblyController
   void save();
   void saveAs();
 
-
+  void showXML();  
   void generateJavaSource();
   //File compileJavaClass();
   void runAssembly();

@@ -40,5 +40,6 @@ public interface ViskitAssemblyView
   //public boolean getVerbose();
 
   public void    showAndSaveSource(String s);
+  public void    displayXML(File f);
 
 }

@@ -34,7 +34,8 @@ public interface ViskitView
   public void    fileName(String s);    // informative, tells view what we're working on
 
   public void    showAndSaveSource(String s);
-
+  public void    displayXML(File f);
+  
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
   public String addParameterDialog();          // returns param name
   public String addStateVariableDialog();      // returns statevar name
