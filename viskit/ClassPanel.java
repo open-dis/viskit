@@ -111,11 +111,12 @@ public class ClassPanel extends JPanel
     public boolean accept(File f)
     {
       if (f.isFile()) {
-        if (f.getName().endsWith(".jar"))
+        String lcnam = f.getName().toLowerCase();
+        if (lcnam.endsWith(".jar"))
           return true;
-        if (f.getName().endsWith(".xml"))
+        if (lcnam.endsWith(".xml"))
           return true;
-        if (f.getName().endsWith(".class")) {
+        if (lcnam.endsWith(".class")) {
           Class fileClass = getClass(f);
           if (fileClass == null)
             return false;
@@ -134,8 +135,10 @@ public class ClassPanel extends JPanel
         c = FindClassesForInterface.classFromFile(f, c);
       }
       catch (Throwable e) {}
+
       // Here we don't show any classes that are reachable through the viskit classpath..i.e., simkit.jar
       // We want no dups there.
+
       if(c != null) {
         try {
           Class.forName(c.getName());
@@ -143,6 +146,7 @@ public class ClassPanel extends JPanel
         }
         catch (ClassNotFoundException e) {}        // positive case
       }
+
       return c;
     }
 
