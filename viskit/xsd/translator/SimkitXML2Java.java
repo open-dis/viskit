@@ -151,7 +151,7 @@ public class SimkitXML2Java {
 	    try {
 		c = Class.forName(s.getType());
 	    } catch ( ClassNotFoundException cnfe ) {
-	        pw.println(sp4 + "protected" + sp + s.getType() 
+	        pw.println(sp4 + "protected" + sp + stripLength(s.getType()) 
 			+ sp + s.getName() + sc);
 	    }
 
@@ -261,10 +261,10 @@ public class SimkitXML2Java {
 
 	if (isCloneable(s.getType())) {
 	    clStr = ".clone()";
-	    tyStr = lp + s.getType() + rp;
+	    tyStr = lp + stripLength(s.getType()) + rp;
 	}
 
-        pw.print(sp4 + "public " + s.getType() + sp + "get" + capitalize(s.getName()) );
+        pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()) );
         pw.println(lp + rp + sp + ob);
 	pw.println(sp8 + "return" + sp + tyStr + sp + s.getName() + clStr + sc);
 	pw.println(sp4 + cb);
@@ -309,9 +309,6 @@ public class SimkitXML2Java {
 	List sched = run.getScheduleOrCancel();
 	ListIterator schi = sched.listIterator();
 	
-	// w/out a tag, can only assume arrays in parameters
-	// are all the same size...
-	String firstArray=null;
 
 	pw.println();
 	pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
@@ -345,9 +342,7 @@ public class SimkitXML2Java {
 	    Parameter pt = (Parameter) li.next();
 	    pw.println(sp8 + "set" + capitalize(pt.getName()) + 
 		lp + shortinate(pt.getName()) + rp + sc);
-	    if( firstArray == null ) {
-		firstArray = (isArray(pt.getType()))?pt.getName():null;
-	    }
+	    
 	}
 
 	// create new arrays, if any
@@ -359,8 +354,7 @@ public class SimkitXML2Java {
 	while ( li.hasNext() ) {
 	    StateVariable st = (StateVariable) li.next();
 	    if (isArray(st.getType())) {
-		pw.print(sp8 + st.getName() + sp + eq + sp + "new" + sp + baseOf(st.getType()));
-		pw.println(lb + shortinate(firstArray) + pd + "length" + rb + sc);
+		pw.println(sp8 + st.getName() + sp + eq + sp + "new" + sp + st.getType() + sc);
 	    }
 	}	
 	
@@ -553,6 +547,10 @@ public class SimkitXML2Java {
 		    constructor+="Long";
 		} else if (type.equals("boolean")) {
 		    constructor+="Boolean";
+		} else if (type.equals("char")) {
+		    constructor+="Character";
+		} else if (type.equals("short")) {
+		    constructor+="Short";
 		}
 		pw.print(constructor + lp + ep.getValue() + rp);
 	    }
@@ -649,6 +647,15 @@ public class SimkitXML2Java {
     private String capitalize( String s ) {
         return s.substring(0,1).toUpperCase() + s.substring(1);
     }
+    
+    private String stripLength( String s ) {
+        int left, right;
+        if ( !isArray(s) ) return s;
+        left = s.indexOf(lb);
+        right = s.indexOf(rb);
+        return s.substring(0,left + 1) + s.substring(right);
+        
+    }
 
     boolean compileCode (String fileName) {
 	return ( 
@@ -716,7 +723,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isArray( String c ) {
-	if ( c.endsWith(rb) ) return true;
+	if ( c.indexOf(rb) > 0 ) return true;
 	else return false;
     }
 
