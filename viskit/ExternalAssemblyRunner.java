@@ -106,6 +106,9 @@ public class ExternalAssemblyRunner extends JFrame
 
   private void dumpOutputs()
   {
+    if(outputs == null)
+      return;
+    
     System.out.println("\n"+borderString);
     boolean first=true;
     for(Iterator itr = outputs.iterator();itr.hasNext();) {
