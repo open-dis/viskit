@@ -97,13 +97,16 @@ public class ArrayInspector  extends JDialog
    JScrollPane jsp = new JScrollPane(olp);
    jsp.getViewport().setPreferredSize(new Dimension(Integer.MAX_VALUE,240));
    contentP.add(jsp);
-    //contentP.add(olp);
     contentP.add(Box.createVerticalStrut(5));
     contentP.add(buttPan);
 
     sizeTF.setText(""+lis.size());
     pack();
     this.setLocationRelativeTo(locationComp);
+
+    // Something going on....the array size textfield doesn't become active again until we do this...
+    olp.requestFocus();
+    sizeTF.requestFocus();
   }
   String myArrTyp;
   String myTyp;

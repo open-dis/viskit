@@ -564,8 +564,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         add(Box.createVerticalGlue());
 
-        if(packMe != null)
-          packMe.pack();
+       // if(packMe != null)  // gets done in modified handler
+       //   packMe.pack();
         if(ip.modifiedListener != null)
           ip.modifiedListener.actionPerformed(new ActionEvent(this,0,"Factory method chosen"));
       }
