@@ -307,8 +307,13 @@ public class SimkitAssemblyXML2Java {
         while ( lili.hasNext() ) {
             AdapterType a = (AdapterType)lili.next();
             String n = a.getName();
-            pw.print(sp8 + "simkit.util.Bridge" + sp + n + sp + eq + sp + nw + "simkit.util.Bridge");
-            pw.println(sp8 + lp + qu + a.getFrom() + cm + sp + a.getTo() + rp + sc);
+            pw.print(sp8 + "simkit.Bridge" + sp + n + sp + eq + sp + nw + sp + "simkit.Bridge");
+            pw.println(lp + qu + a.getEventHeard() + qu + cm + sp + qu + a.getEventSent() + qu + rp + sc);
+            pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
+            pw.println(a.getName() + rp + sc);
+            pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
+            pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
+            pw.println();
         }
         
     }
