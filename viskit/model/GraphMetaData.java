@@ -13,7 +13,7 @@ package viskit.model;
 public class GraphMetaData
 {
   public String name = "EventGraph_name";
-  public String pkg = "";
+  public String pkg = "pkg";
   public String author = "";
   public String version = "1.0";
   public String comment = "";

@@ -88,23 +88,36 @@ public class VGlobals
 
   public void runAssemblyView()
   {
+    if (avf == null)
+      buildAssemblyViewFrame();
+
     avf.setVisible(true);
     avf.toFront();
 
-      SwingUtilities.invokeLater(new Runnable()
+    SwingUtilities.invokeLater(new Runnable()
+    {
+      public void run()
       {
-        public void run()
-        {
-          if(assyFirstRun)
-            return;
+        if (assyFirstRun)
+          return;
 
-          assyFirstRun = true;
-          acont.newAssembly();
-        }
-      });
+        assyFirstRun = true;
+        acont.newAssembly();
+      }
+    });
 
   }
 
+  public void quitAssemblyEditor()
+  {
+    if(avf != null) {
+      avf.setVisible(false);
+    }
+
+    if(egvf != null && egvf.isVisible())
+      return;
+    System.exit(0);
+  }
   EventGraphViewFrame egvf;
   public EventGraphViewFrame getEventGraphEditor()
   {
@@ -125,9 +138,20 @@ public class VGlobals
 
     return egvf;
   }
-
+  public void quitEventGraphEditor()
+  {
+    if(egvf != null) {
+      egvf.setVisible(false);
+    }
+    if(avf != null && avf.isVisible())
+      return;
+    System.exit(0);
+  }
   public void runEventGraphView()
   {
+    if (egvf == null)
+      buildEventGraphViewFrame();
+
     egvf.setVisible(true);
     egvf.toFront();
   }

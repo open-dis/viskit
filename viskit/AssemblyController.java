@@ -6,6 +6,7 @@ import viskit.model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
+import java.util.Iterator;
 import java.io.File;
 
 import actions.ActionIntrospector;
@@ -27,11 +28,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   //-----------------
   {
     //newEventGraph();
-  }
-
-  /* menu selections */
-  public void copy()
-  {
   }
 
   public void generateJavaClass()
@@ -56,6 +52,31 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     VGlobals.instance().runEventGraphView();
   }
 
+
+  public void quit()
+  //----------------
+  {
+    if (((AssemblyModel)getModel()).isDirty())
+      if(askToSaveAndContinue() == false)
+        return;
+    VGlobals.instance().quitAssemblyEditor();
+
+  }
+
+  File lastFile;
+  public void open()
+  {
+
+  }
+  public void save()
+  //----------------
+  {
+    if(lastFile == null)
+      saveAs();
+    else
+      ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
+  }
+
   public void saveAs()
   {
     lastFile = ((ViskitAssemblyView)getView()).saveFileAsk(((ViskitAssemblyModel)getModel()).getMetaData().name);
@@ -66,29 +87,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   }
 
-  public void quit()
-  //----------------
-  {
-    
-  }
-  public void cut()
-  {
-
-  }
-  public void paste()
-  {
-
-  }
-  File lastFile;
-  public void open()
-  {
-
-  }
-  public void save()
-  //----------------
-  {
-    // todo implement
-  }
   public void newAssembly()
   {
     if (((AssemblyModel)getModel()).isDirty())
@@ -125,7 +123,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
    */
     private boolean askToSaveAndContinue()
     {
-      int yn = (((ViskitView) getView()).genericAsk("Question", "Save current graph?"));
+      int yn = (((ViskitAssemblyView) getView()).genericAsk("Question", "Save current assembly?"));
 
       switch (yn) {
         case JOptionPane.YES_OPTION:
@@ -152,25 +150,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       if(modified)
         ((ViskitAssemblyModel)getModel()).changeMetaData(gmd);
     }
-  Vector selectionVector;
-  public void selectNodeOrEdge(Vector v)
-  //------------------------------------
-  {
-    selectionVector = v;
-    boolean ccbool = (selectionVector.size() > 0 ? true : false);
-// todo   ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
-//    ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
-//    ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
-  }
+
   public void newAdapterArc(Object[]nodes)
   {
     Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
     Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
     if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
-    else
-    ((ViskitAssemblyModel)getModel()).newAdapterEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
-                                                     ((DefaultGraphCell)nodes[1]).getUserObject());
+    else {
+      AdapterEdge ae = ((ViskitAssemblyModel)getModel()).newAdapterEdge((EvGraphNode)oA,(EvGraphNode)oB);
+      // edit right away
+      if(ae != null)     // shouldn't happen
+        ((ViskitAssemblyView)getView()).doEditAdapterEdge(ae);
+    }
   }
   public void newSimEvListArc(Object[]nodes)
   {
@@ -179,44 +171,28 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     if(!(oA instanceof EvGraphNode) || !(oB instanceof EvGraphNode))
       ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection", "Both nodes must be instances of Event Graphs.");
     else
-    ((ViskitAssemblyModel)getModel()).newSimEvLisEdge(((DefaultGraphCell)nodes[0]).getUserObject(),
-                                                      ((DefaultGraphCell)nodes[1]).getUserObject()); 
+    ((ViskitAssemblyModel)getModel()).newSimEvLisEdge((EvGraphNode)oA,(EvGraphNode)oB);
   }
   public void newPropChangeListArc(Object[]nodes)
   {
     // One and only one has to be a prop change listener
     Object oA = ((DefaultGraphCell)nodes[0]).getUserObject();
     Object oB = ((DefaultGraphCell)nodes[1]).getUserObject();
+
+    PropChangeEdge pce = null;
     if(oA instanceof PropChangeListenerNode && !(oB instanceof PropChangeListenerNode)) {
-      ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oB,(PropChangeListenerNode)oA);
-      return;
+      pce = ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oB,(PropChangeListenerNode)oA);
     }
-    if(oB instanceof PropChangeListenerNode && !(oA instanceof PropChangeListenerNode)) {
-      ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oA,(PropChangeListenerNode)oB);
-      return;
+    else if(oB instanceof PropChangeListenerNode && !(oA instanceof PropChangeListenerNode)) {
+      pce = ((ViskitAssemblyModel)getModel()).newPclEdge((EvGraphNode)oA,(PropChangeListenerNode)oB);
     }
-
-    ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","One of the two nodes must be an instance of a PropertyChangeListener.");
-  }
-/*
-  public void newArc(Object[] nodes)
-  //--------------------------------
-  {
-    // My node view objects hold node model objects and vice versa
-    EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-    EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
-    ((ViskitModel) getModel()).newEdge(src, tar);
+    else
+      ((ViskitAssemblyView)getView()).genericErrorReport("Incompatible connection","One of the two nodes must be an instance of a PropertyChangeListener.");
+    // edit right away
+    if(pce != null)
+      ((ViskitAssemblyView)getView()).doEditPclEdge(pce);
   }
 
-  public void newCancelArc(Object[] nodes)
-  //--------------------------------------
-  {
-    // My node view objects hold node model objects and vice versa
-    EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-    EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
-    ((ViskitModel) getModel()).newCancelEdge(src, tar);
-  }
-*/
   public void pcListenerEdit(PropChangeListenerNode pclNode)
   //---------------------------------------
   {
@@ -257,4 +233,107 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel)getModel()).changeSimEvEdge(seEdge);
     }
   }
+  private Vector selectionVector = new Vector();
+
+  public void selectNodeOrEdge(Vector v)
+  //------------------------------------
+  {
+    selectionVector = v;
+    boolean ccbool = (selectionVector.size() > 0 ? true : false);
+    ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
+    ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
+  }
+
+  private Vector copyVector = new Vector();
+
+  public void copy()
+  //----------------
+  {
+    if (selectionVector.size() <= 0)
+      return;
+    copyVector = (Vector) selectionVector.clone();
+    ActionIntrospector.getAction(this,"paste").setEnabled(true);
+  }
+  int copyCount=0;
+  public void paste()
+  //-----------------
+  {
+    if (copyVector.size() <= 0)
+      return;
+    int x=100,y=100; int n=0;
+    // We only paste un-attached nodes (at first)
+    for(Iterator itr = copyVector.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      if(o instanceof AssemblyEdge)
+        continue;
+      if(o instanceof EvGraphNode) {
+        String nm = ((EvGraphNode)o).getName();
+        String typ = ((EvGraphNode)o).getType();
+        ((ViskitAssemblyModel)getModel()).newEventGraph(nm+"-copy"+copyCount++,typ,new Point(x+(20*n),y+(20*n)));
+      }
+      else if (o instanceof PropChangeListenerNode) {
+        String nm = ((PropChangeListenerNode)o).getName();
+        String typ = ((PropChangeListenerNode)o).getType();
+        ((ViskitAssemblyModel)getModel()).newPropChangeListener(nm+"-copy"+copyCount++,typ,new Point(x+(20*n),y+(20*n)));
+      }
+      n++;
+    }
+  }
+
+  public void cut()
+  //---------------
+  {
+    if (selectionVector != null && selectionVector.size() > 0) {
+      // first ask:
+      String msg = "";
+      int nodeCount = 0;  // different msg for edge delete
+      for (Iterator itr = selectionVector.iterator(); itr.hasNext();) {
+        Object o = itr.next();
+        if(o instanceof EvGraphNode || o instanceof PropChangeListenerNode)
+          nodeCount++;
+        String s = o.toString();
+        s = s.replace('\n', ' ');
+        msg += ", \n" + s;
+      }
+      String specialNodeMsg = (nodeCount > 0 ? "\n(All unselected but attached edges will also be deleted.)" : "");
+      if (((ViskitView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg)
+       == JOptionPane.YES_OPTION) {
+        // do edges first?
+        Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
+        for (Iterator itr = localV.iterator(); itr.hasNext();) {
+          Object elem = itr.next();
+          if(elem instanceof AssemblyEdge) {
+            killEdge((AssemblyEdge)elem);
+          }
+          else if(elem instanceof EvGraphNode) {
+            EvGraphNode en = (EvGraphNode)elem;
+            for (Iterator it2 = en.getConnections().iterator(); it2.hasNext();) {
+              AssemblyEdge ed = (AssemblyEdge) it2.next();
+              killEdge(ed);
+            }
+            ((ViskitAssemblyModel) getModel()).deleteEvGraphNode(en);
+          }
+          else if(elem instanceof PropChangeListenerNode) {
+            PropChangeListenerNode en = (PropChangeListenerNode)elem;
+            for (Iterator it2 = en.getConnections().iterator(); it2.hasNext();) {
+              AssemblyEdge ed = (AssemblyEdge) it2.next();
+              killEdge(ed);
+            }
+            ((ViskitAssemblyModel) getModel()).deletePCLNode(en);
+          }
+        }
+      }
+    }
+  }
+
+  private void killEdge(AssemblyEdge e)
+  {
+    if (e instanceof AdapterEdge)
+      ((ViskitAssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
+    else if (e instanceof PropChangeEdge)
+      ((ViskitAssemblyModel) getModel()).deletePropChangeEdge((PropChangeEdge) e);
+    else if (e instanceof SimEvListenerEdge)
+      ((ViskitAssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
+  }
+
 }

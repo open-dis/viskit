@@ -69,7 +69,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private JButton zoomIn, zoomOut;
 
   private JPanel canvasPanel;
-  private LegosTree lTree;
+  private LegosTree lTree, pclTree;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
@@ -81,7 +81,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     setLocation(((d.width - 800) / 2)+30, ((d.height - 600) / 2)+30);
     setSize(800, 600);
 
-/*   enable when finished with widget creation
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new WindowAdapter()
     {
@@ -90,7 +89,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         ((AssemblyController)getController()).quit();
       }
     });
-*/
   }
 
   /**
@@ -383,9 +381,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return b;
   }
 
-
-
-
   private vGraphAssemblyComponent graphPane;
   private JComponent buildCanvas()
   {
@@ -415,32 +410,27 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JComponent buildTreePanels()
   {
-    lTree = new LegosTree(this);
+    lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png", this);
     LegosPanel lPan = new LegosPanel(lTree);
 
-    PropChangeListenersList pcList = new PropChangeListenersList(this);
-    PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pcList);
+    //PropChangeListenersList pcList = new PropChangeListenersList(this);
+    pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20), this);
+    PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree); //pcList);
 
     lTree.setBackground(background);
-    pcList.setBackground(background);
+    pclTree.setBackground(background);
 
-      panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT,lPan,pcPan);
-/*
-  JScrollPane tsp = new JScrollPane(lPan,JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-  JScrollPane psp = new JScrollPane(pcPan,JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-  panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT,tsp,psp);
-  tsp.setMinimumSize(new Dimension(20,20));
-  psp.setMinimumSize(new Dimension(20,20));
-*/
+    panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pcPan);
 
-      panJsp.setBorder(null);
-      panJsp.setOneTouchExpandable(true);
-      pcPan.setMinimumSize(new Dimension(20,80));
-      lPan.setMinimumSize(new Dimension(20,80));
+    panJsp.setBorder(null);
+    panJsp.setOneTouchExpandable(true);
+    pcPan.setMinimumSize(new Dimension(20, 80));
+    lPan.setMinimumSize(new Dimension(20, 80));
 
     lTree.setDragEnabled(true);
-  //  lTree.setTransferHandler(new JTreeToJgraphTransferHandler());
-   // lTree.addMouseListener( new DragMouseAdapter());
+    pclTree.setDragEnabled(true);
+    //  lTree.setTransferHandler(new JTreeToJgraphTransferHandler());
+    // lTree.addMouseListener( new DragMouseAdapter());
     return panJsp;
   }
   
@@ -450,24 +440,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     JOptionPane.showMessageDialog(this,msg,title,JOptionPane.ERROR_MESSAGE);
   }
 
-  // Two classes to support dragging and dropping on the graph
-  class xDragMouseAdapter extends MouseAdapter
-  {
-    public void mousePressed(MouseEvent e)
-    {
-      JComponent c = (JComponent) e.getSource();
-      System.out.println(c);
-/*
-      if(c == EventGraphViewFrame.this.addSelfRef)
-        dragger = SELF_REF_DRAG;
-      else
-        dragger = NODE_DRAG;
-*/
-
-   //   TransferHandler handler = c.getTransferHandler();
-   //   handler.exportAsDrag(c, e, TransferHandler.COPY);
-    }
-  }
   Transferable dragged;
   public void startingDrag(Transferable trans)
   {
@@ -481,25 +453,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     {
       if(dragged != null) {
         try {
-          String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
-          Class uo = null;
-          Class c = null;
-          Class cc= null;
-          try {
-            uo = Class.forName(s);     // what we've drug
-            c  = Class.forName("simkit.BasicSimEntity");   // what  we're checking for
-            cc = Class.forName("java.beans.PropertyChangeListener");      // ditto
-          }
-          catch (ClassNotFoundException e) {
-            e.printStackTrace();
-          }
           Point p = dtde.getLocation();
 
-          if(((Class)cc).isAssignableFrom(uo))
-            ((ViskitAssemblyController)getController()).newPropChangeListenerNode(s,p);
-          else if(((Class)c).isAssignableFrom(uo))
-            ((ViskitAssemblyController)getController()).newEventGraphNode(s,p);
+          String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
+          String[] sa = s.split("\t");
 
+          if(sa[0].equals("simkit.BasicSimEntity")) {
+            ((ViskitAssemblyController)getController()).newEventGraphNode(sa[1],p);
+          }
+          else if(sa[0].equals("java.beans.PropertyChangeListener")) {
+            ((ViskitAssemblyController)getController()).newPropChangeListenerNode(sa[1],p);
+          }
           dragged = null;
           return;
         }
@@ -510,23 +474,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
           e.printStackTrace();
         }
       }
-      else {
-/*
-        // get the node in question from the graph
-        Object o = graphPane.getViskitElementAt(p);
-        if(o != null && o instanceof EventNode) {
-          EventNode en = (EventNode)o;
-          // We're making a self-referential arc
-          ((ViskitController)getController()).newArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
-*/
-        }
-      }
     }
-
-  private void buildToolBar()
-  {
-
   }
+
   private boolean firstShown = false;
 
   public void setVisible(boolean b)
@@ -587,20 +537,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public void modelChanged(mvcModelEvent event)
   //-------------------------------------------
   {
-    //System.out.println("AssView got "+event.toString());
+
     switch(event.getID())
     {
-/*
-      case ModelEvent.EVENTGRAPHADDED:
-        break;
-      case ModelEvent.NEWASSEMBLYMODEL:
-        // fall through
-*/
-
-      // Changes the graph needs to know about
       default:
         this.graphPane.viskitModelChanged((ModelEvent)event);
-
     }
   }
 
@@ -639,7 +580,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public int genericAsk(String title, String msg)
   //---------------------------------------------
   {
-    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_OPTION);
+    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_CANCEL_OPTION);
   }
 
   public String promptForStringOrCancel(String title, String message, String initval)

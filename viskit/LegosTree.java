@@ -21,22 +21,31 @@ import java.io.*;
  */
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener
 {
-  private static DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+  private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
   private Class targetClass;
+  private String targetClassName;
   private Color background = new Color(0xFB, 0xFB, 0xE5);
   private Icon standardClosedIcon;
   private ImageIcon myLeafIcon;
   private Image myLeafIconImage;
   DefaultTreeModel mod;
   private DragStartListener lis;
-  public LegosTree(DragStartListener dslis)
+
+
+  public LegosTree(String className, String iconPath, DragStartListener dslis)
   {
-    super(root);
+    this(className,new ImageIcon(ClassLoader.getSystemResource(iconPath)),dslis);
+  }
+
+  public LegosTree(String className, ImageIcon icon, DragStartListener dslis)
+  {
+    super();
     lis = dslis;
+    targetClassName = className;
     mod = new DefaultTreeModel(root);
 
     try {
-      targetClass = Class.forName("simkit.BasicSimEntity");
+      targetClass = Class.forName(targetClassName); //"simkit.BasicSimEntity");
     }
     catch (ClassNotFoundException e) {
       System.out.println("Error:  Need simkit classes in classpath");
@@ -60,7 +69,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     setVisibleRowCount(100);    // means always fill a normal size panel
     rendr.setBackgroundNonSelectionColor(background);
 
-    myLeafIcon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/assembly.png"));
+    myLeafIcon = icon;
     myLeafIconImage = myLeafIcon.getImage();
 
     rendr.setLeafIcon(myLeafIcon);
@@ -71,6 +80,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         DnDConstants.ACTION_COPY_OR_MOVE, // actions
         this); // drag gesture recognizer
 
+  }
+  public Class getTargetClass()
+  {
+    return targetClass;
   }
 
   public void removeSelected()
@@ -255,11 +268,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return;
 
     }
-    Class c = simkit.BasicSimEntity.class;
+    //Class c = simkit.BasicSimEntity.class;
 
-    java.util.List list = FindClassesForInterface.findClasses(jarFile, c);
+    java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass); //c);
     if (list == null || list.size() <= 0) {
-      JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + c.getName() + " found\n" +
+      JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +//"c.getName() + " found\n" +
           "in " + jarFileName, "Not found", JOptionPane.WARNING_MESSAGE);
       return;
     }
@@ -367,7 +380,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   {
     String s = getClassName();
     if(s != null) {
-      StringSelection ss = new StringSelection(s);
+      StringSelection ss = new StringSelection(targetClassName + "\t" +s);
       if(lis != null)
         lis.startingDrag(ss);
       e.startDrag(DragSource.DefaultCopyDrop,

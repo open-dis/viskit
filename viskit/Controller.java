@@ -50,7 +50,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (((Model)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
-    System.exit(0);
+    VGlobals.instance().quitEventGraphEditor();
   }
 
   public void newEventGraph()

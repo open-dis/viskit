@@ -716,7 +716,7 @@ cancelArcMode.setIcon(new CanArcIcon());
   public int genericAsk(String title, String msg)
   //---------------------------------------------
   {
-    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_OPTION);
+    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_CANCEL_OPTION);
   }
 
   public void genericErrorReport(String title, String msg)

@@ -5,6 +5,7 @@ import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.ModelEvent;
 import viskit.VGlobals;
+import viskit.ViskitAssemblyController;
 
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
@@ -37,6 +38,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   private GraphMetaData metaData;
   HashMap nodeCache = new HashMap();
   HashMap assEdgeCache = new HashMap();
+  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/simkit.xsd";
 
   public void init()
   {
@@ -55,7 +57,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   /* from other model...*/
   public void saveModel(File f)
   {
-/*
+
     if(f == null)
       f = currentFile;
      try {
@@ -71,14 +73,16 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
        jaxbRoot.setName(nIe(metaData.name));
        jaxbRoot.setVersion(nIe(metaData.version));
-       jaxbRoot.setAuthor(nIe(metaData.author));
        jaxbRoot.setPackage(nIe(metaData.pkg));
+/*
+       jaxbRoot.setAuthor(nIe(metaData.author));
 
        java.util.List clis = jaxbRoot.getComment();
        clis.clear();;
        String cmt = nIe(metaData.comment);
        if(cmt != null)
          clis.add(cmt.trim());
+*/
 
        m.marshal(jaxbRoot,fw);
        fw.close();
@@ -99,7 +103,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
                                   "File I/O Error",JOptionPane.ERROR_MESSAGE);
        return;
      }
-*/
+
   }
 
   public void newEventGraph(String widgetName, String className, Point  p)
@@ -151,56 +155,45 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbPCL.setType(className);
     pcNode.opaqueModelObject = jaxbPCL;
     nodeCache.put(jaxbPCL,pcNode);
-    jaxbRoot.getSimEntity().add(jaxbPCL);
+    jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
     modelDirty = true;
     notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
   }
 
-  public void newAdapterEdge (Object src, Object target)
+  public AdapterEdge newAdapterEdge (EvGraphNode src, EvGraphNode target)
   {
     AdapterEdge ae = new AdapterEdge();
     ae.setFrom(src);
     ae.setTo(target);
-    Object srcOMO,targetOMO;
-    if(src instanceof EvGraphNode) {
-      ((EvGraphNode)src).getConnections().add(ae);
-      srcOMO = ((EvGraphNode)src).opaqueModelObject;
-    }
-    else {
-      ((PropChangeListenerNode)src).getConnections().add(ae);
-      srcOMO = ((PropChangeListenerNode)src).opaqueModelObject;
-    }
-    if(target instanceof EvGraphNode) {
-      ((EvGraphNode)target).getConnections().add(ae);
-      targetOMO = ((EvGraphNode)target).opaqueModelObject;
-    }
-    else {
-      ((PropChangeListenerNode)target).getConnections().add(ae);
-      targetOMO = ((PropChangeListenerNode)target).opaqueModelObject;
-    }
+    src.getConnections().add(ae);
+    target.getConnections().add(ae);
 
-    SimEventListenerConnection selc; // no such thing as "AdapterConnection"?
+    Adapter jaxbAdapter;
     try {
-      selc = oFactory.createSimEventListenerConnection();
+      jaxbAdapter = oFactory.createAdapter();
     }
     catch (JAXBException e) {
       //assert false : "AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.";
       System.err.println("AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.");
-      return;
+      return null;
     }
-    ae.opaqueModelObject = selc;
+    ae.opaqueModelObject = jaxbAdapter;
+    jaxbAdapter.setTo(target.opaqueModelObject);
+    jaxbAdapter.setFrom(src.opaqueModelObject);
 
-    selc.setListener(targetOMO);
-    selc.setSource(srcOMO);
+    jaxbAdapter.setName("requiredadaptername");
 
-    assEdgeCache.put(selc,ae);
+    assEdgeCache.put(jaxbAdapter,ae);
+    jaxbRoot.getAdapter().add(jaxbAdapter);
+
     modelDirty = true;
 
     this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter edge added"));
+    return ae;
   }
 
-  public void newPclEdge(EvGraphNode src, PropChangeListenerNode target)
+  public PropChangeEdge newPclEdge(EvGraphNode src, PropChangeListenerNode target)
   {
     PropChangeEdge pce = new PropChangeEdge();
     pce.setFrom(src);
@@ -216,7 +209,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     catch (JAXBException e) {
       //assert false : "AssemblyModel.newPclEdge, error creating viskit.xsd.bindings.assembly.PropertyChangeListenerConnection.";
       System.err.println("AssemblyModel.newPclEdge, error creating viskit.xsd.bindings.assembly.PropertyChangeListenerConnection.");
-      return;
+      return null;
     }
     pce.opaqueModelObject = pclc;
     PropertyChangeListener targL = (PropertyChangeListener) target.opaqueModelObject;
@@ -226,71 +219,138 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
 
     assEdgeCache.put(pclc, pce);
+    jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
     modelDirty = true;
 
     this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
-
+    return pce;
   }
 
-  public void newSimEvLisEdge (Object src, Object target){
+  public void newSimEvLisEdge (EvGraphNode src, EvGraphNode target){
     SimEvListenerEdge sele = new SimEvListenerEdge();
-    //AdapterEdge ae = new AdapterEdge();
     sele.setFrom(src);
     sele.setTo(target);
-    Object srcOMO,targetOMO;
-    if(src instanceof EvGraphNode) {
-      ((EvGraphNode)src).getConnections().add(sele);
-      srcOMO = ((EvGraphNode)src).opaqueModelObject;
-    }
-    else {
-      ((PropChangeListenerNode)src).getConnections().add(sele);
-      srcOMO = ((PropChangeListenerNode)src).opaqueModelObject;
-    }
-    if(target instanceof EvGraphNode) {
-      ((EvGraphNode)target).getConnections().add(sele);
-      targetOMO = ((EvGraphNode)target).opaqueModelObject;
-    }
-    else {
-      ((PropChangeListenerNode)target).getConnections().add(sele);
-      targetOMO = ((PropChangeListenerNode)target).opaqueModelObject;
-    }
+    src.getConnections().add(sele);
+    target.getConnections().add(sele);
 
-    SimEventListenerConnection selc; // no such thing as "AdapterConnection"?
+    SimEventListenerConnection selc;
     try {
       selc = oFactory.createSimEventListenerConnection();
     }
     catch (JAXBException e) {
-      //assert false : "AssemblyModel.newAdapterEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.";
+      //assert false : "AssemblyModel.newSimEvLisEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.";
       System.err.println("AssemblyModel.newSimEvLisEdge, error creating viskit.xsd.bindings.assembly.SimEventListenerConnection.");
       return;
     }
     sele.opaqueModelObject = selc;
 
-    selc.setListener(targetOMO);
-    selc.setSource(srcOMO);
+    selc.setListener(target.opaqueModelObject);
+    selc.setSource(src.opaqueModelObject);
 
     assEdgeCache.put(selc,sele);
+    jaxbRoot.getSimEventListenerConnection().add(selc);
+
     modelDirty = true;
-
-    this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
-
+    notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
   }
+
+  public void deleteEvGraphNode(EvGraphNode evNode)
+  {
+    SimEntity jaxbEv = (SimEntity)evNode.opaqueModelObject;
+    nodeCache.remove(jaxbEv);
+    jaxbRoot.getSimEntity().remove(jaxbEv);
+
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event graph deleted"));
+  }
+
+  public void deletePCLNode(PropChangeListenerNode pclNode)
+  {
+    PropertyChangeListener jaxbPcNode = (PropertyChangeListener)pclNode.opaqueModelObject;
+    nodeCache.remove(pclNode);
+    jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
+
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
+  }
+
+  /**
+   *  Assembly nodes don't hold onto edges.
+   */
+
+  public void deletePropChangeEdge(PropChangeEdge pce)
+  {
+    PropertyChangeListenerConnection pclc  = (PropertyChangeListenerConnection)pce.opaqueModelObject;
+
+    assEdgeCache.remove(pce);
+    jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
+
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
+  }
+
+  public void deleteSimEvLisEdge(SimEvListenerEdge sele)
+  {
+    SimEventListenerConnection sel_c = (SimEventListenerConnection)sele.opaqueModelObject;
+
+    assEdgeCache.remove(sele);
+    jaxbRoot.getSimEventListenerConnection().remove(sel_c);
+
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
+  }
+
+  public void deleteAdapterEdge(AdapterEdge ae)
+  {
+    Adapter j_adp = (Adapter)ae.opaqueModelObject;
+    assEdgeCache.remove(ae);
+    jaxbRoot.getAdapter().remove(j_adp);
+
+    modelDirty = true;
+    notifyChanged(new ModelEvent(ae,ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
+  }
+
   public void changePclEdge(PropChangeEdge pclEdge)
   {
-    //todo implement
-    System.out.println("changePclEdge...todo");
+    EvGraphNode src = (EvGraphNode)pclEdge.getFrom();
+    PropChangeListenerNode targ = (PropChangeListenerNode)pclEdge.getTo();
+
+    PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection)pclEdge.opaqueModelObject;
+    //pclc.setListener(targ.opaqueModelObject);  never changes
+    pclc.setProperty(pclEdge.getProperty());
+
+    modelDirty = true;
+    notifyChanged(new ModelEvent(pclEdge,ModelEvent.PCLEDGECHANGED, "PCL edge changed"));
   }
 
-  public void changeAdapterEdge(AdapterEdge aEdge)
+  public void changeAdapterEdge(AdapterEdge ae)
   {
-    //todo implement
-    System.out.println("changeAdapterEdge...todo");
+    EvGraphNode src = (EvGraphNode)ae.getFrom();
+    EvGraphNode targ = (EvGraphNode)ae.getTo();
+
+    Adapter jaxbAE = (Adapter)ae.opaqueModelObject;
+
+    jaxbAE.setFrom((SimEntity)src.opaqueModelObject);
+    jaxbAE.setTo((SimEntity)targ.opaqueModelObject);
+
+    jaxbAE.setEventHeard(ae.getSourceEvent());
+    jaxbAE.setEventSent(ae.getTargetEvent());
+
+    modelDirty = true;
+    notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGECHANGED, "Adapter edge changed"));
   }
 
   public void changeSimEvEdge(SimEvListenerEdge seEdge)
   {
-    //todo implement
-    System.out.println("changeSimEvEdge...todo");
+    EvGraphNode src = (EvGraphNode)seEdge.getFrom();
+    EvGraphNode targ = (EvGraphNode)seEdge.getTo();
+    SimEventListenerConnection selc = (SimEventListenerConnection)seEdge.opaqueModelObject;
+
+    selc.setListener(targ.opaqueModelObject);
+    selc.setSource(src.opaqueModelObject);
+
+    modelDirty = true;
+    notifyChanged(new ModelEvent(seEdge,ModelEvent.SIMEVLISTEDGECHANGED, "SimEvListener edge changed"));
   }
 
   public void changePclNode(PropChangeListenerNode pclNode)

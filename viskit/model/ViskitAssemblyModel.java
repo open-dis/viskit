@@ -30,17 +30,23 @@ public interface ViskitAssemblyModel
   public void saveModel     (File f);
   
   public GraphMetaData getMetaData();
-  public void changeMetaData   (GraphMetaData gmd);
+  public void changeMetaData    (GraphMetaData gmd);
 
-  public void newAdapterEdge  (Object src, Object target);
-  public void newPclEdge      (EvGraphNode src, PropChangeListenerNode target);
-  public void newSimEvLisEdge (Object src, Object target);
+  public AdapterEdge    newAdapterEdge    (EvGraphNode src, EvGraphNode target);
+  public PropChangeEdge newPclEdge        (EvGraphNode src, PropChangeListenerNode target);
+  public void           newSimEvLisEdge   (EvGraphNode src, EvGraphNode target);
 
-  public void changePclNode(PropChangeListenerNode pclNode);
-  public void changeEvGraphNode(EvGraphNode evNode);
+  public void changePclNode     (PropChangeListenerNode pclNode);
+  public void changeEvGraphNode (EvGraphNode evNode);
   public void changePclEdge     (PropChangeEdge pclEdge);
   public void changeAdapterEdge (AdapterEdge aEdge);
   public void changeSimEvEdge   (SimEvListenerEdge seEdge);
+
+  public void deleteEvGraphNode   (EvGraphNode evNode);
+  public void deletePCLNode       (PropChangeListenerNode pclNode);
+  public void deleteAdapterEdge   (AdapterEdge ae);
+  public void deletePropChangeEdge(PropChangeEdge pce);
+  public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
 
   public String buildJavaSource();
 

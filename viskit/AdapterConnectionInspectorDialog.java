@@ -200,6 +200,10 @@ public class AdapterConnectionInspectorDialog extends JDialog
 
   private void unloadWidgets()
   {
+    if(adapterEdge != null) {
+      adapterEdge.setSourceEvent(sourceEventTF.getText().trim());
+      adapterEdge.setTargetEvent(targetEventTF.getText().trim());
+    }
     //todo implement
     //newTarget,newTargetEvent,newSource,newSourceEvent;
 
@@ -226,6 +230,12 @@ public class AdapterConnectionInspectorDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
+      String stf = sourceEventTF.getText().trim();
+      String ttf = targetEventTF.getText().trim();
+      if(stf == null || stf.length() == 0 || ttf == null || ttf.length() == 0) {
+        JOptionPane.showMessageDialog(AdapterConnectionInspectorDialog.this,"Source and target events must be entered.");        
+        return;
+      }
       if (modified)
         unloadWidgets();
       setVisible(false);
