@@ -129,8 +129,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
   public ViskitElement getViskitElementAt(Point p)
   {
     Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(p.x, p.y);
-    if(cell != null && cell instanceof AssemblyCircleCell)
-      return (ViskitElement)((AssemblyCircleCell)cell).getUserObject();
+    if(cell != null && (cell instanceof AssemblyCircleCell || cell instanceof AssemblyPropListCell))
+      return (ViskitElement)((DefaultGraphCell)cell).getUserObject();
     return null;
   }
 
@@ -658,7 +658,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       // Associate the Vertex with its Attributes
       attributes.put(vertex, map);
 
-      System.out.println("!!!!!!!!!insert");
       // Insert the Vertex and its Attributes
       //   graphPane.getModel().insert(new Object[]{vertex}, null, null, attributes);
     }
@@ -701,7 +700,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
           {
             // jmb fix remove.actionPerformed(e);
             // remove is an Action
-            System.out.println("!!!!!!!!!!!!!!remove");
           }
         });
       }

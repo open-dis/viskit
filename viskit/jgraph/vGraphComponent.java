@@ -585,7 +585,6 @@ PortView p = getSourcePortAt(e.getPoint());
       // Associate the Vertex with its Attributes
       attributes.put(vertex, map);
 
-      System.out.println("!!!!!!!!!insert");
       // Insert the Vertex and its Attributes
       //   graphPane.getModel().insert(new Object[]{vertex}, null, null, attributes);
     }
@@ -626,7 +625,6 @@ PortView p = getSourcePortAt(e.getPoint());
           {
             // jmb fix remove.actionPerformed(e);
             // remove is an Action
-            System.out.println("!!!!!!!!!!!!!!remove");
           }
         });
       }

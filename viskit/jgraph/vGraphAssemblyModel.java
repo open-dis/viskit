@@ -64,9 +64,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     GraphConstants.setLineWidth(viskitAssySimEvLisEdgeStyle, 1.0f);
   }
 
-  public void changeEvent(EventNode en)
+  public void changeEvent(AssemblyNode en)
   {
-    CircleCell c = (CircleCell)en.opaqueViewObject;
+    DefaultGraphCell c = (DefaultGraphCell)en.opaqueViewObject;
     c.setUserObject(en);
 
     graph.getUI().stopEditing(graph);
@@ -79,9 +79,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     //remove(getRoots(this));
     Object[] roots = getRoots(this);
     for(int i=0;i<roots.length;i++) {
-      if( roots[i] instanceof CircleCell) {
+      if( roots[i] instanceof AssemblyCircleCell || roots[i] instanceof AssemblyPropListCell) {
         Object[] child = new Object[1];
-        child[0] = ((CircleCell)roots[i]).getFirstChild();
+        child[0] = ((DefaultGraphCell)roots[i]).getFirstChild();
         remove(child);
       }
     }
