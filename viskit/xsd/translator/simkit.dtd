@@ -1,7 +1,9 @@
-<!ELEMENT SimkitModule ( Comment*, Parameter*, StateVariable*, Event* ) >
-<!ATTLIST SimkitModule
+<!ELEMENT SimEntity ( Comment*, Parameter*, StateVariable*, Event* ) >
+<!ATTLIST SimEntity
         name            CDATA   #REQUIRED
+        package         CDATA   "examples"
 	version		CDATA	#REQUIRED
+        author          CDATA   #IMPLIED
 >
 
 <!ELEMENT Comment ( #PCDATA ) >
@@ -10,7 +12,6 @@
 <!ATTLIST StateVariable
 	type        CDATA	#REQUIRED
 	name        ID  	#REQUIRED
-        shortName   CDATA       #IMPLIED
 >
 
 <!ELEMENT Argument ( Comment )* >
