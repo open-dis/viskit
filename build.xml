@@ -27,6 +27,8 @@
     <property description="Location of Viskit's dependencies" location="${basedir}/lib" name="dir.lib"/>
           
     <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.4" name="dir.lib.xml"/>
+    
+    <property description="Runtime module extension libraries." location="${dir.lib}/ext" name="dir.lib.ext"/>
           
     <property description="Location of class files resulting from operations of this build file." location="${dir.build}/classes" name="dir.build.classes"/>
           
@@ -35,13 +37,36 @@
     <property description="Generated JAXB bindings for Simtran" location="${dir.src}/viskit/xsd/bindings" name="dir.src.simtran"/>
               
     <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
+    
+    <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
               
     <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
 
     <property description="where the help source sits" location="${dir.src}/viskit/javahelp" name="javahelp"/>
+    
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
+    
+    <path id="runtime.extension.classes" >
+        <fileset dir="${dir.lib.ext}" includes="*.jar"/>
+    </path>
+    
+    <path id="jaxb.classes">
+        <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+    </path>
+    
+    <path id="runtime.classpath" >
+        <pathelement location="${dir.build}/lib/viskit.jar"/>
+        <pathelement location="${dir.lib}/simkit.jar"/>
+        <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+        <pathelement location="${dir.lib}/jgraph.jar"/>
+        <pathelement location="${dir.lib}/actions.jar"/>
+        <pathelement location="${dir.lib}/jhall.jar"/>
+        <pathelement location="${dir.lib}/tools.jar"/>
+        <path refid="jaxb.classes"/>
+        <path refid="runtime.extension.classes"/>
+    </path>
 
 <!--  === TARGET: help === -->
     <target name="help">
@@ -66,6 +91,7 @@
         <mkdir dir="${dir.build.doc}"/>
         <mkdir dir="${dir.src.simtran}"/>
         <mkdir dir="${dir.src.simasm}"/>
+        <mkdir dir="${dir.lib.ext}"/>
     </target>
 
   <target depends="init" description="build the help search database" name="javahelp">
@@ -221,6 +247,15 @@
         </javac>
     </target>   
     
+    <!-- just add new modules to the depends variable here -->
+    <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples" />
+    
+    <target depends="jar" description="diskit module" name="examples.diskit" >
+        <ant dir="${dir.examples}/diskit" target="dist"/>
+        <copy file="${dir.examples}/diskit/lib/dis.jar" todir="${dir.lib.ext}"/>
+        <copy file="${dir.examples}/diskit/dist/lib/diskit.jar" todir="${dir.lib.ext}"/>
+    </target>
+    
     <!-- TARGET: buildapp from Kirk Stork -->
     <target depends="build.init, jar" description="Build a complete, double-clickable jar file with all dependencies included." name="buildapp">                                                               
         <jar destfile="${dir.build}/viskitapp.jar">
@@ -231,5 +266,15 @@
                 <attribute name="Class-Path" value="../lib/simkit.jar ../lib/actions.jar ../lib/jhall.jar ../lib/bsh-2.0b1.jar ../lib/jdom.jar ../lib/jgraph.jar ../lib/simkit.jar ../lib/tools.jar ../lib/jwsdp-1.4/jax-qname.jar ../lib/jwsdp-1.4/jaxb-api.jar ../lib/jwsdp-1.4/jaxb-impl.jar ../lib/jwsdp-1.4/jaxb-libs.jar ../lib/jwsdp-1.4/jaxp-api.jar ../lib/jwsdp-1.4/namespace.jar ../lib/jwsdp-1.4/relaxngDatatype.jar ../lib/jwsdp-1.4/xsdlib.jar"/>                                                                   
             </manifest>                                                                     
         </jar>
+    </target>
+    
+    <!-- TARGET: Run, include extensions such as diskit module -->
+    <target depends="jar, examples" description="Run Viskit, include example modules if any" name="build-run">
+        <java classpathref="runtime.classpath" classname="viskit.Splash2" fork="true" />
+    </target>
+    
+    <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
+    <target description="Run Viskit, don't check dependencies" name="quick-run">
+        <java classpathref="runtime.classpath" classname="viskit.Splash2" fork="true" />
     </target>
 </project>
