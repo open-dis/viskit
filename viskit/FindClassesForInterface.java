@@ -24,7 +24,10 @@ public class FindClassesForInterface
     Class c = null;
     try {
       c = classFromFile(f);
-      if(c.isInterface() || !implementing.isAssignableFrom(c) || !isConcrete(c))
+
+      if(c.isInterface()  || !isConcrete(c))
+        c = null;
+      else if (implementing != null && !implementing.isAssignableFrom(c))
         c = null;
     }
     catch (Throwable t){}
