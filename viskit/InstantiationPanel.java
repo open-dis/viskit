@@ -490,26 +490,17 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
         Vector vn = new Vector();
         HashMap hm = new HashMap();
-// test
-
-
-/*
-try {
-myObjClass = Class.forName("simkit.random.RandomVariate");
-}
-catch (ClassNotFoundException e1) {
-e1.printStackTrace();
-}
-*/
-
 
         for(int i=0;i<statMeths.length;i++) {
           int mods = statMeths[i].getModifiers();
           Class retCl = statMeths[i].getReturnType();
           if(Modifier.isStatic(mods))
             if(retCl == myObjClass){
-              hm.put(statMeths[i].toString(),statMeths[i]);
-              vn.add(statMeths[i].toString());
+              String ts = statMeths[i].toString();
+              int strt = ts.lastIndexOf('.',ts.indexOf('(')); // go to ( , back to .
+              ts = ts.substring(strt+1,ts.length());
+              hm.put(ts,statMeths[i]);
+              vn.add(ts);
             }
         }
         if(vn.size() <= 0) {
