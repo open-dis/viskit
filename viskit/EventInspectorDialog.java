@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -29,14 +30,14 @@ public class EventInspectorDialog extends JDialog
   private Component locationComponent;
   private EventNode node;
   private static boolean modified = false;
-  private JButton canButt,okButt,testButt;
+  private JButton canButt, okButt, testButt;
   private JTextField name, delay;
   private JList parameters;
   private TransitionsPanel transitions;
   private ArgumentsPanel arguments;
   private LocalVariablesPanel localVariables;
   private JFrame fr;
-  private JButton lvPlus,lvMinus;
+  private JButton lvPlus, lvMinus;
 
   /**
    * Set up and show the dialog.  The first Component argument
@@ -49,48 +50,48 @@ public class EventInspectorDialog extends JDialog
    */
   public static boolean showDialog(JFrame f, Component comp, EventNode node)
   {
-    if(dialog == null)
-      dialog = new EventInspectorDialog(f,comp,node);
+    if (dialog == null)
+      dialog = new EventInspectorDialog(f, comp, node);
     else
-      dialog.setParams(comp,node);
+      dialog.setParams(comp, node);
 
     dialog.setVisible(true);
-      // above call blocks
+    // above call blocks
     return modified;
   }
 
   private EventInspectorDialog(JFrame frame,
-                              Component locationComp,
-                              EventNode node)
+                               Component locationComp,
+                               EventNode node)
   {
-    super(frame, "Event -- "+node.getName(), true);
+    super(frame, "Event -- " + node.getName(), true);
     this.fr = frame;
     this.node = node;
     this.locationComponent = locationComp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
     Container cont = getContentPane();
-    cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
-    
+    cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+
     JPanel con = new JPanel();
-    con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
+    con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
     con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
     con.add(Box.createVerticalStrut(5));
 
-      // name
-      JPanel namePan = new JPanel();
-      namePan.setLayout(new BoxLayout(namePan,BoxLayout.X_AXIS));
-      namePan.setOpaque(false);
-      namePan.setBorder(BorderFactory.createTitledBorder("Event name"));
-        name = new JTextField("Junk");
-        name.setOpaque(true);
-        name.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+    // name
+    JPanel namePan = new JPanel();
+    namePan.setLayout(new BoxLayout(namePan, BoxLayout.X_AXIS));
+    namePan.setOpaque(false);
+    namePan.setBorder(BorderFactory.createTitledBorder("Event name"));
+    name = new JTextField("Junk");
+    name.setOpaque(true);
+    name.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
-      namePan.add(name);
+    namePan.add(name);
     // make the field expand only horiz.
-     Dimension d = namePan.getPreferredSize();
-     d.width = Integer.MAX_VALUE;
-     namePan.setMaximumSize(d);
+    Dimension d = namePan.getPreferredSize();
+    d.width = Integer.MAX_VALUE;
+    namePan.setMaximumSize(d);
 
     con.add(namePan);
     con.add(Box.createVerticalStrut(5));
@@ -109,32 +110,32 @@ public class EventInspectorDialog extends JDialog
     con.add(Box.createVerticalStrut(5));
 */
 
-      // state transitions
-      transitions = new TransitionsPanel();
-      transitions.setBorder(BorderFactory.createTitledBorder("State transitions"));
+    // state transitions
+    transitions = new TransitionsPanel();
+    transitions.setBorder(BorderFactory.createTitledBorder("State transitions"));
     con.add(transitions);
     con.add(Box.createVerticalStrut(5));
 
-      // local vars
-      localVariables = new LocalVariablesPanel(300);
-      localVariables.setBorder(BorderFactory.createTitledBorder("Local variables"));
+    // local vars
+    localVariables = new LocalVariablesPanel(300);
+    localVariables.setBorder(BorderFactory.createTitledBorder("Local variables"));
     con.add(localVariables);
     con.add(Box.createVerticalStrut(5));
 
-      // Event arguments
-      arguments = new ArgumentsPanel(300);
-      arguments.setBorder(BorderFactory.createTitledBorder("Event arguments"));
+    // Event arguments
+    arguments = new ArgumentsPanel(300);
+    arguments.setBorder(BorderFactory.createTitledBorder("Event arguments"));
     con.add(arguments);
     con.add(Box.createVerticalStrut(5));
 
-      // buttons
-      JPanel buttPan = new JPanel();
-      buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
-      canButt = new JButton("Cancel");
-      okButt = new JButton("Apply changes");
-      buttPan.add(Box.createHorizontalGlue());
-      buttPan.add(canButt);
-      buttPan.add(okButt);
+    // buttons
+    JPanel buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    canButt = new JButton("Cancel");
+    okButt = new JButton("Apply changes");
+    buttPan.add(Box.createHorizontalGlue());
+    buttPan.add(canButt);
+    buttPan.add(okButt);
     con.add(buttPan);
 
     cont.add(con);
@@ -148,35 +149,35 @@ public class EventInspectorDialog extends JDialog
     myChangeActionListener chlis = new myChangeActionListener();
     //name.addActionListener(chlis);
     name.addKeyListener(new myKeyListener());
-    arguments.addDoubleClickedListener( new ActionListener()
+    arguments.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        EventArgument ea = (EventArgument)e.getSource();
-        boolean modified = EventArgumentDialog.showDialog(fr,locationComponent,ea);
-        if(modified) {
+        EventArgument ea = (EventArgument) e.getSource();
+        boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
+        if (modified) {
           arguments.updateRow(ea);
         }
       }
     });
-    transitions.addDoubleClickedListener( new MouseAdapter()
+    transitions.addDoubleClickedListener(new MouseAdapter()
     {
       public void mouseClicked(MouseEvent e)
       {
-        EventStateTransition est = (EventStateTransition)e.getSource();
-        boolean modified = EventTransitionDialog.showDialog(fr,locationComponent,est);
-        if(modified) {
+        EventStateTransition est = (EventStateTransition) e.getSource();
+        boolean modified = EventTransitionDialog.showDialog(fr, locationComponent, est);
+        if (modified) {
           transitions.updateTransition(est);
         }
       }
     });
-    this.localVariables.addDoubleClickedListener( new ActionListener()
+    this.localVariables.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        EventLocalVariable elv = (EventLocalVariable)e.getSource();
-        boolean modified = LocalVariableDialog.showDialog(fr,locationComponent,elv);
-        if(modified) {
+        EventLocalVariable elv = (EventLocalVariable) e.getSource();
+        boolean modified = LocalVariableDialog.showDialog(fr, locationComponent, elv);
+        if (modified) {
           localVariables.updateRow(elv);
         }
       }
@@ -187,14 +188,14 @@ public class EventInspectorDialog extends JDialog
   {
     pack();     // do this prior to next
     // little check to add some extra space to always include the node name in title bar w/out dotdotdots
-    if(getWidth()<350)
-      setSize(350,getHeight());
+    if (getWidth() < 350)
+      setSize(350, getHeight());
     this.setLocationRelativeTo(locationComponent);
   }
 
   public void setParams(Component c, EventNode en)
   {
-    node=en;
+    node = en;
     locationComponent = c;
 
     fillWidgets();
@@ -203,7 +204,7 @@ public class EventInspectorDialog extends JDialog
 
   private void fillWidgets()
   {
-    setTitle("Event -- "+node.getName());
+    setTitle("Event -- " + node.getName());
     name.setText(node.getName());
     transitions.setTransitions(node.getTransitions());
     arguments.setData(node.getArguments());
@@ -215,7 +216,7 @@ public class EventInspectorDialog extends JDialog
 
   private void unloadWidgets()
   {
-    if(modified) {
+    if (modified) {
       String nuts = name.getText();
       node.setName(name.getText());
       node.setTransitions(transitions.getTransitions());
@@ -223,6 +224,7 @@ public class EventInspectorDialog extends JDialog
       node.setLocalVariables(new Vector(localVariables.getData()));
     }
   }
+
   class cancelButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
@@ -231,17 +233,35 @@ public class EventInspectorDialog extends JDialog
       setVisible(false);
     }
   }
+
   class applyButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
     {
       // test
       modified = true;
-      if(modified)
+      if (modified) {
+
+        // Parse the state transitions
+        StringBuffer parseThis = new StringBuffer();
+        for (Iterator itr = transitions.getTransitions().iterator(); itr.hasNext();) {
+          parseThis.append(((EventStateTransition) itr.next()).toString());
+          parseThis.append(";");
+        }
+        String parseResults = VGlobals.instance().parseCode(node, parseThis.toString().trim());
+        if (parseResults != null) {
+          int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
+              "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+          if (ret != JOptionPane.YES_OPTION)
+            return;
+        }
+
         unloadWidgets();
+      }
       setVisible(false);
     }
   }
+
   class myKeyListener extends KeyAdapter
   {
     public void keyTyped(KeyEvent e)
@@ -251,7 +271,8 @@ public class EventInspectorDialog extends JDialog
       getRootPane().setDefaultButton(okButt);
     }
   }
-  class myChangeActionListener implements ChangeListener,ActionListener
+
+  class myChangeActionListener implements ChangeListener, ActionListener
   {
     public void stateChanged(ChangeEvent event)
     {

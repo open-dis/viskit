@@ -1,14 +1,15 @@
 package viskit;
 
-import bsh.Interpreter;
 import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.NameSpace;
+import viskit.model.*;
 
 import javax.swing.*;
-import java.util.*;
-
-import viskit.model.vParameter;
-import viskit.model.EventNode;
-import viskit.model.vStateVariable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,11 +42,15 @@ public class VGlobals
   }
 
   private String[] defaultTypes = {
+    "char",
+    "boolean",
+    "byte",
     "double",
     "float",
     "int",
-    "java.lang.String",
     "short",
+    "long",
+    "java.lang.String",
   };
 
   public void addType(String ty)
@@ -90,6 +95,13 @@ public class VGlobals
   {
     interpreter = new Interpreter();
     interpreter.setStrictJava(true);       // no loose typeing
+    NameSpace ns = interpreter.getNameSpace();
+    ns.importPackage("simkit.*");
+    ns.importPackage("simkit.examples.*");
+    ns.importPackage("simkit.random.*");
+    ns.importPackage("simkit.smdx.*");
+    ns.importPackage("simkit.stat.*");
+    ns.importPackage("simkit.util.*");
   }
   String bshErr = "BeanShell eval error";
   private Vector nsSets = new Vector();
@@ -100,36 +112,51 @@ public class VGlobals
     // Load up the local variables and event parameters for this particular node
     // Then do the parse.
 
+    // Lose the new lines
+    s = s.replace('\n',' ');
+
+    // state variables
     for (Iterator itr = stateVars.iterator(); itr.hasNext();) {
       vStateVariable sv = (vStateVariable) itr.next();
-      if (!handlePrimitive(sv.getName(), sv.getType())) {
-        if (!handleJavaDotLang(sv.getName(), sv.getType())) {
-          try {
-            interpreter.set(sv.getName(), Class.forName(sv.getType()).newInstance());
-          }
-          catch (Exception ex) {
-            clearNamespace();
-            return bshErr + "\n" + ex.getMessage();
-          }
-        }
+      String result = handleNameType(sv.getName(),sv.getType());
+      if(result != null) {
+        clearNamespace();
+        return bshErr +"\n" + result;
       }
       nsSets.add(sv.getName());
     }
+    // Sim parameters
     for (Iterator itr = simParms.iterator(); itr.hasNext();) {
       vParameter par = (vParameter) itr.next();
-      if (!handlePrimitive(par.getName(), par.getType())) {
-        if (!handleJavaDotLang(par.getName(), par.getType())) {
-          try {
-            interpreter.set(par.getName(), Class.forName(par.getType()).newInstance());
-          }
-          catch (Exception ex) {
-            clearNamespace();
-            return bshErr + "\n" + ex.getMessage();
-          }
-        }
+      String result = handleNameType(par.getName(),par.getType());
+      if(result != null) {
+        clearNamespace();
+        return bshErr +"\n" + result;
       }
       nsSets.add(par.getName());
     }
+    // Event local variables
+    if(node != null) {
+      for(Iterator itr = node.getLocalVariables().iterator(); itr.hasNext(); ) {
+        EventLocalVariable elv = (EventLocalVariable)itr.next();
+        String result = handleNameType(elv.getName(),elv.getType());
+        if(result != null) {
+          clearNamespace();
+          return bshErr +"\n" + result;
+        }
+        nsSets.add(elv.getName());
+      }
+      // Event arguments
+      for(Iterator itr = node.getArguments().iterator(); itr.hasNext(); ) {
+        EventArgument ea = (EventArgument)itr.next();
+        String result = handleNameType(ea.getName(),ea.getType());
+        if(result != null) {
+          clearNamespace();
+          return bshErr +"\n" + result;
+        }
+      }
+    }
+
     try {
       String noCRs = s.replace('\n',' ');
       Object o = interpreter.eval(noCRs);
@@ -155,6 +182,39 @@ public class VGlobals
       }
     }
     nsSets.clear();
+  }
+  private String handleNameType(String name, String typ)
+  {
+    if (!handlePrimitive(name, typ)) {
+     // if (!handleJavaDotLang(name, typ)) {
+        try {
+          interpreter.set(name,instantiateType(typ));      // the 2nd param will be null if nogo and cause exc
+         // interpreter.set(name, Class.forName(typ).newInstance());
+        }
+        catch (Exception ex) {
+          clearNamespace();
+          return bshErr + "\n" + ex.getMessage();
+        }
+      //}
+    }
+    return null; // this is good
+  }
+
+
+  private Object instantiateType(String typ)
+  {
+    Object o = null;
+    try {
+      o = Class.forName(typ).newInstance();
+    }
+    catch (Exception e) {
+      o = null;
+    }
+    if(o != null)
+      return o;
+
+    // OK. See if we've got a dummy one in our HashMap
+    return VsimkitObjects.hashmap.get(typ);
   }
 
   private boolean handlePrimitive(String name, String typ)
@@ -201,17 +261,5 @@ public class VGlobals
     }
     return false;
   }
-  private boolean handleJavaDotLang(String nm, String typ)
-  {
-    if(nm.indexOf('.') != -1)
-      return false;
 
-    try {
-      interpreter.set(nm,Class.forName("java.lang."+typ).newInstance());
-    }
-    catch (Exception e) {
-      return false;
-    }
-    return true;
-  }
 }

@@ -40,7 +40,7 @@ public class SourceWindow extends JFrame
     buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
     buttPan.add(Box.createHorizontalGlue());
 
-    JButton saveButt = new JButton("Save source");
+    JButton saveButt = new JButton("Save source and close");
     buttPan.add(saveButt);
 
     JButton closeButt = new JButton("Close");
@@ -78,6 +78,7 @@ public class SourceWindow extends JFrame
           FileWriter fw = new FileWriter(f);
           fw.write(src);
           fw.close();
+          SourceWindow.this.dispose();
         }
         catch (IOException ex) {
           JOptionPane.showMessageDialog(null,"Exception on source file write" +
@@ -85,6 +86,7 @@ public class SourceWindow extends JFrame
                                      "\n"+ ex.getMessage(),
                                      "File I/O Error",JOptionPane.ERROR_MESSAGE);
         }
+
       }
     });
   }

@@ -698,15 +698,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       // Changes the two side panels need to know about
       case ModelEvent.SIMPARAMETERADDED:
         pp.addRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getStateVariables());
+        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
       case ModelEvent.SIMPARAMETERDELETED:
         pp.removeRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getStateVariables());
+        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
       case ModelEvent.SIMPARAMETERCHANGED:
         pp.updateRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getStateVariables());
+        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
 
       case ModelEvent.STATEVARIABLEADDED:
