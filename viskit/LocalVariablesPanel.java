@@ -45,7 +45,9 @@ public class LocalVariablesPanel extends ViskitTablePanel
 
   public Object newRowObject()
   {
-    return new EventLocalVariable("locvar_"+count++,"int","0");
+    //return new EventLocalVariable("locvar_"+count++,"int","0"); 
+    return new EventLocalVariable(VGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
+                                    "int","0");
   }
 
   public int getNumVisibleRows()
