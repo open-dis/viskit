@@ -29,7 +29,6 @@ public class VGlobals
 {
   private static VGlobals me;
   private Interpreter interpreter;
-  private JPopupMenu moreTypesMenu;
   private DefaultComboBoxModel cbMod;
   private JPopupMenu popup;
   private myTypeListener myListener;
@@ -298,13 +297,14 @@ public class VGlobals
     moreTypesString
   };
 
-  private String[] morePackages = {"primitives","java.lang","java.util","simkit.random"};
+  private String[] morePackages = {"primitives","java.lang","java.util","simkit.random","cancel"};
   private String[][] moreClasses =
   {
     {"boolean","byte","char","float","long","short"},
     {"Boolean","Byte","Character","Float","Long","Short"},
     {"HashMap","HashSet","LinkedList","Properties","Random","TreeMap","TreeSet","Vector"},
-    {"RandomNumber","RandomVariate"}
+    {"RandomNumber","RandomVariate"},
+    {}
   };
 
   /**
@@ -319,7 +319,6 @@ public class VGlobals
       if(cbMod.getElementAt(i).toString().equals(ty))
         return ty;
     }
-
     // else, put it at the end, but before the "more"
     cbMod.insertElementAt(ty,cbMod.getSize()-1);
     return ty;
@@ -350,13 +349,20 @@ public class VGlobals
     }
 */
    for(int i=0;i<morePackages.length;i++) {
-     m = new JMenu(morePackages[i]);
-     for(int j=0;j<moreClasses[i].length;j++) {
-       mi = new JMenuItem(moreClasses[i][j]);
+     if(moreClasses[i].length <= 0) {           // if no classes, make the "package selectable
+       mi = new JMenuItem(morePackages[i]);
        mi.addActionListener(myListener);
-       m.add(mi);
+       popup.add(mi);
      }
-     popup.add(m);
+     else {
+       m = new JMenu(morePackages[i]);
+       for(int j=0;j<moreClasses[i].length;j++) {
+         mi = new JMenuItem(moreClasses[i][j]);
+         mi.addActionListener(myListener);
+         m.add(mi);
+       }
+       popup.add(m);
+     }
    }
   }
   JComboBox pending;
@@ -376,8 +382,8 @@ public class VGlobals
       if(o instanceof JComboBox) {
         JComboBox cb = (JComboBox)o;
         pending = cb;
-        if(cb.getSelectedItem().toString().equals(moreTypesString))     // == moreTypesLabel)
-           popup.show(cb,0,0); //cb.getLocation().x,cb.getLocation().y); //cb.getX(),cb.getY());
+        if(cb.getSelectedItem().toString().equals(moreTypesString))
+           popup.show(cb,0,0);
       }
       else {
         JMenuItem mi = (JMenuItem)o;
@@ -390,13 +396,13 @@ public class VGlobals
   }
   class myTypeListRenderer extends JLabel implements ListCellRenderer
   {
-    Font specialFont = getFont().deriveFont(Font.ITALIC);
+    //Font specialFont = getFont().deriveFont(Font.ITALIC);
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
       JLabel lab = new JLabel(value.toString());
       if(value.toString().equals(moreTypesString))
         lab.setBorder(BorderFactory.createRaisedBevelBorder()); //createEtchedBorder());
-        lab.setFont(specialFont);
+        //lab.setFont(specialFont);
       return lab;
     }
   }
