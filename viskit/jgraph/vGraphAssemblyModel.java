@@ -84,6 +84,148 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
   }
 
+
+  public void deleteAll()
+  {
+    //remove(getRoots(this));
+    Object[] roots = getRoots(this);
+    for(int i=0;i<roots.length;i++) {
+      if( roots[i] instanceof CircleCell) {
+        Object[] child = new Object[1];
+        child[0] = ((CircleCell)roots[i]).getFirstChild();
+        remove(child);
+      }
+    }
+    remove(roots);
+  }
+
+/*
+  public void deleteEventNode(EventNode en)
+  {
+    DefaultGraphCell c = (DefaultGraphCell)en.opaqueViewObject;
+    c.removeAllChildren();
+    this.remove(new Object[]{c});
+  }
+*/
+  public void deleteEGNode(EvGraphNode egn)
+  {
+    DefaultGraphCell c = (DefaultGraphCell)egn.opaqueViewObject;
+    c.removeAllChildren();
+    this.remove(new Object[]{c});
+  }
+  public void addEGNode(EvGraphNode egn)
+  {
+    DefaultGraphCell c = new AssemblyCircleCell(egn.getName());
+    egn.opaqueViewObject = c;
+    c.setUserObject(egn);
+    Map attributes = new Hashtable();
+    attributes.put(c,createBounds(egn.getPosition().x,egn.getPosition().y,Color.black));
+    c.add(new vAssemblyPortCell(egn.getName()+"/Center"));
+    this.insert(new Object[]{c},attributes,null,null,null);
+  }
+  
+  public void changeEGNode(EvGraphNode egn)
+  {
+    AssemblyCircleCell c = (AssemblyCircleCell)egn.opaqueViewObject;
+    c.setUserObject(egn);
+
+    graph.getUI().stopEditing(graph);
+    graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+
+  }
+
+  public void addPCLNode(PropChangeListenerNode pcln)
+  {
+    DefaultGraphCell c = new AssemblyPropListCell(pcln.getName());
+    pcln.opaqueViewObject = c;
+    c.setUserObject(pcln);
+    Map attributes = new Hashtable();
+    attributes.put(c,createBounds(pcln.getPosition().x,pcln.getPosition().y,Color.black));
+    c.add(new vAssemblyPortCell(pcln.getName()+"/Center"));
+    this.insert(new Object[]{c},attributes,null,null,null);
+
+  }
+  public void deletePCLNode(PropChangeListenerNode pcln)
+  {
+    DefaultGraphCell c = (DefaultGraphCell)pcln.opaqueViewObject;
+    c.removeAllChildren();
+    this.remove(new Object[]{c});
+
+  }
+  public void changePCLNode(PropChangeListenerNode pcln)
+  {
+    AssemblyPropListCell c = (AssemblyPropListCell)pcln.opaqueViewObject;
+    c.setUserObject(pcln);
+
+    graph.getUI().stopEditing(graph);
+    graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+
+
+  }
+  public void addAdapterEdge(AdapterEdge ae)
+  {
+
+  }
+  public void deleteAdapterEdge(AdapterEdge ae)
+  {
+
+  }
+  public void changeAdapterEdge(AdapterEdge ae)
+  {
+
+  }
+  public void addSimEvListEdge(SimEvListenerEdge sele)
+  {
+
+  }
+  public void deleteSimEvListEdge(SimEvListenerEdge sele)
+  {
+
+  }
+  public void changeSimEvListEdge(SimEvListenerEdge sele)
+  {
+
+  }
+  public void addPclEdge(PropChangeEdge pce)
+  {
+
+  }
+  public void deletePclEdge(PropChangeEdge pce)
+  {
+
+  }
+  public void changePclEdge(PropChangeEdge pce)
+  {
+
+  }
+/*
+  public void addEventNode(EventNode en)
+  {
+    DefaultGraphCell c = new CircleCell(en.getName());
+    en.opaqueViewObject = c;
+    c.setUserObject(en);
+
+    Map attributes = new Hashtable();
+    attributes.put(c,createBounds(en.getPosition().x, en.getPosition().y,Color.black));
+    //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
+    
+    //c.add(new DefaultPort(en.getName()+"/Center"));
+    c.add(new vPortCell(en.getName()+"/Center"));
+    this.insert(new Object[]{c},attributes,null,null,null);
+  }
+*/
+/*
+  public void deleteEdge(SchedulingEdge edge)
+  {
+    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
+    this.remove(new Object[]{e});
+  }
+
+  public void deleteCancellingEdge(CancellingEdge edge)
+  {
+    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
+    this.remove(new Object[]{e});
+  }
   public void changeEdge(SchedulingEdge ed)
   {
     changeEitherEdge(ed);
@@ -109,63 +251,6 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     graph.getUI().stopEditing(graph);    // this does it, but label is screwed
     graph.graphDidChange(); // needed for redraw
 
-  }
-
-  public void deleteAll()
-  {
-    //remove(getRoots(this));
-    Object[] roots = getRoots(this);
-    for(int i=0;i<roots.length;i++) {
-      if( roots[i] instanceof CircleCell) {
-        Object[] child = new Object[1];
-        child[0] = ((CircleCell)roots[i]).getFirstChild();
-        remove(child);
-      }
-    }
-    remove(roots);
-  }
-
-  public void deleteEdge(SchedulingEdge edge)
-  {
-    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
-    this.remove(new Object[]{e});
-  }
-  
-  public void deleteCancellingEdge(CancellingEdge edge)
-  {
-    DefaultEdge e = (DefaultEdge)edge.opaqueViewObject;
-    this.remove(new Object[]{e});
-  }
-  public void deleteEventNode(EventNode en)
-  {
-    DefaultGraphCell c = (DefaultGraphCell)en.opaqueViewObject;
-    c.removeAllChildren();
-    this.remove(new Object[]{c});
-  }
-  public void addEGNode(EvGraphNode egn)
-  {
-    DefaultGraphCell c = new AssemblyCircleCell(egn.getName());
-    egn.opaqueViewObject = c;
-    c.setUserObject(egn);
-    Map attributes = new Hashtable();
-    attributes.put(c,createBounds(egn.getPosition().x,egn.getPosition().y,Color.black));
-    c.add(new vPortCell(egn.getName()+"/Center"));
-    this.insert(new Object[]{c},attributes,null,null,null);
-  }
-
-  public void addEventNode(EventNode en)
-  {
-    DefaultGraphCell c = new CircleCell(en.getName());
-    en.opaqueViewObject = c;
-    c.setUserObject(en);
-
-    Map attributes = new Hashtable();
-    attributes.put(c,createBounds(en.getPosition().x, en.getPosition().y,Color.black));
-    //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
-    
-    //c.add(new DefaultPort(en.getName()+"/Center"));
-    c.add(new vPortCell(en.getName()+"/Center"));
-    this.insert(new Object[]{c},attributes,null,null,null);
   }
   public void addEdge(SchedulingEdge se)
   {
@@ -207,6 +292,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     this.insert(new Object[]{edge},attributes,cs,null,null);
 
   }
+*/
   public Map createBounds(int x, int y, Color c) {
     Map map = GraphConstants.createMap();
     GraphConstants.setBounds(map, new Rectangle(x, y, 54, 54)); //90, 30));

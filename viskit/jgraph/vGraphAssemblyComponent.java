@@ -75,8 +75,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
   public ViskitElement getViskitElementAt(Point p)
   {
     Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(p.x, p.y);
-    if(cell != null && cell instanceof CircleCell)
-      return (ViskitElement)((CircleCell)cell).getUserObject();
+    if(cell != null && cell instanceof AssemblyCircleCell)
+      return (ViskitElement)((AssemblyCircleCell)cell).getUserObject();
     return null;
   }
 
@@ -93,6 +93,54 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       case ModelEvent.EVENTGRAPHADDED:
         model.addEGNode((EvGraphNode)ev.getSource());
         break;
+      case ModelEvent.EVENTGRAPHDELETED:
+        model.deleteEGNode((EvGraphNode)ev.getSource());
+        break;
+      case ModelEvent.EVENTGRAPHCHANGED:
+        model.changeEGNode((EvGraphNode)ev.getSource());
+        break;
+
+      case ModelEvent.PCLADDED:
+        model.addPCLNode((PropChangeListenerNode)ev.getSource());
+        break;
+      case ModelEvent.PCLDELETED:
+        model.deletePCLNode((PropChangeListenerNode)ev.getSource());
+        break;
+      case ModelEvent.PCLCHANGED:
+        model.changePCLNode((PropChangeListenerNode)ev.getSource());
+        break;
+
+      case ModelEvent.ADAPTEREDGEADDED:
+        model.addAdapterEdge((AdapterEdge)ev.getSource());
+        break;
+      case ModelEvent.ADAPTEREDGEDELETED:
+        model.deleteAdapterEdge((AdapterEdge)ev.getSource());
+        break;
+      case ModelEvent.ADAPTEREDGECHANGED:
+        model.changeAdapterEdge((AdapterEdge)ev.getSource());
+        break;
+
+      case ModelEvent.SIMEVLISTEDGEADDED:
+        model.addSimEvListEdge((SimEvListenerEdge)ev.getSource());
+        break;
+      case ModelEvent.SIMEVLISTEDGEDELETED:
+        model.deleteSimEvListEdge((SimEvListenerEdge)ev.getSource());
+        break;
+      case ModelEvent.SIMEVLISTEDGECHANGED:
+        model.changeSimEvListEdge((SimEvListenerEdge)ev.getSource());
+        break;
+
+      case ModelEvent.PCLEDGEADDED:
+        model.addPclEdge((PropChangeEdge)ev.getSource());
+        break;
+      case ModelEvent.PCLEDGEDELETED:
+        model.deletePclEdge((PropChangeEdge)ev.getSource());
+        break;
+      case ModelEvent.PCLEDGECHANGED:
+        model.changePclEdge((PropChangeEdge)ev.getSource());
+        break;
+
+
 /*
       case ModelEvent.EVENTADDED:
         model.addEventNode((EventNode) ev.getSource());
@@ -144,14 +192,14 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     Object[] ch = c.getChanged();
     if (ch != null) {
       for (int i = 0; i < ch.length; i++) {
-        if (ch[i] instanceof CircleCell) {
-          CircleCell cc = (CircleCell) ch[i];
+        if (ch[i] instanceof AssemblyCircleCell) {
+          AssemblyCircleCell cc = (AssemblyCircleCell) ch[i];
           Map m = cc.getAttributes();
           Rectangle r = (Rectangle) m.get("bounds");
           if (r != null) {
-            EventNode en = (EventNode) cc.getUserObject();
+            EvGraphNode en = (EvGraphNode) cc.getUserObject();
             en.setPosition(new Point(r.x, r.y));
-            ((ViskitModel) parent.getModel()).changeEvent(en);
+            ((ViskitAssemblyModel) parent.getModel()).changeEvGNode(en);
           }
         }
       }
@@ -165,10 +213,20 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       if (c != null) {
         String tt = "";
 
-        if (c instanceof vEdgeCell) {
-          vEdgeCell vc = (vEdgeCell) c;
-          Edge se = (Edge) vc.getUserObject();
+        if (c instanceof vAssemblyEdgeCell) {
+          vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
+          AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
 
+          if(vc.getUserObject() instanceof AdapterEdge) {
+            tt = "<center>Adapter</center>";
+          }
+          else if(vc.getUserObject() instanceof SimEvListenerEdge) {
+            tt = "<center>SimEvent Listener</center>";
+          }
+          else /*if(vc.getUserObject() instanceof PropChangeEdge)*/ {
+            tt = "<center>Property Change Listener</center>";
+          }
+/*
           if (vc.getUserObject() instanceof SchedulingEdge) {
             tt = "<center>Schedule</center>";
             if (se.delay != null && se.delay.length() > 0)
@@ -192,14 +250,16 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             epSt.setLength(epSt.length() - 4); // lose the last <br>
             tt += "<u>edge parameters</u><br>" + epSt.toString();
           }
+*/
           return "<HTML>" + tt + "</HTML>";
 
         }
-        else if (c instanceof CircleCell) {
-          CircleCell cc = (CircleCell) c;
-          EventNode en = (EventNode) cc.getUserObject();
+        else if (c instanceof AssemblyCircleCell) {
+          AssemblyCircleCell cc = (AssemblyCircleCell) c;
+          EvGraphNode en = (EvGraphNode) cc.getUserObject();
           tt += "<center>" + en.getName() + "</center>";
 
+/*
           ArrayList st = en.getTransitions();
           String sttrans = "";
           for (Iterator itr = st.iterator(); itr.hasNext();) {
@@ -240,7 +300,14 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             lvs = lvs.substring(0, lvs.length() - 4); // remove last <br>
             tt += "<br><u>local variables</u><br>" + lvs;
           }
+*/
           return "<HTML>" + tt + "</HTML>";
+        }
+        else if (c instanceof AssemblyPropListCell) {
+          AssemblyPropListCell cc = (AssemblyPropListCell) c;
+           PropChangeListenerNode en = (PropChangeListenerNode) cc.getUserObject();
+           tt += "<center>" + en.getName() + "</center>";
+
         }
       }
     }
@@ -253,12 +320,26 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         ? (CellView) value
         : getGraphLayoutCache().getMapping(value, false);
 
-    if (view instanceof CircleView) {
-      CircleCell cc = (CircleCell) view.getCell();
+    if (view instanceof AssemblyCircleView) {
+      AssemblyCircleCell cc = (AssemblyCircleCell) view.getCell();
       Object en = cc.getUserObject();
-      if (en instanceof EventNode)  // should always be, except for our prototype examples
-        return ((EventNode) en).getName();
+      if (en instanceof EvGraphNode) //EventNode)  // should always be, except for our prototype examples
+        return ((EvGraphNode) en).getName();
     }
+    else if (view instanceof vAssemblyEdgeView) {
+      vAssemblyEdgeCell aec = (vAssemblyEdgeCell)view.getCell();
+      Object e = aec.getUserObject();
+      if( e instanceof PropChangeEdge) {
+        return "PropChangeEdge"; // temp
+      }
+      else if ( e instanceof SimEvListenerEdge ) {
+        return "SimEvListenerEdge"; // temp
+      }
+      else if ( e instanceof AdapterEdge ) {
+        return " AdapterEdge";
+      }
+    }
+/*         old
     else if (view instanceof vEdgeView) {
       vEdgeCell cc = (vEdgeCell) view.getCell();
       Object e = cc.getUserObject();
@@ -271,6 +352,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       else if (e instanceof CancellingEdge) // should always be one of these 2 except for proto examples
         return null;
     }
+*/
     return null;
   }
 
@@ -278,8 +360,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
   // To use circles, from the tutorial
   protected VertexView createVertexView(Object v, CellMapper cm)
   {
-    if (v instanceof CircleCell)
-      return new CircleView(v, this, cm);
+    if (v instanceof AssemblyCircleCell)
+      return new AssemblyCircleView(v, this, cm);
+    else if (v instanceof AssemblyPropListCell)
+      return new AssemblyPropListView(v, this, cm);
     // else
     return super.createVertexView(v, cm);
   }
@@ -287,18 +371,19 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
   // To customize my edges
   protected EdgeView createEdgeView(Object e, CellMapper cm)
   {
-    if (e instanceof vSelfEdgeCell)             // order important... 1st is sub of 2nd
-      return new vSelfEdgeView(e, this, cm);
-    else if (e instanceof vEdgeCell)
-      return new vEdgeView(e, this, cm);
+    if (e instanceof vAssemblyEdgeCell)             // order important... 1st is sub of 2nd
+      return new vAssemblyEdgeView(e, this, cm);
+    // different edge types here
+    //else if (e instanceof vEdgeCell)
+      //return new vEdgeView(e, this, cm);
     // else
     return super.createEdgeView(e, cm);
   }
 
   protected PortView createPortView(Object p, CellMapper cm)
   {
-    if (p instanceof vPortCell)
-      return new vPortView(p,this,cm);
+    if (p instanceof vAssemblyPortCell)
+      return new vAssemblyPortView(p,this,cm);
     return super.createPortView(p, cm);
   }
 
@@ -544,13 +629,14 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       DefaultGraphCell src = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(source);
       DefaultGraphCell tar = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(target);
       Object[] oa = new Object[]{src, tar};
-      ViskitController controller = (ViskitController) parent.getController();
+      ViskitAssemblyController controller = (ViskitAssemblyController) parent.getController();
 
-   //   if (parent.getCurrentMode() == AssemblyViewFrame.CANCEL_ARC_MODE)
-    //    controller.newCancelArc(oa);
-   //   else
-        controller.newArc(oa);
-
+      if(parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE)
+        /*controller.newAdapterArc(oa)*/;
+      else if(parent.getCurrentMode() == AssemblyViewFrame.SIMEVLIS_MODE)
+        /* controller.newSimEvListArc(oa)*/;
+      else if(parent.getCurrentMode() == AssemblyViewFrame.PCL_MODE)
+        /* controller.newPropChangeListArc(oa)*/;
     }
 
     public JPopupMenu createPopupMenu(final Point pt, final Object cell)
@@ -708,6 +794,37 @@ class vAssemblyEdgeView extends EdgeView
 /**
  * To mark our nodes.
  */
+class AssemblyPropListCell extends DefaultGraphCell
+{
+  AssemblyPropListCell()
+  {
+    this(null);
+  }
+
+  public AssemblyPropListCell(Object userObject)
+  {
+    super(userObject);
+  }
+
+}
+/**
+ * Sub class VertexView to install our own renderer.
+ */
+class AssemblyPropListView extends VertexView
+{
+  static vAssemblyPclVertexRenderer renderer = new vAssemblyPclVertexRenderer();
+
+  public AssemblyPropListView(Object cell, JGraph gr, CellMapper cm)
+  {
+    super(cell, gr, cm);
+  }
+
+  public CellViewRenderer getRenderer()
+  {
+    return renderer;
+  }
+
+}
 class AssemblyCircleCell extends DefaultGraphCell
 {
 
@@ -727,7 +844,7 @@ class AssemblyCircleCell extends DefaultGraphCell
  */
 class AssemblyCircleView extends VertexView
 {
-  static vVertexRenderer renderer = new vVertexRenderer();
+  static vAssemblyEgVertexRenderer renderer = new vAssemblyEgVertexRenderer();
 
   public AssemblyCircleView(Object cell, JGraph gr, CellMapper cm)
   {

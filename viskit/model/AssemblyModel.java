@@ -4,6 +4,7 @@ import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.SimEntity;
+import viskit.xsd.bindings.assembly.PropertyChangeListener;
 import viskit.ModelEvent;
 
 import javax.swing.*;
@@ -30,7 +31,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   private File currentFile;
   private boolean modelDirty = false;
   private GraphMetaData metaData;
-  HashMap egNodeCache = new HashMap();
+  HashMap nodeCache = new HashMap();
   HashMap assEdgeCache = new HashMap();
   public void init()
   {
@@ -66,12 +67,71 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbEG.setName(nIe(widgetName));
     node.opaqueModelObject = jaxbEG;
     jaxbEG.setType(className);
-    egNodeCache.put(jaxbEG,node);   // key = ev
+    nodeCache.put(jaxbEG,node);   // key = ev
     jaxbRoot.getSimEntity().add(jaxbEG);
 
     modelDirty = true;
     notifyChanged(new ModelEvent(node,ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
 
+  }
+
+  public void newPropChangeListener(String widgetName, String className, Point p)
+  {
+    PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName,className);
+    if(p == null)
+      pcNode.setPosition(new Point(100,100));
+    else
+      pcNode.setPosition(p);
+    PropertyChangeListener jaxbPCL = null;
+    try {
+      jaxbPCL = oFactory.createPropertyChangeListener();
+    }
+    catch (JAXBException e) {
+      // assert false: "AssemblyModel.newPropChangeListener, error creating viskit.xsd.bindings.assembly.PropChangeListener.";
+      System.err.println("AssemblyModel.newPropChangeListener, error creating viskit.xsd.bindings.assembly.PropChangeListener.");
+      return;
+    }
+    jaxbPCL.setName(nIe(widgetName));
+    pcNode.opaqueModelObject = jaxbPCL;
+    jaxbPCL.setType(className);
+    nodeCache.put(jaxbPCL,pcNode);
+    jaxbRoot.getSimEntity().add(jaxbPCL);
+
+    modelDirty = true;
+    notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
+  }
+
+  public void changeEvGNode(EvGraphNode node)
+  {
+    SimEntity jaxbSE = (SimEntity)node.opaqueModelObject;
+
+    jaxbSE.setName(node.getName());
+
+
+
+
+ //todo
+/*
+    Coordinate coor = null;
+    try {
+      coor = oFactory.createCoordinate();
+    } catch(JAXBException e) {
+      System.err.println("Exc Model.changeEvent()");
+    }
+    coor.setX(""+node.getPosition().x);
+    coor.setY(""+node.getPosition().y);
+    jaxbSE.set
+    jaxbEv.setCoordinate(coor);
+
+    cloneComments(jaxbEv.getComment(),node.getComments());
+    cloneArguments(jaxbEv.getArgument(),node.getArguments());
+    cloneLocalVariables(jaxbEv.getLocalVariable(),node.getLocalVariables());
+    // following must follow above
+    cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
+*/
+
+    modelDirty = true;
+    this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
   }
 
   public void newModel(File f)
@@ -96,7 +156,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       done ..metaData = new GraphMetaData();
       done..this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
 */
-      egNodeCache.clear();
+      nodeCache.clear();
       assEdgeCache.clear();
       metaData = new GraphMetaData(); //todo need new object?
       metaData.name = "Assembly_name"; // override

@@ -39,6 +39,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
 
+  // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
+  public static final int SELECT_MODE = 0;
+  public static final int ADAPTER_MODE = 1;
+  public static final int SIMEVLIS_MODE = 2;
+  public static final int PCL_MODE = 3;
+
 
   /**
    * Toolbar for dropping icons, connecting, etc.
@@ -122,6 +128,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     //jsp.setDividerLocation(0.5d);
     top.add(jsp,BorderLayout.CENTER);
     top.add(vcrToolBar,BorderLayout.SOUTH);
+    top.setBorder(BorderFactory.createEmptyBorder(5,5,0,5));
+
     getContentPane().add(top);
   }
 
@@ -131,6 +139,23 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
 
   }
+  /**
+   * Returns the current mode--select, add, arc, cancelArc
+   */
+  public int getCurrentMode()
+  {
+    // Use the button's selected status to figure out what mode
+    // we are in.
+
+    if (selectMode.isSelected() == true) return SELECT_MODE;
+    if (adapterMode.isSelected() == true) return ADAPTER_MODE;
+    if (simEventListenerMode.isSelected() == true) return SIMEVLIS_MODE;
+    if (propChangeListenerMode.isSelected() == true) return PCL_MODE;
+    //assert false : "getCurrentMode()";
+    System.err.println("assert false : \"getCurrentMode()\"");
+    return 0;
+  }
+
 
   private JPanel vcrToolBar;
   private JButton vcrStop, vcrPause, vcrPlay, vcrStep;
@@ -159,6 +184,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     vcrToolBar.add(vcrVerbose);
 
     vcrToolBar.add(Box.createHorizontalGlue());
+    vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
 
   }
   private void buildToolbar()

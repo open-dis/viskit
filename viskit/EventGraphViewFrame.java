@@ -299,7 +299,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
     stateDrawingSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(graphPane), stateParameterSplit);
     top.add(stateDrawingSplit, BorderLayout.CENTER);
-
+    top.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     this.getContentPane().add(top);
   }
 

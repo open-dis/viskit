@@ -65,7 +65,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     rendr.setLeafIcon(myLeafIcon);
     standardClosedIcon = rendr.getClosedIcon();
-
     DragSource dragSource = DragSource.getDefaultDragSource();
 
     dragSource.createDefaultDragGestureRecognizer(this, // component where drag originates
@@ -322,10 +321,12 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
     {
       Object uo = ((DefaultMutableTreeNode) value).getUserObject();
+/*  try
       if (uo instanceof Class)
         setLeafIcon(myLeafIcon);
       else
         setLeafIcon(standardClosedIcon);
+*/
 
       super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 

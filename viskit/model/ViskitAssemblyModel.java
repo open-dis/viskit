@@ -15,6 +15,7 @@ import java.io.File;
 public interface ViskitAssemblyModel
 {
   public void newEventGraph(String widgetName, String className, Point p);
+  public void newPropChangeListener(String widgetName, String className, Point p);
   /**
     *  Reports saved state of model.  Becomes "clean" after a save.
     */
@@ -26,5 +27,6 @@ public interface ViskitAssemblyModel
   public void newModel      (File f);
   public GraphMetaData getMetaData();
   public void changeMetaData   (GraphMetaData gmd);
+  public void changeEvGNode      (EvGraphNode ev);
   
 }

@@ -53,7 +53,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void newEventGraphNode(String typeName, Point p)
   {
     System.out.println("new eg node "+typeName+" at "+p.x+" "+p.y);
-    String fauxName = "evnt_" + egNodeCount++;
+    String fauxName = "evgr_" + egNodeCount++;
     ((viskit.model.AssemblyModel) getModel()).newEventGraph(fauxName, typeName, p);
 
   }
@@ -61,6 +61,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void newPropChangeListenerNode(String name, Point p)
   {
     System.out.println("new prop change node "+name+" at "+p.x+" "+p.y);
+    String fauxName = "lstnr_"+egNodeCount++; // use same counter
+    ((viskit.model.AssemblyModel)getModel()).newPropChangeListener(fauxName,name,p);
 
   }
   /**

@@ -77,9 +77,8 @@ public interface ViskitModel
 
   public void changeEdge       (Edge e);
   public void changeCancelEdge (Edge e);
-  public void changeEvent      (EventNode ev);
   public void changeMetaData   (GraphMetaData gmd);
-
+  public void changeEvent      (EventNode en);
   public void newStateVariable    (String name, String type, String initVal, String comment);
   public void newSimParameter     (String name, String type, String initVal, String comment);
   public void changeStateVariable (vStateVariable st);
