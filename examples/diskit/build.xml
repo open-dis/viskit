@@ -52,7 +52,7 @@
     -->
 
     <!-- Put everything in ${build} into the diskit.jar file -->
-    <jar jarfile="${dist}/lib/diskit.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/lib/diskit0.jar" basedir="${build}"/>
   </target>
   
   <!-- Generates javadocs for the source code -->
