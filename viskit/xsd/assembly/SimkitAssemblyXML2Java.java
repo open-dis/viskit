@@ -18,16 +18,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import javax.xml.bind.JAXBContext; 
 import javax.xml.bind.JAXBException; 
 import javax.xml.bind.Unmarshaller; 
 import javax.xml.bind.Marshaller; 
 import viskit.xsd.bindings.assembly.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 
 /**
  *
@@ -37,31 +48,34 @@ import viskit.xsd.bindings.assembly.*;
 
 public class SimkitAssemblyXML2Java {
 
-    private SimkitAssemblyType root;
-
+    SimkitAssemblyType root;
     InputStream fileInputStream;
     String fileBaseName;
     File inputFile;
     JAXBContext jaxbCtx;
     GridTaskGetter tasker;
+    int port;
+    int count;
+    int totalResults;
+    boolean listening = true;
 
     /* convenience Strings for formatting */
 
-    final String sp  = " ";
-    final String sp4 = sp+sp+sp+sp;
-    final String sp8 = sp4+sp4;
-    final String sp12 = sp8+sp4;
-    final String sp16 = sp8+sp8;
-    final String ob  = "{";
-    final String cb  = "}";
-    final String sc  = ";";
-    final String cm  = ",";
-    final String lp  = "(";
-    final String rp  = ")";
-    final String eq  = "=";
-    final String pd  = ".";
-    final String qu  = "\"";
-    final String nw = "new";
+    final private String sp  = " ";
+    final private String sp4 = sp+sp+sp+sp;
+    final private String sp8 = sp4+sp4;
+    final private String sp12 = sp8+sp4;
+    final private String sp16 = sp8+sp8;
+    final private String ob  = "{";
+    final private String cb  = "}";
+    final private String sc  = ";";
+    final private String cm  = ",";
+    final private String lp  = "(";
+    final private String rp  = ")";
+    final private String eq  = "=";
+    final private String pd  = ".";
+    final private String qu  = "\"";
+    final private String nw = "new";
 
     
     /** 
@@ -83,6 +97,33 @@ public class SimkitAssemblyXML2Java {
 	
     }
     
+    public SimkitAssemblyXML2Java(int port, String fileName) {
+        this(fileName);
+        this.port = port;
+    }
+    
+    public SimkitAssemblyXML2Java(int port) {
+        ServerSocket servs = null;
+        this.port = port;
+        try {
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            servs = new ServerSocket(port);
+            // first time through, wait for Assembly file
+            new AssemblyReader(this,servs.accept()).start();
+            
+            do {
+                new AssemblyReader(this,servs.accept()).start();
+            } while (getTotalResults() < getCount() - 1);
+            
+            marshal(new File(root.getName()+"Exp.xml"));
+            
+        } catch ( Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+    }
+    
     public SimkitAssemblyXML2Java(File f) throws Exception {
         this.fileBaseName = baseNameOf(f.getName());
 	this.inputFile = f;
@@ -96,8 +137,24 @@ public class SimkitAssemblyXML2Java {
 	    u = jaxbCtx.createUnmarshaller();
 	    this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
 	} catch (Exception e) { e.printStackTrace(); }
+        marshal();
     }  
 
+    public javax.xml.bind.Element unmarshalAny(String bindings) {
+        JAXBContext oldCtx = jaxbCtx;
+        Unmarshaller u;
+        try {
+            jaxbCtx = JAXBContext.newInstance(bindings);
+            u = jaxbCtx.createUnmarshaller();
+            jaxbCtx = oldCtx;
+            return (javax.xml.bind.Element) u.unmarshal(fileInputStream);
+        } catch (Exception e) {
+            jaxbCtx = oldCtx;
+            return (javax.xml.bind.Element) null;
+        }
+        
+    }
+    
     public void marshal() {
         Marshaller m;
         try {
@@ -110,18 +167,22 @@ public class SimkitAssemblyXML2Java {
     }
     
     public void marshal(File f) {
-        System.out.println("marshal to "+f);
-        Marshaller m;
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(f);
-            m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                new Boolean(true));
-            m.marshal(this.root,fos);
-
+            marshal((javax.xml.bind.Element)root, (OutputStream)fos);
         } catch (Exception e) { e.printStackTrace(); }
     }
+    
+    public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
+        Marshaller m;
+        try {
+            m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.marshal(node,o);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    
     
     public String translate() {
 
@@ -237,6 +298,9 @@ public class SimkitAssemblyXML2Java {
 
 	String type = term.getType();
 	String value = term.getValue();
+        if ( term.getNameRef() != null ) {
+            value=((TerminalParameterType)(term.getNameRef())).getValue();
+        }
         if ( isPrimitive(type) ) {
 	    pw.print(indent + sp4 + value); 
 	} else if ( isString(type) ) {
@@ -506,21 +570,65 @@ public class SimkitAssemblyXML2Java {
 
     /**
      * @param args the command line arguments
-     * args[0] - XML file to translate
-     * args[1] - flag stdout ouput
-     * follow this pattern to use this class from another,
-     * otherwise this can be used stand alone from command line
+     * args[0] - -f | --file | -p | --port
+     * args[1] - filename | port
+     * args[2] - -p | --port | -f | --file
+     * args[3] - port | filename
      */
 
-    public static void main(String[] args) {
-        String fileName = args[0];
-        SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(fileName);
+    public static void main(String[] arg) {
+        int port = 0;
+        String fileName = null;
+        SimkitAssemblyXML2Java sax2j = null;
+        List args = java.util.Arrays.asList(arg);
+        Iterator it = args.iterator();
         
-        sax2j.tasker.start();
-        //Thread.yield();
+        while (it.hasNext()) {
+            String a = (String)(it.next());
+            
+            if (a.equals("-p") || a.equals("--port")) {
+                if ( it.hasNext() ) {
+                    a = (String)(it.next());
+                    port = Integer.parseInt(a);
+                } else {
+                    usage();
+                }
+            } else if (a.equals("-f") || a.equals("--file")) {
+                if ( it.hasNext() ) {
+                    fileName = (String)(it.next());
+                } else {
+                    usage();
+                }
+            }
+        }
+        
+        if ( port == 0 ) {
+            if ( fileName == null ) {
+                usage();
+            } else {
+                sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
+                sax2j.unmarshal();
+                sax2j.tasker.start();
+            }
+            
+        } else {
+            if ( fileName == null ) {
+                sax2j = new SimkitAssemblyXML2Java(port); // this should not return, start server
+            } else {
+                sax2j = new SimkitAssemblyXML2Java(port,fileName); // in grid mode
+                sax2j.tasker.start();
+            }
+        }
+        
     }
     
-    public void doGridTask(int taskID, int lastTask, int jobID) {
+    static void usage() {
+        System.out.println("Check args, you need at least a port or a file in grid mode");
+        System.out.println("usage: Assembly [-p port | --port port | -f file | --file file]");
+        System.exit(1);
+    }
+    
+    public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
         System.out.println(fileBaseName +" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
         
         unmarshal();
@@ -529,7 +637,7 @@ public class SimkitAssemblyXML2Java {
         exp.setRunID(fileBaseName+" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
         
         List designPoints = exp.getDesignPoint();
-        DesignPointType designPoint = (DesignPointType)(designPoints.get(taskID));
+        DesignPointType designPoint = (DesignPointType)(designPoints.get(taskID-1));
         List designParams = designPoint.getTerminalParameter();
         List params = root.getTerminalParameter();
         Iterator itd = designParams.iterator();
@@ -542,7 +650,7 @@ public class SimkitAssemblyXML2Java {
         }
         
         try {
-            //when to send back the data, if it is done here,
+            
             //can be processed into results tag, sent back to
             //SGE_O_HOST at socket in raw XML, which is better
             //than wakeup to see if new files came in.
@@ -554,14 +662,28 @@ public class SimkitAssemblyXML2Java {
             
             bsh.Interpreter bsh = new bsh.Interpreter();
             
-            List depends = root.getDepends();
+            List depends = root.getEventGraph();
             Iterator di = depends.iterator();
+            
             while ( di.hasNext() ) {
-                Depends d = (Depends)(di.next());
-                viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(d.getFile());
+                
+                EventGraphType d = (EventGraphType)(di.next());
+                ByteArrayInputStream bais;
+                StringBuffer s = new StringBuffer();
+                List content = d.getContent();
+                Iterator it = content.iterator();
+                
+                while ( it.hasNext() ) {
+                    String str = (String)(it.next());
+                    s.append(str);
+                }
+                
+                bais = new ByteArrayInputStream(s.toString().getBytes());
+                
+                viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(bais);
                 sx2j.unmarshal();
                 bsh.eval(sx2j.translate());
-                System.out.println(sx2j.translate());
+                
             }
             
             bsh.eval(translate());
@@ -570,25 +692,58 @@ public class SimkitAssemblyXML2Java {
             
             System.setOut(new PrintStream(oldOut));
             
-            java.io.StringReader sr = new java.io.StringReader(log.toString());
+            java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
             
-            String line;
-            while( (line = br.readLine()) != null ) {
-                System.out.println(line); // for now
+            try {
+                
+                Socket sock;
+                PrintWriter out;
+                String line;
+                ArrayList logs = new ArrayList();
+                ArrayList propertyChanges = new ArrayList();
+                
+                sock = new Socket(frontHost,port);
+                out = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()));
+                
+                out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+">");
+                while( (line = br.readLine()) != null ) {
+                    if (line.indexOf("<PropertyChange") !=0) {
+                        logs.add(line);
+                        
+                    } else {
+                        propertyChanges.add(line);
+                    }
+                    
+                }
+                out.println("<Log>");
+                out.println("<![CDATA[");
+                Iterator it = logs.iterator();
+                while (it.hasNext()) {
+                    out.println((String)(it.next()));
+                }
+                out.println("]]>");
+                out.println("</Log>");
+                it = propertyChanges.iterator();
+                while (it.hasNext()) {
+                    out.println((String)(it.next()));
+                }
+                
+                out.println("</Results>");
+                out.println();
+                out.flush();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             
         } catch (bsh.EvalError ee) {
             ee.printStackTrace();
-        } catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
-        }
+        } 
     }
     
     public void doLocalTask() {
         boolean batch;
-        
-        unmarshal();
         
         java.util.List params = root.getTerminalParameter();
         batch = !params.isEmpty();
@@ -627,7 +782,7 @@ public class SimkitAssemblyXML2Java {
                     iterate(values,values.size()-1);
                 }
                 String experimentsFileName = fileBaseName + "Exp.xml";
-                System.out.println("Creating experiements: "+experimentsFileName);
+                System.out.println("Creating experiments: "+experimentsFileName);
                 marshal(new File(experimentsFileName));
                 try {
                     Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+getCount(),"-S","/bin/bash","./gridrun.sh",experimentsFileName});
@@ -669,39 +824,57 @@ public class SimkitAssemblyXML2Java {
 
     }
     
-    private int cnt = 0;
     private void incrementCount() {
-        ++this.cnt;
+        ++this.count;
     }
     
     private int getCount() {
-        return cnt;
+        return count;
+    }
+    
+    private void incrementTotalResults() {
+        ++this.totalResults;
+        System.out.println(totalResults+" of "+count);
+    }
+    
+    private int getTotalResults() {
+        return totalResults;
     }
     
     void iterate(HashMap values, int depth) {
+        
         Object[] terms = ((values.keySet()).toArray());
         Object params = (values.get((TerminalParameter)(terms[depth])));
         Object[] paramValues = (Object[])params;
+        
         for ( int i = 0; i < paramValues.length; i++ ) {
+            
             TerminalParameter tp = (TerminalParameter)(terms[depth]);
             tp.setValue(paramValues[i].toString());
-            incrementCount();
+            
             if ( depth > 0) {
+                
                 iterate(values, depth - 1);
+                
             } else {
+                
                 ObjectFactory of = new ObjectFactory();
                 try {
                     ExperimentType experiment = root.getExperiment();
                     List designPoints = experiment.getDesignPoint();
                     DesignPointType designPoint = of.createDesignPoint();
                     List terminalParams = designPoint.getTerminalParameter();
+                    
                     for (int j = 0; j<terms.length; j++) {
                         TerminalParameterType termCopy = of.createTerminalParameter();
                         termCopy.setValue(((TerminalParameterType)terms[j]).getValue());
                         termCopy.setType(((TerminalParameterType)terms[j]).getType());
                         terminalParams.add(termCopy);
                     }
+                    
                     designPoints.add(designPoint);
+                    incrementCount();
+                
                 } catch (javax.xml.bind.JAXBException jaxe) {jaxe.printStackTrace();}
             }
         }
@@ -710,8 +883,89 @@ public class SimkitAssemblyXML2Java {
         
     }
     
-    void evaluate(int taskID) {
+ 
+    
+    class AssemblyReader extends Thread implements Runnable {
+        SimkitAssemblyXML2Java inst;
+        Socket s;
+        
+        public AssemblyReader(SimkitAssemblyXML2Java inst, Socket socket) {
+            this.inst = inst;
+            s = socket;
+        }
+        
+        public void run() {
+            try {
+                
+                if ( inst.fileInputStream == null ) { // in local mode, read initial file
+                    
+                    inst.fileInputStream = new BufferedInputStream(s.getInputStream());
+                    inst.unmarshal();
+                    inst.fileBaseName = inst.root.getName();
+                    inst.tasker = new GridTaskGetter(inst);
+                    inst.tasker.start();
+                    inst.fileInputStream.close();
+                    
+                } else { // in local mode, accept Results XML from nodes
+                    int index;
+                    ResultsType r;
+                    //BufferedInputStream bufIn = new BufferedInputStream(s.getInputStream());
+                    InputStreamReader inptRead = new InputStreamReader(s.getInputStream());
+                    BufferedReader bufRead = new BufferedReader(inptRead);
+                    StringBuffer buf = new StringBuffer();
+                    String line;
+                    
+                    while ( (line=bufRead.readLine()) != null) {
+                        buf.append(line);
+                    }
+                    
+                    //
+                    
+                    
+                    synchronized(inst.fileInputStream) {
+                        inst.fileInputStream = new ByteArrayInputStream(buf.toString().getBytes());
+                        //inst.fileInputStream = bufIn;
+                        javax.xml.transform.stream.StreamSource strsrc = 
+                                new javax.xml.transform.stream.StreamSource(inst.fileInputStream);
+                        
+                        JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+                        Unmarshaller u = jc.createUnmarshaller();
+                        r = (ResultsType) ( u.unmarshal(strsrc) );
+       
+                        //Object o = u.unmarshal( new StreamSource( new StringReader( xmlStr.toString() ) ) );
+                                
+                        //r = (ResultsType) unmarshalAny("viskit.xsd.bindings.assembly");
+                    
+                        index = Integer.parseInt(r.getIndex());
+                    
+                    }
+                    
+                    List designPoints = Collections.synchronizedList(inst.root.getExperiment().getDesignPoint());
+                    
+                    synchronized(designPoints) {
+                    
+                        DesignPointType designPoint = (DesignPointType) designPoints.get(index);
+                        designPoint.setResults(r);
+                    
+                        inst.incrementTotalResults();
+                    
+                    }
+                    
+                }
             
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            finally {
+                try {
+                    inst.fileInputStream.close();
+                    s.close() ;
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        }
     }
     
     class GridTaskGetter extends Thread implements Runnable {
@@ -722,6 +976,8 @@ public class SimkitAssemblyXML2Java {
         int task;
         int numTasks;
         int jobID;
+        int port;
+        String frontHost;
         
         public GridTaskGetter(SimkitAssemblyXML2Java instance) {
             inst = instance;
@@ -741,13 +997,15 @@ public class SimkitAssemblyXML2Java {
                     task=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
                     jobID=Integer.parseInt(p.getProperty("JOB_ID"));
                     numTasks=Integer.parseInt(p.getProperty("SGE_TASK_LAST"));
+                    frontHost = p.getProperty("SGE_O_HOST");
                 }
+                
             } catch (IOException ioe) {
                     ioe.printStackTrace();
             }
             
             if (isTask) {
-                inst.doGridTask(task,numTasks,jobID);
+                inst.doGridTask(frontHost,task,numTasks,jobID);
             } else {
                 inst.doLocalTask();
             }
