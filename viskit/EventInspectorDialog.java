@@ -255,7 +255,10 @@ public class EventInspectorDialog extends JDialog
     nmSt.replace(' ','_');
     setTitle("Event -- " + nmSt); //node.getName());
     name.setText(nmSt); //node.getName());
+    Dimension d = comment.getPreferredSize();
     comment.setText(fillString(node.getComments()));
+    comment.setCaretPosition(0);
+    comment.setPreferredSize(d);
     transitions.setTransitions(node.getTransitions());
     arguments.setData(node.getArguments());
     localVariables.setData(node.getLocalVariables());
@@ -308,7 +311,7 @@ public class EventInspectorDialog extends JDialog
         // Build a temp one;
         EventNode evn = node.shallowCopy();   // temp copy
         unloadWidgets(evn);  // put our pending edits in place
-        
+
         // Parse the state transitions
         StringBuffer parseThis = new StringBuffer();
         for (Iterator itr = transitions.getTransitions().iterator(); itr.hasNext();) {
@@ -382,10 +385,11 @@ public class EventInspectorDialog extends JDialog
     public void actionPerformed(ActionEvent e)
     {
       StringBuffer sb = new StringBuffer(EventInspectorDialog.this.comment.getText().trim());
-      boolean modified = EventCommentDialog.showDialog(fr,EventInspectorDialog.this,sb);
-      if(modified) {
+      boolean modded = EventCommentDialog.showDialog(fr,EventInspectorDialog.this,sb);
+      if(modded) {
         EventInspectorDialog.this.comment.setText(sb.toString().trim());
         EventInspectorDialog.this.comment.setCaretPosition(0);
+        modified = true;
         okButt.setEnabled(true);
       }
     }
