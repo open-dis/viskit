@@ -288,7 +288,7 @@ public class VGlobals
     if (!handlePrimitive(name, typ)) {
         try {
           Object o = instantiateType(typ);
-          interpreter.set(name,VsimkitObjects.getFullName(typ));      // the 2nd param will be null if nogo and cause exc
+          interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
         }
         catch (Exception ex) {
           clearNamespace();
@@ -395,7 +395,7 @@ public class VGlobals
     }
     catch (EvalError evalError) {
       //assert false:"BeanShell eval error ";
-      System.err.println("BeanShell eval error");
+      System.err.println(bshErr);
       evalError.printStackTrace();
       return false;
     }

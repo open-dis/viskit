@@ -51,10 +51,16 @@ public class VsimkitObjects
     }
   }
 
-  public static Object getInstance(String nm) {return hashmap.get(nm);}
-  public static Object getFullName(String nm) {
+  public static Object getInstance(String nm)
+  {
+    return ((FullNameAndInstance)hashmap.get(nm)).instance;
+  }
+
+  public static Object getFullName(String nm)
+  {
     FullNameAndInstance fnai = (FullNameAndInstance)hashmap.get(nm);
-    if(fnai == null) return null;
+    if(fnai == null)
+      return null;
     return fnai.fullname;
   }
 
