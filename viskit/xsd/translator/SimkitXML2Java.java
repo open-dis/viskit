@@ -360,7 +360,7 @@ public class SimkitXML2Java {
 	pw.println(rp + sp + ob);
 	pw.println();
         
-        if (!this.root.getExtend().equals("SimEntityBase")) {
+        if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
             pList = this.root.getParameter();
             li = pList.listIterator();
             pw.print(sp8 + "super" + lp);
