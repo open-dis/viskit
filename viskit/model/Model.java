@@ -91,6 +91,10 @@ public class Model extends mvcAbstractModel implements ViskitModel
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
         return;
       }
+      stateVariables.removeAllElements();
+      simParameters.removeAllElements();
+      evNodeCache.clear();
+      edgeCache.clear();
       this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
     }
     else {
@@ -101,6 +105,10 @@ public class Model extends mvcAbstractModel implements ViskitModel
         // Unmarshaller does NOT validate by default
         jaxbRoot = (SimkitModule) u.unmarshal(f);
 
+        stateVariables.removeAllElements();
+        simParameters.removeAllElements();
+        evNodeCache.clear();
+        edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
 
         buildEventsFromJaxb(jaxbRoot.getEvent());
@@ -240,6 +248,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       StateVariable   sv = (StateVariable)st.getState();
       est.setStateVarName(sv.getName());
       est.setStateVarType(sv.getType());
+      est.setIndexingExpression((String)st.getIndex());     // todo remove cast when/if Rick updates
       est.setOperation(st.getOperation() != null);
       if(est.isOperation())
         est.setOperationOrAssignment(st.getOperation().getMethod());
@@ -545,6 +554,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
         StateTransition st =  oFactory.createStateTransition();
          StateVariable sv = findStateVariable(est.getStateVarName());
         st.setState(sv);
+        st.setIndex(est.getIndexingExpression());
+
         if(est.isOperation()) {
           Operation o = oFactory.createOperation();
           o.setMethod(est.getOperationOrAssignment());
@@ -555,6 +566,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
           a.setValue(est.getOperationOrAssignment());
           st.setAssignment(a);
         }
+
         est.opaqueModelObject = st; //replace
         targ.add(st);
       }

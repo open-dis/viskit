@@ -16,15 +16,31 @@ public class EventStateTransition extends ViskitElement
   private String operationOrAssignment="";
   private boolean isOperation=false;
   private ArrayList comments=new ArrayList();
+  private String indexingExpression="";
 
   public String toString()
   {
+    StringBuffer sb = new StringBuffer(stateVarName);
+    if(stateVarType.indexOf('[') != -1)
+      handleArrayIndexing(sb);
+
     if(isOperation)
-      return stateVarName + "." + operationOrAssignment;
+      sb.append('.');
     else
-      return stateVarName + "=" + operationOrAssignment;
+      sb.append('=');
+    sb.append(operationOrAssignment);
+    return sb.toString();
   }
-  
+
+  private void handleArrayIndexing(StringBuffer sb)
+  {
+    if(indexingExpression != null && indexingExpression.length() > 0) {
+      sb.append('[');
+      sb.append(indexingExpression);
+      sb.append(']');
+    }
+  }
+
   public ArrayList getComments()
   {
     return comments;
@@ -75,5 +91,13 @@ public class EventStateTransition extends ViskitElement
     this.stateVarType = stateVarType;
   }
 
+  public String getIndexingExpression()
+  {
+    return null;
+  }
 
+  public void setIndexingExpression(String idxExpr)
+  {
+    this.indexingExpression = idxExpr; 
+  }
 }
