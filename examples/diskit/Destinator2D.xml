@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="rickg" extend="SimEntityBase" name="Destinator2D" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="random" type="simkit.random.RandomVariate">
+        <Comment/>
+    </Parameter>
+    <Parameter name="Z_constant" type="float">
+        <Comment/>
+    </Parameter>
+    <Event name="ArrivePoint">
+        <Comment/>
+        <Schedule event="NewDestination"/>
+        <Coordinate x="85" y="55"/>
+    </Event>
+    <Event name="NewDestination">
+        <Comment/>
+        <LocalVariable name="randomDest" type="mil.navy.nps.math.Vec4f" value="new mil.navy.nps.math.Vec4f((float)random.generate(),(float)random.generate(),getZ_constant(),(float)Math.abs(Schedule.getSimTime()+(float)random.generate()))">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="locvar_0" type="boolean" value="true; System.out.println(&quot;NewDestination is &quot; + randomDest.get(0) + &quot; &quot; + randomDest.get(1) + &quot; &quot; + randomDest.get(2) + &quot; &quot; + randomDest.get(3))">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="UpdateDestination" priority="0">
+            <Comment/>
+            <EdgeParameter value="randomDest"/>
+        </Schedule>
+        <Coordinate x="232" y="70"/>
+    </Event>
+    <Event name="UpdateDestination">
+        <Comment/>
+        <Argument name="newDestination" type="mil.navy.nps.math.Vec4f"/>
+        <Coordinate x="195" y="207"/>
+    </Event>
+    <Event name="Run">
+        <Comment>set rv</Comment>
+        <Schedule event="NewDestination"/>
+        <Coordinate x="36" y="159"/>
+    </Event>
+</SimEntity>
+
