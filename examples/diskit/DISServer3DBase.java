@@ -68,12 +68,13 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
             // spaced demarkations and sleep, which should allow the following from
             // the reader thread.
             
-            System.out.println("Got EntityStatePdu from " + producer );
+            System.out.println("Got EntityStatePdu from " + producer + " at time " + (double)dt*millisecsToSimTime);
             System.out.println("ID: " + espdu.getEntityID());
             System.out.println("(x,y,z): ("+espdu.getEntityLocationX() + ", " + espdu.getEntityLocationY() + ", " + espdu.getEntityLocationZ() + ")" );
             System.out.println("(vx,vy,vz): ("+espdu.getEntityLinearVelocityX() + ", " + espdu.getEntityLinearVelocityY() + ", " + espdu.getEntityLinearVelocityZ() + ")" );
             
-            waitDelay("ESPDU_in",(double)dt*millisecsToSimTime,new Object[]{espdu},0.0);
+            //not really workable without a ping, or really needed.
+            //waitDelay("ESPDU_in",(double)dt*millisecsToSimTime,new Object[]{espdu},0.0);
             
         } else {
             System.out.println("Recieved unknown Pdu " + pdu + " from " + producer );
@@ -85,5 +86,9 @@ public class DISServer3DBase extends SimEntityBase implements BehaviorConsumerIF
         System.out.println("Also got some data: " + data );
     }
     
+    public void reset() {
+        time = (new java.util.Date()).getTime();
+        super.reset();
+    }
     
 }
