@@ -26,7 +26,7 @@
           
     <property description="Location of Viskit's dependencies" location="${basedir}/lib" name="dir.lib"/>
           
-    <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.3" name="dir.lib.xml"/>
+    <property description="Where all the JWSDP extensions are." location="${dir.lib}/jwsdp-1.4" name="dir.lib.xml"/>
           
     <property description="Location of class files resulting from operations of this build file." location="${dir.build}/classes" name="dir.build.classes"/>
           
@@ -40,8 +40,8 @@
               
     <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
 
-    <property name="javahelp"       location="${dir.src}/viskit/javahelp"           description="where the help source sits"/>
-    <property name="build.javahelp" location="${dir.build.classes}/viskit/javahelp" description="where the generated and copied help files go"/>
+    <property description="where the help source sits" location="${dir.src}/viskit/javahelp" name="javahelp"/>
+    <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
 
 <!--  === TARGET: help === -->
     <target name="help">
@@ -68,7 +68,7 @@
         <mkdir dir="${dir.src.simasm}"/>
     </target>
 
-  <target name="javahelp" depends="init" description="build the help search database">
+  <target depends="init" description="build the help search database" name="javahelp">
     <java classname="com.sun.java.help.search.Indexer">
       <arg value="-db"/>
       <arg value="${build.javahelp}/JavaHelpSearch"/>
@@ -101,6 +101,8 @@
                 <pathelement location="${dir.lib}/actions.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
                 <pathelement location="${dir.lib}/tools.jar"/>
+                <pathelement location="${dir.lib}/trang.jar"/>
+                <pathelement location="${dir.lib}/trangtask.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
                 <pathelement location="${dir.build.classes}"/>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
@@ -156,7 +158,7 @@
 
     <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
          <classpath>
-             <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+             <fileset dir="${dir.lib.xml}" excludes="dom.jar" includes="*.jar"/>
          </classpath>
     </taskdef>
     
@@ -218,4 +220,15 @@
             <include name="SimkitAssemblyXML2Java.java"/>
         </javac>
     </target>   
+    
+    <!-- TARGET: buildapp from Kirk Stork -->
+    <target depends="build.init, jar" description="Build a complete, double-clickable jar file with all dependencies included." name="buildapp">                                                               
+        <jar destfile="${dir.build}/viskitapp.jar">
+            <zipfileset src="${dir.build.lib}/viskit.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="viskit.Splash2"/>
+                <attribute name="Class-Path" value="../lib/actions.jar ../lib/jhall.jar ../lib/bsh-2.0b1.jar ../lib/jdom.jar ../lib/jgraph.jar ../lib/simkit.jar ../lib/tools.jar ../lib/jwsdp-1.4/jax-qname.jar ../lib/jwsdp-1.4/jaxb-api.jar ../lib/jwsdp-1.4/jaxb-impl.jar ../lib/jwsdp-1.4/jaxb-libs.jar ../lib/jwsdp-1.4/jaxp-api.jar ../lib/jwsdp-1.4/namespace.jar ../lib/jwsdp-1.4/relaxngDatatype.jar ../lib/jwsdp-1.4/xsdlib.jar"/>                                                                   
+            </manifest>                                                                     
+        </jar>
+    </target>
 </project>
