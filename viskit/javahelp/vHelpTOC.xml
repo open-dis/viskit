@@ -10,6 +10,7 @@
     <tocitem text="Event Graph Editor" target="eventgrapheditor"/>
     <tocitem text="Assembly Editor" target="assemblyeditor"/>
     <tocitem text="Tutorial" target="tutorial"/>
+    <tocitem text="Cluster" target="cluster" />
   </tocitem>
 </toc>
 
