@@ -1,7 +1,7 @@
 /*
- * DISMover3DSender.java
+ * DISMover3D.java
  *
- * Created on September 7, 2004, 1:07 PM
+ * Created on October 4, 2004, 3:07 PM
  */
 
 package examples.diskit;
@@ -98,7 +98,7 @@ public class DISSender3D extends SimEntityBase {
         for ( int i = 0; i < movers.size(); i++ ) {
             
             espdu = (EntityStatePdu) pdus.get(i);
-            mover = (DISMover3DBase) movers.get(i);
+            mover = (DISMover3D) movers.get(i);
             
             // math here : see http://web.nps.navy.mil/~brutzman/vrtp/demo/auv/AuvPduGenerator.java
             
