@@ -87,6 +87,8 @@ public class ConstructorPanel extends JPanel
 
     if(selectListener != null)
       selectButt.addActionListener(selectListener);
+
+    setSelected(false);
   }
   JPanel cont = new JPanel(new SpringLayout());
   void clampHeight(JComponent comp)
@@ -95,7 +97,13 @@ public class ConstructorPanel extends JPanel
     comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
     comp.setMinimumSize(new Dimension(Integer.MAX_VALUE,d.height));
   }
-
+  public void setSelected(boolean tf)
+  {
+    for(int i=0;i<field.length;i++) {
+      field[i].setEnabled(tf);
+      label[i].setEnabled(tf);
+    }
+  }
   public void setData(ArrayList arl)
   {
     for(int i=0;i<arl.size();i++) {

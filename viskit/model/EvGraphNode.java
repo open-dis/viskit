@@ -1,6 +1,7 @@
 package viskit.model;
 
 import viskit.xsd.bindings.Event;
+import viskit.xsd.bindings.assembly.SimEntity;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class EvGraphNode extends ViskitElement
   public void setName(String s)
   {
     if(this.opaqueModelObject != null)
-      ((Event)opaqueModelObject).setName(s);
+      ((SimEntity)opaqueModelObject).setName(s);
 
     this.name = s;
   }

@@ -76,10 +76,12 @@ public class InstantiationPanel extends JTabbedPane implements ActionListener,Ca
       if(i == idx) {
         setIconAt(i,checkMark);
         constructorPanels[i].setBorder(BorderFactory.createLineBorder(Color.red));
+        constructorPanels[i].setSelected(true);
       }
       else {
-       setIconAt(i,null);
+        setIconAt(i,null);
         constructorPanels[i].setBorder(null);
+        constructorPanels[i].setSelected(false);
       }
     }
     if(modifiedListener != null)

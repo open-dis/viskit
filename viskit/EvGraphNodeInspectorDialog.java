@@ -36,7 +36,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
   private Class myClass;
   private static EvGraphNodeInspectorDialog dialog;
   private static boolean modified = false;
-  private EvGraphNode pclNode;
+  private EvGraphNode egNode;
   private Component locationComp;
   private JButton okButt, canButt;
   private enableApplyButtonListener lis;
@@ -59,7 +59,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
   private EvGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv)
   {
     super(parent, "Property Change Listener", true);
-    this.pclNode = lv;
+    this.egNode = lv;
     this.locationComp = comp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
@@ -92,7 +92,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
     fillWidgets();     // put the data into the widgets
 
-    modified = (lv == null ? true : false);     // if it's a new pclNode, they can always accept defaults with no typing
+    modified = (lv == null ? true : false);     // if it's a new egNode, they can always accept defaults with no typing
     okButt.setEnabled((lv == null ? true : false));
 
     getRootPane().setDefaultButton(canButt);
@@ -107,7 +107,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
   public void setParams(Component c, EvGraphNode p)
   {
-    pclNode = p;
+    egNode = p;
     locationComp = c;
 
     fillWidgets();
@@ -122,18 +122,18 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
   private void fillWidgets()
   {
-    if (pclNode != null) {
+    if (egNode != null) {
 
       try {
-        myClass = Class.forName(pclNode.getType());
+        myClass = Class.forName(egNode.getType());
         Constructor[] cons = myClass.getConstructors();
       }
       catch (ClassNotFoundException e) {
         e.printStackTrace();
       }
 
-      handleField.setText(pclNode.getName());
-      typeField.setText(pclNode.getType());
+      handleField.setText(egNode.getName());
+      typeField.setText(egNode.getType());
 
       ip = new InstantiationPanel(myClass,lis);
       setupIP();
@@ -155,7 +155,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
       setContentPane(content);
     }
     else {
-      handleField.setText("pclNode name");
+      handleField.setText("egNode name");
       //commentField.setText("comments here");
     }
   }
@@ -164,9 +164,9 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     String nm = handleField.getText();
     nm = nm.replaceAll("\\s", "");
-    if (pclNode != null) {
-      pclNode.setName(nm);
-      pclNode.setConstructorArguments(ip.getData());
+    if (egNode != null) {
+      egNode.setName(nm);
+      egNode.setConstructorArguments(ip.getData());
     }
     else {
       newName = nm;
@@ -179,9 +179,9 @@ public class EvGraphNodeInspectorDialog extends JDialog
    */
   private void setupIP()
   {
-    //if (pclNode.getConstructorArguments().isEmpty())
+    //if (egNode.getConstructorArguments().isEmpty())
     //  return;           must handle zero-arg constructors
-    ArrayList ca = pclNode.getConstructorArguments();
+    ArrayList ca = egNode.getConstructorArguments();
 
     ip.setData(ca);
   }

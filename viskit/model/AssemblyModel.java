@@ -308,42 +308,62 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     coor.setX(""+pclNode.getPosition().x);
     coor.setY(""+pclNode.getPosition().y);
     jaxBPcl.setCoordinate(coor);
-    
+
+    List lis = jaxBPcl.getTerminalParameter();
+    lis.clear();;
+    for (Iterator itr = pclNode.getConstructorArguments().iterator(); itr.hasNext();) {
+      ConstructorArgument ca = (ConstructorArgument) itr.next();
+      TerminalParameter tp = null;
+      try {
+        tp = oFactory.createTerminalParameter();
+      }
+      catch (JAXBException e) {
+        e.printStackTrace();
+      }
+      tp.setType(ca.getType());
+      tp.setValue(ca.getValue());
+      lis.add(tp);
+    }
+
     modelDirty = true;
     this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
   }
 
-  public void changeEvGraphNode(EvGraphNode node)
+  public void changeEvGraphNode(EvGraphNode evNode)
   {
-    SimEntity jaxbSE = (SimEntity)node.opaqueModelObject;
+    SimEntity jaxbSE = (SimEntity)evNode.opaqueModelObject;
 
-    jaxbSE.setName(node.getName());
-
-
-
-
- //todo
-/*
-    Coordinate coor = null;
+    jaxbSE.setName(evNode.getName());
+    jaxbSE.setType(evNode.getType());
+    viskit.xsd.bindings.assembly.Coordinate coor = null;
     try {
       coor = oFactory.createCoordinate();
     } catch(JAXBException e) {
-      System.err.println("Exc Model.changeEvent()");
+      System.err.println("Exc AssemblyModel.changeEvGraphNode()");
+      return;
     }
-    coor.setX(""+node.getPosition().x);
-    coor.setY(""+node.getPosition().y);
-    jaxbSE.set
-    jaxbEv.setCoordinate(coor);
+    coor.setX(""+evNode.getPosition().x);
+    coor.setY(""+evNode.getPosition().y);
+    jaxbSE.setCoordinate(coor);
 
-    cloneComments(jaxbEv.getComment(),node.getComments());
-    cloneArguments(jaxbEv.getArgument(),node.getArguments());
-    cloneLocalVariables(jaxbEv.getLocalVariable(),node.getLocalVariables());
-    // following must follow above
-    cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
-*/
+    List lis = jaxbSE.getParameters();
+    lis.clear();;
+    for (Iterator itr = evNode.getConstructorArguments().iterator(); itr.hasNext();) {
+      ConstructorArgument ca = (ConstructorArgument) itr.next();
+      TerminalParameter tp = null;
+      try {
+        tp = oFactory.createTerminalParameter();
+      }
+      catch (JAXBException e) {
+        e.printStackTrace();
+      }
+      tp.setType(ca.getType());
+      tp.setValue(ca.getValue());
+      lis.add(tp);
+    }
 
     modelDirty = true;
-    this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
+    this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
   }
 
   public void newModel(File f)
