@@ -14,7 +14,6 @@ import viskit.model.EvGraphNode;
 import viskit.model.VInstantiator;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -75,6 +74,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     handleLab.setLabelFor(handleField);
     //outputLab = new JLabel("detailed output",JLabel.TRAILING);
     outputCheck = new JCheckBox("detailed output");
+    outputCheck.addActionListener(lis);
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
