@@ -9,11 +9,9 @@
         Advanced Simkit application.
 -->
 
-<!--<!DOCTYPE SimkitModule PUBLIC '-//NPS Simkit//DTD Web Application//EN' 'http://blueoak.com/home/rmgold/CVS/Simkit/simkit/xsd/translator/simkit.dtd'>
--->
 <SimkitModule
     name="ServerWithReneges"
-    version="0.1.3" >
+    version="0.1.4" >
 
     <Parameter name="numberServers" type="int" shortName="servers" />
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" shortName="service" />
@@ -65,7 +63,7 @@
     
     <Event name="StartService" >
         
-        <LocalVariable name="customer" type="java.lang.Integer" value="queue.first()" />
+        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" />
         
         <StateTransition state="queue" >
             <Operation method="removeFirst()" />
@@ -98,7 +96,7 @@
             <Assignment value="numberServed+1" />
         </StateTransition>
         
-        <Schedule event="StartService" condition="getNumberInQueue() > 0" priority="1.0" />
+        <Schedule event="StartService" condition="queue.size() > 0" priority="1.0" />
         
     </Event>
     
