@@ -115,7 +115,16 @@ public class vGraphModel extends DefaultGraphModel
 
   public void deleteAll()
   {
-    remove(getRoots(this));
+    //remove(getRoots(this));
+    Object[] roots = getRoots(this);
+    for(int i=0;i<roots.length;i++) {
+      if( roots[i] instanceof CircleCell) {
+        Object[] child = new Object[1];
+        child[0] = ((CircleCell)roots[i]).getFirstChild();
+        remove(child);
+      }
+    }
+    remove(roots);
   }
 
   public void deleteEdge(SchedulingEdge edge)
@@ -145,7 +154,8 @@ public class vGraphModel extends DefaultGraphModel
     attributes.put(c,createBounds(en.getPosition().x, en.getPosition().y,Color.black));
     //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
     
-    c.add(new DefaultPort(en.getName()+"/Center"));
+    //c.add(new DefaultPort(en.getName()+"/Center"));
+    c.add(new vPortCell(en.getName()+"/Center"));
     this.insert(new Object[]{c},attributes,null,null,null);
   }
   public void addEdge(SchedulingEdge se)
