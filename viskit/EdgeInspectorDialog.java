@@ -32,12 +32,12 @@ import java.util.Vector;
 public class EdgeInspectorDialog extends JDialog
 {
   private static EdgeInspectorDialog dialog;
-  private Component locationComp;
-  private Edge edge,xedgeCopy;
+  private Edge edge;
   private static boolean modified = false;
-  private JButton canButt,okButt,reverse;
+  private JButton canButt,okButt;
   private JRadioButton schrb,canrb;
   private ButtonGroup bGroup;
+  private Component locationComp;
   private JLabel srcEvent,targEvent;
   private JTextField delay;
   private EdgeParametersPanel parameters;
@@ -77,7 +77,6 @@ public class EdgeInspectorDialog extends JDialog
     super(frame, "Edge Inspector", true);
     myFrame = frame;
     this.edge = edge;
-    //this.edgeCopy = (Edge)edge; //.copyShallow();                   // todo jmb comfirm
 
     this.locationComp = locationComp;
 
@@ -279,7 +278,6 @@ public class EdgeInspectorDialog extends JDialog
   public void setParams(Component c, Edge e)
   {
     edge = e;
-    //edgeCopy = (Edge)e; //.copyShallow();       // todo jmb confirm
     locationComp = c;
 
     fillWidgets();

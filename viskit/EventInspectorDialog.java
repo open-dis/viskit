@@ -30,14 +30,12 @@ public class EventInspectorDialog extends JDialog
   private Component locationComponent;
   private EventNode node;
   private static boolean modified = false;
-  private JButton canButt, okButt, testButt;
-  private JTextField name, delay;
-  private JList parameters;
+  private JButton canButt, okButt;
+  private JTextField name;
   private TransitionsPanel transitions;
   private ArgumentsPanel arguments;
   private LocalVariablesPanel localVariables;
   private JFrame fr;
-  private JButton lvPlus, lvMinus;
   private myChangeActionListener myChangeListener;
   /**
    * Set up and show the dialog.  The first Component argument
@@ -226,14 +224,13 @@ public class EventInspectorDialog extends JDialog
     getRootPane().setDefaultButton(canButt);
   }
 
-  private void unloadWidgets()
+  private void unloadWidgets(EventNode en)
   {
     if (modified) {
-      String nuts = name.getText();
-      node.setName(name.getText());
-      node.setTransitions(transitions.getTransitions());
-      node.setArguments(arguments.getData());
-      node.setLocalVariables(new Vector(localVariables.getData()));
+      en.setName(name.getText());
+      en.setTransitions(transitions.getTransitions());
+      en.setArguments(arguments.getData());
+      en.setLocalVariables(new Vector(localVariables.getData()));
     }
   }
 
@@ -260,7 +257,13 @@ public class EventInspectorDialog extends JDialog
           parseThis.append(((EventStateTransition) itr.next()).toString());
           parseThis.append(";");
         }
-        String parseResults = VGlobals.instance().parseCode(node, parseThis.toString().trim());
+        // Our node object hasn't been updated yet (see unloadWidgets) and won't if
+        // we cancel out below.  But to do the beanshell parse test, a node needs to be supplied
+        // so the context can be set up properly.
+        // Build a temp one;
+        EventNode evn = node.shallowCopy();
+        unloadWidgets(evn);  // put our pending edits in place
+        String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
         if (parseResults != null) {
           int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
               "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -268,7 +271,7 @@ public class EventInspectorDialog extends JDialog
             return;
         }
 
-        unloadWidgets();
+        unloadWidgets(node);
       }
       setVisible(false);
     }

@@ -1,9 +1,6 @@
 package viskit;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import viskit.model.Edge;
-import viskit.model.vParameter;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -11,9 +8,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -25,8 +19,8 @@ import java.util.Iterator;
  * Time: 11:53:36 AM
  */
 
-public class ConditionalsPanel extends JPanel implements ActionListener
-/*********************************************************************/
+public class ConditionalsPanel extends JPanel
+/*******************************************/
 {
   JTextArea jta,jtaComments;
   Edge edge;
@@ -68,17 +62,6 @@ public class ConditionalsPanel extends JPanel implements ActionListener
 
     add(Box.createVerticalStrut(5));
 
-/*
-    JPanel buttPan = new JPanel();
-    buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
-    buttPan.add(Box.createHorizontalGlue());
-    JButton testButt = new JButton("test expression");
-    buttPan.add(testButt);
-    buttPan.add(Box.createHorizontalGlue());
-    add(buttPan);
-    add(Box.createVerticalStrut(5));
-*/
-
      jtaComments = new JTextArea(2,25);
      jsp = new JScrollPane(jtaComments);
      jsp.setBorder(BorderFactory.createTitledBorder("Comments"));
@@ -93,8 +76,6 @@ public class ConditionalsPanel extends JPanel implements ActionListener
     d.width = Integer.MAX_VALUE;
     setMinimumSize(d);
     setMaximumSize(d);
-    //testButt.addActionListener(this);
-
 
     jtaComments.addCaretListener(new CaretListener()
     {
@@ -114,34 +95,6 @@ public class ConditionalsPanel extends JPanel implements ActionListener
         }
       }
     });
-  }
-
-  public void actionPerformed(ActionEvent event)
-  //--------------------------------------------
-  {
-    try {
-      Interpreter interpreter = new Interpreter();
-      interpreter.setStrictJava(true);       // no loose typeing
-
-      // set globals;
-      for (Iterator itr = edge.parameters.iterator(); itr.hasNext();) {
-        vParameter ep = (vParameter) itr.next();
-        interpreter.set(ep.getName(), ep.getType());
-      }
- System.out.println(jta.getText());
-      String noCRs = jta.getText().replace('\n',' ');
-      noCRs = "if("+noCRs+")System.out.println();";
- System.out.println(noCRs);
-      Object o = interpreter.eval(noCRs);
-      //interpreter.eval("if(" + noCRs + ")System.out.println(\"ok\")");
-    }
-
-    catch (EvalError evalError) {
-      String s = ""; //"Error in line " + evalError.getErrorLineNumber() + ":  ";
-      //s += evalError.getErrorText() + "\n";
-      s += evalError.getMessage();
-      JOptionPane.showMessageDialog(ConditionalsPanel.this, s, "Java Error", JOptionPane.ERROR_MESSAGE);
-    }
   }
 
   public void setText(String s)
