@@ -258,7 +258,7 @@ public class TransitionsPanel extends JPanel
       if (lis.getModel().getSize() <= 0) {
         minusButt.setEnabled(false);
       }
-      lis.setVisibleRowCount(model.getSize());
+      lis.setVisibleRowCount(Math.max(3,model.getSize()));
       TransitionsPanel.this.invalidate();
 
       if (myMinusListener != null)
