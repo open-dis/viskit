@@ -302,8 +302,16 @@ public class EventTransitionDialog extends JDialog
       Dimension d = actionLab.getPreferredSize();
       if(assTo.isSelected())
         actionLab.setText("=");
-      else
-        actionLab.setText(".");
+      else {
+        String ty = ((vStateVariable)stateVarsCB.getSelectedItem()).getType();
+        if(VGlobals.instance().isPrimitive(ty)) {
+          JOptionPane.showMessageDialog(EventTransitionDialog.this,"A method may not be invoked on a primitive type.",
+                                        "Java Language Error",JOptionPane.ERROR_MESSAGE);
+          assTo.setSelected(true);
+        }
+        else
+          actionLab.setText(".");
+      }
       actionLab.setPreferredSize(d);
     }
   }
