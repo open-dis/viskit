@@ -2,6 +2,7 @@ package viskit;
 
 import viskit.model.EventStateTransition;
 import viskit.model.vStateVariable;
+import viskit.model.ViskitModel;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -39,12 +40,13 @@ public class EventTransitionDialog extends JDialog
   private JButton okButt, canButt;
   private JButton newSVButt;
   private JLabel actionLab;
+  private JPanel indexPanel;
 
   public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
   public static boolean newIsOperation;
 
-  private JFrame parentFrame;
-  public static boolean showDialog(JFrame f, Component comp, EventStateTransition parm)
+  private EventGraphViewFrame parentFrame;
+  public static boolean showDialog(EventGraphViewFrame f, Component comp, EventStateTransition parm)
   {
     if(dialog == null)
       dialog = new EventTransitionDialog(f,comp,parm);
@@ -56,7 +58,7 @@ public class EventTransitionDialog extends JDialog
     return modified;
   }
 
-  private EventTransitionDialog(JFrame parent, Component comp, EventStateTransition param)
+  private EventTransitionDialog(EventGraphViewFrame parent, Component comp, EventStateTransition param)
   {
     super(parent, "State Transition", true);
     this.param = param;
@@ -105,7 +107,7 @@ public class EventTransitionDialog extends JDialog
           arrayIndexField    = new JTextField(25);   setMaxHeight(arrayIndexField);
 
         fieldsPanel.add(new OneLinePanel(nameLab,w,stateVarsCB,newSVButt));
-        fieldsPanel.add(new OneLinePanel(arrayIdxLab,w,arrayIndexField));
+        fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab,w,arrayIndexField));
         fieldsPanel.add(new OneLinePanel(null,w,assTo));
         fieldsPanel.add(new OneLinePanel(null,w,opOn));
         fieldsPanel.add(new OneLinePanel(actionLab,w,actionField));
@@ -153,8 +155,10 @@ public class EventTransitionDialog extends JDialog
         vStateVariable sv = (vStateVariable)cb.getSelectedItem();
         commentField.setText(sv.getComment());
         okButt.setEnabled(true);
-        arrayIndexField.setEditable(sv.getType().indexOf('[') != -1);
+        arrayIndexField.setEditable(false); //sv.getType().indexOf('[') != -1);
+        indexPanel.setVisible(sv.getType().indexOf('[')!= -1);
         modified=true;
+        pack();
       }
     });
     newSVButt.addActionListener(new ActionListener()
@@ -222,7 +226,11 @@ public class EventTransitionDialog extends JDialog
     if(param != null) {
       //nameField.setText(param.getStateVarName());//getName());
       actionField.setText(param.getOperationOrAssignment());
-      arrayIndexField.setText(param.getIndexingExpression());
+      String ie = param.getIndexingExpression();
+      if(ie == null || ie.equals(""))
+        arrayIndexField.setText(((ViskitModel)parentFrame.getModel()).generateLocalVariableName());
+      else
+        arrayIndexField.setText(param.getIndexingExpression());
       opOn.setSelected(param.isOperation());
       assTo.setSelected(!param.isOperation());
 
@@ -232,16 +240,19 @@ public class EventTransitionDialog extends JDialog
       else
         commentField.setText("");
       vStateVariable vsv = (vStateVariable)stateVarsCB.getSelectedItem();
-      arrayIndexField.setEditable(vsv.getType().indexOf('[') != -1);
+      arrayIndexField.setEditable(false); //vsv.getType().indexOf('[') != -1);
     }
     else {
       //nameField.setText("");
       actionField.setText("");
-      arrayIndexField.setText("");
+      arrayIndexField.setText( ((ViskitModel)parentFrame.getModel()).generateLocalVariableName());
+      arrayIndexField.setEditable(false);
       stateVarsCB.setSelectedIndex(0);
       commentField.setText("");
       assTo.setSelected(true);
     }
+    indexPanel.setVisible(((vStateVariable)stateVarsCB.getItemAt(0)).getType().indexOf('[')!= -1);
+    pack();
   }
 
   private void setVarNameComboBox(EventStateTransition est)
