@@ -30,6 +30,7 @@ public abstract class ViskitTablePanel extends JPanel
 /***************************************************/
 {
   protected JTable tab;
+  private JScrollPane jsp;
   private JButton plusButt, minusButt, edButt;
   private ThisTableModel mod;
 
@@ -85,8 +86,9 @@ public abstract class ViskitTablePanel extends JPanel
      int rowHeight = tab.getRowHeight();
      int defaultHeight = rowHeight * (defaultNumRows+1);
 
-     tab.setPreferredScrollableViewportSize(new Dimension(defaultWidth, rowHeight*2));
-     JScrollPane jsp = new JScrollPane(tab);
+     tab.setPreferredScrollableViewportSize(new Dimension(defaultWidth, rowHeight*3));
+     tab.setMinimumSize(new Dimension(20,rowHeight*2));
+     jsp = new JScrollPane(tab);
      jsp.setMinimumSize(new Dimension(defaultWidth,defaultHeight));       // jmb test
     add(jsp);
     add(Box.createVerticalStrut(5));
@@ -206,6 +208,10 @@ public abstract class ViskitTablePanel extends JPanel
     mod.addRow(rowData);
 
     adjustColumnWidths();
+
+    // This doesn't work perfectly on the Mac
+    JScrollBar vsb = jsp.getVerticalScrollBar();
+    vsb.setValue(vsb.getMaximum());
   }
 
   /**
