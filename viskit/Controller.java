@@ -70,6 +70,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     editGraphMetaData();
 
     newNode(new Point(30,30),"Run");   // always start with a run event
+    ((ViskitModel)getModel()).setDirty(false); // we're not really dirty yet
   }
 
 /**
@@ -124,10 +125,20 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void saveAs()
   //------------------
   {
-    lastFile = ((ViskitView)getView()).saveFileAsk(((ViskitModel)getModel()).getMetaData().name+".xml",false);
+    ViskitModel mod = (ViskitModel)getModel();
+    ViskitView view = (ViskitView)getView();
+    GraphMetaData gmd = mod.getMetaData();
+
+    lastFile = view.saveFileAsk(gmd.name+".xml",false);
     if(lastFile != null) {
-      ((ViskitModel)getModel()).saveModel(lastFile);
-      ((ViskitView)getView()).fileName(lastFile.getName());
+      String n = lastFile.getName();
+      if(n.endsWith(".xml") || n.endsWith(".XML"))
+        n = n.substring(0,n.length()-4);
+      gmd.name = n;
+      mod.changeMetaData(gmd); // might have renamed
+
+      mod.saveModel(lastFile);
+      view.fileName(lastFile.getName());
     }
   }
 
