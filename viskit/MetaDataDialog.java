@@ -57,6 +57,7 @@ abstract public class MetaDataDialog extends JDialog
     c.setLayout(new BoxLayout(c,BoxLayout.Y_AXIS));
 
     JPanel textFieldPanel = new JPanel(new SpringLayout());
+    textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     JLabel nmLab = new JLabel("name",JLabel.TRAILING);
     nameTf = new JTextField(20);
@@ -91,7 +92,7 @@ abstract public class MetaDataDialog extends JDialog
     //Lay out the panel.
     SpringUtilities.makeCompactGrid(textFieldPanel,
                                     5, 2, //rows, cols
-                                    6, 6,        //initX, initY
+                                    0, 0,        //initX, initY
                                     6, 6);       //xPad, yPad
 
     Dimension d = textFieldPanel.getPreferredSize();
@@ -117,27 +118,37 @@ abstract public class MetaDataDialog extends JDialog
                                       2,2, 6,6, 6,6 );
       d = runtimePanel.getPreferredSize();
       runtimePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
+      runtimePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
     c.add(runtimePanel);
+
+    JLabel comLab = new JLabel("Comment");
+    comLab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    c.add(comLab);
+    c.add(Box.createVerticalStrut(5));
 
     commentTa = new JTextArea(6,40);
     commentTa.setWrapStyleWord(true);
     commentTa.setLineWrap(true);
-    commentTa.setBorder(authorTf.getBorder());
+    commentTa.setBorder(BorderFactory.createEmptyBorder());
     JScrollPane csp = new JScrollPane(commentTa);
-    csp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5,5,5,5),
-                  "Comment"));
+    csp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    csp.setBorder(authorTf.getBorder());
+
     c.add(csp);
+
+    c.add(Box.createVerticalStrut(5));
 
     JPanel buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    buttPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
     canButt = new JButton("Cancel");
     okButt = new JButton("Apply changes");
     buttPan.add(Box.createHorizontalGlue());
     buttPan.add(canButt);
     buttPan.add(okButt);
-    buttPan.add(Box.createHorizontalStrut(5));
     c.add(buttPan);
-    c.add(Box.createVerticalStrut(5));
     fillWidgets();
 
     pack();     // do this prior to next
