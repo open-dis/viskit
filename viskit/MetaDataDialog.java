@@ -51,7 +51,9 @@ abstract public class MetaDataDialog extends JDialog
     this.addWindowListener(new myCloseListener());
 
     //Create and populate the panel.
-    Container c = getContentPane();
+    JPanel c = new JPanel();
+    setContentPane(c);
+    c.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     c.setLayout(new BoxLayout(c,BoxLayout.Y_AXIS));
 
     JPanel textFieldPanel = new JPanel(new SpringLayout());
