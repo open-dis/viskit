@@ -15,7 +15,7 @@
             <Comment>used internally</Comment>
         </LocalVariable>
         <StateTransition index="_idxvar_0" state="numberAvailableServers">
-            <Assignment value="totalNumberServers[j]"/>
+            <Assignment value="totalNumberServers[_idxvar_0]"/>
         </StateTransition>
         <StateTransition index="_idxvar_1" state="numberInQueue">
             <Assignment value="0"/>
