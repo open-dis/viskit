@@ -326,14 +326,20 @@ public class EventInspectorDialog extends JDialog
             addPotentialLocalIndexVariable(evn,est.getIndexingExpression());
         }
 
-        String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
-        if (parseResults != null) {
-          int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
-              "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-          if (ret != JOptionPane.YES_OPTION)
-            return;
+        if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+          String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
+          if (parseResults != null) {
+            boolean ret = BeanshellErrorDialog.showDialog(parseResults,EventInspectorDialog.this);
+            if(ret == false) // don't ignore
+              return;
+/*
+            int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (ret != JOptionPane.YES_OPTION)
+              return;
+*/
+          }
         }
-
         unloadWidgets(node);
       }
       setVisible(false);

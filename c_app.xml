@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- values in this file are retrieved by keys such as 'app.beanshell.warning' -->
+<!-- the root element name is ignored when assembling keys -->
+<ViskitConfig>
+  <app>
+    <beanshell>
+      <warning>true</warning>
+    </beanshell>
+  </app>
+</ViskitConfig>

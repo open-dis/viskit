@@ -336,17 +336,19 @@ public class StateVariableDialog extends ViskitSmallDialog
           String s = typ + " " + nam + " = new " + typ;
           s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
-          String result = VGlobals.instance().parseCode(null, s);
-          if (result != null) {
-            //JOptionPane.showMessageDialog(StateVariableDialog.this, result,
-            //    "Data entry error", JOptionPane.ERROR_MESSAGE);
-            //return;
-
-
-            int ret = JOptionPane.showConfirmDialog(StateVariableDialog.this, "Java language error:\n" + result + "\nIgnore and continue?",
-                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (ret != JOptionPane.YES_OPTION)
-              return;
+          if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+            String result = VGlobals.instance().parseCode(null, s);
+            if (result != null) {
+              boolean ret = BeanshellErrorDialog.showDialog(result,StateVariableDialog.this);
+              if(ret == false) // don't ignore
+                return;
+/*
+              int ret = JOptionPane.showConfirmDialog(StateVariableDialog.this, "Java language error:\n" + result + "\nIgnore and continue?",
+                  "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+              if (ret != JOptionPane.YES_OPTION)
+                return;
+*/
+            }
           }
         }
         // ok, we passed

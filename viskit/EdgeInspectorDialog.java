@@ -399,13 +399,18 @@ public class EdgeInspectorDialog extends JDialog
         sb.append("if(");
         sb.append(conditionals.getText());
         sb.append("){;}");
-        
-        String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionals.getText()+post);
-        if(parseResults != null) {
-          int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
-                                        "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-          if(ret != JOptionPane.YES_OPTION)
-            return;
+
+        if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+          String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionals.getText()+post);
+          if(parseResults != null) {
+            boolean ret = BeanshellErrorDialog.showDialog(parseResults,EdgeInspectorDialog.this);
+            if(ret == false) // don't ignore
+              return;
+ /*           int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
+                                          "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+            if(ret != JOptionPane.YES_OPTION)
+              return;
+*/          }
         }
         unloadWidgets();
       }
