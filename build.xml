@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Viskit"
+         basedir="."
+         default="help" >
+	<description>
+         Ant build file for the NPS Viskit and associated libraries. Third
+         party jar files are not compiled from source here, but they are copied as
+         necessary for the simkit distribution.  This buildfile was created and tested
+         using Ant version 1.5.1
+        </description>
+	
+<!-- magic properties, do not change or delete -->
+
+	<property name="build.compiler" value="modern"/>
+	
+<!-- CVS properties (this file) -->
+	<property name="CVSId"
+              value="$Id$" />
+
+<!-- Project directories             -->
+
+	<property name="dir.src"
+	          location="."
+	          description="Root of the Viskit source tree." />
+	
+	<property name="dir.build"
+	          location="${basedir}/build"
+	          description="Root of the Viskit binary tree." />
+	          
+	<property name="dir.build.lib"
+	          location="${dir.build}/lib"
+	          description="Directory for built and copied jar files that will wind up in dir.dist." />
+	          
+	<property name="dir.dist"
+	          location="${basedir}/dist"
+	          description="Where the distribution files wind up." />
+	          
+	<property name="dir.lib"
+	          location="${basedir}/lib"
+	          description="Location of Viskit's dependencies" />
+	          
+	<property name="dir.lib.xml"
+	          location="${dir.lib}/jwsdp-1.3"
+	          description="Where all the JWSDP extensions are." />
+	          
+	<property name="dir.build.classes"
+	          location="${dir.build}/classes"
+	          description="Location of class files resulting from operations of this build file." />
+	          
+	<property name="dir.build.doc"
+	          location="${dir.build}/doc"
+	          description="Root of the javadoc tree for Viskit." />
+                  
+        <property name="dir.src.simtran"
+                  location="${dir.src}/simkit/xsd/bindings"
+                  description="Generated JAXB bindings for Simtran" />
+                  
+        <property name="dir.src.simasm"
+                  location="${dir.src}/simkit/xsd/bindings/assembly"
+                  description="Generated JAXB bindings for Simasm" />
+                  
+        <property name="dir.src.simasm.util"
+                  location="${dir.src}/simkit/xsd/assembly"
+                  description="Simasm utility" />
+                  
+        <property name="dir.src.simtran.util"
+                  location="${dir.src}/simkit/xsd/translator"
+                  description="Simtran utility" />             
+
+<!--  === TARGET: help === -->
+	<target name="help">
+		<echo message="This is the Ant build file for the NPS Viskit and associated libraries. Third-party jar files are not compiled from source here, but they are copied as necessary for the simkit distribution.  This buildfile was created and tested using Ant version 1.5.1. Modified from Simkit's build.xml" />
+    </target>
+
+<!--  === TARGET: init === -->
+	<target name="init"
+	        description="Preparatory actions required for all targets.">
+	    <tstamp />
+		<echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
+		<echo message="Buildfile version ${CVSId}"/>
+		<echo message="Base directory: ${basedir}" />
+		<echo message="Source directory: ${dir.src}" />
+		<echo message="Build directory: ${dir.build}" />
+	</target>
+	
+<!--  === TARGET: build.init === -->
+	<target name="build.init"
+	        depends="init"
+	        description="Preparatory actions for compilation and documentation targets">
+		<mkdir dir="${dir.build}" />
+		<mkdir dir="${dir.build.lib}" />
+		<mkdir dir="${dir.build.classes}" />
+                <mkdir dir="${dir.build.doc}" />
+                <mkdir dir="${dir.src.simtran}" />
+                <mkdir dir="${dir.src.simasm}" />
+	</target>
+	
+<!--  === TARGET: clean === -->
+    <target name="clean"
+            depends="init"
+            description="Deletes build directory, javadoc directory and dist directory" >
+        <delete dir="${dir.src.simtran}" />
+        <delete dir="${dir.src.simasm}" />
+        <delete dir="${dir.build}" />
+        <delete dir="${dir.dist}" />
+    </target>
+
+<!--  === TARGET: compile === -->
+  
+    <target name="compile"
+               depends="compile.simxml.util">
+        <javac destdir="${dir.build.classes}"
+               excludes="xsd/**">
+        	<classpath>
+        		<pathelement location="${dir.lib}/bsh-2.0b1.jar" />
+        		<pathelement location="${dir.lib}/jdom.jar" />
+        		<pathelement location="${dir.lib}/jgraph.jar" />
+        		<pathelement location="${dir.lib}/actions.jar" />
+        		<pathelement location="${dir.build.classes}" />
+        		<fileset dir="${dir.lib.xml}" includes="*.jar" />
+        	</classpath>
+        	<src path="${dir.src}/simkit/viskit/"/>
+        </javac>
+	</target>
+<!--  === TARGET: jar === -->
+    <target name="jar"
+            depends="compile" >
+        <jar basedir="${dir.build.classes}"
+             compress="false"
+             excludes="*/test/*"
+             jarfile="${dir.build.lib}/viskit.jar"/>
+    </target>
+
+<!--  === TARGET: doc === -->
+    <target name="doc"
+            depends="build.init"
+            description="Create the javadoc for Viskit." >
+        
+        <javadoc access="private"
+                 author="true"
+                 destdir="${dir.build.doc}"
+                 excludepackagenames="*.test.*"
+                 sourcepath="${dir.src}"
+                 version="true">
+        	<classpath>
+        		<pathelement location="${dir.lib}/bsh-2.0b1.jar" />
+        		<pathelement location="${dir.lib}/jdom.jar" />
+        		<pathelement location="${dir.lib}/jgraph.jar" />
+        		<fileset dir="${dir.lib.xml}" includes="*.jar" />
+        	</classpath>
+            
+            <package name="simkit.viskit" />
+            <package name="simkit.xsd" />
+        </javadoc>
+    </target>
+    
+<!-- === TARGET: dist === -->
+
+	<target name="dist"
+	        depends="jar, doc">
+	    <mkdir dir="${dir.dist}" />
+	    <mkdir dir="${dir.dist}/doc" />
+		<copy todir="${dir.dist}">
+			<fileset dir="${dir.build.lib}" />
+		</copy>
+		<copy todir="${dir.dist}/doc">
+			<fileset dir="${dir.build.doc}" />
+		</copy>
+	</target>
+	
+        <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask" >
+             <classpath>
+                 <fileset dir="${dir.lib.xml}" includes="*.jar" />
+             </classpath>
+        </taskdef>
+        
+        <taskdef name="trang" classname="net.amadan.trang.ant.TrangTask" >
+             <classpath>
+                 <fileset dir="${dir.lib}" includes="trang*.jar" />
+             </classpath>
+        </taskdef>       
+        <target name="bindings.simkit"
+                depends="build.schema"
+                description="Create bindings to the simkit XML Schema" >
+            
+            <xjc target="${dir.src}"
+                package="simkit.xsd.bindings"
+                schema="${dir.src.simtran.util}/simkit.xsd" />
+              
+            <xjc target="${dir.src}"
+                extension="true"
+                package="simkit.xsd.bindings.assembly"
+                schema="${dir.src.simasm.util}/assembly.xsd" />
+        </target>
+        
+        <target name="build.schema"
+                depends="build.init"
+                description="Create xsd Schemas from dtd" >
+
+            <trang
+                failonerror="true"
+                input="${dir.src.simtran.util}/simkit.dtd"
+                output="${dir.src.simtran.util}/simkit.xsd"
+                schemaIn="dtd"
+                schemaOut="xsd" />
+                
+            <trang
+                failonerror="true"
+                input="${dir.src.simasm.util}/assembly.dtd"
+                output="${dir.src.simasm.util}/assembly.xsd"
+                schemaIn="dtd"
+                schemaOut="xsd" />
+        </target>
+        
+        <target name="compile.bindings"
+                depends="bindings.simkit"
+                description="Build bindings to Schemas" >
+            <javac destdir="${dir.build.classes}" >
+        	<classpath>
+        		<fileset dir="${dir.lib.xml}" includes="*.jar" />
+        	</classpath>
+                <src path="${dir.src.simtran}"/>
+            </javac>
+            <copy todir="${dir.build.classes}/simkit/xsd/bindings" >
+                <fileset dir="${dir.src}/simkit/xsd/bindings" includes="jaxb.properties" />
+                <fileset dir="${dir.src}/simkit/xsd/bindings" includes="bgm.ser" />
+            </copy>
+            <javac destdir="${dir.build.classes}" >
+        	<classpath>
+        		<fileset dir="${dir.lib.xml}" includes="*.jar" />
+        	</classpath>
+        	<src path="${dir.src.simasm}"/>
+            </javac>    
+            <copy todir="${dir.build.classes}/simkit/xsd/bindings/assembly" >
+                <fileset dir="${dir.src}/simkit/xsd/bindings/assembly" includes="jaxb.properties" />
+                <fileset dir="${dir.src}/simkit/xsd/bindings/assembly" includes="bgm.ser" />
+            </copy>
+            
+        </target>
+        
+        <target name="compile.simxml.util"
+                depends="compile.bindings"
+                description="Build xml2java utils" >
+            <javac destdir="${dir.build.classes}" >
+                <classpath>
+                    <fileset dir="${dir.build.classes}" />
+        	    <pathelement location="${dir.lib.xml}/jaxb-api.jar" />
+                </classpath>
+                <src path="${dir.src.simtran.util}" />
+            </javac>    
+            <javac destdir="${dir.build.classes}" >
+                <classpath>
+                    <fileset dir="${dir.build.classes}" />
+        	    <pathelement location="${dir.lib.xml}/jaxb-api.jar" />
+                </classpath>
+                <src path="${dir.src.simasm.util}" />
+                <include name="SimkitAssemblyXML2Java.java"/>
+            </javac>
+        </target>   
+</project>
