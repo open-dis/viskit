@@ -45,12 +45,19 @@ public class ConstructorPanel extends JPanel
 
   public void setData(List args) // of VInstantiators
   {
-    //field = new JTextField[args.size()];
-    //label = new JLabel[args.size()];
+    this.removeAll();
+    add(Box.createVerticalGlue());
+    
     olp = new ObjListPanel(modLis); // may have to intercept
     olp.setData(args,true);
-    this.removeAll();
-    add(olp);
+    if(args.size() > 0) {
+      add(olp);
+    }
+    else {
+      JLabel lab = new JLabel("zero argument constructor");
+      lab.setAlignmentX(Box.CENTER_ALIGNMENT);
+      add(lab);
+    }
     if(showButt) {
       add(Box.createVerticalStrut(5));
       add(Box.createVerticalGlue());
@@ -63,8 +70,10 @@ public class ConstructorPanel extends JPanel
 
       setSelected(false);
     }
-    else
+    else {
+      add(Box.createVerticalGlue());
       setSelected(true);
+    }
   }
 /*
   public ConstructorPanel(Constructor construct, ActionListener selectListener, CaretListener modifiedListener)
