@@ -397,7 +397,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       // Find and Remember Port
       port = getSourcePortAt(e.getPoint());
       // If Port Found and in ConnectMode (=Ports Visible)
-      if (port != null && vGraphComponent.this.isPortsVisible())
+      if (port != null && vGraphComponent.this.isPortsVisible() && e.getClickCount()!=2)      //jmb  added to edit when in edge mode
         return true;
       // Else Call Superclass
       return super.isForceMarqueeEvent(e);
