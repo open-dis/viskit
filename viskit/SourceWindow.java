@@ -20,6 +20,8 @@ public class SourceWindow extends JFrame
   JFrame main;
   final String src;
 
+  Thread sysOutThread;
+
   public SourceWindow(JFrame main, String source)
   {
     this.main = main;
@@ -30,7 +32,7 @@ public class SourceWindow extends JFrame
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
 
     JTextArea jta = new JTextArea(src);
-jta.setEditable(false);
+    jta.setEditable(false);
     jta.setFont(new Font("Monospaced",Font.PLAIN,12));
     JScrollPane jsp = new JScrollPane(jta);
     con.add(jsp);
@@ -78,38 +80,41 @@ jta.setEditable(false);
          try {pos.connect(pis);}catch (IOException e1) {JOptionPane.showMessageDialog(null,"bad pos.connect!");}
          br = new BufferedReader(new InputStreamReader(pis));
 
-        new Thread(new Runnable() {
-          public void run()
-          {
-            try {
-              while(true) {
-                sb.append(br.readLine());
-                sb.append(nl);
-              }
-            }
-            catch (IOException e1) {
+         sysOutThread = new Thread(new Runnable() {
+           public void run()
+           {
+             try {
+               String ln;
+               while((ln = br.readLine()) != null)
+               {
+                 sb.append(ln);
+                 sb.append(nl);
+               }
+             }
+             catch (IOException e1) {
               // normal termination
-            }
+             }
+             try {br.close();}catch (IOException e1) {}
+             sysOutThread = null;
           }
-        }).start();
+        });
+
+        sysOutThread.start();
 
         System.setOut(newSysOut);
         System.setErr(newSysOut);
 
         AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
         
-        System.out.flush();
-
+        newSysOut.flush();
         System.setOut(origSysOut);
-
         newSysOut.close();
-        try {
-          br.close();
-        }
-        catch (IOException e1) {
-          e1.printStackTrace();
-        }
 
+        // We're on the Swing event thread here so this is slightly lousy:
+        while(sysOutThread != null)
+          Thread.yield();
+
+        // Display the commpile results:
         sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
       }
     });
