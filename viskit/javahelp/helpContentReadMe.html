@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Authoring JavaHelp for Viskit</title>
+</head>
+<body>
+This is a summary of how to add to the help system for the Viskit
+application.  Content is added into both XML and HTML files which are described
+below.
+<p>
+JavaHelp support in Viskit is contained in these project areas:
+<ul>
+<li>
+1. <code><b>viskit/javahelp/</b></code> subdirectory in the CVS archive, and the deployment (build) directory
+</li><li>
+2. <code><b>jhall.jar</b></code> library in the CVS archive, and the deployment (build) directory
+</li><li>
+3. Java source files, especially viskit.Help.java, which has the menu bar action handlers, which launch the help window.
+</li><li>
+4. A target in <code>build.xml</code>, which builds the search database from the html
+files and copies the javahelp CVS directory to the javahelp build directory.
+</li><li>
+(5. If/when <u>context-sensitive</u> help is implemented, other .java files in the project
+</li>
+</ul>
+<p>
+Further details:
+<p>
+The <code><b>javahelp/</b></code> directory contains the following:
+<ol>
+<li><code><b>vHelpSet.hs</b></code> -- This is the "master" file that initializes the
+javahelp system.  To simply add content, it does not need to be edited unless further indexing functionality is added.
+</li>
+<li>
+<code><b>vHelpMap.jhm</b></code> -- A map file which defines tokens to be used in
+other parts of the help system.  Look at <code>vHelpTOC.xml</code>, for instance, to see how
+it is used.  Add more entries as appropriate.
+</li>
+<li>
+<code><b>vHelpTOC.xml</b></code> -- The master TOC tree is defined in this file.  As more content
+is added, there should be more topics and subtopics added here.
+</li>
+<li><code><b>javahelp/Pages/</b></code> -- All html and image content goes in this directory.
+</li>
+<li><code><b><i>vHelpIndex.xml</i></b></code> -- This file is currently unused.  If an index
+is built for the Viskit help system, it will go here.
+</li>
+</ol>
+<p>
+
+The <code><b>jhall.jar</b></code> is Sun code which implements the JavaHelp system, as well
+as containing the search-indexing utility.
+<p>
+
+Summary:&nbsp;&nbsp;Write your table of contents in <code>vHelpTOC.xml</code>.  Define your tokens in <code>vHelpMap.xml</code>.  Write
+your html, css, images, etc., and put them in <code>javahelp/Pages</code>.
+</body>
+</html>

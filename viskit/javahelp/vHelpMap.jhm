@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE map
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN"
+         "http://java.sun.com/products/javahelp/map_2_0.dtd">
+
+<map version="2.0">
+	<mapID target="intro"            url="Pages/Intro.html" />
+  <mapID target="eventgraphintro"  url="Pages/Intro.html#eventgraphintro" />
+  <mapID target="eventgrapheditor" url="Pages/EventGraphEditor.html" />
+  <mapID target="assemblyeditor"   url="Pages/AssemblyEditor.html" />
+  <mapID target="tutorial"         url="Pages/Tutorial.html" />
+  
+  <mapID target="topic"   url="Pages/redcircle.png" />
+  <mapID target="chapter" url="Pages/chapTopic.gif" />
+  <mapID target="empty"   url="Pages/empty.gif" />
+
+</map>

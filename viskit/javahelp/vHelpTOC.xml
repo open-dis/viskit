@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+<toc version="2.0" topicimage="topic">
+  <tocitem text="Viskit" image="empty">
+    <tocitem text="Introduction" target="intro">
+      <tocitem text="Event Graphs" target="eventgraphintro" />
+    </tocitem>
+    <tocitem text="Event Graph Editor" target="eventgrapheditor"/>
+    <tocitem text="Assembly Editor" target="assemblyeditor"/>
+    <tocitem text="Tutorial" target="tutorial"/>
+  </tocitem>
+</toc>
+

@@ -317,6 +317,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       stateDrawingSplit.setDividerLocation(0.5d);
       stateParameterSplit.setDividerLocation(0.5d);
     }
+
+    // tell the help screen where we are so he can center himself
+    help.mainFrameLocated(this.getBounds());
   }
 
   /**
@@ -413,9 +416,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     help = new Help(this);
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic(KeyEvent.VK_H);
-    
+
+    helpMenu.add( buildMenuItem(help,"doContents","Contents",null,null));
+    helpMenu.add( buildMenuItem(help,"doSearch","Search",null,null));
+    helpMenu.addSeparator();
+    helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial",null,null));
     helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
-    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
+    //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
     menuBar.add(helpMenu);
     
     this.setJMenuBar(menuBar);

@@ -1,6 +1,13 @@
 package viskit;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
 import javax.swing.*;
+import javax.help.HelpBroker;
+import javax.help.CSH;
+import javax.help.HelpSet;
+import javax.help.HelpSetException;
 /**
  *
  * @author  ahbuss
@@ -28,7 +35,30 @@ public class Help {
         "  Mike Bailey" + CR +
         "  Rick Goldberg";
     
-    
+
+    private static HelpBroker hb;
+    // A strange couple of things to support JavaHelp's rather strange design for CSH use:
+    private static Component      tutorialComponent;
+    private static ActionListener tutListenerLauncher;
+
+    static
+    {
+      ClassLoader cl = viskit.Help.class.getClassLoader();
+      URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
+      HelpSet hs = null;
+      try {
+        hs = new HelpSet(null, helpSetURL);
+        hb = hs.createHelpBroker();
+      }
+      catch (HelpSetException e) {
+        e.printStackTrace();
+      }
+      // Here we're setting up the action event peripherals for the tutorial menu selection
+      tutorialComponent = new Button();
+      tutListenerLauncher = new CSH.DisplayHelpFromSource(hb);
+      CSH.setHelpIDString(tutorialComponent, "tutorial");
+    }
+  
     /** Creates a new instance of Help */
     public Help(Component parent) {
         this.parent = parent;
@@ -50,10 +80,39 @@ public class Help {
             DEVELOPERS, "About Viskit Event Graph Editor...",
             JOptionPane.OK_OPTION, icon);
     }
-    
+
+    public void doContents()
+    {
+      hb.setDisplayed(true);
+      hb.setCurrentView("TOC");
+    }
+    public void doSearch()
+    {
+      hb.setDisplayed(true);
+      hb.setCurrentView("Search");
+    }
+    public void doTutorial()
+    {
+      ActionEvent ae = new ActionEvent(tutorialComponent,0,"tutorial");
+      tutListenerLauncher.actionPerformed(ae);
+    }
+/*
     public void help() {
         JOptionPane.showMessageDialog(parent, "Viskit help not yet implemented",
             "Viskit Help", JOptionPane.OK_OPTION, icon);
     }
-    
+*/
+  // message when the main frame has been positioned on the screen
+  public void mainFrameLocated(Rectangle bounds)
+  {
+    Point p = new Point(bounds.x, bounds.y);
+    Dimension d = new Dimension(bounds.width,bounds.height);
+    Dimension hd = hb.getSize();
+    hd.width+=100;
+    hb.setSize(hd);
+    p.x = p.x + d.width / 2 - hd.width / 2;
+    p.y = p.y + d.height / 2 - hd.height / 2;
+    hb.setLocation(p);
+  }
+
 }

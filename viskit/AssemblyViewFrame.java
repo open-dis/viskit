@@ -203,11 +203,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic(KeyEvent.VK_H);
     
-    helpMenu.add( buildMenuItem(help, "aboutAssemblyEditor", "About...", null, null ) );
-    helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
+    helpMenu.add( buildMenuItem(help,"doContents","Contents",null,null));
+    helpMenu.add( buildMenuItem(help,"doSearch","Search",null,null));
+    helpMenu.addSeparator();
+    helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial",null,null));
+    helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
+    //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
     menuBar.add(helpMenu);
     
-    this.setJMenuBar(menuBar);
+    this.setJMenuBar(menuBar);    
   }
 
   // Use the actions package
