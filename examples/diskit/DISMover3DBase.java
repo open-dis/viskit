@@ -28,7 +28,7 @@ public class DISMover3DBase extends SimEntityBase {
     float[] v;
     
     /**
-     * Creates a new instance of DISMover3DBase, a linear 3D momver. "All your base are belong to us."
+     * Creates a new instance of DISMover3DBase, a linear 3D momver. 
      * @param start initial positiono
      * @param speedLimit mover's limit of speed
      * @param id DIS entity id for this mover
@@ -48,7 +48,7 @@ public class DISMover3DBase extends SimEntityBase {
                 this.id[i] = id[i];
             }
         }
-        this.tol = tol;
+        this.tol = tol;  // tol = .01 seems o.k.
         
         stp = new float[4];
         v = new float[4];
