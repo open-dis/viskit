@@ -13,7 +13,7 @@ public class DISPinger extends SimEntityBase {
     /**
      * Create a DISPinger with initial interval.
      * @param duration in sim time
-     * @param stms sim time per milliseconds clock time. duration in sim time divided by stms gives clock time in milliseconds, with appropriate type conversions.
+     * @param stms 1.0 sim time per stms milliseconds clock time. 
      */    
     public DISPinger(double duration, long stms) {
 	super("DISPinger",SimEntityBase.DEFAULT_PRIORITY);
