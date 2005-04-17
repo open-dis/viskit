@@ -923,7 +923,6 @@ public class SimkitAssemblyXML2Java {
         
     }
     
-    // really "doStochasticallyJitteredRandomLatinHyperCube()
     public void doLatinHypercube() {
         ExperimentType experiment = root.getExperiment();
         int runs = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
@@ -936,6 +935,7 @@ public class SimkitAssemblyXML2Java {
         // so, the script should get copied into each DesignPoint instance.
         
         // the DesignParameters return a range of values as per the FullFactorial
+        // version.
         // each range is divided into runs bins of equal probability. Each bin is
         // numbered from 0 to runs-1. runs should be the number of DesignParameters.
         // An index runs x runs matrix is created in the form of of a
@@ -959,7 +959,7 @@ public class SimkitAssemblyXML2Java {
         
         int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
         int size = root.getDesignParameters().size();
-        LatinSquares latinSquares = new LatinSquares(size);
+        LatinPermutator latinSquares = new LatinPermutator(size);
         List designParams = root.getDesignParameters();
         List designPoints = root.getExperiment().getDesignPoint();
         ObjectFactory of = new ObjectFactory();
@@ -968,14 +968,14 @@ public class SimkitAssemblyXML2Java {
         
         for ( int i = 0; i < totalSamples; i++ ) {
             
-            int[] matrixRows = latinSquares.getRandomLatinSquare();
+            int[][] latinSquare = latinSquares.getRandomLatinSquare();
             int[] row;
             
-            for ( int j = 0 ; j < matrixRows.length; j++) {
+            for ( int j = 0 ; j < latinSquare.length; j++) {
                 try {
                     DesignPointType designPt = of.createDesignPoint();
                     Iterator it = designParams.iterator();
-                    row = latinSquares.getRow(matrixRows[j]);
+                    row = latinSquare[j];
                     int ct = 0;
                     
                     while ( it.hasNext() ) {
@@ -1038,285 +1038,6 @@ public class SimkitAssemblyXML2Java {
         
     }
     
-    
-     // given the complete set of permutations, find unique LatinSquares
-     // can also generate a nearest random LHS, given a random long.
-    
-     public class LatinSquares {
-	public Permutator p;
-        ArrayList squares; // represented by arrays of indices to permutations
-        int[][] permutations; // all n! permutations of 1..n wide alphabet
-	int size;
-
-	//to test outside of GridKit
-	//public static void main(String args[]) {
-	    //LatinSquares l = new LatinSquares(Integer.parseInt(args[0]));
-            //
-	    //l.search();
-	    //l.report();
-        //}
-
-        LatinSquares(int size) {
-	    p = new Permutator(size);
-            squares = new ArrayList();
-            this.permutations = p.getPermutations();
-	    this.size = size;
-        }
-
-	void search() {
-
-	    while ( p.hasNextMatrix() ) {
-		if ( p.unique() ) {
-		    int[] matrix = p.getNextMatrix();
-	 	    if ( isLatin(matrix) ) {
-		        outputArray(matrix);
-		        squares.add(matrix);
-		    }	
-		}
-	    }
-	    
-	}
-        
-        int[] getRandomLatinSquare() {
-            int[] matrix = new int[size];
-            
-            p.randomSquare();
-            
-            while ( !isLatin(matrix) ) {
-                if ( p.hasNextMatrix() ) {
-                    matrix = p.getNextMatrix();
-                } else {
-                    while ( !p.hasNextMatrix() ) { // in rare cases
-                        p.randomSquare();
-                        matrix=p.getNextMatrix();
-                    }
-                }
-            }
-       
-            return matrix;
-        }
-        
-        // row should be used READ ONLY
-        int[] getRow(int i) {
-            return p.perms[i];
-        }
-
-	void report() {
-	    System.out.println("-------------------");
-	    System.out.println("generating complete");
-	    java.util.Iterator i = squares.iterator();
-	    while ( i.hasNext() ) {
-		outputArray((int[])i.next());
-	    }
-	}
-        
-        boolean isLatin(int[] rows) {
-            for ( int i = 0; i < rows.length; i++ ) {
-		for ( int j = i+1; j < rows.length; j++ ) {
-			if (!uniqueColumns(i,j,rows)) {
-			    return false;
-			}
-		}
-
-	    }
-	    return true;
-        }
-        
-        boolean uniqueColumns(int i, int j, int[] rows) {
-            for ( int k = 0; k< rows.length; k++) {
-                if (permutations[rows[i]][k] == permutations[rows[j]][k])
-		    return false;
-            }
-
-            return true;
-            
-        }
-
-	void output(int row) {
-
-	    System.out.println("Row: "+row);
-	    if(row>-1)
-	    for ( int i = 0 ; i < permutations[row].length; i++ ) {
-		
-
-		System.out.print(permutations[row][i]+" ");
-	    }
-	    System.out.println();
-	}
-	
-	void outputArray(int[] array) {
-	    for ( int i = 0; i < array.length; i++ ) {
-		for ( int j = 0; j < array.length; j++ ) {
-		    if ( array[i] == -1 ) System.out.print("-1");
-		    else System.out.print(permutations[array[i]][j]);
-		    System.out.print(" ");
-		}
-		System.out.println();
-	    }
-
-	    System.out.println("-----------------");
-	}
-
-	void outputMutation(int[] array) {
-	    for ( int j = 0; j < array.length; j++ ) 
-		System.out.print(array[j]+" ");
-	
-	    System.out.println();
-	}
-
-    }
-     
-    public class Permutator {
-        MersenneTwister rnd;
-        ArrayList set;
-        int size;
-        int totalSize;
-        int[][] perms;
-        int count = 0;
-	boolean hasNext;
-	int next = 0;
-	int[] dials;
-        
-        public Permutator(int size) {
-            rnd = new MersenneTwister();
-            this.size=size;
-            totalSize = factorial(size);
-            perms=new int[totalSize][size];
-	    set = new ArrayList();
-            init();
-            permute(set);
-            //output();
-	
-	    dials = new int[size];
-        }
-
-        int factorial(int f) {
-            if ( f == 0 ) return 1;
-            else return f * factorial(f-1);
-        }
-
-        void init() {
-            for ( int i = 0; i < size; i++ ) {
-                set.add(new Integer(i));
-                perms[0][i]=i;
-            }
-        }
-
-        void permute(ArrayList s) {
-            Integer j;
-
-            if ( s.size() == 0 ) {
-                count ++;
-                fill();
-            }
-
-            for ( int i = 0; i < s.size(); i++ ) {
-                ArrayList subset = (ArrayList)s.clone();
-                j = (Integer)subset.remove(i);
-                perms[count][size-s.size()] = j.intValue();
-                permute(subset);
-            }
-        }
-        
-        void fill() {
-            if ( count < totalSize && count > 0 ) {
-                for ( int j = 0; j < size; j++) {
-                    perms[count][j] = perms[count-1][j];
-                }
-            }
-        }
-
-        void output() {
-            for ( int i = 0;  i < totalSize; i++ ) {
-                System.out.println();
-                for ( int j = 0; j < size; j++ ) {
-                    System.out.print(perms[i][j]+" ");
-                }
-            }
-            System.out.println();
-        }
-
-	void dialOut() {
-	    System.out.print("Dial :");
-	    for ( int i = 0; i<size; i++ ) {
-		System.out.print(dials[i]+" ");
-	    }
-	    System.out.println();
-	}
-        
-        public int[][] getPermutations() { 
-            return perms;
-        }
-
-	public boolean hasNextMatrix() {
-	    boolean next = false;
-	    next = flip(size-1);
-	    //System.out.println();
-	    //System.out.println("nextMatrix:");
-	    //dialOut();
-	
-    	    return next; 
-	}
-
-	public int[] getNextMatrix() {
-	    int[] ret = new int[dials.length];
-	    System.arraycopy(dials,0,ret,0,dials.length);
-	    return ret;
-	}
-
-	boolean flip(int i) {
-	   //System.out.println();
-	   //dialOut();
-	   //System.out.println("flipping "+i);
-	   //System.out.println();
-	   if ( i >= 0 ) {
-		dials[i]++;
-		if ( dials[i] > totalSize - 1 ) {
-		    dials[i] = 0;
-		    return flip(i-1);
-		}
-	   } else {
-	       return false; 
-	   }
-
-	   return true;
-	}
-
-	boolean unique() {
-	   boolean unique = true;
-	   for ( int i = 0; i < size; i++ ) {
-		for ( int j = i+1; j < size; j++ ) {
-		    if ( dials[i] == dials[j] ) {
-			return false;
-		    } 
-		}
-	   }
-
-	   return true;
-	}
-        
-        
-        // usage:
-        // randomSquare();
-        // while ( !hasNextSquare() ) {
-        //     randomSquare();
-        // }
-        // matrix=getNextSquare();
-        // 
-        void randomSquare() {
-            for ( int i = 0 ; i < size; i ++ ) {
-                dials[i] = (int)(((double)totalSize)*rnd.draw());
-            }
-            
-        }
-
-        void setSeed(long seed) {
-            rnd.setSeed(seed);
-        }
-
-    }
-
-    
     private void incrementCount() {
         ++this.count;
     }
@@ -1333,9 +1054,174 @@ public class SimkitAssemblyXML2Java {
     private int getTotalResults() {
         return totalResults;
     }
+    // any swap of two rows or two columns in a LHS is a LHS
+    // start with a base LHS, where
+    // A(i,j) = [ i + (N-j) % N ] % N
+    //
+    // which is also a table of addition, eg,
+    // ( i + j ) = A(i,j) % N
     
+    // can be shown that any permution of 1..N-1 used as
+    // i' = I(p(i)) and j' = J(q(j)) in A is Latin.
+    
+    // hence we can iterate through all I and J permutations rather quickly
+    // and generate all Latins, or any random one almost instantly.
+    // no memory matrix needs to be created, just indexes into virtual
+    // rows and cols.
+    
+    class LatinPermutator {
+        MersenneTwister rnd;
+        ArrayList set;
+        int size;
+        int[] row;
+        int[] col;
+        int rc,cc;
+        int ct;
+        
+        //for testing stand-alone
+        //public static void main(String[] args) {
+            //LatinPermutator lp = new LatinPermutator(Integer.parseInt(args[0]));
+            //output size number of randoms
+            //System.out.println("Output "+lp.size+" random LHS");
+            //for ( int j = 0; j < 10*lp.size; j++ ) {
+                //java.util.Date d = new java.util.Date();
+                //long time = d.getTime();
+                //lp.randomSquare();
+                //d = new java.util.Date();
+                //time -= d.getTime();
+                //System.out.println("Random Square:");
+                //lp.output();
+                //System.out.println("milliseconds : "+-1*time);
+                //System.out.println("---------------------------------------------");
+            //}
+            
+            //output series starting at base
+            //System.out.println("---------------------------------------------");
+            //System.out.println("Output bubbled LHS");
+            //lp.ct=0;
+            //bubbles not perfect, hits some squares more than once, not all squares
+            //possible with only single base
+            //lp.bubbles();
+            
+        //}
+        
+        public LatinPermutator(int size) {
+            rnd = new MersenneTwister();
+            this.size=size;
+            row = new int[size];
+            col = new int[size];
+            rc = cc = size-1;
+            ct=0;
+        }
+        
+        int getAsubIJ(int i, int j) {
+            return
+                    (i + ((size - j)%size))%size;
+        }
+        
+        // not really used except for test as per main()
+        void bubbles() {
+            int i;
+            for ( i = 0; i < size; i++ ) {
+                row[i] = col[i] = i;
+            }
+            output();
+            i = size;
+            while ( i-- > 0 )
+                while (bubbleRow()) {
+                output();
+                while (bubbleCol()) {
+                    output();
+                }
+                }
+            
+        }
+        
+        // not really used except for test as per bubbles() in main()
+        boolean bubbleRow() {
+            int t;
+            if ( rc < 1 ) {
+                rc = size-1;
+                return false;
+            }
+            t = row[rc];
+            row[rc] = row[rc-1];
+            row[rc-1] = t;
+            rc--;
+            return true;
+        }
+        
+        // not really used except for test as per bubbles() in main()
+        boolean bubbleCol() {
+            int t;
+            if ( cc < 1 ) {
+                cc = size-1;
+                return false;
+            }
+            t = col[cc];
+            col[cc] = col[cc-1];
+            col[cc-1] = t;
+            cc--;
+            return true;
+        }
+        
+        void output() {
+            //System.out.println("Row index: ");
+            ////for ( int i = 0;  i < size; i++ ) {
+            //System.out.print(row[i]+" ");
+            //}
+            //System.out.println();
+            //System.out.println();
+            //System.out.println("Col index: ");
+            //for ( int i = 0;  i < size; i++ ) {
+            //System.out.print(col[i]+" ");
+            //}
+            //System.out.println();
+            //System.out.println();
+            System.out.println();
+            System.out.println("Square "+(ct++)+": ");
+            for ( int i = 0;  i < size; i++ ) {
+                System.out.println();
+                for ( int j = 0; j < size; j++ ) {
+                    System.out.print(getAsubIJ(row[i],col[j])+" ");
+                }
+            }
+            System.out.println();
+        }
+        
+        void randomSquare() {
+            int totSize = size;
+            ArrayList r = new ArrayList();
+            ArrayList c = new ArrayList();
+            
+            for ( int i = 0; i < size; i ++) {
+                r.add(new Integer(i));
+                c.add(new Integer(i));
+            }
+            
+            for ( int i = 0; i < size; i ++) {
+                row[i] = ((Integer)(r.remove((int)((double)r.size()*rnd.draw())))).intValue();
+                col[i] = ((Integer)(c.remove((int)((double)c.size()*rnd.draw())))).intValue();
+            }
 
- 
+        }
+        
+        int[][] getRandomLatinSquare() {
+            int[][] square = new int[size][size];
+            randomSquare();
+            for ( int i = 0;  i < size; i++ ) {
+                for ( int j = 0; j < size; j++ ) {
+                    square[i][j]=getAsubIJ(row[i],col[j]);
+                }
+            }
+            return square;
+        }
+        
+        void setSeed(long seed) {
+            rnd.setSeed(seed);
+        }
+        
+    }
     
     class AssemblyReader extends Thread implements Runnable {
         SimkitAssemblyXML2Java inst;
