@@ -131,7 +131,9 @@
 
 <!--  === TARGET: compile === -->
     <target depends="init,compile.simxml.util" name="compile">
-        <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**">
+        <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**"
+            source="1.4"
+            target="1.4">
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -236,7 +238,9 @@
     </target>
     
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
-        <javac destdir="${dir.build.classes}">
+        <javac destdir="${dir.build.classes}"
+            source="1.4"
+            target="1.4">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -246,7 +250,9 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings" includes="jaxb.properties"/>
             <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser"/>
         </copy>
-        <javac destdir="${dir.build.classes}">
+        <javac destdir="${dir.build.classes}"
+            source="1.4"
+            target="1.4">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -260,14 +266,18 @@
     
     <!-- depend create stage 1 visxml.jar which later includes stuff from this compile to make viskit.jar -->
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
-        <javac destdir="${dir.build.classes}">
+        <javac destdir="${dir.build.classes}"
+            source="1.4"
+            target="1.4">
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
             </classpath>
             <src path="${dir.src.simtran.util}"/>
         </javac>
-        <javac debug="on" destdir="${dir.build.classes}">
+        <javac debug="on" destdir="${dir.build.classes}"
+            source="1.4"
+            target="1.4">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
