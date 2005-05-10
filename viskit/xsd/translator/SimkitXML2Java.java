@@ -622,9 +622,7 @@ public class SimkitXML2Java {
 		    constructor+="Character";
 		} else if (type.equals("short")) {
 		    constructor+="Short";
-		} else { // hack, see bug #93, since gui is using beanshell not javac
-                    // no classes get generated on the classpath for other user supplied
-                    // event graphs, so the above check fails if one is used
+		} else { // see #93
                     constructor = "";
                     pw.print(ep.getValue());
                 } if ( !constructor.equals("") )
