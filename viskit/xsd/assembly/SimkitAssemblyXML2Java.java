@@ -34,7 +34,7 @@ import java.util.Collections;
 import javax.xml.bind.JAXBContext; 
 import javax.xml.bind.JAXBException; 
 import javax.xml.bind.Unmarshaller; 
-import javax.xml.bind.Marshaller; 
+import javax.xml.bind.Marshaller;  
 import viskit.xsd.bindings.assembly.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -965,6 +965,7 @@ public class SimkitAssemblyXML2Java {
         ObjectFactory of = new ObjectFactory();
         HashMap values = new java.util.HashMap();
         MersenneTwister rnd = new MersenneTwister();
+        count = 0;
         
         for ( int i = 0; i < totalSamples; i++ ) {
             
@@ -1032,7 +1033,7 @@ public class SimkitAssemblyXML2Java {
                     designPoints.add(designPt);
                     
                 } catch (javax.xml.bind.JAXBException jaxbe) { jaxbe.printStackTrace(); }
-                
+                incrementCount();
             }
         }
         
