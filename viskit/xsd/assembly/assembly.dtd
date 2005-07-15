@@ -76,7 +76,7 @@
 <!ELEMENT Log (#PCDATA) >
 <!ELEMENT Errors (#PCDATA) >
 
-<!ELEMENT Results (PropertyChange | Log | Errors )* >
+<!ELEMENT Results ( Log | Errors )* >
 <!ATTLIST Results 
     design  CDATA #REQUIRED
     run     CDATA #REQUIRED
@@ -99,7 +99,7 @@
 <!ATTLIST Experiment
     batchID CDATA #IMPLIED
     type (latin-hypercube | full-factorial)  "latin-hypercube"
-    runsPerDesignPoint CDATA #IMPLIED
+    runsPerDesignPoint CDATA "1"
     totalSamples CDATA #IMPLIED
 >
 
