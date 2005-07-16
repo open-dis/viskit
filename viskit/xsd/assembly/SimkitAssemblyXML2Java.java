@@ -51,7 +51,7 @@ import org.apache.xmlrpc.*;
  *
  */
 
-public class SimkitAssemblyXML2Java {
+public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
     SimkitAssemblyType root;
     InputStream fileInputStream;
@@ -1270,11 +1270,28 @@ public class SimkitAssemblyXML2Java {
     }
     
     /**
+     * Implement the XmlRpcHandler interface directly to manually specify available
+     * methods.
+     */
+    
+    public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
+        if (methodName=="setAssembly") {
+            String xmlData=(String) parameters.elementAt(0);
+            return setAssembly(xmlData);
+        } else if (methodName=="addResult") {
+            String xmlData=(String) parameters.elementAt(0);
+            return addReport(xmlData);
+        } else {
+            throw new Exception("No such method!");
+        }
+    }
+    
+    /**
      * hook for experiment.setAssembly XML-RPC call, used to initialize
      * from DOE panel. Accepts raw XML String of Assembly.
      */
     
-    public void setAssembly(String assembly) {
+    public Boolean setAssembly(String assembly) {
         if(!busy) {
             busy = true;
             fileInputStream = new ByteArrayInputStream(assembly.getBytes());
@@ -1283,6 +1300,7 @@ public class SimkitAssemblyXML2Java {
             tasker = new GridTaskGetter(this);
             tasker.start();
         }
+        return new Boolean(busy);
     }
     
     /**
@@ -1290,8 +1308,8 @@ public class SimkitAssemblyXML2Java {
      * back results from grid node run. Accepts raw XML String of Report.
      */
     
-    public void addReport(String report) {
-        
+    public Boolean addReport(String report) {
+        boolean error = false;
         StreamSource strsrc =
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
         
@@ -1324,7 +1342,9 @@ public class SimkitAssemblyXML2Java {
                 busy = false;
             }
             
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { error = true; e.printStackTrace(); }
+        
+        return new Boolean(error);
     }
     
     
