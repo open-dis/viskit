@@ -76,6 +76,7 @@
         <pathelement location="${dir.lib}/commons-logging-1.0.4.jar"/>
         <pathelement location="${dir.lib}/log4j-1.2.8.jar"/>
         <pathelement location="${dir.lib}/xerces.jar"/>
+        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <path refid="jaxb.classes"/>
         <path refid="runtime.extension.classes"/>
     </path>
@@ -152,6 +153,7 @@
                 <pathelement location="${dir.lib}/cli.jar"/>
                 <pathelement location="${dir.lib}/log4j-1.2.8.jar"/>
                 <pathelement location="${dir.lib}/xerces.jar"/>
+                <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.build.classes}"/>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -283,6 +285,7 @@
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
+                <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
