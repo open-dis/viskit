@@ -25,21 +25,25 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Vector;
 import javax.xml.bind.JAXBContext; 
 import javax.xml.bind.JAXBException; 
 import javax.xml.bind.Unmarshaller; 
-import javax.xml.bind.Marshaller;  
+import javax.xml.bind.Marshaller; 
+import javax.xml.transform.stream.StreamSource;
 import viskit.xsd.bindings.assembly.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+//import java.net.ServerSocket;
+//import java.net.Socket;
 import simkit.random.RandomNumber;
 import simkit.random.MersenneTwister;
+import org.apache.xmlrpc.*;
 
 /**
  *
@@ -55,10 +59,11 @@ public class SimkitAssemblyXML2Java {
     File inputFile;
     JAXBContext jaxbCtx;
     GridTaskGetter tasker;
+    AssemblyServer assemblyServer;
     int port;
     int count;
     int totalResults;
-    boolean listening = true;
+    boolean busy = false;
 
     /* convenience Strings for formatting */
 
@@ -80,9 +85,16 @@ public class SimkitAssemblyXML2Java {
 
     
     /** 
-     * Creates a new instance of SimkitXML2Java 
+     * Creates a new instance of SimkitAssemblyXML2Java 
      * when used from another class, instance this
-     * with a String for the name of the xmlFile
+     * with a String for the name of the xmlFile.
+     *
+     * If the xmlFile contains DesignParameters, then it must be a grid
+     * experiment, in which case, calculates the design points and runs
+     * grid tasks.
+     *
+     * Otherwise, it runs the file as a plain assembly, no grid.
+     *
      */
 
     public SimkitAssemblyXML2Java(String xmlFile) {
@@ -98,25 +110,38 @@ public class SimkitAssemblyXML2Java {
 	
     }
     
+    
+    /** Started from qsub grid script on grid nodes. */
     public SimkitAssemblyXML2Java(int port, String fileName) {
         this(fileName);
         this.port = port;
     }
     
+    
+    /** 
+     * Starts the server in "local" mode. This is the front end service.
+     * Sets up an XML-RPC webserver to read in an assembly from DOE panel.
+     * Once read, handler is added for reports, then DesignPoints calculated 
+     * and each run on grid nodes. 
+     */
+    
     public SimkitAssemblyXML2Java(int port) {
-        ServerSocket servs = null;
+        //ServerSocket servs = null;
         this.port = port;
         try {
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-            servs = new ServerSocket(port);
+            //servs = new ServerSocket(port);
             // first time through, wait for Assembly file
-            new AssemblyReader(this,servs.accept()).start();
+            //new AssemblyReader(this,servs.accept()).start();
             
-            do {
-                new AssemblyReader(this,servs.accept()).start();
-            } while (getTotalResults() < getCount() - 1);
+            assemblyServer = new AssemblyServer(this,port);
+            assemblyServer.start();
             
-            marshal(new File(root.getName()+"Exp.xml"));
+            //do {
+                //new AssemblyReader(this,servs.accept()).start();
+            //} while (getTotalResults() < getCount() - 1);
+            
+            //marshal(new File(root.getName()+"Exp.xml"));
             
         } catch ( Exception e) {
             e.printStackTrace();
@@ -125,6 +150,8 @@ public class SimkitAssemblyXML2Java {
         
     }
     
+    
+    /** Used by Viskit */
     public SimkitAssemblyXML2Java(File f) throws Exception {
         this.fileBaseName = baseNameOf(f.getName());
 	this.inputFile = f;
@@ -675,9 +702,8 @@ public class SimkitAssemblyXML2Java {
         
         try {
             
-            //can be processed into results tag, sent back to
-            //SGE_O_HOST at socket in raw XML, which is better
-            //than wakeup to see if new files came in.
+            //processed into results tag, sent back to
+            //SGE_O_HOST at socket in raw XML
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream log = new PrintStream(baos);
             java.io.OutputStream oldOut = System.out;
@@ -720,16 +746,18 @@ public class SimkitAssemblyXML2Java {
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
             
             try {
-                
-                Socket sock;
+                XmlRpcClientLite xmlrpc = new XmlRpcClientLite(frontHost,port);
+                //Socket sock;
                 PrintWriter out;
+                StringWriter sw;
                 String line;
                 ArrayList logs = new ArrayList();
                 ArrayList propertyChanges = new ArrayList();
                 
-                sock = new Socket(frontHost,port);
-                out = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()));
-                
+                //sock = new Socket(frontHost,port);
+                //out = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()));
+                sw = new StringWriter();
+                out = new PrintWriter(sw);
                 out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+">");
                 while( (line = br.readLine()) != null ) {
                     if (line.indexOf("<PropertyChange") !=0) {
@@ -756,6 +784,11 @@ public class SimkitAssemblyXML2Java {
                 out.println("</Results>");
                 out.println();
                 out.flush();
+                
+                //send results back to front end
+                Vector parms = new Vector();
+                params.add(sw.toString());
+                xmlrpc.execute("experiment.addResult", parms);
                 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1224,6 +1257,83 @@ public class SimkitAssemblyXML2Java {
         
     }
     
+    class AssemblyServer extends WebServer {
+        
+        SimkitAssemblyXML2Java inst;
+        
+        AssemblyServer(SimkitAssemblyXML2Java inst, int port) {
+            super(port);
+            this.inst=inst;
+            addHandler("experiment",inst);
+            
+        }
+    }
+    
+    /**
+     * hook for experiment.setAssembly XML-RPC call, used to initialize
+     * from DOE panel. Accepts raw XML String of Assembly.
+     */
+    
+    public void setAssembly(String assembly) {
+        if(!busy) {
+            busy = true;
+            fileInputStream = new ByteArrayInputStream(assembly.getBytes());
+            unmarshal();
+            fileBaseName = root.getName();
+            tasker = new GridTaskGetter(this);
+            tasker.start();
+        }
+    }
+    
+    /**
+     * hook for experiment.addReport XML-RPC call, used to report
+     * back results from grid node run. Accepts raw XML String of Report.
+     */
+    
+    public void addReport(String report) {
+        
+        StreamSource strsrc =
+                new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
+        
+        try {
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            Unmarshaller u = jc.createUnmarshaller();
+            ResultsType r = (ResultsType) ( u.unmarshal(strsrc) );
+            
+            int index = Integer.parseInt(r.getDesign());
+            
+            
+            List designPoints = Collections.synchronizedList(root.getExperiment().getDesignPoint());
+            
+            synchronized(designPoints) {
+                
+                DesignPointType designPoint = (DesignPointType) designPoints.get(index);
+                List runList = designPoint.getRun();
+                RunType run = (RunType)runList.get(Integer.parseInt(r.getRun()));
+                run.setResults(r);
+                incrementTotalResults();
+                
+            }
+            
+            
+            //check if done, then write out complete file.
+            //unlock the setAssembly method to accept further
+            //experiments.
+            if ( getTotalResults() == getCount()) {
+                marshal(new File(root.getName()+"Exp.xml"));
+                busy = false;
+            }
+            
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    
+    /** 
+     * @deprecated 
+     * use AssemblyServer
+     * keeping here for reference until test remove
+     */
+    /*
     class AssemblyReader extends Thread implements Runnable {
         SimkitAssemblyXML2Java inst;
         Socket s;
@@ -1236,6 +1346,7 @@ public class SimkitAssemblyXML2Java {
         public void run() {
             try {
                 
+                // this equates to setAssembly(String s)
                 if ( inst.fileInputStream == null ) { // in local mode, read initial file
                     
                     inst.fileInputStream = new BufferedInputStream(s.getInputStream());
@@ -1297,6 +1408,8 @@ public class SimkitAssemblyXML2Java {
             }
         }
     }
+     
+    */
     
     class GridTaskGetter extends Thread implements Runnable {
         InputStream is;
