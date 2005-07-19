@@ -1275,15 +1275,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      */
     
     public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
-        if (methodName=="setAssembly") {
+        Object ret;
+        System.out.println("Execute request for "+methodName);
+        if (methodName.equals("experiment.setAssembly")) {
             String xmlData=(String) parameters.elementAt(0);
-            return setAssembly(xmlData);
-        } else if (methodName=="addResult") {
+            ret = setAssembly(xmlData);
+        } else if (methodName.equals("experiment.addResult")) {
             String xmlData=(String) parameters.elementAt(0);
-            return addReport(xmlData);
+            ret = addReport(xmlData);
         } else {
-            throw new Exception("No such method!");
+            throw new Exception("No such method \""+methodName+"\"! ");
         }
+        return ret;
     }
     
     /**
@@ -1292,11 +1295,19 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      */
     
     public Boolean setAssembly(String assembly) {
+	Unmarshaller u;
+        System.out.println("Setting assembly");
         if(!busy) {
+	    System.out.println(assembly);
             busy = true;
             fileInputStream = new ByteArrayInputStream(assembly.getBytes());
-            unmarshal();
+       	    try {
+                u = jaxbCtx.createUnmarshaller();
+                this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
+            } catch (Exception e) { e.printStackTrace(); busy=false; }
+
             fileBaseName = root.getName();
+            System.out.println("got fileBaseName of "+fileBaseName);
             tasker = new GridTaskGetter(this);
             tasker.start();
         }
