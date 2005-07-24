@@ -100,7 +100,7 @@
     batchID CDATA #IMPLIED
     type (latin-hypercube | full-factorial)  "latin-hypercube"
     runsPerDesignPoint CDATA "1"
-    totalSamples CDATA #IMPLIED
+    totalSamples CDATA "1"
 >
 
 <!ELEMENT EventGraph (#PCDATA) >
