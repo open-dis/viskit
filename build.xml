@@ -268,6 +268,7 @@
     
     <!-- depend create stage 1 visxml.jar which later includes stuff from this compile to make viskit.jar -->
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
+       
         <javac destdir="${dir.build.classes}"
             source="1.4"
             target="1.4">
@@ -277,7 +278,8 @@
             </classpath>
             <src path="${dir.src.simtran.util}"/>
         </javac>
-        <javac debug="on" destdir="${dir.build.classes}"
+        
+        <javac destdir="${dir.build.classes}"
             source="1.4"
             target="1.4">
             <classpath>
@@ -290,6 +292,7 @@
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
         </javac>
+        <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
     </target>   
     
     <!-- just add new modules to the depends variable here -->
