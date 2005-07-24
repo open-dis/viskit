@@ -708,9 +708,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             PrintStream log = new PrintStream(baos);
             java.io.OutputStream oldOut = System.out;
             
-            System.setOut(log);
+            //debug
+            //System.setOut(log);
             
             bsh.Interpreter bsh = new bsh.Interpreter();
+            bsh.setClassLoader(SimkitAssemblyXML2Java.class.getClassLoader());
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
@@ -732,30 +734,35 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(bais);
                 sx2j.unmarshal();
+		System.out.println("Evaluating generated java Event Graph:");
+		System.out.println(sx2j.translate());
                 bsh.eval(sx2j.translate());
                 
             }
-            
+
+	    System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
+	    System.out.println(translate());
+            bsh.debug("true");
             bsh.eval(translate());
-            bsh.eval("sim = new "+ root.getName() +"();");
-            bsh.eval("sim.main(new String[0])");
+            //bsh.eval("sim = new "+ root.getName() +"();");
+            //bsh.eval("sim.main(new String[0])");
             
-            System.setOut(new PrintStream(oldOut));
+            bsh.eval(root.getName()+".main(new String[0]);");
+            
+            //debug
+            //System.setOut(new PrintStream(oldOut));
             
             java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
             
             try {
                 XmlRpcClientLite xmlrpc = new XmlRpcClientLite(frontHost,port);
-                //Socket sock;
                 PrintWriter out;
                 StringWriter sw;
                 String line;
                 ArrayList logs = new ArrayList();
                 ArrayList propertyChanges = new ArrayList();
                 
-                //sock = new Socket(frontHost,port);
-                //out = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()));
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
                 out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+">");
@@ -819,8 +826,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
 
             } else { // take a Script or use built ins
-                
-                String expType = root.getExperiment().getType();
+                ExperimentType e = root.getExperiment();
+                e.setBatchID(fileBaseName+": "+(new java.util.Date()).toString());
+                String expType = e.getType();
                 bsh.Interpreter bsh = new bsh.Interpreter();
                 
                 if (expType.equals("full-factorial")) {
@@ -833,7 +841,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
             }
             
-            String experimentsFileName = fileBaseName + "Exp.xml";
+            String experimentsFileName = fileBaseName + ".exp";
             System.out.println("Creating experiments: "+experimentsFileName);
             marshal(new File(experimentsFileName));
             try {
@@ -1020,6 +1028,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                         Iterator itex = exprList.iterator();
                         Object returns = null;
                         
+                        // evaluate each TerminalParameter script within the 
+                        // DesignParameter group 
                         while (itex.hasNext()) {
                             String expr = (String)itex.next();
                             bsh = new bsh.Interpreter();
@@ -1064,9 +1074,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     }
                     
                     designPoints.add(designPt);
+                    incrementCount();
                     
                 } catch (javax.xml.bind.JAXBException jaxbe) { jaxbe.printStackTrace(); }
-                incrementCount();
             }
         }
         
@@ -1248,6 +1258,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     square[i][j]=getAsubIJ(row[i],col[j]);
                 }
             }
+            
+            output();
             return square;
         }
         
@@ -1276,12 +1288,17 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
         Object ret;
-        System.out.println("Execute request for "+methodName);
-        if (methodName.equals("experiment.setAssembly")) {
-            String xmlData=(String) parameters.elementAt(0);
+	String call = new String(methodName);
+	String xmlData = new String("error");
+        System.out.println("Execute request for "+call+getTotalResults());
+
+        if (call.equals("experiment.setAssembly")) {
+            xmlData=(String) parameters.elementAt(0);
             ret = setAssembly(xmlData);
-        } else if (methodName.equals("experiment.addResult")) {
-            String xmlData=(String) parameters.elementAt(0);
+        } else if (call.equals("experiment.addResult") ||
+		   call.equals("experiment.addReport")) {
+	    System.out.println("adding " + getTotalResults());
+            xmlData=(String) parameters.elementAt(0);
             ret = addReport(xmlData);
         } else {
             throw new Exception("No such method \""+methodName+"\"! ");
@@ -1311,6 +1328,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             tasker = new GridTaskGetter(this);
             tasker.start();
         }
+
+	// clear results count
+	totalResults = 0;
+
         return new Boolean(busy);
     }
     
@@ -1323,6 +1344,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         boolean error = false;
         StreamSource strsrc =
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
+        System.out.println("addResults() "+getTotalResults()+" of "+getCount());
         
         try {
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
@@ -1340,16 +1362,17 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 List runList = designPoint.getRun();
                 RunType run = (RunType)runList.get(Integer.parseInt(r.getRun()));
                 run.setResults(r);
-                incrementTotalResults();
                 
             }
-            
+
+            incrementTotalResults();
             
             //check if done, then write out complete file.
             //unlock the setAssembly method to accept further
             //experiments.
+            
             if ( getTotalResults() == getCount()) {
-                marshal(new File(root.getName()+"Exp.xml"));
+                marshal(new File(root.getName()+".exp"));
                 busy = false;
             }
             
