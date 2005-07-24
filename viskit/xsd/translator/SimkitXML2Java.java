@@ -146,8 +146,11 @@ public class SimkitXML2Java {
 
 	    Parameter p = (Parameter) li.next();
 	    
-	    pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
-
+            if ( !superParams.contains(p) ) {
+                pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
+            } else {
+                pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
+            }
 	    
 	    if ( !extend ) 
 		buildParameterAccessor(p,accessorBlock);
