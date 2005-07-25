@@ -680,19 +680,26 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
     
     public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
-        System.out.println(fileBaseName +" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
+
         
         unmarshal();
         
         ExperimentType exp = root.getExperiment();
-        exp.setBatchID(fileBaseName+" Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID);
-        
+        int runsPerDesignPt = Integer.parseInt(exp.getRunsPerDesignPoint());
         List designPoints = exp.getDesignPoint();
-        DesignPointType designPoint = (DesignPointType)(designPoints.get(taskID-1));
+        int designPtsSize = designPoints.size();
+        
+        int designPtIndex = (taskID-1)/runsPerDesignPt;
+        int runIndex = (taskID-1)%runsPerDesignPt;
+        
+        DesignPointType designPoint = (DesignPointType)(designPoints.get(designPtIndex));
         List designParams = designPoint.getTerminalParameter();
         List params = root.getDesignParameters();
         Iterator itd = designParams.iterator();
         Iterator itp = params.iterator();
+        
+        System.out.println(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
+        exp.setBatchID(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
         
         while ( itd.hasNext() && itp.hasNext() ) {
             TerminalParameterType param = (TerminalParameterType)(itp.next());
@@ -708,8 +715,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             PrintStream log = new PrintStream(baos);
             java.io.OutputStream oldOut = System.out;
             
-            //debug
-            //System.setOut(log);
+            System.setOut(log);
             
             bsh.Interpreter bsh = new bsh.Interpreter();
             bsh.setClassLoader(SimkitAssemblyXML2Java.class.getClassLoader());
@@ -742,15 +748,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	    System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
 	    System.out.println(translate());
-            bsh.debug("true");
             bsh.eval(translate());
             //bsh.eval("sim = new "+ root.getName() +"();");
             //bsh.eval("sim.main(new String[0])");
             
             bsh.eval(root.getName()+".main(new String[0]);");
             
-            //debug
-            //System.setOut(new PrintStream(oldOut));
+            System.setOut(new PrintStream(oldOut));
             
             java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
@@ -765,7 +769,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
-                out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+">");
+                
+                out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" design="+qu+designPtIndex+qu+" run="+qu+runIndex+qu+">");
                 while( (line = br.readLine()) != null ) {
                     if (line.indexOf("<PropertyChange") !=0) {
                         logs.add(line);
@@ -790,11 +795,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 out.println("</Results>");
                 out.println();
-                out.flush();
+                //out.flush();
                 
                 //send results back to front end
                 Vector parms = new Vector();
-                params.add(sw.toString());
+                parms.add(new String(sw.toString()));
                 xmlrpc.execute("experiment.addResult", parms);
                 
             } catch (Exception e) {
@@ -844,8 +849,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             String experimentsFileName = fileBaseName + ".exp";
             System.out.println("Creating experiments: "+experimentsFileName);
             marshal(new File(experimentsFileName));
+            
+            int runsPerDesignPt = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+            int totalRuns = getCount()*runsPerDesignPt;
             try {
-                Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+getCount(),"-S","/bin/bash","./gridrun.sh",experimentsFileName});
+                Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+totalRuns,"-S","/bin/bash","./gridrun.sh",experimentsFileName});
             } catch (java.io.IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -1000,6 +1008,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
         int size = root.getDesignParameters().size();
+        int runsPerDesignPt = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
         LatinPermutator latinSquares = new LatinPermutator(size);
         List designParams = root.getDesignParameters();
         List designPoints = root.getExperiment().getDesignPoint();
@@ -1071,6 +1080,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                         
                         designPt.getTerminalParameter().add(tp);
                         ct++; //
+                    }
+                    
+                    List runList = designPt.getRun();
+                    for ( int ri = 0; ri < runsPerDesignPt ; ri++ ) {
+                        RunType r = of.createRun();
+                        r.setIndex(""+ri);
+                        runList.add(r);
                     }
                     
                     designPoints.add(designPt);
@@ -1289,16 +1305,15 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
         Object ret;
 	String call = new String(methodName);
-	String xmlData = new String("error");
-        System.out.println("Execute request for "+call+getTotalResults());
+	String xmlData = new String("empty");
+        System.out.println("Execute for "+call+getTotalResults());
 
         if (call.equals("experiment.setAssembly")) {
             xmlData=(String) parameters.elementAt(0);
             ret = setAssembly(xmlData);
         } else if (call.equals("experiment.addResult") ||
 		   call.equals("experiment.addReport")) {
-	    System.out.println("adding " + getTotalResults());
-            xmlData=(String) parameters.elementAt(0);
+            xmlData=new String((String) parameters.elementAt(0));
             ret = addReport(xmlData);
         } else {
             throw new Exception("No such method \""+methodName+"\"! ");
@@ -1308,7 +1323,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     /**
      * hook for experiment.setAssembly XML-RPC call, used to initialize
-     * from DOE panel. Accepts raw XML String of Assembly.
+     * From DOE panel. Accepts raw XML String of Assembly.
      */
     
     public Boolean setAssembly(String assembly) {
@@ -1380,90 +1395,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         return new Boolean(error);
     }
-    
-    
-    /** 
-     * @deprecated 
-     * use AssemblyServer
-     * keeping here for reference until test remove
-     */
-    /*
-    class AssemblyReader extends Thread implements Runnable {
-        SimkitAssemblyXML2Java inst;
-        Socket s;
-        
-        public AssemblyReader(SimkitAssemblyXML2Java inst, Socket socket) {
-            this.inst = inst;
-            s = socket;
-        }
-        
-        public void run() {
-            try {
-                
-                // this equates to setAssembly(String s)
-                if ( inst.fileInputStream == null ) { // in local mode, read initial file
-                    
-                    inst.fileInputStream = new BufferedInputStream(s.getInputStream());
-                    inst.unmarshal();
-                    inst.fileBaseName = inst.root.getName();
-                    inst.tasker = new GridTaskGetter(inst);
-                    inst.tasker.start();
-                    inst.fileInputStream.close();
-                    
-                } else { // in local mode, accept Results XML from nodes
-                    int index;
-                    ResultsType r;
-                    InputStreamReader inptRead = new InputStreamReader(s.getInputStream());
-                    BufferedReader bufRead = new BufferedReader(inptRead);
-                    StringBuffer buf = new StringBuffer();
-                    String line;
-                    
-                    while ( (line=bufRead.readLine()) != null) {
-                        buf.append(line);
-                    }
- 
-                    synchronized(inst.fileInputStream) {
-                        inst.fileInputStream = new ByteArrayInputStream(buf.toString().getBytes());
-                        javax.xml.transform.stream.StreamSource strsrc = 
-                                new javax.xml.transform.stream.StreamSource(inst.fileInputStream);
-                        
-                        JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
-                        Unmarshaller u = jc.createUnmarshaller();
-                        r = (ResultsType) ( u.unmarshal(strsrc) );
-
-                        index = Integer.parseInt(r.getDesign());
-                    }
-                    
-                    List designPoints = Collections.synchronizedList(inst.root.getExperiment().getDesignPoint());
-                    
-                    synchronized(designPoints) {
-                    
-                        DesignPointType designPoint = (DesignPointType) designPoints.get(index);
-                        List runList = designPoint.getRun();
-                        RunType run = (RunType)runList.get(Integer.parseInt(r.getRun()));
-                        run.setResults(r);
-                        inst.incrementTotalResults();
-                    
-                    }
-                    
-                }
-            
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            
-            finally {
-                try {
-                    inst.fileInputStream.close();
-                    s.close() ;
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            }
-        }
-    }
-     
-    */
     
     class GridTaskGetter extends Thread implements Runnable {
         InputStream is;

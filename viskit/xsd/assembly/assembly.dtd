@@ -75,12 +75,13 @@
 
 <!ELEMENT Log (#PCDATA) >
 <!ELEMENT Errors (#PCDATA) >
-
-<!ELEMENT Results ( Log | Errors )* >
+<!ELEMENT PropertyChange (#PCDATA) >
+<!ELEMENT Results ( Log | PropertyChange | Errors )* >
 <!ATTLIST Results 
     design  CDATA #REQUIRED
     run     CDATA #REQUIRED
-    job     CDATA #IMPLIED
+    index   CDATA #REQUIRED
+    job     CDATA #REQUIRED
 >
 
 <!ELEMENT DesignPoint (TerminalParameter*,Script?,Run*) >
