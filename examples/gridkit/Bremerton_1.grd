@@ -424,7 +424,7 @@
     
     <Schedule stopTime="10000.0" verbose="false"/>
 
-    <Experiment type="latin-hypercube" />
+    <Experiment type="latin-hypercube" totalSamples="100" runsPerDesignPoint="5" />
     
 </SimkitAssembly>
 
