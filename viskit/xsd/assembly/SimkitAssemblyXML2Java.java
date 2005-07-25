@@ -795,7 +795,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 out.println("</Results>");
                 out.println();
-                //out.flush();
                 
                 //send results back to front end
                 Vector parms = new Vector();
@@ -1306,7 +1305,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         Object ret;
 	String call = new String(methodName);
 	String xmlData = new String("empty");
-        System.out.println("Execute for "+call+getTotalResults());
+        System.out.println("Execute for "+call+sp+getTotalResults());
 
         if (call.equals("experiment.setAssembly")) {
             xmlData=(String) parameters.elementAt(0);
@@ -1359,7 +1358,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         boolean error = false;
         StreamSource strsrc =
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
-        System.out.println("addResults() "+getTotalResults()+" of "+getCount());
         
         try {
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
