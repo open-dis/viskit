@@ -672,7 +672,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
         } else {
             if ( fileName == null ) {
-                sax2j = new SimkitAssemblyXML2Java(port); // this should not return, start server
+                sax2j = new SimkitAssemblyXML2Java(port); // start server
             } else {
                 sax2j = new SimkitAssemblyXML2Java(port,fileName); // in grid mode
                 sax2j.tasker.start();
@@ -688,7 +688,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
     
     public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
-
         
         unmarshal();
         
@@ -989,24 +988,24 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      * numbered from 0 to number of independent variables - 1.
      * A numIndptVars x numIndptVars index matrix is created in the form of of a
      * Random Latin Square. A Random Latin Square is one whose first row and
-     * column contain a random permutation of {sequence 0...runs-1} .
-     *
-     * Each sub matrix is created by selecting values that are not in the
-     * row or column of the super matrix. To randomize within the same jvm session, 
-     * rather than take the value of the range at the bin number in the 
-     * stratification, a uniformly chosen sample is taken from the bin for each 
-     * design point, which stochastically jitters the sample points. Then even if 
-     * the single pass node runs all are from the same seed, they came from a slightly 
-     * different sample point. To create more runs per sample that have any meaning then, 
-     * it is required to use a different seed each run via Script, since each run starts 
-     * from a "fresh" jvm.
+     * column contain a random permutation of {sequence 0...runs-1} and each sub 
+     * matrix is created by selecting values that are not in the row or column 
+     * of the super matrix. To randomize within the same jvm session, rather 
+     * than take the value of the range at the bin number in the stratification, 
+     * a uniformly chosen sample is taken from the bin for each design point, 
+     * which stochastically jitters the sample points. Then even if the single 
+     * pass node runs all are from the same seed, they came from a slightly 
+     * different sample point. To create more runs per sample that have any 
+     * meaning then, it is required to use a different seed each Run via Script,
+     * since each run starts from a "fresh" jvm.
      * 
-     * The Latin part is that the index matrix is Latin, which represent probabiliy 
-     * bins to select from, not interpolated values of the ranges. For small number
-     * of variates, more samples, as controlled from the Experiment tag's totalsSamples
-     * attribute, from each Latin square, should be run per per Experiment. If a 
-     * script for the Runs as described above is used then several different results
-     * can occur for designs where a RandomVariate is seeded, otherwise they are the same.
+     * The Latin part is that the index matrix is Latin, which represent 
+     * probability bins to select from, not interpolated values of the ranges. 
+     * For small number of variates, more samples, as controlled from the 
+     * Experiment tag's totalsSamples attribute, from each Latin square, should 
+     * be run per per Experiment. If a script for the Runs as described above is 
+     * used then several different results can occur for designs where a 
+     * RandomVariate is seeded, otherwise they are the same.
      * 
      * Each Latin square may generate an "infinite" number of similarly jittered 
      * DesignPoints, but there are countably finite Latin square combinations. 
@@ -1018,6 +1017,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      * one sample set from each Latin square.
      *
      */
+    
     public void doLatinHypercube() {
         ExperimentType experiment = root.getExperiment();
         int runs = getRunsPerDesignPoint();
@@ -1312,6 +1312,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         }
         
     }
+    
+    /**
+     * XML-RPC service for Gridkit
+     */
     
     class AssemblyServer extends WebServer {
         
