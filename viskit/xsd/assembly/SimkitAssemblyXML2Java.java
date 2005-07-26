@@ -1367,26 +1367,30 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      */
     
     public Boolean setAssembly(String assembly) {
-	Unmarshaller u;
+        Unmarshaller u;
+        
         System.out.println("Setting assembly");
-        if(!busy) {
-	    System.out.println(assembly);
-            busy = true;
-            fileInputStream = new ByteArrayInputStream(assembly.getBytes());
-       	    try {
-                u = jaxbCtx.createUnmarshaller();
-                this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
-            } catch (Exception e) { e.printStackTrace(); busy=false; }
-
-            fileBaseName = root.getName();
-            System.out.println("got fileBaseName of "+fileBaseName);
-            tasker = new GridTaskGetter(this);
-            tasker.start();
+        if (busy) {
+            flushQueue();
         }
-
-	// clear results count
-	totalResults = 0;
-
+        
+        System.out.println(assembly);
+        busy = true; // needed now with all the other methods??
+        fileInputStream = new ByteArrayInputStream(assembly.getBytes());
+        try {
+            u = jaxbCtx.createUnmarshaller();
+            this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
+        } catch (Exception e) { e.printStackTrace(); busy=false; }
+        
+        fileBaseName = root.getName();
+        System.out.println("got fileBaseName of "+fileBaseName);
+        tasker = new GridTaskGetter(this);
+        tasker.start();
+        
+        
+        // clear results count
+        totalResults = 0;
+        
         return new Boolean(busy);
     }
     
@@ -1452,7 +1456,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
-        marshal(new File(root.getName()+".exp"));
+        if (root != null) {
+            marshal(new File(root.getName()+".exp"));
+        }
         busy = false;
         
         return remainingJobs;
