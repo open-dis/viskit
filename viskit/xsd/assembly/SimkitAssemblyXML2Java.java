@@ -1446,11 +1446,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     public Integer flushQueue() {
         Integer remainingJobs = new Integer(( getCount() * getRunsPerDesignPoint() ) - getTotalResults());
         try {
-                Runtime.getRuntime().exec( new String[] {"qdel","all"} ) ;
+            Runtime.getRuntime().exec( new String[] {"qdel","all"} ) ;
         } catch (java.io.IOException ioe) {
-                ioe.printStackTrace();
+            ioe.printStackTrace();
         }
-    
+        marshal(new File(root.getName()+".exp"));
+        busy = false;
+        
         return remainingJobs;
     }
     
