@@ -130,19 +130,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         this.port = port;
         try {
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-            //servs = new ServerSocket(port);
-            // first time through, wait for Assembly file
-            //new AssemblyReader(this,servs.accept()).start();
-            
             assemblyServer = new AssemblyServer(this,port);
             assemblyServer.start();
-            
-            //do {
-                //new AssemblyReader(this,servs.accept()).start();
-            //} while (getTotalResults() < getCount() - 1);
-            
-            //marshal(new File(root.getName()+"Exp.xml"));
-            
         } catch ( Exception e) {
             e.printStackTrace();
         }
@@ -517,17 +506,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
             pw.println();    
         }
-        
 
-        
         pw.println(sp4 + cb);
 	pw.println();
     }
 
     void buildOutput(StringWriter out) {
 	PrintWriter pw = new PrintWriter(out);	
-        
-        // main method moved, so buildOutput also supplies that
         
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + "asm" + sp);
@@ -991,40 +976,53 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         
     }
-    
+    /**
+     * Here we can use a Script to optionally set values before each set of Runs.
+     * eg.
+     * <Script> server.getServiceTime().getRandomNumber().resetSeed(); </Script>
+     * so, the script should get copied into each DesignPoint instance (?).
+     *
+     * The DesignParameters return a range of values as per the FullFactorial
+     * version.
+     * 
+     * Each range is divided into bins of equal probability. Each bin is
+     * numbered from 0 to number of independent variables - 1.
+     * An index runs x runs matrix is created in the form of of a
+     * Random Latin Square. A Random Latin Square is one whose first row and
+     * column contain a random permutation of {sequence 0...runs-1} .
+     *
+     * Each sub matrix is created by selecting values that are not in the
+     * row or column of the super matrix. To randomize within the same jvm session, 
+     * rather than take the value of the range at the bin number in the 
+     * stratification, a uniformly chosen sample is taken from the bin for each 
+     * design point, which stochastically jitters the sample points. Then even if 
+     * the single pass node runs all are from the same seed, they came from a slightly 
+     * different sample point. To create more runs per sample that have any meaning then, 
+     * it is required to use a different seed each run via Script, since each run starts 
+     * from a "fresh" jvm.
+     * 
+     * The Latin part is that the index matrix is Latin, which represent probabiliy 
+     * bins to select from, not interpolated values of the ranges. For small number
+     * of variates, more samples, as controlled from the Experiment tag's totalsSamples
+     * attribute, from each Latin square, should be run per per Experiment. If a 
+     * script for the Runs as described above is used then several different results
+     * can occur for designs where a RandomVariate is seeded, otherwise they are the same.
+     * 
+     * Each Latin square may generate an "infinite" number of similarly jittered 
+     * DesignPoints, but there are countably finite Latin square combinations. 
+     * 
+     * In general, the number of Latin square combinations is far
+     * less than the number of FullFactorial combinations and converges as fast,
+     * even so, there can be a large number of Latin squares, so in the case of
+     * a large number of variates, it may not be essential to select more than
+     * one sample set from each Latin square.
+     *
+     */
     public void doLatinHypercube() {
         ExperimentType experiment = root.getExperiment();
         int runs = getRunsPerDesignPoint();
         String initScript = experiment.getScript();
         bsh.Interpreter bsh = new bsh.Interpreter();
-        
-        // here we can use initScript to optionally set values before each set of Runs.
-        // eg.
-        // <Script> server.getServiceTime().getRandomNumber().resetSeed(); </Script>
-        // so, the script should get copied into each DesignPoint instance.
-        
-        // the DesignParameters return a range of values as per the FullFactorial
-        // version.
-        // each range is divided into runs bins of equal probability. Each bin is
-        // numbered from 0 to runs-1. runs should be the number of DesignParameters.
-        // An index runs x runs matrix is created in the form of of a
-        // Random Latin Square. A Random Latin Square is one whose first row and
-        // column contain a random permutation of {sequence 0...runs-1} .
-        // Each sub matrix is created by selecting values that are not in the
-        // row or column of the super matrix. To improve randomization, rather
-        // than take the value of the range at the bin number in the stratification,
-        // a uniformly chosen sample is taken from the bin for each design point,
-        // which stochastically jitters the sample points. The Latin
-        // part is that the index matrix is Latin, which represent probabiliy bins
-        // to select from, not interpolated values of the ranges. For small number
-        // of variates, more samples from each Latin square should be run per per
-        // Experiment. That is, each Latin square is capable of generating an infinite
-        // number of similar jittered DesignPoints, and there are finite Latin square
-        // combinations. In general, the number of Latin square combinations is far
-        // less than the number of FullFactorial combinations and converges as fast,
-        // even so, there can be a large number of Latin squares, so in the case of
-        // a large number of variates, it may not be essential to select more than
-        // one sample set from each Latin square.
         
         int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
         int size = root.getDesignParameters().size();
@@ -1057,8 +1055,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                         Iterator itex = exprList.iterator();
                         Object returns = null;
                         
-                        // evaluate each TerminalParameter script within the 
-                        // DesignParameter group 
+                        // evaluate each TerminalParameter script within the
+                        // DesignParameter group
                         while (itex.hasNext()) {
                             String expr = (String)itex.next();
                             bsh = new bsh.Interpreter();
