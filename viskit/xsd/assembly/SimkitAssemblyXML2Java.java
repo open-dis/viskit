@@ -39,8 +39,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller; 
 import javax.xml.transform.stream.StreamSource;
 import viskit.xsd.bindings.assembly.*;
-//import java.net.ServerSocket;
-//import java.net.Socket;
 import simkit.random.RandomNumber;
 import simkit.random.MersenneTwister;
 import org.apache.xmlrpc.*;
