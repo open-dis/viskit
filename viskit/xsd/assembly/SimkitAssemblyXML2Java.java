@@ -1086,6 +1086,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                         runList.add(r);
                     }
                     
+                    designPt.setIndex(""+getCount());
                     designPoints.add(designPt);
                     incrementCount();
                     
