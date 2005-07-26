@@ -194,6 +194,21 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
+    public String marshalToString(Object jaxb) {
+        Marshaller m;
+        String s = "<Error/>";
+        try {
+            m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
+                    new Boolean(true));
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            m.marshal(jaxb,pw);
+            s = sw.toString();
+        } catch (Exception e) { e.printStackTrace(); }
+        return s;
+    }
+    
     public void marshal(File f) {
         FileOutputStream fos;
         try {
@@ -1320,9 +1335,17 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             ret = setAssembly(xmlData);
         } else if (call.equals("experiment.addResult") ||
 		   call.equals("experiment.addReport")) {
-            xmlData=new String((String) parameters.elementAt(0));
+            xmlData= (String) parameters.elementAt(0);
             ret = addReport(xmlData);
-        } else {
+        } else if (call.equals("experiment.getResult")) {
+            Integer designPt = (Integer) parameters.elementAt(0);
+            Integer run = (Integer) parameters.elementAt(1);
+            ret = getResult(designPt.intValue(),run.intValue());
+        } else if (call.equals("experiment.flushQueue")) {
+            ret = flushQueue();
+        } else if (call.equals("experiment.getRemainingJobs")) {
+            ret = getRemainingJobs();
+        } else { 
             throw new Exception("No such method \""+methodName+"\"! ");
         }
         return ret;
@@ -1400,6 +1423,37 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         } catch (Exception e) { error = true; e.printStackTrace(); }
         
         return new Boolean(busy);
+    }
+    
+    public String getResult(int designPt, int run) {
+        ResultsType r = ((RunType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getRun().get(run))).getResults();
+        return marshalToString(r);
+    }
+    
+    /** 
+     * XML-RPC handler for clearing the grid queue, 
+     * @returns number of remaining jobs still in the queue
+     * that will be terminated.
+     */
+    public Integer flushQueue() {
+        Integer remainingJobs = new Integer(( getCount() * getRunsPerDesignPoint() ) - getTotalResults());
+        try {
+                Runtime.getRuntime().exec( new String[] {"qdel","all"} ) ;
+        } catch (java.io.IOException ioe) {
+                ioe.printStackTrace();
+        }
+    
+        return remainingJobs;
+    }
+    
+    /** 
+     * XML-RPC handler for returning number of remaining jobs in queue,
+     * could be used to estimate when a set of jobs becomes stuck. 
+     * @returns number of remaining jobs in the queue still running.
+     */
+    
+    public Integer getRemainingJobs() {
+        return new Integer(( getCount() * getRunsPerDesignPoint() ) - getTotalResults());
     }
     
     class GridTaskGetter extends Thread implements Runnable {
