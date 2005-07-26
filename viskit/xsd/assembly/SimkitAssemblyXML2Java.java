@@ -196,7 +196,15 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     public String marshalToString(Object jaxb) {
         Marshaller m;
-        String s = "<Error/>";
+        String s;
+        if ( jaxb == null ) {
+            return "<Empty/>";
+        }
+        if (jaxb instanceof ResultsType) {
+            s = "<Result/>";
+        } else {
+            s = "<Errors/>";
+        }
         try {
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
