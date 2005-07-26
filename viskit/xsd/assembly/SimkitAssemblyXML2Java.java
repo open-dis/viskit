@@ -61,8 +61,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     GridTaskGetter tasker;
     AssemblyServer assemblyServer;
     int port;
-    int count;
-    int totalResults;
+    int count; // of design points
+    int totalResults; // of total runs
     boolean busy = false;
 
     /* convenience Strings for formatting */
@@ -685,10 +685,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         unmarshal();
         
         ExperimentType exp = root.getExperiment();
-        int runsPerDesignPt = Integer.parseInt(exp.getRunsPerDesignPoint());
+        int runsPerDesignPt = getRunsPerDesignPoint();
         List designPoints = exp.getDesignPoint();
-        int designPtsSize = designPoints.size();
-        
+        int designPtsSize = designPoints.size(); // aka getCount() on local side
         int designPtIndex = (taskID-1)/runsPerDesignPt;
         int runIndex = (taskID-1)%runsPerDesignPt;
         
@@ -849,8 +848,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             System.out.println("Creating experiments: "+experimentsFileName);
             marshal(new File(experimentsFileName));
             
-            int runsPerDesignPt = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
-            int totalRuns = getCount()*runsPerDesignPt;
+            int totalRuns = getCount()*getRunsPerDesignPoint();
             try {
                 Runtime.getRuntime().exec( new String[] {"qsub","-t","1-"+totalRuns,"-S","/bin/bash","./gridrun.sh",experimentsFileName});
             } catch (java.io.IOException ioe) {
@@ -973,7 +971,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     public void doLatinHypercube() {
         ExperimentType experiment = root.getExperiment();
-        int runs = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+        int runs = getRunsPerDesignPoint();
         String initScript = experiment.getScript();
         bsh.Interpreter bsh = new bsh.Interpreter();
         
@@ -1007,7 +1005,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
         int size = root.getDesignParameters().size();
-        int runsPerDesignPt = Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+        int runsPerDesignPt = getRunsPerDesignPoint();
         LatinPermutator latinSquares = new LatinPermutator(size);
         List designParams = root.getDesignParameters();
         List designPoints = root.getExperiment().getDesignPoint();
@@ -1044,7 +1042,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                             try {
                                 bsh.eval(expr);
                                 returns = bsh.eval(dp.getName()+"();");
-                                System.out.println(expr+" returns "+returns);
+                                
                                 values.put(dp,returns);
                                 
                             } catch (bsh.EvalError ee) {
@@ -1097,6 +1095,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
     }
     
+    /* count of design points */
     private void incrementCount() {
         ++this.count;
     }
@@ -1105,14 +1104,22 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         return count;
     }
     
+    private int getRunsPerDesignPoint() {
+        return Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+    }
+    
+    /* results from each run */
+    /* note this would only be called when getCount() has already been tallied */
     private void incrementTotalResults() {
         ++this.totalResults;
-        System.out.println(totalResults+" of "+count);
+        System.out.println(totalResults+" of "+getCount() * getRunsPerDesignPoint());
     }
     
     private int getTotalResults() {
         return totalResults;
     }
+    
+    // LatinPermutator -
     // any swap of two rows or two columns in a LHS is a LHS
     // start with a base LHS, where
     // A(i,j) = [ i + (N-j) % N ] % N
@@ -1384,14 +1391,14 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             //unlock the setAssembly method to accept further
             //experiments.
             
-            if ( getTotalResults() == getCount()) {
+            if ( getTotalResults() == getCount() * getRunsPerDesignPoint()) {
                 marshal(new File(root.getName()+".exp"));
                 busy = false;
             }
             
         } catch (Exception e) { error = true; e.printStackTrace(); }
         
-        return new Boolean(error);
+        return new Boolean(busy);
     }
     
     class GridTaskGetter extends Thread implements Runnable {
