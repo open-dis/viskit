@@ -1334,15 +1334,15 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
         Object ret;
-	String call = new String(methodName);
-	String xmlData = new String("empty");
+        String call = new String(methodName);
+        String xmlData = new String("empty");
         System.out.println("Execute for "+call+sp+getTotalResults());
-
+        
         if (call.equals("experiment.setAssembly")) {
             xmlData=(String) parameters.elementAt(0);
             ret = setAssembly(xmlData);
         } else if (call.equals("experiment.addResult") ||
-		   call.equals("experiment.addReport")) {
+                call.equals("experiment.addReport")) {
             xmlData= (String) parameters.elementAt(0);
             ret = addReport(xmlData);
         } else if (call.equals("experiment.getResult")) {
@@ -1353,6 +1353,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             ret = flushQueue();
         } else if (call.equals("experiment.getRemainingJobs")) {
             ret = getRemainingJobs();
+        } else if (call.equals("experiment.clear")) {
+            ret = clear();
         } else { 
             throw new Exception("No such method \""+methodName+"\"! ");
         }
@@ -1464,6 +1466,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     public Integer getRemainingJobs() {
         return new Integer(( getCount() * getRunsPerDesignPoint() ) - getTotalResults());
+    }
+    
+    /**
+     * XML-RPC handler for clearing the experiment from memory,
+     * could be used in cases where you want to flush the queue
+     * and also the accumulated state so far.
+     */
+    public Boolean clear() {
+        flushQueue();
+        this.root = null;
+        System.gc();
+        return new Boolean(true);
     }
     
     class GridTaskGetter extends Thread implements Runnable {
