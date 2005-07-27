@@ -719,6 +719,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             PrintStream log = new PrintStream(baos);
             java.io.OutputStream oldOut = System.out;
             
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            PrintStream err = new PrintStream(baos2);
+            java.io.OutputStream oldErr = System.err;
+            
+            System.setErr(err);
             System.setOut(log);
             
             bsh.Interpreter bsh = new bsh.Interpreter();
@@ -759,9 +764,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             bsh.eval(root.getName()+".main(new String[0]);");
             
             System.setOut(new PrintStream(oldOut));
+            System.setErr(new PrintStream(oldErr));
             
             java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
+            
+            java.io.StringReader esr = new java.io.StringReader(baos.toString());
+            java.io.BufferedReader ebr = new java.io.BufferedReader(sr);
             
             try {
                 XmlRpcClientLite xmlrpc = new XmlRpcClientLite(frontHost,port);
@@ -770,6 +779,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 String line;
                 ArrayList logs = new ArrayList();
                 ArrayList propertyChanges = new ArrayList();
+                ArrayList errs = new ArrayList();
                 
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
@@ -784,6 +794,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     }
                     
                 }
+                while( (line = ebr.readLine()) != null ) {
+                    errs.add(line);
+                }
                 out.println("<Log>");
                 out.println("<![CDATA[");
                 Iterator it = logs.iterator();
@@ -797,6 +810,16 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     out.println((String)(it.next()));
                 }
                 
+                out.println("<Errors>");
+                out.println("<![CDATA[");
+                it = errs.iterator();
+                while (it.hasNext()) {
+                    
+                    out.println((String)(it.next()));
+                    
+                }
+                out.println("]]>");
+                out.println("</Errors>");
                 out.println("</Results>");
                 out.println();
                 
