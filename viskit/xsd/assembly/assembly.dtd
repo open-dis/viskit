@@ -102,6 +102,8 @@
     type (latin-hypercube | full-factorial)  "latin-hypercube"
     runsPerDesignPoint CDATA "1"
     totalSamples CDATA "1"
+    jitter ( true | false ) "true"
+    timeout CDATA "0"
 >
 
 <!ELEMENT EventGraph (#PCDATA) >
@@ -116,4 +118,3 @@
 	package CDATA   #REQUIRED
         extend  CDATA   "simkit.SimEntityBase"
 >
-
