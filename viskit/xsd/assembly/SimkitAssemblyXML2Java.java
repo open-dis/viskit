@@ -1038,7 +1038,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             int[][] latinSquare = latinSquares.getRandomLatinSquare();
             int[] row;
             
-            for ( int j = 0 ; j < latinSquare.length; j++) {
+            for ( int j = 0 ; j < latinSquare.length; j++) { // .length == size
                 try {
                     DesignPointType designPt = of.createDesignPoint();
                     Iterator it = designParams.iterator();
@@ -1074,14 +1074,19 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                         // create sample "stratified" from n=size equal probability bins
                         // over range; this will "jitter" the sample if used repeatedly,
                         // while maintaining proximity to the same hypersurface anchor points
-                        
+                        boolean enableJitter = true; // make a property of Experiment type tbd
                         if (range[0] instanceof Double) { // right now accept Double[2], spline TBD
-                            
-                            double dt = ((Double)(range[0])).doubleValue() -
-                                    ((Double)(range[1])).doubleValue();
+                            double h = ((Double)(range[0])).doubleValue();
+                            double l = ((Double)(range[1])).doubleValue();
+                            if ( h < l ) {
+                                double tmp = l;
+                                l = h;
+                                h = tmp;
+                            }
+                            double dt = h - l;
                             double ddt = dt/(double)size;
-                            double sampleOffset = ddt*rnd.draw(); // fits in bin
-                            double sample = ddt*row[ct] + sampleOffset;
+                            double sampleJitter = ddt*(rnd.draw()-.5); // fits in bin +/- .5ddt
+                            double sample = l + ddt*((double)row[ct]) + (enableJitter?sampleJitter:0.0);
                             
                             tp.setValue(""+sample);
                             tp.setType(dp.getType());
@@ -1205,6 +1210,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     (i + ((size - j)%size))%size;
         }
         
+        /*
         // not really used except for test as per main()
         void bubbles() {
             int i;
@@ -1250,7 +1256,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             cc--;
             return true;
         }
-        
+        */
         void output() {
             //System.out.println("Row index: ");
             ////for ( int i = 0;  i < size; i++ ) {
