@@ -1426,7 +1426,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 List runList = designPoint.getRun();
                 RunType run = (RunType)runList.get(Integer.parseInt(r.getRun()));
                 run.setResults(r);
-                
+                synchronized(run) {
+                    run.notify();
+                }
             }
 
             incrementTotalResults();
@@ -1445,11 +1447,36 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         return new Boolean(busy);
     }
     
-    public String getResult(int designPt, int run) {
-        ResultsType r = ((RunType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getRun().get(run))).getResults();
+    public synchronized String getResult(int designPt, int run) {
+        RunType runner = (RunType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getRun().get(run));
+        ResultsType r = runner.getResults();
+        int timeout = Integer.parseInt(root.getExperiment().getTimeout());
+        if ( r == null ) { // not while
+            synchronized(runner) {
+                try {
+                    if (timeout == 0)
+                        runner.wait();
+                    else
+                        runner.wait(timeout);
+                } catch (InterruptedException ie) {
+                    ;
+                }
+            }
+            r = runner.getResults();
+            
+        }
+
+        if ( r == null ) {
+            try {
+                ObjectFactory of = new ObjectFactory();
+                r = (ResultsType)(of.createResults());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return marshalToString(r);
     }
-    
+
     /** 
      * XML-RPC handler for clearing the grid queue, 
      * @returns number of remaining jobs still in the queue
