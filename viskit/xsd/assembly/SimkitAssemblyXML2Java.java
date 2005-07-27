@@ -1361,6 +1361,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             ret = getRemainingJobs();
         } else if (call.equals("experiment.clear")) {
             ret = clear();
+        } else if (call.equals("experiment.removeTask")) {
+            Integer designPt = (Integer) parameters.elementAt(0);
+            Integer run = (Integer) parameters.elementAt(1);
+            ret = removeTask(designPt.intValue(),run.intValue());
         } else { 
             throw new Exception("No such method \""+methodName+"\"! ");
         }
@@ -1470,11 +1474,37 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             try {
                 ObjectFactory of = new ObjectFactory();
                 r = (ResultsType)(of.createResults());
+                r.setDesign(""+designPt);
+                r.setRun(""+run);
+               
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return marshalToString(r);
+    }
+    
+    public Integer removeTask(int designPt, int run) {
+        int taskID = designPt * Integer.parseInt(root.getExperiment().getRunsPerDesignPoint());
+        taskID += run;
+        taskID += 1;
+        try {
+            Runtime.getRuntime().exec( new String[] {"qdel",""+taskID} ) ;
+        } catch (java.io.IOException ioe) {
+            ioe.printStackTrace();
+        }
+        
+        try {
+            ObjectFactory of = new ObjectFactory();
+            ResultsType r = (ResultsType)(of.createResults());
+            r.setDesign(""+designPt);
+            r.setRun(""+run);
+            // release Results lock on thread
+            addReport(marshalToString(r)); 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Integer(taskID);
     }
 
     /** 
