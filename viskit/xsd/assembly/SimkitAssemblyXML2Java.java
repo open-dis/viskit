@@ -1474,6 +1474,27 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         return new Boolean(busy);
     }
     
+    /** 
+     * XML-RPC hook to retrieve results from an experimental run.
+     * The call is synchronized, the calling client thread
+     * which invokes this method on the server thread blocks
+     * until a node run invokes the addResult() on a separate
+     * server thread for the particular run requested.
+     *
+     * Any of Async XML-RPC with client callbacks, single threaded
+     * in order, or multithreaded any order clients can be used.
+     * This server has a maximum of 100 server threads default,
+     * so don't send more than that many multithreaded requests 
+     * unless using Async mode with callbacks.
+     *
+     * Note: this method times out if a timeout value is set as 
+     * an attribute of the Experiment. This makes it tunable depending
+     * on the expected run time of the bench test by the user. This
+     * comes in handy if the client was single threaded in sequence,
+     * see TestReader.java in gridkit.tests. If no value for timeout
+     * is supplied in the XML-GRD, then it waits indefinitely.
+     */
+    
     public synchronized String getResult(int designPt, int run) {
         RunType runner = (RunType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getRun().get(run));
         ResultsType r = runner.getResults();
