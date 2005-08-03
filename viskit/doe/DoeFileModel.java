@@ -43,12 +43,19 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.bindings.assembly.SimkitAssemblyType;
+
 import java.util.List;
+import java.io.File;
 
 public class DoeFileModel
 {
+  public File userFile;
+  public File tempFile;
   public ParamTree paramTree;
   public ParamTable paramTable;
   public List designParms;
   public List simEntities;
+  public SimkitAssemblyType jaxbRoot;
 }

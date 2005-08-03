@@ -60,7 +60,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents
 
   public DoeMainFrame(DoeController controller)
   {
-    setTitle("Simkit/Viskit/Gridkit  Experiment Design");
+    setTitle("!!!TEST only -- Load only Bremerton_1.grd...Simkit/Viskit/Gridkit Experiment Design");
     this.controller = controller;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myWlistener());
@@ -71,9 +71,10 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     getContentPane().setLayout(new BorderLayout());
     //getContentPane().add(split,BorderLayout.CENTER);
   }
+  private DoeFileModel dfm;
   public void setModel(DoeFileModel dfm)
   {
-
+    this.dfm = dfm;
     leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
     leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
 /*
@@ -93,6 +94,10 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     getContentPane().add(leftJsp,BorderLayout.CENTER);
     getContentPane().validate();
 
+  }
+  public DoeFileModel getModel()
+  {
+    return dfm;
   }
   class myWlistener extends WindowAdapter
   {

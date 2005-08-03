@@ -112,10 +112,9 @@ public class ParamTableModel extends DefaultTableModel
     //List lis = elm.getContent();
     //System.out.println(typ+" "+nm +" "+txt);
       setValueAt(new Boolean(true),row,FACTOR_COL); //cb
-      System.out.println("");
     }
-    System.out.println("");
   }
+  
   Object[] parseMinMax(String txt)
   {
     Pattern pat =  Pattern.compile("Double\\s*\\(",Pattern.DOTALL);

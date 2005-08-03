@@ -110,13 +110,11 @@ public class DoeController implements DoeEvents, ActionListener
         break;
       case RUN_JOB:
         System.out.println("got RUN_JOB event");
-        //todo use ParmamTable and FileHandler to write out a temp file
-        // use it here
-        String file = "/Users/mike/Desktop/bremerton.xml";
-        new JobLauncher(file,mainFrame);
+        doRun();
         break;
     }
   }
+
   private void doOpen(File f)
   {
     try {
@@ -127,16 +125,26 @@ public class DoeController implements DoeEvents, ActionListener
       System.out.println("bad file open: "+e.getMessage());
     }
   }
+  private void doRun()
+  {
+    DoeFileModel dfm = mainFrame.getModel();
+    if(dfm != null)
+      FileHandler.runFile(dfm,mainFrame);
+    else
+      System.out.println("no model");
+  }
+
   private JFileChooser initFileChooser()
   {
     JFileChooser chooser = new JFileChooser(System.getProperty("user.home")+"/Desktop"); //dir")); //"Scripts");
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     FileHandler.FileFilterEx[] filter = {
-      new FileHandler.FileFilterEx(".xml", "Doe files (*.xml)", true)
+      new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
+      new FileHandler.FileFilterEx(".xml", "Assembly files (*.xml)", true)
     };
     for (int i = 0; i < filter.length; i++)
       chooser.addChoosableFileFilter(filter[i]);
-
+    
     //chooser.setFileView(new FileHandler.IconFileView(".xml", new ImageIcon("build/image/xmlicon.png")));
     return chooser;
   }
