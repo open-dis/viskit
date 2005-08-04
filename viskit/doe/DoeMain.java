@@ -74,7 +74,6 @@ public class DoeMain implements DoeEvents
   {
     menuBar = new DoeMenuBar(controller);
     mainFrame.setJMenuBar(menuBar);
-    controller.setMenu(menuBar);
   }
   private void buildMainFrame()
   {

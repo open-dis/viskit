@@ -76,15 +76,16 @@ public class DoeController implements DoeEvents, ActionListener
   {
     char c = e.getActionCommand().charAt(0);
 
+    DoeFileModel dfm;
     switch (c) {
       case OPEN_FILE:
-        System.out.println("got OPEN_FILE event");
+        checkDirty();
         doOpen(new File(((String)e.getSource())));
         break;
 
       case OPEN_FILE_CHOOSE:
-        System.out.println("got OPEN_FILE_CHOOSE event");
-        openSaveFileChooser.setDialogTitle("Open Doe File");
+        checkDirty();
+        openSaveFileChooser.setDialogTitle("Open Assembly or DOE File");
         int retv = openSaveFileChooser.showOpenDialog(mainFrame);
         if (retv != JFileChooser.APPROVE_OPTION)
           return;
@@ -92,26 +93,90 @@ public class DoeController implements DoeEvents, ActionListener
         File f = openSaveFileChooser.getSelectedFile();
         doOpen(f);
         break;
-      case IMPORT_ASSEMBLY:
-        System.out.println("got IMPORT_ASSEMBLY event");
-        break;
 
       case SAVE_FILE:
-        System.out.println("got SAVE_FILE event");
+        dfm = mainFrame.getModel();
+        if(dfm == null)
+          return;
+
+        if(dfm.userFile.getName().endsWith(".grd"))
+          doSave(dfm);
+        else
+          doSaveAs(dfm);
+        clearDirty();
         break;
+
       case SAVE_FILE_AS:
-        System.out.println("got SAVE_FILE_AS event");
+        dfm = mainFrame.getModel();
+        if(dfm == null)
+          return;
+        doSaveAs(dfm);
+        clearDirty();
         break;
 
       case EXIT_APP:
-        System.out.println("got EXIT_APP event");
-        //if(!dirty)
+        if(checkDirty() != JOptionPane.CANCEL_OPTION)
           System.exit(0);
-        break;
+       break;
+
       case RUN_JOB:
-        System.out.println("got RUN_JOB event");
         doRun();
         break;
+    }
+  }
+
+  private int checkDirty()
+  {
+    DoeFileModel dfm = mainFrame.getModel();
+    int reti = JOptionPane.YES_OPTION;
+    if(dfm != null) {
+      if(((ParamTableModel)dfm.paramTable.getModel()).dirty == true) {
+        reti = JOptionPane.showConfirmDialog(mainFrame,"Save changes?");
+        if(reti == JOptionPane.YES_OPTION)
+          doSave(dfm);
+      }
+    }
+    return reti;
+  }
+  private void clearDirty()
+  {
+    DoeFileModel dfm = mainFrame.getModel();
+    if(dfm != null)
+      ((ParamTableModel)dfm.paramTable.getModel()).dirty = false;
+  }
+
+  private void doSaveAs(DoeFileModel dfm)
+  {
+    String nm = dfm.userFile.getName();
+    if(!nm.endsWith(".grd")) {
+      int idx = nm.lastIndexOf('.');
+      nm = nm.substring(0,idx);
+      nm = nm+".grd";
+    }
+
+    openSaveFileChooser.setSelectedFile(new File(nm));
+    int ret = openSaveFileChooser.showSaveDialog(mainFrame);
+    if(ret != JFileChooser.APPROVE_OPTION)
+      return;
+
+    File f = openSaveFileChooser.getSelectedFile();
+    try {
+      dfm.marshall(f);
+    }
+    catch (Exception e) {
+      JOptionPane.showMessageDialog(mainFrame,"Error on file save-as: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
+    }
+    dfm.userFile = f;
+    mainFrame.setTitle(mainFrame.titleString+" -- "+dfm.userFile.getName());
+  }
+
+  private void doSave(DoeFileModel dfm)
+  {
+    try {
+      dfm.marshall(dfm.userFile);
+    }
+    catch (Exception e) {
+      JOptionPane.showMessageDialog(mainFrame,"Error on file save: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
     }
   }
 
@@ -120,6 +185,7 @@ public class DoeController implements DoeEvents, ActionListener
     try {
       DoeFileModel dfm = FileHandler.openFile(f);
       mainFrame.setModel(dfm);
+      mainFrame.setTitle(mainFrame.titleString+" -- "+dfm.userFile.getName());
     }
     catch (Exception e) {
       System.out.println("bad file open: "+e.getMessage());
@@ -128,15 +194,39 @@ public class DoeController implements DoeEvents, ActionListener
   private void doRun()
   {
     DoeFileModel dfm = mainFrame.getModel();
-    if(dfm != null)
-      FileHandler.runFile(dfm,mainFrame);
+
+    // check for anything checked
+    check:{
+      int n = dfm.paramTable.getModel().getRowCount();
+
+      for(int r=0;r<n;r++) {
+        if(((Boolean)dfm.paramTable.getModel().getValueAt(r,ParamTableModel.FACTOR_COL)).booleanValue() == true){
+          break check;
+        }
+      }
+      JOptionPane.showMessageDialog(mainFrame,"No independent variables (factors) selected.",
+          "Sorry",JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    if(dfm != null) {
+      File fil=null;
+      try {
+        fil = dfm.marshall();
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        return;
+      }
+      FileHandler.runFile(fil,dfm.userFile.getName(),mainFrame);
+    }
     else
       System.out.println("no model");
   }
 
   private JFileChooser initFileChooser()
   {
-    JFileChooser chooser = new JFileChooser(System.getProperty("user.home")+"/Desktop"); //dir")); //"Scripts");
+    JFileChooser chooser = new JFileChooser(); //System.getProperty("user.home")+"/Desktop"); //dir")); //"Scripts");
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     FileHandler.FileFilterEx[] filter = {
       new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
@@ -144,13 +234,8 @@ public class DoeController implements DoeEvents, ActionListener
     };
     for (int i = 0; i < filter.length; i++)
       chooser.addChoosableFileFilter(filter[i]);
-    
-    //chooser.setFileView(new FileHandler.IconFileView(".xml", new ImageIcon("build/image/xmlicon.png")));
+
     return chooser;
   }
 
-  public void setMenu(JMenuBar mb)
-  {
-
-  }
 }

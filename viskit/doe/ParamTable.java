@@ -114,11 +114,29 @@ public class ParamTable extends JTable
         setBackground(defaultC);
 
       setText(value.toString());
-      setToolTipText("" + row + " " + column); //todo something real
+      setToolTipText(getTT(column));
       return this;
 
     }
-
+    private String getTT(int col)
+    {
+      switch(col) {
+        case ParamTableModel.NAME_COL:
+          return "Name of variable.  Each variable used in the experiment must have a name.";
+        case ParamTableModel.TYPE_COL:
+          return "Variable type.";
+        case ParamTableModel.VALUE_COL:
+          return "Value of variable.  Not used if variable is used in experiment.";
+        case ParamTableModel.FACTOR_COL:
+          return "Whether this variable is used as an indepedent variable in the experiment.";
+        case ParamTableModel.MIN_COL:
+          return "Beginning value of independent variable.";
+        case ParamTableModel.MAX_COL:
+          return "Final value of independent variable.";
+        default:
+          return "";
+      }
+    }
     /**
      * Twiddle the background of the value, min and max cells based on the state of the
      * check box.
@@ -197,6 +215,7 @@ public class ParamTable extends JTable
         setBackground(defaultC);
 
       setSelected((value != null && ((Boolean) value).booleanValue()));
+      setToolTipText("Whether this variable is used as an indepedent variable in the experiment.");
 
       return this;
     }

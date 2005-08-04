@@ -57,8 +57,8 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
     // Top-level menus
     file = new fileMenu();
     add(file);
-    edit = new editMenu();
-    add(edit);
+   // edit = new editMenu();
+   // add(edit);
     run = new runMenu();
     add(run);
  }
@@ -82,9 +82,7 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
       super("File");
       JMenuItem mi;
 
-      mi = buildMI("Open Doe file",controller, OPEN_FILE_CHOOSE);
-      add(mi);
-      mi = buildMI("Import Viskit assembly file", controller, IMPORT_ASSEMBLY);
+      mi = buildMI("Open file",controller, OPEN_FILE_CHOOSE);
       add(mi);
 
       addSeparator();

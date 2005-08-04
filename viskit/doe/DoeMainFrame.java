@@ -58,12 +58,14 @@ public class DoeMainFrame extends JFrame implements DoeEvents
   JPanel leftP, rightP;
   JSplitPane split;
 
+  public String titleString = "Simkit/Viskit/Gridkit Experiment Design";
+
   public DoeMainFrame(DoeController controller)
   {
-    setTitle("!!!TEST only -- Load only Bremerton_1.grd...Simkit/Viskit/Gridkit Experiment Design");
+    setTitle(titleString);
     this.controller = controller;
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new myWlistener());
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new myWlistener());
 
     leftP = new JPanel(new BorderLayout());
     rightP = new JPanel(new BorderLayout());

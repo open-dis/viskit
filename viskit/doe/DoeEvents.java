@@ -47,7 +47,7 @@ public interface DoeEvents
 {
   public static final char OPEN_FILE        = '\u0000';
   public static final char OPEN_FILE_CHOOSE = '\u0001';
-  public static final char IMPORT_ASSEMBLY  = '\u0002';
+  //public static final char IMPORT_ASSEMBLY  = '\u0002';
   public static final char SAVE_FILE        = '\u0003';
   public static final char SAVE_FILE_AS     = '\u0004';
 

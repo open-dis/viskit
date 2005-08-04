@@ -73,7 +73,7 @@ public class ParamTableModel extends DefaultTableModel
   Vector rows;
   public HashSet noEditRows = new HashSet();
   public HashSet multiRows = new HashSet();
-
+  public boolean dirty = false;
   public ParamTableModel(List simEntitiesJDom, List designParamsJDom)
   {
     super(0, 0);
@@ -94,6 +94,7 @@ public class ParamTableModel extends DefaultTableModel
         processDesignParam(elm);
       }
     }
+    dirty = false;
   }
 
   private void processDesignParam(Element elm)
@@ -104,15 +105,22 @@ public class ParamTableModel extends DefaultTableModel
     String nm = (at==null?"":at.getValue());
     assert nm.length()>0:"Terminal param w/out name ref!";
     int row = ((Integer)termHashMap.get(nm)).intValue();
+
+    at = elm.getAttribute("value");
+    String val = (at==null?"":at.getValue());
+    setValueAt(val,row,VALUE_COL);
+
     String txt = elm.getTextTrim();
     Object[] minMax = parseMinMax(txt);
     if(minMax != null) {
-      this.setValueAt(""+((Double)minMax[0]).doubleValue(),row,MIN_COL);
-      this.setValueAt(""+((Double)minMax[1]).doubleValue(),row,MAX_COL);
-    //List lis = elm.getContent();
-    //System.out.println(typ+" "+nm +" "+txt);
-      setValueAt(new Boolean(true),row,FACTOR_COL); //cb
+      setValueAt(""+((Double)minMax[0]).doubleValue(),row,MIN_COL);
+      setValueAt(""+((Double)minMax[1]).doubleValue(),row,MAX_COL);
     }
+    else {
+      setValueAt("0.0",row,MIN_COL);
+      setValueAt("1.0",row,MAX_COL);
+    }
+    setValueAt(new Boolean(true),row,FACTOR_COL); //cb
   }
   
   Object[] parseMinMax(String txt)
@@ -134,6 +142,7 @@ public class ParamTableModel extends DefaultTableModel
 
   String currentSEname = "";
   HashMap termHashMap = new HashMap();
+  ArrayList elementsByRow = new ArrayList();
   Vector prefixes;
   private void processRow(Element el)
   {
@@ -150,6 +159,8 @@ public class ParamTableModel extends DefaultTableModel
       oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
       oa[FACTOR_COL] = new Boolean(false);
       rows.add(oa);
+      elementsByRow.add(el);
+
       noEditRows.add(new Integer(rows.size()-1));
       prefixes.clear();
       prefixes.add(currentSEname);
@@ -173,6 +184,8 @@ public class ParamTableModel extends DefaultTableModel
       oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
       oa[FACTOR_COL] = new Boolean(false);
       rows.add(oa);
+      elementsByRow.add(el);
+
       termHashMap.put(nam,new Integer(rows.size()-1));
     }
     else {
@@ -184,6 +197,8 @@ public class ParamTableModel extends DefaultTableModel
       oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
       oa[FACTOR_COL] = new Boolean(false);
       rows.add(oa);
+      elementsByRow.add(el);
+
       multiRows.add(new Integer(rows.size()-1));
 
       List children = el.getChildren();
@@ -195,6 +210,16 @@ public class ParamTableModel extends DefaultTableModel
       }
     }
   }
+
+  public Element getElementAtRow(int r)
+  {
+    return (Element)elementsByRow.get(r);
+  }
+  public Object[] getRowData(int r)
+  {
+    return mydata[r];
+  }
+
   StringBuffer sb = new StringBuffer();
   private String dumpPrefixes()
   {
@@ -270,7 +295,33 @@ public class ParamTableModel extends DefaultTableModel
    */
   public void setValueAt(Object value, int row, int col)
   {
+    Element el = (Element)elementsByRow.get(row);
+    switch(col) {
+      case NAME_COL:
+        el.setAttribute("nameRef",value.toString());
+        break;
+      case TYPE_COL:
+        el.setAttribute("type",value.toString());
+        break;
+      case VALUE_COL:
+        el.setAttribute("value",value.toString());
+        break;
+      case FACTOR_COL:
+        // nothing here
+        break;
+      case MIN_COL:
+        // nothing here
+        break;
+      case MAX_COL:
+        // nothing here
+        break;
+      default:
+        assert false: "Program error, ParamTableModel.setValueAt()";
+    }
+
     mydata[row][col] = value;
+    dirty=true;
+
     fireTableCellUpdated(row, col);
   }
 

@@ -44,9 +44,9 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Attribute;
 import viskit.SpringUtilities;
 
 import javax.swing.*;
@@ -62,8 +62,9 @@ import java.util.Vector;
 
 public class JobLauncher extends JFrame implements Runnable
 {
-  String file;
-  File f;
+  String inputFileString;
+  File inputFile;
+  File filteredFile;
   FileReader fr;
   PrintWriter out;
   BufferedReader br;
@@ -84,15 +85,21 @@ public class JobLauncher extends JFrame implements Runnable
   private Thread thread;
   private boolean outputDirty = false;
 
-  public JobLauncher(String file, JFrame mainFrame)
+  public JobLauncher(String file, String title, JFrame mainFrame)
   {
-    super("Job " + file);
-    this.file = file;
-    f = new File(file);
+    super("Job " + title);
+    inputFileString = file;
+    inputFile = new File(file);
+    filteredFile = inputFile;      // will be possibly changed
 
-    this.mom = mainFrame;
-    this.designPts = designPts;
-    this.numRuns = numRuns;
+    try {
+      filteredFile = File.createTempFile("DoeInputFile",".xml");
+    }
+    catch (IOException e) {
+      System.out.println("couldn't make temp file");
+    }
+
+    mom = mainFrame;
 
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -152,9 +159,9 @@ public class JobLauncher extends JFrame implements Runnable
     setContentPane(p);
 
     pack();
-    Dimension d = this.getSize();
+    Dimension d = getSize();
     d.width+=50;
-    this.setSize(d);
+    setSize(d);
     centerMe();
 
     setVisible(true);
@@ -171,7 +178,7 @@ public class JobLauncher extends JFrame implements Runnable
 
   private void getParams() throws Exception
   {
-    doc = FileHandler.unmarshallJdom(f);
+    doc = FileHandler.unmarshallJdom(inputFile);
     Element root = doc.getRootElement();
 
     Element exp = root.getChild("Experiment");
@@ -197,7 +204,7 @@ public class JobLauncher extends JFrame implements Runnable
     att = exp.getAttribute("timeout");
     att.setValue(tmo.getText().trim());
 
-    FileHandler.marshallJdom(f,doc);
+    FileHandler.marshallJdom(filteredFile,doc);
   }
 
   private void doListeners()
@@ -316,7 +323,7 @@ public class JobLauncher extends JFrame implements Runnable
       writeStatus("Building XML-RPC client to " + clusterDNS + ".");
       rpc = new XmlRpcClientLite(clusterDNS, 4444);
 
-      fr = new FileReader(f);
+      fr = new FileReader(filteredFile);
       br = new BufferedReader(fr);
       data = new StringWriter();
       out = new PrintWriter(data);
@@ -401,7 +408,7 @@ public class JobLauncher extends JFrame implements Runnable
     if(args.length != 1)
       System.out.println("Give .grd file as argument");
     else
-      new JobLauncher(args[0],null);
+      new JobLauncher(args[0],args[0],null);
   }
 
 }
