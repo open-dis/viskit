@@ -76,14 +76,16 @@ public class JobLauncher extends JFrame implements Runnable
   private JButton canButt;
   private JButton runButt;
   private JButton closeButt;
-  private int designPts,numRuns;
   private Document doc;
-  private JTextField samps;
+  private JTextField sampsTF;
   private JTextField runs;
+  private JTextField dps;
   private JTextField tmo;
 
   private Thread thread;
   private boolean outputDirty = false;
+  private int numRuns,designPts;
+  private int samps;
 
   public JobLauncher(String file, String title, JFrame mainFrame)
   {
@@ -112,15 +114,18 @@ public class JobLauncher extends JFrame implements Runnable
 
     JTextField cluster = new JTextField(clusterDNS);
     JLabel clusLab = new JLabel("Target grid engine");
-    samps = new JTextField(6);
-    JLabel sampLab = new JLabel("Number of samples");
+    sampsTF = new JTextField(6);
+    JLabel dpLab = new JLabel("Design points");
+    dps = new JTextField(6);
+    JLabel sampLab = new JLabel("Hypercubes");
     runs = new JTextField(6);
-    JLabel runLab = new JLabel("Number of runs");
+    JLabel runLab = new JLabel("Replications");
     tmo = new JTextField(6);
-    JLabel tmoLab = new JLabel("Time out (ms)");
+    JLabel tmoLab = new JLabel("Replication time out (ms)");
 
+    dps.setEditable(false);
     cluster.setEditable(false);
-    cluster.setBackground(samps.getBackground());
+    //cluster.setBackground(samps.getBackground());
 
     try {
       getParams();
@@ -131,14 +136,16 @@ public class JobLauncher extends JFrame implements Runnable
 
     topPan.add(clusLab);
     topPan.add(cluster);
+    topPan.add(dpLab);
+    topPan.add(dps);
     topPan.add(sampLab);
-    topPan.add(samps);
+    topPan.add(sampsTF);
     topPan.add(runLab);
     topPan.add(runs);
     topPan.add(tmoLab);
     topPan.add(tmo);
 
-    SpringUtilities.makeCompactGrid(topPan, 4, 2, 10, 10, 5, 5);
+    SpringUtilities.makeCompactGrid(topPan, 5, 2, 10, 10, 5, 5);
     topPan.setMaximumSize(topPan.getPreferredSize());
 
     canButt = new JButton("Cancel job");
@@ -183,11 +190,22 @@ public class JobLauncher extends JFrame implements Runnable
 
     Element exp = root.getChild("Experiment");
 
+    designPts = root.getChildren("TerminalParameter").size();
+    dps.setText(""+designPts);
+
     String att = exp.getAttributeValue("totalSamples");
-    samps.setText(att);
-    designPts = Integer.parseInt(att);
+    if(att != null) { // old code
+      samps = Integer.parseInt(att);
+      sampsTF.setText(""+samps/designPts);
+    }
+    else {
+      att = exp.getAttributeValue("samples");
+      if(att != null)
+        sampsTF.setText(att);
+    }
     att = exp.getAttributeValue("runsPerDesignPoint");
     runs.setText(att);
+
     numRuns = Integer.parseInt(att);
     att = exp.getAttributeValue("timeout");
     tmo.setText(att);
@@ -196,13 +214,19 @@ public class JobLauncher extends JFrame implements Runnable
   {
     Element root = doc.getRootElement();
     Element exp = root.getChild("Experiment");
+    samps = Integer.parseInt(sampsTF.getText());
+    designPts = Integer.parseInt(dps.getText());
+    numRuns = Integer.parseInt(runs.getText());
     Attribute att;
     att = exp.getAttribute("totalSamples");
-    att.setValue(samps.getText().trim());
-    att = exp.getAttribute("runsPerDesignPoint");
-    att.setValue(runs.getText().trim());
-    att = exp.getAttribute("timeout");
-    att.setValue(tmo.getText().trim());
+    if(att != null) {
+      att.setValue(""+samps*designPts);
+    }
+    else {
+      exp.setAttribute("samples",""+samps);
+    }
+    exp.setAttribute("runsPerDesignPoint",""+numRuns);
+    exp.setAttribute("timeout",tmo.getText().trim());
 
     FileHandler.marshallJdom(filteredFile,doc);
   }
@@ -330,7 +354,6 @@ public class JobLauncher extends JFrame implements Runnable
       String line;
       while ((line = br.readLine()) != null) {
         out.println('\t' + line);
-        //System.out.println('\t' + line);
       }
       out.close();
 
@@ -354,8 +377,8 @@ public class JobLauncher extends JFrame implements Runnable
     Vector parms = new Vector();
     Object o = null;
     int i=0;
-    int n = designPts*numRuns;
-    for (int dp = 0; dp < designPts; dp++) {
+    int n = designPts*samps*numRuns;
+    for (int dp = 0; dp < designPts*samps; dp++) {
       for (int nrun = 0; nrun < numRuns; nrun++,i++) {
         try {
           parms.clear();
