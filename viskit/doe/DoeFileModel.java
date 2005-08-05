@@ -92,14 +92,14 @@ public class DoeFileModel
 
       String val = (String)rData[ParamTableModel.VALUE_COL];
       if(val != null && val.length()>0)
-        el.getAttribute("value").setValue(val);
+        el.setAttribute("value",val);
 
       if(((Boolean)rData[ParamTableModel.FACTOR_COL]).booleanValue() == true) {
         String nmrf = (String)rData[ParamTableModel.NAME_COL];
         if(nmrf != null && nmrf.length()>0)
-          el.getAttribute("nameRef").setValue(nmrf);
+          el.setAttribute("nameRef",nmrf);
         else
-          el.getAttribute("nameRef").setValue("noname"+r);
+          el.setAttribute("nameRef","noname"+r);
 
         Element tp = new Element("TerminalParameter");
         tp.setAttribute("type",el.getAttribute("type").getValue());
