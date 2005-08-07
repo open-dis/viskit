@@ -80,8 +80,8 @@
 <!ATTLIST Results 
     design  CDATA #REQUIRED
     run     CDATA #REQUIRED
-    index   CDATA #REQUIRED
-    job     CDATA #REQUIRED
+    index   CDATA #IMPLIED
+    job     CDATA #IMPLIED
 >
 
 <!ELEMENT DesignPoint (TerminalParameter*,Script?,Run*) >
