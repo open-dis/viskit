@@ -436,15 +436,38 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
 	    pw.println(sp4 + "java.beans.PropertyChangeListener" + sp + pcl.getName() + sp + eq + sp);
 	    pw.print(sp8 + nw + sp + pcl.getType() + lp);
-	    if ( tparami.hasNext() ) {
-	        while ( tparami.hasNext() ) {
+            
+            // this is effectively not used by Viskit, not sending any parameters for 
+            // properties to listen to. instead use info from PropertyChangeListenerConnection
+	    //if ( tparami.hasNext() ) {
+	        //while ( tparami.hasNext() ) {
 		    // note, check if PropertyChangeListeners can have more than one
 		    // String param, if so, do a maybeComma() 
 		    // see bug #36, this should now check all other parameter types
-		    doSimpleStringParameter((TerminalParameter)tparami.next(), pw);
-	        }
-	    } 
-	    pw.println(rp + sc);
+		    //doSimpleStringParameter((TerminalParameter)tparami.next(), pw);
+	        //}
+	    //}
+            
+            // also note this fix will only accept DISKIT PCL's, as simkit.stat's 
+            // construct with just the name of the property.
+            
+            pw.print(qu+pcl.getName()+qu);
+	    
+            // dig through PropertyChangeListenerConnections to get the name of the 
+            // property. It may be possible to have more than one PCLC per PCL, results
+            // currently undefined if the names/types of the properties are different.
+            
+            PropertyChangeListenerConnectionType pclc;
+            String property = null;
+            ListIterator lipclc = root.getPropertyChangeListenerConnection().listIterator();
+            while(lipclc.hasNext()) {
+                pclc = (PropertyChangeListenerConnection)(lipclc.next());
+                if ( pclc.getListener().equals(pcl) ) { // idref should return same obj
+                    property = pclc.getProperty();
+                }
+            }
+            if (property != null) pw.print(cm+sp+qu+property+qu);
+            pw.println(rp + sc);
 	    pw.println();
 	} 
 
@@ -686,6 +709,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
     
     public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
+    
+        System.out.println("Doing GridTask "+taskID+" of "+lastTask+" for "+frontHost+" as jobID "+jobID);
+        
         
         unmarshal();
         
@@ -701,6 +727,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         List params = root.getDesignParameters();
         Iterator itd = designParams.iterator();
         Iterator itp = params.iterator();
+        boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
         
         System.out.println(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
         exp.setBatchID(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
@@ -723,11 +750,13 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             PrintStream err = new PrintStream(baos2);
             java.io.OutputStream oldErr = System.err;
             
-            System.setErr(err);
-            System.setOut(log);
+            if(!debug_io) {
+                System.setErr(err);
+                System.setOut(log);
+            }
             
             bsh.Interpreter bsh = new bsh.Interpreter();
-            bsh.setClassLoader(SimkitAssemblyXML2Java.class.getClassLoader());
+            //bsh.setClassLoader(SimkitAssemblyXML2Java.class.getClassLoader());
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
@@ -749,8 +778,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(bais);
                 sx2j.unmarshal();
+                
 		System.out.println("Evaluating generated java Event Graph:");
 		System.out.println(sx2j.translate());
+                
                 bsh.eval(sx2j.translate());
                 
             }
@@ -763,8 +794,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
             bsh.eval(root.getName()+".main(new String[0]);");
             
-            System.setOut(new PrintStream(oldOut));
-            System.setErr(new PrintStream(oldErr));
+            if(!debug_io) {
+                System.setOut(new PrintStream(oldOut));
+                System.setErr(new PrintStream(oldErr));
+            }
             
             java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
@@ -786,13 +819,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 
                 out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" design="+qu+designPtIndex+qu+" run="+qu+runIndex+qu+">");
                 while( (line = br.readLine()) != null ) {
-                    if (line.indexOf("<PropertyChange") !=0) {
+                    if (line.indexOf("<PropertyChange") < 0) {
                         logs.add(line);
-                        
                     } else {
                         propertyChanges.add(line);
+                        // all one line? already added, else :
+                        while (line.indexOf("</PropertyChange>") < 0 ) {
+                            if ( ( line = br.readLine() ) != null ) {
+                                propertyChanges.add(line);
+                            }
+                        }
+ 
                     }
-                    
                 }
                 while( (line = ebr.readLine()) != null ) {
                     errs.add(line);
@@ -826,6 +864,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 //send results back to front end
                 Vector parms = new Vector();
                 parms.add(new String(sw.toString()));
+                
+                //debug
+                System.out.println("sending Result ");
+                System.out.println(sw.toString());
+                
                 xmlrpc.execute("experiment.addResult", parms);
                 
             } catch (Exception e) {
