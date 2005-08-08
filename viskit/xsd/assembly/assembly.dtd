@@ -76,6 +76,10 @@
 <!ELEMENT Log (#PCDATA) >
 <!ELEMENT Errors (#PCDATA) >
 <!ELEMENT PropertyChange (#PCDATA) >
+<!ATTLIST PropertyChange
+    listenerName CDATA #REQUIRED
+    property CDATA #IMPLIED
+>
 <!ELEMENT Results ( Log | PropertyChange | Errors )* >
 <!ATTLIST Results 
     design  CDATA #REQUIRED
@@ -104,6 +108,7 @@
     totalSamples CDATA "1"
     jitter ( true | false ) "true"
     timeout CDATA "0"
+    debug ( true | false ) "false"
 >
 
 <!ELEMENT EventGraph (#PCDATA) >
