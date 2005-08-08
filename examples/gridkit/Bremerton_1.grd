@@ -180,7 +180,7 @@
 
     </EventGraph>
     
-    <SimEntity name="DISReferee" type="diskit.DISReferee">
+    <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter type="boolean" value="true"/>
         <TerminalParameter type="java.lang.String" value="239.255.5.8"/>
         <TerminalParameter type="int" value="62040"/>
@@ -399,32 +399,35 @@
         <TerminalParameter type="diskit.Mover3D" value="Platform_0"/>
         <TerminalParameter type="double" value="700.0"/>
     </SimEntity>
-    
+    <PropertyChangeListener name="Platform_0_Status" type="diskit.stat.MarshaledSimpleStatsTally">
+        <TerminalParameter type="java.lang.String" value=""/>
+        <TerminalParameter type="java.lang.String" value=""/>
+    </PropertyChangeListener>
     <SimEventListenerConnection listener="PatrolBoat" source="ExclusionZone"/>
-    <SimEventListenerConnection listener="DISReferee" source="PatrolBoat"/>
-    <SimEventListenerConnection listener="DISReferee" source="Terrorist1"/>
-    <SimEventListenerConnection listener="DISReferee" source="Terrorist2"/>
-    <SimEventListenerConnection listener="DISReferee" source="Terrorist3"/>
-    <SimEventListenerConnection listener="DISReferee" source="PatrolBoat2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PatrolBoat"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist3"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PatrolBoat2"/>
     <SimEventListenerConnection listener="MachineGun" source="PatrolBoat"/>
     <SimEventListenerConnection listener="MachineGun2" source="PatrolBoat2"/>
-    <SimEventListenerConnection listener="DISReferee" source="Platform"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform"/>
     <SimEventListenerConnection listener="BassTracker" source="BassMan"/>
-    <SimEventListenerConnection listener="DISReferee" source="BassMan"/>
-    <SimEventListenerConnection listener="DISReferee" source="MachineGun"/>
-    <SimEventListenerConnection listener="DISReferee" source="MachineGun2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="BassMan"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="MachineGun"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="MachineGun2"/>
     <SimEventListenerConnection listener="PatrolBoat" source="Platform"/>
     <SimEventListenerConnection listener="ExclusionZone" source="Platform"/>
-    <SimEventListenerConnection listener="DISReferee" source="Platform_0"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform_0"/>
     <SimEventListenerConnection listener="ExclusionZone1" source="Platform_0"/>
     <SimEventListenerConnection listener="PatrolBoat2" source="ExclusionZone1"/>
     <SimEventListenerConnection listener="PatrolBoat2" source="Platform_0"/>
-    
-    <Output entity="DISReferee"/>
+    <PropertyChangeListenerConnection listener="Platform_0_Status" property="alive" source="Platform_0"/>
+    <Output entity="ScenarioManager"/>
     
     <Schedule stopTime="10000.0" verbose="false"/>
 
-    <Experiment type="latin-hypercube" totalSamples="100" runsPerDesignPoint="5" />
+    <Experiment type="latin-hypercube" totalSamples="10" runsPerDesignPoint="5" timeout="15000" />
     
 </SimkitAssembly>
 
