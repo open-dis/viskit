@@ -49,11 +49,15 @@ import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import bsh.Interpreter;
+import bsh.NameSpace;
+import bsh.EvalError;
+
 
 public class ParamTableModel extends DefaultTableModel
 {
   public static final int NUM_COLS = 6;
-  
+
   public static String[] columnNames = {
       "SimEntity/Parameter name",
       "Type",
@@ -78,6 +82,7 @@ public class ParamTableModel extends DefaultTableModel
   {
     super(0, 0);
 
+    initBeanShell();
     rows = new Vector();
     prefixes = new Vector();
     for (Iterator itr = simEntitiesJDom.iterator(); itr.hasNext();) {
@@ -111,10 +116,10 @@ public class ParamTableModel extends DefaultTableModel
     setValueAt(val,row,VALUE_COL);
 
     String txt = elm.getTextTrim();
-    Object[] minMax = parseMinMax(txt);
+    Double[] minMax = parseMinMax(nm,txt);
     if(minMax != null) {
-      setValueAt(""+((Double)minMax[0]).doubleValue(),row,MIN_COL);
-      setValueAt(""+((Double)minMax[1]).doubleValue(),row,MAX_COL);
+      setValueAt(""+(minMax[0]).doubleValue(),row,MIN_COL);
+      setValueAt(""+(minMax[1]).doubleValue(),row,MAX_COL);
     }
     else {
       setValueAt("0.0",row,MIN_COL);
@@ -122,9 +127,43 @@ public class ParamTableModel extends DefaultTableModel
     }
     setValueAt(new Boolean(true),row,FACTOR_COL); //cb
   }
-  
-  Object[] parseMinMax(String txt)
+
+  Interpreter interpreter;
+  private void initBeanShell()
   {
+    interpreter = new Interpreter();
+    interpreter.setStrictJava(true);       // no loose typeing
+    NameSpace ns = interpreter.getNameSpace();
+    ns.importPackage("simkit.*");
+    ns.importPackage("simkit.examples.*");
+    ns.importPackage("simkit.random.*");
+    ns.importPackage("simkit.smdx.*");
+    ns.importPackage("simkit.stat.*");
+    ns.importPackage("simkit.util.*");
+    ns.importPackage("diskit.*");         // 17 Nov 2004
+  }
+
+  Double[] parseMinMax(String name, String txt)
+  {
+    Double[] o=null;
+    try {
+      interpreter.eval(txt);   // insert method
+      o = (Double[])interpreter.eval(name+"()");
+      Double test = o[0];
+      test = o[1];            // will except if not good array
+    }
+    catch (Exception e) {
+      System.out.println("Beanshell error: "+e.getMessage());
+      return null;
+    }
+    // check min
+    if(o[0].doubleValue() > o[1].doubleValue()) {
+      Double mn = o[1];
+      o[1] = o[0];
+      o[0] = mn;
+    }
+    return o;
+/*
     Pattern pat =  Pattern.compile("Double\\s*\\(",Pattern.DOTALL);
 
     String[] sa = pat.split(txt);
@@ -137,6 +176,7 @@ public class ParamTableModel extends DefaultTableModel
     da[1] = sa[2].substring(0,sa[2].indexOf(')')).trim();
     da[1] = new Double((String)da[1]);
     return da;
+*/
   }
 
 

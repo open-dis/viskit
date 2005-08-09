@@ -47,6 +47,7 @@ import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Text;
 import viskit.SpringUtilities;
 
 import javax.swing.*;
@@ -57,8 +58,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.HashMap;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.net.URL;
 
 public class JobLauncher extends JFrame implements Runnable
 {
@@ -73,19 +75,23 @@ public class JobLauncher extends JFrame implements Runnable
   JFrame mom;
 
   String clusterDNS = "cluster.moves.nps.navy.mil";
+  int    clusterPort = 4445;
+  int    chosenPort;
+  String clusterWebStatus1 = "http://cluster.moves.nps.navy.mil/ganglia/";
+  String clusterWebStatus  = "http://cluster.moves.nps.navy.mil/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
   private JButton canButt;
   private JButton runButt;
   private JButton closeButt;
   private Document doc;
   private JTextField sampsTF;
+  private JTextField portTF;
   private JTextField runs;
   private JTextField dps;
   private JTextField tmo;
 
   private Thread thread;
   private boolean outputDirty = false;
-  private int numRuns,designPts;
-  private int samps;
+  private int numRuns,designPts,samps;
 
   public JobLauncher(String file, String title, JFrame mainFrame)
   {
@@ -115,6 +121,8 @@ public class JobLauncher extends JFrame implements Runnable
     JTextField cluster = new JTextField(clusterDNS);
     JLabel clusLab = new JLabel("Target grid engine");
     sampsTF = new JTextField(6);
+    JLabel portLab = new JLabel("RPC port");
+    portTF = new JTextField(6);
     JLabel dpLab = new JLabel("Design points");
     dps = new JTextField(6);
     JLabel sampLab = new JLabel("Hypercubes");
@@ -136,6 +144,8 @@ public class JobLauncher extends JFrame implements Runnable
 
     topPan.add(clusLab);
     topPan.add(cluster);
+    topPan.add(portLab);
+    topPan.add(portTF);
     topPan.add(dpLab);
     topPan.add(dps);
     topPan.add(sampLab);
@@ -145,7 +155,7 @@ public class JobLauncher extends JFrame implements Runnable
     topPan.add(tmoLab);
     topPan.add(tmo);
 
-    SpringUtilities.makeCompactGrid(topPan, 5, 2, 10, 10, 5, 5);
+    SpringUtilities.makeCompactGrid(topPan, 6, 2, 10, 10, 5, 5);
     topPan.setMaximumSize(topPan.getPreferredSize());
 
     canButt = new JButton("Cancel job");
@@ -194,21 +204,18 @@ public class JobLauncher extends JFrame implements Runnable
     dps.setText(""+designPts);
 
     String att = exp.getAttributeValue("totalSamples");
-    if(att != null) { // old code
-      samps = Integer.parseInt(att);
-      sampsTF.setText(""+samps/designPts);
-    }
-    else {
-      att = exp.getAttributeValue("samples");
-      if(att != null)
-        sampsTF.setText(att);
-    }
+    if(att != null)
+      sampsTF.setText(att);
+
     att = exp.getAttributeValue("runsPerDesignPoint");
-    runs.setText(att);
+    if(att != null)
+      runs.setText(att);
 
     numRuns = Integer.parseInt(att);
     att = exp.getAttributeValue("timeout");
     tmo.setText(att);
+
+    portTF.setText(""+clusterPort);
   }
   private void setParams() throws Exception
   {
@@ -217,17 +224,12 @@ public class JobLauncher extends JFrame implements Runnable
     samps = Integer.parseInt(sampsTF.getText());
     designPts = Integer.parseInt(dps.getText());
     numRuns = Integer.parseInt(runs.getText());
-    Attribute att;
-    att = exp.getAttribute("totalSamples");
-    if(att != null) {
-      att.setValue(""+samps*designPts);
-    }
-    else {
-      exp.setAttribute("samples",""+samps);
-    }
+    chosenPort = Integer.parseInt(portTF.getText());
+
+    exp.setAttribute("totalSamples",""+samps);
     exp.setAttribute("runsPerDesignPoint",""+numRuns);
     exp.setAttribute("timeout",tmo.getText().trim());
-
+    //exp.setAttribute("debug","false");
     FileHandler.marshallJdom(filteredFile,doc);
   }
 
@@ -321,6 +323,8 @@ public class JobLauncher extends JFrame implements Runnable
       thread = null;
       t.interrupt();
     }
+
+    hideClusterStatus();
   }
 
   private void writeStatus(final String s)
@@ -341,13 +345,15 @@ public class JobLauncher extends JFrame implements Runnable
   {
     outputDirty = true;
     try {
+      showClusterStatus(clusterWebStatus);
       createOutputDir();
       setParams(); // runs, sampls, tmo
 
       writeStatus("Building XML-RPC client to " + clusterDNS + ".");
-      rpc = new XmlRpcClientLite(clusterDNS, 4444);
+      rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
 
       fr = new FileReader(filteredFile);
+      //fr = new FileReader("/users/mike/Desktop/rickBrem.grd"); //Bremerton_1.grd");
       br = new BufferedReader(fr);
       data = new StringWriter();
       out = new PrintWriter(data);
@@ -359,6 +365,7 @@ public class JobLauncher extends JFrame implements Runnable
 
       Vector parms = new Vector();
       parms.add(data.toString());
+
       writeStatus("Sending job file to " + clusterDNS);
       Object o = rpc.execute("experiment.setAssembly", parms);
       writeStatus("experiment.setAssembly returned " + o);
@@ -374,6 +381,7 @@ public class JobLauncher extends JFrame implements Runnable
     try {Thread.sleep(10000);}catch (InterruptedException e) {e.printStackTrace();}
     writeStatus("Getting results:");
 
+    outputList = new ArrayList();
     Vector parms = new Vector();
     Object o = null;
     int i=0;
@@ -397,20 +405,106 @@ public class JobLauncher extends JFrame implements Runnable
       }
     }
 
+    doResults();
     stopRun();
   }
 
-  HashMap outputs = new HashMap();
 
+
+
+  //HashMap outputs = new HashMap();
+  ArrayList outputList;
   private void createOutputDir() throws Exception
   {
     outDir = File.createTempFile("DoeRun","");
     outDir.delete();
     outDir.mkdir();
   }
+
+  private void doResults()
+  {
+    Vector v = new Vector();
+
+      for(int i=0;i<outputList.size();i++) {
+        try {
+        Object[] oa = (Object[])outputList.get(i);
+        File f = new File((String)oa[2]);
+        int dp = ((Integer)oa[0]).intValue();
+        int nrun = ((Integer)oa[1]).intValue();
+
+
+        Document doc =  FileHandler.unmarshallJdom(f);
+        System.out.println("bp");
+        Element el = doc.getRootElement();
+        if(!el.getName().equals("Results")) {
+          System.out.println("Unknown results format, design point = "+dp+", run = "+nrun);
+          continue;
+        }
+        String design = attValue(el,"design");
+        String index = attValue(el,"index");
+        String job = attValue(el,"job");
+        String run = attValue(el,"run");
+
+        Element propCh = el.getChild("PropertyChange");
+        if(propCh == null) {
+          System.out.println("PropertyChange results element null, design point = "+dp+", run = "+nrun);
+          continue;
+        }
+        String listenerName = attValue(propCh,"listenerName");
+        String property = attValue(propCh,"property");
+        java.util.List content = propCh.getContent();
+        Text txt = (Text)content.get(0);
+        String cstr = txt.getTextTrim();
+        String[] sa = cstr.split("\n1");
+        if(sa.length != 2) {
+          System.out.println("PropertyChange parse error, design point = "+dp+", run = "+nrun);
+          continue;
+        }
+        sa[1] = sa[1].trim();
+        String[] nums = sa[1].split("\\s+");
+        Gresults res = new Gresults();
+        res.listener = listenerName;
+        res.property = property;
+        res.run = Integer.parseInt(run);
+        assert res.run == nrun :"JobLauncher.doResults";
+
+        res.dp = Integer.parseInt(design);
+        assert res.dp == dp : "JobLauncher.doResults1";
+        boolean[] ba = new boolean[nums.length];
+        for(int j=0;j<ba.length;j++) {
+          double d = Double.parseDouble(nums[j]);
+          ba[j] = d != 0.0d;
+        }
+        res.results = ba;
+        v.add(res);
+
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    }
+
+    if(v.size() > 0)
+      new JobResults(mom,v);
+  }
+  public class Gresults
+  {
+    String listener;
+    String property;
+    int run;
+    int dp;
+    boolean[] results;
+  }
+  String attValue(Element e, String att)
+  {
+    Attribute at = e.getAttribute(att);
+    return (at!=null?at.getValue():null);
+  }
   File outDir;
   private void saveOutput(String o, int dp, int nrun)
   {
+    if(o == null)
+      System.out.println("mischief detected!");
     try {
       File f = File.createTempFile("DoeResults", ".xml", outDir);
       f.deleteOnExit();
@@ -418,14 +512,109 @@ public class JobLauncher extends JFrame implements Runnable
       fw.write(o);
       fw.close();
       writeStatus("Result saved to "+f.getAbsolutePath());
-      outputs.put("" + dp + "," + nrun, f);
+      //outputs.put("" + dp + "," + nrun, f);
+
+      outputList.add(new Object[]{new Integer(dp),new Integer(nrun),f.getAbsolutePath()});
+
     }
     catch (IOException e) {
       writeStatus("error saving output for run " + dp + ", " + nrun + ": " + e.getMessage());
     }
 
   }
+  JFrame clusterStatusFrame;
+  JEditorPane editorPane;
+  JScrollPane editorScrollPane;
+  URL statusURL;
+  Thread statusThread;
 
+  private void showClusterStatus(String surl)
+  {
+    if(clusterStatusFrame == null) {
+      clusterStatusFrame = new JFrame("Cluster Status");
+      editorPane = new JEditorPane();
+      editorPane.setEditable(false);
+      editorScrollPane = new JScrollPane(editorPane);
+      editorScrollPane.setVerticalScrollBarPolicy(
+                      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      editorScrollPane.setPreferredSize(new Dimension(640,480));
+      editorScrollPane.setMinimumSize(new Dimension(10, 10));
+
+      clusterStatusFrame.getContentPane().setLayout(new BorderLayout());
+      clusterStatusFrame.getContentPane().add(editorScrollPane);
+    }
+
+    try {
+      statusURL = new URL(surl);
+      editorPane.setPage(statusURL);
+    }
+    catch (Exception e) {
+      System.out.println("Error showing cluster status: "+e.getMessage());
+      return;
+    }
+
+    clusterStatusFrame.pack();
+    clusterStatusFrame.setVisible(true);
+
+    stopStatusThread(); // if running
+    statusThread = new Thread(new statusUpdater());
+    statusThread.start();
+
+  }
+
+  private void hideClusterStatus()
+  {
+    if(clusterStatusFrame != null) {
+      clusterStatusFrame.setVisible(false);
+    }
+    stopStatusThread();
+  }
+
+  private void stopStatusThread()
+  {
+    if(statusThread != null) {
+      Thread t = statusThread;
+      statusThread = null;
+      t.interrupt();
+      Thread.yield();
+    }
+  }
+
+  class statusUpdater implements Runnable
+  {
+    public void run()
+    {
+      while (statusThread != null && clusterStatusFrame != null) {
+        try{
+          Thread.sleep(5000);
+          System.out.println("updating cluster status");
+
+          // to refresh
+          javax.swing.text.Document doc = editorPane.getDocument();
+          doc.putProperty(javax.swing.text.Document.StreamDescriptionProperty, null);
+
+          final JScrollBar hbar = editorScrollPane.getHorizontalScrollBar();
+          System.out.println("h value = "+hbar.getValue());
+          final JScrollBar vbar = editorScrollPane.getHorizontalScrollBar();
+          editorPane.setPage(statusURL); // same page
+          editorPane.setCaretPosition(editorPane.getDocument().getLength());
+          //editorPane.revalidate();
+          int hm = hbar.getMaximum();
+          int vm = vbar.getMaximum();
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+              hbar.setValue(50);
+              vbar.setValue(50); //vbar.getMaximum());
+            }
+          });
+       }
+        catch(Exception e) {
+          System.out.println("statusUpdater kill: "+e.getMessage());
+        }
+      }
+    }
+  }
   public static void main(String[] args)
   {
     if(args.length != 1)
@@ -433,5 +622,6 @@ public class JobLauncher extends JFrame implements Runnable
     else
       new JobLauncher(args[0],args[0],null);
   }
+
 
 }
