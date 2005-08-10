@@ -1,10 +1,10 @@
 <SimkitAssembly name="Bremerton_1" package="atfp" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     
-    <TerminalParameter type="double" value="-1400.0" name="exclusion_zone_position_y" >
+    <TerminalParameter type="double" value="-1400.0" name="exclusion_zone_1_position_y" >
 	<![CDATA[
     
-        Double[] exclusion_zone_position_y() {
-            double center = -1400;
+        Double[] exclusion_zone_1_position_y() {
+            double center = -1000;
             double offset = 100.0;
             Double[] yValues = new Double[2];
             yValues[0] = center + offset;
@@ -16,11 +16,11 @@
         
     </TerminalParameter>
     
-    <TerminalParameter type="double" value="700.0" name="exclusion_zone_radius" >
+    <TerminalParameter type="double" value="700.0" name="exclusion_zone_0_radius" >
     
 	<![CDATA[
 
-        Double[] exclusion_zone_radius() {
+        Double[] exclusion_zone_0_radius() {
             return new Double[] { new Double(700.0), new Double(300.0) };
         }
         
@@ -188,10 +188,10 @@
         <TerminalParameter type="int" value="1"/>
     </SimEntity>
     
-    <SimEntity name="Platform" type="diskit.Platform">
+    <SimEntity name="Platform_0" type="diskit.Platform">
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter type="double" value="-800.0"/>
-            <TerminalParameter type="double" nameRef="exclusion_zone_position_y"/>
+            <TerminalParameter type="double" value="-1300.0"/>
             <TerminalParameter type="double" value="0.01"/>
         </MultiParameter>
         <TerminalParameter type="double" value="0.00000001"/>
@@ -199,8 +199,8 @@
     </SimEntity>
     
     <SimEntity name="ExclusionZone" type="diskit.SphereCutterSensor">
-        <TerminalParameter type="diskit.Mover3D" value="Platform"/>
-        <TerminalParameter type="double" nameRef="exclusion_zone_radius" />
+        <TerminalParameter type="diskit.Mover3D" value="Platform_0"/>
+        <TerminalParameter type="double" nameRef="exclusion_zone_0_radius" />
     </SimEntity>
     
     <SimEntity name="Terrorist1" type="diskit.BasicTerrorist">
@@ -385,10 +385,10 @@
         </MultiParameter>
     </SimEntity>
     
-    <SimEntity name="Platform_0" type="diskit.Platform">
+    <SimEntity name="Platform_1" type="diskit.Platform">
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter type="double" value="-800.0"/>
-            <TerminalParameter type="double" value="-1000.0"/>
+            <TerminalParameter type="double" nameRef="exclusion_zone_1_position_y"/>
             <TerminalParameter type="double" value="0.01"/>
         </MultiParameter>
         <TerminalParameter type="double" value=".00001"/>
@@ -396,7 +396,7 @@
     </SimEntity>
     
     <SimEntity name="ExclusionZone1" type="diskit.SphereCutterSensor">
-        <TerminalParameter type="diskit.Mover3D" value="Platform_0"/>
+        <TerminalParameter type="diskit.Mover3D" value="Platform_1"/>
         <TerminalParameter type="double" value="700.0"/>
     </SimEntity>
     <PropertyChangeListener name="Platform_0_Status" type="diskit.stat.MarshaledSimpleStatsTally">
@@ -411,23 +411,23 @@
     <SimEventListenerConnection listener="ScenarioManager" source="PatrolBoat2"/>
     <SimEventListenerConnection listener="MachineGun" source="PatrolBoat"/>
     <SimEventListenerConnection listener="MachineGun2" source="PatrolBoat2"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="Platform"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform_0"/>
     <SimEventListenerConnection listener="BassTracker" source="BassMan"/>
     <SimEventListenerConnection listener="ScenarioManager" source="BassMan"/>
     <SimEventListenerConnection listener="ScenarioManager" source="MachineGun"/>
     <SimEventListenerConnection listener="ScenarioManager" source="MachineGun2"/>
-    <SimEventListenerConnection listener="PatrolBoat" source="Platform"/>
-    <SimEventListenerConnection listener="ExclusionZone" source="Platform"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="Platform_0"/>
-    <SimEventListenerConnection listener="ExclusionZone1" source="Platform_0"/>
+    <SimEventListenerConnection listener="PatrolBoat" source="Platform_0"/>
+    <SimEventListenerConnection listener="ExclusionZone" source="Platform_0"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform_1"/>
+    <SimEventListenerConnection listener="ExclusionZone1" source="Platform_1"/>
     <SimEventListenerConnection listener="PatrolBoat2" source="ExclusionZone1"/>
-    <SimEventListenerConnection listener="PatrolBoat2" source="Platform_0"/>
+    <SimEventListenerConnection listener="PatrolBoat2" source="Platform_1"/>
     <PropertyChangeListenerConnection listener="Platform_0_Status" property="alive" source="Platform_0"/>
     <Output entity="ScenarioManager"/>
     
-    <Schedule stopTime="10000.0" verbose="false"/>
+    <Schedule stopTime="500.0" verbose="false"/>
 
-    <Experiment type="latin-hypercube" totalSamples="10" runsPerDesignPoint="5" timeout="15000" />
+    <Experiment type="latin-hypercube" totalSamples="10" runsPerDesignPoint="5" timeout="15000" debug="false" />
     
 </SimkitAssembly>
 
