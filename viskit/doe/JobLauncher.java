@@ -124,7 +124,7 @@ public class JobLauncher extends JFrame implements Runnable
     sampsTF = new JTextField(6);
     JLabel portLab = new JLabel("RPC port");
     portTF = new JTextField(6);
-    JLabel dpLab = new JLabel("Design points");
+    JLabel dpLab = new JLabel("Design point variables");
     dps = new JTextField(6);
     JLabel sampLab = new JLabel("Hypercubes");
     runs = new JTextField(6);
@@ -683,14 +683,13 @@ public class JobLauncher extends JFrame implements Runnable
       while (statusThread != null && clusterStatusFrame != null) {
         try{
           Thread.sleep(5000);
-          System.out.println("updating cluster status");
 
           // to refresh
           javax.swing.text.Document doc = editorPane.getDocument();
           doc.putProperty(javax.swing.text.Document.StreamDescriptionProperty, null);
-
+          // I'm trying to control the scroll bar position after loading, but it doesn't
+          // seem to work (somewhat confirmed by reading the forums) when HTML is being rendered.
           final JScrollBar hbar = editorScrollPane.getHorizontalScrollBar();
-          System.out.println("h value = "+hbar.getValue());
           final JScrollBar vbar = editorScrollPane.getHorizontalScrollBar();
           editorPane.setPage(statusURL); // same page
           editorPane.setCaretPosition(editorPane.getDocument().getLength());

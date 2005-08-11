@@ -174,10 +174,14 @@ class MyDataSet extends AbstractXYDataset implements XYDataset
   public void addToTail(JobLauncher.Gresults res)
   {
     v.add(res);
-    if(v.size()>100) {
+    if(v.size()>200) {
+      mom.plot.getRenderer().setShape(new Ellipse2D.Double(-1.0,-1.0,3.0,3.0));
+      mom.repAxis.setTickUnit(new NumberTickUnit(20.0d));      
+    }
+    else if(v.size()>100) {
       mom.plot.getRenderer().setShape(new Ellipse2D.Double(-1.0,-1.0,3.0,3.0));
       mom.repAxis.setTickUnit(new NumberTickUnit(10.0d));
-  }
+    }
     this.fireDatasetChanged();
   }
   public Object getCanonicalDataItem(int idx)
