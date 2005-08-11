@@ -43,35 +43,177 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.labels.XYToolTipGenerator;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.AbstractXYDataset;
+import org.jfree.data.xy.XYDataset;
+
 import javax.swing.*;
-import java.util.Vector;
-import java.util.Iterator;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.util.Vector;
 
 public class JobResults extends JFrame
 {
+  Vector data;
+  MyDataSet dset;
+  XYPlot plot;
+  NumberAxis repAxis;
+
+  public JobResults(JFrame mother)
+  {
+    this(mother,new Vector()); // empty data
+  }
   public JobResults(JFrame mother, Vector data)
   {
-    JTextArea jta = new JTextArea(40,100);
-
-    JScrollPane jsp = new JScrollPane(jta);
-
-    getContentPane().add(jsp, BorderLayout.CENTER);
-
-
-    for(Iterator itr = data.iterator(); itr.hasNext();) {
-      JobLauncher.Gresults res = (JobLauncher.Gresults)itr.next();
-      jta.append(res.listener + " "+res.run+" "+res.dp+" "+res.property+" RESULTS:");
-      for(int i=0;i<res.results.length;i++) {
-        jta.append(res.results[i]?" ok":" FAILURE");
-      }
-      jta.append("\n");
-
-    }
+    this.data = data;
+    dset = (MyDataSet)createDataset(data);
+    JFreeChart chart = createChart(dset);
+    ChartPanel cpan = new ChartPanel(chart);
+    cpan.setPreferredSize(new Dimension(500, 270));
+    cpan.setDomainZoomable(true);
+    cpan.setRangeZoomable(true);
+    cpan.setBorder(new EmptyBorder(10, 10, 10, 10));
+    setContentPane(cpan);
 
     pack();
-    setLocation(100,100);
+    Dimension moms = mother.getSize();
+    Point momp = mother.getLocation();
+    Dimension mine = getSize();
+
+    setLocation(momp.x+moms.width,momp.y);    // to left of mother frame
+
+/*
+    setLocation(momp.x + (moms.width - mine.width) / 2,  // centered on mother frame
+        momp.y + (moms.height - mine.height) / 2);
+*/
     setVisible(true);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+  }
+
+  public void addPoint(JobLauncher.Gresults res)
+  {
+    dset.addToTail(res);
+  }
+
+  JFreeChart chart;
+  private JFreeChart createChart(XYDataset dset)
+  {
+    chart = ChartFactory.createScatterPlot("Bremerton GridKit Output", "Replication",
+        "Platform Failure", dset, PlotOrientation.VERTICAL, false, false, false);
+    //LegendTitle legend = (LegendTitle)chart.getSubtitle(0);
+    //legend.setPosition(RectangleEdge.BOTTOM);
+
+    plot = chart.getXYPlot();
+    repAxis = new NumberAxis("Replication");
+    repAxis.setTickUnit(new NumberTickUnit(5.0d));
+    repAxis.setAutoRangeStickyZero(false);
+    repAxis.setUpperMargin(0.025d);
+    repAxis.setLowerMargin(0.025d);
+    plot.setDomainAxis(repAxis);
+    //todo can set multiple domainaxes
+    NumberAxis yAxis = new NumberAxis("Terrorist success");
+    yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+    yAxis.setAutoRangeStickyZero(false);
+    yAxis.setUpperMargin(0.025d);
+    yAxis.setLowerMargin(0.025d);
+    plot.setRangeAxis(yAxis);
+    plot.getRenderer().setShape(new Ellipse2D.Double(-2.0,-2.0,5.0,5.0));
+    plot.getRenderer().setPaint(new Color(255,0,0,128));
+    plot.getRenderer().setToolTipGenerator(
+      new XYToolTipGenerator()
+        {
+          StringBuffer sb = new StringBuffer();
+          public String generateToolTip(XYDataset dataset, int series, int item)
+          {
+            MyDataSet mds = (MyDataSet)dataset;
+            JobLauncher.Gresults res = (JobLauncher.Gresults)mds.getCanonicalDataItem(item);
+            sb.setLength(0);
+            sb.append("<html><u>");
+            sb.append(res.listener);
+            sb.append("</u><br>run: ");
+            sb.append(res.run);
+            sb.append("<br>design point: ");
+            sb.append(res.dp);
+            sb.append("<br>attack result: ");
+            sb.append(dataset.getYValue(series,item)==0.0?"<b>repulsed":"<b>compromised");
+
+            return sb.toString();
+          }
+        });
+
+
+    return chart;
+  }
+
+  private XYDataset createDataset(Vector v)
+  {
+    return new MyDataSet(this,v);
+  }
+}
+
+class MyDataSet extends AbstractXYDataset implements XYDataset
+{
+  private static int sequence = 0;
+  private Vector v;
+  private int myseq;
+  private JobResults mom;
+  MyDataSet(JobResults mom,Vector v)
+  {
+    this.v = v;
+    this.mom = mom;
+    myseq = MyDataSet.sequence++;
+  }
+  public void addToTail(JobLauncher.Gresults res)
+  {
+    v.add(res);
+    if(v.size()>100) {
+      mom.plot.getRenderer().setShape(new Ellipse2D.Double(-1.0,-1.0,3.0,3.0));
+      mom.repAxis.setTickUnit(new NumberTickUnit(10.0d));
+  }
+    this.fireDatasetChanged();
+  }
+  public Object getCanonicalDataItem(int idx)
+  {
+    return v.get(idx);
+  }
+  public int getSeriesCount()
+  {
+    return 1;
+  }
+
+  public Comparable getSeriesKey(int series)
+  {
+    return "" + myseq;
+  }
+
+  public int getItemCount(int series)
+  {
+    return v.size();
+  }
+
+  public Number getX(int series, int item)
+  {
+
+    return new Integer(item);
+  }
+
+  public Number getY(int series, int item)
+  {
+
+      boolean[] results = ((JobLauncher.Gresults)v.get(item)).results;
+
+      for(int i=0;i<results.length;i++) {
+        if (results[i])
+          return new Integer(1);
+      }
+      return new Double(0);
   }
 }

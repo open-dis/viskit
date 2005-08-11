@@ -78,7 +78,8 @@ public class JobLauncher extends JFrame implements Runnable
   int    clusterPort = 4445;
   int    chosenPort;
   String clusterWebStatus1 = "http://cluster.moves.nps.navy.mil/ganglia/";
-  String clusterWebStatus  = "http://cluster.moves.nps.navy.mil/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
+  String clusterWebStatus2 = "http://cluster.moves.nps.navy.mil/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
+  String clusterWebStatus  = "http://cluster.moves.nps.navy.mil/ganglia/?r=hour&c=MOVES&h=&sh=0";
   private JButton canButt;
   private JButton runButt;
   private JButton closeButt;
@@ -303,6 +304,8 @@ public class JobLauncher extends JFrame implements Runnable
 
   private void stopRun()
   {
+    outputList.clear();
+
     canButt.setEnabled(false);
     closeButt.setEnabled(true);
     runButt.setEnabled(true);
@@ -344,14 +347,15 @@ public class JobLauncher extends JFrame implements Runnable
   public void run()
   {
     outputDirty = true;
+    outputList = new ArrayList();
+    lp3:
+    {
     try {
-      showClusterStatus(clusterWebStatus);
       createOutputDir();
       setParams(); // runs, sampls, tmo
 
       writeStatus("Building XML-RPC client to " + clusterDNS + ".");
       rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
-
       fr = new FileReader(filteredFile);
       //fr = new FileReader("/users/mike/Desktop/rickBrem.grd"); //Bremerton_1.grd");
       br = new BufferedReader(fr);
@@ -372,44 +376,57 @@ public class JobLauncher extends JFrame implements Runnable
 
     }
     catch (Exception e) {
-      writeStatus("Error connecting to server: "+e.getMessage());
+      writeStatus("Error connecting to server: " + e.getMessage());
       thread = null;
-      return;
+      break lp3;
     }
+    // Bring up the 2 other windows
+    showClusterStatus(clusterWebStatus);
+    chartter = new JobResults(JobLauncher.this);
 
     writeStatus("10 second wait before getting results.");
-    try {Thread.sleep(10000);}catch (InterruptedException e) {e.printStackTrace();}
+    try {
+      Thread.sleep(10000);
+    }
+    catch (InterruptedException e) {
+      thread=null;
+      break lp3;
+    }
     writeStatus("Getting results:");
 
-    outputList = new ArrayList();
     Vector parms = new Vector();
     Object o = null;
-    int i=0;
-    int n = designPts*samps*numRuns;
-    for (int dp = 0; dp < designPts*samps; dp++) {
-      for (int nrun = 0; nrun < numRuns; nrun++,i++) {
-        try {
-          parms.clear();
-          parms.add(new Integer(dp));
-          parms.add(new Integer(nrun));
-          o = rpc.execute("experiment.getResult", parms);
-          writeStatus("gotResult " + dp + "," + nrun + " ("+i+" of "+n+")");
-          saveOutput((String) o, dp, nrun);
-        }
-        catch (Exception e) {
-          writeStatus("Error from experiment.getResult(): " + e.getMessage());
-          if(thread == null)
-            return;
-        }
+    int i = 0;
+    int n = designPts * samps * numRuns;
+    lp:
+    {
+      for (int dp = 0; dp < designPts * samps; dp++) {
+        for (int nrun = 0; nrun < numRuns; nrun++, i++) {
+          try {
+            parms.clear();
+            parms.add(new Integer(dp));
+            parms.add(new Integer(nrun));
+            o = rpc.execute("experiment.getResult", parms);
+            writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
+            int idx = saveOutput((String) o, dp, nrun);
+            if(idx != -1)
+              plotOutput(idx);
+            else
+              System.out.println("Output not saved");
+          }
+          catch (Exception e) {
+            writeStatus("Error from experiment.getResult(): " + e.getMessage());
+            if (thread == null)
+              break lp;
+          }
 
+        }
       }
-    }
-
-    doResults();
+    } // lp
+    } // lp3
+ //   doResults();
     stopRun();
   }
-
-
 
 
   //HashMap outputs = new HashMap();
@@ -421,10 +438,84 @@ public class JobLauncher extends JFrame implements Runnable
     outDir.mkdir();
   }
 
+  JobResults chartter;
+  private void plotOutput(int idx)
+  {
+    if(chartter == null)
+      chartter = new JobResults(JobLauncher.this);
+    synchronized(outputList) {
+      Object[] oa = (Object[])outputList.get(idx);
+      Gresults res = getSingleResult(oa);
+      if(res != null)
+        chartter.addPoint(res);
+      else
+        System.out.println("Results not retrieved for rep "+idx);
+    }
+  }
+
+  private Gresults getSingleResult(Object[] oa)
+  {
+    File f = new File((String)oa[2]);
+    int dp = ((Integer)oa[0]).intValue();
+    int nrun = ((Integer)oa[1]).intValue();
+
+    Document doc =  null;
+    try {
+      doc = FileHandler.unmarshallJdom(f);
+    }
+    catch (Exception e) {
+      System.out.println("Error unmarshalling results: "+e.getMessage());
+      return null;
+    }
+    Element el = doc.getRootElement();
+    if(!el.getName().equals("Results")) {
+      System.out.println("Unknown results format, design point = "+dp+", run = "+nrun);
+      return null;
+    }
+    String design = attValue(el,"design");
+    String index = attValue(el,"index");
+    String job = attValue(el,"job");
+    String run = attValue(el,"run");
+
+    Element propCh = el.getChild("PropertyChange");
+    if(propCh == null) {
+      System.out.println("PropertyChange results element null, design point = "+dp+", run = "+nrun);
+      return null;
+    }
+    String listenerName = attValue(propCh,"listenerName");
+    String property = attValue(propCh,"property");
+    java.util.List content = propCh.getContent();
+    Text txt = (Text)content.get(0);
+    String cstr = txt.getTextTrim();
+    System.out.println("got back "+cstr);
+    String[] sa = cstr.split("\n");
+    if(sa.length != 2) {
+      System.out.println("PropertyChange parse error, design point = "+dp+", run = "+nrun);
+      return null;
+    }
+    sa[1] = sa[1].trim();
+    String[] nums = sa[1].split("\\s+");
+    Gresults res = new Gresults();
+    res.listener = listenerName;
+    res.property = property;
+    res.run = Integer.parseInt(run);
+    assert res.run == nrun :"JobLauncher.doResults";
+
+    res.dp = Integer.parseInt(design);
+    assert res.dp == dp : "JobLauncher.doResults1";
+    boolean[] ba = new boolean[nums.length];
+    for(int j=0;j<ba.length;j++) {
+      double d = Double.parseDouble(nums[j]);
+      ba[j] = d != 0.0d;
+    }
+    res.results = ba;
+    return res;
+  }
+/*
   private void doResults()
   {
     Vector v = new Vector();
-
+      synchronized(outputList) {
       for(int i=0;i<outputList.size();i++) {
         try {
         Object[] oa = (Object[])outputList.get(i);
@@ -483,25 +574,19 @@ public class JobLauncher extends JFrame implements Runnable
       e.printStackTrace();
     }
     }
+      }
 
-    if(v.size() > 0)
-      new JobResults(mom,v);
+  // to test  if(v.size() > 0)
+      new JobResults(JobLauncher.this,v);
   }
-  public class Gresults
-  {
-    String listener;
-    String property;
-    int run;
-    int dp;
-    boolean[] results;
-  }
+ */
   String attValue(Element e, String att)
   {
     Attribute at = e.getAttribute(att);
     return (at!=null?at.getValue():null);
   }
   File outDir;
-  private void saveOutput(String o, int dp, int nrun)
+  private int  saveOutput(String o, int dp, int nrun)
   {
     if(o == null)
       System.out.println("mischief detected!");
@@ -513,14 +598,14 @@ public class JobLauncher extends JFrame implements Runnable
       fw.close();
       writeStatus("Result saved to "+f.getAbsolutePath());
       //outputs.put("" + dp + "," + nrun, f);
-
+      int idx = outputList.size();
       outputList.add(new Object[]{new Integer(dp),new Integer(nrun),f.getAbsolutePath()});
-
+      return idx;
     }
     catch (IOException e) {
       writeStatus("error saving output for run " + dp + ", " + nrun + ": " + e.getMessage());
     }
-
+    return -1;
   }
   JFrame clusterStatusFrame;
   JEditorPane editorPane;
@@ -537,7 +622,7 @@ public class JobLauncher extends JFrame implements Runnable
       editorScrollPane = new JScrollPane(editorPane);
       editorScrollPane.setVerticalScrollBarPolicy(
                       JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-      editorScrollPane.setPreferredSize(new Dimension(640,480));
+      editorScrollPane.setPreferredSize(new Dimension(680,800)); //640,480));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
 
       clusterStatusFrame.getContentPane().setLayout(new BorderLayout());
@@ -554,6 +639,17 @@ public class JobLauncher extends JFrame implements Runnable
     }
 
     clusterStatusFrame.pack();
+    Rectangle frR = clusterStatusFrame.getBounds();
+
+    Rectangle r = this.getBounds();
+/*
+    frR.x = r.x + r.width / 2 - frR.width / 2;
+    frR.y = r.y + r.height / 2 - frR.height / 2;
+*/
+    frR.x = r.x + r.width;
+    frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
+    clusterStatusFrame.setBounds(frR);
+
     clusterStatusFrame.setVisible(true);
 
     stopStatusThread(); // if running
@@ -623,5 +719,13 @@ public class JobLauncher extends JFrame implements Runnable
       new JobLauncher(args[0],args[0],null);
   }
 
+  public static class Gresults
+  {
+    String listener;
+    String property;
+    int run;
+    int dp;
+    boolean[] results;
+  }
 
 }
