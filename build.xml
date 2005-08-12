@@ -343,7 +343,7 @@
     </target>
 
     <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
-        <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true"/>
+        <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
 
     <target name="debug" depends="compile" description="Debug Project">

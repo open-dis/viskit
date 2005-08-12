@@ -229,6 +229,7 @@ public class DoeController implements DoeEvents, ActionListener
   {
     JFileChooser chooser = new JFileChooser(); //System.getProperty("user.home")+"/Desktop"); //dir")); //"Scripts");
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
     FileHandler.FileFilterEx[] filter = {
       new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
       new FileHandler.FileFilterEx(".xml", "Assembly files (*.xml)", true)
