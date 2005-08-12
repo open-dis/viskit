@@ -46,13 +46,20 @@ package viskit.doe;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.event.AxisChangeListener;
+import org.jfree.chart.event.AxisChangeEvent;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.TickUnitSource;
+import org.jfree.chart.axis.TickUnit;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.AbstractXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.ui.RectangleEdge;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -67,17 +74,18 @@ public class JobResults extends JFrame
   XYPlot plot;
   NumberAxis repAxis;
 
-  public JobResults(JFrame mother)
+  public JobResults(JFrame mother, String title)
   {
-    this(mother,new Vector()); // empty data
+    this(mother,title, new Vector()); // empty data
   }
-  public JobResults(JFrame mother, Vector data)
+  public JobResults(JFrame mother, String title, Vector data)
   {
+    super(title);
     this.data = data;
     dset = (MyDataSet)createDataset(data);
     JFreeChart chart = createChart(dset);
     ChartPanel cpan = new ChartPanel(chart);
-    cpan.setPreferredSize(new Dimension(500, 270));
+    cpan.setPreferredSize(new Dimension(640, 270));
     cpan.setDomainZoomable(true);
     cpan.setRangeZoomable(true);
     cpan.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -86,11 +94,11 @@ public class JobResults extends JFrame
     pack();
     Dimension moms = mother.getSize();
     Point momp = mother.getLocation();
-    Dimension mine = getSize();
 
     setLocation(momp.x+moms.width,momp.y);    // to left of mother frame
 
 /*
+    Dimension mine = getSize();
     setLocation(momp.x + (moms.width - mine.width) / 2,  // centered on mother frame
         momp.y + (moms.height - mine.height) / 2);
 */
@@ -106,18 +114,28 @@ public class JobResults extends JFrame
   JFreeChart chart;
   private JFreeChart createChart(XYDataset dset)
   {
-    chart = ChartFactory.createScatterPlot("Bremerton GridKit Output", "Replication",
+    chart = ChartFactory.createScatterPlot("GridKit Output", "Replication",
         "Platform Failure", dset, PlotOrientation.VERTICAL, false, false, false);
-    //LegendTitle legend = (LegendTitle)chart.getSubtitle(0);
-    //legend.setPosition(RectangleEdge.BOTTOM);
+
+    Font f = chart.getTitle().getFont();
+    chart.getTitle().setFont(f.deriveFont(Font.PLAIN)); // lose the bold
+
+    TextTitle tt = new TextTitle("1 Terrorist successful, 0 Platform defended, -1 Results inconclusive");
+    tt.setBackgroundPaint(new Color(255,255,255,192)); // translucent white
+    tt.setBorder(new BlockBorder(Color.black));
+    f = tt.getFont();
+    tt.setFont(f.deriveFont(Font.PLAIN));
+    chart.getSubtitles().add(0,tt);
 
     plot = chart.getXYPlot();
-    repAxis = new NumberAxis("Replication");
-    repAxis.setTickUnit(new NumberTickUnit(5.0d));
+    NumberAxis.createIntegerTickUnits();
+    final NumberAxis repAxis = new NumberAxis("Replication");
+    repAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
     repAxis.setAutoRangeStickyZero(false);
     repAxis.setUpperMargin(0.025d);
     repAxis.setLowerMargin(0.025d);
     plot.setDomainAxis(repAxis);
+
     //todo can set multiple domainaxes
     NumberAxis yAxis = new NumberAxis("Terrorist success");
     yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
@@ -125,6 +143,7 @@ public class JobResults extends JFrame
     yAxis.setUpperMargin(0.025d);
     yAxis.setLowerMargin(0.025d);
     plot.setRangeAxis(yAxis);
+
     plot.getRenderer().setShape(new Ellipse2D.Double(-2.0,-2.0,5.0,5.0));
     plot.getRenderer().setPaint(new Color(255,0,0,128));
     plot.getRenderer().setToolTipGenerator(
@@ -135,6 +154,9 @@ public class JobResults extends JFrame
           {
             MyDataSet mds = (MyDataSet)dataset;
             JobLauncher.Gresults res = (JobLauncher.Gresults)mds.getCanonicalDataItem(item);
+            if(!res.resultsValid)
+              return "Inconclusive results";
+
             sb.setLength(0);
             sb.append("<html><u>");
             sb.append(res.listener);
@@ -148,8 +170,6 @@ public class JobResults extends JFrame
             return sb.toString();
           }
         });
-
-
     return chart;
   }
 
@@ -176,11 +196,11 @@ class MyDataSet extends AbstractXYDataset implements XYDataset
     v.add(res);
     if(v.size()>200) {
       mom.plot.getRenderer().setShape(new Ellipse2D.Double(-1.0,-1.0,3.0,3.0));
-      mom.repAxis.setTickUnit(new NumberTickUnit(20.0d));      
+//      mom.repAxis.setTickUnit(new NumberTickUnit(20.0d));
     }
     else if(v.size()>100) {
       mom.plot.getRenderer().setShape(new Ellipse2D.Double(-1.0,-1.0,3.0,3.0));
-      mom.repAxis.setTickUnit(new NumberTickUnit(10.0d));
+//      mom.repAxis.setTickUnit(new NumberTickUnit(10.0d));
     }
     this.fireDatasetChanged();
   }
@@ -211,13 +231,10 @@ class MyDataSet extends AbstractXYDataset implements XYDataset
 
   public Number getY(int series, int item)
   {
-
-      boolean[] results = ((JobLauncher.Gresults)v.get(item)).results;
-
-      for(int i=0;i<results.length;i++) {
-        if (results[i])
-          return new Integer(1);
-      }
-      return new Double(0);
+    JobLauncher.Gresults results = (JobLauncher.Gresults)v.get(item);
+    if(!results.resultsValid)
+      return new Double(-1);
+    return (results.resultsMean < 1.0)? new Double(1):new Double(0);
   }
 }
+

@@ -255,6 +255,7 @@ public class JobLauncher extends JFrame implements Runnable
           canButt.setEnabled(true);
           closeButt.setEnabled(false);
           thread = new Thread(JobLauncher.this);
+          thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
           thread.start();
           break;
         case 'c':
@@ -350,86 +351,83 @@ public class JobLauncher extends JFrame implements Runnable
     outputList = new ArrayList();
     lp3:
     {
-    try {
-      createOutputDir();
-      setParams(); // runs, sampls, tmo
+      try {
+        createOutputDir();
+        setParams(); // runs, sampls, tmo
 
-      writeStatus("Building XML-RPC client to " + clusterDNS + ".");
-      rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
-      fr = new FileReader(filteredFile);
-      //fr = new FileReader("/users/mike/Desktop/rickBrem.grd"); //Bremerton_1.grd");
-      br = new BufferedReader(fr);
-      data = new StringWriter();
-      out = new PrintWriter(data);
-      String line;
-      while ((line = br.readLine()) != null) {
-        out.println('\t' + line);
+        writeStatus("Building XML-RPC client to " + clusterDNS + ".");
+        rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
+        fr = new FileReader(filteredFile);
+        //fr = new FileReader("/users/mike/Desktop/rickBrem.grd"); //Bremerton_1.grd");
+        br = new BufferedReader(fr);
+        data = new StringWriter();
+        out = new PrintWriter(data);
+        String line;
+        while ((line = br.readLine()) != null) {
+          out.println('\t' + line);
+        }
+        out.close();
+
+        Vector parms = new Vector();
+        parms.add(data.toString());
+
+        writeStatus("Sending job file to " + clusterDNS);
+        Object o = rpc.execute("experiment.setAssembly", parms);
+        writeStatus("experiment.setAssembly returned " + o);
+
       }
-      out.close();
+      catch (Exception e) {
+        writeStatus("Error connecting to server: " + e.getMessage());
+        thread = null;
+        break lp3;
+      }
+      // Bring up the 2 other windows
+      showClusterStatus(clusterWebStatus);
+      chartter = new JobResults(JobLauncher.this, getTitle());
+
+      writeStatus("10 second wait before getting results.");
+      try {
+        Thread.sleep(10000);
+      }
+      catch (InterruptedException e) {
+        thread = null;
+        break lp3;
+      }
+      writeStatus("Getting results:");
 
       Vector parms = new Vector();
-      parms.add(data.toString());
-
-      writeStatus("Sending job file to " + clusterDNS);
-      Object o = rpc.execute("experiment.setAssembly", parms);
-      writeStatus("experiment.setAssembly returned " + o);
-
-    }
-    catch (Exception e) {
-      writeStatus("Error connecting to server: " + e.getMessage());
-      thread = null;
-      break lp3;
-    }
-    // Bring up the 2 other windows
-    showClusterStatus(clusterWebStatus);
-    chartter = new JobResults(JobLauncher.this);
-
-    writeStatus("10 second wait before getting results.");
-    try {
-      Thread.sleep(10000);
-    }
-    catch (InterruptedException e) {
-      thread=null;
-      break lp3;
-    }
-    writeStatus("Getting results:");
-
-    Vector parms = new Vector();
-    Object o = null;
-    int i = 0;
-    int n = designPts * samps * numRuns;
-    lp:
-    {
-      for (int dp = 0; dp < designPts * samps; dp++) {
-        for (int nrun = 0; nrun < numRuns; nrun++, i++) {
-          try {
-            parms.clear();
-            parms.add(new Integer(dp));
-            parms.add(new Integer(nrun));
-            o = rpc.execute("experiment.getResult", parms);
-            writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
-            int idx = saveOutput((String) o, dp, nrun);
-            if(idx != -1)
-              plotOutput(idx);
-            else
-              System.out.println("Output not saved");
+      Object o = null;
+      int i = 0;
+      int n = designPts * samps * numRuns;
+      lp:
+      {
+        for (int dp = 0; dp < designPts * samps; dp++) {
+          for (int nrun = 0; nrun < numRuns; nrun++, i++) {
+            try {
+              parms.clear();
+              parms.add(new Integer(dp));
+              parms.add(new Integer(nrun));
+              o = rpc.execute("experiment.getResult", parms);
+              kickOffClusterUpdate();
+              writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
+              int idx = saveOutput((String) o, dp, nrun);
+              if (idx != -1)
+                plotOutput(idx);
+              else
+                System.out.println("Output not saved");
+            }
+            catch (Exception e) {
+              writeStatus("Error from experiment.getResult(): " + e.getMessage());
+              if (thread == null)
+                break lp;
+            }
           }
-          catch (Exception e) {
-            writeStatus("Error from experiment.getResult(): " + e.getMessage());
-            if (thread == null)
-              break lp;
-          }
-
         }
-      }
-    } // lp
+      } // lp
     } // lp3
- //   doResults();
     stopRun();
   }
 
-
-  //HashMap outputs = new HashMap();
   ArrayList outputList;
   private void createOutputDir() throws Exception
   {
@@ -442,13 +440,12 @@ public class JobLauncher extends JFrame implements Runnable
   private void plotOutput(int idx)
   {
     if(chartter == null)
-      chartter = new JobResults(JobLauncher.this);
+      chartter = new JobResults(JobLauncher.this,getTitle());
     synchronized(outputList) {
       Object[] oa = (Object[])outputList.get(idx);
       Gresults res = getSingleResult(oa);
-      if(res != null)
-        chartter.addPoint(res);
-      else
+      chartter.addPoint(res);
+      if(!res.resultsValid)
         System.out.println("Results not retrieved for rep "+idx);
     }
   }
@@ -458,6 +455,7 @@ public class JobLauncher extends JFrame implements Runnable
     File f = new File((String)oa[2]);
     int dp = ((Integer)oa[0]).intValue();
     int nrun = ((Integer)oa[1]).intValue();
+    Gresults res = new Gresults();
 
     Document doc =  null;
     try {
@@ -470,7 +468,7 @@ public class JobLauncher extends JFrame implements Runnable
     Element el = doc.getRootElement();
     if(!el.getName().equals("Results")) {
       System.out.println("Unknown results format, design point = "+dp+", run = "+nrun);
-      return null;
+      return res;
     }
     String design = attValue(el,"design");
     String index = attValue(el,"index");
@@ -480,7 +478,7 @@ public class JobLauncher extends JFrame implements Runnable
     Element propCh = el.getChild("PropertyChange");
     if(propCh == null) {
       System.out.println("PropertyChange results element null, design point = "+dp+", run = "+nrun);
-      return null;
+      return res;
     }
     String listenerName = attValue(propCh,"listenerName");
     String property = attValue(propCh,"property");
@@ -491,11 +489,16 @@ public class JobLauncher extends JFrame implements Runnable
     String[] sa = cstr.split("\n");
     if(sa.length != 2) {
       System.out.println("PropertyChange parse error, design point = "+dp+", run = "+nrun);
-      return null;
+      return res;
     }
     sa[1] = sa[1].trim();
     String[] nums = sa[1].split("\\s+");
-    Gresults res = new Gresults();
+    // format: 0: int, count
+    //         1: float, minObs
+    //         2: float, maxObs
+    //         3: float, mean -- if < 1.0, a terrorist succeeded
+    //         4: float, variance
+    //         5: float, std dev
     res.listener = listenerName;
     res.property = property;
     res.run = Integer.parseInt(run);
@@ -503,88 +506,24 @@ public class JobLauncher extends JFrame implements Runnable
 
     res.dp = Integer.parseInt(design);
     assert res.dp == dp : "JobLauncher.doResults1";
-    boolean[] ba = new boolean[nums.length];
-    for(int j=0;j<ba.length;j++) {
-      double d = Double.parseDouble(nums[j]);
-      ba[j] = d != 0.0d;
-    }
-    res.results = ba;
+
+    res.resultsCount   = Integer.parseInt(nums[Gresults.COUNT]);
+    res.resultsMinObs   = Double.parseDouble(nums[Gresults.MINOBS]);
+    res.resultsMaxObs   = Double.parseDouble(nums[Gresults.MAXOBS]);
+    res.resultsMean     = Double.parseDouble(nums[Gresults.MEAN]);
+    res.resultsVariance = Double.parseDouble(nums[Gresults.VARIANCE]);
+    res.resultsStdDev   = Double.parseDouble(nums[Gresults.STDDEV]);
+
+    res.resultsValid = true;
     return res;
   }
-/*
-  private void doResults()
-  {
-    Vector v = new Vector();
-      synchronized(outputList) {
-      for(int i=0;i<outputList.size();i++) {
-        try {
-        Object[] oa = (Object[])outputList.get(i);
-        File f = new File((String)oa[2]);
-        int dp = ((Integer)oa[0]).intValue();
-        int nrun = ((Integer)oa[1]).intValue();
 
-
-        Document doc =  FileHandler.unmarshallJdom(f);
-        System.out.println("bp");
-        Element el = doc.getRootElement();
-        if(!el.getName().equals("Results")) {
-          System.out.println("Unknown results format, design point = "+dp+", run = "+nrun);
-          continue;
-        }
-        String design = attValue(el,"design");
-        String index = attValue(el,"index");
-        String job = attValue(el,"job");
-        String run = attValue(el,"run");
-
-        Element propCh = el.getChild("PropertyChange");
-        if(propCh == null) {
-          System.out.println("PropertyChange results element null, design point = "+dp+", run = "+nrun);
-          continue;
-        }
-        String listenerName = attValue(propCh,"listenerName");
-        String property = attValue(propCh,"property");
-        java.util.List content = propCh.getContent();
-        Text txt = (Text)content.get(0);
-        String cstr = txt.getTextTrim();
-        String[] sa = cstr.split("\n1");
-        if(sa.length != 2) {
-          System.out.println("PropertyChange parse error, design point = "+dp+", run = "+nrun);
-          continue;
-        }
-        sa[1] = sa[1].trim();
-        String[] nums = sa[1].split("\\s+");
-        Gresults res = new Gresults();
-        res.listener = listenerName;
-        res.property = property;
-        res.run = Integer.parseInt(run);
-        assert res.run == nrun :"JobLauncher.doResults";
-
-        res.dp = Integer.parseInt(design);
-        assert res.dp == dp : "JobLauncher.doResults1";
-        boolean[] ba = new boolean[nums.length];
-        for(int j=0;j<ba.length;j++) {
-          double d = Double.parseDouble(nums[j]);
-          ba[j] = d != 0.0d;
-        }
-        res.results = ba;
-        v.add(res);
-
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    }
-      }
-
-  // to test  if(v.size() > 0)
-      new JobResults(JobLauncher.this,v);
-  }
- */
   String attValue(Element e, String att)
   {
     Attribute at = e.getAttribute(att);
     return (at!=null?at.getValue():null);
   }
+
   File outDir;
   private int  saveOutput(String o, int dp, int nrun)
   {
@@ -607,6 +546,7 @@ public class JobLauncher extends JFrame implements Runnable
     }
     return -1;
   }
+
   JFrame clusterStatusFrame;
   JEditorPane editorPane;
   JScrollPane editorScrollPane;
@@ -657,7 +597,13 @@ public class JobLauncher extends JFrame implements Runnable
     statusThread.start();
 
   }
-
+  private void kickOffClusterUpdate()
+  {
+    if(waitToGo == true) {
+      waitToGo=false;
+      statusThread.interrupt();
+    }
+  }
   private void hideClusterStatus()
   {
     if(clusterStatusFrame != null) {
@@ -676,13 +622,17 @@ public class JobLauncher extends JFrame implements Runnable
     }
   }
 
+  boolean waitToGo = true;
   class statusUpdater implements Runnable
   {
     public void run()
     {
+      if(waitToGo == true)
+        try {statusThread.sleep(60000);}catch (InterruptedException e) {}
+
       while (statusThread != null && clusterStatusFrame != null) {
         try{
-          Thread.sleep(5000);
+          Thread.sleep(10000);
 
           // to refresh
           javax.swing.text.Document doc = editorPane.getDocument();
@@ -693,7 +643,6 @@ public class JobLauncher extends JFrame implements Runnable
           final JScrollBar vbar = editorScrollPane.getHorizontalScrollBar();
           editorPane.setPage(statusURL); // same page
           editorPane.setCaretPosition(editorPane.getDocument().getLength());
-          //editorPane.revalidate();
           int hm = hbar.getMaximum();
           int vm = vbar.getMaximum();
           SwingUtilities.invokeLater(new Runnable() {
@@ -720,11 +669,26 @@ public class JobLauncher extends JFrame implements Runnable
 
   public static class Gresults
   {
-    String listener;
-    String property;
-    int run;
-    int dp;
-    boolean[] results;
+    String listener="";
+    String property="";
+    int run=-1;
+    int dp=-1;
+
+    public static final int COUNT=0;
+    public static final int MINOBS=1;
+    public static final int MAXOBS=2;
+    public static final int MEAN=3;
+    public static final int VARIANCE=4;
+    public static final int STDDEV=5;
+
+    boolean resultsValid=false;
+
+    int resultsCount;
+    double resultsMinObs;
+    double resultsMaxObs;
+    double resultsMean;    //if < 1.0, a terrorist succeeded
+    double resultsVariance;
+    double resultsStdDev;
   }
 
 }

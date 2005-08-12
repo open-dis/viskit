@@ -47,6 +47,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Date;
 
 public class DoeController implements DoeEvents, ActionListener
 {
@@ -218,7 +219,7 @@ public class DoeController implements DoeEvents, ActionListener
         e.printStackTrace();
         return;
       }
-      FileHandler.runFile(fil,dfm.userFile.getName(),mainFrame);
+      FileHandler.runFile(fil,dfm.userFile.getName()+" "+new Date().toString(),mainFrame);
     }
     else
       System.out.println("no model");
