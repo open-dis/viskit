@@ -96,7 +96,6 @@ public class JobResults extends JFrame
     Point momp = mother.getLocation();
 
     setLocation(momp.x+moms.width,momp.y);    // to left of mother frame
-
 /*
     Dimension mine = getSize();
     setLocation(momp.x + (moms.width - mine.width) / 2,  // centered on mother frame

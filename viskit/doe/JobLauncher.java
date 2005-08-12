@@ -180,8 +180,8 @@ public class JobLauncher extends JFrame implements Runnable
     Dimension d = getSize();
     d.width+=50;
     setSize(d);
-    centerMe();
-
+    //centerMe();
+    setLocation(10,10);
     setVisible(true);
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter()
