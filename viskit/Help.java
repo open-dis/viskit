@@ -29,7 +29,7 @@ public class Help {
 
     
     public static final String DEVELOPERS =         
-        "(c) 2004 under the Lesser GNU License" +CR +CR +
+        "(c) 2004-2005 under the Lesser GNU License" +CR +CR +
         "Developers:" + CR +
         "  Arnold Buss" + CR +
         "  Mike Bailey" + CR +
