@@ -17,9 +17,6 @@ import java.awt.*;
 
 public class EvGraphMetaDataDialog extends MetaDataDialog
 {
-  protected static MetaDataDialog dialog;
-  protected static boolean modified = false;
-
   public static boolean showDialog(JFrame f, Component comp, GraphMetaData gmd)
   {
     if(dialog == null)
