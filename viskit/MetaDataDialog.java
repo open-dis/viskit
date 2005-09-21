@@ -212,7 +212,10 @@ abstract public class MetaDataDialog extends JDialog
   {
     public void actionPerformed(ActionEvent event)
     {
-      // test
+      // In this class, if the user hits the apply button, it is assumed that the data has been changed,
+      // so the model is marked dirty.  A different, more controlled scheme would be to have change listeners
+      // for all the widgets, and only mark dirty if data has been changed.  Else do a string compare between
+      // final data and ending data and set modified only if something had actually changed.
       modified = true;
       if (modified) {
         if (nameTf.getText().trim().length() <= 0) {
