@@ -1,15 +1,20 @@
 package viskit;
 
-import viskit.model.vStateVariable;
 import viskit.model.ViskitModel;
+import viskit.model.vStateVariable;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -58,7 +63,8 @@ public class StateVariableDialog extends ViskitSmallDialog
 
      JPanel con = new JPanel();
      con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-     con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+     con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                                      new EmptyBorder(10,10,10,10)));
 
       con.add(Box.createVerticalStrut(5));
       JPanel fieldsPanel = new JPanel();

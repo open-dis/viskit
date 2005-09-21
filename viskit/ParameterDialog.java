@@ -3,6 +3,8 @@ package viskit;
 import viskit.model.vParameter;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -64,7 +66,9 @@ public class ParameterDialog extends JDialog
 
      JPanel con = new JPanel();
      con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-     con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+     con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                                      new EmptyBorder(10,10,10,10)));
+
 
       con.add(Box.createVerticalStrut(5));
       JPanel fieldsPanel = new JPanel();
