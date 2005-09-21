@@ -22,7 +22,6 @@ import org.jdom.*;
  */
 public class XTree extends JTree
 {
-  private DefaultMutableTreeNode root;
   DefaultTreeModel mod;
 
   public static XTreePanel getTreeInPanel(File xmlF) throws Exception
@@ -60,7 +59,7 @@ public class XTree extends JTree
     // throw existing away here?
    // this.removeAll();
 
-    root = new DefaultMutableTreeNode("root");
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     root.setUserObject(new nElement(0,doc.getRootElement()));
     mod = new DefaultTreeModel(root);
     //addChildren(root);
@@ -343,7 +342,9 @@ class XTreePanel extends JPanel
     srcXML.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
     Font oldF = srcXML.getFont();
     srcXML.setFont(new Font("Monospaced",oldF.getStyle(),oldF.getSize()));
-
+    srcXML.setText(getElementText((DefaultMutableTreeNode)xtree.mod.getRoot()));
+    srcXML.setCaretPosition(0);
+    
     JScrollPane treeJsp = new JScrollPane(xtree);
     JScrollPane taJsp = new JScrollPane(srcXML);
     taJsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
@@ -365,18 +366,22 @@ class XTreePanel extends JPanel
         DefaultMutableTreeNode dmt = (DefaultMutableTreeNode)xtree.getLastSelectedPathComponent();
         if(dmt== null)
           return;
-        Object o = dmt.getUserObject();
-        if(o instanceof XTree.nElement) {
-          Element elm = ((XTree.nElement)o).elem;
-          srcXML.setText(xtree.xmlOut.outputString(elm));
-        }
-        else {
-          srcXML.setText("");
-        }
+        srcXML.setText(getElementText(dmt));
         srcXML.revalidate();
         srcXML.setCaretPosition(0);
       }
     });
+  }
+
+  String getElementText(DefaultMutableTreeNode dmt)
+  {
+    Object o = dmt.getUserObject();
+    if(o instanceof XTree.nElement) {
+      Element elm = ((XTree.nElement)o).elem;
+      return xtree.xmlOut.outputString(elm);
+    }
+    else
+      return "";
   }
 }
 class XTreeIcon implements Icon
