@@ -4,7 +4,6 @@ import viskit.model.*;
 
 import java.awt.*;
 import java.util.Vector;
-import java.io.File;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -22,29 +21,29 @@ public interface ViskitAssemblyController
   public void newPropChangeListenerNode();
 
   // user has established some parameter, model can create object
-  public void newEventGraphNode(String name, Point p);
-  public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
-  public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
-  public void newPropChangeListenerNode(String name, Point p);
+  public void newEventGraphNode                  (String name, Point p);
+  public void newFileBasedEventGraphNode         (FileBasedAssyNode xnode, Point p);
+  public void newFileBasedPropChangeListenerNode (FileBasedAssyNode xnode, Point p);
+  public void newPropChangeListenerNode          (String name, Point p);
 
   public void editGraphMetaData  ();
   
   public void newAssembly();
 
-  void runEventGraphEditor();
-  void showXML();
+         void runEventGraphEditor();
+         void showXML();
  
-  public void selectNodeOrEdge(Vector v);
+  public void selectNodeOrEdge      (Vector v);
 
-  public void newAdapterArc(Object[]nodes);
-  public void newSimEvListArc(Object[]nodes);
-  public void newPropChangeListArc(Object[]nodes);
+  public void newAdapterArc         (Object[]nodes);
+  public void newSimEvListArc       (Object[]nodes);
+  public void newPropChangeListArc  (Object[]nodes);
 
-  public void pcListenerEdit(PropChangeListenerNode pclNode);
-  public void evGraphEdit(EvGraphNode evNode);
-  public void pcListenerEdgeEdit(PropChangeEdge pclEdge);
-  public void adapterEdgeEdit(AdapterEdge edgeObj);
-  public void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);
+  public void pcListenerEdit        (PropChangeListenerNode pclNode);
+  public void evGraphEdit           (EvGraphNode evNode);
+  public void pcListenerEdgeEdit    (PropChangeEdge pclEdge);
+  public void adapterEdgeEdit       (AdapterEdge edgeObj);
+  public void simEvListenerEdgeEdit (SimEvListenerEdge edgeObj);
 
   /* menu selections */
   void copy();
@@ -56,7 +55,6 @@ public interface ViskitAssemblyController
   void saveAs();
 
   void generateJavaSource();
-  //File compileJavaClass();
   void runAssembly();
 
   void captureWindow();
