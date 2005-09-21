@@ -73,11 +73,12 @@
         <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
         <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
         <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
-        <pathelement location="${dir.lib}/commons-configuration-1.1RC1.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration-1.1.jar"/>
         <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
         <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
         <pathelement location="${dir.lib}/commons-logging-1.0.4.jar"/>
         <pathelement location="${dir.lib}/log4j-1.2.8.jar"/>
+        <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
         <pathelement location="${dir.lib}/xerces.jar"/>
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <path refid="jaxb.classes"/>
@@ -152,12 +153,13 @@
                 <pathelement location="${dir.lib}/jcommon-1.0.0-rc1.jar"/>
                 <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
                 <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
-                <pathelement location="${dir.lib}/commons-configuration-1.1RC1.jar"/>
+                <pathelement location="${dir.lib}/commons-configuration-1.1.jar"/>
                 <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
                 <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
                 <pathelement location="${dir.lib}/commons-logging-1.0.4.jar"/>
                 <pathelement location="${dir.lib}/cli.jar"/>
                 <pathelement location="${dir.lib}/log4j-1.2.8.jar"/>
+                <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
                 <pathelement location="${dir.lib}/xerces.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.build.classes}"/>
@@ -322,7 +324,7 @@
             <zipfileset src="${dir.src}/lib/ext/dis.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="viskit.Splash2"/>
-                <attribute name="Class-Path" value="../lib/simkit.jar ../lib/actions.jar ../lib/commons-beanutils-1.7.0.jar ../lib/commons-collections-3.1.jar ../lib/commons-configuration-1.1RC1.jar ../lib/commons-digester-1.6.jar ../lib/commons-lang-2.0.jar ../lib/commons-logging-1.0.4.jar ../lib/log4j-1.2.8.jar ../lib/xerces.jar ../lib/jhall.jar ../lib/bsh-2.0b1.jar ../lib/jdom.jar ../lib/jgraph.jar ../lib/simkit.jar ../lib/ext/dis.jar ../lib/ext/diskit.jar ../lib/tools.jar ../lib/jwsdp-1.4/jax-qname.jar ../lib/jwsdp-1.4/jaxb-api.jar ../lib/jwsdp-1.4/jaxb-impl.jar ../lib/jwsdp-1.4/jaxb-libs.jar ../lib/jwsdp-1.4/jaxp-api.jar ../lib/jwsdp-1.4/namespace.jar ../lib/jwsdp-1.4/relaxngDatatype.jar ../lib/jwsdp-1.4/xsdlib.jar"/>                                                                   
+                <attribute name="Class-Path" value="../lib/simkit.jar ../lib/actions.jar ../lib/commons-beanutils-1.7.0.jar ../lib/commons-collections-3.1.jar ../lib/commons-configuration-1.1.jar ../lib/commons-digester-1.6.jar ../lib/commons-lang-2.0.jar ../lib/commons-logging-1.0.4.jar ../lib/log4j-1.2.8.jar ../lib/xerces.jar ../lib/jhall.jar ../lib/bsh-2.0b1.jar ../lib/jdom.jar ../lib/jgraph.jar ../lib/simkit.jar ../lib/ext/dis.jar ../lib/ext/diskit.jar ../lib/tools.jar ../lib/jwsdp-1.4/jax-qname.jar ../lib/jwsdp-1.4/jaxb-api.jar ../lib/jwsdp-1.4/jaxb-impl.jar ../lib/jwsdp-1.4/jaxb-libs.jar ../lib/jwsdp-1.4/jaxp-api.jar ../lib/jwsdp-1.4/namespace.jar ../lib/jwsdp-1.4/relaxngDatatype.jar ../lib/jwsdp-1.4/xsdlib.jar"/>
             </manifest>                                                                     
         </jar>
     </target>
