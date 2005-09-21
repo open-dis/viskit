@@ -2,23 +2,26 @@ package viskit;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import viskit.jgraph.vGraphComponent;
+import viskit.images.CanArcIcon;
+import viskit.images.EventNodeIcon;
+import viskit.images.SchedArcIcon;
 import viskit.jgraph.vGraphModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
-import viskit.images.EventNodeIcon;
-import viskit.images.SchedArcIcon;
-import viskit.images.CanArcIcon;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +43,10 @@ import java.util.Map;
  * Instead, this class (the View) messages the controller class (Controller -- by means of the ViskitController i/f).
  * The controller then informs the model (Model), which then updates itself and "broadcasts" that fact.  This class is a model
  * listener, so it gets the report, then updates the GUI.  A round trip.
+ *
+ * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is largely unchanged.  To understand the
+ * flow, understand that 1) The tab "ChangeListener" plays a key role; 2) When the ChangeListener is hit, the controller.setModel()
+ * method installs the appropriate model for the newly-selected eventgraph.
  */
 
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements ViskitView
@@ -52,43 +59,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public final static int SELF_REF_MODE = 4;
 
   /**
-   * Menu bar for the application
-   */
-  private JMenuBar menuBar;
-
-  // We keep a reference to the menus in case we have to turn menu
-  // items on or off
-  private JMenu fileMenu, editMenu; //, simulationMenu;
-
-  /**
-   * Two right panels
-   */
-  private JPanel stateVariablesPanel, parametersPanel;
-
-  /**
-   * canvas/drawing pane
-   */
-  private vGraphComponent graphPane;
-
-  /**
-   * main split pane, with left-hand drawing pane & state variables on right
-   */
-  private JSplitPane stateDrawingSplit;
-
-  /**
-   * Secondary split pane, with state variables on the top and parameters on the bottom
-   */
-  private JSplitPane stateParameterSplit;
-
-  /**
    * Toolbar for dropping icons, connecting, etc.
    */
   private JToolBar toolBar;
-
-  /**
-   * Button group that holds the mode buttons.
-   */
-  private ButtonGroup modeButtonGroup;
 
   // Mode buttons on the toolbar
   private JLabel addEvent;
@@ -97,70 +70,56 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private JToggleButton selectMode;
   private JToggleButton arcMode;
   private JToggleButton cancelArcMode;
-  //private JToggleButton selfRefMode;
-  private JButton zoomIn, zoomOut;
 
-  /**
-   * Whether or not we can edit this event graph
-   */
-  private boolean isEditable;
-
-  private ParametersPanel pp;
-  private VariablesPanel vp;
-
-  private String filename = "unnamed";
-  
   private Help help;
+  private JTabbedPane tabbedPane;
+  private JPanel eventGraphViewerContent;
 
   /**
    * Constructor; lays out initial GUI objects
    */
-  public EventGraphViewFrame(Model mod, Controller ctrl)
+  public EventGraphViewFrame(boolean contentOnly, Controller ctrl)
   //====================================================
   {
     super("Viskit -- Simkit Event Graph Editor");
-    this.initMVC(mod,ctrl);   // set up mvc linkages
-    this.initUI();            // build widgets
+    initMVC(ctrl);   // set up mvc linkages
+    initUI(contentOnly);    // build widgets
 
-   // parameterTableModel = new ParameterTableModel();
-   // stateVariableTableModel = new StateVariableTableModel();
+    if (!contentOnly) {
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+      setLocation((d.width - 800) / 2, (d.height - 600) / 2);
+      setSize(800, 600);
 
-    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    this.setLocation((d.width - 800) / 2, (d.height - 600) / 2);
-    this.setSize(800, 600);
-
-    this.setEditable(true);
-
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent e)
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      addWindowListener(new WindowAdapter()
       {
-        ((Controller)getController()).quit();
-        // if this simply returns, nothing happens
-        // else, the controller will Sys.exit()
-      }
-    });
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
-    this.setIconImage(icon.getImage());
+        public void windowClosing(WindowEvent e)
+        {
+          ((Controller) getController()).quit();
+          // if this simply returns, nothing happens
+          // else, the controller will Sys.exit()
+        }
+      });
+      ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+      setIconImage(icon.getImage());
+    }
   }
 
-  /**
-   * Sets whether or not we can edit this event graph
-   */
-  public void setEditable(boolean pIsEditable)
+  public EventGraphViewFrame(Controller ctrl)
   {
-    isEditable = pIsEditable;
+    this(false, ctrl);
   }
 
-  /**
-   * Returns whether or not we can edit this event graph
-   */
-  public boolean getIsEditable()
+  public JComponent getContent()
   {
-    return isEditable;
+    return eventGraphViewerContent;
   }
 
+  public JMenuBar getMenus()
+  {
+    return getJMenuBar();
+  }
+  
   /**
    * Returns the current mode--select, add, arc, cancelArc
    */
@@ -169,10 +128,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // Use the button's selected status to figure out what mode
     // we are in.
 
-    if (selectMode.isSelected() == true) return SELECT_MODE;
+    if (selectMode.isSelected()) return SELECT_MODE;
     //if (addEvent.isSelected() == true) return ADD_NODE_MODE;
-    if (arcMode.isSelected() == true) return ARC_MODE;
-    if (cancelArcMode.isSelected() == true) return CANCEL_ARC_MODE;
+    if (arcMode.isSelected()) return ARC_MODE;
+    if (cancelArcMode.isSelected()) return CANCEL_ARC_MODE;
     //if (selfRefMode.isSelected() == true) return SELF_REF_MODE;
     // If none of them are selected we're in serious trouble.
     //assert false : "getCurrentMode()";
@@ -183,49 +142,76 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   /**
    * Initialize the MCV connections
    */
-  private void initMVC(Model mod, Controller ctrl)
+  private void initMVC(Controller ctrl)
   {
-    setModel(mod);
+    //setModel(mod);
     setController(ctrl);
   }
 
   /**
    * Initialize the user interface
    */
-  private void initUI()
+  private void initUI(boolean contentOnly)
   {
     // Layout menus
-    this.setupMenus();
+    setupMenus(contentOnly);
 
     // Layout of toolbar
-    this.setupToolbar();
+    setupToolbar();
 
-    // Set up a top level pane that will be the content pane. This
-    // has a border layout, and contains the toolbar on the top and
+    // Set up a eventGraphViewerContent level pane that will be the content pane. This
+    // has a border layout, and contains the toolbar on the eventGraphViewerContent and
     // the main splitpane underneath.
 
-    // top level panel
-    JPanel top = new JPanel();
-    top.setLayout(new BorderLayout());
-    top.add(toolBar, BorderLayout.NORTH);
+    eventGraphViewerContent = new JPanel();
+    eventGraphViewerContent.setLayout(new BorderLayout());
+    eventGraphViewerContent.add(toolBar, BorderLayout.NORTH);
 
-    // Set up the basic panes for the layouts
-    vGraphModel mod = new vGraphModel();
-    graphPane = new vGraphComponent(mod,this);
-    mod.graph = graphPane;                               // todo fix this
+    tabbedPane = new JTabbedPane();
+    tabbedPane.addChangeListener(new TabSelectionHandler());
 
-    graphPane.addMouseListener(new vCursorHandler());
-    try{
-      graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
+    eventGraphViewerContent.add(tabbedPane,BorderLayout.CENTER);
+    eventGraphViewerContent.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    if(!contentOnly)                // Can't add it here if we're going to put it somewhere  else
+      getContentPane().add(eventGraphViewerContent);
+  }
+
+  private VgraphComponentWrapper getCurrentVgcw()
+  {
+    JSplitPane jsplt = (JSplitPane)tabbedPane.getSelectedComponent();
+    if(jsplt == null)
+      return null;
+
+    JScrollPane jsp = (JScrollPane)jsplt.getLeftComponent();
+    return(VgraphComponentWrapper)jsp.getViewport().getComponent(0);
+  }
+
+  class TabSelectionHandler implements ChangeListener
+  {
+   /*
+    * Tab switch: this will come in with the newly selected tab in place.
+    */
+    public void stateChanged(ChangeEvent e)
+    {
+      VgraphComponentWrapper myVgcw = getCurrentVgcw();
+
+      if(myVgcw == null) {     // last tab has been closed
+        return;
+      }
+      getController().setModel((Model)myVgcw.model);  // tell controller
+      adjustMenus(myVgcw.model);                      // enable/disable menu items based on new EG
+
+      GraphMetaData gmd = myVgcw.model.getMetaData();
+      if(gmd != null)
+        setSelectedEventGraphName(gmd.name);
     }
-    catch(Exception e) {
-      //assert false : "Drop target init. error";
-      System.err.println("assert false : \"Drop target init. error\"");
-    }
+  }
 
+  private void buildStateParamSplit(VgraphComponentWrapper vgcw)
+  {
     // State variables area:
-    stateVariablesPanel = new JPanel();
-    stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel,BoxLayout.Y_AXIS)); //new BorderLayout());
+    JPanel stateVariablesPanel = new JPanel();
+    stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel,BoxLayout.Y_AXIS));
     stateVariablesPanel.add(Box.createVerticalStrut(5));
 
      JPanel p = new JPanel();
@@ -235,7 +221,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      p.add(Box.createHorizontalGlue());
     stateVariablesPanel.add(p);
 
-     vp = new VariablesPanel(300,5);
+    VariablesPanel vp = new VariablesPanel(300,5);
     stateVariablesPanel.add(vp);
     stateVariablesPanel.add(Box.createVerticalStrut(5));
     stateVariablesPanel.setMinimumSize(new Dimension(20,20));
@@ -262,7 +248,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     });
 
     // Simulation parameters area
-    parametersPanel = new JPanel();
+    JPanel parametersPanel = new JPanel();
     parametersPanel.setLayout(new BoxLayout(parametersPanel,BoxLayout.Y_AXIS)); //BorderLayout());
     parametersPanel.add(Box.createVerticalStrut(5));
      p = new JPanel();
@@ -272,7 +258,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      p.add(Box.createHorizontalGlue());
     parametersPanel.add(p);
 
-      pp = new ParametersPanel(300,5);
+    ParametersPanel pp = new ParametersPanel(300,5);
     parametersPanel.add(pp);
     parametersPanel.add(Box.createVerticalStrut(5));
     pp.setMinimumSize(new Dimension(20,20));
@@ -298,32 +284,101 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     });
 
     // Split pane that has state variables on top, parameters on bottom.
-    stateParameterSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(stateVariablesPanel),
-                                                                    new JScrollPane(parametersPanel));
-    stateParameterSplit.setMinimumSize(new Dimension(20,20));
-
-    // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
-    stateDrawingSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(graphPane), stateParameterSplit);
-    top.add(stateDrawingSplit, BorderLayout.CENTER);
-    top.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-    this.getContentPane().add(top);
+    JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                                                    new JScrollPane(stateVariablesPanel),
+                                                    new JScrollPane(parametersPanel));
+    spltPn.setMinimumSize(new Dimension(20,20));
+    vgcw.stateParamSplitPane = spltPn;
+    vgcw.paramPan = pp;
+    vgcw.varPan = vp;
   }
 
-  // The following is done solely to be able to set the splitpanes to a default position on startup.
-  // Widgets have to be showing.
-  private boolean firstShown = false;
+  int untitledCount=0;
+  public void addTab(ViskitModel mod, boolean isNewEG) // When a tab is added
+  {
+    vGraphModel vmod = new vGraphModel();
+    VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod,this); //vGraphComponent(mod,this);
+    vmod.graph = graphPane;                               // todo fix this
+    graphPane.model = mod;
+
+    buildStateParamSplit(graphPane);
+    // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
+    graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                       new JLabel(), //new JScrollPane(graphPane),
+                                       new JLabel()); //dummy stateParameterSplit);
+
+
+    // Save the existing as the first setting for the new one.
+    //graphPane.drawingSplitSetting = drawingSplitPane.getDividerLocation();
+
+    graphPane.addMouseListener(new vCursorHandler());
+    try{
+      graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
+    }
+    catch(Exception e) {
+      //assert false : "Drop target init. error";
+      System.err.println("assert false : \"Drop target init. error\"");
+    }
+    JScrollPane jsp = new JScrollPane(graphPane);
+    graphPane.drawingSplitPane.setLeftComponent(jsp);
+    graphPane.drawingSplitPane.setRightComponent(graphPane.stateParamSplitPane);
+
+    tabbedPane.add("untitled"+untitledCount++,graphPane.drawingSplitPane);
+    tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
+
+    // If a new one, the splitpane is off
+    if(isNewEG)
+      graphPane.drawingSplitPane.setDividerLocation(250);
+
+    setModel((mvcModel)mod); // the view holds only one model, so it gets overwritten with each tab
+    // but this call serves also to register the view with the passed model
+  }
+
+  public void delTab(ViskitModel mod) // When a tab is removed
+  {
+    Component[] ca = tabbedPane.getComponents();
+
+    for(int i=0;i<ca.length;i++) {
+      JSplitPane jsplt = (JSplitPane)ca[i];
+      JScrollPane jsp = (JScrollPane)jsplt.getLeftComponent();
+      VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+      if(vgcw.model==mod){
+        tabbedPane.remove(i);
+        vgcw.isActive = false;
+        return;
+      }
+    }
+    System.out.println("Deleting a tab that wasn't there!");
+  }
+
+  public ViskitModel[] getOpenModels()
+  {
+    Component[] ca = tabbedPane.getComponents();
+    ViskitModel[] vm = new ViskitModel[ca.length];
+    for (int i = 0; i < vm.length; i++) {
+      JSplitPane jsplt = (JSplitPane)ca[i];
+      JScrollPane jsp = (JScrollPane)jsplt.getLeftComponent();
+      VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+      vm[i] = vgcw.model;
+    }
+    return vm;
+  }
 
   public void setVisible(boolean b)
   {
     super.setVisible(b);
-    if(firstShown == false) {
-      firstShown = true;
-      stateDrawingSplit.setDividerLocation(0.5d);
-      stateParameterSplit.setDividerLocation(0.5d);
-    }
-
     // tell the help screen where we are so he can center himself
     help.mainFrameLocated(this.getBounds());
+  }
+
+  public void prepareToQuit()
+  {
+    String boundsKey = "app.EventGraphEditor.FrameBounds";
+    Rectangle bounds = getBounds();
+    ViskitConfig.instance().setVal(boundsKey+"[@h]",""+bounds.height);
+    ViskitConfig.instance().setVal(boundsKey+"[@w]",""+bounds.width);
+    ViskitConfig.instance().setVal(boundsKey+"[@x]",""+bounds.x);
+    ViskitConfig.instance().setVal(boundsKey+"[@y]",""+bounds.y);
   }
 
   /**
@@ -333,7 +388,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   {
 
     if( ParameterDialog.showDialog(this,this,null)) {      // blocks here
-      ((ViskitController)getController()).newSimParameter(ParameterDialog.newName,
+      ((ViskitController)getController()).buildNewSimParameter(ParameterDialog.newName,
                                                           ParameterDialog.newType,
                                                           "new value here",
                                                           ParameterDialog.newComment);
@@ -345,7 +400,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public String addStateVariableDialog()
   {
     if( StateVariableDialog.showDialog(this,this,null)) {      // blocks here
-      ((ViskitController)getController()).newStateVariable(StateVariableDialog.newName,
+      ((ViskitController)getController()).buildNewStateVariable(StateVariableDialog.newName,
                                                           StateVariableDialog.newType,
                                                           "new value here",
                                                           StateVariableDialog.newComment);
@@ -358,18 +413,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
    * package, which
    */
 
-  private void setupMenus()
+  private void adjustMenus(ViskitModel mod)
+  {
+    //todo
+  }
+
+  private void setupMenus(boolean contentOnly)
   {
     ViskitController controller = (ViskitController)getController();
     int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     // Set up file menu
-    fileMenu = new JMenu("File");
+    JMenu fileMenu = new JMenu("File");
     fileMenu.setMnemonic(KeyEvent.VK_F);
     fileMenu.add(buildMenuItem(controller,"newEventGraph",    "New Event Graph", new Integer(KeyEvent.VK_N),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
     fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
+    fileMenu.add(buildMenuItem(controller,"openRecent",       "Open Recent", null, null));
+    fileMenu.add(buildMenuItem(controller,"close",            "Close",null,null));
+    fileMenu.add(buildMenuItem(controller,"closeAll",         "Close All",null,null));
     fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
@@ -379,11 +442,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
     fileMenu.addSeparator();
     fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
-    fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
-
+    if(!contentOnly) {
+      fileMenu.addSeparator();
+      fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+    }
     // Set up edit menu
-    editMenu = new JMenu("Edit");
+    JMenu editMenu = new JMenu("Edit");
     editMenu.setMnemonic(KeyEvent.VK_E);
     // the next three are disabled until something is selected
     editMenu.add(buildMenuItem(controller,"cut",  "Cut",  new Integer(KeyEvent.VK_T),
@@ -412,7 +476,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Graph Properties...",null,null));
 
     // Create a new menu bar and add the menus we created above to it
-    menuBar = new JMenuBar();
+    JMenuBar menuBar = new JMenuBar();
     menuBar.add(fileMenu);
     menuBar.add(editMenu);
     //menuBar.add(simulationMenu);
@@ -429,7 +493,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
     menuBar.add(helpMenu);
     
-    this.setJMenuBar(menuBar);
+    if(!contentOnly)
+      setJMenuBar(menuBar);
   }
 
   // Use the actions package
@@ -480,7 +545,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
   private void setupToolbar()
   {
-    modeButtonGroup = new ButtonGroup();
+    ButtonGroup modeButtonGroup = new ButtonGroup();
     toolBar = new JToolBar();
 
     // Buttons for what mode we are in
@@ -508,10 +573,10 @@ cancelArcMode.setIcon(new CanArcIcon());
 //    selfRefMode   = makeJTButton(null, "viskit/images/selfArc.png",
 //                                       "Add a self-referential edge to a node");
 
-    zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
+    JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                                         "Zoom in on the graph");
 
-    zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
+    JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
                                         "Zoom out on the graph");
 
     modeButtonGroup.add(selectMode);
@@ -548,14 +613,14 @@ cancelArcMode.setIcon(new CanArcIcon());
     {
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setScale(graphPane.getScale() + 0.1d);
+        getCurrentVgcw().setScale(getCurrentVgcw().getScale() + 0.1d);
       }
     });
     zoomOut.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setScale(Math.max(graphPane.getScale() - 0.1d, 0.1d));
+        getCurrentVgcw().setScale(Math.max(getCurrentVgcw().getScale() - 0.1d, 0.1d));
       }
     });
 
@@ -572,21 +637,21 @@ cancelArcMode.setIcon(new CanArcIcon());
     {
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setPortsVisible(false);
+        getCurrentVgcw().setPortsVisible(false);
       }
     });
     arcMode.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setPortsVisible(true);
+        getCurrentVgcw().setPortsVisible(true);
       }
     });
     cancelArcMode.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        graphPane.setPortsVisible(true);
+        getCurrentVgcw().setPortsVisible(true);
       }
     });
 
@@ -674,7 +739,7 @@ cancelArcMode.setIcon(new CanArcIcon());
 
         Graphics g = bi.createGraphics();
         infoflags = 0;
-        if (g.drawImage(img, 0, 0, this) == false)
+        if (!g.drawImage(img, 0, 0, this))
           waitForIt();
 
         cancel = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0, 0), "CancelArcCursor");
@@ -694,13 +759,13 @@ cancelArcMode.setIcon(new CanArcIcon());
       switch (getCurrentMode()) {
         case SELECT_MODE:
         case SELF_REF_MODE:
-          graphPane.setCursor(select);
+          getCurrentVgcw().setCursor(select);
           break;
         case ARC_MODE:
-          graphPane.setCursor(arc);
+          getCurrentVgcw().setCursor(arc);
           break;
         case CANCEL_ARC_MODE:
-          graphPane.setCursor(cancel);
+          getCurrentVgcw().setCursor(cancel);
           break;
         default:
           //assert false : "vCursorHandler";
@@ -737,15 +802,15 @@ cancelArcMode.setIcon(new CanArcIcon());
         Point pp = new Point(
           p.x - addEvent.getWidth(),
           p.y - addEvent.getHeight());
-        ((ViskitController)getController()).newNode(pp);
+        ((ViskitController)getController()).buildNewNode(pp);
       }
       else {
         // get the node in question from the graph
-        Object o = graphPane.getViskitElementAt(p);
+        Object o = getCurrentVgcw().getViskitElementAt(p);
         if(o != null && o instanceof EventNode) {
           EventNode en = (EventNode)o;
           // We're making a self-referential arc
-          ((ViskitController)getController()).newArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
+          ((ViskitController)getController()).buildNewArc(new Object[]{en.opaqueViewObject,en.opaqueViewObject});
         }
       }
     }
@@ -799,16 +864,32 @@ cancelArcMode.setIcon(new CanArcIcon());
 
     jfc.setSelectedFile(fil);
     int retv = jfc.showSaveDialog(this);
-    if(retv == JFileChooser.APPROVE_OPTION)
+    if(retv == JFileChooser.APPROVE_OPTION) {
+      if(jfc.getSelectedFile().exists()) {
+        if (JOptionPane.YES_OPTION !=
+            JOptionPane.showConfirmDialog(this,"Overwrite existing file?",
+                                          "File Exists!",JOptionPane.WARNING_MESSAGE))
+          return null;
+      }
       return jfc.getSelectedFile();
+    }
     return null;
   }
 
-  public void fileName(String s)
+  public File openRecentFilesAsk(Collection lis)
+  {
+    String fn = RecentFilesDialog.showDialog(this,this,lis);
+    if (fn != null)
+      return new File(fn);
+    else
+      return null;
+  }
+
+  public void setSelectedEventGraphName(String s)
   //----------------------------
   {
-    this.filename = s;
     this.setTitle("Viskit: "+s);
+    tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),s);
   }
 
   public boolean doEditNode(EventNode node)
@@ -822,29 +903,29 @@ cancelArcMode.setIcon(new CanArcIcon());
   //--------------------------------------------
   {
     selectMode.doClick();     // always go back into select mode
-    return EdgeInspectorDialog.showDialog(this,this.graphPane,edge); // blocks
+    return EdgeInspectorDialog.showDialog(this,getCurrentVgcw(),edge); // blocks
   }
 
   public boolean doEditCancelEdge(CancellingEdge edge)
   //--------------------------------------------------
   {
     selectMode.doClick();     // always go back into select mode
-    return EdgeInspectorDialog.showDialog(this,this.graphPane,edge); // blocks
+    return EdgeInspectorDialog.showDialog(this,getCurrentVgcw(),edge); // blocks
   }
 
   public boolean doEditParameter(vParameter param)
   {
-    return ParameterDialog.showDialog(this,this.graphPane,param);    // blocks
+    return ParameterDialog.showDialog(this,getCurrentVgcw(),param);    // blocks
   }
   public boolean doEditStateVariable(vStateVariable var)
   {
-    return StateVariableDialog.showDialog(this,this.graphPane,var);
+    return StateVariableDialog.showDialog(this,getCurrentVgcw(),var);
   }
 
   public boolean doMetaGraphEdit(GraphMetaData gmd)
   //-----------------------------------------------
   {
-    return EvGraphMetaDataDialog.showDialog(this,this.graphPane,gmd);
+    return EvGraphMetaDataDialog.showDialog(this,getCurrentVgcw(),gmd);
   }
 
   public int genericAsk(String title, String msg)
@@ -873,6 +954,9 @@ cancelArcMode.setIcon(new CanArcIcon());
   public void modelChanged(mvcModelEvent event)
   //-------------------------------------------
   {
+    VgraphComponentWrapper vgcw = getCurrentVgcw();
+    ParametersPanel pp = vgcw.paramPan;
+    VariablesPanel  vp = vgcw.varPan;
     switch(event.getID())
     {
       // Changes the two side panels need to know about
@@ -911,7 +995,7 @@ cancelArcMode.setIcon(new CanArcIcon());
 
       // Changes the graph needs to know about
       default:
-        this.graphPane.viskitModelChanged((ModelEvent)event);
+        getCurrentVgcw().viskitModelChanged((ModelEvent)event);
 
     }
   }
@@ -921,7 +1005,7 @@ cancelArcMode.setIcon(new CanArcIcon());
    * to save.
    * @param s Java source
    */
-  public void showAndSaveSource(String s)
+  public void showAndSaveSource(String s, String filename)
   {
     JFrame f = new SourceWindow(this,s);
     f.setTitle("Generated source from "+filename);

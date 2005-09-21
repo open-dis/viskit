@@ -6,11 +6,9 @@ import java.awt.*;
 import java.util.Vector;
 
 /**
- * Created by IntelliJ IDEA.
  * User: mike
  * Date: Mar 19, 2004
  * Time: 9:00:57 AM
- * To change this template use File | Settings | File Templates.
  */
 
 public interface ViskitController
@@ -24,12 +22,12 @@ public interface ViskitController
   void newStateVariable();
 
   /* user has established some entity parameters, model can create objects */
-  void newNode         (Point p);
-  void newNode         (Point p, String name);
-  void newSimParameter (String name, String type, String initVal, String comment);
-  void newStateVariable(String name, String type, String initVal, String comment);
-  void newArc          (Object[] nodes);
-  void newCancelArc    (Object[] nodes);
+  void buildNewNode         (Point p);
+  void buildNewNode         (Point p, String name);
+  void buildNewSimParameter (String name, String type, String initVal, String comment);
+  void buildNewStateVariable(String name, String type, String initVal, String comment);
+  void buildNewArc          (Object[] nodes);
+  void buildNewCancelArc    (Object[] nodes);
 
   void editGraphMetaData  ();
   
@@ -49,6 +47,9 @@ public interface ViskitController
   void copy();
   void cut();        // to remove nodes and edges
   void open();
+  void openRecent();
+  void close();
+  void closeAll();
   void paste();
   void quit();
   void save();

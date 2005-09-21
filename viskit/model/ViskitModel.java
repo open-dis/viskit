@@ -25,8 +25,9 @@ public interface ViskitModel
   /**
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
+   * @return for good open
    */
-  public void newModel      (File f);
+  public boolean newModel      (File f);
 
   /**
    * Save existing model to specified file.  If null, save to last file.  If no last file, error.
@@ -34,6 +35,10 @@ public interface ViskitModel
    */
   public void saveModel     (File f);
 
+  /**
+   * @return A File object representing the last one passed to the two methods above.
+   */
+  public File getLastFile();
   /**
    *  Reports saved state of model.  Becomes "clean" after a save.
    */

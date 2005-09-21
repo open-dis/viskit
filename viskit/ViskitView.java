@@ -1,7 +1,9 @@
 package viskit;
 
 import viskit.model.*;
+
 import java.io.File;
+import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,12 +31,19 @@ public interface ViskitView
   public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
+  public File    openRecentFilesAsk(Collection lis);
   public File    saveFileAsk(String suggName,boolean showUniqueName);
 
-  public void    fileName(String s);    // informative, tells view what we're working on
+  public void    setSelectedEventGraphName(String s);    // informative, tells view what we're working on //todo make sure this is called with each addTab
 
-  public void    showAndSaveSource(String s);
+  public void    addTab(ViskitModel mod, boolean isNew); // When a tab is added
+  public void    delTab(ViskitModel mod); // When a tab is removed
+  public ViskitModel[] getOpenModels();
+
+  public void    showAndSaveSource(String s, String filename);
   public void    displayXML(File f);
+
+  public void    prepareToQuit();
   
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
   public String addParameterDialog();          // returns param name

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- values in this file are retrieved by keys such as 'history.eventGraphEditor' -->
+<!-- the root element name is ignored when assembling keys -->
+<ViskitConfig>
+  <history>
+    <AssemblyEditor>
+      <Recent>
+        <AssyProjectFile value="unimplemented"/>
+        <AssyProjectFile value="unimplemented"/>
+      </Recent>
+    </AssemblyEditor>
+    <EventGraphEditor>
+      <Recent>
+      </Recent>
+    </EventGraphEditor>
+  </history>
+</ViskitConfig>

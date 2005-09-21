@@ -1,18 +1,20 @@
 package viskit;
 
 import actions.ActionIntrospector;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
+import viskit.mvc.mvcModel;
 
-import javax.swing.*;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -37,39 +39,58 @@ import java.util.Vector;
 public class Controller extends mvcAbstractController implements ViskitController
 /*******************************************************************************/
 {
+
   public Controller()
   //=================
   {
+    initConfig();
+    this._setFileLists();
   }
   public void begin()
   //-----------------
   {
     // wait for Main to do this after the first window is put up
     // newEventGraph();
+
+    ArrayList lis = this.getOpenFileList(false);
+    if(lis.size() <= 0)
+      newEventGraph();
+    else {
+     for(int i=0;i<lis.size();i++) {
+       _doOpen(new File((String)lis.get(i)));
+     }
+    }
   }
 
   public void quit()
   //----------------
   {
-    if (((Model)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
-        return;
+
+    ViskitModel[] modAr = ((ViskitView)getView()).getOpenModels();
+    for(int i=0;i<modAr.length;i++) {
+      setModel((mvcModel)modAr[i]);
+      File f = modAr[i].getLastFile();
+      if(f != null)
+        markConfigOpen(f);
+      close();
+    }
+    ((ViskitView)getView()).prepareToQuit();
     VGlobals.instance().quitEventGraphEditor();
   }
 
   public void newEventGraph()
   //-------------------------
   {
-    if (((Model)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
-        return;
+    Model mod = new Model();
+    mod.init();
+    mod.newModel(null);
 
-    lastFile = null;
-    ((ViskitModel) getModel()).newModel(null);
-
+    // No model set in controller yet...it gets set
+    // when TabbedPane changelistener detects a tab change.
+    ((ViskitView)getView()).addTab(mod,true);
     editGraphMetaData();
 
-    newNode(new Point(30,30),"Run");   // always start with a run event
+    buildNewNode(new Point(30,30),"Run");   // always start with a run event
     ((ViskitModel)getModel()).setDirty(false); // we're not really dirty yet
   }
 
@@ -98,26 +119,133 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
   }
 
-  File lastFile;
   public void open()
   //----------------
+  {
+    File file = ((ViskitView)getView()).openFileAsk();
+    if (file != null) {
+      _doOpen(file);
+    }
+  }
+
+  private void _doOpen(File file)
+  {
+    Model mod = new Model();
+    mod.init();
+
+    ((ViskitView) getView()).addTab(mod,false);
+
+    if (false == mod.newModel(file)) {
+      ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
+      return;
+    }
+    ((ViskitView)getView()).setSelectedEventGraphName(mod.getMetaData().name);
+    adjustRecentList(file);
+  }
+
+  private static final int RECENTLISTSIZE = 15;
+  private ArrayList recentFileList;
+
+  public void openRecent()
+  {
+    ArrayList v = getRecentFileList(false);
+    if(v.size() <= 0)
+      open();
+    else {
+      File file = ((ViskitView)getView()).openRecentFilesAsk(v);
+      if(file != null)
+        _doOpen(file);
+    }
+  }
+
+  /**
+   * If passed file is in the list, move it to the top.  Else insert it;
+   * Trim to RECENTLISTSIZE
+   * @param file
+   */
+  private void adjustRecentList(File file)
+  {
+    String s = file.getAbsolutePath();
+    int idx;
+    if((idx = recentFileList.indexOf(s)) != -1)
+      recentFileList.remove(idx);
+    recentFileList.add(0,s);      // to the top
+
+    while(recentFileList.size() > RECENTLISTSIZE)
+      recentFileList.remove(recentFileList.size()-1);
+    saveHistoryXML(recentFileList);
+  }
+
+  private ArrayList openV;
+
+  private void _setFileLists()
+  {
+    recentFileList = new ArrayList(RECENTLISTSIZE+1);
+    openV = new ArrayList(4);
+    String[] valueAr = historyConfig.getStringArray(egHistoryKey+"[@value]");
+    for (int i = 0; i < valueAr.length; i++) {
+      recentFileList.add(valueAr[i]);
+      String op = historyConfig.getString(egHistoryKey + "(" + i + ")[@open]");
+      if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes")))
+        openV.add(valueAr[i]);
+    }
+  }
+  private void saveHistoryXML(ArrayList recentFiles)
+  {
+    historyConfig.clearTree(egHistoryClearKey);
+
+    for(int i=0;i<recentFiles.size();i++) {
+      String value = (String)recentFiles.get(i);
+      historyConfig.setProperty(egHistoryKey+"("+i+")[@value]",value);
+    }
+    historyConfig.getDocument().normalize();
+  }
+  private void markConfigOpen(File f)
+  {
+    int idx = recentFileList.indexOf(f.getAbsolutePath());
+    if(idx != -1)
+      historyConfig.setProperty(egHistoryKey+"("+idx+")[@open]","true");
+
+    // The open attribute is zeroed out for all recent files the first time a file is opened
+  }
+
+  private ArrayList getRecentFileList(boolean refresh)
+  {
+    if (refresh || recentFileList == null)
+      _setFileLists();
+    return recentFileList;
+  }
+
+  private ArrayList getOpenFileList(boolean refresh)
+  {
+    if (refresh || openV == null)
+      _setFileLists();
+    return openV;
+  }
+
+  public void close()
   {
     if (((Model)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
 
-    lastFile = ((ViskitView) getView()).openFileAsk();
-    if (lastFile != null) {
-      ((ViskitModel) getModel()).newModel(lastFile);
-      // may not have been a good open, but gmd will be accurate
-      GraphMetaData gmd = ((ViskitModel)getModel()).getMetaData();
-      ((ViskitView) getView()).fileName(gmd.name); //lastFile.getName());
+    ((ViskitView)getView()).delTab((Model)getModel());
+  }
+
+  public void closeAll()
+  {
+    ViskitModel[] modAr = ((ViskitView)getView()).getOpenModels();
+    for(int i=0;i<modAr.length;i++) {
+      setModel((mvcModel)modAr[i]);
+      close();
     }
   }
 
   public void save()
   //----------------
   {
+    ViskitModel mod = (ViskitModel)getModel();
+    File lastFile = mod.getLastFile();
     if(lastFile == null)
       saveAs();
     else
@@ -131,7 +259,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ViskitView view = (ViskitView)getView();
     GraphMetaData gmd = mod.getMetaData();
 
-    lastFile = view.saveFileAsk(gmd.name+".xml",false);
+    File lastFile = view.saveFileAsk(gmd.name+".xml",false);
     if(lastFile != null) {
       String n = lastFile.getName();
       if(n.endsWith(".xml") || n.endsWith(".XML"))
@@ -140,7 +268,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       mod.changeMetaData(gmd); // might have renamed
 
       mod.saveModel(lastFile);
-      view.fileName(lastFile.getName());
+      view.setSelectedEventGraphName(n); //lastFile.getName());
     }
   }
 
@@ -150,7 +278,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitView) getView()).addParameterDialog();
 
   }
-  public void newSimParameter(String name, String type, String initVal, String comment)
+  public void buildNewSimParameter(String name, String type, String initVal, String comment)
   {
     ((ViskitModel)getModel()).newSimParameter(name, type, initVal, comment);
   }
@@ -170,12 +298,15 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((viskit.model.ViskitModel) getModel()).changeStateVariable(var);
     }
   }
-  
+
+  // Comes in from plus button
   public void newStateVariable()
   {
     ((ViskitView) getView()).addStateVariableDialog();
   }
-  public void newStateVariable(String name, String type, String initVal, String comment)
+
+  // Comes in from view
+  public void buildNewStateVariable(String name, String type, String initVal, String comment)
   //----------------------------
   {
     ((viskit.model.ViskitModel)getModel()).newStateVariable(name,type,initVal,comment);
@@ -279,7 +410,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   private boolean checkSave()
   {
-    if(((ViskitModel)getModel()).isDirty() || lastFile == null) {
+    if(((ViskitModel)getModel()).isDirty() || ((ViskitModel)getModel()).getLastFile() == null) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
         return false;
@@ -289,19 +420,20 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   }
   public void generateJavaClass()
   {
+    File lastFile = ((ViskitModel)getModel()).getLastFile();
     if(checkSave() == false || lastFile == null)
       return;
     String source = ((ViskitModel)getModel()).buildJavaSource();
     if(source != null && source.length() > 0)
-      ((ViskitView)getView()).showAndSaveSource(source);
+      ((ViskitView)getView()).showAndSaveSource(source,lastFile.getName());
   }
 
   public void showXML()
   {
-    if(checkSave() == false || lastFile == null)
+    if(checkSave() == false || ((ViskitModel)getModel()).getLastFile() == null)
       return;
 
-    ((ViskitView)getView()).displayXML(lastFile); 
+    ((ViskitView)getView()).displayXML(((ViskitModel)getModel()).getLastFile());
   }
 
   public void runAssemblyEditor()
@@ -313,7 +445,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   public void eventList()
   {
-    // todo implement
+    // not used
     System.out.println("EventListAction in " + this);
   }
 
@@ -321,20 +453,20 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void newNode()
   //-------------------
   {
-    newNode(new Point(100,100));
+    buildNewNode(new Point(100,100));
   }
-  public void newNode(Point p)
+  public void buildNewNode(Point p)
   //--------------------------
   {
-    newNode(p,"evnt_"+nodeCount++);
+    buildNewNode(p,"evnt_"+nodeCount++);
   }
-  public void newNode(Point p,String nm)
+  public void buildNewNode(Point p,String nm)
   //------------------------------------
   {
     ((viskit.model.ViskitModel) getModel()).newEvent(nm, p);
   }
 
-  public void newArc(Object[] nodes)
+  public void buildNewArc(Object[] nodes)
   //--------------------------------
   {
     // My node view objects hold node model objects and vice versa
@@ -343,7 +475,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel) getModel()).newEdge(src, tar);
   }
 
-  public void newCancelArc(Object[] nodes)
+  public void buildNewCancelArc(Object[] nodes)
   //--------------------------------------
   {
     // My node view objects hold node model objects and vice versa
@@ -374,7 +506,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((ViskitModel)getModel()).changeMetaData(gmd);
 
     // update title bar
-    ((ViskitView)getView()).fileName(gmd.name);    
+    ((ViskitView)getView()).setSelectedEventGraphName(gmd.name);
   }
   
   public void nodeEdit(viskit.model.EventNode node)      // shouldn't be required
@@ -409,6 +541,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //-------------------------
   {
     String fileName = "ViskitScreenCapture";
+    File lastFile = ((ViskitModel)getModel()).getLastFile();
     if (lastFile != null)
       fileName = lastFile.getName();
 
@@ -457,6 +590,21 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       frame.pack();
       frame.setLocationRelativeTo((Component) getView());
       frame.setVisible(true);
+    }
+  }
+
+  XMLConfiguration historyConfig;
+  String egHistoryKey = "history.EventGraphEditor.Recent.EventGraphFile";
+  String egHistoryClearKey = "history.EventGraphEditor.Recent";
+  private void initConfig()
+  {
+    try {
+      historyConfig = ViskitConfig.instance().getIndividualXMLConfig("c_history.xml");
+    }
+    catch (Exception e) {
+      System.out.println("Error loading history file: "+e.getMessage());
+      System.out.println("Recent file saving disabled");
+      historyConfig = null;
     }
   }
 }

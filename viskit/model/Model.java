@@ -98,13 +98,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
   public void changeMetaData(GraphMetaData gmd)
   {
     metaData = gmd;
+    setDirty(true);
   }
   /**
    * Replace current model with one contained in the passed file.
    *
    * @param f
+   * @return true for good open, else false
    */
-  public void newModel(File f)
+   public boolean newModel(File f)
   {
     GraphMetaData mymetaData;
     if (f == null) {
@@ -116,7 +118,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
                                    "\n"+ f.getName() +
                                    "\n"+ e.getMessage(),
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
-        return;
+        return false;
       }
       VGlobals.instance().reset();
       stateVariables.removeAllElements();
@@ -176,12 +178,13 @@ public class Model extends mvcAbstractModel implements ViskitModel
                                    "\n"+ e.getMessage(),
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
         }
-        return;    // from either error case
+        return false;    // from either error case
       }
     }
     metaData = mymetaData;
     currentFile = f;
-    modelDirty = false;
+    setDirty(false);
+    return true;
   }
 
   public void saveModel(File f)
@@ -213,7 +216,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
        m.marshal(jaxbRoot,fw);
        fw.close();
 
-       modelDirty = false;
+       setDirty(false);
        currentFile = f;
      }
      catch (JAXBException e) {
@@ -229,6 +232,14 @@ public class Model extends mvcAbstractModel implements ViskitModel
                                   "File I/O Error",JOptionPane.ERROR_MESSAGE);
        return;
      }
+  }
+
+  /**
+   * @return A File object representing the last one passed to the two methods above.
+   */
+  public File getLastFile()
+  {
+    return currentFile;
   }
 
   private void buildEventsFromJaxb(List lis)
@@ -378,7 +389,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     se.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
     edgeCache.put(ed,se);
 
-    modelDirty = true;
+    setDirty(true);
 
     this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
 
@@ -410,7 +421,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     target.getConnections().add(ce);
 
     edgeCache.put(ed,ce);
-    modelDirty = true;
+    setDirty(true);
 
     notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Cancelling edge added"));
     return ce;
@@ -497,7 +508,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   // --------------
   public void newSimParameter(String nm, String typ, String xinitVal, String comment)
   {
-    modelDirty = true;
+    setDirty(true);
 
     vParameter vp = new vParameter(nm,typ,comment);
     //p.setValue(initVal);
@@ -509,19 +520,19 @@ public class Model extends mvcAbstractModel implements ViskitModel
     p.getComment().add(comment);
 
     vp.opaqueModelObject = p;
-    this.simParameters.add(vp);
+    simParameters.add(vp);
     jaxbRoot.getParameter().add(p);
 
-    this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
+    notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
   }
 
   public void deleteSimParameter(vParameter vp)
   {
     // remove jaxb variable
     jaxbRoot.getParameter().remove(vp.opaqueModelObject);
-    modelDirty = true;
-    this.simParameters.remove(vp);
-    this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
+    setDirty(true);
+    simParameters.remove(vp);
+    notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
   }
 
   public void changeSimParameter(vParameter vp)
@@ -534,7 +545,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     p.getComment().clear();
     p.getComment().add(vp.getComment());
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERCHANGED, "vParameter changed"));
   }
 
@@ -543,9 +554,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   public void newStateVariable(String name, String type, String xinitVal, String comment)
   {
-    // put code to do it here
+    setDirty(true);
 
-    modelDirty = true;
     // get the new one here and show it around
     vStateVariable vsv = new vStateVariable(name,type,comment);
     StateVariable s = null;
@@ -557,18 +567,17 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     vsv.opaqueModelObject = s;
     jaxbRoot.getStateVariable().add(s);
-    this.stateVariables.add(vsv);
-    this.notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
-
+    stateVariables.add(vsv);
+    notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
   }
 
   public void deleteStateVariable(vStateVariable vsv)
   {
     // remove jaxb variable
     jaxbRoot.getStateVariable().remove(vsv.opaqueModelObject);
-    this.stateVariables.remove(vsv);
-    modelDirty = true;
-    this.notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
+    stateVariables.remove(vsv);
+    setDirty(true);
+    notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
   }
 
   public void changeStateVariable(vStateVariable vsv)
@@ -581,8 +590,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     sv.getComment().clear();
     sv.getComment().add(vsv.getComment());
 
-    modelDirty = true;
-    this.notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLECHANGED, "State variable changed"));
+    setDirty(true);
+    notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLECHANGED, "State variable changed"));
   }
 
   // Event (node) mods
@@ -613,7 +622,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     evNodeCache.put(jaxbEv,node);   // key = ev
     jaxbRoot.getEvent().add(jaxbEv);
 
-    modelDirty = true;
+    setDirty(true);
     notifyChanged(new ModelEvent(node,ModelEvent.EVENTADDED, "Event added"));
   }
 
@@ -628,7 +637,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     evNodeCache.remove(jaxbEv);
     jaxbRoot.getEvent().remove(jaxbEv);
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
   }
 
@@ -831,7 +840,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     // following must follow above
     cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));
   }
 
@@ -870,7 +879,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
 
     this.edgeCache.put(sch,se);
-    modelDirty = true;
+    setDirty(true);
 
     this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
   }
@@ -909,7 +918,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
 
     this.edgeCache.put(can,ce);
-    modelDirty = true;
+    setDirty(true);
 
     this.notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Edge added"));
   }
@@ -918,7 +927,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     _commonEdgeDelete(edge);
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
   }
 
@@ -940,7 +949,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   {
     _commonEdgeDelete(edge);
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGEDELETED, "Cancelling edge deleted"));
   }
 
@@ -972,7 +981,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       sch.getEdgeParameter().add(p);
     }
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
   }
 
@@ -1002,7 +1011,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
 
 
-    modelDirty = true;
+    setDirty(true);
     this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELLINGEDGECHANGED, "Cancelling edge changed"));
   }
 

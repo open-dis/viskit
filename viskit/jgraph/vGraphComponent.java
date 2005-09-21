@@ -616,9 +616,9 @@ PortView p = getSourcePortAt(e.getPoint());
       Object[] oa = new Object[]{src, tar};
       ViskitController controller = (ViskitController) parent.getController();
       if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE)
-        controller.newCancelArc(oa);
+        controller.buildNewCancelArc(oa);
       else
-        controller.newArc(oa);
+        controller.buildNewArc(oa);
 
     }
 

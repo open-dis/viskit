@@ -1,15 +1,13 @@
 package viskit;
 
-import viskit.model.Model;
-import viskit.model.ViskitModel;
+import com.jgoodies.looks.Options;
+import com.jgoodies.looks.common.ShadowPopupFactory;
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
-import java.awt.geom.PathIterator;
-import java.io.*;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -31,22 +29,73 @@ public class Main
   {
     setLandFandFonts();
 
-    final Model mod = new Model();
     final Controller cont = new Controller();
 
     //Latest thinking is to do EVERYTHING involving the GUI in the GUI thread.  See recent Sun doc.
     SwingUtilities.invokeLater(new Runnable(){
       public void run()
       {
-        VGlobals.instance().buildEventGraphViewFrame(cont,mod);
+        VGlobals.instance().buildEventGraphViewFrame(cont);
         VGlobals.instance().runEventGraphView();
-
-        cont.newEventGraph();
       }
     });
   }
+
+  private static EventGraphViewFrame _frame;
+
+  /**
+   * Alternate entry for EG Editor to run as component, not application
+   * @param args
+   * @return EventGraphViewFrame instance, unvisualized
+   */
+  public static EventGraphViewFrame main2(String[] args)
+  {
+    final Controller cont = new Controller();
+    try {
+      SwingUtilities.invokeAndWait(new Runnable()
+      {
+        public void run()
+        {
+          _frame = VGlobals.instance().buildEventGraphViewFrame(cont);
+          VGlobals.instance().installEventGraphView();
+        }
+      });
+    }
+    catch (Exception e) {
+      System.out.println("bad launch of eventgraph editor");
+    }
+    return _frame;
+  }
+
+  /**
+   * Place-holder.  Can sub the code from the method below if desired.
+   */
   public static void setLandFandFonts()
   {
+  }
+
+  /**
+   * This shows some experiments with L&F.  If this is not used the platform
+   * default L&Fs appear.
+   */
+  private static void unused_setLandFandFonts()
+  {
+    LookAndFeel laf = new PlasticLookAndFeel();
+    Options.setUseNarrowButtons(true);
+    PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer()); //SkyBluerTahoma()); //SkyBluerTahoma()); //new DesertBlue()); //new ExperienceBlue());
+    //PlasticLookAndFeel.setTabStyle(com.jgoodies.looks.plastic.Plastic3DLookAndFeel.TAB_STYLE_METAL_VALUE);
+    PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
+
+    try {
+      UIManager.setLookAndFeel(laf);
+      ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
+      //Wrapper.wrap(); //Force all widgets to go anti-aliased
+    }
+    catch (UnsupportedLookAndFeelException e) {
+      System.out.println("can't change l&f");
+    }
+    //setAllFonts();
+/*
     //System.out.println(System.getProperty("java.class.path"));
     //System.out.println(System.getProperty("user.dir"));
     String laf = "javax.swing.plaf.metal.MetalLookAndFeel";          //default
@@ -73,11 +122,12 @@ public class Main
       UIManager.setLookAndFeel(laf);
       UIDefaults def = UIManager.getDefaults();
       def.put("Tree.font", new Font("Verdana", Font.PLAIN, 12));
-      setAllFonts(/*null*/);
+      setAllFonts(/*null);
     }
     catch (Exception e) {
       System.err.println("Could not enable " + laf);
     }
+    */
   }
   
   private static void setAllFonts(/*JFrame f*/)

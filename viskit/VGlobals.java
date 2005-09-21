@@ -72,10 +72,12 @@ public class VGlobals
   {
     return avf;
   }
+
   public AssemblyViewFrame buildAssemblyViewFrame()
   {
     return buildAssemblyViewFrame(new AssemblyController(), new AssemblyModel());
   }
+
   public AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont, AssemblyModel mod)
   {
     avf = new AssemblyViewFrame(mod,cont);
@@ -89,10 +91,12 @@ public class VGlobals
 
     return avf;
   }
+
   public AssemblyModel getAssemblyModel()
   {
     return amod;
   }
+  
   public AssemblyController getAssemblyController()
   {
     return acont;
@@ -130,24 +134,23 @@ public class VGlobals
       return;
     System.exit(0);
   }
+
   EventGraphViewFrame egvf;
   public EventGraphViewFrame getEventGraphEditor()
   {
     return egvf;
   }
+
   public EventGraphViewFrame buildEventGraphViewFrame()
   {
-    return buildEventGraphViewFrame(new Controller(), new Model());
+    return buildEventGraphViewFrame(new Controller());
   }
-  public EventGraphViewFrame buildEventGraphViewFrame(Controller cont, Model mod)
+
+  public EventGraphViewFrame buildEventGraphViewFrame(Controller cont)
   {
-    egvf = new EventGraphViewFrame(mod,cont);
-    cont.setModel(mod);   // registers cntl as model listener
+    egvf = new EventGraphViewFrame(cont);
     cont.setView(egvf);
-
-    mod.init();
     cont.begin();
-
     return egvf;
   }
 
@@ -155,6 +158,7 @@ public class VGlobals
   {
     return  (ViskitModel)egvf.getModel();
   }
+
   public void quitEventGraphEditor()
   {
     if(egvf != null) {
@@ -164,6 +168,7 @@ public class VGlobals
       return;
     System.exit(0);
   }
+
   public void runEventGraphView()
   {
     if (egvf == null)
@@ -173,6 +178,11 @@ public class VGlobals
     egvf.toFront();
   }
 
+  public void installEventGraphView()
+  {
+    if (egvf == null)
+      buildEventGraphViewFrame();
+  }
 
   public void setStateVarsList(Collection svs)
   {

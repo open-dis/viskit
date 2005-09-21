@@ -4,5 +4,6 @@
   <!-- stack up your config files here -->
   <xml fileName="c_app.xml"/>
   <xml fileName="c_gui.xml"/>
+  <xml fileName="c_history.xml"/>
 </configuration>
 

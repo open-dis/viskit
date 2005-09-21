@@ -93,4 +93,17 @@ public class ViskitConfig
 
     return config.getString(key);
   }
+
+  public int getConfigValueCount(String key)
+  {
+    String[]sa = config.getStringArray(key);
+    return sa.length;
+  }
+
+  public XMLConfiguration getIndividualXMLConfig(String f) throws Exception
+  {
+    XMLConfiguration config = new XMLConfiguration(f);
+    config.setAutoSave(true);
+    return config;
+  }
 }
