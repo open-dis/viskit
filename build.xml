@@ -288,8 +288,9 @@
         </javac>
         
         <javac destdir="${dir.build.classes}"
-            source="1.4"
-            target="1.4">
+            debug="on"
+            source="1.5"
+            target="1.5">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
@@ -299,6 +300,7 @@
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
+            <include name="ViskitAssembly.java"/>
         </javac>
         <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
     </target>   
