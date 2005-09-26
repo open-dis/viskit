@@ -125,5 +125,5 @@
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED
 	package CDATA   #REQUIRED
-        extend  CDATA   "simkit.BasicAssembly"
+        extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
 >
