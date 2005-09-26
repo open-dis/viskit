@@ -106,6 +106,10 @@ public class ViskitAssembly extends BasicAssembly {
     public void createDesignPointStats() {
         designPointStats = 
                 (new ArrayList<SampleStatistics>(designPointStatistics.values())).toArray(new SampleStatistics[0]);
+        // set up some defaults from the super method
+        if ( designPointStats.length == 0 ) {
+            super.createDesignPointStats();
+        }
     }
     
     public void createReplicationStats() {

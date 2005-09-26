@@ -259,7 +259,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	pw.println("import simkit.stat.*;");
 	pw.println("import simkit.util.*;");
 	pw.println("import java.text.*;");
-        pw.println("import java.beans.PropertyChangeListener");
+        pw.println("import java.beans.PropertyChangeListener;");
 	pw.println();
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
@@ -511,7 +511,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println(sp4 + cb);
         pw.println();
         
-        pw.println(sp4 + "public createDesignPointStats" + lp + rp + sp + ob);
+        pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
         
         pcls = (new ArrayList<String>(designPointStats.keySet())).toArray(new String[0]);
         
@@ -526,11 +526,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
         }
         
-        if ( pcls.length == 0 ) {
-            pw.println(sp8 + "super" + pd + "super" + pd + "createDesignPointStats" + lp + rp + sc);
-        } else {
-            pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
-        }
+        
+        pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
+
         pw.println(sp4 + cb);
         pw.println();
         
