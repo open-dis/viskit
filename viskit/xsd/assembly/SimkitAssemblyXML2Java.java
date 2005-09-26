@@ -290,7 +290,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	    ListIterator pli = pl.listIterator();
 	    
 	    pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
-	    pw.print(sp12 + lp + "SimEntity" + rp + lp + nw + sp + se.getType() + lp);
+	    pw.print(sp12 + nw + sp + se.getType() + lp);
 
 	    if ( pli.hasNext() ) {
 		pw.println();
@@ -301,7 +301,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	        pw.println(sp12 + rp);
 	    } else pw.println(rp);
 
-	    pw.println(sp8 + rp + rp + sc);
+	    pw.println(sp8 + rp + sc);
             pw.println();
 	} 
         
