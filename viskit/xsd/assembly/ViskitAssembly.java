@@ -122,7 +122,7 @@ public class ViskitAssembly extends BasicAssembly {
                 (new ArrayList<PropertyChangeListener>(propertyChangeListeners.values())).toArray(new PropertyChangeListener[0]);
     }
     
-    void addSimEntity(String name, SimEntity entity) {
+    public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name,entity);
     }
@@ -132,7 +132,7 @@ public class ViskitAssembly extends BasicAssembly {
      * property comes from the connector
      * however Simkit's take the property name in the constructor. 
      */
-    void addDesignPointStat(String listenerName, String propertyName, String type) {
+    public void addDesignPointStat(String listenerName, String propertyName, String type) {
         try {
             Class statClass = Class.forName(type);
             Constructor c = statClass.getConstructor(new Class[]{ String.class });
@@ -146,7 +146,7 @@ public class ViskitAssembly extends BasicAssembly {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
-    void addReplicationStat(String listenerName, String propertyName, String type) {
+    public void addReplicationStat(String listenerName, String propertyName, String type) {
         try {
             Class statClass = Class.forName(type);
             Constructor c = statClass.getConstructor(new Class[]{ String.class });
@@ -160,7 +160,7 @@ public class ViskitAssembly extends BasicAssembly {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
-    void addPropertyChangeListener(String listenerName, String propertyName, String type) {
+    public void addPropertyChangeListener(String listenerName, String propertyName, String type) {
         try {
             Class statClass = Class.forName(type);
             Constructor c = statClass.getConstructor(new Class[]{ String.class });
@@ -174,19 +174,19 @@ public class ViskitAssembly extends BasicAssembly {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
-    void addPropertyChangeListenerConnection(String listener, String property, String source) {
+    public void addPropertyChangeListenerConnection(String listener, String property, String source) {
         propertyChangeListenerConnections.put(listener,new PropertyConnector(property,source));
     }
     
-    void addDesignPointStatListenerConnection(String listener, String property, String source) {
+    public void addDesignPointStatListenerConnection(String listener, String property, String source) {
         designPointStatsListenerConnections.put(listener,new PropertyConnector(property,source));
     }
         
-    void addReplicationStatsListenerConnection(String listener, String property, String source) {
+    public void addReplicationStatsListenerConnection(String listener, String property, String source) {
         propertyChangeListenerConnections.put(listener,new PropertyConnector(property,source));
     } 
     
-    void addSimEventListenerConnection(String listener, String source) {
+    public void addSimEventListenerConnection(String listener, String source) {
         simEventListenerConnections.put(listener,source);
     }
     

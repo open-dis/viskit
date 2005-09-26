@@ -290,7 +290,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	    ListIterator pli = pl.listIterator();
 	    
 	    pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
-	    pw.print(sp12 + nw + sp + se.getType() + lp);
+	    pw.print(sp12 + lp + "SimEntity" + rp + lp + nw + sp + se.getType() + lp);
 
 	    if ( pli.hasNext() ) {
 		pw.println();
@@ -301,7 +301,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	        pw.println(sp12 + rp);
 	    } else pw.println(rp);
 
-	    pw.println(sp8 + rp + sc);
+	    pw.println(sp8 + rp + rp + sc);
             pw.println();
 	} 
         
@@ -612,25 +612,25 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	if ( (schedule = this.root.getSchedule()) != null ) {
 	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
-            pw.print(sp8 + "setStopTime");
+            pw.print(sp8 + "asm.setStopTime");
 	    pw.println(lp + schedule.getStopTime() + rp + sc);
 	
-	    pw.print(sp8 + "setVerbose");
+	    pw.print(sp8 + "asm.setVerbose");
 	    pw.println(lp + schedule.getVerbose() + rp + sc);
 	    
-            pw.print(sp8 + "setNumberReplications");
+            pw.print(sp8 + "asm.setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
             
-            pw.print(sp8 + "setPrintReplicationReports");
+            pw.print(sp8 + "asm.setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
             
-            pw.print(sp8 + "setPrintSummaryReport");
+            pw.print(sp8 + "asm.setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
             
 
 	}
         
-        pw.println(sp8 + nw + "Thread" + lp + "asm" + rp + pd + "run" + lp + rp + sc);
+        pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "run" + lp + rp + sc);
 
 	pw.println();
 	pw.println(sp4 + cb);
