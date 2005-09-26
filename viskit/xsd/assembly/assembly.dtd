@@ -1,7 +1,7 @@
-<!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter" >
-<!ENTITY % DesignParameters "TerminalParameter" >
+<!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter" > 
+<!ENTITY % DesignParameters "TerminalParameter" >   
 
-<!ELEMENT MultiParameter (%Parameters;)* >
+<!ELEMENT MultiParameter (%Parameters;)* >  
 <!ATTLIST MultiParameter
     type  CDATA #REQUIRED
 >
@@ -38,6 +38,7 @@
 <!ATTLIST PropertyChangeListener
     type CDATA #REQUIRED
     name ID    #REQUIRED
+    mode (replicationStat|designPointStat|listener) "listener"
 >
 
 <!ELEMENT SimEventListenerConnection EMPTY >
@@ -62,6 +63,9 @@
 <!ATTLIST Schedule
     stopTime CDATA "0.0"
     verbose  (true|false) "true"
+    numberReplications CDATA "1"
+    printReplicationReports     (true|false) "true"
+    printSummaryReport  (true|false) "true" 
 >
 
 <!ELEMENT Adapter (Coordinate?) >
