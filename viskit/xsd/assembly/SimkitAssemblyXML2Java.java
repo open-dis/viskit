@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
+import java.util.LinkedHashMap;
 import javax.xml.bind.JAXBContext; 
 import javax.xml.bind.JAXBException; 
 import javax.xml.bind.Unmarshaller; 
@@ -235,11 +236,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	buildHead(head);
 	buildEntities(entities);
 	buildListeners(listeners);
-	buildConnectors(connectors);
+	//buildConnectors(connectors);
 	buildOutput(output);
 	buildTail(tail);
 
-	buildSource(source, head, entities, listeners, connectors, output, tail);
+	buildSource(source, head, entities, listeners, /*connectors,*/ output, tail);
 
 	return source.toString();
     }
@@ -258,6 +259,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	pw.println("import simkit.stat.*;");
 	pw.println("import simkit.util.*;");
 	pw.println("import java.text.*;");
+        pw.println("import java.beans.PropertyChangeListener");
 	pw.println();
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
@@ -267,6 +269,12 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	pw.println("public class " + name + sp + extend + ob);
 	pw.println();
 	pw.println();
+        pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
+        pw.println(sp8 + "super" + lp + rp + sc);
+        pw.println(sp8 + "createObjects" + lp + rp + sc);
+        pw.println(sp8 + "performHookups" + lp + rp + sc);
+        pw.println(sp4 + cb);
+        pw.println();
 
     }
 
@@ -274,29 +282,43 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	PrintWriter pw = new PrintWriter(entities);
 	ListIterator seli = this.root.getSimEntity().listIterator();
 
+        pw.println(sp4+"public void createSimEntities"+ lp + rp + sp + ob);
 	while ( seli.hasNext() ) {
 
 	    SimEntity se = (SimEntity) seli.next();
 	    List pl = se.getParameters();
 	    ListIterator pli = pl.listIterator();
 	    
-	    pw.print(sp4 + "public" + sp + se.getType() + sp + se.getName() + sp + eq);
-	    pw.print(sp + nw + sp + se.getType() + lp);
+	    pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
+	    pw.print(sp12 + nw + sp + se.getType() + lp);
 
 	    if ( pli.hasNext() ) {
 		pw.println();
 	        while ( pli.hasNext() ) {
-		    doParameter(pl, pli.next(), sp12, pw);
+		    doParameter(pl, pli.next(), sp16, pw);
 	        }
 		pw.println();
-	        pw.println(sp8 + rp + sc);
-	    } else pw.println(rp + sc);
+	        pw.println(sp12 + rp);
+	    } else pw.println(rp);
 
-	    pw.println();
-
+	    pw.println(sp8 + rp + sc);
+            pw.println();
 	} 
+        
+        ListIterator sec = this.root.getSimEventListenerConnection().listIterator();
+        
+        while(sec.hasNext()) {
+            SimEventListenerConnectionType sect = (SimEventListenerConnectionType)sec.next();
+            pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity)(sect.getListener())).getName() + qu);
+            pw.println(cm + qu + ((SimEntity)(sect.getSource())).getName() + qu + rp + sc);
+        }
+        
+        pw.println();
+        
+        pw.println(sp8 + "super" + pd + "createSimEntities"+ lp + rp + sc);
 
-	pw.println();
+	pw.println(sp4 + cb);
+        pw.println();
 
     }
 
@@ -424,63 +446,95 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	
 	PrintWriter pw = new PrintWriter(listeners);
         
-        
-        
+
+        LinkedHashMap replicationStats = new LinkedHashMap();
+        LinkedHashMap designPointStats = new LinkedHashMap();
+        LinkedHashMap propertyChangeListeners = new LinkedHashMap();
+        LinkedHashMap propertyChangeListenerConnections = new LinkedHashMap();
+        LinkedHashMap simEventListenerConnections = new LinkedHashMap();
 	ListIterator li = this.root.getPropertyChangeListener().listIterator();
 
 	while ( li.hasNext() ) {
 	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)li.next();
 	    List tparam = pcl.getParameters(); 
 	    ListIterator tparami = tparam.listIterator();
+            String pclMode = pcl.getMode();
             
-            
-	    pw.println(sp4 + "java.beans.PropertyChangeListener" + sp + pcl.getName() + sp + eq + sp);
-	    pw.print(sp8 + nw + sp + pcl.getType() + lp);
-            
-            // this is effectively not used by Viskit, not sending any parameters for 
-            // properties to listen to. instead use info from PropertyChangeListenerConnection
-	    //if ( tparami.hasNext() ) {
-	        //while ( tparami.hasNext() ) {
-		    // note, check if PropertyChangeListeners can have more than one
-		    // String param, if so, do a maybeComma() 
-		    // see bug #36, this should now check all other parameter types
-		    //doSimpleStringParameter((TerminalParameter)tparami.next(), pw);
-	        //}
-	    //}
-            
-            // also note this fix will only accept DISKIT PCL's, as simkit.stat's 
-            // construct with just the name of the property.
-            
-            pw.print(qu+pcl.getName()+qu);
-	    
-            // dig through PropertyChangeListenerConnections to get the name of the 
-            // property. It may be possible to have more than one PCLC per PCL, results
-            // currently undefined if the names/types of the properties are different.
-            
-            PropertyChangeListenerConnectionType pclc;
-            String property = null;
-            ListIterator lipclc = root.getPropertyChangeListenerConnection().listIterator();
-            while(lipclc.hasNext()) {
-                pclc = (PropertyChangeListenerConnection)(lipclc.next());
-                if ( pclc.getListener().equals(pcl) ) { // idref should return same obj
-                    property = pclc.getProperty();
-                }
+            if ( "replicationStats".equals(pclMode) ) {
+                replicationStats.put(pcl.getName(), pcl);
+            } else if ( "designPointStats".equals(pclMode) ) {
+                designPointStats.put(pcl.getName(), pcl);
+            } else {
+                propertyChangeListeners.put(pcl.getName(), pcl);
             }
-            if (property != null) pw.print(cm+sp+qu+property+qu);
-            pw.println(rp + sc);
-	    pw.println();
-	} 
-
-	li = this.root.getAdapter().listIterator();
-        
-        while ( li.hasNext() ) {
-            AdapterType a = (AdapterType)li.next();
-            String n = a.getName();
-            pw.print(sp4 + "simkit.Bridge" + sp + n + sp + eq + sp + nw + sp + "simkit.Bridge");
-            pw.println(lp + qu + a.getEventHeard() + qu + cm + sp + qu + a.getEventSent() + qu + rp + sc);
-            pw.println();
         }
         
+        li = this.root.getPropertyChangeListenerConnection().listIterator();
+        
+        while ( li.hasNext() ) {
+            PropertyChangeListenerConnectionType pclc = (PropertyChangeListenerConnectionType)li.next();
+            propertyChangeListenerConnections.put(((PropertyChangeListenerType)pclc.getListener()).getName(),pclc);
+        }
+        
+        pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
+        
+        String[] pcls = (new ArrayList<String[]>(propertyChangeListeners.keySet())).toArray(new String[0]);
+        for ( int i = 0; i < pcls.length; i++ ) {
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType) propertyChangeListeners.get(pcls[i]);
+            //currenlty only one connection per pcl allowed, but multi per source
+            PropertyChangeListenerConnectionType pclc = 
+                    (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
+            pw.print(sp8 + "addPropertyChangeListener" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm + qu + pcl.getType() + qu );
+            pw.println(rp + sc);
+            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm); 
+            pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
+        }
+        pw.println(sp8 + "super" + pd + "createPropertyChangeListeners" + lp + rp + sc);
+        pw.println(sp4 + cb);
+        pw.println();
+        
+        
+        pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
+        
+        pcls = (new ArrayList<String>(replicationStats.keySet())).toArray(new String[0]);
+        for ( int i = 0; i < pcls.length; i++ ) {
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType) replicationStats.get(pcls[i]);
+            //currenlty only one connection per pcl allowed, but multi per source
+            PropertyChangeListenerConnectionType pclc = 
+                    (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
+            pw.print(sp8 + "addReplicationStat" + lp + pcls[i] + cm + pclc.getProperty() + cm +  pcl.getType());
+            pw.println(rp + sc);
+            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + pcls[i] + cm + pclc.getProperty() + cm); 
+            pw.println(((SimEntityType)pclc.getSource()).getName() + rp + sc);
+        }
+        pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
+        pw.println(sp4 + cb);
+        pw.println();
+        
+        pw.println(sp4 + "public createDesignPointStats" + lp + rp + sp + ob);
+        
+        pcls = (new ArrayList<String>(designPointStats.keySet())).toArray(new String[0]);
+        
+        for ( int i = 0; i < pcls.length; i++ ) {
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType) designPointStats.get(pcls[i]);
+            //currenlty only one connection per pcl allowed, but multi per source
+            PropertyChangeListenerConnectionType pclc =
+                    (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
+            pw.print(sp8 + "addDesignPointStat" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm + qu + pcl.getType() + qu );
+            pw.println(rp + sc);
+            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
+            pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
+        }
+        
+        if ( pcls.length == 0 ) {
+            pw.println(sp8 + "super" + pd + "super" + pd + "createDesignPointStats" + lp + rp + sc);
+        } else {
+            pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
+        }
+        pw.println(sp4 + cb);
+        pw.println();
+        
+            
     }
 
     void buildConnectors(StringWriter connectors) {
@@ -559,37 +613,37 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	ScheduleType schedule;
 
 	if ( (schedule = this.root.getSchedule()) != null ) {
-	    pw.print(sp8 + "Schedule" + pd + "stopAtTime");
+	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
+            pw.print(sp8 + "setStopTime");
 	    pw.println(lp + schedule.getStopTime() + rp + sc);
 	
-	    pw.print(sp8 + "Schedule" + pd + "setVerbose");
+	    pw.print(sp8 + "setVerbose");
 	    pw.println(lp + schedule.getVerbose() + rp + sc);
-
-	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
-	    pw.println(sp8 + "Schedule" + pd + "startSimulation" + lp + rp + sc);
+	    
+            pw.print(sp8 + "setNumberReplications");
+            pw.println(lp + schedule.getNumberReplications() + rp + sc);
+            
+            pw.print(sp8 + "setPrintReplicationReports");
+            pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
+            
+            pw.print(sp8 + "setPrintSummaryReport");
+            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
+            
 
 	}
         
-        List pclList = this.root.getPropertyChangeListener();
-        Iterator it = pclList.iterator();
-            
-        while ( it.hasNext() ) {
-            String name;
-            PropertyChangeListenerType pcl = (PropertyChangeListenerType)(it.next());
-            pw.println(sp8 + "System.out.println"+lp+"asm"+pd+pcl.getName()+pd+"toString"+lp+rp+rp+sc);
-        }
-        
+        pw.println(sp8 + nw + "Thread" + lp + "asm" + rp + pd + "run" + lp + rp + sc);
+
 	pw.println();
 	pw.println(sp4 + cb);
 	pw.println(cb);
     }
 
     void buildSource(StringBuffer source, StringWriter head, StringWriter entities, 
-		StringWriter listeners, StringWriter connectors, StringWriter output, 
-		StringWriter tail ) {
+		StringWriter listeners, StringWriter output, StringWriter tail ) {
    	 
 	source.append(head.getBuffer()).append(entities.getBuffer()).append(listeners.getBuffer());
-	source.append(connectors.getBuffer()).append(output.getBuffer()).append(tail.getBuffer());
+	source.append(output.getBuffer()).append(tail.getBuffer());
     }
 
     public void writeOut(String data, java.io.PrintStream out) {
