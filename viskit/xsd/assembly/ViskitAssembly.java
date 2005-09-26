@@ -6,7 +6,7 @@
  * BasicAssembly doesn't provide Viskit users with ability to 
  * reference a known SimEntity within a constructor. This class 
  * provides hooks into the BasicAssembly and enables named references
- * to instances within the design tool.
+ * to instances within the design tool. Note accidental use of generics.
  */
 
 package viskit.xsd.assembly;
@@ -45,7 +45,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void hookupReplicationListeners() {
-        String[] listeners = (String[])(new ArrayList(replicationStatsListenerConnections.keySet())).toArray();
+        String[] listeners = (new ArrayList<String>(replicationStatsListenerConnections.keySet())).toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             PropertyConnector pc = (PropertyConnector)replicationStatsListenerConnections.get(listeners[i]);
             connectReplicationStat(listeners[i], pc.source);
@@ -54,7 +54,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void hookupSimEventListeners() {
-        String[] listeners = (String[])(new ArrayList(simEventListenerConnections.keySet())).toArray();
+        String[] listeners = (new ArrayList<String>(simEventListenerConnections.keySet())).toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             String source = (String) simEventListenerConnections.get(listeners[i]);
             connectSimEventListener(listeners[i], source);
@@ -63,7 +63,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void hookupPropertyChangeListeners() {
-        String[] listeners = (String[])(new ArrayList(propertyChangeListenerConnections.keySet())).toArray();
+        String[] listeners = (new ArrayList<String>(propertyChangeListenerConnections.keySet())).toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             PropertyConnector pc = (PropertyConnector)propertyChangeListenerConnections.get(listeners[i]);
             connectPropertyChangeListener(listeners[i], pc.source);
@@ -71,7 +71,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void hookupDesignPointListeners() {
-        String[] listeners = (String[])(new ArrayList(designPointStatsListenerConnections.keySet())).toArray();
+        String[] listeners = (new ArrayList<String>(designPointStatsListenerConnections.keySet())).toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             PropertyConnector pc = (PropertyConnector)designPointStatsListenerConnections.get(listeners[i]);
             connectDesignPointStat(listeners[i], pc.source);
@@ -99,19 +99,23 @@ public class ViskitAssembly extends BasicAssembly {
     /** to be called after all entities have been added as a super() */
     /*  note not using template version of ArrayList... */
     public void createSimEntities() {
-        simEntity = (SimEntity[])(new ArrayList(entities.values())).toArray();
+        simEntity = 
+                (new ArrayList<SimEntity>(entities.values())).toArray(new SimEntity[0]);
     }
     
     public void createDesignPointStats() {
-        designPointStats = (SampleStatistics[]) (new ArrayList(designPointStatistics.values())).toArray();
+        designPointStats = 
+                (new ArrayList<SampleStatistics>(designPointStatistics.values())).toArray(new SampleStatistics[0]);
     }
     
     public void createReplicationStats() {
-        replicationStats = (SampleStatistics[]) (new ArrayList(replicationStatistics.values())).toArray();
+        replicationStats = 
+                (new ArrayList<SampleStatistics>(replicationStatistics.values())).toArray(new SampleStatistics[0]);
     }
     
     public void createPropertyChangeListeners() {
-        propertyChangeListener = (PropertyChangeListener[]) (new ArrayList(propertyChangeListeners.values())).toArray();
+        propertyChangeListener = 
+                (new ArrayList<PropertyChangeListener>(propertyChangeListeners.values())).toArray(new PropertyChangeListener[0]);
     }
     
     void addSimEntity(String name, SimEntity entity) {
@@ -197,7 +201,6 @@ public class ViskitAssembly extends BasicAssembly {
     public SimEntity getEntityByName(String name) {
         return (SimEntity) entities.get(name);
     }
-    
     
     /* not exactly sure if this is needed when a property is set as in the constructor
      * of a SampleStatisics type 
