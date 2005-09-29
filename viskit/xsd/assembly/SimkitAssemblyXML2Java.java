@@ -601,7 +601,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             } else if ( elem instanceof PropertyChangeListenerType ) {
                 name = ((PropertyChangeListenerType)elem).getName();
             }
-	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + name + rp + sc);
+	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
 	}
     }
 

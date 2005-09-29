@@ -80,19 +80,19 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     void connectSimEventListener(String listener, String source) {
-        getEntityByName(source).addSimEventListener(getEntityByName(listener));
+        getSimEntityByName(source).addSimEventListener(getSimEntityByName(listener));
     } 
     
     void connectPropertyChangeListener(String listener, String source) {
-        getEntityByName(source).addPropertyChangeListener(getPropertyChangeListenerByName(listener));
+        getSimEntityByName(source).addPropertyChangeListener(getPropertyChangeListenerByName(listener));
     }
     
     void connectReplicationStat(String listener, String source) {
-        getEntityByName(source).addPropertyChangeListener(getReplicationStatByName(listener));
+        getSimEntityByName(source).addPropertyChangeListener(getReplicationStatByName(listener));
     }
     
     void connectDesignPointStat(String listener, String source) {
-        getEntityByName(source).addPropertyChangeListener(getDesignPointStatByName(listener));
+        getSimEntityByName(source).addPropertyChangeListener(getDesignPointStatByName(listener));
     }
     
 
@@ -202,7 +202,7 @@ public class ViskitAssembly extends BasicAssembly {
         return (SampleStatistics) designPointStatistics.get(name);
     }
     
-    public SimEntity getEntityByName(String name) {
+    public SimEntity getSimEntityByName(String name) {
         return (SimEntity) entities.get(name);
     }
     
