@@ -342,12 +342,30 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	maybeComma(plist, param, pw);
     }
 
+    // with newer getSimEntityByName() always returns SimEntity, however
+    // parameter may actually call for a subclass.
+    String castIfSimEntity(String type) {
+        String sret = "";
+        try {
+            if (
+                    (Class.forName("simkit.SimEntityBase")).isAssignableFrom(Class.forName(type))
+            ||
+                    (Class.forName("simkit.SimEntity")).isAssignableFrom(Class.forName(type))
+            ) {
+                sret = new String(lp + type + rp);
+            }
+        } catch (ClassNotFoundException cnfe) {
+                ; //
+        }
+        return sret;
+    }
+    
     void doFactoryParameter(FactoryParameterType fact, String indent, PrintWriter pw) {
 	String factory = fact.getFactory();
         String method = fact.getMethod();
 	List facts = fact.getParameters();
 	ListIterator facti = facts.listIterator();
-	pw.println(indent + sp4 + factory + pd + method + lp);
+	pw.println(indent + sp4 + castIfSimEntity(fact.getType()) + factory + pd + method + lp);
 	while ( facti.hasNext() ) {
 	    doParameter(facts, facti.next(), indent + sp8, pw);
 	}
@@ -368,7 +386,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	} else { // some Expression
 	    //pw.print(indent + sp4 + nw + sp + type + lp);
 	    //pw.print(value + rp);
-            pw.print(indent + value);
+            pw.print(indent + castIfSimEntity(type) + value);
 	}
 
     }
@@ -420,14 +438,14 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	ListIterator paramsi = params.listIterator();
         String ptype = p.getType();
 
-	if ( isArray(ptype) ) {
+	if ( isArray(ptype) ) { 
 	    pw.println(indent + sp4 + nw + sp + ptype + ob);
 	    while ( paramsi.hasNext() ) {
 		doParameter(params, paramsi.next(), indent + sp4, pw);
 	    }
 	    pw.print(indent + sp4 + cb);
 	} else { // some multi param object
-	    pw.println(indent + sp4 + nw + sp + ptype + lp);
+	    pw.println(indent + sp4 + castIfSimEntity(ptype) + nw + sp + ptype + lp);
 	    while ( paramsi.hasNext() ) {
 		doParameter(params, paramsi.next(), indent + sp4, pw);
 	    }
@@ -611,7 +629,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	ScheduleType schedule;
 
 	if ( (schedule = this.root.getSchedule()) != null ) {
-	    pw.println(sp8 + "Schedule" + pd + "reset" + lp + rp + sc);
+	    
             pw.print(sp8 + "asm.setStopTime");
 	    pw.println(lp + schedule.getStopTime() + rp + sc);
 	
