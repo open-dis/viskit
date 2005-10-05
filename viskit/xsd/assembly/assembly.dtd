@@ -120,7 +120,15 @@
     fileName CDATA #IMPLIED
 >
 
-<!ELEMENT SimkitAssembly ( (%DesignParameters;)*, EventGraph*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
+<!ELEMENT Meta EMPTY>
+<!ATTLIST Meta
+    name CDATA #REQUIRED
+    content CDATA #IMPLIED
+>
+
+<!ELEMENT Head (Meta*) >
+
+<!ELEMENT SimkitAssembly ( Head?, (%DesignParameters;)*, EventGraph*, SimEntity* , PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment? ) >
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	#REQUIRED

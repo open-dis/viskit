@@ -1,4 +1,13 @@
-<!ELEMENT SimEntity ( Comment*, Parameter*, StateVariable*, Event*, Function* ) >
+<!ELEMENT SimEntity ( Head?, Comment*, Parameter*, StateVariable*, Event*, Function* ) >
+
+<!ELEMENT Head (Meta*) >
+
+<!ELEMENT Meta EMPTY >
+<!ATTLIST Meta 
+	name CDATA #REQUIRED
+	content CDATA #IMPLIED
+>
+
 <!ATTLIST SimEntity
         name            CDATA   #REQUIRED
         package         CDATA   "examples"
