@@ -24,7 +24,7 @@ import viskit.xsd.bindings.assembly.PropertyChangeListenerConnection;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
-    protected LinkedHashMap entities;
+    protected LinkedHashMap entities = new LinkedHashMap();
     protected LinkedHashMap replicationStatistics;
     protected LinkedHashMap designPointStatistics;
     protected LinkedHashMap propertyChangeListeners;
@@ -35,14 +35,21 @@ public class ViskitAssembly extends BasicAssembly {
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
+
+        
+    }
+    
+    public void createObjects() {
         entities = new LinkedHashMap();
         replicationStatistics = new LinkedHashMap();
         designPointStatistics = new LinkedHashMap();
         propertyChangeListeners = new LinkedHashMap();
         simEventListenerConnections = new LinkedHashMap();
+        propertyChangeListenerConnections = new LinkedHashMap();
+        simEventListenerConnections = new LinkedHashMap();
         designPointStatsListenerConnections = new LinkedHashMap();
         replicationStatsListenerConnections = new LinkedHashMap();
-        
+        super.createObjects();
     }
     
     public void hookupReplicationListeners() {
