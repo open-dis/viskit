@@ -496,7 +496,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
         
-        String[] pcls = (new ArrayList<String[]>(propertyChangeListeners.keySet())).toArray(new String[0]);
+        String[] pcls = (String[]) propertyChangeListeners.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) propertyChangeListeners.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
@@ -514,7 +514,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
         
-        pcls = (new ArrayList<String>(replicationStats.keySet())).toArray(new String[0]);
+        pcls = (String[]) replicationStats.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) replicationStats.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
@@ -531,7 +531,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
         
-        pcls = (new ArrayList<String>(designPointStats.keySet())).toArray(new String[0]);
+        pcls = (String[]) designPointStats.keySet().toArray(new String[0]);
         
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) designPointStats.get(pcls[i]);
