@@ -289,8 +289,8 @@
         
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.5"
-            target="1.5">
+            source="1.4"
+            target="1.4">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
