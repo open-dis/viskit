@@ -43,13 +43,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import edu.nps.util.DirectoryWatch;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Date;
 
-public class DoeController implements DoeEvents, ActionListener
+public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.DirectoryChangeListener
 {
   private JFileChooser openSaveFileChooser;
   private DoeMainFrame mainFrame;
@@ -186,6 +188,7 @@ public class DoeController implements DoeEvents, ActionListener
     try {
       DoeFileModel dfm = FileHandler.openFile(f);
       mainFrame.setModel(dfm);
+      mainFrame.installContent();
       mainFrame.setTitle(mainFrame.titleString+" -- "+dfm.userFile.getName());
     }
     catch (Exception e) {
@@ -240,4 +243,11 @@ public class DoeController implements DoeEvents, ActionListener
     return chooser;
   }
 
+  /* Here's where we are informed of changed in the assembly file */
+  public void fileChanged(File file, int action, DirectoryWatch source)
+  {
+    // temp:
+    System.out.println("DoeController got assembly change message: "+action+
+                                  " " + file.getAbsolutePath());
+  }
 }
