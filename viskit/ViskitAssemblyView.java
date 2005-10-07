@@ -1,7 +1,9 @@
 package viskit;
 
 import viskit.model.*;
+
 import java.io.File;
+import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,12 +30,19 @@ public interface ViskitAssemblyView
 
   public Object  getSelectedPropChangeListener();
   public Object  getSelectedEventGraph();
+
+  public void    addToEventGraphPallette(File f);
+  public void    removeFromEventGraphPallette(File f);
+  public void    addToPropChangePallette(File f);
+  public void    removeFromPropChangePallette(File f);
   
   public int     genericAsk             ( String title, String prompt );      // returns JOptionPane constants
   public void    genericErrorReport     ( String title, String message );
   public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File    openFileAsk();
+  public File    openRecentFilesAsk(Collection lis);
+  
   public File    saveFileAsk(String suggName, boolean suggUniqueName);
 
   public void    fileName(String s);    // informative, tells view what we're working on
