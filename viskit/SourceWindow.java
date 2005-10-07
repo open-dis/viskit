@@ -17,14 +17,12 @@ import java.io.*;
  */
 public class SourceWindow extends JFrame
 {
-  JFrame main;
   final String src;
 
   Thread sysOutThread;
   JTextArea jta;
   public SourceWindow(JFrame main, String source)
   {
-    this.main = main;
     this.src = source;
 
     JPanel outerPan = new JPanel(new BorderLayout());
@@ -85,9 +83,18 @@ public class SourceWindow extends JFrame
     //buttPan.add(Box.createHorizontalStrut(40));
     con.add(buttPan);
 
-    this.setSize(main.getWidth()-200,main.getHeight()-100);
-    this.setLocationRelativeTo(main);
-
+    if(main.isVisible()) {
+      this.setSize(main.getWidth()-200,main.getHeight()-100);
+      this.setLocationRelativeTo(main);
+    }
+    else {
+      pack();
+      Dimension d = getSize();
+      d.height = Math.min(d.height,400);
+      d.width = Math.min(d.width,800);
+      setSize(d);
+      setLocationRelativeTo(null);
+    }
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     closeButt.addActionListener( new ActionListener()
