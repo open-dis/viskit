@@ -74,6 +74,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private Help help;
   private JTabbedPane tabbedPane;
   private JPanel eventGraphViewerContent;
+  private JMenuBar myMenuBar;
+  private JMenuItem quitMenuItem;
 
   /**
    * Constructor; lays out initial GUI objects
@@ -117,9 +119,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
   public JMenuBar getMenus()
   {
-    return getJMenuBar();
+    return myMenuBar;
   }
   
+  public JMenuItem getQuitMenuItem()
+  {
+    return quitMenuItem;
+  }
   /**
    * Returns the current mode--select, add, arc, cancelArc
    */
@@ -440,12 +446,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", null,null));
     fileMenu.add(buildMenuItem(controller,"generateJavaClass","Generate Java",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
-    fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
     if(!contentOnly) {
       fileMenu.addSeparator();
-      fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+      fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
     }
+    fileMenu.addSeparator();
+    fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+
     // Set up edit menu
     JMenu editMenu = new JMenu("Edit");
     editMenu.setMnemonic(KeyEvent.VK_E);
@@ -476,9 +483,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Graph Properties...",null,null));
 
     // Create a new menu bar and add the menus we created above to it
-    JMenuBar menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    menuBar.add(editMenu);
+    myMenuBar = new JMenuBar();
+    myMenuBar.add(fileMenu);
+    myMenuBar.add(editMenu);
     //menuBar.add(simulationMenu);
     
     help = new Help(this);
@@ -491,10 +498,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial",null,null));
     helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
     //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
-    menuBar.add(helpMenu);
+    myMenuBar.add(helpMenu);
     
     if(!contentOnly)
-      setJMenuBar(menuBar);
+      setJMenuBar(myMenuBar);
   }
 
   // Use the actions package
