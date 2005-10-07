@@ -34,7 +34,7 @@ public class FileBasedClassManager implements Runnable
   {
     classMap = new HashMap();
     fileMap = new HashMap();
-    new Thread(this).start();
+    new Thread(this,"FileBasedClsMgr").start();
   }
 
   public void addFileClass(Class c)
@@ -44,12 +44,23 @@ public class FileBasedClassManager implements Runnable
 
   public void removeFileClass(Class c)
   {
-    classMap.remove(c.getName());
+    removeFileClass(c.getName());
+  }
+  private void removeFileClass(String nm)
+  {
+    Object duh = classMap.remove(nm);
+    System.out.println("remove this");
   }
 
   public Class getFileClass(String s)
   {
     return (Class)classMap.get(s);
+  }
+
+  public void unloadFile(FileBasedAssyNode fban)
+  {
+    removeFileClass(fban.loadedClass);
+    fileMap.remove(fban.loadedClass);
   }
 
   public FileBasedAssyNode loadFile(File f) throws Throwable

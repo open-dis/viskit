@@ -3,16 +3,15 @@ package viskit;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarFile;
 
 /**
@@ -101,7 +100,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   /**
    * Override to provide a global tooltip for entire table..not just for nodes
    * @param event
-   * @return
+   * @return tooltip string
    */
   public String getToolTipText(MouseEvent event)
   {
@@ -128,6 +127,42 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
       }
     }
+  }
+  public void removeContentRoot(File f)
+  {
+    System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
+    if(_removeNode(root,f) != null)
+      System.out.println("...success");
+    else
+      System.out.println("...failure");
+  }
+
+  private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f)
+  {
+    if(dmtn.getChildCount() > 0) {
+      for(int i=0;i<dmtn.getChildCount(); i++) {
+        DefaultMutableTreeNode n = (DefaultMutableTreeNode)dmtn.getChildAt(i);
+        if(n != null) {
+          Object uo = n.getUserObject();
+          if(! (uo instanceof FileBasedAssyNode))
+            continue;
+          FileBasedAssyNode fban = (FileBasedAssyNode)uo;
+          try {
+            String s1 = fban.xmlSource.getCanonicalPath();
+            String s2 = f.getCanonicalPath();
+            if(fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
+              mod.removeNodeFromParent(n);
+              FileBasedClassManager.inst().unloadFile(fban);
+              return n;
+            }
+          }
+          catch (IOException e) {
+            System.out.println("getCanonicalPath in LegosTree : "+e.getMessage());
+          }
+        }
+      }
+    }
+    return null;
   }
 
 
