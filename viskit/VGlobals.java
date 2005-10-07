@@ -3,24 +3,25 @@ package viskit;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
+import edu.nps.util.FileIO;
+import org.apache.commons.configuration.XMLConfiguration;
 import viskit.model.*;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -73,22 +74,33 @@ public class VGlobals
     return avf;
   }
 
-  public AssemblyViewFrame buildAssemblyViewFrame()
+  public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly)
   {
-    return buildAssemblyViewFrame(new AssemblyController(), new AssemblyModel());
+    return buildAssemblyViewFrame(contentOnly, new AssemblyController(), new AssemblyModel());
   }
 
-  public AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont, AssemblyModel mod)
+  public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod)
   {
-    avf = new AssemblyViewFrame(mod,cont);
+    initAssemblyViewFrame(contentOnly,cont,mod);
+    cont.begin();
+
+    return avf;
+  }
+
+  public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly)
+  {
+    return initAssemblyViewFrame(contentOnly,new AssemblyController(), new AssemblyModel());
+  }
+
+  public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod)
+  {
+    avf = new AssemblyViewFrame(contentOnly, mod,cont);
     acont = cont;
     amod = mod;
     cont.setModel(mod);   // registers cntl as model listener
     cont.setView(avf);
 
     mod.init();
-    cont.begin();
-
     return avf;
   }
 
@@ -96,7 +108,7 @@ public class VGlobals
   {
     return amod;
   }
-  
+
   public AssemblyController getAssemblyController()
   {
     return acont;
@@ -105,7 +117,7 @@ public class VGlobals
   public void runAssemblyView()
   {
     if (avf == null)
-      buildAssemblyViewFrame();
+      buildAssemblyViewFrame(false);
 
     avf.setVisible(true);
     avf.toFront();
@@ -124,17 +136,30 @@ public class VGlobals
 
   }
 
+  ActionListener defaultAssyQuitHandler = new ActionListener()
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      if(avf != null) {
+        avf.setVisible(false);
+      }
+      if(egvf != null && egvf.isVisible())
+        return;
+      System.exit(0);
+    }
+  };
+  ActionListener assyQuitHandler=defaultAssyQuitHandler;
+
   public void quitAssemblyEditor()
   {
-    if(avf != null) {
-      avf.setVisible(false);
-    }
-
-    if(egvf != null && egvf.isVisible())
-      return;
-    System.exit(0);
+    if(assyQuitHandler!= null)
+      assyQuitHandler.actionPerformed(new ActionEvent(this,0,"quit assy editor"));
   }
 
+  public void setAssemblyQuitHandler(ActionListener  lis)
+  {
+    assyQuitHandler = lis;
+  }
   EventGraphViewFrame egvf;
   public EventGraphViewFrame getEventGraphEditor()
   {
@@ -143,30 +168,55 @@ public class VGlobals
 
   public EventGraphViewFrame buildEventGraphViewFrame()
   {
-    return buildEventGraphViewFrame(new Controller());
+    return buildEventGraphViewFrame(false,new Controller());
   }
 
-  public EventGraphViewFrame buildEventGraphViewFrame(Controller cont)
+  public EventGraphViewFrame buildEventGraphViewFrame(boolean contentOnly, Controller cont)
   {
-    egvf = new EventGraphViewFrame(cont);
-    cont.setView(egvf);
+    initEventGraphViewFrame(contentOnly,cont);
     cont.begin();
     return egvf;
   }
+  public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly)
+  {
+    return initEventGraphViewFrame(contentOnly,new Controller());
+  }
 
+  public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly, Controller cont)
+  {
+    egvf = new EventGraphViewFrame(contentOnly,cont);
+    cont.setView(egvf);
+    return egvf;
+  }
+  
   public ViskitModel getActiveEventGraphModel()
   {
     return  (ViskitModel)egvf.getModel();
   }
 
+  ActionListener defaultEventGraphQuitHandler = new ActionListener()
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      if(egvf != null) {
+        egvf.setVisible(false);
+      }
+      if(avf != null && avf.isVisible())
+        return;
+      System.exit(0);
+    }
+  };
+
+  ActionListener eventGraphQuitHandler = defaultEventGraphQuitHandler;
+
   public void quitEventGraphEditor()
   {
-    if(egvf != null) {
-      egvf.setVisible(false);
-    }
-    if(avf != null && avf.isVisible())
-      return;
-    System.exit(0);
+    if(eventGraphQuitHandler != null)
+      eventGraphQuitHandler.actionPerformed(new ActionEvent(this,0,"quit event graph editor"));
+  }
+  public void setEventGraphQuitHandler(ActionListener lis)
+  {
+    eventGraphQuitHandler = lis;
   }
 
   public void runEventGraphView()
@@ -744,7 +794,7 @@ public class VGlobals
       workDirectory = new File(p);
       workDirectory.mkdir();
       workDirectory.deleteOnExit();
-      
+
       File nf = new File(workDirectory,"simkit");     // most go here
       nf.mkdir();
       nf.deleteOnExit();
@@ -759,5 +809,31 @@ public class VGlobals
         JOptionPane.showMessageDialog(null,"The directory "+ workDirectory.getPath()+
                     " could not be created.  Correct permissions before proceeding.",
                                       "Error",JOptionPane.ERROR_MESSAGE);
+  }
+
+  private XMLConfiguration hConfig;
+  private String userConfigPath = System.getProperty("user.home")+
+                                  System.getProperty("file.separator") +
+                                  ".viskit_history.xml";
+
+  public XMLConfiguration getHistoryConfig()
+  {
+    if (hConfig == null) {
+      try {
+        File hf = new File(userConfigPath);
+        if (!hf.exists()) {
+          File src = new File("c_history_template.xml");
+          hf.createNewFile();
+          FileIO.copyFile(src, hf, true);
+        }
+        hConfig = ViskitConfig.instance().getIndividualXMLConfig(hf.getAbsolutePath());
+      }
+      catch (Exception e) {
+        System.out.println("Error loading history file: " + e.getMessage());
+        System.out.println("Recent file saving disabled");
+        hConfig = null;
+      }
+    }
+    return hConfig;
   }
 }
