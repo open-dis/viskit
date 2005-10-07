@@ -59,6 +59,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   EventGraphViewFrame egFrame;
   AssemblyViewFrame asyFrame;
   InternalAssemblyRunner asyRunComponent;
+  Action myQuitAction;
 
   public EventGraphAssemblyComboMainFrame(String[] args)
   {
@@ -75,8 +76,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     {
       public void windowClosing(WindowEvent e)
       {
-        // if this simply returns, nothing happens
-        // else, the controller will Sys.exit()
+        myQuitAction.actionPerformed(null);
       }
     });
     ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
@@ -92,7 +92,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     VGlobals.instance().setEventGraphQuitHandler(null);
 
     tabbedPane = new JTabbedPane();
-    Action myQuitAction = new QuitAction("Quit");
+    myQuitAction = new QuitAction("Quit");
 
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
     tabbedPane.add("Event Graphs",egFrame.getContent());   // 0
