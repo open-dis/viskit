@@ -171,6 +171,7 @@
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
             <src path="${dir.src}/viskit/"/>
+            <src path="${dir.src}/edu/"/>
         </javac>
         <copy todir="${dir.build.classes}">
             <fileset dir="${dir.src}">
