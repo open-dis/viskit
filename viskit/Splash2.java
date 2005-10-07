@@ -123,19 +123,28 @@ contentPanel.setPreferredSize(label.getPreferredSize());
   }
   public static void main(String[] args)
   {
+    System.out.println(System.getProperty("user.dir"));
+    System.out.println(System.getProperty("java.class.path"));
     Splash2 spl = new Splash2();
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     spl.setLocation((d.width-spl.getWidth())/2,(d.height-spl.getHeight())/2);
     spl.setVisible(true);
 
+    // First argument is main class
+    String target = args[0];
+    int newLen = args.length-1;
+    String[] newArgs = new String[newLen];
+    for(int i=0;i<newLen;i++)
+      newArgs[i] = args[i+1];
+
     try{Thread.sleep(2000);}catch(Exception e){}  // this is used to give us some min splash viewing
 
     try {
       // Call the main() method of the application using reflection
-      Object[] arguments = new Object[]{args};
-      Class[] parameterTypes = new Class[]{args.getClass()};
+      Object[] arguments = new Object[]{newArgs};
+      Class[] parameterTypes = new Class[]{newArgs.getClass()};
 
-      Class mainClass = Class.forName("viskit.Main");
+      Class mainClass = Class.forName(target);
 
       Method mainMethod = mainClass.getMethod("main",parameterTypes);
       mainMethod.invoke(null, arguments);
@@ -146,7 +155,20 @@ contentPanel.setPreferredSize(label.getPreferredSize());
 
     spl.dispose();
   }
-
+  static public class DefaultEntry
+  {
+    public static void main(String[] args)
+    {
+      Splash2.main(new String[]{"viskit.EventGraphAssemblyComboMain"});
+    }
+  }
+  static public class DefaultEntryOrig
+  {
+    public static void main(String[] args)
+    {
+      Splash2.main(new String[]{"viskit.Main"});
+    }
+  }
 }
 
 class MyPanel extends JPanel
