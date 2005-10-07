@@ -37,8 +37,14 @@ public class ExternalAssemblyRunner extends JFrame
   RunnerPanel runPanel;
   ActionListener closer,saver;
   static String lineSep = System.getProperty("line.separator");
+  JMenuBar myMenuBar;
 
   public ExternalAssemblyRunner(String className, boolean verbose, double stopTime, List outputEntities)
+  {
+    this(false,className,verbose,stopTime,outputEntities);
+  }
+
+  public ExternalAssemblyRunner(boolean contentOnly, String className, boolean verbose, double stopTime, List outputEntities)
   {
     this.targetClassName = className;
     this.defaultVerbose = verbose;
@@ -46,14 +52,15 @@ public class ExternalAssemblyRunner extends JFrame
 
     this.outputs = outputEntities;
 
-    closer = new closeListener();
     saver = new saveListener();
+    runPanel = new RunnerPanel(verbose,false);
+    doMenus(contentOnly);
 
-    doMenus();
-
-    setTitle("Assembly Run Panel -- "+className);
-    runPanel = new RunnerPanel(verbose);
-    this.setContentPane(runPanel);
+    if(!contentOnly) {
+      closer = new closeListener();
+      setTitle("Assembly Run Panel -- "+className);
+      setContentPane(runPanel);
+    }
 
     runPanel.vcrStop.addActionListener(new stopListener());
     runPanel.vcrPlay.addActionListener(new startResumeListener());
@@ -94,12 +101,25 @@ public class ExternalAssemblyRunner extends JFrame
     runPanel.vcrStopTime.setText(""+defaultStopTime);
     runPanel.vcrSimTime.setText(Schedule.getSimTimeStr());
 
-    this.setSize(750,500);
-    this.setLocation(300,300);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    if(!contentOnly) {
+      setSize(750,500);
+      setLocation(300,300);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setVisible(true);
+    }
+  }
 
-    this.setVisible(true);
-    runPanel.splPn.setDividerLocation(0.85d);       // clumsy way
+  public JComponent getContent()
+  {
+    return runPanel;
+  }
+  public JMenuBar getMenus()
+  {
+    return myMenuBar;
+  }
+  public JMenuItem getQuitMenuItem()
+  {
+    return null;
   }
 
   private String borderString = "******************************";
@@ -108,7 +128,7 @@ public class ExternalAssemblyRunner extends JFrame
   {
     if(outputs == null)
       return;
-    
+
     System.out.println("\n"+borderString);
     boolean first=true;
     for(Iterator itr = outputs.iterator();itr.hasNext();) {
@@ -234,6 +254,7 @@ public class ExternalAssemblyRunner extends JFrame
   {
     Schedule.stopAtTime(getStopTime());
     Schedule.setVerbose(getVerbose());
+    // testing Schedule.setReallyVerbose(true);
     new Thread(new Runnable()
     {
       public void run()
@@ -299,9 +320,9 @@ public class ExternalAssemblyRunner extends JFrame
         break;
     }
   }
-  private void doMenus()
+  private void doMenus(boolean contentOnly)
   {
-    JMenuBar mb = new JMenuBar();
+    myMenuBar = new JMenuBar();
     JMenu file = new JMenu("File");
     JMenuItem save  = new JMenuItem("Save output streams");
     JMenuItem close = new JMenuItem("Close");
@@ -321,10 +342,11 @@ public class ExternalAssemblyRunner extends JFrame
     edit.add(copy);
     edit.add(selAll);
     edit.add(clrAll);
-    mb.add(file);
-    mb.add(edit);
-    
-    setJMenuBar(mb);
+    myMenuBar.add(file);
+    myMenuBar.add(edit);
+
+    if(!contentOnly)
+      setJMenuBar(myMenuBar);
   }
 
   class copyListener implements ActionListener
@@ -369,23 +391,55 @@ public class ExternalAssemblyRunner extends JFrame
    * @param args
    */
 
+
   public static void main(String[] args)
   {
-     if(args.length < 2) {
-      JOptionPane.showMessageDialog(null,"Wrong number of parameters to ExternalAssemblyRunner.main().",
-           "Internal Error",JOptionPane.ERROR_MESSAGE);
+    Vector v = null;
+    try {
+      v = _mainCommon(args);
+    }
+    catch (Exception e) {
       System.exit(-1);
     }
 
     viskit.Main.setLandFandFonts(); // same as editor
+    new ExternalAssemblyRunner(args[0],
+        Boolean.valueOf(args[1]).booleanValue(),
+        Double.valueOf(args[2]).doubleValue(), v);
+  }
 
-    Vector v=null;
-    if(args.length > 3) {
+  private static String errMsg = "Wrong number of parameters to ExternalAssemblyRunner.main().";
+  private static Vector _mainCommon(String[] args) throws Exception
+  {
+    if (args.length < 2) {
+      JOptionPane.showMessageDialog(null, errMsg,
+          "Internal Error", JOptionPane.ERROR_MESSAGE);
+      throw new Exception(errMsg);
+    }
+
+    Vector v = null;
+    if (args.length > 3) {
       v = new Vector();
-      for(int i=3;i<args.length;i++)
+      for (int i = 3; i < args.length; i++)
         v.add(args[i]);
     }
 
-    new ExternalAssemblyRunner(args[0],Boolean.valueOf(args[1]).booleanValue(),Double.valueOf(args[2]).doubleValue(), v);
+    return v;
+  }
+
+  /** An alternate entry point which doesn't assume we're to run in a different vm. */
+  public static ExternalAssemblyRunner main2(String[] args)
+  {
+    Vector v = null;
+    try {
+      v = _mainCommon(args);
+    }
+    catch (Exception e) {
+      return null;
+    }
+
+    return new ExternalAssemblyRunner(true, args[0],
+        Boolean.valueOf(args[1]).booleanValue(),
+        Double.valueOf(args[2]).doubleValue(), v);
   }
 }
