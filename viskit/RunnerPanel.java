@@ -1,13 +1,9 @@
 package viskit;
 
 import javax.swing.*;
+import javax.swing.text.Document;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -34,17 +30,33 @@ public class RunnerPanel extends JPanel
 
   public JTextField vcrSimTime, vcrStopTime;
 
-  public RunnerPanel(boolean verbose)
+  private InputStream outInpStr, errInpStr;
+  JPanel vcrToolBar;
+
+  public RunnerPanel(boolean verbose, boolean skipCloseButt)
+  {
+    this(null,skipCloseButt);
+    vcrVerbose.setSelected(verbose);
+    piping=true;
+    setupPipes();
+  }
+
+  public RunnerPanel(String title, boolean skipCloseButt)
   {
     setLayout(new BorderLayout());
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+    if(title != null) {
+      JLabel titl = new JLabel(title);
+      titl.setHorizontalAlignment(JLabel.CENTER);
+      add(titl,BorderLayout.NORTH);
+    }
     soutTA = new JTextArea("Assembly output stream:" + lineEnd +
         "----------------------" + lineEnd);
     soutTA.setEditable(true); //false);
     soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
     soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
     JScrollPane jsp = new JScrollPane(soutTA);
+    jsp.setPreferredSize(new Dimension(10,350));   // give it some height for the initial split
 
     serrTA = new JTextArea("Assembly error stream:" + lineEnd +
         "---------------------" + lineEnd);
@@ -54,18 +66,21 @@ public class RunnerPanel extends JPanel
     serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
     JScrollPane jspErr = new JScrollPane(serrTA);
 
-    splPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, jsp, jspErr);
-
+    splPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false,jsp,jspErr);
     add(splPn, BorderLayout.CENTER);
-    add(makeVCRPanel(), BorderLayout.SOUTH);
-    vcrVerbose.setSelected(verbose);
+    add(makeVCRPanel(skipCloseButt), BorderLayout.SOUTH);
+  }
 
+  public void setStreams(InputStream out, InputStream err)
+  {
+    outInpStr = out;
+    errInpStr = err;
     setupPipes();
   }
 
-  JPanel makeVCRPanel()
+  JPanel makeVCRPanel(boolean skipCloseButt)
   {
-    JPanel vcrToolBar = new JPanel();
+    vcrToolBar = new JPanel();
     vcrToolBar.setLayout(new BoxLayout(vcrToolBar, BoxLayout.X_AXIS));
     vcrToolBar.add(Box.createHorizontalGlue());
 
@@ -117,47 +132,52 @@ public class RunnerPanel extends JPanel
     vcrVerbose = new JCheckBox("verbose output", false);
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     vcrToolBar.add(vcrVerbose);
+    vcrToolBar.add(Box.createHorizontalStrut(5));
 
     closeButt = new JButton("Close");
     closeButt.setToolTipText("Close this window");
-    vcrToolBar.add(closeButt);
-
+    if(!skipCloseButt) {
+      vcrToolBar.add(closeButt);
+    }
     vcrToolBar.add(Box.createHorizontalGlue());
     vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
     return vcrToolBar;
   }
 
-  PipedInputStream piOut;
-  PipedInputStream piErr;
-  PipedOutputStream poOut;
-  PipedOutputStream poErr;
-
+  private boolean piping=false;
   private void setupPipes()
   {
-    try {
-      piOut = new PipedInputStream();
-      poOut = new PipedOutputStream(piOut);
-      System.setOut(new PrintStream(poOut, true));
-      piErr = new PipedInputStream();
-      poErr = new PipedOutputStream(piErr);
-      System.setErr(new PrintStream(poErr, true));
-
-      new ReaderThread(piOut, soutTA).start();
-      new ReaderThread(piErr, serrTA).start();
+    if ((outInpStr != null) && (errInpStr != null)) {
+      new ReaderThread(outInpStr, soutTA).start();
+      new ReaderThread(errInpStr, serrTA).start();
     }
-    catch (IOException e) {
-      JOptionPane.showMessageDialog(null,"exep in setupPipes "+e.getMessage());
+    else {
+      try {
+        PipedInputStream piOut = new PipedInputStream();
+        PipedOutputStream poOut = new PipedOutputStream(piOut);
+        System.setOut(new PrintStream(poOut, true));
+        PipedInputStream piErr = new PipedInputStream();
+        PipedOutputStream poErr = new PipedOutputStream(piErr);
+        System.setErr(new PrintStream(poErr, true));
+
+        new ReaderThread(piOut, soutTA).start();
+        new ReaderThread(piErr, serrTA).start();
+      }
+      catch (IOException e) {
+        JOptionPane.showMessageDialog(null, "exep in setupPipes " + e.getMessage());
+      }
     }
   }
 
   class ReaderThread extends Thread
   {
-    PipedInputStream pi;
+    InputStream pi;
     JTextArea myTa;
 
-    ReaderThread(PipedInputStream pi, JTextArea ta)
+    ReaderThread(InputStream pi, JTextArea ta)
     {
+      super("rdrThr");
       this.pi = pi;
       this.myTa = ta;
     }
@@ -177,11 +197,13 @@ public class RunnerPanel extends JPanel
           // ExternalAssemblyRunner dies each time we exit Schedule, whether stepping or otherwise.
           // It's fine to just set up the I/O again and wait for the next time.
 
-          setupPipes();
+          if(piping)
+            setupPipes();
           return;
         }
         if (len == -1) {
-          setupPipes();
+          if(piping)
+            setupPipes();
           return;
         }
 
@@ -199,11 +221,13 @@ public class RunnerPanel extends JPanel
   {
     JTextArea ta;
     String s;
+    Document doc;
 
     inSwingThread(JTextArea ta, String s)
     {
       this.ta = ta;
       this.s = s;
+      doc = ta.getDocument();
 
       SwingUtilities.invokeLater(this);
     }
@@ -211,7 +235,7 @@ public class RunnerPanel extends JPanel
     public void run()
     {
       ta.append(s);
-      ta.setCaretPosition(ta.getText().length());
+      ta.setCaretPosition(doc.getLength());
     }
   }
 }
