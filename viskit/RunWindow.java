@@ -95,8 +95,6 @@ public class RunWindow extends JDialog
       serrW.kill();
       soutW.kill();
     }
-    SwingUtilities.invokeLater(new Runnable(){public void run() {
-      splPn.setDividerLocation(0.85d); }});         // do it this way to make it have an effect
 
     super.setVisible(b);       // blocks here
   }
