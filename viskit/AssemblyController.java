@@ -1,25 +1,28 @@
 package viskit;
 
-import viskit.mvc.mvcAbstractController;
-import viskit.model.*;
-import viskit.xsd.translator.SimkitXML2Java;
-import viskit.xsd.assembly.SimkitAssemblyXML2Java;
-
-import javax.swing.*;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.io.*;
-
 import actions.ActionIntrospector;
+import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileIO;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.jgraph.graph.DefaultGraphCell;
+import viskit.model.*;
+import viskit.mvc.mvcAbstractController;
+import viskit.xsd.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.translator.SimkitXML2Java;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -35,9 +38,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 {
   Class simEvSrcClass,simEvLisClass,propChgSrcClass,propChgLisClass;
 
+  public AssemblyController()
+  {
+    initConfig();
+    initFileWatch();
+  }
+
   public void begin()
   //-----------------
   {
+    ArrayList lis = getOpenFileList(false);
+    if(lis.size() > 0)
+      _doOpen(new File((String)lis.get(0)));     // should only be one
+
     //newEventGraph();
     // The following comments were an attempt to solve classloader issues that needed to be solved
     // a different way
@@ -66,11 +79,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void quit()
   //----------------
   {
+    if(lastFile != null)
+      markConfigOpen(lastFile);
+
     if (((AssemblyModel)getModel()).isDirty())
       if(askToSaveAndContinue() == false)
         return;
     VGlobals.instance().quitAssemblyEditor();
-
   }
 
   File lastFile;
@@ -80,15 +95,114 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       if(askToSaveAndContinue() == false)
         return;
 
-    lastFile = ((ViskitAssemblyView) getView()).openFileAsk();
-    if (lastFile != null) {
-      ((ViskitAssemblyModel) getModel()).newModel(lastFile);
-      // May not have been a good open, but gmd  will be accurate
-      GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
-      ((ViskitAssemblyView) getView()).fileName(gmd.name); //lastFile.getName());
+    File file = ((ViskitAssemblyView) getView()).openFileAsk();
+    if (file != null) {
+      _doOpen(file);
     }
-
   }
+
+  private void _doOpen(File f)
+  {
+    lastFile = f;
+    ((ViskitAssemblyModel) getModel()).newModel(lastFile);
+    // May not have been a good open, but gmd  will be accurate
+    GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
+    ((ViskitAssemblyView) getView()).fileName(gmd.name); //lastFile.getName());
+
+    adjustRecentList(lastFile);
+    fileWatchOpen(lastFile);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  // Methods to implement a scheme where other modules will be informed of file changes //
+  // (Would Java Beans do this with more or less effort?
+
+  private DirectoryWatch dirWatch;
+  private File watchDir;
+  private void initFileWatch()
+  {
+    try {
+      watchDir = File.createTempFile("assy","current");   // actually creates
+      String p = watchDir.getAbsolutePath();   // just want the name part of it
+      watchDir.delete();        // Don't want the file to be made yet
+      watchDir = new File(p);
+      watchDir.mkdir();
+      watchDir.deleteOnExit();
+
+      dirWatch = new DirectoryWatch(watchDir);
+      dirWatch.setLoopSleepTime(2*1000); // 2 secs
+      dirWatch.startWatcher();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void fileWatchSave(File f)
+  {
+    fileWatchOpen(f);
+  }
+  private void fileWatchOpen(File f)
+  {
+    String nm = f.getName();
+    File ofile = new File(watchDir,nm);
+    try {
+      FileIO.copyFile(f,ofile,true);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  private void fileWatchClose(File f)
+  {
+    String nm = f.getName();
+    File ofile = new File(watchDir,nm);
+    ofile.delete();
+  }
+
+  public void addAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis)
+  {
+    dirWatch.addListener(lis);
+  }
+
+  public void removeAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis)
+  {
+    dirWatch.removeListener(lis);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  /** Here we are informed of open Event Graphs */
+
+  DirectoryWatch.DirectoryChangeListener egListener = new DirectoryWatch.DirectoryChangeListener()
+  {
+    public void fileChanged(File file, int action, DirectoryWatch source)
+    {
+      System.out.println("AssemblyController got open-event-graph msg "+action+" "+
+                         file.getAbsolutePath());
+
+      ViskitAssemblyView view = (ViskitAssemblyView)getView();
+      switch(action)
+      {
+        case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
+          view.addToEventGraphPallette(file);
+          break;
+        case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
+          view.removeFromEventGraphPallette(file);
+          break;
+        case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
+          break;
+        default:
+          assert false:"Program error in AssemblyController.egListener.fileChanged";
+      }
+    }
+  };
+
+  public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener()
+  {
+    return egListener;
+  }
+
+
   public void save()
   //----------------
   {
@@ -97,6 +211,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     else {
       updateGMD();
       ((ViskitAssemblyModel)getModel()).saveModel(lastFile);
+      fileWatchSave(lastFile);
     }
   }
 
@@ -106,9 +221,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     ViskitAssemblyView  view  = (ViskitAssemblyView)getView();
     GraphMetaData gmd         = model.getMetaData();
 
-    lastFile = view.saveFileAsk(gmd.name+".xml",false);
+    File saveFile = view.saveFileAsk(gmd.name+".xml",false);
 
-    if(lastFile != null) {
+    if(saveFile != null) {
+      if(lastFile != null)
+        fileWatchClose(lastFile);
+      lastFile = saveFile;
+
       String n = lastFile.getName();
       if(n.endsWith(".xml") || n.endsWith(".XML"))
         n = n.substring(0,n.length()-4);
@@ -117,6 +236,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       updateGMD();
       model.saveModel(lastFile);
       view.fileName(lastFile.getName());
+
+      fileWatchOpen(lastFile);
     }
   }
 
@@ -131,10 +252,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void newAssembly()
   {
     if (((AssemblyModel)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
+      if(!askToSaveAndContinue())
         return;
-    
-    lastFile=null;
+
+    if(lastFile != null) {
+      fileWatchClose(lastFile);
+      lastFile=null;
+    }
     ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
     vmod.newModel(null);
     editGraphMetaData();
@@ -367,7 +491,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     return Vstatics.classForName(o.getType());
   }
-  
+
   AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
   {
     AssemblyNode[] obArr = new AssemblyNode[2];
@@ -675,7 +799,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   /** do a temporary file gig to point to a java class file which we created from
    * a passed eventgraph xml file.
    * @param xmlFile
-   * @return
+   * @return temp file
    */
 /*
   public static File xcreateTemporaryEventGraphClass(File xmlFile)
@@ -770,18 +894,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
       String[] execStrings = buildExecStrings(clNam,classPath);
 
-      try {
-        Runtime.getRuntime().exec(execStrings);
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-
-
+      /** call the potentially overridden exec'er */
+      runner.exec(execStrings,3);   // see buildExecStrings for the 3
     }
     else
       JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
   }
+
   static String getCustomClassPath()
   {
     String classPath = System.getProperty("java.class.path");
@@ -837,11 +956,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      StringBuffer sb = new StringBuffer();
      sb.append(System.getProperty("java.home"));
      sb.append(fsep+"bin"+fsep+"java");
-    v.add(sb.toString());
+    v.add(sb.toString());   //0
 
-    v.add("-cp");
-    v.add(classPath);
-    v.add("viskit.ExternalAssemblyRunner");
+    v.add("-cp");         //1
+    v.add(classPath);     //2
+    v.add("viskit.ExternalAssemblyRunner"); //3
     v.add(className);
 
     v.add(""+((ViskitAssemblyModel) getModel()).getMetaData().verbose);
@@ -913,8 +1032,124 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
   }
 
+  /** The default version of this.  Run assembly in external VM. */
+  AssemblyRunnerPlug runner = new AssemblyRunnerPlug()
+  {
+    public void exec(String[] execStrings, int runnerClassIndex)
+    {
+      try {
+        Runtime.getRuntime().exec(execStrings);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  };
+
+  public void setAssemblyRunner(AssemblyRunnerPlug plug)
+  {
+    runner = plug;
+  }
+
+  // Recent open file support:
+  private static final int RECENTLISTSIZE = 15;
+  private ArrayList recentFileList;
+
+  public void openRecent()
+  {
+    ArrayList v = getRecentFileList(false);
+    if(v.size() <= 0)
+      open();
+    else {
+      File file = ((ViskitAssemblyView)getView()).openRecentFilesAsk(v);
+      if(file != null)
+        _doOpen(file);
+    }
+  }
+
+  /**
+   * If passed file is in the list, move it to the top.  Else insert it;
+   * Trim to RECENTLISTSIZE
+   * @param file
+   */
+  private void adjustRecentList(File file)
+  {
+    String s = file.getAbsolutePath();
+    int idx;
+    if((idx = recentFileList.indexOf(s)) != -1)
+      recentFileList.remove(idx);
+    recentFileList.add(0,s);      // to the top
+
+    while(recentFileList.size() > RECENTLISTSIZE)
+      recentFileList.remove(recentFileList.size()-1);
+    saveHistoryXML(recentFileList);
+  }
+
+  private ArrayList openV;
+
+  private void _setFileLists()
+  {
+    recentFileList = new ArrayList(RECENTLISTSIZE+1);
+    openV = new ArrayList(4);
+    String[] valueAr = historyConfig.getStringArray(assyHistoryKey +"[@value]");
+    for (int i = 0; i < valueAr.length; i++) {
+      recentFileList.add(valueAr[i]);
+      String op = historyConfig.getString(assyHistoryKey + "(" + i + ")[@open]");
+      if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes")))
+        openV.add(valueAr[i]);
+    }
+  }
+  private void saveHistoryXML(ArrayList recentFiles)
+  {
+    historyConfig.clearTree(assyHistoryClearKey);
+
+    for(int i=0;i<recentFiles.size();i++) {
+      String value = (String)recentFiles.get(i);
+      historyConfig.setProperty(assyHistoryKey +"("+i+")[@value]",value);
+    }
+    historyConfig.getDocument().normalize();
+  }
+  private void markConfigOpen(File f)
+  {
+    int idx = recentFileList.indexOf(f.getAbsolutePath());
+    if(idx != -1)
+      historyConfig.setProperty(assyHistoryKey +"("+idx+")[@open]","true");
+
+    // The open attribute is zeroed out for all recent files the first time a file is opened
+  }
+
+  private ArrayList getRecentFileList(boolean refresh)
+  {
+    if (refresh || recentFileList == null)
+      _setFileLists();
+    return recentFileList;
+  }
+
+  private ArrayList getOpenFileList(boolean refresh)
+  {
+    if (refresh || openV == null)
+      _setFileLists();
+    return openV;
+  }
+
+
+  XMLConfiguration historyConfig;
+  String assyHistoryKey = "history.AssemblyEditor.Recent.AssemblyFile";
+  String assyHistoryClearKey = "history.AssemblyEditor.Recent";
+  private void initConfig()
+  {
+    try {
+      historyConfig = VGlobals.instance().getHistoryConfig();
+    }
+    catch (Exception e) {
+      System.out.println("Error loading history file: "+e.getMessage());
+      System.out.println("Recent file saving disabled");
+      historyConfig = null;
+    }
+  }
 
 }
+
 class PkgAndFile
 {
   String pkg;
@@ -925,4 +1160,8 @@ class PkgAndFile
     this.pkg = pkg;
     this.f = f;
   }
+}
+interface AssemblyRunnerPlug
+{
+  public void exec(String[] execStrings, int runnerClassIndex);
 }

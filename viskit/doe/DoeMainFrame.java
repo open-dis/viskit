@@ -57,12 +57,14 @@ public class DoeMainFrame extends JFrame implements DoeEvents
   JScrollPane rightJsp;
   JPanel leftP, rightP;
   JSplitPane split;
-
+  JComponent content;
+  boolean contentOnly;
   public String titleString = "Simkit/Viskit/Gridkit Experiment Design";
 
-  public DoeMainFrame(DoeController controller)
+  public DoeMainFrame(boolean contentOnly, DoeController controller)
   {
     setTitle(titleString);
+    this.contentOnly = contentOnly;
     this.controller = controller;
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     addWindowListener(new myWlistener());
@@ -70,37 +72,54 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     leftP = new JPanel(new BorderLayout());
     rightP = new JPanel(new BorderLayout());
     split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
+
+    content = new JPanel();
+    content.setLayout(new BorderLayout());
+
+    content.add(split,BorderLayout.CENTER);
+
     getContentPane().setLayout(new BorderLayout());
     //getContentPane().add(split,BorderLayout.CENTER);
   }
+
   private DoeFileModel dfm;
   public void setModel(DoeFileModel dfm)
   {
     this.dfm = dfm;
     leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
     leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
-/*
-    rightJsp = new JScrollPane(new JLabel("tbd"));
-    leftP.removeAll();
-    leftP.add(leftJsp,BorderLayout.CENTER);
-    rightP.removeAll();
-    rightP.add(rightJsp,BorderLayout.CENTER);
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      public void run()
-      {
-        split.setDividerLocation(0.5d);
-      }
-    });
-*/
-    getContentPane().add(leftJsp,BorderLayout.CENTER);
-    getContentPane().validate();
+ }
 
+  public void installContent()
+  {
+    content.removeAll();
+    if (leftJsp != null) {
+      if (contentOnly) {
+        content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
+      }
+      content.add(leftJsp, BorderLayout.CENTER);
+    }
+    if (!contentOnly) {
+      getContentPane().add(content, BorderLayout.CENTER);
+      getContentPane().validate();
+    }
   }
+
   public DoeFileModel getModel()
   {
     return dfm;
   }
+
+  public DoeController getController()
+  {
+    return controller;
+  }
+
+  public JComponent getContent()
+  {
+    return content;
+  }
+
   class myWlistener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)

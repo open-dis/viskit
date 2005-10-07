@@ -51,16 +51,18 @@ public class DoeMain implements DoeEvents
   private DoeMainFrame mainFrame;
   private DoeMenuBar menuBar;
 
-  public DoeMain(String[] args)
+  public DoeMain(boolean contentOnly, String[] args)
   {
-    DoeMain.setLookAndFeel();
+    if(!contentOnly)
+      DoeMain.setLookAndFeel();
 
     doConfiguration();
     buildController();
-    buildMainFrame();
-    buildMenuBar();
+    buildMainFrame(contentOnly);
+    buildMenuBar(contentOnly);
 
-    displayFrame();
+    if(!contentOnly)
+      displayFrame();
 
     if(args != null)
       for(int i=0;i<args.length;i++)
@@ -70,23 +72,33 @@ public class DoeMain implements DoeEvents
   {
 
   }
-  private void buildMenuBar()
+  private void buildMenuBar(boolean contentOnly)
   {
     menuBar = new DoeMenuBar(controller);
-    mainFrame.setJMenuBar(menuBar);
+    if(!contentOnly)
+      mainFrame.setJMenuBar(menuBar);
   }
-  private void buildMainFrame()
+  private void buildMainFrame(boolean contentOnly)
   {
-    mainFrame = new DoeMainFrame(controller);
+    mainFrame = new DoeMainFrame(contentOnly,controller);
     controller.setMainFrame(mainFrame);
   }
   private void buildController()
   {
     controller = new DoeController();
   }
+  public DoeMainFrame getMainFrame()
+  {
+    return mainFrame;
+  }
+  public JMenuBar getMenus()
+  {
+    return menuBar;
+  }
   private void displayFrame()
   {
-
+    mainFrame.installContent();
+    mainFrame.setJMenuBar(menuBar);
     mainFrame.setBounds(100,100,800,600);
 
     // Make frame visible in GUI thread to be strictly legal
@@ -129,6 +141,10 @@ public class DoeMain implements DoeEvents
 
   public static void main(String[] args)
   {
-    new DoeMain(args);
+    new DoeMain(false,args);
+  }
+  public static DoeMain main2()
+  {
+    return new DoeMain(true,null);
   }
 }

@@ -58,9 +58,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.Vector;
-import java.util.ArrayList;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class JobLauncher extends JFrame implements Runnable
 {
@@ -94,7 +94,7 @@ public class JobLauncher extends JFrame implements Runnable
   private boolean outputDirty = false;
   private int numRuns,designPts,samps;
 
-  public JobLauncher(String file, String title, JFrame mainFrame)
+  public JobLauncher(Container container, String file, String title, JFrame mainFrame)
   {
     super("Job " + title);
     inputFileString = file;
@@ -303,6 +303,13 @@ public class JobLauncher extends JFrame implements Runnable
     setBounds(meR);
   }
 
+  /**
+   * There seems to be a bug in the XMLRpc code.  If you try to
+   * attach to a server which never answers, you can't kill the thread.
+   * (This has been reported.)  The solution is to make the best effort,
+   * but do it in a separate thread to not stop gui.  The thread may not die
+   * but shouldn't be a problem.
+   */
   private void stopRun()
   {
     outputList.clear();
@@ -311,24 +318,42 @@ public class JobLauncher extends JFrame implements Runnable
     closeButt.setEnabled(true);
     runButt.setEnabled(true);
 
+    if(thread == null)
+      return;
+
     writeStatus("Stopping run.");
-    try {
-      Vector parms = new Vector();
-      //o = rpc.execute("experiment.flushQueue",parms);
-      Object o = rpc.execute("experiment.clear", parms);
-      writeStatus("flushQueue = " + o);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    if(thread != null) {
-      Thread t = thread;
-      thread = null;
-      t.interrupt();
-    }
-
     hideClusterStatus();
+
+    Thread jobKiller = new Thread(new Runnable()
+    {
+      public void run()
+      {
+        if(thread != null) {
+          Thread t = thread;
+          thread = null;
+          t.interrupt();
+          try {
+            t.join(1000);
+          }
+          catch (InterruptedException e) {
+            System.out.println("join exception");
+          }
+
+        }
+        try {
+          Vector parms = new Vector();
+          //o = rpc.execute("experiment.flushQueue",parms);
+          Object o = rpc.execute("experiment.clear", parms);
+          //writeStatus("flushQueue = " + o);
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+
+      }
+    },"JobKiller");
+    jobKiller.setPriority(Thread.NORM_PRIORITY);
+    jobKiller.start();
   }
 
   private void writeStatus(final String s)
@@ -358,7 +383,6 @@ public class JobLauncher extends JFrame implements Runnable
         writeStatus("Building XML-RPC client to " + clusterDNS + ".");
         rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
         fr = new FileReader(filteredFile);
-        //fr = new FileReader("/users/mike/Desktop/rickBrem.grd"); //Bremerton_1.grd");
         br = new BufferedReader(fr);
         data = new StringWriter();
         out = new PrintWriter(data);
@@ -377,20 +401,19 @@ public class JobLauncher extends JFrame implements Runnable
 
       }
       catch (Exception e) {
-        writeStatus("Error connecting to server: " + e.getMessage());
-        thread = null;
+        if(thread != null)    // If normal error:
+          writeStatus("Error connecting to server: " + e.getMessage());
         break lp3;
       }
       // Bring up the 2 other windows
       showClusterStatus(clusterWebStatus);
       chartter = new JobResults(JobLauncher.this, getTitle());
 
-      writeStatus("10 second wait before getting results.");
+      //writeStatus("10 second wait before getting results.");
       try {
         Thread.sleep(10000);
       }
       catch (InterruptedException e) {
-        thread = null;
         break lp3;
       }
       writeStatus("Getting results:");
@@ -408,6 +431,8 @@ public class JobLauncher extends JFrame implements Runnable
               parms.add(new Integer(dp));
               parms.add(new Integer(nrun));
               o = rpc.execute("experiment.getResult", parms);
+              if(thread == null)
+                break lp;
               kickOffClusterUpdate();
               writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
               int idx = saveOutput((String) o, dp, nrun);
@@ -417,9 +442,9 @@ public class JobLauncher extends JFrame implements Runnable
                 System.out.println("Output not saved");
             }
             catch (Exception e) {
-              writeStatus("Error from experiment.getResult(): " + e.getMessage());
-              if (thread == null)
-                break lp;
+              if (thread != null)
+                writeStatus("Error from experiment.getResult(): " + e.getMessage());
+              break lp;
             }
           }
         }
@@ -617,8 +642,15 @@ public class JobLauncher extends JFrame implements Runnable
     if(statusThread != null) {
       Thread t = statusThread;
       statusThread = null;
+      int pr = Thread.currentThread().getPriority();
+      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
       t.interrupt();
+      t.interrupt();
+      t.interrupt();
+      t.interrupt();
+      Thread.currentThread().setPriority(pr);
       Thread.yield();
+
     }
   }
 
@@ -664,7 +696,7 @@ public class JobLauncher extends JFrame implements Runnable
     if(args.length != 1)
       System.out.println("Give .grd file as argument");
     else
-      new JobLauncher(args[0],args[0],null);
+      new JobLauncher(null,args[0],args[0],null);
   }
 
   public static class Gresults
