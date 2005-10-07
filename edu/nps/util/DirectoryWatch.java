@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @since 10:04:25 AM
  */
 
-package edu.nps.nuts;
+package edu.nps.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

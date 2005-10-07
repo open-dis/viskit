@@ -43,7 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* Taken from Java Cookbook, by Ian F. Darwin */
 
-package edu.nps.nuts;
+package edu.nps.util;
 
 import java.io.*;
 
