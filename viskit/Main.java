@@ -22,6 +22,8 @@ import java.awt.*;
  * This is a simple class which does the MVC initting for Viskit.  Since the JFrame is
  * really "just" a view into the data, it is not really the lord of all the rings.  That's
  * what this class is.
+ * 7 OCT 05 -- This is the original entry point.  The equivalent new one for the integrated,
+ * tabbed application is EventGraphAssemblyComboMain
  */
 public class Main
 {
@@ -35,7 +37,7 @@ public class Main
     SwingUtilities.invokeLater(new Runnable(){
       public void run()
       {
-        VGlobals.instance().buildEventGraphViewFrame(cont);
+        VGlobals.instance().buildEventGraphViewFrame(false,cont);
         VGlobals.instance().runEventGraphView();
       }
     });
@@ -56,8 +58,8 @@ public class Main
       {
         public void run()
         {
-          _frame = VGlobals.instance().buildEventGraphViewFrame(cont);
-          VGlobals.instance().installEventGraphView();
+          _frame = VGlobals.instance().buildEventGraphViewFrame(true,cont);
+          //VGlobals.instance().installEventGraphView();
         }
       });
     }
