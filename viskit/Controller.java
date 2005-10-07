@@ -1,6 +1,8 @@
 package viskit;
 
 import actions.ActionIntrospector;
+import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileIO;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
@@ -14,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -44,6 +47,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //=================
   {
     initConfig();
+    initFileWatch();
     this._setFileLists();
   }
   public void begin()
@@ -52,7 +56,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     // wait for Main to do this after the first window is put up
     // newEventGraph();
 
-    ArrayList lis = this.getOpenFileList(false);
+    ArrayList lis = getOpenFileList(false);
     if(lis.size() <= 0)
       newEventGraph();
     else {
@@ -65,7 +69,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void quit()
   //----------------
   {
-
+    markConfigAllClosed();
     ViskitModel[] modAr = ((ViskitView)getView()).getOpenModels();
     for(int i=0;i<modAr.length;i++) {
       setModel((mvcModel)modAr[i]);
@@ -141,6 +145,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
     ((ViskitView)getView()).setSelectedEventGraphName(mod.getMetaData().name);
     adjustRecentList(file);
+
+    fileWatchOpen(file);
   }
 
   private static final int RECENTLISTSIZE = 15;
@@ -156,6 +162,63 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       if(file != null)
         _doOpen(file);
     }
+  }
+
+  // Support for informing listeners about open eventgraphs
+  // Methods to implement a scheme where other modules will be informed of file changes //
+  // (Would Java Beans do this with more or less effort?
+
+  private DirectoryWatch dirWatch;
+  private File watchDir;
+  private void initFileWatch()
+  {
+    try {
+      watchDir = File.createTempFile("egs","current");   // actually creates
+      String p = watchDir.getAbsolutePath();   // just want the name part of it
+      watchDir.delete();        // Don't want the file to be made yet
+      watchDir = new File(p);
+      watchDir.mkdir();
+      watchDir.deleteOnExit();
+
+      dirWatch = new DirectoryWatch(watchDir);
+      dirWatch.setLoopSleepTime(3*1000); // 3 secs
+      dirWatch.startWatcher();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void fileWatchSave(File f)
+  {
+    fileWatchOpen(f);
+  }
+  private void fileWatchOpen(File f)
+  {
+    String nm = f.getName();
+    File ofile = new File(watchDir,nm);
+    try {
+      FileIO.copyFile(f,ofile,true);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  private void fileWatchClose(File f)
+  {
+    String nm = f.getName();
+    File ofile = new File(watchDir,nm);
+    ofile.delete();
+  }
+
+  public void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis)
+  {
+    dirWatch.addListener(lis);
+  }
+
+  public void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis)
+  {
+    dirWatch.addListener(lis);
   }
 
   /**
@@ -200,6 +263,11 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
     historyConfig.getDocument().normalize();
   }
+  private void markConfigAllClosed()
+  {
+    for(int i=0;i<recentFileList.size();i++)
+      historyConfig.setProperty(egHistoryKey+"("+i+")[@open]","false");
+  }
   private void markConfigOpen(File f)
   {
     int idx = recentFileList.indexOf(f.getAbsolutePath());
@@ -225,11 +293,15 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   public void close()
   {
-    if (((Model)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
+    Model mod = (Model)getModel();
+    if (mod.isDirty())
+      if(!askToSaveAndContinue())
         return;
 
-    ((ViskitView)getView()).delTab((Model)getModel());
+    ((ViskitView)getView()).delTab(mod);
+
+    if(mod.getLastFile() != null)
+      fileWatchClose(mod.getLastFile());
   }
 
   public void closeAll()
@@ -248,8 +320,10 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     File lastFile = mod.getLastFile();
     if(lastFile == null)
       saveAs();
-    else
+    else {
       ((ViskitModel)getModel()).saveModel(lastFile);
+      fileWatchSave(lastFile);
+    }
   }
 
   public void saveAs()
@@ -259,16 +333,22 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ViskitView view = (ViskitView)getView();
     GraphMetaData gmd = mod.getMetaData();
 
-    File lastFile = view.saveFileAsk(gmd.name+".xml",false);
-    if(lastFile != null) {
-      String n = lastFile.getName();
+    File saveFile = view.saveFileAsk(gmd.name+".xml",false);
+    if(saveFile != null) {
+      File lastFile = mod.getLastFile();
+      if(lastFile != null)
+        fileWatchClose(lastFile);
+
+      String n = saveFile.getName();
       if(n.endsWith(".xml") || n.endsWith(".XML"))
         n = n.substring(0,n.length()-4);
       gmd.name = n;
       mod.changeMetaData(gmd); // might have renamed
 
-      mod.saveModel(lastFile);
-      view.setSelectedEventGraphName(n); //lastFile.getName());
+      mod.saveModel(saveFile);
+      view.setSelectedEventGraphName(n);
+
+      fileWatchOpen(saveFile);
     }
   }
 
@@ -439,7 +519,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void runAssemblyEditor()
   {
     if (VGlobals.instance().getAssemblyEditor() == null)
-      VGlobals.instance().buildAssemblyViewFrame();
+      VGlobals.instance().buildAssemblyViewFrame(false);
     VGlobals.instance().runAssemblyView();
   }
 
@@ -599,7 +679,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   private void initConfig()
   {
     try {
-      historyConfig = ViskitConfig.instance().getIndividualXMLConfig("c_history.xml");
+      historyConfig = VGlobals.instance().getHistoryConfig();
     }
     catch (Exception e) {
       System.out.println("Error loading history file: "+e.getMessage());

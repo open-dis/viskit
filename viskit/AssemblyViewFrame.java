@@ -1,32 +1,32 @@
 package viskit;
 
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
+import viskit.images.AdapterIcon;
+import viskit.images.PropChangeListenerIcon;
+import viskit.images.SimEventListenerIcon;
+import viskit.jgraph.vGraphAssemblyComponent;
+import viskit.jgraph.vGraphAssemblyModel;
+import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModelEvent;
-import viskit.model.*;
-import viskit.jgraph.vGraphAssemblyModel;
-import viskit.jgraph.vGraphAssemblyComponent;
-import viskit.images.AdapterIcon;
-import viskit.images.SimEventListenerIcon;
-import viskit.images.PropChangeListenerIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.*;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
-import java.io.IOException;
 import java.io.File;
-import java.util.Map;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-
-import actions.ActionIntrospector;
-import actions.ActionUtilities;
+import java.util.Map;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -40,8 +40,6 @@ import actions.ActionUtilities;
 
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
 {
-  //private ViskitAssemblyModel model;
-  //private ViskitAssemblyController controller;
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
 
@@ -51,9 +49,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public static final int SIMEVLIS_MODE = 2;
   public static final int PCL_MODE = 3;
 
-   private JMenuBar menuBar;
-   private JMenu fileMenu, editMenu;
-
   private String filename;
 
   /**
@@ -61,45 +56,59 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
    */
   private JToolBar toolBar;
 
-  /**
-   * Button group that holds the mode buttons.
-   */
-  private ButtonGroup modeButtonGroup;
-
   private JToggleButton selectMode;
   private JToggleButton adapterMode, simEventListenerMode, propChangeListenerMode;
-  private JButton zoomIn, zoomOut, runButt;
 
   private JPanel canvasPanel;
   private LegosTree lTree, pclTree;
-  
-  private Help help;
-
-  //private JTextField vcrStopTime;
+  private JPanel assemblyEditorContent;
+  private JMenuBar myMenuBar;
+  private JMenuItem quitMenuItem;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
-    super("Viskit -- Simkit Assembly Editor");
-    initMVC(model,controller);   // set up mvc linkages
-    initUI();            // build widgets
-
-    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    setLocation(((d.width - 800) / 2)+30, ((d.height - 600) / 2)+30);
-    setSize(800, 600);
-
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent e)
-      {
-        ((AssemblyController)getController()).quit();
-      }
-    });
-
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
-    setIconImage(icon.getImage());
+    this(false,model,controller);
   }
 
+  public AssemblyViewFrame(boolean contentOnly, AssemblyModel model, AssemblyController controller)
+  {
+    super("Viskit -- Simkit Assembly Editor");
+    initMVC(model, controller);   // set up mvc linkages
+    initUI(contentOnly);            // build widgets
+
+    if (!contentOnly) {
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+      setLocation(((d.width - 800) / 2) + 30, ((d.height - 600) / 2) + 30);
+      setSize(800, 600);
+
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      this.addWindowListener(new WindowAdapter()
+      {
+        public void windowClosing(WindowEvent e)
+        {
+          ((AssemblyController) getController()).quit();
+        }
+      });
+
+      ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+      setIconImage(icon.getImage());
+    }
+  }
+
+  public JComponent getContent()
+  {
+    return assemblyEditorContent;
+  }
+
+  public JMenuBar getMenus()
+  {
+    return myMenuBar;
+  }
+
+  public JMenuItem getQuitMenuItem()
+  {
+    return quitMenuItem;
+  }
   /**
    * Initialize the MCV connections
    */
@@ -112,25 +121,23 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   /**
    * Initialize the user interface
    */
-  private void initUI()
+  private void initUI(boolean contentOnly)
   {
-    Container cont = getContentPane();
-
-    buildMenus();
+    buildMenus(contentOnly);
     buildToolbar();
     //buildVCRToolbar();
 
-    // Set up a top level pane that will be the content pane. This
-    // has a border layout, and contains the toolbar on the top and
+    // Set up a assemblyEditorContent level pane that will be the content pane. This
+    // has a border layout, and contains the toolbar on the assemblyEditorContent and
     // the main splitpane underneath.
 
-    // top level panel
-    JPanel top = new JPanel();
-    top.setLayout(new BorderLayout());
-    //top.add(toolBar, BorderLayout.NORTH);
+    // assemblyEditorContent level panel
+    assemblyEditorContent = new JPanel();
+    assemblyEditorContent.setLayout(new BorderLayout());
+    //assemblyEditorContent.add(toolBar, BorderLayout.NORTH);
 
     JComponent canvas = buildCanvas();
-    JComponent trees = buildTreePanels();
+    JSplitPane trees = buildTreePanels();
     trees.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
     JScrollPane leftsp = new JScrollPane(trees);
@@ -141,29 +148,33 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     trees.setMinimumSize(new Dimension(20,20));
     canvas.setMinimumSize(new Dimension(20,20));
     //jsp.setDividerLocation(0.5d);
-    top.add(jsp,BorderLayout.CENTER);
+    assemblyEditorContent.add(jsp,BorderLayout.CENTER);
     // uncomment following to put the vcr toolbar back in place.
     // It's now in ExternalAssemblyRunner
-    //top.add(vcrToolBar,BorderLayout.SOUTH);
-    top.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    //assemblyEditorContent.add(vcrToolBar,BorderLayout.SOUTH);
+    assemblyEditorContent.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-    getContentPane().add(top);
+    if(!contentOnly) // Can't add it here if we're going to put it somewhere else
+      getContentPane().add(assemblyEditorContent);
+
+    trees.setDividerLocation(250);
   }
 
 
 
-  private void buildMenus()
+  private void buildMenus(boolean contentOnly)
   {
     ViskitAssemblyController controller = (ViskitAssemblyController)getController();
     int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     // Set up file menu
-    fileMenu = new JMenu("File");
+    JMenu fileMenu = new JMenu("File");
     fileMenu.setMnemonic(KeyEvent.VK_F);
     fileMenu.add(buildMenuItem(controller,"newAssembly",    "New Assembly", new Integer(KeyEvent.VK_N),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
     fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
+    fileMenu.add(buildMenuItem(controller,"openRecent",       "Open Recent", null, null));
     fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
     fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
@@ -172,14 +183,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
     fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
-    //fileMenu.add(buildMenuItem(controller,"compileJavaClass","Compile Java Class",new Integer(KeyEvent.VK_M),null));
+    if(!contentOnly) {
+      fileMenu.addSeparator();
+      fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
+    }
     fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
-    fileMenu.addSeparator();
-    fileMenu.add(buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+    fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
 
     // Set up edit menu
-    editMenu = new JMenu("Edit");
+    JMenu editMenu = new JMenu("Edit");
     editMenu.setMnemonic(KeyEvent.VK_E);
     // the next three are disabled until something is selected
     editMenu.add(buildMenuItem(controller,"cut",  "Cut",  new Integer(KeyEvent.VK_T),
@@ -206,24 +218,25 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Assembly Properties...",null,null));
 
     // Create a new menu bar and add the menus we created above to it
-    menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    menuBar.add(editMenu);
+    myMenuBar = new JMenuBar();
+    myMenuBar.add(fileMenu);
+    myMenuBar.add(editMenu);
     //menuBar.add(simulationMenu);
-    
-    help = new Help(this);
+
+    Help help = new Help(this);
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic(KeyEvent.VK_H);
-    
+
     helpMenu.add( buildMenuItem(help,"doContents","Contents",null,null));
     helpMenu.add( buildMenuItem(help,"doSearch","Search",null,null));
     helpMenu.addSeparator();
     helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial",null,null));
     helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
     //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
-    menuBar.add(helpMenu);
-    
-    this.setJMenuBar(menuBar);    
+    myMenuBar.add(helpMenu);
+
+    if(!contentOnly)
+      setJMenuBar(myMenuBar);
   }
 
   // Use the actions package
@@ -251,10 +264,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // Use the button's selected status to figure out what mode
     // we are in.
 
-    if (selectMode.isSelected() == true) return SELECT_MODE;
-    if (adapterMode.isSelected() == true) return ADAPTER_MODE;
-    if (simEventListenerMode.isSelected() == true) return SIMEVLIS_MODE;
-    if (propChangeListenerMode.isSelected() == true) return PCL_MODE;
+    if (selectMode.isSelected()) return SELECT_MODE;
+    if (adapterMode.isSelected()) return ADAPTER_MODE;
+    if (simEventListenerMode.isSelected()) return SIMEVLIS_MODE;
+    if (propChangeListenerMode.isSelected()) return PCL_MODE;
     //assert false : "getCurrentMode()";
     System.err.println("assert false : \"getCurrentMode()\"");
     return 0;
@@ -262,7 +275,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private void buildToolbar()
   {
-    modeButtonGroup = new ButtonGroup();
+    ButtonGroup modeButtonGroup = new ButtonGroup();
     toolBar = new JToolBar();
 
     // Buttons for what mode we are in
@@ -294,15 +307,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(
         defBor,BorderFactory.createLineBorder(new Color(0xff,0xc8,0xc8),2)));
 
-    zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
-                                        "Zoom in on the graph");
+    JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
+        "Zoom in on the graph");
 
-    zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
-                                        "Zoom out on the graph");
+    JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
+        "Zoom out on the graph");
 
     Action runAction = ActionIntrospector.getAction(getController(),"runAssembly");
-    runButt = makeButton(runAction, "viskit/images/Play24.gif",
-                                        "Run the assembly");
+    JButton runButt = makeButton(runAction, "viskit/images/Play24.gif",
+        "Run the assembly");
     modeButtonGroup.add(selectMode);
     modeButtonGroup.add(adapterMode);
     modeButtonGroup.add(simEventListenerMode);
@@ -433,7 +446,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   }
   private JSplitPane panJsp;
 
-  private JComponent buildTreePanels()
+  private JSplitPane buildTreePanels()
   {
     lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                           this, (AssemblyController)getController(),
@@ -451,15 +464,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pcPan);
     panJsp.setBorder(null);
     panJsp.setOneTouchExpandable(true);
+
     pcPan.setMinimumSize(new Dimension(20, 80));
     lPan.setMinimumSize(new Dimension(20, 80));
+    lPan.setPreferredSize(new Dimension(20,240)); // give it some height for the initial split
 
     lTree.setDragEnabled(true);
     pclTree.setDragEnabled(true);
-
     return panJsp;
   }
-  
+
   public void genericErrorReport(String title, String msg)
   //-----------------------------------------------------
   {
@@ -550,7 +564,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public void setVisible(boolean b)
   {
     super.setVisible(b);
-    if(firstShown == false) {
+    if(!firstShown) {
       firstShown = true;
       jsp.setDividerLocation(225);
       panJsp.setDividerLocation(0.5d);
@@ -665,6 +679,27 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return getLeafUO(pclTree);
   }
 
+  // For auto load of open eventgraphs
+  public void addToEventGraphPallette(File f)
+  {
+    lTree.addContentRoot(f);
+  }
+
+  public void addToPropChangePallette(File f)
+  {
+    pclTree.addContentRoot(f);
+  }
+
+  public void removeFromEventGraphPallette(File f)
+  {
+    lTree.removeContentRoot(f);
+  }
+
+  public void removeFromPropChangePallette(File f)
+  {
+    pclTree.removeContentRoot(f);
+  }
+
   public int genericAsk(String title, String msg)
   //---------------------------------------------
   {
@@ -690,6 +725,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     if (retv == JFileChooser.APPROVE_OPTION)
       return jfc.getSelectedFile();
     return null;
+  }
+
+  public File openRecentFilesAsk(Collection lis)
+  {
+    String fn = RecentFilesDialog.showDialog(this,this,lis);
+    if (fn != null)
+      return new File(fn);
+    else
+      return null;
   }
 
   private File getUniqueName(String suggName)
