@@ -94,7 +94,7 @@ public class Vstatics
    * Call this method to inst a class representation of an entity.  We'll try first
    * the "standard" classpath-classloader, then try to inst any that were loaded by file.
    * @param s
-   * @return
+   * @return class
    */
   public static Class classForName(String s)
   {
@@ -233,11 +233,11 @@ public class Vstatics
     }
 
   }
-  static String getPathSeparator()
+  static public String getPathSeparator()
   {
     return System.getProperty("path.separator");
   }
-  static String getFileSeparator()
+  static public String getFileSeparator()
   {
     return System.getProperty("file.separator");
   }
