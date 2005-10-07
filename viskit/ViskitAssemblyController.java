@@ -1,5 +1,6 @@
 package viskit;
 
+import edu.nps.util.DirectoryWatch;
 import viskit.model.*;
 
 import java.awt.*;
@@ -27,12 +28,12 @@ public interface ViskitAssemblyController
   public void newPropChangeListenerNode          (String name, Point p);
 
   public void editGraphMetaData  ();
-  
+
   public void newAssembly();
 
          void runEventGraphEditor();
          void showXML();
- 
+
   public void selectNodeOrEdge      (Vector v);
 
   public void newAdapterArc         (Object[]nodes);
@@ -49,10 +50,16 @@ public interface ViskitAssemblyController
   void copy();
   void cut();        // to remove nodes and edges
   void open();
+  void openRecent();
   void paste();
   void quit();
   void save();
   void saveAs();
+
+  void addAssemblyFileListener   (DirectoryWatch.DirectoryChangeListener lis);
+  void removeAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis);
+
+  DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener ();
 
   void generateJavaSource();
   void runAssembly();

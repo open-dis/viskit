@@ -1,5 +1,6 @@
 package viskit;
 
+import edu.nps.util.DirectoryWatch;
 import viskit.model.*;
 
 import java.awt.*;
@@ -30,12 +31,12 @@ public interface ViskitController
   void buildNewCancelArc    (Object[] nodes);
 
   void editGraphMetaData  ();
-  
+
   void newEventGraph();
 
   void runAssemblyEditor();
   void showXML();
-  
+
   /* requests to the controller to perform editing operations on existing entities */
   void nodeEdit         (EventNode node);
   void arcEdit          (SchedulingEdge ed);
@@ -62,4 +63,7 @@ public interface ViskitController
   void eventList();
   void generateJavaClass();
   void captureWindow();
+
+  void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis);
+  void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) ;
 }
