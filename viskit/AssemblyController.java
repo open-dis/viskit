@@ -83,7 +83,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       markConfigOpen(lastFile);
 
     if (((AssemblyModel)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
+      if(!askToSaveAndContinue())
         return;
     VGlobals.instance().quitAssemblyEditor();
   }
@@ -92,7 +92,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void open()
   {
     if (((AssemblyModel)getModel()).isDirty())
-      if(askToSaveAndContinue() == false)
+      if(!askToSaveAndContinue())
         return;
 
     File file = ((ViskitAssemblyView) getView()).openFileAsk();
