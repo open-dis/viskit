@@ -33,7 +33,9 @@ public class Help {
         "Developers:" + CR +
         "  Arnold Buss" + CR +
         "  Mike Bailey" + CR +
-        "  Rick Goldberg";
+        "  Rick Goldberg" + CR +
+        "  Don McGregor" + CR +
+        "  Don Brutzman";
     
 
     private static HelpBroker hb;
