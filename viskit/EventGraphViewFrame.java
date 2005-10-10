@@ -473,7 +473,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     editMenu.add(buildMenuItem(controller,"newNode",         "Add Event",                   new Integer(KeyEvent.VK_E),null));
     editMenu.add(buildMenuItem(controller,"newStateVariable","Add State Variable...",       new Integer(KeyEvent.VK_S),null));
-    editMenu.add(buildMenuItem(controller,"newSimParameter", "Add Sim Parameter...",        new Integer(KeyEvent.VK_M),null));
+    editMenu.add(buildMenuItem(controller,"newSimParameter", "Add Simulation Parameter...", new Integer(KeyEvent.VK_M),null));
     editMenu.add(buildMenuItem(controller,"newSelfRefEdge",  "Add Self-Referential Edge...",null,null));
 
     // This starts off being disabled, until something is selected
