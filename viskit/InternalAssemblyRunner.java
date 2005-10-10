@@ -661,6 +661,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
     private void execLoop()
     {
+      Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
       try {
@@ -682,12 +683,23 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               Schedule.reset();
               break;
             case SCHEDULE_STOPSIMULATION:
+              System.err.println("Got stop sim.");
               Schedule.stopSimulation();
               break;
             case SCHEDULE_STARTSIMULATION:
-              Schedule.startSimulation();
-              if(backChannel != null)
-                backChannel.println("SimDone");
+              // test
+              Thread t = new Thread(new Runnable()
+              {
+                public void run()
+                {
+                  Schedule.startSimulation();
+                  if(backChannel != null)
+                    backChannel.println("SimDone");
+                }
+              },"startSimThread");
+              t.setPriority(Thread.NORM_PRIORITY);
+              t.start();
+              //Schedule.startSimulation();
               break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();

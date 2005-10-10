@@ -184,7 +184,16 @@ public class RunnerPanel extends JPanel
 
     public void run()
     {
-      final byte[] buf = new byte[1024];
+      final byte[] buf = new byte[20*1024];
+      PipedInputStream pis = new PipedInputStream();
+      PipedOutputStream pos = null;
+      try {
+        pos = new PipedOutputStream(pis);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+      byte[] ba = new byte[1];
 
       while (true) {
         int len = -1;
@@ -208,7 +217,13 @@ public class RunnerPanel extends JPanel
         }
 
         // Write to the swing widget
-        new inSwingThread(myTa, new String(buf, 0, len));
+        new inSwingThread(myTa, new String(buf, 0, len), pos);
+        try {
+          pis.read(ba);
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
   }
@@ -222,13 +237,14 @@ public class RunnerPanel extends JPanel
     JTextArea ta;
     String s;
     Document doc;
+    PipedOutputStream pos;
 
-    inSwingThread(JTextArea ta, String s)
+    inSwingThread(JTextArea ta, String s, PipedOutputStream pos)
     {
       this.ta = ta;
       this.s = s;
+      this.pos = pos;
       doc = ta.getDocument();
-
       SwingUtilities.invokeLater(this);
     }
 
@@ -236,6 +252,15 @@ public class RunnerPanel extends JPanel
     {
       ta.append(s);
       ta.setCaretPosition(doc.getLength());
+
+      if(pos != null)
+        try {
+          pos.write(1);
+          pos.flush();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
     }
   }
 }
