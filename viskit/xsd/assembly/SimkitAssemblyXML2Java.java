@@ -236,7 +236,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	buildHead(head);
 	buildEntities(entities);
 	buildListeners(listeners);
-	//buildConnectors(connectors);
 	buildOutput(output);
 	buildTail(tail);
 
@@ -270,9 +269,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	pw.println();
 	pw.println();
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
-        pw.println(sp8 + "super" + lp + rp + sc);
-        pw.println(sp8 + "createObjects" + lp + rp + sc);
-        pw.println(sp8 + "performHookups" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
 
@@ -384,8 +380,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	} else if ( isString(type) ) {
 	    pw.print(indent + sp4 + qu + value + qu);
 	} else { // some Expression
-	    //pw.print(indent + sp4 + nw + sp + type + lp);
-	    //pw.print(value + rp);
             pw.print(indent + castIfSimEntity(type) + value);
 	}
 
@@ -648,7 +642,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	}
         
-        pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "run" + lp + rp + sc);
+        pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "start" + lp + rp + sc);
 
 	pw.println();
 	pw.println(sp4 + cb);
