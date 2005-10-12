@@ -315,44 +315,14 @@
     <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples"/>
     
     <target description="diskit module" name="examples.diskit">
-	<echo message="Building DISkit:"/>
-        <ant dir="${dir.examples}/diskit" target="dist"/>
-	<echo message="Building DISKIT:"/>
+	<echo message="Building Diskit:"/>
 	<ant dir="${dir.diskit}" target="dist"/>
-        <copy file="${dir.examples}/diskit/lib/dis.jar" todir="${dir.lib.ext}"/>
-        <copy file="${dir.examples}/diskit/dist/lib/diskit0.jar" todir="${dir.lib.ext}"/> 
+        <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
     </target>
     
-    <!-- TARGET: buildapp from Kirk Stork -->
-    <!-- mod, Mike Bailey, to work, you need to put the resulting jar in the basedirectory; it won't run
-      from ./build since the application needs its default directory set to Viskit/.  But there are other problems with this
-      target.  Simply putting the jar in the right place still doesn't make it work. The target needs to be debugged.-->
-    <target depends="build.init, jar" description="Build a complete, double-clickable jar file with all dependencies included." name="buildapp">                                                               
-       <jar destfile="${dir.build}/viskitapp.jar">
-            <zipfileset src="${dir.build.lib}/viskit.jar"/>
-        <!--<zipfileset src="${dir.src}/examples/diskit/lib/dis.jar"/> -->
-            <zipfileset src="${dir.src}/lib/ext/dis.jar"/>
-            <manifest>
-                <attribute name="Main-Class" value="viskit.Splash2$DefaultEntry"/>
-                <attribute name="Class-Path" value="lib/simkit.jar lib/actions.jar lib/commons-beanutils-1.7.0.jar lib/commons-collections-3.1.jar lib/commons-configuration-1.1.jar lib/commons-digester-1.6.jar lib/commons-lang-2.0.jar lib/commons-logging-1.0.4.jar lib/log4j-1.2.8.jar lib/looks-1.3.1.jar lib/xerces.jar lib/jhall.jar lib/bsh-2.0b1.jar lib/jdom.jar lib/jgraph.jar lib/simkit.jar lib/ext/dis.jar lib/ext/diskit.jar lib/tools.jar lib/jwsdp-1.4/jax-qname.jar lib/jwsdp-1.4/jaxb-api.jar lib/jwsdp-1.4/jaxb-impl.jar lib/jwsdp-1.4/jaxb-libs.jar lib/jwsdp-1.4/jaxp-api.jar lib/jwsdp-1.4/namespace.jar lib/jwsdp-1.4/relaxngDatatype.jar lib/jwsdp-1.4/xsdlib.jar"/>
-            </manifest>                                                                     
-        </jar>
-    </target>
 
-  <target depends="build.init, jar" description="Build a complete, double-clickable jar file with all dependencies included." name="buildapp-orig">
-      <jar destfile="${dir.build}/viskitapp.jar">
-          <zipfileset src="${dir.build.lib}/viskit.jar"/>
-      <!--<zipfileset src="${dir.src}/examples/diskit/lib/dis.jar"/> -->
-          <zipfileset src="${dir.src}/lib/ext/dis.jar"/>
-          <manifest>
-              <attribute name="Main-Class" value="viskit.Splash2$DefaultEntryOrig"/>
-              <attribute name="Class-Path" value="lib/simkit.jar lib/actions.jar lib/commons-beanutils-1.7.0.jar lib/commons-collections-3.1.jar lib/commons-configuration-1.1.jar lib/commons-digester-1.6.jar lib/commons-lang-2.0.jar lib/commons-logging-1.0.4.jar lib/log4j-1.2.8.jar lib/looks-1.3.1.jar lib/xerces.jar lib/jhall.jar lib/bsh-2.0b1.jar lib/jdom.jar lib/jgraph.jar lib/simkit.jar lib/ext/dis.jar lib/ext/diskit.jar lib/tools.jar lib/jwsdp-1.4/jax-qname.jar lib/jwsdp-1.4/jaxb-api.jar lib/jwsdp-1.4/jaxb-impl.jar lib/jwsdp-1.4/jaxb-libs.jar lib/jwsdp-1.4/jaxp-api.jar lib/jwsdp-1.4/namespace.jar lib/jwsdp-1.4/relaxngDatatype.jar lib/jwsdp-1.4/xsdlib.jar"/>
-          </manifest>
-      </jar>
-  </target>
-
-    <!-- TARGET: Run, include extensions such as diskit module -->
+    <!-- TARGET: Run -->
   <target depends="splashy, jar, examples" description="Run Viskit, include example modules if any" name="build-run">
     <java classname="viskit.EventGraphAssemblyComboMain" classpathref="runtime.classpath" fork="true"/>
   </target>
@@ -360,7 +330,7 @@
     <java classname="viskit.Main" classpathref="runtime.classpath" fork="true"/>
   </target>
 
-  <!-- TARGET: Run, include extensions such as diskit module - no ant splash may be needed for FreeBSD on command line -->
+  <!-- TARGET: Run - no ant splash -->
   <target depends="jar, examples" description="Run Viskit, include example modules if any" name="build-run-default">
     <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
       <arg value="viskit.EventGraphAssemblyComboMain"/>
