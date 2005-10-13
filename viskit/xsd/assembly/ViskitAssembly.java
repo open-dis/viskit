@@ -24,14 +24,14 @@ import viskit.xsd.bindings.assembly.PropertyChangeListenerConnection;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
-    protected LinkedHashMap entities = new LinkedHashMap();
-    protected LinkedHashMap replicationStatistics;
-    protected LinkedHashMap designPointStatistics;
-    protected LinkedHashMap propertyChangeListeners;
-    protected LinkedHashMap propertyChangeListenerConnections;
-    protected LinkedHashMap designPointStatsListenerConnections;
-    protected LinkedHashMap replicationStatsListenerConnections;
-    protected LinkedHashMap simEventListenerConnections;
+    public LinkedHashMap entities = new LinkedHashMap();
+    public LinkedHashMap replicationStatistics;
+    public LinkedHashMap designPointStatistics;
+    public LinkedHashMap propertyChangeListeners;
+    public LinkedHashMap propertyChangeListenerConnections;
+    public LinkedHashMap designPointStatsListenerConnections;
+    public LinkedHashMap replicationStatsListenerConnections;
+    public LinkedHashMap simEventListenerConnections;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
@@ -109,6 +109,16 @@ public class ViskitAssembly extends BasicAssembly {
     public void createSimEntities() {
         simEntity = 
                 (SimEntity[]) entities.values().toArray(new SimEntity[0]);
+        //reverseOrder(simEntity);
+    }
+    
+    void reverseOrder(SimEntity[] a) {
+        SimEntity temp;
+        for ( int i = 0; i < a.length / 2; i ++){
+            temp = a[i];
+            a[i] = a[a.length - (i + 1)];
+            a[a.length - (i+1)] = temp;
+        }
     }
     
     public void createDesignPointStats() {
