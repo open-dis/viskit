@@ -760,21 +760,28 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public File saveFileAsk(String suggName, boolean showUniqueName)
   //-----------------------
   {
-    if(jfc == null)
+    if (jfc == null)
       jfc = new JFileChooser(System.getProperty("user.dir"));
 
     File fil = new File(suggName);
-    if(showUniqueName)
+    if (showUniqueName)
       fil = getUniqueName(suggName);
 
     jfc.setSelectedFile(fil);
     int retv = jfc.showSaveDialog(this);
-    if(retv == JFileChooser.APPROVE_OPTION)
+    if (retv == JFileChooser.APPROVE_OPTION) {
+      if (jfc.getSelectedFile().exists()) {
+        if (JOptionPane.YES_OPTION !=
+            JOptionPane.showConfirmDialog(this, "Overwrite existing file?",
+                "File Exists!", JOptionPane.WARNING_MESSAGE))
+          return null;
+      }
       return jfc.getSelectedFile();
+    }
     return null;
   }
 
-    /**
+  /**
    * Called by the controller after source has been generated.  Show to the user and provide him with the option
    * to save.
    * @param s Java source
