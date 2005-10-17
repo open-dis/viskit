@@ -250,7 +250,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	String name = this.root.getName();
 	String pkg  = this.root.getPackage();
         String extend = this.root.getExtend();
-	
+
 	pw.println("package " + pkg + sc);
 	pw.println();
 	pw.println("import simkit.*;");
@@ -284,7 +284,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	    SimEntity se = (SimEntity) seli.next();
 	    List pl = se.getParameters();
 	    ListIterator pli = pl.listIterator();
-	    
+
 	    pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
 	    pw.print(sp12 + nw + sp + se.getType() + lp);
 
@@ -299,18 +299,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	    pw.println(sp8 + rp + sc);
             pw.println();
-	} 
-        
+	}
+
         ListIterator sec = this.root.getSimEventListenerConnection().listIterator();
-        
+
         while(sec.hasNext()) {
             SimEventListenerConnectionType sect = (SimEventListenerConnectionType)sec.next();
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity)(sect.getListener())).getName() + qu);
             pw.println(cm + qu + ((SimEntity)(sect.getSource())).getName() + qu + rp + sc);
         }
-        
+
         pw.println();
-        
+
         pw.println(sp8 + "super" + pd + "createSimEntities"+ lp + rp + sc);
 
 	pw.println(sp4 + cb);
@@ -318,20 +318,20 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
     }
 
-     /* Build up a parameter up to but not including a trailing comma. 
-      * _callers_ should check the size of the list to determine if a 
+     /* Build up a parameter up to but not including a trailing comma.
+      * _callers_ should check the size of the list to determine if a
       * comma is needed. This may include a closing paren or brace
       * and any nesting. Note a a doParameter may also be a caller
       * of a doParameter, so the comma placement is tricky.
       */
- 
+
     void doParameter(List plist, Object param, String indent, PrintWriter pw) {
 
 	if ( param instanceof MultiParameterType ) {
 	    doMultiParameter((MultiParameterType)param, indent, pw);
 	} else if ( param instanceof FactoryParameterType ) {
 	    doFactoryParameter((FactoryParameterType)param, indent, pw);
-	} else { 
+	} else {
 	    doTerminalParameter((TerminalParameterType)param, indent, pw);
 	}
 
@@ -355,7 +355,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         }
         return sret;
     }
-    
+
     void doFactoryParameter(FactoryParameterType fact, String indent, PrintWriter pw) {
 	String factory = fact.getFactory();
         String method = fact.getMethod();
@@ -376,7 +376,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             value=((TerminalParameterType)(term.getNameRef())).getValue();
         }
         if ( isPrimitive(type) ) {
-	    pw.print(indent + sp4 + value); 
+	    pw.print(indent + sp4 + value);
 	} else if ( isString(type) ) {
 	    pw.print(indent + sp4 + qu + value + qu);
 	} else { // some Expression
@@ -386,7 +386,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
 
     void doSimpleStringParameter(TerminalParameterType term, PrintWriter pw) {
-	
+
 	String type = term.getType();
 	String value = term.getValue();
 
@@ -406,21 +406,21 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	    type.equals("float") |
 	    type.equals("int") |
 	    type.equals("long") |
-	    type.equals("short") 
+	    type.equals("short")
 	) return true;
 	else return false;
     }
 
     boolean isString(String type) {
-	if ( 
-	    type.equals("String") | 
-	    type.equals("java.lang.String") 
+	if (
+	    type.equals("String") |
+	    type.equals("java.lang.String")
 	) return true;
 	else return false;
     }
 
     boolean isArray(String type) {
-	if ( 
+	if (
 	    type.endsWith("]")
 	) return true;
 	else return false;
@@ -432,7 +432,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	ListIterator paramsi = params.listIterator();
         String ptype = p.getType();
 
-	if ( isArray(ptype) ) { 
+	if ( isArray(ptype) ) {
 	    pw.println(indent + sp4 + nw + sp + ptype + ob);
 	    while ( paramsi.hasNext() ) {
 		doParameter(params, paramsi.next(), indent + sp4, pw);
@@ -455,9 +455,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
 
     void buildListeners(StringWriter listeners) {
-	
+
 	PrintWriter pw = new PrintWriter(listeners);
-        
+
 
         LinkedHashMap replicationStats = new LinkedHashMap();
         LinkedHashMap designPointStats = new LinkedHashMap();
@@ -468,10 +468,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	while ( li.hasNext() ) {
 	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)li.next();
-	    List tparam = pcl.getParameters(); 
+	    List tparam = pcl.getParameters();
 	    ListIterator tparami = tparam.listIterator();
             String pclMode = pcl.getMode();
-            
+
             if ( "replicationStats".equals(pclMode) ) {
                 replicationStats.put(pcl.getName(), pcl);
             } else if ( "designPointStats".equals(pclMode) ) {
@@ -480,53 +480,53 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 propertyChangeListeners.put(pcl.getName(), pcl);
             }
         }
-        
+
         li = this.root.getPropertyChangeListenerConnection().listIterator();
-        
+
         while ( li.hasNext() ) {
             PropertyChangeListenerConnectionType pclc = (PropertyChangeListenerConnectionType)li.next();
             propertyChangeListenerConnections.put(((PropertyChangeListenerType)pclc.getListener()).getName(),pclc);
         }
-        
+
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
-        
+
         String[] pcls = (String[]) propertyChangeListeners.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) propertyChangeListeners.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
-            PropertyChangeListenerConnectionType pclc = 
+            PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
             pw.print(sp8 + "addPropertyChangeListener" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm + qu + pcl.getType() + qu );
             pw.println(rp + sc);
-            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm); 
+            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
         }
         pw.println(sp8 + "super" + pd + "createPropertyChangeListeners" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-        
-        
+
+
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
-        
+
         pcls = (String[]) replicationStats.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) replicationStats.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
-            PropertyChangeListenerConnectionType pclc = 
+            PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.print(sp8 + "addReplicationStat" + lp + pcls[i] + cm + pclc.getProperty() + cm +  pcl.getType());
+            pw.print(sp8 + "addReplicationStat" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm +  qu + pcl.getType() +qu);
             pw.println(rp + sc);
-            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + pcls[i] + cm + pclc.getProperty() + cm); 
-            pw.println(((SimEntityType)pclc.getSource()).getName() + rp + sc);
+            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
+            pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
         }
         pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-        
+
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
-        
+
         pcls = (String[]) designPointStats.keySet().toArray(new String[0]);
-        
+
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) designPointStats.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
@@ -537,32 +537,32 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
         }
-        
-        
+
+
         pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
 
         pw.println(sp4 + cb);
         pw.println();
-        
-            
+
+
     }
 
     void buildConnectors(StringWriter connectors) {
-	
+
 	PrintWriter pw = new PrintWriter(connectors);
-        
+
         // listeners get attached upon instantiation
-        
+
         pw.println(sp4 + "public" + sp + this.root.getName() + lp + rp + sp + ob);
-        
+
 	ListIterator connects = this.root.getSimEventListenerConnection().listIterator();
-	
+
 	while ( connects.hasNext() ) {
 	    SimEventListenerConnectionType simcon = (SimEventListenerConnectionType)connects.next();
 	    pw.print(sp8 + ((SimEntityType)simcon.getSource()).getName() + pd + "addSimEventListener" );
-	    pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc); 
+	    pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc);
 	}
-        
+
 	pw.println();
 
 	connects = this.root.getPropertyChangeListenerConnection().listIterator();
@@ -573,14 +573,14 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	    pw.print(pd + "addPropertyChangeListener" + lp);
 	    if ( pccon.getProperty() != null ) {
 		pw.print(qu + pccon.getProperty() + qu + cm);
-	    } 
+	    }
 	    Object listener = pccon.getListener();
 	    if ( listener instanceof SimEntity ) {
 	        pw.println(((SimEntityType)(pccon.getListener())).getName() + rp + sc);
 	    } else {
 	        pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
 	    }
-	}            
+	}
         pw.println();
         connects = this.root.getAdapter().listIterator();
         while (connects.hasNext()) {
@@ -589,7 +589,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.println(a.getName() + rp + sc);
             pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
             pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
-            pw.println();    
+            pw.println();
         }
 
         pw.println(sp4 + cb);
@@ -597,8 +597,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
 
     void buildOutput(StringWriter out) {
-	PrintWriter pw = new PrintWriter(out);	
-        
+	PrintWriter pw = new PrintWriter(out);
+
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + "asm" + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
@@ -607,7 +607,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	while ( outputs.hasNext() ) {
             Object elem = ((OutputType)outputs.next()).getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
-            
+
             if ( elem instanceof SimEntityType ) {
                 name = ((SimEntityType)elem).getName();
             } else if ( elem instanceof PropertyChangeListenerType ) {
@@ -623,25 +623,25 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 	ScheduleType schedule;
 
 	if ( (schedule = this.root.getSchedule()) != null ) {
-	    
+
             pw.print(sp8 + "asm.setStopTime");
 	    pw.println(lp + schedule.getStopTime() + rp + sc);
-	
+
 	    pw.print(sp8 + "asm.setVerbose");
 	    pw.println(lp + schedule.getVerbose() + rp + sc);
-	    
+
             pw.print(sp8 + "asm.setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
-            
+
             pw.print(sp8 + "asm.setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
-            
+
             pw.print(sp8 + "asm.setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
-            
+
 
 	}
-        
+
         pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "start" + lp + rp + sc);
 
 	pw.println();
@@ -713,7 +713,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
 
     /**
-     * @param args the command line arguments
+     * @param arg the command line arguments
      * args[0] - -f | --file | -p | --port
      * args[1] - filename | port
      * args[2] - -p | --port | -f | --file
@@ -1660,7 +1660,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
     /** 
      * XML-RPC handler for clearing the grid queue, 
-     * @returns number of remaining jobs still in the queue
+     * @return number of remaining jobs still in the queue
      * that will be terminated.
      */
     public Integer flushQueue() {
@@ -1681,7 +1681,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     /** 
      * XML-RPC handler for returning number of remaining jobs in queue,
      * could be used to estimate when a set of jobs becomes stuck. 
-     * @returns number of remaining jobs in the queue still running.
+     * @return number of remaining jobs in the queue still running.
      */
     
     public Integer getRemainingJobs() {
