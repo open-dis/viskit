@@ -656,7 +656,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public void fileName(String s)    // informative, tells view what we're working on
   {
     this.filename = s;
-    this.setTitle("Viskit Assembly: "+s);
+    String ttl = "Viskit Assembly: "+s;
+    setTitle(ttl);
+    if(titlList != null)
+      titlList.setTitle(ttl,titlkey);
   }
 
   private Object getLeafUO(JTree tree)
@@ -847,6 +850,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     Dimension d = comp.getPreferredSize();
     comp.setMaximumSize(d);
     comp.setMinimumSize(d);
+  }
+
+  private TitleListener titlList;
+  private int titlkey;
+  public void setTitleListener(TitleListener lis, int key)
+  {
+    titlList = lis;
+    titlkey = key;
   }
 
 }

@@ -145,6 +145,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     myCmdLine = parms;
 
     targetClassName = parms[4];
+    if(titlList != null)
+      titlList.setTitle(parms[4],titlkey);
     targetClassPath = parms[2];
     boolean defaultVerbose = Boolean.valueOf(parms[5]).booleanValue();
     double defaultStopTime = Double.parseDouble(parms[6]);
@@ -778,5 +780,11 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
   }
 
-
+  private TitleListener titlList;
+  private int titlkey;
+  public void setTitleListener(TitleListener lis, int key)
+  {
+    titlList = lis;
+    titlkey = key;
+  }
 }

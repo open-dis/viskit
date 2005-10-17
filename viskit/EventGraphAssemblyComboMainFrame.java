@@ -97,17 +97,20 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
     tabbedPane.add("Event Graphs",egFrame.getContent());   // 0
     menus.add(egFrame.getMenus());
+    egFrame.setTitleListener(myTitleListener,0);
     setJMenuBar(egFrame.getMenus());
     jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
 
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
     tabbedPane.add("Assembly",asyFrame.getContent());      // 1
     menus.add(asyFrame.getMenus());
+    asyFrame.setTitleListener(myTitleListener,1);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
     asyRunComponent = new InternalAssemblyRunner();
     tabbedPane.add("Run Assembly",asyRunComponent.getContent());   // 2
     menus.add(asyRunComponent.getMenus());
+    asyRunComponent.setTitleListener(myTitleListener,2);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     ((AssemblyController)asyFrame.getController()).setAssemblyRunner( new ThisAssemblyRunnerPlug());
 
@@ -158,7 +161,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     {
       int i = tabbedPane.getSelectedIndex();
       setJMenuBar((JMenuBar)menus.get(i));
-      //setTitle(....?);
+      setTitle((String)titles[i]);
     }
   }
   private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb)
@@ -208,6 +211,18 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
        */
       tabbedPane.setSelectedIndex(2);
       asyRunComponent.initParams(execStrings,runnerClassIndex);
+    }
+  }
+
+  String[] titles = new String[]{"","","","","","","","","",""};
+  TitleListener myTitleListener = new myTitleListener();
+  class myTitleListener implements TitleListener
+  {
+    public void setTitle(String title, int key)
+    {
+      titles[key] = title;
+      if(tabbedPane.getSelectedIndex() == key)
+        EventGraphAssemblyComboMainFrame.this.setTitle(title);
     }
   }
 }

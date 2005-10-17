@@ -76,6 +76,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private JPanel eventGraphViewerContent;
   private JMenuBar myMenuBar;
   private JMenuItem quitMenuItem;
+  private TitleListener titlList;
+  private int titlKey;
 
   /**
    * Constructor; lays out initial GUI objects
@@ -895,8 +897,11 @@ cancelArcMode.setIcon(new CanArcIcon());
   public void setSelectedEventGraphName(String s)
   //----------------------------
   {
-    this.setTitle("Viskit: "+s);
+    String ttl = "Viskit: "+s;
+    setTitle(ttl);
     tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),s);
+    if(this.titlList != null)
+      titlList.setTitle(ttl,titlKey);
   }
 
   public boolean doEditNode(EventNode node)
@@ -1060,6 +1065,12 @@ cancelArcMode.setIcon(new CanArcIcon());
         jf.setVisible(false);
       }
     });
+  }
+
+  public void setTitleListener(TitleListener lis, int key)
+  {
+    titlList = lis;
+    titlKey = key;
   }
 }
 
