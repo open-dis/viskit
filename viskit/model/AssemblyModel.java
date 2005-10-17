@@ -417,6 +417,14 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     viskit.xsd.bindings.assembly.PropertyChangeListener jaxBPcl =  (viskit.xsd.bindings.assembly.PropertyChangeListener)pclNode.opaqueModelObject;
     jaxBPcl.setName(pclNode.getName());
     jaxBPcl.setType(pclNode.getType());
+
+    if(pclNode.isSampleStats()) {
+      if(pclNode.isClearStatsAfterEachRun())
+        jaxBPcl.setMode("replicationStats");
+      else
+        jaxBPcl.setMode("designPointStats");
+    }
+
     viskit.xsd.bindings.assembly.Coordinate coor = null;
     try {
       coor = oFactory.createCoordinate();
@@ -886,6 +894,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       return pNode;
     }
     pNode = new PropChangeListenerNode(pcl.getName(),pcl.getType());
+    pNode.setClearStatsAfterEachRun(pcl.getMode().equals("replicationStats"));
+
     CoordinateType coor = pcl.getCoordinate();
     if(coor == null) {
       pNode.setPosition(pointLess);

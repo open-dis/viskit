@@ -1,6 +1,7 @@
 package viskit.model;
 
 import viskit.xsd.bindings.Event;
+import viskit.Vstatics;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,6 +24,43 @@ public class PropChangeListenerNode extends AssemblyNode
 {
   PropChangeListenerNode(String name, String type)      // package access on constructor
   {
-    super(name,type);
+    super(name, type);
+    setType(type);
   }
+
+  // override
+  public void setType(String typ)
+  {
+    super.setType(typ);
+
+    Class myClass = Vstatics.classForName(typ);
+    if (myClass != null) {
+      Class sampstatcls = Vstatics.classForName("simkit.stat.SampleStatistics");
+      if (sampstatcls != null) {
+        if (sampstatcls.isAssignableFrom(myClass))
+          isSampleStatistics = true;
+      }
+    }
+  }
+
+  private boolean isSampleStatistics = false;
+  public boolean isSampleStats()
+  {
+    return isSampleStatistics;
+  }
+  public void setIsSampleStats(boolean b)
+  {
+    isSampleStatistics = b;
+  }
+
+  private boolean clearStatsAfterEachRun;
+  public boolean isClearStatsAfterEachRun()
+  {
+    return clearStatsAfterEachRun;
+  }
+  public void setClearStatsAfterEachRun(boolean b)
+  {
+    clearStatsAfterEachRun = b;
+  }
+
 }

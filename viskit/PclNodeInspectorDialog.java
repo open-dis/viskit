@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 
 
 public class PclNodeInspectorDialog extends JDialog
@@ -41,6 +40,8 @@ public class PclNodeInspectorDialog extends JDialog
   private JButton okButt, canButt;
   private enableApplyButtonListener lis;
   JPanel  buttPan;
+
+  private JCheckBox clearStatsCB;
 
   public static String newName, newConstrValue;
 
@@ -97,6 +98,10 @@ public class PclNodeInspectorDialog extends JDialog
     typeField.setEditable(false);
     typeLab.setLabelFor(typeField);
 
+    clearStatsCB = new JCheckBox("Clear statistics after each run");
+    clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
+    clearStatsCB.addActionListener(lis);
+
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
     canButt = new JButton("Cancel");
@@ -143,6 +148,7 @@ public class PclNodeInspectorDialog extends JDialog
         JOptionPane.showMessageDialog(this,"Class "+pclNode.getType() + " not found.");
         return;
       }
+
       Constructor[] cons = myClass.getConstructors();
 
       handleField.setText(pclNode.getName());
@@ -168,8 +174,14 @@ public class PclNodeInspectorDialog extends JDialog
       cont.add(typeField);
       SpringUtilities.makeCompactGrid(cont, 2 , 2, 10, 10, 5, 5);
 
- //     SpringUtilities.makeCompactGrid(cont,1,2,10,10,5,5);
       content.add(cont);
+
+      // Put up a "clear statistics after each run " checkbox if type is descendent of one of these:
+      if(pclNode.isSampleStats()) {
+        clearStatsCB.setSelected(pclNode.isClearStatsAfterEachRun());
+        content.add(clearStatsCB);
+        content.add(Box.createVerticalStrut(3));
+      }
 
       content.add(ip);
       content.add(Box.createVerticalStrut(5));
@@ -189,6 +201,9 @@ public class PclNodeInspectorDialog extends JDialog
     if (pclNode != null) {
       pclNode.setName(nm);
       pclNode.setInstantiator(ip.getData());
+      if(pclNode.isSampleStats()) {
+        pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
+      }
     }
     else {
       newName = nm;
