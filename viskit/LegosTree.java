@@ -130,11 +130,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   }
   public void removeContentRoot(File f)
   {
-    System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
+    //System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
     if(_removeNode(root,f) != null)
-      System.out.println("...success");
+     ; // System.out.println("...success");
     else
-      System.out.println("...failure");
+     ; // System.out.println("...failure");
   }
 
   private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f)
@@ -213,7 +213,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 */
     JOptionPane.showMessageDialog(LegosTree.this,"No classes of type " + targetClass.getName() +
                                                  " found in "+f.getName() + ",\n" +
-                        "or only duplicate class type(s) encountered.","Error",JOptionPane.WARNING_MESSAGE);
+                        "or only duplicate class type(s) encountered,"+"\n" +
+                        "or compile error.","Error",JOptionPane.WARNING_MESSAGE);
   }
 
   // The two above are the public ones.

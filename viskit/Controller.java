@@ -61,7 +61,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       newEventGraph();
     else {
      for(int i=0;i<lis.size();i++) {
-       _doOpen(new File((String)lis.get(i)));
+       File f = new File((String)lis.get(i));
+       if(f.exists())
+         _doOpen(f);
      }
     }
   }

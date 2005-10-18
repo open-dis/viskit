@@ -48,8 +48,7 @@ public class FileBasedClassManager implements Runnable
   }
   private void removeFileClass(String nm)
   {
-    Object duh = classMap.remove(nm);
-    System.out.println("remove this");
+    classMap.remove(nm);
   }
 
   public Class getFileClass(String s)

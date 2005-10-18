@@ -90,26 +90,34 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   {
     VGlobals.instance().setAssemblyQuitHandler(null);
     VGlobals.instance().setEventGraphQuitHandler(null);
+    JMenu helpMenu;
+    JMenuBar menuBar;
 
     tabbedPane = new JTabbedPane();
     myQuitAction = new QuitAction("Quit");
 
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
     tabbedPane.add("Event Graphs",egFrame.getContent());   // 0
-    menus.add(egFrame.getMenus());
+    menuBar = egFrame.getMenus();
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
     egFrame.setTitleListener(myTitleListener,0);
-    setJMenuBar(egFrame.getMenus());
+    setJMenuBar(menuBar);
     jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
 
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
-    tabbedPane.add("Assembly",asyFrame.getContent());      // 1
-    menus.add(asyFrame.getMenus());
+    tabbedPane.add("Assembly",asyFrame.getContent());  //1
+    menuBar = asyFrame.getMenus();
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
     asyFrame.setTitleListener(myTitleListener,1);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
     asyRunComponent = new InternalAssemblyRunner();
     tabbedPane.add("Run Assembly",asyRunComponent.getContent());   // 2
-    menus.add(asyRunComponent.getMenus());
+    menuBar = asyRunComponent.getMenus();
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
     asyRunComponent.setTitleListener(myTitleListener,2);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     ((AssemblyController)asyFrame.getController()).setAssemblyRunner( new ThisAssemblyRunnerPlug());
@@ -159,11 +167,34 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   {
     public void stateChanged(ChangeEvent e)
     {
+      getJMenuBar().remove(hmen);
       int i = tabbedPane.getSelectedIndex();
-      setJMenuBar((JMenuBar)menus.get(i));
+      JMenuBar newMb = (JMenuBar)menus.get(i);
+      newMb.add(hmen);
+      setJMenuBar(newMb); //(JMenuBar)menus.get(i));
       setTitle((String)titles[i]);
     }
   }
+
+  private JMenu hmen;
+  /**
+   * Stick the first Help menu we see into all the following ones.
+   * @param mb
+   */
+  private void doCommonHelp(JMenuBar mb)
+  {
+    for(int i=0;i<mb.getMenuCount();i++) {
+      JMenu men = mb.getMenu(i);
+      if(men.getText().equalsIgnoreCase("Help")) {
+        if(hmen == null)
+          hmen = men;
+        else
+          mb.remove(i);
+        return;
+      }
+    }
+  }
+
   private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb)
   {
     if(mi==null) {

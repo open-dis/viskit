@@ -124,6 +124,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public void externalClassesChanged(Vector v)
   {
+    // This shouldn't be necessary.  Classes are recompiled whenever a save is done.
+/*
     StringBuffer sb = new StringBuffer();
     for (Iterator itr = v.iterator(); itr.hasNext();) {
       String className = (String) itr.next();
@@ -138,10 +140,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       sb.setLength(sb.length()-2); // lose last comma and space
       //todo get rid of view code in model
       JFrame view = VGlobals.instance().getAssemblyEditor();       // use this to try to fix the option pane below showing up inaccessibly between the 2 frams
-      JOptionPane.showMessageDialog(view,"The classes underlying assembly nodes(es) "+sb.toString()+" have been modified.\n"+
+      JOptionPane.showMessageDialog(view,"The classes underlying assembly node(s) "+sb.toString()+" have been modified.\n"+
         "The nodes may be in an inconsistent state.",
         "Data modification alert",JOptionPane.WARNING_MESSAGE);
     }
+*/
   }
 
   public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p)

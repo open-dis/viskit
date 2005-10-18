@@ -887,11 +887,15 @@ cancelArcMode.setIcon(new CanArcIcon());
 
   public File openRecentFilesAsk(Collection lis)
   {
-    String fn = RecentFilesDialog.showDialog(this,this,lis);
-    if (fn != null)
-      return new File(fn);
-    else
-      return null;
+    String fn = RecentFilesDialog.showDialog(this, this, lis);
+    if (fn != null) {
+      File f = new File(fn);
+      if (f.exists())
+        return f;
+      else
+        JOptionPane.showMessageDialog(this, "File not found.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    return null;
   }
 
   public void setSelectedEventGraphName(String s)

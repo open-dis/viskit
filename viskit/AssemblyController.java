@@ -103,7 +103,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   private void _doOpen(File f)
   {
+    if(!f.exists())
+      return;
+
     lastFile = f;
+
     ((ViskitAssemblyModel) getModel()).newModel(lastFile);
     // May not have been a good open, but gmd  will be accurate
     GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
@@ -177,9 +181,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     public void fileChanged(File file, int action, DirectoryWatch source)
     {
-      System.out.println("AssemblyController got open-event-graph msg "+action+" "+
-                         file.getAbsolutePath());
-
       ViskitAssemblyView view = (ViskitAssemblyView)getView();
       switch(action)
       {
@@ -190,6 +191,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
           view.removeFromEventGraphPallette(file);
           break;
         case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
+          // If an event graph has changed, recompile it
+          createTemporaryEventGraphClass(file);
           break;
         default:
           assert false:"Program error in AssemblyController.egListener.fileChanged";
