@@ -32,7 +32,9 @@ import java.util.Iterator;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.TreeSet;
 import java.util.Vector;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import javax.xml.bind.JAXBContext; 
 import javax.xml.bind.JAXBException; 
@@ -253,12 +255,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
 
 	pw.println("package " + pkg + sc);
 	pw.println();
-	pw.println("import simkit.*;");
-	pw.println("import simkit.random.*;");
-	pw.println("import simkit.stat.*;");
-	pw.println("import simkit.util.*;");
-	pw.println("import java.text.*;");
-        pw.println("import java.beans.PropertyChangeListener;");
+        
+        printImports(pw);
+	
 	pw.println();
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
@@ -273,7 +272,101 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println();
 
     }
-
+    
+    void printImports(PrintWriter pw) {
+        Vector list = new Vector();
+        List r = this.root.getSimEntity();
+        ListIterator ri = r .listIterator();
+        
+        while ( ri.hasNext() ) {
+            traverseForImports(ri.next(), list);
+            
+        }
+        
+        r = this.root.getPropertyChangeListener();
+        ri = r.listIterator();
+        
+        while ( ri.hasNext() ) {
+            traverseForImports(ri.next(), list);
+            
+        }
+        //some reason java.lang.Object fails the filter below?
+        String[] excludes = { "char","int","float","double","long","boolean","java.lang.Object" };
+        for ( int i = 0 ; i < excludes.length ; i++ ) {
+            list.remove(excludes[i]);
+        }
+        java.util.Enumeration e = list.elements();
+        while ( e.hasMoreElements() ) {
+            String t = (String)e.nextElement();
+            if ( t.startsWith("java.lang") || t.endsWith("]")) {
+                list.remove(t);
+            }
+        }
+            
+        TreeSet t = new TreeSet(list);
+        Iterator ti = t.iterator();
+        while (ti.hasNext()) {
+            String imp = (String) ti.next();
+            pw.println("import" + sp + imp + sc);
+        }
+    }
+    
+    void traverseForImports(Object branch, Vector list) {
+        if ( branch instanceof SimEntityType ) {
+            String t = ((SimEntityType)branch).getType();
+            if ( !list.contains(t) ) {
+                list.add(t);
+            }
+            List p = ((SimEntityType)branch).getParameters();
+            ListIterator pi = p.listIterator();
+            while ( pi.hasNext() ) {
+                traverseForImports(pi.next(), list);
+            }
+        } else if ( branch instanceof FactoryParameterType ) {
+            FactoryParameterType fp = (FactoryParameter)branch;
+            String t = fp.getType();
+            if ( !list.contains(t) ) {
+                list.add(t);
+            }
+            List p = fp.getParameters();
+            ListIterator pi = p.listIterator();
+            while ( pi.hasNext() ) {
+                traverseForImports(pi.next(), list);
+            }
+        } else if ( branch instanceof MultiParameterType ) {
+            MultiParameterType mp = (MultiParameterType)branch;
+            String t = mp.getType();
+            if ( !list.contains(t) ) {
+                list.add(t);
+            }
+            List p = mp.getParameters();
+            ListIterator pi = p.listIterator();
+            while ( pi.hasNext() ) {
+                traverseForImports(pi.next(), list);
+            }
+        } else if ( branch instanceof TerminalParameterType ) {
+            TerminalParameterType tp = (TerminalParameterType)branch;
+            String t = tp.getType();
+            if ( !list.contains(t) ){
+                list.add(t);
+            }
+        } else if ( branch instanceof PropertyChangeListenerType ) {
+            if ( !list.contains("java.beans.PropertyChangeListener") ) {
+                list.add("java.beans.PropertyChangeListener");
+            }
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType)branch;
+            String t = pcl.getType();
+            if ( !list.contains(t) ) {
+                list.add(t);
+            }
+            List p = pcl.getParameters();
+            ListIterator pi = p.listIterator();
+            while ( pi.hasNext() ) {
+                traverseForImports(pi.next(), list);
+            }   
+        }
+    }
+    
     void buildEntities(StringWriter entities) {
 	PrintWriter pw = new PrintWriter(entities);
 	ListIterator seli = this.root.getSimEntity().listIterator();
