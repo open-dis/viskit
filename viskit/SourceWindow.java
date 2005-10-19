@@ -21,10 +21,15 @@ public class SourceWindow extends JFrame
 
   Thread sysOutThread;
   JTextArea jta;
+  private static JFileChooser saveChooser;
+
   public SourceWindow(JFrame main, String source)
   {
     this.src = source;
-
+    if(saveChooser == null) {
+      saveChooser = new JFileChooser();
+      saveChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+    }
     JPanel outerPan = new JPanel(new BorderLayout());
     setContentPane(outerPan);
     JPanel con = new JPanel();
@@ -162,14 +167,20 @@ public class SourceWindow extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        JFileChooser jfc = new JFileChooser();
         String fn = getFileName();
-        jfc.setSelectedFile(new File(fn));
-        jfc.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        int ret =  jfc.showSaveDialog(SourceWindow.this);
+        saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(),fn));
+        int ret =  saveChooser.showSaveDialog(SourceWindow.this);
         if(ret != JFileChooser.APPROVE_OPTION)
           return;
-        File f = jfc.getSelectedFile();
+        File f = saveChooser.getSelectedFile();
+
+        if(f.exists()) {
+          int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?","Confirm",
+                                                JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+          if(r != JOptionPane.YES_OPTION)
+            return;
+        }
+
         try {
           FileWriter fw = new FileWriter(f);
           fw.write(src);

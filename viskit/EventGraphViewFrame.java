@@ -876,8 +876,8 @@ cancelArcMode.setIcon(new CanArcIcon());
     if(retv == JFileChooser.APPROVE_OPTION) {
       if(jfc.getSelectedFile().exists()) {
         if (JOptionPane.YES_OPTION !=
-            JOptionPane.showConfirmDialog(this,"Overwrite existing file?",
-                                          "File Exists!",JOptionPane.WARNING_MESSAGE))
+            JOptionPane.showConfirmDialog(this, "File exists.  Overwrite?","Confirm",
+                                                  JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE))
           return null;
       }
       return jfc.getSelectedFile();
