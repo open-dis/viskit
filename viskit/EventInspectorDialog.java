@@ -228,6 +228,7 @@ public class EventInspectorDialog extends JDialog
         if (modified) {
           localVariables.updateRow(elv);
           okButt.setEnabled(true);
+          EventInspectorDialog.modified = true;
         }
       }
     });
