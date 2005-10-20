@@ -106,7 +106,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
  */
   private boolean askToSaveAndContinue()
   {
-    int yn = (((ViskitView) getView()).genericAsk("Question", "Save current graph?"));
+    int yn = (((ViskitView) getView()).genericAsk("Question", "Save modified graph?"));
 
     switch (yn) {
       case JOptionPane.YES_OPTION:

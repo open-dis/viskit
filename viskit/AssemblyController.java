@@ -366,7 +366,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
    */
     private boolean askToSaveAndContinue()
     {
-      int yn = (((ViskitAssemblyView) getView()).genericAsk("Question", "Save current assembly?"));
+      int yn = (((ViskitAssemblyView) getView()).genericAsk("Question", "Save modified assembly?"));
 
       switch (yn) {
         case JOptionPane.YES_OPTION:
