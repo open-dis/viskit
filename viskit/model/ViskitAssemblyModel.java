@@ -31,9 +31,9 @@ public interface ViskitAssemblyModel
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
    */
-  public void newModel      (File f);
-  public void saveModel     (File f);
-  public File getFile       ();
+  public boolean newModel      (File f);
+  public void    saveModel     (File f);
+  public File    getFile       ();
 
   public GraphMetaData getMetaData();
   public void changeMetaData    (GraphMetaData gmd);

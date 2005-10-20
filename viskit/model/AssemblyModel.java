@@ -802,7 +802,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     return mp;
   }
 
-  public void newModel(File f)
+  public boolean newModel(File f)
   {
     GraphMetaData mymetaData;
     if (f == null) {
@@ -814,7 +814,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
                                    "\n"+ f.getName() +
                                    "\n"+ e.getMessage(),
                                    "XML I/O Error",JOptionPane.ERROR_MESSAGE);
-        return;
+        return false;
       }
 
       VGlobals.instance().assemblyReset();
@@ -885,7 +885,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
                                      "\n"+ e.getMessage(),
                                      "XML I/O Error",JOptionPane.ERROR_MESSAGE);
         }
-        return; // from both exceptions
+        return false; // from both exceptions
       }
 
 
@@ -893,6 +893,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     metaData = mymetaData;
     currentFile = f;
     modelDirty = false;
+    return true;
   }
   private void buildPCConnectionsFromJaxb(List pcconnsList)
   {
