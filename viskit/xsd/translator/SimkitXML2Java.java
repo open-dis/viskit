@@ -683,7 +683,9 @@ public class SimkitXML2Java {
 		    constructor+="Long";
 		} else if (type.equals("boolean")) {
 		    constructor+="Boolean";
-		}
+		} else if (ep.getValue().equals("this")) {
+                    constructor = "";
+                }
 		pw.print(constructor + lp + ep.getValue() + rp);
 	    }
 	    if (cl != null) {
@@ -793,7 +795,7 @@ public class SimkitXML2Java {
 
 	} catch ( java.lang.ClassNotFoundException cnfe ) {
 	    String extend = this.root.getExtend();
-	    if (extend.equals("SimEntityBase")) {
+	    if (extend.equals("simkit.SimEntityBase")) {
 	        System.out.println(extend + " not in classpath ");
 	    }
 	}
