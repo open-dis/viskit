@@ -1,8 +1,10 @@
 package viskit.model;
 
-import viskit.*;
+import viskit.FileBasedAssyNode;
+import viskit.ModelEvent;
+import viskit.VGlobals;
+import viskit.ViskitAssemblyController;
 import viskit.mvc.mvcAbstractModel;
-import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 
 import javax.swing.*;
@@ -11,13 +13,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -40,6 +40,13 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   HashMap assEdgeCache = new HashMap();
   public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
   private Point pointLess = new Point(100,100);
+
+  private ViskitAssemblyController controller;
+
+  public AssemblyModel(ViskitAssemblyController cont)
+  {
+    controller = cont;
+  }
 
   public void init()
   {
@@ -147,6 +154,61 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 */
   }
 
+  private char[] hdigits = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
+  private String _fourHexDigits(int i)
+  {
+    char[] ca = new char[4];
+    for(int j=3;j>=0;j--) {
+      int idx = i & 0xF;
+      i >>= 4;
+      ca[j] = hdigits[idx];
+    }
+    return new String(ca);
+  }
+
+  Random mangleRandom = new Random();
+
+  private String mangleName(String name)
+  {
+    int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
+    StringBuffer sb = new StringBuffer(name);
+    if (sb.charAt(sb.length() - 1) == '_')
+      sb.setLength(sb.length() - 6);
+    sb.append('_');
+    sb.append(_fourHexDigits(nxt));
+    sb.append('_');
+    return sb.toString();
+  }
+
+  private void manglePCLName(PropChangeListenerNode node)
+  {
+    do {
+      node.setName(mangleName(node.getName()));
+    }
+    while (!nameCheck());
+  }
+
+  private void mangleEGName(EvGraphNode node)
+  {
+    do {
+      node.setName(mangleName(node.getName()));
+    }
+    while (!nameCheck());
+  }
+
+
+  private boolean nameCheck()
+  {
+    HashSet hs = new HashSet(10);
+    for(Iterator itr=nodeCache.values().iterator();itr.hasNext();) {
+      AssemblyNode n = (AssemblyNode)itr.next();
+      if(!hs.add(n.getName()))
+        return false;
+    }
+    return true;
+  }
+
   public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p)
   {
     // This is not needed
@@ -179,6 +241,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     node.setInstantiator(vc);
 
     nodeCache.put(jaxbEG,node);   // key = ev
+
+    if(!nameCheck()) {
+      mangleEGName(node);
+    }
+
     jaxbRoot.getSimEntity().add(jaxbEG);
 
     modelDirty = true;
@@ -210,7 +277,10 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     pcNode.setInstantiator(vc);    
 
     pcNode.opaqueModelObject = jaxbPCL;
-    nodeCache.put(jaxbPCL,pcNode);
+    if(!nameCheck()) {
+      manglePCLName(pcNode);
+    }
+
     jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
     modelDirty = true;
@@ -415,8 +485,15 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     notifyChanged(new ModelEvent(seEdge,ModelEvent.SIMEVLISTEDGECHANGED, "SimEvListener edge changed"));
   }
 
-  public void changePclNode(PropChangeListenerNode pclNode)
+  public boolean changePclNode(PropChangeListenerNode pclNode)
   {
+    boolean retcode = true;
+    if(!nameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate name detected: "+pclNode.getName()+
+                                   "\nUnique name substituted.");
+      manglePCLName(pclNode);
+      retcode = false;
+    }
     viskit.xsd.bindings.assembly.PropertyChangeListener jaxBPcl =  (viskit.xsd.bindings.assembly.PropertyChangeListener)pclNode.opaqueModelObject;
     jaxBPcl.setName(pclNode.getName());
     jaxBPcl.setType(pclNode.getType());
@@ -433,7 +510,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       coor = oFactory.createCoordinate();
     } catch(JAXBException e) {
       System.err.println("Exc AssemblyModel.changePclNode()");
-      return;
+      return false;
     }
     coor.setX(""+pclNode.getPosition().x);
     coor.setY(""+pclNode.getPosition().y);
@@ -465,10 +542,18 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
+    return retcode;
   }
 
-  public void changeEvGraphNode(EvGraphNode evNode)
+  public boolean changeEvGraphNode(EvGraphNode evNode)
   {
+    boolean retcode = true;
+    if(!nameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate name detected: "+evNode.getName()+
+                                   "\nUnique name substituted.");
+      mangleEGName(evNode);
+      retcode = false;
+    }
     SimEntity jaxbSE = (SimEntity)evNode.opaqueModelObject;
 
     jaxbSE.setName(evNode.getName());
@@ -478,7 +563,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       coor = oFactory.createCoordinate();
     } catch(JAXBException e) {
       System.err.println("Exc AssemblyModel.changeEvGraphNode()");
-      return;
+      return false;
     }
     coor.setX(""+evNode.getPosition().x);
     coor.setY(""+evNode.getPosition().y);
@@ -513,6 +598,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     modelDirty = true;
     this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
+    return retcode;
   }
 
   private void removeFromOutputList(SimEntity se)
@@ -915,6 +1001,12 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     pNode.opaqueModelObject = pcl;
     nodeCache.put(pcl,pNode);   // key = se
 
+    if(!nameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                      "XML file contains duplicate event name: "+pNode.getName() +
+                      "\nUnique name substituted.");
+      manglePCLName(pNode);
+    }
     notifyChanged(new ModelEvent(pNode,ModelEvent.PCLADDED, "PCL added"));
 
     return pNode;
@@ -946,6 +1038,12 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     en.opaqueModelObject = se;
     nodeCache.put(se,en);   // key = se
 
+    if(!nameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                      "XML file contains duplicate event name: "+en.getName() +
+                      "\nUnique name substituted.");
+      mangleEGName(en);
+    }
     notifyChanged(new ModelEvent(en,ModelEvent.EVENTGRAPHADDED, "Event added"));
 
     return en;

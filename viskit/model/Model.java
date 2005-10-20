@@ -2,6 +2,7 @@ package viskit.model;
 
 import viskit.ModelEvent;
 import viskit.VGlobals;
+import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.*;
 import viskit.xsd.bindings.Event;
@@ -56,6 +57,12 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   private GraphMetaData metaData;
 
+  private ViskitController controller;
+
+  public Model(ViskitController controller)
+  {
+    this.controller = controller;
+  }
   public void init()
   {
     try {
@@ -264,6 +271,12 @@ public class Model extends mvcAbstractModel implements ViskitModel
     en.opaqueModelObject = ev;
     evNodeCache.put(ev,en);   // key = ev
 
+    if(!eventNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                      "XML file contains duplicate event name: "+en.getName() +
+                      "\nUnique name substituted.");
+      mangleNodeName(en);
+    }
     notifyChanged(new ModelEvent(en,ModelEvent.EVENTADDED, "Event added"));
 
     return en;
@@ -278,6 +291,84 @@ public class Model extends mvcAbstractModel implements ViskitModel
         sb.append(' ');
     }
     return sb.toString().trim();
+  }
+
+  private char[] hdigits = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
+  private String _fourHexDigits(int i)
+  {
+    char[] ca = new char[4];
+    for(int j=3;j>=0;j--) {
+      int idx = i & 0xF;
+      i >>= 4;
+      ca[j] = hdigits[idx];
+    }
+    return new String(ca);
+  }
+
+  Random mangleRandom = new Random();
+
+  private String mangleName(String name)
+  {
+    int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
+    StringBuffer sb = new StringBuffer(name);
+    if (sb.charAt(sb.length() - 1) == '_')
+      sb.setLength(sb.length() - 6);
+    sb.append('_');
+    sb.append(_fourHexDigits(nxt));
+    sb.append('_');
+    return sb.toString();
+  }
+
+  private void mangleNodeName(EventNode node)
+  {
+    do {
+      node.setName(mangleName(node.getName()));
+    }
+    while (!eventNameCheck());
+  }
+
+  private void mangleStateVarName(vStateVariable vsv)
+  {
+    do {
+      vsv.setName(mangleName(vsv.getName()));
+    }
+    while (!stateVarParamNameCheck());
+  }
+
+  private void mangleParamName(vParameter vp)
+  {
+    do {
+      vp.setName(mangleName(vp.getName()));
+    }
+    while (!stateVarParamNameCheck());
+  }
+
+  private boolean eventNameCheck()
+  {
+    HashSet hs = new HashSet(10);
+    for(Iterator itr=evNodeCache.values().iterator();itr.hasNext();) {
+      EventNode en = (EventNode)itr.next();
+      if(!hs.add(en.getName()))
+        return false;
+    }
+    return true;
+  }
+
+  private boolean stateVarParamNameCheck()
+  {
+    HashSet hs = new HashSet(10);
+    for(Iterator itr=stateVariables.iterator();itr.hasNext();) {
+      vStateVariable vsv = (vStateVariable)itr.next();
+      if(!hs.add(vsv.getName()))
+        return false;
+    }
+    for(Iterator itr=simParameters.iterator();itr.hasNext();) {
+      vParameter vp = (vParameter)itr.next();
+      if(!hs.add(vp.getName()))
+        return false;
+    }
+    return true;
   }
 
   private void jaxbEvToNode(Event ev, EventNode node)
@@ -344,7 +435,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       else
         est.setOperationOrAssignment(st.getAssignment().getValue());
       ArrayList cmt = new ArrayList();
-      cmt.addAll(sv.getComment());  // jmb here
+      cmt.addAll(sv.getComment());
       est.setComments(cmt);
       est.opaqueModelObject = st;
       node.getTransitions().add(est);
@@ -447,10 +538,16 @@ public class Model extends mvcAbstractModel implements ViskitModel
         c += (String)ii.next();
         c += " ";
       }
-
       vStateVariable v = new vStateVariable(var.getName(),var.getType(),c.trim());
       v.opaqueModelObject = var;
-      this.stateVariables.add(v);
+      stateVariables.add(v);
+
+      if(!stateVarParamNameCheck()) {
+        controller.messageUser(JOptionPane.ERROR_MESSAGE,"XML file contains duplicate state variable name."+
+                              "\nUnique name substituted.");
+        mangleStateVarName(v);
+      }
+
       notifyChanged(new ModelEvent(v,ModelEvent.STATEVARIABLEADDED,"New state variable"));
     }
   }
@@ -467,10 +564,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
       }
       vParameter vp = new vParameter(p.getName(), p.getType(),c.trim());
       vp.opaqueModelObject = p;
-      this.simParameters.add(vp);
+      simParameters.add(vp);
+
+      if(!stateVarParamNameCheck()) {
+        controller.messageUser(JOptionPane.ERROR_MESSAGE,"XML file contains duplicate parameter name."+
+                               "\nUnique name substituted.");
+        mangleParamName(vp);
+      }
       notifyChanged(new ModelEvent(vp,ModelEvent.SIMPARAMETERADDED,"New sim parameter"));
     }
-
   }
 
   public Vector getAllNodes()
@@ -511,6 +613,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
     setDirty(true);
 
     vParameter vp = new vParameter(nm,typ,comment);
+    simParameters.add(vp);
+
+    if(!stateVarParamNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                      "Duplicate parameter name detected: "+nm +
+                      "\nUnique name substituted.");
+      mangleParamName(vp);
+    }
+
     //p.setValue(initVal);
     Parameter p = null;
     try {p = this.oFactory.createParameter(); } catch(JAXBException e){ System.out.println("newParmJAXBEX"); }
@@ -520,7 +631,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     p.getComment().add(comment);
 
     vp.opaqueModelObject = p;
-    simParameters.add(vp);
+
     jaxbRoot.getParameter().add(p);
 
     notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
@@ -535,8 +646,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
     notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
   }
 
-  public void changeSimParameter(vParameter vp)
+  public boolean changeSimParameter(vParameter vp)
   {
+    boolean retcode = true;
+    if(!stateVarParamNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate parameter name detected: "+vp.getName()+
+                                         "\nUnique name substituted.");
+      mangleParamName(vp);
+      retcode = false;
+    }
     // fill out jaxb variable
     Parameter p = (Parameter)vp.opaqueModelObject;
     p.setName(nIe(vp.getName()));
@@ -546,7 +664,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     p.getComment().add(vp.getComment());
 
     setDirty(true);
-    this.notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERCHANGED, "vParameter changed"));
+    notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERCHANGED, "vParameter changed"));
+    return retcode;
   }
 
   // State variable mods
@@ -558,6 +677,13 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     // get the new one here and show it around
     vStateVariable vsv = new vStateVariable(name,type,comment);
+    stateVariables.add(vsv);
+    if(!stateVarParamNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                      "Duplicate state variable name detected: "+name +
+                      "\nUnique name substituted.");
+      mangleStateVarName(vsv);
+    }
     StateVariable s = null;
     try {s = this.oFactory.createStateVariable(); } catch(JAXBException e){ System.out.println("newStVarJAXBEX"); }
     s.setName(nIe(name));
@@ -567,7 +693,6 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     vsv.opaqueModelObject = s;
     jaxbRoot.getStateVariable().add(s);
-    stateVariables.add(vsv);
     notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
   }
 
@@ -580,8 +705,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
     notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
   }
 
-  public void changeStateVariable(vStateVariable vsv)
+  public boolean changeStateVariable(vStateVariable vsv)
   {
+    boolean retcode = true;
+    if(!stateVarParamNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate state variable name detected: "+vsv.getName()+
+                                         "\nUnique name substituted.");
+      mangleStateVarName(vsv);
+      retcode = false;
+    }
     // fill out jaxb variable
     StateVariable sv = (StateVariable)vsv.opaqueModelObject;
     sv.setName(nIe(vsv.getName()));
@@ -592,6 +724,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     setDirty(true);
     notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLECHANGED, "State variable changed"));
+    return retcode;
   }
 
   // Event (node) mods
@@ -616,10 +749,14 @@ public class Model extends mvcAbstractModel implements ViskitModel
       System.err.println("Model.newEvent, error creating viskit.xsd.bindings.Event.");
       return;
     }
+    evNodeCache.put(jaxbEv,node);   // key = ev
+
+    if(!eventNameCheck()) {
+      mangleNodeName(node);
+    }
 
     jaxbEv.setName(nIe(nodeName));
     node.opaqueModelObject = jaxbEv;
-    evNodeCache.put(jaxbEv,node);   // key = ev
     jaxbRoot.getEvent().add(jaxbEv);
 
     setDirty(true);
@@ -816,8 +953,16 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   }
 
-  public void changeEvent(EventNode node)
+  public boolean changeEvent(EventNode node)
   {
+    boolean retcode = true;
+    if(!eventNameCheck()) {
+      controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate event name detected: "+node.getName()+
+                                   "\nUnique name substituted.");
+      mangleNodeName(node);
+      retcode = false;
+    }
+
     Event jaxbEv = (Event)node.opaqueModelObject;
 
     jaxbEv.setName(node.getName());
@@ -841,7 +986,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
 
     setDirty(true);
-    this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));
+    notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));
+    return retcode;
   }
 
   // Edge mods

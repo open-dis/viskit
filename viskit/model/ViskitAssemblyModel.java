@@ -1,11 +1,11 @@
 package viskit.model;
 
-import viskit.ViskitAssemblyView;
 import viskit.FileBasedAssyNode;
 
-import java.awt.Point;
+import java.awt.*;
 import java.io.File;
 import java.util.Vector;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -42,8 +42,8 @@ public interface ViskitAssemblyModel
   public PropChangeEdge newPclEdge        (AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
   public void           newSimEvLisEdge   (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-  public void changePclNode     (PropChangeListenerNode pclNode);
-  public void changeEvGraphNode (EvGraphNode evNode);
+  public boolean changePclNode     (PropChangeListenerNode pclNode);
+  public boolean changeEvGraphNode (EvGraphNode evNode);
   public void changePclEdge     (PropChangeEdge pclEdge);
   public void changeAdapterEdge (AdapterEdge aEdge);
   public void changeSimEvEdge   (SimEvListenerEdge seEdge);

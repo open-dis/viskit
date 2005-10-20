@@ -532,18 +532,27 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void pcListenerEdit(PropChangeListenerNode pclNode)
   //---------------------------------------
   {
-    boolean modified = ((ViskitAssemblyView) getView()).doEditPclNode(pclNode);
-    if (modified) {
-      ((ViskitAssemblyModel) getModel()).changePclNode(pclNode);
+    boolean done;
+    do {
+      done = true;
+      boolean modified = ((ViskitAssemblyView) getView()).doEditPclNode(pclNode);
+      if (modified)
+        done = ((ViskitAssemblyModel) getModel()).changePclNode(pclNode);
     }
+    while (!done);
   }
 
   public void evGraphEdit(EvGraphNode evNode)
   {
-    boolean modified = ((ViskitAssemblyView)getView()).doEditEvGraphNode(evNode);
-    if(modified) {
-      ((ViskitAssemblyModel)getModel()).changeEvGraphNode(evNode);
+    boolean done;
+    do {
+      done = true;
+      boolean modified = ((ViskitAssemblyView) getView()).doEditEvGraphNode(evNode);
+      if (modified)
+        done = ((ViskitAssemblyModel) getModel()).changeEvGraphNode(evNode);
     }
+    while (!done);
+
   }
 
   public void pcListenerEdgeEdit(PropChangeEdge pclEdge)
@@ -672,6 +681,28 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       ((ViskitAssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
   }
 
+  /* a component, e.g., model, wants to say something. */
+  public void messageUser(int typ, String msg)    // typ is one of JOptionPane types
+  {
+    String title;
+    switch(typ) {
+      case JOptionPane.WARNING_MESSAGE:
+        title = "Warning";
+        break;
+      case JOptionPane.ERROR_MESSAGE:
+        title = "Error";
+        break;
+      case JOptionPane.INFORMATION_MESSAGE:
+        title = "Information";
+        break;
+      case JOptionPane.PLAIN_MESSAGE:
+      case JOptionPane.QUESTION_MESSAGE:
+      default:
+        title = "";
+        break;
+    }
+    ((ViskitAssemblyView)getView()).genericErrorReport(title,msg);
+  }
 
   /********************************/
 

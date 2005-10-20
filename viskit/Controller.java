@@ -87,7 +87,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void newEventGraph()
   //-------------------------
   {
-    Model mod = new Model();
+    Model mod = new Model(this);
     mod.init();
     mod.newModel(null);
 
@@ -136,7 +136,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   private void _doOpen(File file)
   {
-    Model mod = new Model();
+    Model mod = new Model(this);
     mod.init();
 
     ((ViskitView) getView()).addTab(mod,false);
@@ -291,6 +291,30 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (refresh || openV == null)
       _setFileLists();
     return openV;
+  }
+
+
+  /* a component, e.g., model, wants to say something. */
+  public void messageUser(int typ, String msg)    // typ is one of JOptionPane types
+  {
+    String title;
+    switch(typ) {
+      case JOptionPane.WARNING_MESSAGE:
+        title = "Warning";
+        break;
+      case JOptionPane.ERROR_MESSAGE:
+        title = "Error";
+        break;
+      case JOptionPane.INFORMATION_MESSAGE:
+        title = "Information";
+        break;
+      case JOptionPane.PLAIN_MESSAGE:
+      case JOptionPane.QUESTION_MESSAGE:
+      default:
+        title = "";
+        break;
+    }
+    ((ViskitView)getView()).genericErrorReport(title,msg);
   }
 
   public void close()
@@ -594,10 +618,14 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void nodeEdit(viskit.model.EventNode node)      // shouldn't be required
   //----------------------------------
   {
-    boolean modified = ((ViskitView) getView()).doEditNode(node);
-    if (modified) {
-      ((viskit.model.ViskitModel) getModel()).changeEvent(node);
-    }
+    boolean done;
+    do {
+      done=true;
+      boolean modified = ((ViskitView) getView()).doEditNode(node);
+      if (modified) {
+        done = ((viskit.model.ViskitModel) getModel()).changeEvent(node);
+      }
+    } while(!done);
   }
 
   public void arcEdit(viskit.model.SchedulingEdge ed)

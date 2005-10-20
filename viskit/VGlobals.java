@@ -76,7 +76,8 @@ public class VGlobals
 
   public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly)
   {
-    return buildAssemblyViewFrame(contentOnly, new AssemblyController(), new AssemblyModel());
+    AssemblyController cont = new AssemblyController();
+    return buildAssemblyViewFrame(contentOnly, cont, new AssemblyModel(cont));
   }
 
   public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod)
@@ -89,7 +90,8 @@ public class VGlobals
 
   public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly)
   {
-    return initAssemblyViewFrame(contentOnly,new AssemblyController(), new AssemblyModel());
+    AssemblyController cont = new AssemblyController();
+    return initAssemblyViewFrame(contentOnly,cont, new AssemblyModel(cont));
   }
 
   public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod)

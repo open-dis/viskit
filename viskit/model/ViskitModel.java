@@ -2,7 +2,6 @@ package viskit.model;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -72,24 +71,25 @@ public interface ViskitModel
 
 
   // todo further comments...
-  public void newEvent      (String nodeName, Point p);
-  public void newEdge       (EventNode src, EventNode target);
-  public void newCancelEdge (EventNode src, EventNode target);
+  public void    newEvent      (String nodeName, Point p);
+  public void    newEdge       (EventNode src, EventNode target);
+  public void    newCancelEdge (EventNode src, EventNode target);
 
-  public void deleteEvent      (EventNode node);
-  public void deleteEdge       (SchedulingEdge edge);
-  public void deleteCancelEdge (CancellingEdge edge);
+  public void    deleteEvent      (EventNode node);
+  public void    deleteEdge       (SchedulingEdge edge);
+  public void    deleteCancelEdge (CancellingEdge edge);
 
-  public void changeEdge       (Edge e);
-  public void changeCancelEdge (Edge e);
-  public void changeMetaData   (GraphMetaData gmd);
-  public void changeEvent      (EventNode en);
-  public void newStateVariable    (String name, String type, String initVal, String comment);
-  public void newSimParameter     (String name, String type, String initVal, String comment);
-  public void changeStateVariable (vStateVariable st);
-  public void changeSimParameter  (vParameter p);
-  public void deleteStateVariable (vStateVariable sv);
-  public void deleteSimParameter  (vParameter p);
+  public void    changeEdge       (Edge e);
+  public void    changeCancelEdge (Edge e);
+  public void    changeMetaData   (GraphMetaData gmd);
+  public boolean changeEvent      (EventNode en);
+
+  public void    newStateVariable    (String name, String type, String initVal, String comment);
+  public void    newSimParameter     (String name, String type, String initVal, String comment);
+  public boolean changeStateVariable (vStateVariable st);
+  public boolean changeSimParameter  (vParameter p);
+  public void    deleteStateVariable (vStateVariable sv);
+  public void    deleteSimParameter  (vParameter p);
 
   public GraphMetaData getMetaData();
 
