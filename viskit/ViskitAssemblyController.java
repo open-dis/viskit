@@ -34,6 +34,9 @@ public interface ViskitAssemblyController
          void runEventGraphEditor();
          void showXML();
 
+  /* a component, e.g., model, wants to say something. */
+  public void messageUser(int typ, String msg);    // typ is one of JOptionPane types
+
   public void selectNodeOrEdge      (Vector v);
 
   public void newAdapterArc         (Object[]nodes);

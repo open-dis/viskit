@@ -37,6 +37,9 @@ public interface ViskitController
   void runAssemblyEditor();
   void showXML();
 
+  /* a component, e.g., model, wants to say something. */
+  void messageUser(int typ, String msg);    // typ is one of JOptionPane types
+
   /* requests to the controller to perform editing operations on existing entities */
   void nodeEdit         (EventNode node);
   void arcEdit          (SchedulingEdge ed);
