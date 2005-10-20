@@ -68,7 +68,7 @@ public class PclNodeInspectorDialog extends JDialog
 
   private PclNodeInspectorDialog(JFrame parent, Component comp, PropChangeListenerNode lv) throws ClassNotFoundException
   {
-    super(parent, "Property Change Listener", true);
+    super(parent, "Property Change Listener (PCL) Inspector", true);
     this.pclNode = lv;
     this.locationComp = comp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
