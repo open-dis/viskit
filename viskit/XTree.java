@@ -299,7 +299,7 @@ public class XTree extends JTree
         c.add(p,BorderLayout.CENTER);
         f.setSize(500, 400);
         f.setLocation(300, 300);
-        f.show();
+        f.setVisible(true);
 
 
        // xt.setFile(fil);
