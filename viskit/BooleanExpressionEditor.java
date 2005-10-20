@@ -54,7 +54,7 @@ public class BooleanExpressionEditor extends JDialog
                               Component locationComp,
                               EventNode node)
   {
-    super(frame, "Event -- "+node.getName(), true);
+    super(frame, "Event Inspector: "+node.getName(), true);
     this.node = node;
     this.locationComp = locationComp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -144,7 +144,7 @@ public class BooleanExpressionEditor extends JDialog
 
   private void fillWidgets()
   {
-    setTitle("Event -- "+node.getName());
+    setTitle("Event Inspector: "+node.getName());
     name.setText(node.getName());
     transitions.setListData(new String[]{"a>b", "b>c", "c>a","fill from Event"});
 

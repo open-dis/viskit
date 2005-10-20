@@ -50,7 +50,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 
   protected StateVariableDialog(JFrame parent, Component comp, Object param)
   {
-    super(parent, "State Variable Declaration", true);
+    super(parent, "State Variable Declaration Inspector", true);
     this.parent = (EventGraphViewFrame)parent;
 
     focList = new myFocusListener();

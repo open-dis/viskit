@@ -65,7 +65,7 @@ public class EventInspectorDialog extends JDialog
                                Component locationComp,
                                EventNode node)
   {
-    super(frame, "Event -- " + node.getName(), true);
+    super(frame, "Event Inspector: " + node.getName(), true);
     this.fr = frame;
     this.node = node;
     this.locationComponent = locationComp;
@@ -255,7 +255,7 @@ public class EventInspectorDialog extends JDialog
   {
     String nmSt = node.getName();
     nmSt.replace(' ','_');
-    setTitle("Event -- " + nmSt); //node.getName());
+    setTitle("Event Inspector: " + nmSt); //node.getName());
     name.setText(nmSt); //node.getName());
     Dimension d = comment.getPreferredSize();
     comment.setText(fillString(node.getComments()));
