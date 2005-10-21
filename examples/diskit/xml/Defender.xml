@@ -316,7 +316,7 @@
             <Comment/>
             <EdgeParameter value="nextTarget"/>
         </Schedule>
-        <Coordinate x="560" y="340"/>
+        <Coordinate x="530" y="350"/>
     </Event>
     <Event name="RemoveObstacle">
         <Comment/>
@@ -356,7 +356,7 @@
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="NextEscort" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="640" y="290"/>
+        <Coordinate x="720" y="410"/>
     </Event>
     <Event name="NextEscort">
         <Comment/>
@@ -380,7 +380,7 @@
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Coordinate x="650" y="390"/>
+        <Coordinate x="640" y="420"/>
     </Event>
     <Event name="Escort">
         <Comment>message sent to ScenarioManager, if not replied in time, Interdict</Comment>
@@ -394,12 +394,20 @@
     <Event name="CloseInterdict">
         <Comment>not much warning</Comment>
         <Argument name="target" type="diskit.Mover3D"/>
-        <Coordinate x="710" y="560"/>
+        <Schedule condition="true" delay="0.0" event="Interdict" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Coordinate x="720" y="50"/>
     </Event>
     <Event name="FarInterdict">
         <Comment>keep some distance but be within surefire range</Comment>
         <Argument name="target" type="diskit.Mover3D"/>
-        <Coordinate x="640" y="560"/>
+        <Schedule condition="true" delay="0.0" event="Interdict" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Coordinate x="660" y="120"/>
     </Event>
     <Event name="EndEscort">
         <Comment/>
@@ -409,7 +417,7 @@
         <StateTransition state="assetState">
             <Assignment value="diskit.AssetState.PATROLLING"/>
         </StateTransition>
-        <Coordinate x="650" y="140"/>
+        <Coordinate x="590" y="180"/>
     </Event>
     <Event name="StopIntercept">
         <Comment/>
@@ -499,12 +507,12 @@
             <Assignment value="kills + 1"/>
         </StateTransition>
         <Schedule event="EndInterdict"/>
-        <Coordinate x="430" y="130"/>
+        <Coordinate x="530" y="40"/>
     </Event>
     <Event name="EndInterdict">
         <Comment/>
         <Schedule event="CheckIfMore"/>
-        <Coordinate x="430" y="240"/>
+        <Coordinate x="420" y="190"/>
     </Event>
     <Event name="EscortClear">
         <Comment>event comes back from ScenarioManager, or not</Comment>
@@ -527,7 +535,7 @@
         </StateTransition>
         <Cancel event="Interdict"/>
         <Schedule event="CheckIfMore"/>
-        <Coordinate x="560" y="130"/>
+        <Coordinate x="510" y="190"/>
     </Event>
     <Event name="MagazineEmpty">
         <Comment>heard by weapon</Comment>
