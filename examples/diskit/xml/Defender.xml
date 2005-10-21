@@ -312,11 +312,11 @@
             <Assignment value="targetQueue"/>
         </StateTransition>
         <Cancel event="EndEscort"/>
-        <Schedule condition="true" delay="0.0" event="StartIntercept" priority="0">
+        <Schedule condition="nextTarget != null" delay="0.0" event="StartIntercept" priority="0">
             <Comment/>
             <EdgeParameter value="nextTarget"/>
         </Schedule>
-        <Coordinate x="530" y="350"/>
+        <Coordinate x="540" y="360"/>
     </Event>
     <Event name="RemoveObstacle">
         <Comment/>
@@ -328,7 +328,7 @@
     </Event>
     <Event name="SafetyOff">
         <Comment/>
-        <Coordinate x="420" y="500"/>
+        <Coordinate x="320" y="390"/>
     </Event>
     <Event name="CantIntercept">
         <Comment/>
@@ -345,11 +345,14 @@
         <Schedule condition="true" delay="0.1" event="SafetyOn" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="350" y="420"/>
+        <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
+            <Comment/>
+        </Schedule>
+        <Coordinate x="430" y="440"/>
     </Event>
     <Event name="SafetyOn">
         <Comment/>
-        <Coordinate x="340" y="540"/>
+        <Coordinate x="330" y="560"/>
     </Event>
     <Event name="EndIntercept">
         <Comment>entry event from InterceptMoverManager</Comment>
@@ -511,7 +514,9 @@
     </Event>
     <Event name="EndInterdict">
         <Comment/>
-        <Schedule event="CheckIfMore"/>
+        <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
+            <Comment/>
+        </Schedule>
         <Coordinate x="420" y="190"/>
     </Event>
     <Event name="EscortClear">
@@ -534,7 +539,9 @@
             <Assignment value="patrolMoverManager; patrolMoverManager.setMover(this)"/>
         </StateTransition>
         <Cancel event="Interdict"/>
-        <Schedule event="CheckIfMore"/>
+        <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
+            <Comment/>
+        </Schedule>
         <Coordinate x="510" y="190"/>
     </Event>
     <Event name="MagazineEmpty">
