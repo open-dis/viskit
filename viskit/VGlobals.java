@@ -4,6 +4,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
 import edu.nps.util.FileIO;
+import edu.nps.util.SimpleDirectoryClassLoader;
 import org.apache.commons.configuration.XMLConfiguration;
 import viskit.model.*;
 
@@ -817,6 +818,14 @@ public class VGlobals
   private String userConfigPath = System.getProperty("user.home")+
                                   System.getProperty("file.separator") +
                                   ".viskit_history.xml";
+
+  private ClassLoader workLoader;
+  public ClassLoader getWorkClassLoader()
+  {
+    if(workLoader == null)
+      workLoader = new SimpleDirectoryClassLoader(workDirectory);
+    return workLoader;
+  }
 
   public XMLConfiguration getHistoryConfig()
   {

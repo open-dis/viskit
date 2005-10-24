@@ -231,10 +231,12 @@ public class PclEdgeInspectorDialog extends JDialog
         classname = ((PropChangeListenerNode)o).getType();
 
       try {
-        Class c = Vstatics.classForName(classname);
+        ClassLoader cl = VGlobals.instance().getWorkClassLoader();
+        Class c = Class.forName(classname,true,cl);
         if(c == null)
           throw new ClassNotFoundException(classname+" not found");
-        Class stopClass = Class.forName("simkit.BasicSimEntity");
+        
+        Class stopClass = Class.forName("simkit.BasicSimEntity",false,cl);
         BeanInfo binf = Introspector.getBeanInfo(c,stopClass);
         PropertyDescriptor[] pds = binf.getPropertyDescriptors();
         if(pds == null || pds.length <=0) {
@@ -262,8 +264,9 @@ public class PclEdgeInspectorDialog extends JDialog
           propertyTF.setText(nms[which][0]);
         }
       }
-      catch (Exception e1) {
-        e1.printStackTrace();
+      catch (Throwable e1) {
+        System.out.println("Exception getting bean properties, PclEdgeInspectorDialog: "+e1.getMessage());
+        System.out.println(System.getProperty("java.class.path"));
       }
 
     }

@@ -75,10 +75,16 @@ public class AdapterConnectionInspectorDialog extends JDialog
     targetLab = new JLabel("target event graph",JLabel.TRAILING);
 
     nameTF = new JTextField();
+    float[] tfColors = nameTF.getBackground().getRGBColorComponents(null);
+    Color tfBack = new Color(tfColors[0]*0.95f,tfColors[1]*0.95f,tfColors[2]*0.95f);
     sourceTF = new JTextField();
     targetTF = new JTextField();
     sourceEventTF = new JTextField();
+    sourceEventTF.setEditable(false); // events are chosen from list
+    sourceEventTF.setBackground(tfBack);
     targetEventTF = new JTextField();
+    targetEventTF.setEditable(false); // events are chosen from list
+    targetEventTF.setBackground(tfBack);
 
     evSourceNavButt = new JButton("...");
     evSourceNavButt.addActionListener(new findSourceEventsAction());
