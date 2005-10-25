@@ -338,7 +338,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
         SchedulingEdge se = (SchedulingEdge) e;
         if (se.conditional == null || se.conditional.length() <= 0)   // put S only for conditional edges
           return null;
-        return "S";
+        return null;  // bug 675 "S";
       }
       else if (e instanceof CancellingEdge) // should always be one of these 2 except for proto examples
         return null;
@@ -1016,6 +1016,3 @@ class vSelfEdgeRenderer extends vEdgeRenderer
   }
 
 }
-
-
-
