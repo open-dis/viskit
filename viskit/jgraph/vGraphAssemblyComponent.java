@@ -50,7 +50,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     //this.setGridMode(JGraph.DOT_GRID_MODE);
     this.setGridMode(JGraph.LINE_GRID_MODE);
     this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
-    this.setGridEnabled(true);
+    this.setGridEnabled(true); // means snap
+    this.setGridSize(10);
     this.setMarqueeHandler(new MyMarqueeHandler());
     this.setAntiAliased(true);
     this.addGraphSelectionListener(new myGraphSelectionListener());
@@ -226,6 +227,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             EvGraphNode en = (EvGraphNode) cc.getUserObject();
             en.setPosition(new Point(r.x, r.y));
             ((ViskitAssemblyModel) parent.getModel()).changeEvGraphNode(en);
+            m.put("bounds",new Rectangle(en.getPosition().x, en.getPosition().y,r.width,r.height));
           }
         }
         else if (ch[i] instanceof AssemblyPropListCell) {
@@ -236,6 +238,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
             pcln.setPosition(new Point(r.x, r.y));
             ((ViskitAssemblyModel) parent.getModel()).changePclNode(pcln);
+            // might have changed:
+            m.put("bounds",new Rectangle(pcln.getPosition().x, pcln.getPosition().y,r.width,r.height));
           }
         }
       }
@@ -595,7 +599,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         e.consume();
       }
       // Call Superclass
-      super.mouseReleased(e);
+      super.mouseMoved(e); //this was super.mouseReleased(e);  apparently was not screwing things up
     }
 
     // Use Xor-Mode on Graphics to Paint Connector

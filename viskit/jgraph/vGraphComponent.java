@@ -52,7 +52,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     //this.setGridMode(JGraph.DOT_GRID_MODE);
     this.setGridMode(JGraph.LINE_GRID_MODE);
     this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
-    this.setGridEnabled(true);
+    this.setGridEnabled(true); // means snap
+    this.setGridSize(10);
     this.setMarqueeHandler(new MyMarqueeHandler());
     this.setAntiAliased(true);
     this.addGraphSelectionListener(new myGraphSelectionListener());
@@ -203,6 +204,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
             EventNode en = (EventNode) cc.getUserObject();
             en.setPosition(new Point(r.x, r.y));
             ((ViskitModel) parent.getModel()).changeEvent(en);
+            m.put("bounds",new Rectangle(en.getPosition().x, en.getPosition().y,r.width,r.height));
           }
         }
       }
@@ -535,13 +537,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       if (e != null && getSourcePortAt(e.getPoint()) != null &&
           !e.isConsumed() && vGraphComponent.this.isPortsVisible()) {
         // Set Cusor on Graph (Automatically Reset)
-PortView p = getSourcePortAt(e.getPoint());
         vGraphComponent.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
         // Consume Event
         e.consume();
       }
       // Call Superclass
-      super.mouseReleased(e);
+      super.mouseMoved(e); //this was super.mouseReleased() but apparently was not causing probs.
     }
 
     // Use Xor-Mode on Graphics to Paint Connector
@@ -993,7 +994,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer
    * This class will determine if there are other self-referential edges attached to this
    * node, and try to return a different angle for different edges, so they will be rendered
    * at different "clock" points around the node circle.  The
-   * @return
+   * @return angle
    */
   private double getAngle()
   {

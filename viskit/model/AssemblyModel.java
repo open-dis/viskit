@@ -221,8 +221,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     EvGraphNode node = new EvGraphNode(widgetName,className);
     if (p == null)
       node.setPosition(new Point(100,100));
-    else
+    else {
+      p.x = ((p.x+5)/10)*10;    // round
+      p.y = ((p.y+5)/10)*10;
       node.setPosition(p);
+    }
 
     SimEntity jaxbEG = null;
     try {
@@ -487,6 +490,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public boolean changePclNode(PropChangeListenerNode pclNode)
   {
+    System.out.println("AssemblyMode.changePclNode");
     boolean retcode = true;
     if(!nameCheck()) {
       controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate name detected: "+pclNode.getName()+
@@ -512,8 +516,14 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       System.err.println("Exc AssemblyModel.changePclNode()");
       return false;
     }
-    coor.setX(""+pclNode.getPosition().x);
-    coor.setY(""+pclNode.getPosition().y);
+    //coor.setX(""+pclNode.getPosition().x);
+    //coor.setY(""+pclNode.getPosition().y);
+    int GridScale = 10;
+    int x = ((pclNode.getPosition().x+GridScale/2)/GridScale)*GridScale;
+    int y = ((pclNode.getPosition().y+GridScale/2)/GridScale)*GridScale;
+    coor.setX(""+x);
+    coor.setY(""+y);
+    pclNode.getPosition().setLocation(x,y);
     jaxBPcl.setCoordinate(coor);
 
 
@@ -565,8 +575,11 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       System.err.println("Exc AssemblyModel.changeEvGraphNode()");
       return false;
     }
-    coor.setX(""+evNode.getPosition().x);
-    coor.setY(""+evNode.getPosition().y);
+    //coor.setX(""+evNode.getPosition().x);
+    //coor.setY(""+evNode.getPosition().y);
+    int GridScale = 10;
+    coor.setX(""+(((evNode.getPosition().x+GridScale/2)/GridScale)*GridScale));
+    coor.setY(""+(((evNode.getPosition().y+GridScale/2)/GridScale)*GridScale));
     jaxbSE.setCoordinate(coor);
 
     List lis = jaxbSE.getParameters();

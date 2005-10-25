@@ -737,9 +737,11 @@ public class Model extends mvcAbstractModel implements ViskitModel
     EventNode node = new EventNode(nodeName);
     if (p == null)
       node.setPosition(new Point(100,100));
-    else
+    else {
+      p.x = ((p.x+5)/10)*10;    //round
+      p.y = ((p.y+5)/10)*10;
       node.setPosition(p);
-
+    }
     Event jaxbEv = null;
     try {
       jaxbEv = oFactory.createEvent();
