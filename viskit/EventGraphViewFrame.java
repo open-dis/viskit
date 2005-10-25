@@ -206,6 +206,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       if(myVgcw == null) {     // last tab has been closed
         return;
       }
+      setModel((Model)myVgcw.model);                  // hold on locally
       getController().setModel((Model)myVgcw.model);  // tell controller
       adjustMenus(myVgcw.model);                      // enable/disable menu items based on new EG
 
@@ -978,35 +979,35 @@ cancelArcMode.setIcon(new CanArcIcon());
       // Changes the two side panels need to know about
       case ModelEvent.SIMPARAMETERADDED:
         pp.addRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
+        //VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
       case ModelEvent.SIMPARAMETERDELETED:
         pp.removeRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
+        //VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
       case ModelEvent.SIMPARAMETERCHANGED:
         pp.updateRow(event.getSource());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
+        //VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         break;
 
       case ModelEvent.STATEVARIABLEADDED:
         vp.addRow(event.getSource());
-        VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
         break;
       case ModelEvent.STATEVARIABLEDELETED:
         vp.removeRow(event.getSource());
-        VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
         break;
       case ModelEvent.STATEVARIABLECHANGED:
         vp.updateRow(event.getSource());
-        VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
         break;
 
       case ModelEvent.NEWMODEL:
         vp.setData(null);
         pp.setData(null);
-        VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
-        VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
+        //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        //VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
         // fall through
 
       // Changes the graph needs to know about

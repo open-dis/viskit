@@ -237,20 +237,18 @@ public class VGlobals
       buildEventGraphViewFrame();
   }
 
-  public void setStateVarsList(Collection svs)
+  private Vector getStateVarsList()
   {
-    stateVars = svs;
+    return getActiveEventGraphModel().getStateVariables();
   }
-  public void setSimParmsList(Collection parms)
+  private Vector getSimParmsList()
   {
-    simParms = parms;
+    return getActiveEventGraphModel().getSimParameters();
   }
-  private Collection stateVars = new Vector();
-  private Collection simParms = new Vector();
 
   public ComboBoxModel getStateVarsCBModel()
   {
-    return new DefaultComboBoxModel(new Vector(stateVars));
+    return new DefaultComboBoxModel(getStateVarsList());
   }
 
   /******/
@@ -282,7 +280,7 @@ public class VGlobals
     s = s.replace('\n',' ');
 
     // state variables
-    for (Iterator itr = stateVars.iterator(); itr.hasNext();) {
+    for (Iterator itr = getStateVarsList().iterator(); itr.hasNext();) {
       vStateVariable sv = (vStateVariable) itr.next();
       String result;
       if(sv.getType().indexOf('[') != -1)
@@ -296,7 +294,7 @@ public class VGlobals
       nsSets.add(sv.getName());
     }
     // Sim parameters
-    for (Iterator itr = simParms.iterator(); itr.hasNext();) {
+    for (Iterator itr = getSimParmsList().iterator(); itr.hasNext();) {
       vParameter par = (vParameter) itr.next();
       String result;
       if(par.getType().indexOf('[') != -1)
@@ -756,8 +754,6 @@ public class VGlobals
   public void reset()
   {
     existingNames.clear();
-    stateVars.clear();
-    simParms.clear();
   }
   public void assemblyReset()
   {

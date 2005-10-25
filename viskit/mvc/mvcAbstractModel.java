@@ -36,7 +36,8 @@ public abstract class mvcAbstractModel implements mvcModel
 
   public void addModelListener(mvcModelListener l)
   {
-    listeners.add(l);
+    if(!listeners.contains(l))
+      listeners.add(l);
   }
 
   public void removeModelListener(mvcModelListener l)
