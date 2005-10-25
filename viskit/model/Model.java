@@ -977,8 +977,11 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     // rudimentary snap to grid - this works on saved file only, not the live position in the node.  reload to enjoy.
     int GridScale = 10;
-    coor.setX(""+(((node.getPosition().x+GridScale/2)/GridScale)*GridScale));
-    coor.setY(""+(((node.getPosition().y+GridScale/2)/GridScale)*GridScale));
+    int x = ((node.getPosition().x+GridScale/2)/GridScale)*GridScale;
+    int y = ((node.getPosition().y+GridScale/2)/GridScale)*GridScale;
+    coor.setX(""+x);
+    coor.setY(""+y);
+    node.getPosition().setLocation(x,y);
     jaxbEv.setCoordinate(coor);
 
     cloneComments(jaxbEv.getComment(),node.getComments());

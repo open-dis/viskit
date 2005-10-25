@@ -516,8 +516,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       System.err.println("Exc AssemblyModel.changePclNode()");
       return false;
     }
-    //coor.setX(""+pclNode.getPosition().x);
-    //coor.setY(""+pclNode.getPosition().y);
+
     int GridScale = 10;
     int x = ((pclNode.getPosition().x+GridScale/2)/GridScale)*GridScale;
     int y = ((pclNode.getPosition().y+GridScale/2)/GridScale)*GridScale;
@@ -525,7 +524,6 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     coor.setY(""+y);
     pclNode.getPosition().setLocation(x,y);
     jaxBPcl.setCoordinate(coor);
-
 
     List lis = jaxBPcl.getParameters();
     lis.clear();
@@ -575,11 +573,13 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       System.err.println("Exc AssemblyModel.changeEvGraphNode()");
       return false;
     }
-    //coor.setX(""+evNode.getPosition().x);
-    //coor.setY(""+evNode.getPosition().y);
+
     int GridScale = 10;
-    coor.setX(""+(((evNode.getPosition().x+GridScale/2)/GridScale)*GridScale));
-    coor.setY(""+(((evNode.getPosition().y+GridScale/2)/GridScale)*GridScale));
+    int x = ((evNode.getPosition().x+GridScale/2)/GridScale)*GridScale;
+    int y = ((evNode.getPosition().y+GridScale/2)/GridScale)*GridScale;
+    coor.setX(""+x);
+    coor.setY(""+y);
+    evNode.getPosition().setLocation(x,y);
     jaxbSE.setCoordinate(coor);
 
     List lis = jaxbSE.getParameters();
