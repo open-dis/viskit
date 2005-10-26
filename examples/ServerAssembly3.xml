@@ -8,7 +8,7 @@
                     <TerminalParameter value="1.7" type="double"/>
                 </MultiParameter>
             </MultiParameter>
-            <TerminalParameter value="CongruentialSeeds.SEED[0]" type="long"/>
+            <TerminalParameter value="simkit.random.CongruentialSeeds.SEED[0]" type="long"/>
         </FactoryParameter>
         <Coordinate y="98" x="86"/>
     </SimEntity>
@@ -23,7 +23,7 @@
                     <TerminalParameter value="2.3" type="double"/>
                 </MultiParameter>
             </MultiParameter>
-            <TerminalParameter value="CongruentialSeeds.SEED[1]" type="long"/>
+            <TerminalParameter value="simkit.random.CongruentialSeeds.SEED[1]" type="long"/>
         </FactoryParameter>
         <TerminalParameter value="2" type="int"/>
         <Coordinate y="98" x="286"/>
