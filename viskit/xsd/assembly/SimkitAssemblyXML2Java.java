@@ -291,7 +291,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
         }
         //some reason java.lang.Object fails the filter below?
-        String[] excludes = { "char","int","float","double","long","boolean","java.lang.Object" };
+        String[] excludes = { "byte","byte[]","char","char[]","int","int[]","float","float[]","double","double[]","long","long[]","boolean","boolean[]","java.lang.Object","java.lang.Object[]" };
         for ( int i = 0 ; i < excludes.length ; i++ ) {
             list.remove(excludes[i]);
         }
