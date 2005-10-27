@@ -9,12 +9,12 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 /**
- *
+ * @version $Id$
  * @author  ahbuss
  */
 public class Help {
     
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.2";
     
     private Component parent;
     private Icon icon;
