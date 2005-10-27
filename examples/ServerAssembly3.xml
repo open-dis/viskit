@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly version="1.0" package="examples" name="ServerAssembly3" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ServerAssembly3" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="arrival" type="examples.ArrivalProcess">
-        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
-            <TerminalParameter value="Exponential" type="java.lang.String"/>
+        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter type="java.lang.String" value="Exponential"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter value="1.7" type="double"/>
+                    <TerminalParameter type="double" value="1.7"/>
                 </MultiParameter>
             </MultiParameter>
-            <TerminalParameter value="simkit.random.CongruentialSeeds.SEED[0]" type="long"/>
         </FactoryParameter>
-        <Coordinate y="98" x="86"/>
+        <Coordinate x="86" y="98"/>
     </SimEntity>
     <SimEntity name="server" type="examples.SimpleServer">
-        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
-            <TerminalParameter value="Gamma" type="java.lang.String"/>
+        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter type="java.lang.String" value="Gamma"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter value="2.1" type="double"/>
+                    <TerminalParameter type="double" value="2.1"/>
                 </MultiParameter>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter value="2.3" type="double"/>
+                    <TerminalParameter type="double" value="2.3"/>
                 </MultiParameter>
             </MultiParameter>
-            <TerminalParameter value="simkit.random.CongruentialSeeds.SEED[1]" type="long"/>
         </FactoryParameter>
-        <TerminalParameter value="2" type="int"/>
-        <Coordinate y="98" x="286"/>
+        <TerminalParameter type="int" value="2"/>
+        <Coordinate x="286" y="98"/>
     </SimEntity>
     <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
-        <TerminalParameter value="numberInQueue" type="java.lang.String"/>
-        <Coordinate y="236" x="206"/>
+        <TerminalParameter type="java.lang.String" value="numberInQueue"/>
+        <Coordinate x="206" y="236"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying">
-        <TerminalParameter value="numberAvailableServers" type="java.lang.String"/>
-        <Coordinate y="238" x="356"/>
+        <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
+        <Coordinate x="356" y="238"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener name="SimplePropertyDumper_0" type="simkit.util.SimplePropertyDumper">
+        <Coordinate x="290" y="300"/>
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="numInQueueStat" source="server"/>
     <PropertyChangeListenerConnection listener="numAvailServersStat" source="server"/>
-    <Adapter eventSent="Arrival" from="arrival" name="adptr_3" eventHeard="Arrival" to="server"/>
+    <PropertyChangeListenerConnection listener="SimplePropertyDumper_0" source="server"/>
+    <Adapter eventHeard="Arrival" eventSent="Arrival" from="arrival" name="adptr_3" to="server"/>
     <Output entity="arrival"/>
     <Output entity="server"/>
-    <Schedule verbose="true" stopTime="1000.0"/>
+    <Schedule stopTime="1000.0" verbose="true"/>
 </SimkitAssembly>
+
