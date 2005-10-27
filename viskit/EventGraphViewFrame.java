@@ -464,7 +464,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                                                    KeyStroke.getKeyStroke(KeyEvent.VK_X,accelMod)));
     editMenu.add(buildMenuItem(controller,"copy", "Copy", new Integer(KeyEvent.VK_C),
                                                    KeyStroke.getKeyStroke(KeyEvent.VK_C,accelMod)));
-    editMenu.add(buildMenuItem(controller,"paste","Paste",new Integer(KeyEvent.VK_P),
+    editMenu.add(buildMenuItem(controller,"paste","Paste Events",new Integer(KeyEvent.VK_P),
                                                    KeyStroke.getKeyStroke(KeyEvent.VK_V,accelMod)));
 
     // These 3 start off being disabled, until something is selected

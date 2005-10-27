@@ -425,7 +425,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   {
     selectionVector = v;
     boolean ccbool = (selectionVector.size() > 0 ? true : false);
-    ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
+    ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
     ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
     ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
   }
@@ -435,12 +435,42 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void copy()
   //----------------
   {
-    if (selectionVector.size() <= 0)
+    if(!nodeSelected()) {
+      ((ViskitView) getView()).genericErrorReport("Unsupported Action","Edges cannot be copied.");
       return;
+    }
     copyVector = (Vector) selectionVector.clone();
-    ActionIntrospector.getAction(this,"paste").setEnabled(true);
+
+    // Paste only works for node, check to enable/disable paste menu item
+    handlePasteMenuItem();
   }
 
+  private void handlePasteMenuItem()
+  {
+    ActionIntrospector.getAction(this,"paste").setEnabled(nodeCopied());
+  }
+
+  private boolean nodeCopied()
+  {
+    return nodeInVector(copyVector);
+  }
+
+  private boolean nodeSelected()
+  {
+    return nodeInVector(selectionVector);
+  }
+
+  private boolean nodeInVector(Vector v)
+  {
+    for (Iterator itr = v.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      if(o instanceof EventNode) {
+        return true;
+      }
+    }
+    return false;
+
+  }
   public void paste()
   //-----------------
   {
@@ -473,12 +503,16 @@ public class Controller extends mvcAbstractController implements ViskitControlle
         s = s.replace('\n', ' ');
         msg += ", \n" + s;
       }
-      String specialNodeMsg = (nodeCount > 0 ? "\n(All unselected but attached edges will also be deleted.)" : "");
-      if (((ViskitView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg)
+      if(msg.length()>3)
+        msg = msg.substring(3);  // remove leading stuff
+
+      String specialNodeMsg = (nodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
+      if (((ViskitView) getView()).genericAsk("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg)
        == JOptionPane.YES_OPTION) {
         // do edges first?
-        Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
-        for (Iterator itr = localV.iterator(); itr.hasNext();) {
+        copyVector = (Vector) selectionVector.clone();
+        //Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
+        for (Iterator itr = copyVector.iterator(); itr.hasNext();) {
           Object elem = itr.next();
           if(elem instanceof Edge) {
             killEdge((Edge)elem);
@@ -493,6 +527,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
           }
         }
       }
+      handlePasteMenuItem();
     }
   }
 
