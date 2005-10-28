@@ -880,6 +880,8 @@ public class SimkitXML2Java {
 
     private String shortinate( String s ) {
 
+        return s.trim();
+        /*
 	String result = s.substring(0,1);
 	char[] ca = s.toCharArray();
 	char[] tmp = new char[1];
@@ -891,7 +893,7 @@ public class SimkitXML2Java {
 	    }
 	}
 
-	return result.toLowerCase();
+	return result.toLowerCase();*/
     }
 
     private String baseOf( String s ) {
