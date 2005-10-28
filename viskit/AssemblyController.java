@@ -75,17 +75,26 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     VGlobals.instance().runEventGraphView();
   }
 
-
-  public void quit()
-  //----------------
+  public boolean preQuit()
   {
     if(lastFile != null)
       markConfigOpen(lastFile);
 
     if (((AssemblyModel)getModel()).isDirty())
-      if(!askToSaveAndContinue())
-        return;
+      return askToSaveAndContinue();
+    return true;
+  }
+
+  public void postQuit()
+  {
     VGlobals.instance().quitAssemblyEditor();
+  }
+
+  public void quit()
+  //----------------
+  {
+    if(preQuit())
+      postQuit();
   }
 
   File lastFile;

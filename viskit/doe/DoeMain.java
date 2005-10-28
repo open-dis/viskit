@@ -72,29 +72,40 @@ public class DoeMain implements DoeEvents
   {
 
   }
+
   private void buildMenuBar(boolean contentOnly)
   {
-    menuBar = new DoeMenuBar(controller);
+    menuBar = new DoeMenuBar(controller,contentOnly);
     if(!contentOnly)
       mainFrame.setJMenuBar(menuBar);
   }
+
   private void buildMainFrame(boolean contentOnly)
   {
     mainFrame = new DoeMainFrame(contentOnly,controller);
     controller.setMainFrame(mainFrame);
   }
+
   private void buildController()
   {
     controller = new DoeController();
   }
+
   public DoeMainFrame getMainFrame()
   {
     return mainFrame;
   }
+
   public JMenuBar getMenus()
   {
     return menuBar;
   }
+
+  public DoeController getController()
+  {
+    return controller;
+  }
+
   private void displayFrame()
   {
     mainFrame.installContent();
@@ -137,6 +148,19 @@ public class DoeMain implements DoeEvents
     catch (Exception e) {
       System.out.println("can't change l&f");
     }
+  }
+
+  public JMenuItem getQuitMenuItem()
+  {
+    if (menuBar != null) {
+      JMenu fileM = menuBar.getMenu(0);
+      for (int i = 0; i < fileM.getMenuComponentCount(); i++) {
+        JMenuItem m = fileM.getItem(i);
+        if(m != null && m.getText().toLowerCase().startsWith("quit"))
+          return m;
+      }
+    }
+    return null;
   }
 
   public static void main(String[] args)

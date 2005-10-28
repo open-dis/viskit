@@ -59,6 +59,9 @@ public interface ViskitAssemblyController
   void save();
   void saveAs();
 
+  boolean preQuit();
+  void    postQuit();
+
   void addAssemblyFileListener   (DirectoryWatch.DirectoryChangeListener lis);
   void removeAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis);
 

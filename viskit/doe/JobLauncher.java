@@ -43,12 +43,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import edu.nps.util.DirectoryWatch;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
 import viskit.SpringUtilities;
+import viskit.TitleListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -62,7 +64,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class JobLauncher extends JFrame implements Runnable
+public class JobLauncher extends JFrame implements Runnable, edu.nps.util.DirectoryWatch.DirectoryChangeListener
 {
   String inputFileString;
   File inputFile;
@@ -75,11 +77,11 @@ public class JobLauncher extends JFrame implements Runnable
   JFrame mom;
 
   String clusterDNS = "cluster.moves.nps.navy.mil";
-  int    clusterPort = 4445;
-  int    chosenPort;
+  int clusterPort = 4444;
+  int chosenPort;
   String clusterWebStatus1 = "http://cluster.moves.nps.navy.mil/ganglia/";
   String clusterWebStatus2 = "http://cluster.moves.nps.navy.mil/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
-  String clusterWebStatus  = "http://cluster.moves.nps.navy.mil/ganglia/?r=hour&c=MOVES&h=&sh=0";
+  String clusterWebStatus = "http://cluster.moves.nps.navy.mil/ganglia/?r=hour&c=MOVES&h=&sh=0";
   private JButton canButt;
   private JButton runButt;
   private JButton closeButt;
@@ -92,24 +94,61 @@ public class JobLauncher extends JFrame implements Runnable
 
   private Thread thread;
   private boolean outputDirty = false;
-  private int numRuns,designPts,samps;
+  private int numRuns, designPts, samps;
 
-  public JobLauncher(Container container, String file, String title, JFrame mainFrame)
+  private Container content;
+  private boolean isSubComponent = false;
+
+  public JobLauncher()
+  {
+    super();
+    content = buildContent();
+    doListeners();
+  }
+
+  public JobLauncher(boolean isSubComponent, String file, String title, JFrame mainFrame)
   {
     super("Job " + title);
-    inputFileString = file;
-    inputFile = new File(file);
-    filteredFile = inputFile;      // will be possibly changed
-
-    try {
-      filteredFile = File.createTempFile("DoeInputFile",".xml");
-    }
-    catch (IOException e) {
-      System.out.println("couldn't make temp file");
-    }
-
+    this.isSubComponent = isSubComponent;
     mom = mainFrame;
+    content = buildContent();
+    setContentPane(content);
+    setFile(file,title);
+    doListeners();
 
+    if (!isSubComponent) {
+      try {
+        getParams();
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      pack();
+      Dimension d = getSize();
+      d.width += 50;
+      setSize(d);
+      //centerMe();
+      setLocation(10, 10);
+      setVisible(true);
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      addWindowListener(new WindowAdapter()
+      {
+        public void windowClosing(WindowEvent e)
+        {
+          canButt.doClick();
+        }
+      });
+    }
+  }
+
+  public Container getContent()
+  {
+    return content;
+  }
+
+  private Container buildContent()
+  {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
@@ -136,13 +175,6 @@ public class JobLauncher extends JFrame implements Runnable
     cluster.setEditable(false);
     //cluster.setBackground(samps.getBackground());
 
-    try {
-      getParams();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
     topPan.add(clusLab);
     topPan.add(cluster);
     topPan.add(portLab);
@@ -162,36 +194,47 @@ public class JobLauncher extends JFrame implements Runnable
     canButt = new JButton("Cancel job");
     canButt.setEnabled(false);
     runButt = new JButton("Run job");
-    closeButt = new JButton("Close");
     botBar.add(Box.createHorizontalGlue());
     botBar.add(canButt);
     botBar.add(runButt);
-    botBar.add(Box.createHorizontalStrut(20));
-    botBar.add(closeButt);
-
+    if(!isSubComponent) {
+      botBar.add(Box.createHorizontalStrut(20));
+      closeButt = new JButton("Close");
+      botBar.add(closeButt);
+    }
     p.add(topPan);
     p.add(jsp);
     p.add(Box.createVerticalStrut(8));
     p.add(botBar);
     p.setBorder(new EmptyBorder(10, 10, 10, 10));
-    setContentPane(p);
+    return p;
+  }
 
-    pack();
-    Dimension d = getSize();
-    d.width+=50;
-    setSize(d);
-    //centerMe();
-    setLocation(10,10);
-    setVisible(true);
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent e)
-      {
-        canButt.doClick();
-      }
-    });
-    doListeners();
+  public void setFile(String file, String title)
+  {
+    if(file==null) {
+      inputFileString = null;
+      inputFile=null;
+      filteredFile=null;
+      return;
+    }
+    inputFileString = file;
+    inputFile = new File(file);
+    filteredFile = inputFile;      // will be possibly changed
+
+    try {
+      filteredFile = File.createTempFile("DoeInputFile", ".xml");
+    }
+    catch (IOException e) {
+      System.out.println("couldn't make temp file");
+    }
+
+    try {
+      getParams();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private void getParams() throws Exception
@@ -200,24 +243,41 @@ public class JobLauncher extends JFrame implements Runnable
     Element root = doc.getRootElement();
 
     Element exp = root.getChild("Experiment");
+    if (exp != null) {
+      designPts = root.getChildren("TerminalParameter").size();
+      dps.setText("" + designPts);
 
-    designPts = root.getChildren("TerminalParameter").size();
-    dps.setText(""+designPts);
+      String att = exp.getAttributeValue("totalSamples");
+      if (att != null)
+        sampsTF.setText(att);
 
-    String att = exp.getAttributeValue("totalSamples");
-    if(att != null)
-      sampsTF.setText(att);
+      att = exp.getAttributeValue("runsPerDesignPoint");
+      if (att != null)
+        runs.setText(att);
 
-    att = exp.getAttributeValue("runsPerDesignPoint");
-    if(att != null)
-      runs.setText(att);
+      numRuns = Integer.parseInt(att);
+      att = exp.getAttributeValue("timeout");
+      tmo.setText(att);
+    }
+    else {
+      exp = new Element("Experiment");
 
-    numRuns = Integer.parseInt(att);
-    att = exp.getAttributeValue("timeout");
-    tmo.setText(att);
+      root.addContent(exp);
+      Element tp = new Element("TerminalParameter");
+      root.addContent(tp);
+      exp.setAttribute("totalSamples","1");
+      exp.setAttribute("runsPerDesignPoint","1");
+      exp.setAttribute("timeout","5000");
 
-    portTF.setText(""+clusterPort);
+      dps.setText("1");
+      sampsTF.setText("1");
+      runs.setText("1");
+      numRuns = 1;
+      tmo.setText("5000");
+    }
+    portTF.setText("" + clusterPort);
   }
+
   private void setParams() throws Exception
   {
     Element root = doc.getRootElement();
@@ -227,22 +287,51 @@ public class JobLauncher extends JFrame implements Runnable
     numRuns = Integer.parseInt(runs.getText());
     chosenPort = Integer.parseInt(portTF.getText());
 
-    exp.setAttribute("totalSamples",""+samps);
-    exp.setAttribute("runsPerDesignPoint",""+numRuns);
-    exp.setAttribute("timeout",tmo.getText().trim());
+    exp.setAttribute("totalSamples", "" + samps);
+    exp.setAttribute("runsPerDesignPoint", "" + numRuns);
+    exp.setAttribute("timeout", tmo.getText().trim());
     //exp.setAttribute("debug","false");
-    FileHandler.marshallJdom(filteredFile,doc);
+
+    FileHandler.marshallJdom(filteredFile, doc);
   }
 
   private void doListeners()
   {
     canButt.setActionCommand("cancel");
     runButt.setActionCommand("run");
-    closeButt.setActionCommand("x");
     ActionListener al = new ButtListener();
     canButt.addActionListener(al);
     runButt.addActionListener(al);
-    closeButt.addActionListener(al);
+    if(!isSubComponent) {
+      closeButt.setActionCommand("x");
+      closeButt.addActionListener(al);
+    }
+  }
+
+  /* Here's where we are informed of changed in the assembly file */
+  public void fileChanged(File file, int action, DirectoryWatch source)
+  {
+    // temp:
+    switch(action)
+    {
+      case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
+        System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: "+
+                                      " " + file.getAbsolutePath());
+        setFile(file.getAbsolutePath(),file.getName());
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
+        System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: "+
+                                      " " + file.getAbsolutePath());
+        setFile(null,null);
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
+        System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: "+
+                                      " " + file.getAbsolutePath());
+        setFile(file.getAbsolutePath(),file.getName());
+        break;
+      default:
+
+    }
   }
 
   class ButtListener implements ActionListener
@@ -264,7 +353,7 @@ public class JobLauncher extends JFrame implements Runnable
         case 'x':
           runButt.setEnabled(true);  // for next time (probably not used)
           canButt.setEnabled(false);
-          if(outputDirty ) {
+          if (outputDirty) {
             if (JOptionPane.showConfirmDialog(JobLauncher.this, "Save output?") == JOptionPane.YES_OPTION) {
               JFileChooser jfc = new JFileChooser();
               jfc.setSelectedFile(new File("DOEOutput.txt"));
@@ -273,7 +362,7 @@ public class JobLauncher extends JFrame implements Runnable
                 File f = jfc.getSelectedFile();
                 try {
                   FileWriter fw = new FileWriter(f);
-                   fw.write(ta.getText());
+                  fw.write(ta.getText());
                   fw.close();
                 }
                 catch (IOException e1) {
@@ -295,7 +384,7 @@ public class JobLauncher extends JFrame implements Runnable
   private void centerMe()
   {
     Rectangle meR = getBounds();
-    if(mom != null) {
+    if (mom != null) {
       Rectangle r = mom.getBounds();
       meR.x = r.x + r.width / 2 - meR.width / 2;
       meR.y = r.y + r.height / 2 - meR.height / 2;
@@ -318,7 +407,7 @@ public class JobLauncher extends JFrame implements Runnable
     closeButt.setEnabled(true);
     runButt.setEnabled(true);
 
-    if(thread == null)
+    if (thread == null)
       return;
 
     writeStatus("Stopping run.");
@@ -328,7 +417,7 @@ public class JobLauncher extends JFrame implements Runnable
     {
       public void run()
       {
-        if(thread != null) {
+        if (thread != null) {
           Thread t = thread;
           thread = null;
           t.interrupt();
@@ -351,7 +440,7 @@ public class JobLauncher extends JFrame implements Runnable
         }
 
       }
-    },"JobKiller");
+    }, "JobKiller");
     jobKiller.setPriority(Thread.NORM_PRIORITY);
     jobKiller.start();
   }
@@ -401,7 +490,7 @@ public class JobLauncher extends JFrame implements Runnable
 
       }
       catch (Exception e) {
-        if(thread != null)    // If normal error:
+        if (thread != null)    // If normal error:
           writeStatus("Error connecting to server: " + e.getMessage());
         break lp3;
       }
@@ -431,7 +520,7 @@ public class JobLauncher extends JFrame implements Runnable
               parms.add(new Integer(dp));
               parms.add(new Integer(nrun));
               o = rpc.execute("experiment.getResult", parms);
-              if(thread == null)
+              if (thread == null)
                 break lp;
               kickOffClusterUpdate();
               writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
@@ -454,66 +543,68 @@ public class JobLauncher extends JFrame implements Runnable
   }
 
   ArrayList outputList;
+
   private void createOutputDir() throws Exception
   {
-    outDir = File.createTempFile("DoeRun","");
+    outDir = File.createTempFile("DoeRun", "");
     outDir.delete();
     outDir.mkdir();
   }
 
   JobResults chartter;
+
   private void plotOutput(int idx)
   {
-    if(chartter == null)
-      chartter = new JobResults(JobLauncher.this,getTitle());
-    synchronized(outputList) {
-      Object[] oa = (Object[])outputList.get(idx);
+    if (chartter == null)
+      chartter = new JobResults(JobLauncher.this, getTitle());
+    synchronized (outputList) {
+      Object[] oa = (Object[]) outputList.get(idx);
       Gresults res = getSingleResult(oa);
       chartter.addPoint(res);
-      if(!res.resultsValid)
-        System.out.println("Results not retrieved for rep "+idx);
+      if (!res.resultsValid)
+        System.out.println("Results not retrieved for rep " + idx);
     }
   }
 
   private Gresults getSingleResult(Object[] oa)
   {
-    File f = new File((String)oa[2]);
-    int dp = ((Integer)oa[0]).intValue();
-    int nrun = ((Integer)oa[1]).intValue();
+    File f = new File((String) oa[2]);
+    int dp = ((Integer) oa[0]).intValue();
+    int nrun = ((Integer) oa[1]).intValue();
     Gresults res = new Gresults();
 
-    Document doc =  null;
+    Document doc = null;
     try {
       doc = FileHandler.unmarshallJdom(f);
     }
     catch (Exception e) {
-      System.out.println("Error unmarshalling results: "+e.getMessage());
+      System.out.println("Error unmarshalling results: " + e.getMessage());
       return null;
     }
     Element el = doc.getRootElement();
-    if(!el.getName().equals("Results")) {
-      System.out.println("Unknown results format, design point = "+dp+", run = "+nrun);
+    if (!el.getName().equals("Results")) {
+      System.out.println("Unknown results format, design point = " + dp + ", run = " + nrun);
       return res;
     }
-    String design = attValue(el,"design");
-    String index = attValue(el,"index");
-    String job = attValue(el,"job");
-    String run = attValue(el,"run");
+    String design = attValue(el, "design");
+    String index = attValue(el, "index");
+    String job = attValue(el, "job");
+    String run = attValue(el, "run");
 
     Element propCh = el.getChild("PropertyChange");
-    if(propCh == null) {
-      System.out.println("PropertyChange results element null, design point = "+dp+", run = "+nrun);
+    if (propCh == null) {
+      System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
       return res;
     }
-    String listenerName = attValue(propCh,"listenerName");
-    String property = attValue(propCh,"property");
+    String listenerName = attValue(propCh, "listenerName");
+    String property = attValue(propCh, "property");
     java.util.List content = propCh.getContent();
-    Text txt = (Text)content.get(0);
+    Text txt = (Text) content.get(0);
     String cstr = txt.getTextTrim();
-    System.out.println("got back "+cstr);
+    System.out.println("got back " + cstr);
     String[] sa = cstr.split("\n");
-    if(sa.length != 2) {
-      System.out.println("PropertyChange parse error, design point = "+dp+", run = "+nrun);
+    if (sa.length != 2) {
+      System.out.println("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
       return res;
     }
     sa[1] = sa[1].trim();
@@ -532,12 +623,12 @@ public class JobLauncher extends JFrame implements Runnable
     res.dp = Integer.parseInt(design);
     assert res.dp == dp : "JobLauncher.doResults1";
 
-    res.resultsCount   = Integer.parseInt(nums[Gresults.COUNT]);
-    res.resultsMinObs   = Double.parseDouble(nums[Gresults.MINOBS]);
-    res.resultsMaxObs   = Double.parseDouble(nums[Gresults.MAXOBS]);
-    res.resultsMean     = Double.parseDouble(nums[Gresults.MEAN]);
+    res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);
+    res.resultsMinObs = Double.parseDouble(nums[Gresults.MINOBS]);
+    res.resultsMaxObs = Double.parseDouble(nums[Gresults.MAXOBS]);
+    res.resultsMean = Double.parseDouble(nums[Gresults.MEAN]);
     res.resultsVariance = Double.parseDouble(nums[Gresults.VARIANCE]);
-    res.resultsStdDev   = Double.parseDouble(nums[Gresults.STDDEV]);
+    res.resultsStdDev = Double.parseDouble(nums[Gresults.STDDEV]);
 
     res.resultsValid = true;
     return res;
@@ -546,13 +637,14 @@ public class JobLauncher extends JFrame implements Runnable
   String attValue(Element e, String att)
   {
     Attribute at = e.getAttribute(att);
-    return (at!=null?at.getValue():null);
+    return (at != null ? at.getValue() : null);
   }
 
   File outDir;
-  private int  saveOutput(String o, int dp, int nrun)
+
+  private int saveOutput(String o, int dp, int nrun)
   {
-    if(o == null)
+    if (o == null)
       System.out.println("mischief detected!");
     try {
       File f = File.createTempFile("DoeResults", ".xml", outDir);
@@ -560,10 +652,10 @@ public class JobLauncher extends JFrame implements Runnable
       FileWriter fw = new FileWriter(f);
       fw.write(o);
       fw.close();
-      writeStatus("Result saved to "+f.getAbsolutePath());
+      writeStatus("Result saved to " + f.getAbsolutePath());
       //outputs.put("" + dp + "," + nrun, f);
       int idx = outputList.size();
-      outputList.add(new Object[]{new Integer(dp),new Integer(nrun),f.getAbsolutePath()});
+      outputList.add(new Object[]{new Integer(dp), new Integer(nrun), f.getAbsolutePath()});
       return idx;
     }
     catch (IOException e) {
@@ -580,14 +672,14 @@ public class JobLauncher extends JFrame implements Runnable
 
   private void showClusterStatus(String surl)
   {
-    if(clusterStatusFrame == null) {
+    if (clusterStatusFrame == null) {
       clusterStatusFrame = new JFrame("Cluster Status");
       editorPane = new JEditorPane();
       editorPane.setEditable(false);
       editorScrollPane = new JScrollPane(editorPane);
       editorScrollPane.setVerticalScrollBarPolicy(
-                      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-      editorScrollPane.setPreferredSize(new Dimension(680,800)); //640,480));
+          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      editorScrollPane.setPreferredSize(new Dimension(680, 800)); //640,480));
       editorScrollPane.setMinimumSize(new Dimension(10, 10));
 
       clusterStatusFrame.getContentPane().setLayout(new BorderLayout());
@@ -599,7 +691,7 @@ public class JobLauncher extends JFrame implements Runnable
       editorPane.setPage(statusURL);
     }
     catch (Exception e) {
-      System.out.println("Error showing cluster status: "+e.getMessage());
+      System.out.println("Error showing cluster status: " + e.getMessage());
       return;
     }
 
@@ -622,16 +714,18 @@ public class JobLauncher extends JFrame implements Runnable
     statusThread.start();
 
   }
+
   private void kickOffClusterUpdate()
   {
-    if(waitToGo == true) {
-      waitToGo=false;
+    if (waitToGo == true) {
+      waitToGo = false;
       statusThread.interrupt();
     }
   }
+
   private void hideClusterStatus()
   {
-    if(clusterStatusFrame != null) {
+    if (clusterStatusFrame != null) {
       clusterStatusFrame.setVisible(false);
     }
     stopStatusThread();
@@ -639,7 +733,7 @@ public class JobLauncher extends JFrame implements Runnable
 
   private void stopStatusThread()
   {
-    if(statusThread != null) {
+    if (statusThread != null) {
       Thread t = statusThread;
       statusThread = null;
       int pr = Thread.currentThread().getPriority();
@@ -655,15 +749,20 @@ public class JobLauncher extends JFrame implements Runnable
   }
 
   boolean waitToGo = true;
+
   class statusUpdater implements Runnable
   {
     public void run()
     {
-      if(waitToGo == true)
-        try {statusThread.sleep(60000);}catch (InterruptedException e) {}
+      if (waitToGo == true)
+        try {
+          statusThread.sleep(60000);
+        }
+        catch (InterruptedException e) {
+        }
 
       while (statusThread != null && clusterStatusFrame != null) {
-        try{
+        try {
           Thread.sleep(10000);
 
           // to refresh
@@ -677,43 +776,45 @@ public class JobLauncher extends JFrame implements Runnable
           editorPane.setCaretPosition(editorPane.getDocument().getLength());
           int hm = hbar.getMaximum();
           int vm = vbar.getMaximum();
-          SwingUtilities.invokeLater(new Runnable() {
+          SwingUtilities.invokeLater(new Runnable()
+          {
             public void run()
             {
               hbar.setValue(50);
               vbar.setValue(50); //vbar.getMaximum());
             }
           });
-       }
-        catch(Exception e) {
-          System.out.println("statusUpdater kill: "+e.getMessage());
+        }
+        catch (Exception e) {
+          System.out.println("statusUpdater kill: " + e.getMessage());
         }
       }
     }
   }
+
   public static void main(String[] args)
   {
-    if(args.length != 1)
+    if (args.length != 1)
       System.out.println("Give .grd file as argument");
     else
-      new JobLauncher(null,args[0],args[0],null);
+      new JobLauncher(false, args[0], args[0], null);
   }
 
   public static class Gresults
   {
-    String listener="";
-    String property="";
-    int run=-1;
-    int dp=-1;
+    String listener = "";
+    String property = "";
+    int run = -1;
+    int dp = -1;
 
-    public static final int COUNT=0;
-    public static final int MINOBS=1;
-    public static final int MAXOBS=2;
-    public static final int MEAN=3;
-    public static final int VARIANCE=4;
-    public static final int STDDEV=5;
+    public static final int COUNT = 0;
+    public static final int MINOBS = 1;
+    public static final int MAXOBS = 2;
+    public static final int MEAN = 3;
+    public static final int VARIANCE = 4;
+    public static final int STDDEV = 5;
 
-    boolean resultsValid=false;
+    boolean resultsValid = false;
 
     int resultsCount;
     double resultsMinObs;
@@ -723,4 +824,25 @@ public class JobLauncher extends JFrame implements Runnable
     double resultsStdDev;
   }
 
+  TitleListener titlLis;
+  int titlIdx;
+  public void setTitleListener(TitleListener tLis, int idx)
+  {
+    titlLis = tLis;
+    titlIdx = idx;
+  }
+
+  public JMenuItem getQuitMenuItem()
+  {
+    JMenuBar mb = getJMenuBar();
+    if (mb != null) {
+      JMenu fileM = mb.getMenu(0);
+      for (int i = 0; i < fileM.getMenuComponentCount(); i++) {
+        JMenuItem m = fileM.getItem(i);
+        if (m != null && m.getText().toLowerCase().startsWith("quit"))
+          return m;
+      }
+    }
+    return null;
+  }
 }

@@ -5,6 +5,7 @@ import bsh.Interpreter;
 import bsh.NameSpace;
 import edu.nps.util.FileIO;
 import edu.nps.util.SimpleDirectoryClassLoader;
+import edu.nps.util.SysExitHandler;
 import org.apache.commons.configuration.XMLConfiguration;
 import viskit.model.*;
 
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -148,7 +148,7 @@ public class VGlobals
       }
       if(egvf != null && egvf.isVisible())
         return;
-      System.exit(0);
+      sysExit(0);
     }
   };
   ActionListener assyQuitHandler=defaultAssyQuitHandler;
@@ -206,7 +206,7 @@ public class VGlobals
       }
       if(avf != null && avf.isVisible())
         return;
-      System.exit(0);
+      sysExit(0);
     }
   };
 
@@ -842,5 +842,25 @@ public class VGlobals
       }
     }
     return hConfig;
+  }
+
+  private SysExitHandler sysexithandler = new SysExitHandler()
+  {
+    public void doSysExit(int status)
+    {
+      System.exit(status);
+    }
+  };
+  public void setSysExitHandler(SysExitHandler handler)
+  {
+    sysexithandler = handler;
+  }
+  public SysExitHandler getSysExitHandler()
+  {
+    return sysexithandler;
+  }
+  public void sysExit(int status)
+  {
+    sysexithandler.doSysExit(status);
   }
 }

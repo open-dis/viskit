@@ -50,7 +50,7 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
 {
   private DoeController controller;
   private JMenu file, edit, run;
-  public DoeMenuBar(DoeController controller)
+  public DoeMenuBar(DoeController controller, boolean isSubComponent)
   {
     this.controller = controller;
 
@@ -59,8 +59,10 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
     add(file);
    // edit = new editMenu();
    // add(edit);
-    run = new runMenu();
-    add(run);
+    if(!isSubComponent) {
+      run = new runMenu();
+      add(run);
+    }
  }
 
   JMenuItem buildMI(String label, ActionListener lis, char cmd)
@@ -93,7 +95,7 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
       add(mi);
 
       addSeparator();
-      mi = buildMI("Quit application",controller,EXIT_APP);
+      mi = buildMI("Quit",controller,EXIT_APP);
       add(mi);
     }
   }

@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import edu.nps.util.DirectoryWatch;
+import viskit.VGlobals;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -60,10 +61,12 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
   {
     mainFrame = frame;
   }
+
   public DoeController()
   {
     openSaveFileChooser = initFileChooser();
   }
+
   // Event handling code;
   public void actionPerformed(char c)
   {
@@ -118,16 +121,24 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
         break;
 
       case EXIT_APP:
-        if(checkDirty() != JOptionPane.CANCEL_OPTION)
-          System.exit(0);
-       break;
+        if(preQuit())
+          postQuit();
+         break;
 
       case RUN_JOB:
         doRun();
         break;
     }
   }
+  public boolean preQuit()
+  {
+    return (checkDirty() != JOptionPane.CANCEL_OPTION);
 
+  }
+  public void postQuit()
+  {
+    VGlobals.instance().sysExit(0); //System.exit(0);
+  }
   private int checkDirty()
   {
     DoeFileModel dfm = mainFrame.getModel();
@@ -182,6 +193,13 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
       JOptionPane.showMessageDialog(mainFrame,"Error on file save: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
     }
   }
+  private void doClose()
+  {
+    checkDirty();
+    mainFrame.setModel(null);
+    mainFrame.removeContent();
+  }
+
 
   private void doOpen(File f)
   {
@@ -247,7 +265,25 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
   public void fileChanged(File file, int action, DirectoryWatch source)
   {
     // temp:
-    System.out.println("DoeController got assembly change message: "+action+
-                                  " " + file.getAbsolutePath());
+    switch(action)
+    {
+      case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
+        System.out.println("DoeController got assembly change message: FILE_ADDED: "+
+                                      " " + file.getAbsolutePath());
+        doOpen(file);
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
+        System.out.println("DoeController got assembly change message: FILE_REMOVED: "+
+                                      " " + file.getAbsolutePath());
+        doClose();
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
+        System.out.println("DoeController got assembly change message: FILE_CHANGED: "+
+                                      " " + file.getAbsolutePath());
+        doOpen(file);
+        break;
+      default:
+
+    }
   }
 }

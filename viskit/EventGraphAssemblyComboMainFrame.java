@@ -43,6 +43,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit;
 
+import edu.nps.util.SysExitHandler;
+import viskit.doe.DoeMain;
+import viskit.doe.DoeMainFrame;
+import viskit.doe.JobLauncher;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -59,7 +64,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   EventGraphViewFrame egFrame;
   AssemblyViewFrame asyFrame;
   InternalAssemblyRunner asyRunComponent;
+  JobLauncher runGridComponent;
+
   Action myQuitAction;
+  private DoeMain doeMain;
 
   public EventGraphAssemblyComboMainFrame(String[] args)
   {
@@ -96,8 +104,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     tabbedPane = new JTabbedPane();
     myQuitAction = new QuitAction("Quit");
 
+    // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
-    tabbedPane.add("Event Graphs",egFrame.getContent());   // 0
+    tabbedPane.add("Event Graph Edit",egFrame.getContent());   // 0
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -105,16 +114,18 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     setJMenuBar(menuBar);
     jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
 
+    // Assembly editor
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
-    tabbedPane.add("Assembly",asyFrame.getContent());  //1
+    tabbedPane.add("Assembly Edit",asyFrame.getContent());  //1
     menuBar = asyFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
     asyFrame.setTitleListener(myTitleListener,1);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
+    // Assembly runner
     asyRunComponent = new InternalAssemblyRunner();
-    tabbedPane.add("Run Assembly",asyRunComponent.getContent());   // 2
+    tabbedPane.add("Assembly Run",asyRunComponent.getContent());   // 2
     menuBar = asyRunComponent.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -122,27 +133,40 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     ((AssemblyController)asyFrame.getController()).setAssemblyRunner( new ThisAssemblyRunnerPlug());
 
-/*
-    //DoeMain doeMain = DoeMain.main2();
-    //DoeMainFrame doeFrame = doeMain.getMainFrame();
-    //tabbedPane.add("Design of Experiments",doeFrame.getContent());
-    //menus.add(doeMain.getMenus());
+    // Design of experiments
+    doeMain = DoeMain.main2();
+    DoeMainFrame doeFrame = doeMain.getMainFrame();
+    tabbedPane.add("Design of Experiments",doeFrame.getContent());
+    menuBar = doeMain.getMenus();
+    if(menuBar == null){
+      menuBar = new JMenuBar();
+      menuBar.add(new JMenu("File"));
+    }
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
+    doeFrame.setTitleListener(myTitleListener,3);
+    jamQuitHandler(doeMain.getQuitMenuItem(),myQuitAction,menuBar);
 
-    JLabel junk =  new JLabel("Design of Experiments placeholder");
-    tabbedPane.add("Design of Experiments",junk);
-    menus.add(makeDummyMbar("File"));
+    // Grid run panel
+    runGridComponent = new JobLauncher(true,null,null,this);
+    tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
+    menuBar = runGridComponent.getJMenuBar();
+    if(menuBar == null) {
+      menuBar = new JMenuBar();
+      menuBar.add(new JMenu("File"));
+    }
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
+    runGridComponent.setTitleListener(myTitleListener,4);
+    jamQuitHandler(runGridComponent.getQuitMenuItem(),myQuitAction,menuBar);
 
-    junk =  new JLabel("Cluster Controller placeholder");
-    tabbedPane.add("Cluster Controller",junk);
-    menus.add(makeDummyMbar("File"));
-*/
 
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
 
     asyCntlr.addAssemblyFileListener(asyRunComponent);
-    //todo asyCntlr.addAssemblyFileListener(doeFrame.getController());
-    //todo asyCntlr.addAssemblyFileListener(runGridComponent.getController());
+    asyCntlr.addAssemblyFileListener(doeFrame.getController());
+    asyCntlr.addAssemblyFileListener(runGridComponent);
 
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
@@ -223,16 +247,41 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     public void actionPerformed(ActionEvent e)
     {
+      SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
+      VGlobals.instance().setSysExitHandler(nullSysExitHandler);
+
       tabbedPane.setSelectedIndex(0); // eg
-      ((Controller)egFrame.getController()).quit();
+      if(((Controller)egFrame.getController()).preQuit()) {
+        tabbedPane.setSelectedIndex(1); // assy ed
+        if(((ViskitAssemblyController)asyFrame.getController()).preQuit()) {
+          tabbedPane.setSelectedIndex(3); //doe
+          if(doeMain.getController().preQuit()) {
+            //todo other preQuits here if needed
 
-      tabbedPane.setSelectedIndex(1); // assy ed
-      ((AssemblyController)asyFrame.getController()).quit();
+            VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
-      //todo others
-      System.exit(0);
+            ((ViskitController)egFrame.getController()).postQuit();
+            ((AssemblyController)asyFrame.getController()).postQuit();
+            doeMain.getController().postQuit();
+            //todo other postQuits here if needed
+
+            VGlobals.instance().sysExit(0);  // quit application
+          }
+        }
+      }
+      // Here if somebody cancelled.
+      VGlobals.instance().setSysExitHandler(defaultHandler);
+      return;
     }
   }
+  private SysExitHandler nullSysExitHandler = new SysExitHandler()
+  {
+    public void doSysExit(int status)
+    {
+      // do nothing
+    }
+  };
+
   class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug
   {
     public void exec(String[] execStrings, int runnerClassIndex)

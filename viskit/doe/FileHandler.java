@@ -107,7 +107,7 @@ public class FileHandler
   public static void runFile(File fil, String title, JFrame mainFrame)
   {
     try {
-      new JobLauncher(null,fil.getAbsolutePath(),title,mainFrame);
+      new JobLauncher(true,fil.getAbsolutePath(),title,mainFrame);
     }
     catch (Exception e) {
       e.printStackTrace();

@@ -60,6 +60,11 @@ public interface ViskitController
   void saveAs();
   void selectNodeOrEdge(Vector v);
 
+  boolean preClose();
+  boolean preQuit();
+  void    postClose();
+  void    postQuit();
+
   void deleteSimParameter(vParameter p);
   void deleteStateVariable(vStateVariable var);
 

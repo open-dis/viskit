@@ -58,7 +58,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
     ArrayList lis = getOpenFileList(false);
     if(lis.size() <= 0)
-      newEventGraph();
+      /*newEventGraph()*/;    // don't default to new event graph
     else {
      for(int i=0;i<lis.size();i++) {
        File f = new File((String)lis.get(i));
@@ -69,6 +69,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   }
 
   public void quit()
+  {
+    if(preQuit())
+      postQuit();
+  }
+
+  public boolean preQuit()
   //----------------
   {
     markConfigAllClosed();
@@ -78,12 +84,20 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       File f = modAr[i].getLastFile();
       if(f != null)
         markConfigOpen(f);
-      close();
+      if(preClose())
+        postClose();
+      else
+        return false; // cancelled
     }
-    ((ViskitView)getView()).prepareToQuit();
-    VGlobals.instance().quitEventGraphEditor();
+    return true;
   }
 
+  public void postQuit()
+  {
+    ((ViskitView)getView()).prepareToQuit();
+    VGlobals.instance().quitEventGraphEditor();
+
+  }
   public void newEventGraph()
   //-------------------------
   {
@@ -319,10 +333,22 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   public void close()
   {
+    if(preClose())
+      postClose();
+  }
+
+  public boolean preClose()
+  {
     Model mod = (Model)getModel();
     if (mod.isDirty())
       if(!askToSaveAndContinue())
-        return;
+        return false;
+     return true;
+  }
+
+  public void postClose()
+  {
+    Model mod = (Model)getModel();
 
     ((ViskitView)getView()).delTab(mod);
 

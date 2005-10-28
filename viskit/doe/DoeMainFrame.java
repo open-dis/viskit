@@ -43,6 +43,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import viskit.TitleListener;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -86,13 +88,20 @@ public class DoeMainFrame extends JFrame implements DoeEvents
   public void setModel(DoeFileModel dfm)
   {
     this.dfm = dfm;
-    leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
-    leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
- }
+    if(dfm != null) {
+      leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
+      leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
+    }
+  }
+
+  public void removeContent()
+  {
+    content.removeAll();
+  }
 
   public void installContent()
   {
-    content.removeAll();
+    removeContent();
     if (leftJsp != null) {
       if (contentOnly) {
         content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
@@ -133,4 +142,13 @@ public class DoeMainFrame extends JFrame implements DoeEvents
       });
     }
   }
+
+  TitleListener titlLis;
+  int titlLisIdx;
+  public void setTitleListener(TitleListener tLis, int idx)
+  {
+    titlLis = tLis;
+    titlLisIdx = idx;
+  }
+
 }
