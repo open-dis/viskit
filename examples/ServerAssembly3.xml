@@ -9,7 +9,7 @@
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="86" y="98"/>
+        <Coordinate x="90" y="90"/>
     </SimEntity>
     <SimEntity name="server" type="examples.SimpleServer">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
@@ -24,18 +24,18 @@
             </MultiParameter>
         </FactoryParameter>
         <TerminalParameter type="int" value="2"/>
-        <Coordinate x="286" y="98"/>
+        <Coordinate x="280" y="90"/>
     </SimEntity>
-    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="designPointStats" name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberInQueue"/>
-        <Coordinate x="206" y="236"/>
+        <Coordinate x="210" y="230"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="designPointStats" name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
-        <Coordinate x="356" y="238"/>
+        <Coordinate x="350" y="230"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="simplePropertyDumper" type="simkit.util.SimplePropertyDumper">
-        <Coordinate x="290" y="290"/>
+        <Coordinate x="280" y="290"/>
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="numInQueueStat" source="server"/>
     <PropertyChangeListenerConnection listener="numAvailServersStat" source="server"/>
