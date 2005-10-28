@@ -109,22 +109,11 @@ public class ViskitAssembly extends BasicAssembly {
     public void createSimEntities() {
         simEntity = 
                 (SimEntity[]) entities.values().toArray(new SimEntity[0]);
-        //reverseOrder(simEntity);
-    }
-    
-    void reverseOrder(SimEntity[] a) {
-        SimEntity temp;
-        for ( int i = 0; i < a.length / 2; i ++){
-            temp = a[i];
-            a[i] = a[a.length - (i + 1)];
-            a[a.length - (i+1)] = temp;
-        }
     }
     
     public void createDesignPointStats() {
         designPointStats = 
                 (SampleStatistics[]) designPointStatistics.values().toArray(new SampleStatistics[0]);
-        // set up some defaults from the super method
         if ( designPointStats.length == 0 ) {
             super.createDesignPointStats();
         }
@@ -145,51 +134,16 @@ public class ViskitAssembly extends BasicAssembly {
         entities.put(name,entity);
     }
     
-    /** 
-     * listenerName comes from the PropertyChangeListener tag, while 
-     * property comes from the connector
-     * however Simkit's take the property name in the constructor. 
-     */
-    public void addDesignPointStat(String listenerName, String propertyName, String type) {
-        try {
-            Class statClass = Class.forName(type);
-            Constructor c = statClass.getConstructor(new Class[]{ String.class });
-            PropertyChangeListener pcl;
-            if ("".equals(propertyName)) {
-                pcl = (PropertyChangeListener) statClass.newInstance();
-            } else {
-                pcl = (PropertyChangeListener) c.newInstance(new Object[]{propertyName});
-            }
-            designPointStatistics.put(listenerName,pcl);
-        } catch (Exception e) { e.printStackTrace(); }
+    public void addDesignPointStat(String listenerName, PropertyChangeListener pcl) {
+        designPointStatistics.put(listenerName,pcl);
+    }
+   
+    public void addReplicationStat(String listenerName, PropertyChangeListener pcl) {
+        replicationStatistics.put(listenerName,pcl);
     }
     
-    public void addReplicationStat(String listenerName, String propertyName, String type) {
-        try {
-            Class statClass = Class.forName(type);
-            Constructor c = statClass.getConstructor(new Class[]{ String.class });
-            PropertyChangeListener pcl;
-            if ("".equals(propertyName)) {
-                pcl = (PropertyChangeListener) statClass.newInstance();
-            } else {
-                pcl = (PropertyChangeListener) c.newInstance(new Object[]{propertyName});
-            }
-            replicationStatistics.put(listenerName,pcl);
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-    
-    public void addPropertyChangeListener(String listenerName, String propertyName, String type) {
-        try {
-            Class statClass = Class.forName(type);
-            Constructor c = statClass.getConstructor(new Class[]{ String.class });
-            PropertyChangeListener pcl;
-            if ("".equals(propertyName)) {
-                pcl = (PropertyChangeListener) statClass.newInstance();
-            } else {
-                pcl = (PropertyChangeListener) c.newInstance(new Object[]{propertyName});
-            }
-            propertyChangeListeners.put(listenerName,pcl);
-        } catch (Exception e) { e.printStackTrace(); }
+    public void addPropertyChangeListener(String listenerName, PropertyChangeListener pcl) {
+        propertyChangeListeners.put(listenerName,pcl);
     }
     
     public void addPropertyChangeListenerConnection(String listener, String property, String source) {
