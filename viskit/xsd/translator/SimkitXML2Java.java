@@ -205,7 +205,7 @@ public class SimkitXML2Java {
 	
 	pw.print(sp4 + "public void set" + capitalize(p.getName()) + lp);	
 	pw.println(p.getType() + sp + shortinate(p.getName()) + rp + sp + ob);
-	pw.print(sp8 + p.getName() + sp + eq + sp);
+	pw.print(sp8 + "this" + pd + p.getName() + sp + eq + sp);
 	
 	if ( isArray(p.getType()) ) {
 	    pw.print(lp + p.getType() + rp + sp + shortinate(p.getName()));
@@ -223,7 +223,7 @@ public class SimkitXML2Java {
 
 	    pw.print(sp4 + "public void set" + capitalize(p.getName()) + lp + indx(d));
 	    pw.println(baseOf(p.getType()) + sp + shortinate(p.getName()) + rp + sp + ob);
-	    pw.println(sp8 + p.getName() + indxbr(d) + sp + eq + sp + shortinate(p.getName()) + sc);
+	    pw.println(sp8 + "this" + pd + p.getName() + indxbr(d) + sp + eq + sp + shortinate(p.getName()) + sc);
 	    pw.println(sp4 + cb);
 	    pw.println();
 
@@ -881,19 +881,7 @@ public class SimkitXML2Java {
     private String shortinate( String s ) {
 
         return s.trim();
-        /*
-	String result = s.substring(0,1);
-	char[] ca = s.toCharArray();
-	char[] tmp = new char[1];
-	
-	for ( int i = 1; i < ca.length; i++ ) {
-	    if ( Character.isUpperCase(ca[i]) ) {
-		tmp[0] = ca[i];
-		result += new String(tmp);
-	    }
-	}
-
-	return result.toLowerCase();*/
+        
     }
 
     private String baseOf( String s ) {
