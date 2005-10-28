@@ -39,7 +39,7 @@ public class VsimkitObjects
         nm = nm.substring(4); // lose the 'get_'
         nm = "simkit."+nm.replace('_','.');
         String nm2 = nm.substring(nm.lastIndexOf('.')+1);  // with no package
-        Object m = meths[i].invoke(null,null);
+        Object m = meths[i].invoke(null,(Object[])null);
         Object o = new FullNameAndInstance(nm,m);
         hashmap.put(nm,o);
         hashmap.put(nm2,o);
