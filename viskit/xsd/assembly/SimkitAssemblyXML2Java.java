@@ -156,7 +156,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
         } catch (Exception e) { e.printStackTrace(); }
-        //marshal();
     }
     
     public javax.xml.bind.Element unmarshalAny(String bindings) {
@@ -427,7 +426,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 while ( pli.hasNext() ) {
                     doParameter(pl, pli.next(), sp16, pw);
                 }
-                pw.println();
                 pw.println(sp12 + rp);
             } else pw.println(rp);
             
@@ -627,13 +625,24 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         String[] pcls = (String[]) propertyChangeListeners.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) propertyChangeListeners.get(pcls[i]);
-            //currenlty only one connection per pcl allowed, but multi per source
+            List pl = pcl.getParameters();
+            ListIterator pli = pl.listIterator();
             PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.print(sp8 + "addPropertyChangeListener" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm + qu + pcl.getType() + qu );
-            pw.println(rp + sc);
+            pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcls[i] + qu + cm);
+            pw.print(sp12 + nw + sp + pcl.getType() + lp);
+            
+            if ( pli.hasNext() ) {
+                pw.println();
+                while ( pli.hasNext() ) {
+                    doParameter(pl, pli.next(), sp16, pw);
+                }
+                pw.println(sp12 + rp);
+            } else pw.println(rp);
+            pw.println(sp8 + rp + sc);
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
+            pw.println();
         }
         pw.println(sp8 + "super" + pd + "createPropertyChangeListeners" + lp + rp + sc);
         pw.println(sp4 + cb);
@@ -645,13 +654,26 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pcls = (String[]) replicationStats.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) replicationStats.get(pcls[i]);
-            //currenlty only one connection per pcl allowed, but multi per source
+            List pl = pcl.getParameters();
+            ListIterator pli = pl.listIterator();
             PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.print(sp8 + "addReplicationStat" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm +  qu + pcl.getType() +qu);
-            pw.println(rp + sc);
+            pw.println(sp8 + "addReplicationStat" + lp + qu + pcls[i] + qu + cm);
+            pw.print(sp12 + nw + sp + pcl.getType() + lp);
+            
+            if ( pli.hasNext() ) {
+                pw.println();
+                while ( pli.hasNext() ) {
+                    doParameter(pl, pli.next(), sp16, pw);
+                }
+                pw.println(sp12 + rp);
+            } else pw.println(rp);
+            
+            pw.println(sp8 + rp + sc);
+            pw.println();
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
+            pw.println();
         }
         pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
         pw.println(sp4 + cb);
@@ -663,13 +685,26 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) designPointStats.get(pcls[i]);
-            //currenlty only one connection per pcl allowed, but multi per source
+            List pl = pcl.getParameters();
+            ListIterator pli = pl.listIterator();
             PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.print(sp8 + "addDesignPointStat" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm + qu + pcl.getType() + qu );
-            pw.println(rp + sc);
+            pw.println(sp8 + "addDesignPointStat" + lp + qu + pcls[i] + qu + cm);
+            pw.print(sp12 + nw + sp + pcl.getType() + lp);
+            
+            if ( pli.hasNext() ) {
+                pw.println();
+                while ( pli.hasNext() ) {
+                    doParameter(pl, pli.next(), sp16, pw);
+                }
+                pw.println(sp12 + rp);
+            } else pw.println(rp);
+            
+            pw.println(sp8 + rp + sc);
+            pw.println();
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
+            pw.println();
         }
         
         
@@ -681,6 +716,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
     }
     
+    // unused now
     void buildConnectors(StringWriter connectors) {
         
         PrintWriter pw = new PrintWriter(connectors);
