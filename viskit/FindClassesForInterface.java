@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.jar.*;
 
 /**
- *
+ * @version $Id$
  * @author  ahbuss
  */
 
@@ -38,7 +38,6 @@ public class FindClassesForInterface
    * Added by Mike Bailey.  Same test as above.
    * @param questionable
    * @param target
-   * @return
    */
   public static boolean matchClass(Class questionable, Class target)
   {
