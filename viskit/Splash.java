@@ -38,7 +38,6 @@ public class Splash extends JFrame
 
   /**
    * Do this to put all GUI access in Event thread.  Play the array game to deal with final var restrictions.
-   * @return
    */
   private static Splash makeSplash()
   {
