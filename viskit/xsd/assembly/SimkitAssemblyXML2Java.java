@@ -34,12 +34,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.SortedSet;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import javax.xml.bind.JAXBContext; 
-import javax.xml.bind.JAXBException; 
-import javax.xml.bind.Unmarshaller; 
-import javax.xml.bind.Marshaller; 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Marshaller;
 import javax.xml.transform.stream.StreamSource;
 import viskit.xsd.bindings.assembly.*;
 import simkit.random.RandomNumber;
@@ -53,7 +54,7 @@ import org.apache.xmlrpc.*;
  */
 
 public class SimkitAssemblyXML2Java implements XmlRpcHandler {
-
+    
     SimkitAssemblyType root;
     InputStream fileInputStream;
     String fileBaseName;
@@ -65,9 +66,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     int count; // of design points
     int totalResults; // of total runs
     boolean busy = false;
-
+    
     /* convenience Strings for formatting */
-
+    
     final private String sp  = " ";
     final private String sp4 = sp+sp+sp+sp;
     final private String sp8 = sp4+sp4;
@@ -83,10 +84,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     final private String pd  = ".";
     final private String qu  = "\"";
     final private String nw = "new";
-
     
-    /** 
-     * Creates a new instance of SimkitAssemblyXML2Java 
+    
+    /**
+     * Creates a new instance of SimkitAssemblyXML2Java
      * when used from another class, instance this
      * with a String for the name of the xmlFile.
      *
@@ -97,18 +98,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      * Otherwise, it runs the file as a plain assembly, no grid.
      *
      */
-
+    
     public SimkitAssemblyXML2Java(String xmlFile) {
-	this.fileBaseName = baseNameOf(xmlFile);
-	try {
+        this.fileBaseName = baseNameOf(xmlFile);
+        try {
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
             this.fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
-	} catch ( Exception e ) {
-	    e.printStackTrace();
-	} 
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
         
         tasker = new GridTaskGetter(this);
-	
+        
     }
     
     
@@ -119,11 +120,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
     
     
-    /** 
+    /**
      * Starts the server in "local" mode. This is the front end service.
      * Sets up an XML-RPC webserver to read in an assembly from DOE panel.
-     * Once read, handler is added for reports, then DesignPoints calculated 
-     * and each run on grid nodes. 
+     * Once read, handler is added for reports, then DesignPoints calculated
+     * and each run on grid nodes.
      */
     
     public SimkitAssemblyXML2Java(int port) {
@@ -144,20 +145,20 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     /** Used by Viskit */
     public SimkitAssemblyXML2Java(File f) throws Exception {
         this.fileBaseName = baseNameOf(f.getName());
-	this.inputFile = f;
+        this.inputFile = f;
         this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
         this.fileInputStream = new FileInputStream(f);
     }
-
+    
     public void unmarshal() {
-	Unmarshaller u;
-	try {
-	    u = jaxbCtx.createUnmarshaller();
-	    this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
-	} catch (Exception e) { e.printStackTrace(); }
-        marshal();
-    }  
-
+        Unmarshaller u;
+        try {
+            u = jaxbCtx.createUnmarshaller();
+            this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
+        } catch (Exception e) { e.printStackTrace(); }
+        //marshal();
+    }
+    
     public javax.xml.bind.Element unmarshalAny(String bindings) {
         JAXBContext oldCtx = jaxbCtx;
         Unmarshaller u;
@@ -178,9 +179,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         try {
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                new Boolean(true));
+                    new Boolean(true));
             m.marshal(this.root,System.out);
-
+            
         } catch (Exception e) { e.printStackTrace(); }
     }
     
@@ -197,7 +198,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         }
         try {
             m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     new Boolean(true));
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -226,211 +227,251 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     
     public String translate() {
-
-	StringBuffer source = new StringBuffer();
-	StringWriter head = new StringWriter();
-	StringWriter tail = new StringWriter();
-	StringWriter entities = new StringWriter();
-	StringWriter listeners = new StringWriter();
-	StringWriter connectors = new StringWriter();
-	StringWriter output = new StringWriter();
-
-	buildHead(head);
-	buildEntities(entities);
-	buildListeners(listeners);
-	buildOutput(output);
-	buildTail(tail);
-
-	buildSource(source, head, entities, listeners, /*connectors,*/ output, tail);
-
-	return source.toString();
+        
+        StringBuffer source = new StringBuffer();
+        StringWriter head = new StringWriter();
+        StringWriter tail = new StringWriter();
+        StringWriter entities = new StringWriter();
+        StringWriter listeners = new StringWriter();
+        StringWriter connectors = new StringWriter();
+        StringWriter output = new StringWriter();
+        
+        buildHead(head);
+        buildEntities(entities);
+        buildListeners(listeners);
+        buildOutput(output);
+        buildTail(tail);
+        
+        buildSource(source, head, entities, listeners, /*connectors,*/ output, tail);
+        
+        return source.toString();
     }
-
+    
     void buildHead(StringWriter head) {
-
-	PrintWriter pw = new PrintWriter(head);
-	String name = this.root.getName();
-	String pkg  = this.root.getPackage();
+        
+        PrintWriter pw = new PrintWriter(head);
+        String name = this.root.getName();
+        String pkg  = this.root.getPackage();
         String extend = this.root.getExtend();
-
-	pw.println("package " + pkg + sc);
-	pw.println();
+        
+        pw.println("package " + pkg + sc);
+        pw.println();
         
         printImports(pw);
-	
-	pw.println();
+        
+        pw.println();
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
         } else {
             extend = "extends" + sp + extend + sp;
         }
-	pw.println("public class " + name + sp + extend + ob);
-	pw.println();
-	pw.println();
+        pw.println("public class " + name + sp + extend + ob);
+        pw.println();
+        pw.println();
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
         pw.println(sp4 + cb);
         pw.println();
-
+        
     }
     
     void printImports(PrintWriter pw) {
-        Vector list = new Vector();
+        TreeSet list = new TreeSet();
         List r = this.root.getSimEntity();
         ListIterator ri = r .listIterator();
         
         while ( ri.hasNext() ) {
-            traverseForImports(ri.next(), list);
-            
+            traverseForImports(ri.next(),list);    
         }
         
         r = this.root.getPropertyChangeListener();
-        ri = r.listIterator();
+        ri = r.listIterator();    
         
         while ( ri.hasNext() ) {
-            traverseForImports(ri.next(), list);
-            
+            traverseForImports(ri.next(), list);    
         }
-        //some reason java.lang.Object fails the filter below?
-        String[] excludes = { "byte","byte[]","char","char[]","int","int[]","float","float[]","double","double[]","long","long[]","boolean","boolean[]","java.lang.Object","java.lang.Object[]" };
-        for ( int i = 0 ; i < excludes.length ; i++ ) {
-            list.remove(excludes[i]);
+        
+        String[] excludes = { 
+                "byte","byte[]","char","char[]",
+                "int","int[]","float","float[]","double","double[]",
+                "long","long[]","boolean","boolean[]"
+        };
+        
+        ArrayList exList = new ArrayList();
+        ListIterator li = exList.listIterator();
+        int i = excludes.length - 1;
+        li.add(excludes[i--]);
+        
+        while(i>0) {
+            li.add(excludes[i--]);
         }
-        java.util.Enumeration e = list.elements();
-        while ( e.hasMoreElements() ) {
-            String t = (String)e.nextElement();
-            if ( t.startsWith("java.lang") || t.endsWith("]")) {
-                list.remove(t);
+        
+        Iterator it = list.iterator();
+        
+        while(it.hasNext()) {
+            String cls = (String) it.next();
+            if ( exList.contains(cls) ) {
+                it.remove();
             }
         }
+
+        it = list.iterator();
+        
+        while ( it.hasNext() ) {
+            String t = (String)it.next();
+            int brindex = t.indexOf('[');
             
-        TreeSet t = new TreeSet(list);
-        Iterator ti = t.iterator();
-        while (ti.hasNext()) {
-            String imp = (String) ti.next();
+            if ( brindex > 0 ) {
+                t = t.substring(0,brindex);
+            }
+            
+            if ( t.startsWith("java.lang") ) {
+                    it.remove();
+            }
+        }
+        
+        it = list.iterator();
+
+        while (it.hasNext()) {
+            String imp = (String) it.next();
             pw.println("import" + sp + imp + sc);
         }
     }
     
-    void traverseForImports(Object branch, Vector list) {
+    void traverseForImports(Object branch, TreeSet tlist) {
+        SortedSet list = Collections.synchronizedSortedSet(tlist);
         if ( branch instanceof SimEntityType ) {
             String t = ((SimEntityType)branch).getType();
             if ( !list.contains(t) ) {
-                list.add(t);
+                synchronized(list) {
+                    list.add(t);
+                }
             }
             List p = ((SimEntityType)branch).getParameters();
             ListIterator pi = p.listIterator();
             while ( pi.hasNext() ) {
-                traverseForImports(pi.next(), list);
+                traverseForImports(pi.next(), tlist);
             }
         } else if ( branch instanceof FactoryParameterType ) {
             FactoryParameterType fp = (FactoryParameter)branch;
             String t = fp.getType();
             if ( !list.contains(t) ) {
-                list.add(t);
+                synchronized(list) {
+                    list.add(t);
+                }
             }
             List p = fp.getParameters();
             ListIterator pi = p.listIterator();
             while ( pi.hasNext() ) {
-                traverseForImports(pi.next(), list);
+                traverseForImports(pi.next(), tlist);
             }
         } else if ( branch instanceof MultiParameterType ) {
             MultiParameterType mp = (MultiParameterType)branch;
             String t = mp.getType();
             if ( !list.contains(t) ) {
-                list.add(t);
+                synchronized(list) {
+                    list.add(t);
+                }
             }
             List p = mp.getParameters();
             ListIterator pi = p.listIterator();
+            
             while ( pi.hasNext() ) {
-                traverseForImports(pi.next(), list);
+                traverseForImports(pi.next(), tlist);
             }
+            
         } else if ( branch instanceof TerminalParameterType ) {
             TerminalParameterType tp = (TerminalParameterType)branch;
             String t = tp.getType();
             if ( !list.contains(t) ){
-                list.add(t);
+                synchronized(list) {
+                    list.add(t);
+                }
             }
         } else if ( branch instanceof PropertyChangeListenerType ) {
             if ( !list.contains("java.beans.PropertyChangeListener") ) {
-                list.add("java.beans.PropertyChangeListener");
+                synchronized(list) {
+                    list.add("java.beans.PropertyChangeListener");
+                }
             }
             PropertyChangeListenerType pcl = (PropertyChangeListenerType)branch;
             String t = pcl.getType();
             if ( !list.contains(t) ) {
-                list.add(t);
+                synchronized(list) {
+                    list.add(t);
+                }
             }
             List p = pcl.getParameters();
             ListIterator pi = p.listIterator();
             while ( pi.hasNext() ) {
-                traverseForImports(pi.next(), list);
-            }   
+                traverseForImports(pi.next(), tlist);
+            }
         }
     }
     
     void buildEntities(StringWriter entities) {
-	PrintWriter pw = new PrintWriter(entities);
-	ListIterator seli = this.root.getSimEntity().listIterator();
-
+        PrintWriter pw = new PrintWriter(entities);
+        ListIterator seli = this.root.getSimEntity().listIterator();
+        
         pw.println(sp4+"public void createSimEntities"+ lp + rp + sp + ob);
-	while ( seli.hasNext() ) {
-
-	    SimEntity se = (SimEntity) seli.next();
-	    List pl = se.getParameters();
-	    ListIterator pli = pl.listIterator();
-
-	    pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
-	    pw.print(sp12 + nw + sp + se.getType() + lp);
-
-	    if ( pli.hasNext() ) {
-		pw.println();
-	        while ( pli.hasNext() ) {
-		    doParameter(pl, pli.next(), sp16, pw);
-	        }
-		pw.println();
-	        pw.println(sp12 + rp);
-	    } else pw.println(rp);
-
-	    pw.println(sp8 + rp + sc);
+        while ( seli.hasNext() ) {
+            
+            SimEntity se = (SimEntity) seli.next();
+            List pl = se.getParameters();
+            ListIterator pli = pl.listIterator();
+            
+            pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
+            pw.print(sp12 + nw + sp + se.getType() + lp);
+            
+            if ( pli.hasNext() ) {
+                pw.println();
+                while ( pli.hasNext() ) {
+                    doParameter(pl, pli.next(), sp16, pw);
+                }
+                pw.println();
+                pw.println(sp12 + rp);
+            } else pw.println(rp);
+            
+            pw.println(sp8 + rp + sc);
             pw.println();
-	}
-
+        }
+        
         ListIterator sec = this.root.getSimEventListenerConnection().listIterator();
-
+        
         while(sec.hasNext()) {
             SimEventListenerConnectionType sect = (SimEventListenerConnectionType)sec.next();
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity)(sect.getListener())).getName() + qu);
             pw.println(cm + qu + ((SimEntity)(sect.getSource())).getName() + qu + rp + sc);
         }
-
+        
         pw.println();
-
+        
         pw.println(sp8 + "super" + pd + "createSimEntities"+ lp + rp + sc);
-
-	pw.println(sp4 + cb);
+        
+        pw.println(sp4 + cb);
         pw.println();
-
+        
     }
-
+    
      /* Build up a parameter up to but not including a trailing comma.
       * _callers_ should check the size of the list to determine if a
       * comma is needed. This may include a closing paren or brace
       * and any nesting. Note a a doParameter may also be a caller
       * of a doParameter, so the comma placement is tricky.
       */
-
+    
     void doParameter(List plist, Object param, String indent, PrintWriter pw) {
-
-	if ( param instanceof MultiParameterType ) {
-	    doMultiParameter((MultiParameterType)param, indent, pw);
-	} else if ( param instanceof FactoryParameterType ) {
-	    doFactoryParameter((FactoryParameterType)param, indent, pw);
-	} else {
-	    doTerminalParameter((TerminalParameterType)param, indent, pw);
-	}
-
-	maybeComma(plist, param, pw);
+        
+        if ( param instanceof MultiParameterType ) {
+            doMultiParameter((MultiParameterType)param, indent, pw);
+        } else if ( param instanceof FactoryParameterType ) {
+            doFactoryParameter((FactoryParameterType)param, indent, pw);
+        } else {
+            doTerminalParameter((TerminalParameterType)param, indent, pw);
+        }
+        
+        maybeComma(plist, param, pw);
     }
-
+    
     // with newer getSimEntityByName() always returns SimEntity, however
     // parameter may actually call for a subclass.
     String castIfSimEntity(String type) {
@@ -438,133 +479,133 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         try {
             if (
                     (Class.forName("simkit.SimEntityBase")).isAssignableFrom(Class.forName(type))
-            ||
+                    ||
                     (Class.forName("simkit.SimEntity")).isAssignableFrom(Class.forName(type))
-            ) {
+                    ) {
                 sret = new String(lp + type + rp);
             }
         } catch (ClassNotFoundException cnfe) {
-                ; //
+            ; //
         }
         return sret;
     }
-
+    
     void doFactoryParameter(FactoryParameterType fact, String indent, PrintWriter pw) {
-	String factory = fact.getFactory();
+        String factory = fact.getFactory();
         String method = fact.getMethod();
-	List facts = fact.getParameters();
-	ListIterator facti = facts.listIterator();
-	pw.println(indent + sp4 + castIfSimEntity(fact.getType()) + factory + pd + method + lp);
-	while ( facti.hasNext() ) {
-	    doParameter(facts, facti.next(), indent + sp8, pw);
-	}
-	pw.print(indent + sp4 + rp);
+        List facts = fact.getParameters();
+        ListIterator facti = facts.listIterator();
+        pw.println(indent + sp4 + castIfSimEntity(fact.getType()) + factory + pd + method + lp);
+        while ( facti.hasNext() ) {
+            doParameter(facts, facti.next(), indent + sp8, pw);
+        }
+        pw.print(indent + sp4 + rp);
     }
-
+    
     void doTerminalParameter(TerminalParameterType term, String indent, PrintWriter pw) {
-
-	String type = term.getType();
-	String value = term.getValue();
+        
+        String type = term.getType();
+        String value = term.getValue();
         if ( term.getNameRef() != null ) {
             value=((TerminalParameterType)(term.getNameRef())).getValue();
         }
         if ( isPrimitive(type) ) {
-	    pw.print(indent + sp4 + value);
-	} else if ( isString(type) ) {
-	    pw.print(indent + sp4 + qu + value + qu);
-	} else { // some Expression
+            pw.print(indent + sp4 + value);
+        } else if ( isString(type) ) {
+            pw.print(indent + sp4 + qu + value + qu);
+        } else { // some Expression
             pw.print(indent + castIfSimEntity(type) + value);
-	}
-
+        }
+        
     }
-
+    
     void doSimpleStringParameter(TerminalParameterType term, PrintWriter pw) {
-
-	String type = term.getType();
-	String value = term.getValue();
-
-	if ( isString(type) ) {
-	    pw.print(qu + value + qu);
-	} else {
-	    error("Should only have a single String parameter for this PropertyChangeListener");
-	}
-
+        
+        String type = term.getType();
+        String value = term.getValue();
+        
+        if ( isString(type) ) {
+            pw.print(qu + value + qu);
+        } else {
+            error("Should only have a single String parameter for this PropertyChangeListener");
+        }
+        
     }
-
+    
     boolean isPrimitive(String type) {
-	if (
-	    type.equals("boolean") |
-	    type.equals("char") |
-	    type.equals("double") |
-	    type.equals("float") |
-	    type.equals("int") |
-	    type.equals("long") |
-	    type.equals("short")
-	) return true;
-	else return false;
+        if (
+                type.equals("boolean") |
+                type.equals("char") |
+                type.equals("double") |
+                type.equals("float") |
+                type.equals("int") |
+                type.equals("long") |
+                type.equals("short")
+                ) return true;
+        else return false;
     }
-
+    
     boolean isString(String type) {
-	if (
-	    type.equals("String") |
-	    type.equals("java.lang.String")
-	) return true;
-	else return false;
+        if (
+                type.equals("String") |
+                type.equals("java.lang.String")
+                ) return true;
+        else return false;
     }
-
+    
     boolean isArray(String type) {
-	if (
-	    type.endsWith("]")
-	) return true;
-	else return false;
+        if (
+                type.endsWith("]")
+                ) return true;
+        else return false;
     }
-
+    
     void doMultiParameter(MultiParameterType p, String indent, PrintWriter pw) {
-
-	List params = p.getParameters();
-	ListIterator paramsi = params.listIterator();
+        
+        List params = p.getParameters();
+        ListIterator paramsi = params.listIterator();
         String ptype = p.getType();
-
-	if ( isArray(ptype) ) {
-	    pw.println(indent + sp4 + nw + sp + ptype + ob);
-	    while ( paramsi.hasNext() ) {
-		doParameter(params, paramsi.next(), indent + sp4, pw);
-	    }
-	    pw.print(indent + sp4 + cb);
-	} else { // some multi param object
-	    pw.println(indent + sp4 + castIfSimEntity(ptype) + nw + sp + ptype + lp);
-	    while ( paramsi.hasNext() ) {
-		doParameter(params, paramsi.next(), indent + sp4, pw);
-	    }
-	    pw.print(indent + sp4 + rp);
-	}
-
+        
+        if ( isArray(ptype) ) {
+            pw.println(indent + sp4 + nw + sp + ptype + ob);
+            while ( paramsi.hasNext() ) {
+                doParameter(params, paramsi.next(), indent + sp4, pw);
+            }
+            pw.print(indent + sp4 + cb);
+        } else { // some multi param object
+            pw.println(indent + sp4 + castIfSimEntity(ptype) + nw + sp + ptype + lp);
+            while ( paramsi.hasNext() ) {
+                doParameter(params, paramsi.next(), indent + sp4, pw);
+            }
+            pw.print(indent + sp4 + rp);
+        }
+        
     }
-
+    
     void maybeComma(List params, Object param, PrintWriter pw) {
-	if ( params.size() > 1 && params.indexOf(param) < params.size() - 1 ) {
-	    pw.println(cm);
-	} else pw.println();
+        if ( params.size() > 1 && params.indexOf(param) < params.size() - 1 ) {
+            pw.println(cm);
+        } else pw.println();
     }
-
+    
     void buildListeners(StringWriter listeners) {
-
-	PrintWriter pw = new PrintWriter(listeners);
-
-
+        
+        PrintWriter pw = new PrintWriter(listeners);
+        
+        
         LinkedHashMap replicationStats = new LinkedHashMap();
         LinkedHashMap designPointStats = new LinkedHashMap();
         LinkedHashMap propertyChangeListeners = new LinkedHashMap();
         LinkedHashMap propertyChangeListenerConnections = new LinkedHashMap();
         LinkedHashMap simEventListenerConnections = new LinkedHashMap();
-	ListIterator li = this.root.getPropertyChangeListener().listIterator();
-
-	while ( li.hasNext() ) {
-	    PropertyChangeListenerType pcl = (PropertyChangeListenerType)li.next();
-	    List tparam = pcl.getParameters();
-	    ListIterator tparami = tparam.listIterator();
+        ListIterator li = this.root.getPropertyChangeListener().listIterator();
+        
+        while ( li.hasNext() ) {
+            PropertyChangeListenerType pcl = (PropertyChangeListenerType)li.next();
+            List tparam = pcl.getParameters();
+            ListIterator tparami = tparam.listIterator();
             String pclMode = pcl.getMode();
-
+            
             if ( "replicationStats".equals(pclMode) ) {
                 replicationStats.put(pcl.getName(), pcl);
             } else if ( "designPointStats".equals(pclMode) ) {
@@ -573,16 +614,16 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 propertyChangeListeners.put(pcl.getName(), pcl);
             }
         }
-
+        
         li = this.root.getPropertyChangeListenerConnection().listIterator();
-
+        
         while ( li.hasNext() ) {
             PropertyChangeListenerConnectionType pclc = (PropertyChangeListenerConnectionType)li.next();
             propertyChangeListenerConnections.put(((PropertyChangeListenerType)pclc.getListener()).getName(),pclc);
         }
-
+        
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
-
+        
         String[] pcls = (String[]) propertyChangeListeners.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) propertyChangeListeners.get(pcls[i]);
@@ -597,10 +638,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println(sp8 + "super" + pd + "createPropertyChangeListeners" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-
-
+        
+        
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
-
+        
         pcls = (String[]) replicationStats.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) replicationStats.get(pcls[i]);
@@ -615,11 +656,11 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-
+        
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
-
+        
         pcls = (String[]) designPointStats.keySet().toArray(new String[0]);
-
+        
         for ( int i = 0; i < pcls.length; i++ ) {
             PropertyChangeListenerType pcl = (PropertyChangeListenerType) designPointStats.get(pcls[i]);
             //currenlty only one connection per pcl allowed, but multi per source
@@ -630,50 +671,50 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
         }
-
-
+        
+        
         pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
-
+        
         pw.println(sp4 + cb);
         pw.println();
-
-
+        
+        
     }
-
+    
     void buildConnectors(StringWriter connectors) {
-
-	PrintWriter pw = new PrintWriter(connectors);
-
+        
+        PrintWriter pw = new PrintWriter(connectors);
+        
         // listeners get attached upon instantiation
-
+        
         pw.println(sp4 + "public" + sp + this.root.getName() + lp + rp + sp + ob);
-
-	ListIterator connects = this.root.getSimEventListenerConnection().listIterator();
-
-	while ( connects.hasNext() ) {
-	    SimEventListenerConnectionType simcon = (SimEventListenerConnectionType)connects.next();
-	    pw.print(sp8 + ((SimEntityType)simcon.getSource()).getName() + pd + "addSimEventListener" );
-	    pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc);
-	}
-
-	pw.println();
-
-	connects = this.root.getPropertyChangeListenerConnection().listIterator();
-
-	while ( connects.hasNext() ) {
-	    PropertyChangeListenerConnectionType pccon = (PropertyChangeListenerConnectionType)connects.next();
-	    pw.print(sp8 + ((SimEntityType)pccon.getSource()).getName());
-	    pw.print(pd + "addPropertyChangeListener" + lp);
-	    if ( pccon.getProperty() != null ) {
-		pw.print(qu + pccon.getProperty() + qu + cm);
-	    }
-	    Object listener = pccon.getListener();
-	    if ( listener instanceof SimEntity ) {
-	        pw.println(((SimEntityType)(pccon.getListener())).getName() + rp + sc);
-	    } else {
-	        pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
-	    }
-	}
+        
+        ListIterator connects = this.root.getSimEventListenerConnection().listIterator();
+        
+        while ( connects.hasNext() ) {
+            SimEventListenerConnectionType simcon = (SimEventListenerConnectionType)connects.next();
+            pw.print(sp8 + ((SimEntityType)simcon.getSource()).getName() + pd + "addSimEventListener" );
+            pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc);
+        }
+        
+        pw.println();
+        
+        connects = this.root.getPropertyChangeListenerConnection().listIterator();
+        
+        while ( connects.hasNext() ) {
+            PropertyChangeListenerConnectionType pccon = (PropertyChangeListenerConnectionType)connects.next();
+            pw.print(sp8 + ((SimEntityType)pccon.getSource()).getName());
+            pw.print(pd + "addPropertyChangeListener" + lp);
+            if ( pccon.getProperty() != null ) {
+                pw.print(qu + pccon.getProperty() + qu + cm);
+            }
+            Object listener = pccon.getListener();
+            if ( listener instanceof SimEntity ) {
+                pw.println(((SimEntityType)(pccon.getListener())).getName() + rp + sc);
+            } else {
+                pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
+            }
+        }
         pw.println();
         connects = this.root.getAdapter().listIterator();
         while (connects.hasNext()) {
@@ -684,127 +725,127 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
             pw.println();
         }
-
+        
         pw.println(sp4 + cb);
-	pw.println();
+        pw.println();
     }
-
+    
     void buildOutput(StringWriter out) {
-	PrintWriter pw = new PrintWriter(out);
-
+        PrintWriter pw = new PrintWriter(out);
+        
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + "asm" + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
-
-	ListIterator outputs = this.root.getOutput().listIterator();
-	while ( outputs.hasNext() ) {
+        
+        ListIterator outputs = this.root.getOutput().listIterator();
+        while ( outputs.hasNext() ) {
             Object elem = ((OutputType)outputs.next()).getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
-
+            
             if ( elem instanceof SimEntityType ) {
                 name = ((SimEntityType)elem).getName();
             } else if ( elem instanceof PropertyChangeListenerType ) {
                 name = ((PropertyChangeListenerType)elem).getName();
             }
-	    pw.println(sp8 + "System.out.println" + lp + "asm" + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
-	}
+            pw.println(sp8 + "System.out.println" + lp + "asm" + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+        }
     }
-
+    
     void buildTail(StringWriter t) {
-
-	PrintWriter pw = new PrintWriter(t);
-	ScheduleType schedule;
-
-	if ( (schedule = this.root.getSchedule()) != null ) {
-
+        
+        PrintWriter pw = new PrintWriter(t);
+        ScheduleType schedule;
+        
+        if ( (schedule = this.root.getSchedule()) != null ) {
+            
             pw.print(sp8 + "asm.setStopTime");
-	    pw.println(lp + schedule.getStopTime() + rp + sc);
-
-	    pw.print(sp8 + "asm.setVerbose");
-	    pw.println(lp + schedule.getVerbose() + rp + sc);
-
+            pw.println(lp + schedule.getStopTime() + rp + sc);
+            
+            pw.print(sp8 + "asm.setVerbose");
+            pw.println(lp + schedule.getVerbose() + rp + sc);
+            
             pw.print(sp8 + "asm.setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
-
+            
             pw.print(sp8 + "asm.setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
-
+            
             pw.print(sp8 + "asm.setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
-
-
-	}
-
+            
+            
+        }
+        
         pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "start" + lp + rp + sc);
-
-	pw.println();
-	pw.println(sp4 + cb);
-	pw.println(cb);
+        
+        pw.println();
+        pw.println(sp4 + cb);
+        pw.println(cb);
     }
-
-    void buildSource(StringBuffer source, StringWriter head, StringWriter entities, 
-		StringWriter listeners, StringWriter output, StringWriter tail ) {
-   	 
-	source.append(head.getBuffer()).append(entities.getBuffer()).append(listeners.getBuffer());
-	source.append(output.getBuffer()).append(tail.getBuffer());
+    
+    void buildSource(StringBuffer source, StringWriter head, StringWriter entities,
+            StringWriter listeners, StringWriter output, StringWriter tail ) {
+        
+        source.append(head.getBuffer()).append(entities.getBuffer()).append(listeners.getBuffer());
+        source.append(output.getBuffer()).append(tail.getBuffer());
     }
-
+    
     public void writeOut(String data, java.io.PrintStream out) {
-	out.println(data);	
+        out.println(data);
     }
-
+    
     private String baseNameOf( String s ) {
         return s.substring(0,s.indexOf(pd));
     }
-
+    
     boolean compileCode(String fileName) {
-	String path = this.root.getPackage();
-	File fDest;
-	char[] pchars;
-	int j;
-	pchars = path.toCharArray();
-	for (j = 0; j<pchars.length; j++) {
-	    if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
-	}
-	path = new String(pchars);
-	try {
-	    File f = new File(pd + File.separator + path);
-	    f.mkdirs();
-	    fDest = new File(path + File.separator + fileName);
-	    f = new File(fileName);
-	    f.renameTo(fDest);
-	} catch (Exception e) { e.printStackTrace(); }	
+        String path = this.root.getPackage();
+        File fDest;
+        char[] pchars;
+        int j;
+        pchars = path.toCharArray();
+        for (j = 0; j<pchars.length; j++) {
+            if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
+        }
+        path = new String(pchars);
+        try {
+            File f = new File(pd + File.separator + path);
+            f.mkdirs();
+            fDest = new File(path + File.separator + fileName);
+            f = new File(fileName);
+            f.renameTo(fDest);
+        } catch (Exception e) { e.printStackTrace(); }
         return (
-            com.sun.tools.javac.Main.compile(
-                 new String[] {"-verbose","-sourcepath",path,"-d",pd,path+File.separator+fileName}
-            ) == 0
-        );
+                com.sun.tools.javac.Main.compile(
+                new String[] {"-verbose","-sourcepath",path,"-d",pd,path+File.separator+fileName}
+        ) == 0
+                );
     }
-
+    
     void runIt() {
-	try {
-	    File f = new File(pd);
-	    ClassLoader cl = new URLClassLoader(new URL[] {f.toURL()});
-	    Class assembly = cl.loadClass(this.root.getPackage()+pd+fileBaseName);
-	    Object params[] = { new String[]{} };
+        try {
+            File f = new File(pd);
+            ClassLoader cl = new URLClassLoader(new URL[] {f.toURL()});
+            Class assembly = cl.loadClass(this.root.getPackage()+pd+fileBaseName);
+            Object params[] = { new String[]{} };
             Class classParams[] = { params[0].getClass() };
             Method mainMethod = assembly.getDeclaredMethod("main", classParams);
             mainMethod.invoke(null, params);
-	} catch (Exception e) { error(e.toString()); }
+        } catch (Exception e) { error(e.toString()); }
     }
-
+    
     void error(String desc) {
-
-	StringWriter sw = new StringWriter();
-	PrintWriter pw = new PrintWriter(sw);
-
-	pw.println("error :");
-	pw.println(desc);
-
-	System.err.println(sw.toString());
-	System.exit(1);
+        
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        
+        pw.println("error :");
+        pw.println(desc);
+        
+        System.err.println(sw.toString());
+        System.exit(1);
     }
-
+    
     /**
      * @param arg the command line arguments
      * args[0] - -f | --file | -p | --port
@@ -812,7 +853,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      * args[2] - -p | --port | -f | --file
      * args[3] - port | filename
      */
-
+    
     public static void main(String[] arg) {
         int port = 0;
         String fileName = null;
@@ -866,7 +907,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     }
     
     public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
-    
+        
         System.out.println("Doing GridTask "+taskID+" of "+lastTask+" for "+frontHost+" as jobID "+jobID);
         
         
@@ -936,15 +977,15 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(bais);
                 sx2j.unmarshal();
                 
-		System.out.println("Evaluating generated java Event Graph:");
-		System.out.println(sx2j.translate());
+                System.out.println("Evaluating generated java Event Graph:");
+                System.out.println(sx2j.translate());
                 
                 bsh.eval(sx2j.translate());
                 
             }
-
-	    System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
-	    System.out.println(translate());
+            
+            System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
+            System.out.println(translate());
             bsh.eval(translate());
             //bsh.eval("sim = new "+ root.getName() +"();");
             //bsh.eval("sim.main(new String[0])");
@@ -986,7 +1027,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                                 propertyChanges.add(line);
                             }
                         }
- 
+                        
                     }
                 }
                 while( (line = ebr.readLine()) != null ) {
@@ -1034,7 +1075,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
         } catch (bsh.EvalError ee) {
             ee.printStackTrace();
-        } 
+        }
     }
     
     public void doLocalTask() {
@@ -1055,7 +1096,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     root.setExperiment(e);
                     doFullFactorial();
                 } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
-
+                
             } else { // take a Script or use built ins
                 ExperimentType e = root.getExperiment();
                 e.setBatchID(fileBaseName+": "+(new java.util.Date()).toString());
@@ -1067,7 +1108,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 } else if (expType.equals("latin-hypercube")) {
                     doLatinHypercube();
                 }
-
+                
                 //bsh.eval(root.getExperiment().getScript());
                 
             }
@@ -1082,44 +1123,44 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             } catch (java.io.IOException ioe) {
                 ioe.printStackTrace();
             }
-
+            
         } else {
             System.out.println("Generating Java Source...");
-
+            
             marshal();
             String dotJava = translate();
-        
+            
             writeOut(dotJava,System.out);
-
+            
             System.out.println("Done.");
             System.out.println("Generating Java Bytecode...");
-
+            
             try {
                 String fileName = fileBaseName + ".java";
                 FileOutputStream fout =
-                    new FileOutputStream(fileName);
+                        new FileOutputStream(fileName);
                 PrintStream ps = new PrintStream(fout,true);
                 writeOut(dotJava,ps);
                 if ( !compileCode(fileName) )
                     error("Compile error " + fileName);
                 else {
                     System.out.println("Done.");
-
+                    
                     System.out.println("Running Assembly " + fileBaseName + "...");
                     System.out.println();
-
+                    
                     runIt();
                 }
             } catch (FileNotFoundException fnfe) {
                 error("Bad filename " + fileBaseName);
             }
         }
-
+        
     }
     
     
     public void doFullFactorial() {
-        try { 
+        try {
             List params = root.getDesignParameters();
             ObjectFactory of = new ObjectFactory();
             root.setExperiment(of.createExperiment());
@@ -1152,7 +1193,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 iterate(values,values.size()-1);
             }
         } catch (javax.xml.bind.JAXBException jaxe) { jaxe.printStackTrace(); }
-
+        
     }
     
     void iterate(HashMap values, int depth) {
@@ -1188,7 +1229,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     
                     designPoints.add(designPoint);
                     incrementCount();
-                
+                    
                 } catch (javax.xml.bind.JAXBException jaxe) {jaxe.printStackTrace();}
             }
         }
@@ -1204,33 +1245,33 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      *
      * The DesignParameters return a range of values as per the FullFactorial
      * version.
-     * 
+     *
      * Each range is divided into bins of equal probability. Each bin is
      * numbered from 0 to number of independent variables - 1.
      * A numIndptVars x numIndptVars index matrix is created in the form of of a
      * Random Latin Square. A Random Latin Square is one whose first row and
-     * column contain a random permutation of {sequence 0...runs-1} and each sub 
-     * matrix is created by selecting values that are not in the row or column 
-     * of the super matrix. To randomize within the same jvm session, rather 
-     * than take the value of the range at the bin number in the stratification, 
-     * a uniformly chosen sample is taken from the bin for each design point, 
-     * which stochastically jitters the sample points. Then even if the single 
-     * pass node runs all are from the same seed, they came from a slightly 
-     * different sample point. To create more runs per sample that have any 
+     * column contain a random permutation of {sequence 0...runs-1} and each sub
+     * matrix is created by selecting values that are not in the row or column
+     * of the super matrix. To randomize within the same jvm session, rather
+     * than take the value of the range at the bin number in the stratification,
+     * a uniformly chosen sample is taken from the bin for each design point,
+     * which stochastically jitters the sample points. Then even if the single
+     * pass node runs all are from the same seed, they came from a slightly
+     * different sample point. To create more runs per sample that have any
      * meaning then, it is required to use a different seed each Run via Script,
      * since each run starts from a "fresh" jvm.
-     * 
-     * The Latin part is that the index matrix is Latin, which represent 
-     * probability bins to select from, not interpolated values of the ranges. 
-     * For small number of variates, more samples, as controlled from the 
-     * Experiment tag's totalsSamples attribute, from each Latin square, should 
-     * be run per per Experiment. If a script for the Runs as described above is 
-     * used then several different results can occur for designs where a 
+     *
+     * The Latin part is that the index matrix is Latin, which represent
+     * probability bins to select from, not interpolated values of the ranges.
+     * For small number of variates, more samples, as controlled from the
+     * Experiment tag's totalsSamples attribute, from each Latin square, should
+     * be run per per Experiment. If a script for the Runs as described above is
+     * used then several different results can occur for designs where a
      * RandomVariate is seeded, otherwise they are the same.
-     * 
-     * Each Latin square may generate an "infinite" number of similarly jittered 
-     * DesignPoints, but there are countably finite Latin square combinations. 
-     * 
+     *
+     * Each Latin square may generate an "infinite" number of similarly jittered
+     * DesignPoints, but there are countably finite Latin square combinations.
+     *
      * In general, the number of Latin square combinations is far
      * less than the number of FullFactorial combinations and converges as fast,
      * even so, there can be a large number of Latin squares, so in the case of
@@ -1394,29 +1435,29 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         //for testing stand-alone
         //public static void main(String[] args) {
-            //LatinPermutator lp = new LatinPermutator(Integer.parseInt(args[0]));
-            //output size number of randoms
-            //System.out.println("Output "+lp.size+" random LHS");
-            //for ( int j = 0; j < 10*lp.size; j++ ) {
-                //java.util.Date d = new java.util.Date();
-                //long time = d.getTime();
-                //lp.randomSquare();
-                //d = new java.util.Date();
-                //time -= d.getTime();
-                //System.out.println("Random Square:");
-                //lp.output();
-                //System.out.println("milliseconds : "+-1*time);
-                //System.out.println("---------------------------------------------");
-            //}
-            
-            //output series starting at base
-            //System.out.println("---------------------------------------------");
-            //System.out.println("Output bubbled LHS");
-            //lp.ct=0;
-            //bubbles not perfect, hits some squares more than once, not all squares
-            //possible with only single base
-            //lp.bubbles();
-            
+        //LatinPermutator lp = new LatinPermutator(Integer.parseInt(args[0]));
+        //output size number of randoms
+        //System.out.println("Output "+lp.size+" random LHS");
+        //for ( int j = 0; j < 10*lp.size; j++ ) {
+        //java.util.Date d = new java.util.Date();
+        //long time = d.getTime();
+        //lp.randomSquare();
+        //d = new java.util.Date();
+        //time -= d.getTime();
+        //System.out.println("Random Square:");
+        //lp.output();
+        //System.out.println("milliseconds : "+-1*time);
+        //System.out.println("---------------------------------------------");
+        //}
+        
+        //output series starting at base
+        //System.out.println("---------------------------------------------");
+        //System.out.println("Output bubbled LHS");
+        //lp.ct=0;
+        //bubbles not perfect, hits some squares more than once, not all squares
+        //possible with only single base
+        //lp.bubbles();
+        
         //}
         
         public LatinPermutator(int size) {
@@ -1449,9 +1490,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     output();
                 }
                 }
-            
+         
         }
-        
+         
         // not really used except for test as per bubbles() in main()
         boolean bubbleRow() {
             int t;
@@ -1465,7 +1506,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             rc--;
             return true;
         }
-        
+         
         // not really used except for test as per bubbles() in main()
         boolean bubbleCol() {
             int t;
@@ -1479,7 +1520,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             cc--;
             return true;
         }
-        */
+         */
         void output() {
             //System.out.println("Row index: ");
             ////for ( int i = 0;  i < size; i++ ) {
@@ -1518,7 +1559,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 row[i] = ((Integer)(r.remove((int)((double)r.size()*rnd.draw())))).intValue();
                 col[i] = ((Integer)(c.remove((int)((double)c.size()*rnd.draw())))).intValue();
             }
-
+            
         }
         
         int[][] getRandomLatinSquare() {
@@ -1588,7 +1629,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             Integer designPt = (Integer) parameters.elementAt(0);
             Integer run = (Integer) parameters.elementAt(1);
             ret = removeTask(designPt.intValue(),run.intValue());
-        } else { 
+        } else {
             throw new Exception("No such method \""+methodName+"\"! ");
         }
         return ret;
@@ -1657,7 +1698,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                     run.notify();
                 }
             }
-
+            
             incrementTotalResults();
             
             //check if done, then write out complete file.
@@ -1674,7 +1715,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         return new Boolean(busy);
     }
     
-    /** 
+    /**
      * XML-RPC hook to retrieve results from an experimental run.
      * The call is synchronized, the calling client thread
      * which invokes this method on the server thread blocks
@@ -1684,10 +1725,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
      * Any of Async XML-RPC with client callbacks, single threaded
      * in order, or multithreaded any order clients can be used.
      * This server has a maximum of 100 server threads default,
-     * so don't send more than that many multithreaded requests 
+     * so don't send more than that many multithreaded requests
      * unless using Async mode with callbacks.
      *
-     * Note: this method times out if a timeout value is set as 
+     * Note: this method times out if a timeout value is set as
      * an attribute of the Experiment. This makes it tunable depending
      * on the expected run time of the bench test by the user. This
      * comes in handy if the client was single threaded in sequence,
@@ -1713,14 +1754,14 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             r = runner.getResults();
             
         }
-
+        
         if ( r == null ) {
             try {
                 ObjectFactory of = new ObjectFactory();
                 r = (ResultsType)(of.createResults());
                 r.setDesign(""+designPt);
                 r.setRun(""+run);
-               
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1744,15 +1785,15 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             r.setDesign(""+designPt);
             r.setRun(""+run);
             // release Results lock on thread
-            addReport(marshalToString(r)); 
+            addReport(marshalToString(r));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new Integer(taskID);
     }
-
-    /** 
-     * XML-RPC handler for clearing the grid queue, 
+    
+    /**
+     * XML-RPC handler for clearing the grid queue,
      * @return number of remaining jobs still in the queue
      * that will be terminated.
      */
@@ -1771,9 +1812,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         return remainingJobs;
     }
     
-    /** 
+    /**
      * XML-RPC handler for returning number of remaining jobs in queue,
-     * could be used to estimate when a set of jobs becomes stuck. 
+     * could be used to estimate when a set of jobs becomes stuck.
      * @return number of remaining jobs in the queue still running.
      */
     
@@ -1807,7 +1848,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         public GridTaskGetter(SimkitAssemblyXML2Java instance) {
             inst = instance;
             try {
-                Process pr = Runtime.getRuntime().exec("env"); 
+                Process pr = Runtime.getRuntime().exec("env");
                 is = pr.getInputStream();
                 
             } catch (java.io.IOException ioe) {
@@ -1831,7 +1872,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 }
                 
             } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                ioe.printStackTrace();
             }
             
             if (isTask) {
@@ -1840,6 +1881,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 inst.doLocalTask();
             }
         }
-
+        
     }
 }
