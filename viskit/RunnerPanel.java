@@ -129,7 +129,7 @@ public class RunnerPanel extends JPanel
     vcrToolBar.add(vcrStopTime);
     vcrToolBar.add(Box.createHorizontalStrut(10));
 
-    vcrVerbose = new JCheckBox("verbose output", false);
+    vcrVerbose = new JCheckBox("Verbose output", false);
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     vcrToolBar.add(vcrVerbose);
     vcrToolBar.add(Box.createHorizontalStrut(5));
