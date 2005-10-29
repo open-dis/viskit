@@ -112,7 +112,7 @@ public class RunnerPanel extends JPanel
 
     vcrToolBar.add(Box.createHorizontalStrut(20));
 
-    JLabel vcrSimTimeLab = new JLabel("Sim. time:");
+    JLabel vcrSimTimeLab = new JLabel("Simulation time:");
     vcrSimTime = new JTextField(10);
     vcrSimTime.setEditable(false);
     Vstatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
