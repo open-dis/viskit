@@ -295,15 +295,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 "long","long[]","boolean","boolean[]"
         };
         
-        ArrayList exList = new ArrayList();
-        ListIterator li = exList.listIterator();
-        int i = excludes.length - 1;
-        li.add(excludes[i--]);
-        
-        while(i>0) {
-            li.add(excludes[i--]);
-        }
-        
+        List exList = java.util.Arrays.asList(excludes);
         Iterator it = list.iterator();
         
         while(it.hasNext()) {
@@ -312,34 +304,29 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 it.remove();
             }
         }
-
-        it = list.iterator();
-        
-        while ( it.hasNext() ) {
-            String t = (String)it.next();
-            int brindex = t.indexOf('[');
-            
-            if ( brindex > 0 ) {
-                t = t.substring(0,brindex);
-            }
-            
-            if ( t.startsWith("java.lang") ) {
-                    it.remove();
-            }
-        }
         
         it = list.iterator();
 
         while (it.hasNext()) {
             String imp = (String) it.next();
-            pw.println("import" + sp + imp + sc);
+            if (!imp.startsWith("java.lang")) {
+                pw.println("import" + sp + imp + sc);
+            }
         }
+    }
+    
+    String stripBrackets(String type) {
+        int brindex = type.indexOf('[');
+        if (brindex > 0)
+            return new String(type.substring(0, brindex));
+        else 
+            return type;
     }
     
     void traverseForImports(Object branch, TreeSet tlist) {
         SortedSet list = Collections.synchronizedSortedSet(tlist);
         if ( branch instanceof SimEntityType ) {
-            String t = ((SimEntityType)branch).getType();
+            String t = stripBrackets(((SimEntityType)branch).getType());
             if ( !list.contains(t) ) {
                 synchronized(list) {
                     list.add(t);
@@ -352,7 +339,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             }
         } else if ( branch instanceof FactoryParameterType ) {
             FactoryParameterType fp = (FactoryParameter)branch;
-            String t = fp.getType();
+            String t = stripBrackets(fp.getType());
             if ( !list.contains(t) ) {
                 synchronized(list) {
                     list.add(t);
@@ -365,7 +352,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             }
         } else if ( branch instanceof MultiParameterType ) {
             MultiParameterType mp = (MultiParameterType)branch;
-            String t = mp.getType();
+            String t = stripBrackets(mp.getType());
             if ( !list.contains(t) ) {
                 synchronized(list) {
                     list.add(t);
@@ -380,7 +367,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
         } else if ( branch instanceof TerminalParameterType ) {
             TerminalParameterType tp = (TerminalParameterType)branch;
-            String t = tp.getType();
+            String t = stripBrackets(tp.getType());
             if ( !list.contains(t) ){
                 synchronized(list) {
                     list.add(t);
@@ -393,7 +380,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
                 }
             }
             PropertyChangeListenerType pcl = (PropertyChangeListenerType)branch;
-            String t = pcl.getType();
+            String t = stripBrackets(pcl.getType());
             if ( !list.contains(t) ) {
                 synchronized(list) {
                     list.add(t);
