@@ -89,9 +89,9 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
 
       addSeparator();
 
-      mi = buildMI("Save Doe file", controller, SAVE_FILE);
+      mi = buildMI("Save DOE file", controller, SAVE_FILE);
       add(mi);
-      mi = buildMI("Save Doe File as ...", controller, SAVE_FILE_AS);
+      mi = buildMI("Save DOE file as ...", controller, SAVE_FILE_AS);
       add(mi);
 
       addSeparator();
