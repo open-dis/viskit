@@ -58,14 +58,14 @@
     <path id="jaxb.classes">
         <fileset dir="${dir.lib.xml}" includes="*.jar"/>
     </path>
-    
+
     <!-- access to local environment variables -->
     <property environment="env"/>
-    
+
     <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
       <echo message="warning:  JAVA_HOME not set!"/>
     </target>
-        
+
     <path id="runtime.classpath">
     
         <!-- use local JDK for tools.jar -->
