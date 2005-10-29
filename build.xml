@@ -67,7 +67,7 @@
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/jhall.jar"/>
         <pathelement location="${dir.lib}/tools.jar"/>
-	      <pathelement location="${dir.lib}/jdom.jar"/>
+        <pathelement location="${dir.lib}/jdom.jar"/>
         <pathelement location="${dir.lib}/jfreechart-1.0.0-rc1.jar"/>
         <pathelement location="${dir.lib}/jcommon-1.0.0-rc1.jar"/>
         <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
