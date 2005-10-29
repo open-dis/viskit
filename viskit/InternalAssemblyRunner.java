@@ -80,7 +80,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   public InternalAssemblyRunner()
   {
     saver = new saveListener();
-    runPanel = new RunnerPanel("Initialize with the Run button on the Assembly tab",true);
+    runPanel = new RunnerPanel("Initialize using Assembly Edit tab, then Run button",true);
     doMenus();
     runPanel.vcrStop.addActionListener(new stopListener());
     runPanel.vcrPlay.addActionListener(new startResumeListener());
