@@ -902,7 +902,7 @@ cancelArcMode.setIcon(new CanArcIcon());
   public void setSelectedEventGraphName(String s)
   //----------------------------
   {
-    String ttl = "Viskit: "+s;
+    String ttl = "Viskit Event Graph: "+s;
     setTitle(ttl);
     tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),s);
     if(this.titlList != null)
