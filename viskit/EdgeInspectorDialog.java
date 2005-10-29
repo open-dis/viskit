@@ -268,8 +268,8 @@ public class EdgeInspectorDialog extends JDialog
       {
         vEdgeParameter ep = (vEdgeParameter)event.getSource();
 
-        boolean wasmodified = EdgeParameterDialog.showDialog(myFrame,EdgeInspectorDialog.this,ep);
-        if(wasmodified) {
+        boolean wasModified = EdgeParameterDialog.showDialog(myFrame,EdgeInspectorDialog.this,ep);
+        if(wasModified) {
           parameters.updateRow(ep);
           okButt.setEnabled(true);
           modified=true;
