@@ -32,6 +32,7 @@ public class ViskitAssembly extends BasicAssembly {
     public LinkedHashMap designPointStatsListenerConnections;
     public LinkedHashMap replicationStatsListenerConnections;
     public LinkedHashMap simEventListenerConnections;
+    public LinkedHashMap adapters;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
@@ -49,6 +50,7 @@ public class ViskitAssembly extends BasicAssembly {
         simEventListenerConnections = new LinkedHashMap();
         designPointStatsListenerConnections = new LinkedHashMap();
         replicationStatsListenerConnections = new LinkedHashMap();
+        adapters = new LinkedHashMap();
         super.createObjects();
     }
     
@@ -160,6 +162,15 @@ public class ViskitAssembly extends BasicAssembly {
     
     public void addSimEventListenerConnection(String listener, String source) {
         simEventListenerConnections.put(listener,source);
+    }
+    
+    public void addAdapter(String name, String heard, String sent, String from, String to) {
+        Adapter a = new Adapter(heard,sent);
+        // Adapters always follow SimEntities in the Schema,
+        // it is safe to connect now.
+        a.connect(getSimEntityByName(from),getSimEntityByName(to));
+        adapters.put(name,a);
+        entities.put(name,a);
     }
     
     public PropertyChangeListener getPropertyChangeListenerByName(String name) {

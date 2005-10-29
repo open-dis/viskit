@@ -396,15 +396,16 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     
     void buildEntities(StringWriter entities) {
         PrintWriter pw = new PrintWriter(entities);
-        ListIterator seli = this.root.getSimEntity().listIterator();
+        ListIterator li = this.root.getSimEntity().listIterator();
         
         pw.println(sp4+"public void createSimEntities"+ lp + rp + sp + ob);
-        while ( seli.hasNext() ) {
+        while ( li.hasNext() ) {
             
-            SimEntity se = (SimEntity) seli.next();
+            SimEntity se = (SimEntity) li.next();
             List pl = se.getParameters();
             ListIterator pli = pl.listIterator();
             
+            pw.println();
             pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
             pw.print(sp12 + nw + sp + se.getType() + lp);
             
@@ -417,19 +418,34 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             } else pw.println(rp);
             
             pw.println(sp8 + rp + sc);
-            pw.println();
         }
         
-        ListIterator sec = this.root.getSimEventListenerConnection().listIterator();
+        li = this.root.getSimEventListenerConnection().listIterator();
         
-        while(sec.hasNext()) {
-            SimEventListenerConnectionType sect = (SimEventListenerConnectionType)sec.next();
+        if ( this.root.getSimEventListenerConnection().size() > 0 )
+            pw.println();
+        
+        while(li.hasNext()) {
+            SimEventListenerConnectionType sect = (SimEventListenerConnectionType)li.next();
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity)(sect.getListener())).getName() + qu);
             pw.println(cm + qu + ((SimEntity)(sect.getSource())).getName() + qu + rp + sc);
         }
         
-        pw.println();
+        li = this.root.getAdapter().listIterator();
         
+        if ( this.root.getAdapter().size() > 0 ) 
+            pw.println();
+        
+        while ( li.hasNext() ) {
+            AdapterType a = (AdapterType) li.next();
+            pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm );
+            pw.print(sp + qu + a.getEventHeard() + qu + cm );
+            pw.print(sp + qu + a.getEventSent() + qu + cm );
+            pw.print(sp + qu + ((SimEntityType)a.getFrom()).getName() + qu + cm );
+            pw.println(sp + qu + ((SimEntityType)a.getTo()).getName() + qu + rp + sc );
+        } 
+        
+        pw.println();
         pw.println(sp8 + "super" + pd + "createSimEntities"+ lp + rp + sc);
         
         pw.println(sp4 + cb);
@@ -576,8 +592,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     void buildListeners(StringWriter listeners) {
         
         PrintWriter pw = new PrintWriter(listeners);
-        
-        
         LinkedHashMap replicationStats = new LinkedHashMap();
         LinkedHashMap designPointStats = new LinkedHashMap();
         LinkedHashMap propertyChangeListeners = new LinkedHashMap();
@@ -695,6 +709,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         }
         
         
+        
         pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
         
         pw.println(sp4 + cb);
@@ -702,57 +717,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         
     }
-    
-    // unused now
-    void buildConnectors(StringWriter connectors) {
-        
-        PrintWriter pw = new PrintWriter(connectors);
-        
-        // listeners get attached upon instantiation
-        
-        pw.println(sp4 + "public" + sp + this.root.getName() + lp + rp + sp + ob);
-        
-        ListIterator connects = this.root.getSimEventListenerConnection().listIterator();
-        
-        while ( connects.hasNext() ) {
-            SimEventListenerConnectionType simcon = (SimEventListenerConnectionType)connects.next();
-            pw.print(sp8 + ((SimEntityType)simcon.getSource()).getName() + pd + "addSimEventListener" );
-            pw.println(lp + ((SimEntityType)simcon.getListener()).getName() + rp + sc);
-        }
-        
-        pw.println();
-        
-        connects = this.root.getPropertyChangeListenerConnection().listIterator();
-        
-        while ( connects.hasNext() ) {
-            PropertyChangeListenerConnectionType pccon = (PropertyChangeListenerConnectionType)connects.next();
-            pw.print(sp8 + ((SimEntityType)pccon.getSource()).getName());
-            pw.print(pd + "addPropertyChangeListener" + lp);
-            if ( pccon.getProperty() != null ) {
-                pw.print(qu + pccon.getProperty() + qu + cm);
-            }
-            Object listener = pccon.getListener();
-            if ( listener instanceof SimEntity ) {
-                pw.println(((SimEntityType)(pccon.getListener())).getName() + rp + sc);
-            } else {
-                pw.println(sp + ((PropertyChangeListenerType)(pccon.getListener())).getName() + rp + sc);
-            }
-        }
-        pw.println();
-        connects = this.root.getAdapter().listIterator();
-        while (connects.hasNext()) {
-            AdapterType a = (AdapterType) connects.next();
-            pw.print(sp8 + ((SimEntityType)a.getFrom()).getName() + pd + "addSimEventListener" + lp);
-            pw.println(a.getName() + rp + sc);
-            pw.print(sp8 + a.getName() + pd + "addSimEventListener" + lp);
-            pw.println(((SimEntityType)a.getTo()).getName() + rp + sc);
-            pw.println();
-        }
-        
-        pw.println(sp4 + cb);
-        pw.println();
-    }
-    
+
     void buildOutput(StringWriter out) {
         PrintWriter pw = new PrintWriter(out);
         
@@ -795,7 +760,6 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
             pw.print(sp8 + "asm.setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
-            
             
         }
         
