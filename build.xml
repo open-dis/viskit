@@ -61,13 +61,17 @@
     
     <!-- access to local environment variables -->
     <property environment="env"/>
+    
+    <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
+      <echo message="warning:  JAVA_HOME not set!"/>
+    </target>
         
     <path id="runtime.classpath">
     
         <!-- use local JDK for tools.jar -->
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
    <!-- JDK1.4 version of tools.jar is currently checked in, should remove since that is not a legitimate distribution mode. -->
-   <!-- <pathelement location="${dir.lib}/tools.jar"/> -->
+        <pathelement location="${dir.lib}/tools.jar"/>
         
         <pathelement location="${dir.build}/lib/viskit.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
