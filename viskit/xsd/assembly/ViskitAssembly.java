@@ -15,8 +15,8 @@ import simkit.*;
 import simkit.stat.*;
 import java.util.*;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Constructor;
-import viskit.xsd.bindings.assembly.PropertyChangeListenerConnection;
+
+
 
 /**
  * @version $Id$
@@ -37,7 +37,6 @@ public class ViskitAssembly extends BasicAssembly {
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
 
-        
     }
     
     public void createObjects() {
@@ -166,8 +165,6 @@ public class ViskitAssembly extends BasicAssembly {
     
     public void addAdapter(String name, String heard, String sent, String from, String to) {
         Adapter a = new Adapter(heard,sent);
-        // Adapters always follow SimEntities in the Schema,
-        // it is safe to connect now.
         a.connect(getSimEntityByName(from),getSimEntityByName(to));
         adapters.put(name,a);
         entities.put(name,a);
@@ -182,7 +179,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public SampleStatistics getReplicationStatByName(String name) {
-        return (SampleStatistics) designPointStatistics.get(name);
+        return (SampleStatistics) replicationStatistics.get(name);
     }
     
     public SimEntity getSimEntityByName(String name) {
