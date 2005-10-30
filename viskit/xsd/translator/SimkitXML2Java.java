@@ -543,26 +543,32 @@ public class SimkitXML2Java {
 	    StateVariable sv = (StateVariable) st.getState();
 	    AssignmentType asg = st.getAssignment();
 	    OperationType ops = st.getOperation(); 
-
-	    pw.print(sp8 + sv.getName());
-
-	    if (st.getIndex() != null) pw.print(lb + indexFrom(st) + rb);
-
-	    if (ops != null) {
-		pw.println(pd + ops.getMethod() + sc);
-	    } else if (asg != null) {
-		pw.println(sp + eq + sp + asg.getValue() + sc);
-	    }
 	
-	    if ( isArray(sv.getType()) ) {
-		pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st)); 
-		pw.println(cm + sp + qu + sv.getName() + qu + cm + sp + sv.getName() + rp + sc);
-	    } else {
-	        pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu + cm + sp);
-	        pw.println(sv.getName() + rp + sc);
-	    }
+            String svName = sv.getName();
+            if (st.getIndex() != null) svName += ( lb + indexFrom(st) + rb );
+            String change = "";
+            if (ops != null) {
+                change = ( pd + ops.getMethod() );
+                pw.println(sp8 + svName + change + sc);
+                if ( isArray(sv.getType()) ) {
+                    pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
+                    pw.println(cm + sp + qu + sv.getName() + qu + cm + sp + svName + rp + sc);
+                } else {
+                    pw.print(sp8 + "firePropertyChange" + lp + qu + svName + qu + cm + sp);
+                    pw.println(svName + rp + sc);
+                }
+            }
+            if (asg != null) {
+                change = ( sp + eq + sp + asg.getValue() );
+                if ( isArray(sv.getType()) ) {
+                    pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
+                    pw.println(cm + sp + qu + sv.getName() + qu + cm + sp + svName + cm + sp + svName + change + rp + sc);
+                } else {
+                    pw.print(sp8 + "firePropertyChange" + lp + qu + svName + qu + cm + sp);
+                    pw.println(svName + cm + sp + svName + change + rp + sc);
+                }
+            }
 	    pw.println();
-
 	}
 
 	// waitDelay/interrupt
