@@ -718,11 +718,18 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
     }
 
+    String nameAsm() {
+        String asm = this.root.getName().substring(0,1);
+        asm = asm.toLowerCase();
+        asm += this.root.getName().substring(1,this.root.getName().length());
+        return asm;
+    }
+    
     void buildOutput(StringWriter out) {
         PrintWriter pw = new PrintWriter(out);
         
         pw.println(sp4 + "public static void main(String[] args) {");
-        pw.print(sp8 + this.root.getName() + sp + "asm" + sp);
+        pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
         
         ListIterator outputs = this.root.getOutput().listIterator();
@@ -735,7 +742,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             } else if ( elem instanceof PropertyChangeListenerType ) {
                 name = ((PropertyChangeListenerType)elem).getName();
             }
-            pw.println(sp8 + "System.out.println" + lp + "asm" + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+            pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
         }
     }
     
@@ -746,24 +753,24 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         
         if ( (schedule = this.root.getSchedule()) != null ) {
             
-            pw.print(sp8 + "asm.setStopTime");
+            pw.print(sp8 + nameAsm() + pd + "setStopTime");
             pw.println(lp + schedule.getStopTime() + rp + sc);
             
-            pw.print(sp8 + "asm.setVerbose");
+            pw.print(sp8 + nameAsm() + pd + "setVerbose");
             pw.println(lp + schedule.getVerbose() + rp + sc);
             
-            pw.print(sp8 + "asm.setNumberReplications");
+            pw.print(sp8 + nameAsm() + pd + "setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
             
-            pw.print(sp8 + "asm.setPrintReplicationReports");
+            pw.print(sp8 + nameAsm() + pd + "setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
             
-            pw.print(sp8 + "asm.setPrintSummaryReport");
+            pw.print(sp8 + nameAsm() + pd + "setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
             
         }
         
-        pw.println(sp8 + nw + sp + "Thread" + lp + "asm" + rp + pd + "start" + lp + rp + sc);
+        pw.println(sp8 + nw + sp + "Thread" + lp + nameAsm() + rp + pd + "start" + lp + rp + sc);
         
         pw.println();
         pw.println(sp4 + cb);
