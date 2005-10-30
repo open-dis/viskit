@@ -80,12 +80,16 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void hookupDesignPointListeners() {
+        super.hookupDesignPointListeners();
         String[] listeners = (String[]) designPointStatsListenerConnections.keySet().toArray(new String[0]);
-        for ( int i = 0; i < listeners.length; i++ ) {
-            PropertyConnector pc = (PropertyConnector)designPointStatsListenerConnections.get(listeners[i]);
-            connectDesignPointStat(listeners[i], pc.source);
+        // if not the default case, need to really do this with
+        // a Class to create instances selected by each ReplicationStats listener.
+        if (listeners.length > 0) {
+            for ( int i = 0; i < listeners.length; i++ ) {
+                PropertyConnector pc = (PropertyConnector)designPointStatsListenerConnections.get(listeners[i]);
+                connectDesignPointStat(listeners[i], pc.source);
+            }
         }
-        
     }
     
     void connectSimEventListener(String listener, String source) {
@@ -113,10 +117,11 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void createDesignPointStats() {
-        designPointStats = 
-                (SampleStatistics[]) designPointStatistics.values().toArray(new SampleStatistics[0]);
-        if ( designPointStats.length == 0 ) {
-            super.createDesignPointStats();
+        super.createDesignPointStats();
+        // to be consistent; should be getting the designPointStats from 
+        // the super. 
+        for ( int i = 0 ; i < designPointStats.length; i ++ ) {
+            designPointStatistics.put(designPointStats[i].getName(),designPointStats[i]);
         }
     }
     
@@ -156,7 +161,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
         
     public void addReplicationStatsListenerConnection(String listener, String property, String source) {
-        propertyChangeListenerConnections.put(listener,new PropertyConnector(property,source));
+        replicationStatsListenerConnections.put(listener,new PropertyConnector(property,source));
     } 
     
     public void addSimEventListenerConnection(String listener, String source) {
