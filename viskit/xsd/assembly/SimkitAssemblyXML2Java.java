@@ -762,6 +762,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.print(sp8 + nameAsm() + pd + "setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
             
+            pw.print(sp8 + nameAsm() + pd + "setSaveReplicationData");
+            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
+            
             pw.print(sp8 + nameAsm() + pd + "setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
             
