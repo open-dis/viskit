@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
  * Base on code posted by "Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
  */
 
-class Splash2 extends JFrame
+public class Splash2 extends JFrame
 {
   Robot robot;
   BufferedImage screenImg;
