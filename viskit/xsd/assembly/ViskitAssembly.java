@@ -57,7 +57,7 @@ public class ViskitAssembly extends BasicAssembly {
         String[] listeners = (String[]) replicationStatsListenerConnections.keySet().toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             PropertyConnector pc = (PropertyConnector)replicationStatsListenerConnections.get(listeners[i]);
-            connectReplicationStat(listeners[i], pc.source);
+            connectReplicationStat(listeners[i], pc);
         }
         
     }
@@ -75,7 +75,7 @@ public class ViskitAssembly extends BasicAssembly {
         String[] listeners = (String[]) propertyChangeListenerConnections.keySet().toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             PropertyConnector pc = (PropertyConnector)propertyChangeListenerConnections.get(listeners[i]);
-            connectPropertyChangeListener(listeners[i], pc.source);
+            connectPropertyChangeListener(listeners[i], pc);
         }
     }
     
@@ -87,7 +87,7 @@ public class ViskitAssembly extends BasicAssembly {
         if (listeners.length > 0) {
             for ( int i = 0; i < listeners.length; i++ ) {
                 PropertyConnector pc = (PropertyConnector)designPointStatsListenerConnections.get(listeners[i]);
-                connectDesignPointStat(listeners[i], pc.source);
+                if (pc != null) connectDesignPointStat(listeners[i], pc);
             }
         }
     }
@@ -96,16 +96,16 @@ public class ViskitAssembly extends BasicAssembly {
         getSimEntityByName(source).addSimEventListener(getSimEntityByName(listener));
     } 
     
-    void connectPropertyChangeListener(String listener, String source) {
-        getSimEntityByName(source).addPropertyChangeListener(getPropertyChangeListenerByName(listener));
+    void connectPropertyChangeListener(String listener, PropertyConnector pc) {
+        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
     }
     
-    void connectReplicationStat(String listener, String source) {
-        getSimEntityByName(source).addPropertyChangeListener(getReplicationStatByName(listener));
+    void connectReplicationStat(String listener, PropertyConnector pc) {
+        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatByName(listener));
     }
     
-    void connectDesignPointStat(String listener, String source) {
-        getSimEntityByName(source).addPropertyChangeListener(getDesignPointStatByName(listener));
+    void connectDesignPointStat(String listener, PropertyConnector pc) {
+        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatByName(listener));
     }
     
 
