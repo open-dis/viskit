@@ -92,10 +92,10 @@
         <LocalVariable name="r" type="diskit.Vec3d" value="new diskit.Vec3d(0.0,0.0,0.0)">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="dur" type="double" value="((v.length() != 0.0) &amp;&amp; (getCruisingSpeed() != 0.0) )?v.length()/getCruisingSpeed() : 0.0">
+        <LocalVariable name="dur" type="double" value="(((v.length() != 0.0) &amp;&amp; (getCruisingSpeed() != 0.0) )?v.length()/getCruisingSpeed() : 0.0)">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="sc" type="double" value="(dur &gt; 0.0)?(1.0/dur):1.0; v.scale(sc)">
+        <LocalVariable name="sc" type="double" value="((dur &gt; 0.0)?(1.0/dur):1.0); v.scale(sc)">
             <Comment/>
         </LocalVariable>
         <StateTransition state="velocity">
@@ -152,8 +152,9 @@
         <Coordinate x="160" y="280"/>
     </Event>
     <Event name="Ahead">
-        <Comment/>
+        <Comment>comment that the two velocity sets should somehow be collapsed</Comment>
         <Argument name="newVelocity" type="diskit.Vec3d"/>
+        <Argument name="waypoint" type="diskit.Vec3d"/>
         <LocalVariable name="oldDuration" type="double" value="getDuration()">
             <Comment/>
         </LocalVariable>
@@ -167,7 +168,10 @@
             <Assignment value="newVelocity.length()/getCruisingSpeed()"/>
         </StateTransition>
         <StateTransition state="velocity">
-            <Assignment value="set(newVelocity);velocity.scale(1.0/getDuration())"/>
+            <Operation method="set(newVelocity)"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="scale(1.0/getDuration())"/>
         </StateTransition>
         <Schedule event="StartMove"/>
         <Coordinate x="40" y="260"/>
