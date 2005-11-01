@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Rick Goldberg" extend="diskit.DISMover3D" name="Defender" package="diskit.xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Rick Goldberg" extend="diskit.FriendlyForce" name="Defender" package="diskit.xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This event graph is for documentation purposes, to outline the logic of the diskit package. It does not attempt to be functional.</Comment>
-    <Parameter name="originalStartPosition" type="diskit.Vec3d">
+    <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Must be anything but the first waypoint.</Comment>
     </Parameter>
     <Parameter name="maxSpeed" type="double">
@@ -48,11 +48,8 @@
     </StateVariable>
     <Event name="Run">
         <Comment/>
-        <LocalVariable name="oldReach" type="diskit.Sensor" value="reach">
-            <Comment/>
-        </LocalVariable>
         <StateTransition state="assetState">
-            <Assignment value="diskit.AssetState.STOPPED"/>
+            <Assignment value="diskit.AssetState.STANDBY"/>
         </StateTransition>
         <StateTransition state="targetQueue">
             <Operation method="clear()"/>
@@ -82,7 +79,6 @@
         <Schedule condition="true" delay="0.0" event="AdjustRange" priority="0">
             <Comment/>
             <EdgeParameter value="reach"/>
-            <EdgeParameter value="oldReach"/>
         </Schedule>
         <Coordinate x="40" y="40"/>
     </Event>
@@ -101,12 +97,13 @@
     <Event name="AdjustRange">
         <Comment>scales the sensor</Comment>
         <Argument name="newReach" type="diskit.Sensor"/>
-        <Argument name="oldReach" type="diskit.Sensor"/>
+        <LocalVariable name="oldReach" type="diskit.Sensor">
+            <Comment/>
+        </LocalVariable>
         <StateTransition state="reach">
             <Assignment value="newReach"/>
         </StateTransition>
-        <Schedule condition="oldReach != null
-" delay="0.0" event="UnregisterSensor" priority="0">
+        <Schedule condition="oldReach != null " delay="0.0" event="UnregisterSensor" priority="0">
             <Comment/>
             <EdgeParameter value="oldReach"/>
         </Schedule>
@@ -217,7 +214,7 @@
         <LocalVariable name="steer" type="diskit.Vec3d" value="new Vec3d(); steer.cross(getVelocity(),target.getVelocity());">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="veer" type="diskit.Vec3d" value="new Vec3d(); if ( steer.length() &lt; getCruisingSpeed() ) { steer.cross(velocity,up); veer.set(getLocation()); } else { steer.cross(up); veer.set(target.getLocation()); veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0); veer.set(1,veer.get(1)/2.0))+loc.get(1)/2.0));veer.set(2,(veer.get(2)/2.0))+(loc.get(2)/2.0)); } veer.add(steer);">
+        <LocalVariable name="veer" type="diskit.Vec3d" value="new Vec3d(); if ( steer.length() &lt; getCruisingSpeed() ) { steer.cross(velocity,up); veer.set(getLocation()); } else { steer.cross(up); veer.set(target.getLocation()); veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0)); veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) ); } veer.add(steer)">
             <Comment>this should be moved to the AvoidanceMoverManager at some point</Comment>
         </LocalVariable>
         <LocalVariable name="amm" type="diskit.AvoidanceMoverManager" value="new AvoidanceMoverManager(this) ; amm.avoidToOffset(veer, getActiveMoverManager())">
@@ -232,9 +229,7 @@
         <StateTransition state="targetQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
-        <Schedule condition="(assetState != AssetState.INTERCEPTING)
-&amp;&amp;
-(sensor.getMover().getMoverID() != getMoverID())" delay="0.0" event="StartIntercept" priority="0">
+        <Schedule condition="(assetState != AssetState.INTERCEPTING) &amp;&amp; (sensor.getMover().getMoverID() != getMoverID())" delay="0.0" event="StartIntercept" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
@@ -256,7 +251,13 @@
             <Assignment value="diskit.AssetState.INTERCEPTING"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
-            <Assignment value="interceptMoverManager; activeMoverManager.setMover(this)"/>
+            <Assignment value="interceptMoverManager"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="start()"/>
         </StateTransition>
         <Schedule condition="canIntercept" delay="0.0" event="SafetyOff" priority="0">
             <Comment/>
@@ -273,11 +274,7 @@
             <Comment>sensor causing event, could be reach or exclusion zone for example</Comment>
         </Argument>
         <Argument name="target" type="diskit.Mover3D"/>
-        <Schedule condition="( sensor.getMover() != this )
-&amp;&amp;
-( targetQueue.contains(target) )
-&amp;&amp;
-(sensor != reach)" delay="0.0" event="RemoveTarget" priority="0">
+        <Schedule condition="( sensor.getMover() != this ) &amp;&amp; ( targetQueue.contains(target) ) &amp;&amp; (sensor != reach)" delay="0.0" event="RemoveTarget" priority="0">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
@@ -296,9 +293,7 @@
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="( targetQueue.size() &lt;= 0 )
-&amp;&amp;
-( assetState != diskit.AssetState.ESCORTING )" delay="0.0" event="StopIntercept" priority="0">
+        <Schedule condition="( targetQueue.size() &lt;= 0 ) &amp;&amp; ( assetState != diskit.AssetState.ESCORTING )" delay="0.0" event="StopIntercept" priority="0">
             <Comment>should not get to &lt; 0</Comment>
         </Schedule>
         <Coordinate x="370" y="740"/>
@@ -337,10 +332,16 @@
             <Comment/>
         </LocalVariable>
         <StateTransition state="activeMoverManager">
-            <Assignment value="patrolMoverManager; patrolMoverManager.setMover(this)"/>
+            <Assignment value="patrolMoverManager"/>
         </StateTransition>
         <StateTransition state="missedIntercepts">
             <Assignment value="missedIntercepts+1"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="start()"/>
         </StateTransition>
         <Schedule condition="true" delay="0.1" event="SafetyOn" priority="0">
             <Comment/>
@@ -348,7 +349,7 @@
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="430" y="440"/>
+        <Coordinate x="390" y="460"/>
     </Event>
     <Event name="SafetyOn">
         <Comment/>
@@ -441,7 +442,13 @@
     <Event name="ResumePatrol">
         <Comment/>
         <StateTransition state="activeMoverManager">
-            <Assignment value="patrolMoverManager; patrolMoverManager.start()"/>
+            <Assignment value="patrolMoverManager"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="start()"/>
         </StateTransition>
         <Coordinate x="110" y="590"/>
     </Event>
@@ -536,7 +543,13 @@
             <Assignment value="diskit.AssetState.ESCORTING"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
-            <Assignment value="patrolMoverManager; patrolMoverManager.setMover(this)"/>
+            <Assignment value="patrolMoverManager"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="start()"/>
         </StateTransition>
         <Cancel event="Interdict"/>
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
@@ -551,7 +564,7 @@
     </Event>
     <Event name="ReturnToBase">
         <Comment/>
-        <LocalVariable name="mover" type="diskit.Mover3D" value="this; setDestination(getOriginalStartPostion(),getMaxSpeed())">
+        <LocalVariable name="mover" type="diskit.Mover3D" value="this; setDestination(startPosition ,getMaxSpeed())">
             <Comment/>
         </LocalVariable>
         <StateTransition state="assetState">
