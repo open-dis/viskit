@@ -92,7 +92,7 @@
         <StateTransition state="assetState">
             <Assignment value="diskit.AssetState.PATROLLING"/>
         </StateTransition>
-        <Coordinate x="30" y="200"/>
+        <Coordinate x="40" y="200"/>
     </Event>
     <Event name="AdjustRange">
         <Comment>scales the sensor</Comment>
@@ -142,7 +142,7 @@
             <Assignment value="new diskit.SphereCutterSensor(this,weapon.getRange())"/>
         </StateTransition>
         <Schedule event="AdjustRange"/>
-        <Coordinate x="310" y="230"/>
+        <Coordinate x="180" y="230"/>
     </Event>
     <Event name="Detection">
         <Comment>entry event from a sensor detection</Comment>
@@ -152,6 +152,7 @@
         <Argument name="newTarget" type="diskit.Mover3D"/>
         <Schedule condition="!obstacleQueue.contains(newTarget)" delay="0.0" event="NewObstacle" priority="0">
             <Comment/>
+            <EdgeParameter value="newTarget"/>
         </Schedule>
         <Schedule condition="!friendlyForces.contains(new Integer(newTarget.getMoverID()))" delay="0.0" event="NewTarget" priority="0">
             <Comment/>
@@ -162,6 +163,7 @@
     </Event>
     <Event name="NewObstacle">
         <Comment/>
+        <Argument name="newTarget" type="diskit.Mover3D"/>
         <StateTransition state="obstacleQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
@@ -173,9 +175,9 @@
         <LocalVariable name="closest" type="diskit.Mover3D" value="obstacleQueue.closest()">
             <Comment/>
         </LocalVariable>
-        <Schedule condition="newTarget != null" delay="0.0" event="CheckIntercept" priority="0">
+        <Schedule condition="closest != null" delay="0.0" event="CheckIntercept" priority="0">
             <Comment/>
-            <EdgeParameter value="newTarget"/>
+            <EdgeParameter value="closest"/>
         </Schedule>
         <Coordinate x="110" y="390"/>
     </Event>
@@ -191,33 +193,37 @@
         <Schedule condition="( times[0] &gt; 0.0 ) &amp;&amp; (  times[0] &lt; Double.POSITIVE_INFINITY )" delay="0.0" event="StartAvoidance" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
-            <EdgeParameter value="times"/>
         </Schedule>
         <Coordinate x="250" y="480"/>
     </Event>
     <Event name="StartAvoidance">
         <Comment>must be in the way, avoid</Comment>
-        <Argument name="newTarget" type="diskit.Mover3D"/>
-        <Argument name="times" type="double[]"/>
-        <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(target,(Mover3D)this,getCruisingSpeed())">
+        <Argument name="target" type="diskit.Mover3D"/>
+        <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(target,(diskit.Mover3D)this,getCruisingSpeed())">
             <Comment/>
         </LocalVariable>
         <Schedule condition="collidePoint != null" delay="0.0" event="Steer" priority="0">
             <Comment/>
-            <EdgeParameter value="newTarget"/>
+            <EdgeParameter value="target"/>
         </Schedule>
         <Coordinate x="110" y="490"/>
     </Event>
     <Event name="Steer">
         <Comment>predict how much to steer, set up AvoidanceMoverManger</Comment>
         <Argument name="obstacle" type="diskit.Mover3D"/>
-        <LocalVariable name="steer" type="diskit.Vec3d" value="new Vec3d(); steer.cross(getVelocity(),target.getVelocity());">
+        <LocalVariable name="loc" type="diskit.Vec3d" value="new diskit.Vec3d(getLocation())">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="veer" type="diskit.Vec3d" value="new Vec3d(); if ( steer.length() &lt; getCruisingSpeed() ) { steer.cross(velocity,up); veer.set(getLocation()); } else { steer.cross(up); veer.set(target.getLocation()); veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0)); veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) ); } veer.add(steer)">
+        <LocalVariable name="up" type="diskit.Vec3d" value="new diskit.Vec3d(0.0,0.0,-1.0)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="steer" type="diskit.Vec3d" value="new diskit.Vec3d(); steer.cross(getVelocity(),obstacle.getVelocity());">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="veer" type="diskit.Vec3d" value="new diskit.Vec3d(); if ( steer.length() &lt; getCruisingSpeed() ) { steer.cross(velocity,up); veer.set(getLocation()); } else { steer.cross(up); veer.set(obstacle.getLocation()); veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0)); veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) ); } veer.add(steer)">
             <Comment>this should be moved to the AvoidanceMoverManager at some point</Comment>
         </LocalVariable>
-        <LocalVariable name="amm" type="diskit.AvoidanceMoverManager" value="new AvoidanceMoverManager(this) ; amm.avoidToOffset(veer, getActiveMoverManager())">
+        <LocalVariable name="amm" type="diskit.AvoidanceMoverManager" value="new diskit.AvoidanceMoverManager(this) ; amm.avoidToOffset(veer, getActiveMoverManager())">
             <Comment/>
         </LocalVariable>
         <Coordinate x="250" y="560"/>
@@ -229,7 +235,7 @@
         <StateTransition state="targetQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
-        <Schedule condition="(assetState != AssetState.INTERCEPTING) &amp;&amp; (sensor.getMover().getMoverID() != getMoverID())" delay="0.0" event="StartIntercept" priority="0">
+        <Schedule condition="(assetState != diskit.AssetState.INTERCEPTING) &amp;&amp; (sensor.getMover().getMoverID() != getMoverID())" delay="0.0" event="StartIntercept" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
@@ -256,9 +262,6 @@
         <StateTransition state="activeMoverManager">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Operation method="start()"/>
-        </StateTransition>
         <Schedule condition="canIntercept" delay="0.0" event="SafetyOff" priority="0">
             <Comment/>
         </Schedule>
@@ -266,7 +269,8 @@
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Coordinate x="420" y="320"/>
+        <Schedule event="Start"/>
+        <Coordinate x="440" y="310"/>
     </Event>
     <Event name="UnDetection">
         <Comment>entry event from sensor for when mover leaves sensor bounds</Comment>
@@ -311,7 +315,7 @@
             <Comment/>
             <EdgeParameter value="nextTarget"/>
         </Schedule>
-        <Coordinate x="540" y="360"/>
+        <Coordinate x="560" y="310"/>
     </Event>
     <Event name="RemoveObstacle">
         <Comment/>
@@ -323,7 +327,7 @@
     </Event>
     <Event name="SafetyOff">
         <Comment/>
-        <Coordinate x="320" y="390"/>
+        <Coordinate x="420" y="240"/>
     </Event>
     <Event name="CantIntercept">
         <Comment/>
@@ -340,34 +344,32 @@
         <StateTransition state="activeMoverManager">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Operation method="start()"/>
-        </StateTransition>
         <Schedule condition="true" delay="0.1" event="SafetyOn" priority="0">
             <Comment/>
         </Schedule>
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
             <Comment/>
         </Schedule>
+        <Schedule event="Start"/>
         <Coordinate x="390" y="460"/>
     </Event>
     <Event name="SafetyOn">
         <Comment/>
-        <Coordinate x="330" y="560"/>
+        <Coordinate x="380" y="540"/>
     </Event>
     <Event name="EndIntercept">
         <Comment>entry event from InterceptMoverManager</Comment>
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="NextEscort" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="720" y="410"/>
+        <Coordinate x="720" y="420"/>
     </Event>
     <Event name="NextEscort">
         <Comment/>
         <LocalVariable name="target" type="diskit.Mover3D" value="(diskit.Mover3D)(targetQueue.removeFirst())">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="offset" type="double" value="Vec3d.distance(target.getLocation(),getLocation())">
+        <LocalVariable name="offset" type="double" value="diskit.Vec3d.distance(target.getLocation(),getLocation())">
             <Comment/>
         </LocalVariable>
         <Schedule condition="true" delay="0.0" event="Escort" priority="0">
@@ -402,7 +404,7 @@
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Coordinate x="720" y="50"/>
+        <Coordinate x="730" y="40"/>
     </Event>
     <Event name="FarInterdict">
         <Comment>keep some distance but be within surefire range</Comment>
@@ -421,11 +423,11 @@
         <StateTransition state="assetState">
             <Assignment value="diskit.AssetState.PATROLLING"/>
         </StateTransition>
-        <Coordinate x="590" y="180"/>
+        <Coordinate x="600" y="190"/>
     </Event>
     <Event name="StopIntercept">
         <Comment/>
-        <LocalVariable name="moverManager" type="diskit.InterceptMoverManager" value="interceptMoverManager; moverManager.setMover(null); moverManager.setTarget(null)">
+        <LocalVariable name="moverManager" type="diskit.InterceptMoverManager" value="interceptMoverManager; moverManager.setMover(null)">
             <Comment>should only be InterceptMoverManager at this point</Comment>
         </LocalVariable>
         <LocalVariable name="oldState" type="diskit.AssetState" value="assetState">
@@ -437,7 +439,7 @@
         <Schedule condition="oldState == diskit.AssetState.INTERDICTING" delay="0.0" event="ResumePatrol" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="330" y="640"/>
+        <Coordinate x="320" y="620"/>
     </Event>
     <Event name="ResumePatrol">
         <Comment/>
@@ -447,10 +449,8 @@
         <StateTransition state="activeMoverManager">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Operation method="start()"/>
-        </StateTransition>
-        <Coordinate x="110" y="590"/>
+        <Schedule event="Start"/>
+        <Coordinate x="320" y="510"/>
     </Event>
     <Event name="StartMove">
         <Comment/>
@@ -466,13 +466,13 @@
     <Event name="EndMove">
         <Comment/>
         <Argument name="mover" type="diskit.Mover3D"/>
-        <LocalVariable name="codeInsertion" type="int" value="0; super.doEndMove()">
+        <LocalVariable name="codeInsertion" type="int" value="0; super.doEndMove(mover)">
             <Comment>need to have a super, fix when code insertions are implemented</Comment>
         </LocalVariable>
         <StateTransition state="obstacleQueue">
             <Operation method="clear()"/>
         </StateTransition>
-        <Coordinate x="430" y="50"/>
+        <Coordinate x="400" y="40"/>
     </Event>
     <Event name="Killed">
         <Comment>to fix, ScenarioManager calls a kill() after this due to unregitration, which stop()s the mover</Comment>
@@ -524,7 +524,7 @@
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="420" y="190"/>
+        <Coordinate x="530" y="190"/>
     </Event>
     <Event name="EscortClear">
         <Comment>event comes back from ScenarioManager, or not</Comment>
@@ -546,21 +546,19 @@
             <Assignment value="patrolMoverManager"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
-            <Assignment value="setMover(this)"/>
-        </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Operation method="start()"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <Cancel event="Interdict"/>
         <Schedule condition="targetQueue.size() &gt; 0" delay="0.0" event="CheckIfMore" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="510" y="190"/>
+        <Schedule event="Start"/>
+        <Coordinate x="400" y="180"/>
     </Event>
     <Event name="MagazineEmpty">
         <Comment>heard by weapon</Comment>
         <Schedule event="ReturnToBase"/>
-        <Coordinate x="480" y="650"/>
+        <Coordinate x="560" y="640"/>
     </Event>
     <Event name="ReturnToBase">
         <Comment/>
@@ -570,14 +568,18 @@
         <StateTransition state="assetState">
             <Assignment value="diskit.AssetState.STANDBY"/>
         </StateTransition>
-        <Schedule condition="true" delay="Vec3d.distance(originalStartPostion,getLocation())/getMaxSpeed()" event="Reload" priority="0">
+        <Schedule condition="true" delay="diskit.Vec3d.distance(startPosition,getLocation())/getMaxSpeed()" event="Reload" priority="0">
             <Comment/>
         </Schedule>
-        <Coordinate x="590" y="640"/>
+        <Coordinate x="650" y="640"/>
     </Event>
     <Event name="Reload">
         <Comment/>
-        <Coordinate x="700" y="640"/>
+        <Coordinate x="720" y="640"/>
+    </Event>
+    <Event name="Start">
+        <Comment/>
+        <Coordinate x="320" y="250"/>
     </Event>
 </SimEntity>
 
