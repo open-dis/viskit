@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.xml.bind.JAXBContext;
@@ -784,21 +785,45 @@ public class SimkitXML2Java {
     // note a subclass should have at least the superclass's
     // parameters and maybe some more
     private List resolveSuperParams(List params) {
-	List superParams = new java.util.Vector();
+        System.out.println("resolveSuperParams" + params);
+	List superParams = new ArrayList();
+        if (this.root.getExtend().equals("simkit.SimEntityBase") ||
+            this.root.getExtend().equals("simkit.BasicSimEntity"))
+            return superParams;
+        
 	try { 
 	    Class c = Class.forName(this.root.getExtend());
 	    Constructor[] ca = c.getConstructors();
 	    int maxIndex = 0;
 	    int maxParamCount = 0;
 	    for ( int i = 0; i < ca.length; i++ ) {
-	        int tmpCount = (paramsInSuper(ca[i],params)).size();
+                //find largest array of super parameters constructor
+	        //int tmpCount = (paramsInSuper(ca[i],params)).size();
+                int tmpCount = (ca[i].getParameterTypes()).length;
  	        if ( tmpCount > maxParamCount ) {
 		    maxParamCount = tmpCount;
 		    maxIndex = i;
 	        }
 	    }
-	    superParams = paramsInSuper(ca[maxIndex],params);
+            
+	    ListIterator it = params.listIterator();
+            ParameterType[] parray = new ParameterType[maxParamCount];
+            int pi = 0;
+            while (it.hasNext()) {
+                Object po = it.next();
+                ParameterType p = (ParameterType)po;
+                Class[] sparams = ca[maxIndex].getParameterTypes();
+                for ( int i = 0; i < sparams.length ; i ++) {
+                    if ( p.getType().equals(sparams[i].getName()) && pi < maxParamCount ) {
+                        parray[pi] = p;
+                        ++pi;
+                    }
+                }
+                
+            }
 
+            superParams = java.util.Arrays.asList(parray);
+            
 	} catch ( java.lang.ClassNotFoundException cnfe ) {
 	    String extend = this.root.getExtend();
 	    if (extend.equals("simkit.SimEntityBase")) {
