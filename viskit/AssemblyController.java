@@ -205,7 +205,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
           createTemporaryEventGraphClass(file);
           break;
         default:
-          assert false:"Program error in AssemblyController.egListener.fileChanged";
+          throw new RuntimeException("Program error in AssemblyController.egListener.fileChanged");
       }
     }
   };

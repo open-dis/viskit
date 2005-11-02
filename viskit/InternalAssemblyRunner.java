@@ -727,7 +727,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               break;
 
             default:
-              assert false:"Program error in InternalAssemblyRunner";
+              throw new RuntimeException("Program error in InternalAssemblyRunner");
           }
         }
       }
