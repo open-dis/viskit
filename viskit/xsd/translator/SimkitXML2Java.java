@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.xml.bind.JAXBContext;
@@ -539,39 +540,76 @@ public class SimkitXML2Java {
 	
 	if ( locs.size() > 0 ) pw.println();
 
+        if ( e.getCode() != null ) {
+            pw.println(sp8 + "/* Code block for Event " + e.getName() + " */");
+            String[] lines = e.getCode().split(";");
+            for ( int i = 0; i < lines.length ; i++ ) {
+                pw.println(sp8 + lines[i] + sc);
+            }
+        }
+        LinkedList decls = new LinkedList();
 	while ( sli.hasNext() ) {
    	    StateTransition st = (StateTransition) sli.next();
 	    StateVariable sv = (StateVariable) st.getState();
 	    AssignmentType asg = st.getAssignment();
 	    OperationType ops = st.getOperation(); 
-	
-            String svName = sv.getName();
-            if (st.getIndex() != null) svName += ( lb + indexFrom(st) + rb );
             String change = "";
+            String olds = ""; // old decl line Bar oldFoo ...
+            String oldName = sv.getName(); // oldFoo  
             if (ops != null) {
-                change = ( pd + ops.getMethod() );
-                pw.println(sp8 + svName + change + sc);
-                if ( isArray(sv.getType()) ) {
-                    pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
-                    pw.println(cm + sp + qu + sv.getName() + qu + cm + sp + svName + rp + sc);
-                } else {
-                    pw.print(sp8 + "firePropertyChange" + lp + qu + svName + qu + cm + sp);
-                    pw.println(svName + rp + sc);
-                }
+                change = pd + ops.getMethod() + sc;
+            } else if ( asg != null ) { 
+                change = sp + eq + sp + asg.getValue() + sc;
             }
-            if (asg != null) {
-                change = ( sp + eq + sp + asg.getValue() );
-                if ( isArray(sv.getType()) ) {
-                    pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
-                    pw.println(cm + sp + qu + sv.getName() + qu + cm + sp + svName + cm + sp + svName + change + rp + sc);
-                } else {
-                    pw.print(sp8 + "firePropertyChange" + lp + qu + svName + qu + cm + sp);
-                    pw.println(svName + cm + sp + svName + change + rp + sc);
+            oldName = "_old_" + oldName.substring(0,1).toUpperCase() + oldName.substring(1);
+            if ( !decls.contains(oldName) ) {
+                olds = sv.getType();
+                decls.add(oldName);
+                if ( isArray(olds) ) {
+                    String[] baseName;
+                    baseName = olds.split("\\[");
+                    olds = baseName[0];
                 }
+                olds += sp;
             }
-	    pw.println();
-	}
-
+            // by now, olds is "Bar" ( not Bar[] )
+            // or nothing if alreadyDecld
+            // now build up "Bar oldFoo = getFoo("
+            String getter = oldName + sp + eq + sp + "get" + oldName.substring(5) + lp;
+            if ( "".equals(olds) ) {
+                olds = getter;
+            } else {
+                olds += getter;
+            }
+            // check need _idxvar_from(st)
+            if ( isArray(sv.getType())) {
+                olds += indexFrom(st);
+            }
+            olds += rp + sc;
+            // now olds is Bar oldFoo = getFoo(<idxvar>?);
+            // add this to the pre-formatted block
+            olds += sv.getName() + ( isArray(sv.getType()) ? lb + indexFrom(st)+ rb : "" ) + change;
+            String[] lines = olds.split("\\;");
+            // format it
+            for (int i = 0; i < lines.length; i++) {
+                if ( i == 0 ) {
+                    pw.println(sp8 + "/* StateTransition for " + sv.getName() + " */");
+                } else if ( i == 2 ) {
+                    pw.println(sp8 + "/* Code block for pre-transition */");
+                }
+                pw.println(sp8 + lines[i] + sc);
+            }
+            if ( isArray(sv.getType()) ) {
+                pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
+                pw.print(cm + sp + qu + sv.getName() + qu + cm );
+                pw.println( oldName + cm + sp + "get" + oldName.substring(5) + lp + indexFrom(st) + rp + rp + sc);
+            } else {
+                pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu + cm + sp);
+                pw.println(oldName + cm + sp + "get" + oldName.substring(5) + lp + rp + rp + sc);
+            }
+            pw.println();
+        }
+        pw.println();
 	// waitDelay/interrupt
 	while ( schi.hasNext() ) {
 	    Object o = schi.next();
