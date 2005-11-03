@@ -97,7 +97,7 @@
     <Event name="AdjustRange">
         <Comment>scales the sensor</Comment>
         <Argument name="newReach" type="diskit.Sensor"/>
-        <LocalVariable name="oldReach" type="diskit.Sensor">
+        <LocalVariable name="oldReach" type="diskit.Sensor" value="getReach()">
             <Comment/>
         </LocalVariable>
         <StateTransition state="reach">
@@ -141,7 +141,10 @@
         <StateTransition state="reach">
             <Assignment value="new diskit.SphereCutterSensor(this,weapon.getRange())"/>
         </StateTransition>
-        <Schedule event="AdjustRange"/>
+        <Schedule condition="true" delay="0.0" event="AdjustRange" priority="0">
+            <Comment/>
+            <EdgeParameter value="reach"/>
+        </Schedule>
         <Coordinate x="180" y="230"/>
     </Event>
     <Event name="Detection">
