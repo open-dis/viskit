@@ -99,6 +99,7 @@ public class PclNodeInspectorDialog extends JDialog
     typeLab.setLabelFor(typeField);
 
     clearStatsCB = new JCheckBox("Clear statistics after each run");
+    clearStatsCB.setSelected(true); // bug 706
     clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
     clearStatsCB.addActionListener(lis);
 

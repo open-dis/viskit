@@ -53,7 +53,7 @@ public class PropChangeListenerNode extends AssemblyNode
     isSampleStatistics = b;
   }
 
-  private boolean clearStatsAfterEachRun;
+  private boolean clearStatsAfterEachRun = true; // bug 706
   public boolean isClearStatsAfterEachRun()
   {
     return clearStatsAfterEachRun;
