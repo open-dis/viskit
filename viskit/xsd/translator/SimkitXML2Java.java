@@ -626,12 +626,6 @@ public class SimkitXML2Java {
 		doCancel((CancelType)o,e,pw);
 	    }
 	}
-        
-        String x = "";
-        if ( e.getCode() != null ) { 
-            x = e.getCode();
-        }
-        pw.println(sp4 + x);
 	pw.println(sp4 + cb);
 	pw.println();
 	
