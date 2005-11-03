@@ -44,8 +44,12 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.SysExitHandler;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
+import viskit.doe.FileHandler;
 import viskit.doe.JobLauncher;
 
 import javax.swing.*;
@@ -56,6 +60,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class EventGraphAssemblyComboMainFrame extends JFrame
@@ -110,6 +116,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
+    jamSettingsHandler(menuBar);
     egFrame.setTitleListener(myTitleListener,0);
     setJMenuBar(menuBar);
     jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
@@ -120,6 +127,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menuBar = asyFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
+    jamSettingsHandler(menuBar);
     asyFrame.setTitleListener(myTitleListener,1);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
@@ -129,6 +137,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menuBar = asyRunComponent.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
+    jamSettingsHandler(menuBar);
     asyRunComponent.setTitleListener(myTitleListener,2);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     ((AssemblyController)asyFrame.getController()).setAssemblyRunner( new ThisAssemblyRunnerPlug());
@@ -136,7 +145,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     // Design of experiments
     doeMain = DoeMain.main2();
     DoeMainFrame doeFrame = doeMain.getMainFrame();
-    tabbedPane.add("Design of Experiments",doeFrame.getContent());
+    tabbedPane.addTab("Design of Experiments",new ImageIcon(ClassLoader.getSystemResource("viskit/images/grid.png")),
+                      doeFrame.getContent());
+    //tabbedPane.add("Design of Experiments",doeFrame.getContent());
     menuBar = doeMain.getMenus();
     if(menuBar == null){
       menuBar = new JMenuBar();
@@ -149,7 +160,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Grid run panel
     runGridComponent = new JobLauncher(true,null,null,this);
-    tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
+    //tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
+    tabbedPane.addTab("Launch Cluster Job",new ImageIcon(ClassLoader.getSystemResource("viskit/images/grid.png")),
+                      runGridComponent.getContent());
     menuBar = runGridComponent.getJMenuBar();
     if(menuBar == null) {
       menuBar = new JMenuBar();
@@ -164,27 +177,22 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
 
+    asyCntlr.addAssemblyFileListener(asyFrame);
     asyCntlr.addAssemblyFileListener(asyRunComponent);
-    asyCntlr.addAssemblyFileListener(doeFrame.getController());
-    asyCntlr.addAssemblyFileListener(runGridComponent);
+    //asyCntlr.addAssemblyFileListener(doeFrame.getController());
+    //asyCntlr.addAssemblyFileListener(runGridComponent);
 
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
     cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());
 
     // Start the controllers
-    ((AssemblyController)asyFrame.getController()).begin();
     ((ViskitController)egFrame.getController()).begin();
+    ((AssemblyController)asyFrame.getController()).begin();
 
     // Swing:
     getContentPane().add(tabbedPane);
     tabbedPane.addChangeListener(new myTabChangeListener());
-  }
-  private JMenuBar makeDummyMbar(String s)
-  {
-    JMenuBar mb = new JMenuBar();
-    mb.add(new JMenu(s));
-    return mb;
   }
 
   class myTabChangeListener implements ChangeListener
@@ -218,7 +226,32 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       }
     }
   }
-
+  private void jamSettingsHandler(JMenuBar mb)
+  {
+    for(int i=0;i<mb.getMenuCount();i++) {
+      JMenu men = mb.getMenu(i);
+      if(men.getText().equalsIgnoreCase("File")) {
+        for(int j=0;j<men.getMenuComponentCount();j++) {
+          Component c = men.getMenuComponent(j);
+          if(c instanceof JMenuItem) {
+            JMenuItem jmi = (JMenuItem)c;
+            if(jmi.getText().equalsIgnoreCase("settings"))
+            {
+              jmi.addActionListener(mySettingsHandler);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+  ActionListener mySettingsHandler = new ActionListener()
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      SettingsDialog.showDialog(EventGraphAssemblyComboMainFrame.this);
+    }
+  };
   private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb)
   {
     if(mi==null) {
@@ -265,6 +298,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
             doeMain.getController().postQuit();
             //todo other postQuits here if needed
 
+            thisClassCleanup();
             VGlobals.instance().sysExit(0);  // quit application
           }
         }
@@ -274,6 +308,25 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       return;
     }
   }
+
+  private void thisClassCleanup()
+  {
+    // Lot of hoops to pretty-fy the config xml file
+    String uConfig = VGlobals.instance().getUserConfigFile();
+    Document doc;
+    File f = new File(uConfig);
+    try {
+      doc = FileHandler.unmarshallJdom(f);
+      Format form = Format.getPrettyFormat();
+      XMLOutputter xout = new XMLOutputter(form);
+      xout.output(doc,new FileWriter(f));
+    }
+    catch (Exception e) {
+      System.out.println("Bad jdom op: "+e.getMessage());
+      return;
+    }
+  }
+
   private SysExitHandler nullSysExitHandler = new SysExitHandler()
   {
     public void doSysExit(int status)
@@ -289,7 +342,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
-      tabbedPane.setSelectedIndex(2);
+      // tabbedPane.setSelectedIndex(2);
       asyRunComponent.initParams(execStrings,runnerClassIndex);
     }
   }

@@ -12,4 +12,8 @@
       </Recent>
     </AssemblyEditor>
   </history>
+  <extraClassPath>
+    <path>
+    </path>
+  </extraClassPath>
 </ViskitConfig>

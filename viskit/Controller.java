@@ -68,6 +68,11 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
   }
 
+  public void settings()
+  {
+    // placeholder for multi-tabbed combo app.
+  }
+  
   public void quit()
   {
     if(preQuit())

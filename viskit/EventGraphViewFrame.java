@@ -453,6 +453,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       fileMenu.addSeparator();
       fileMenu.add(buildMenuItem(controller,"runAssemblyEditor", "Assembly Editor", null,null));
     }
+    if(contentOnly) {
+      fileMenu.addSeparator();
+      fileMenu.add(buildMenuItem(controller,"settings",       "Settings", null,null));
+    }
     fileMenu.addSeparator();
     fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
 

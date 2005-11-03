@@ -97,6 +97,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       postQuit();
   }
 
+  public void settings()
+  {
+    // placeholder for combo gui
+  }
+
   File lastFile;
   public void open()
   {
@@ -786,6 +791,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public static File compileJavaClassFromString(String src)
   {
+    return compileJavaClassFromString(src,false);
+  }
+  public static File compileJavaClassFromString(String src, boolean completeOnBadCompile)
+  {
     String baseName=null;
 
     // Find the package subdirectory
@@ -816,7 +825,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       baseName = sa[0];
    // }
     try {
-      //String baseName = currentFile.getName().substring(0,currentFile.getName().indexOf('.'));
       File f = VGlobals.instance().getWorkDirectory();
       f = new File(f,baseName+".java");
       f.createNewFile();
@@ -827,11 +835,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       fw.flush();
       fw.close();
 
-      //String cp = System.getProperty("java.class.path");
       String cp = getCustomClassPath();
-     // cp = f.getParent()+System.getProperty("path.separator") + cp;
+
       int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
-      if(reti == 0)
+      if(reti == 0 || completeOnBadCompile)
         return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
     }
     catch(Exception e) {
@@ -896,8 +903,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
   }
 */
-
   public static PkgAndFile compileJavaClassAndSetPackage(String source)
+  {
+    return compileJavaClassAndSetPackage(source,false);
+  }
+
+  public static PkgAndFile compileJavaClassAndSetPackage(String source, boolean continueOnBadCompile)
   {
     String pkg = null;
     if (source != null && source.length() > 0) {
@@ -911,7 +922,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         String[] sa = nuts.split("\\s");
         pkg = sa[1];
       }
-      File f = compileJavaClassFromString(source);
+      File f = compileJavaClassFromString(source,continueOnBadCompile);
       if (f != null) {
         f.deleteOnExit();
         return new PkgAndFile(pkg, f);
@@ -922,13 +933,29 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
 
   // From menu
+
+  public void export2grid()
+  {
+    ViskitAssemblyModel model = (ViskitAssemblyModel)getModel();
+    File tFile = null;
+    try {
+      tFile = File.createTempFile("ViskitAssy",".xml");
+    }
+    catch (IOException e) {
+      ((ViskitAssemblyView)getView()).genericErrorReport("File System Error",
+               "Error creating temporary file.");
+      return;
+    }
+    model.saveModel(tFile);
+    //todo switch to DOE
+  }
   public void runAssembly()
   {
     // These have to be on the classpath:
     // done abovehandleFileBasedClasses();
 
     String src = produceJavaClass();                   // asks to save
-    PkgAndFile paf = compileJavaClassAndSetPackage(src);
+    PkgAndFile paf = compileJavaClassAndSetPackage(src,true);
     if(paf != null) {
       File f = paf.f;
       String clNam = f.getName().substring(0,f.getName().indexOf('.'));
@@ -947,11 +974,26 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   static String getCustomClassPath()
   {
-    String classPath = System.getProperty("java.class.path");
-    File base = VGlobals.instance().getWorkDirectory();
-    if(classPath.indexOf(base.getAbsolutePath()) == -1)
-      classPath = base.getAbsolutePath() + Vstatics.getPathSeparator() + classPath;
-    return classPath;
+    // The order of the class path is 1) work dir, 2) extra paths, 3) existing classpath
+    String sep = Vstatics.getPathSeparator();
+    StringBuffer cPath = new StringBuffer();
+
+    String appclassPath = System.getProperty("java.class.path");
+    File workDir = VGlobals.instance().getWorkDirectory();
+    // if the workDir is not already in the list, add it
+    if(appclassPath.indexOf(workDir.getAbsolutePath()) == -1){
+      cPath.append(workDir.getAbsolutePath());
+      cPath.append(sep);
+    }
+    String[] extraPaths = SettingsDialog.getExtraClassPath();
+    if(extraPaths != null && extraPaths.length>0) {
+      for(int i=0;i<extraPaths.length;i++) {
+        cPath.append(extraPaths[i]);
+        cPath.append(sep);
+      }
+    }
+    cPath.append(appclassPath);
+    return cPath.toString();
   }
 
   private static void handleFileBasedClasses()

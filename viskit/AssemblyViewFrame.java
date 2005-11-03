@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nps.util.DirectoryWatch;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -38,7 +40,8 @@ import java.util.Map;
  * Time: 2:07:37 PM
  */
 
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
+public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView,
+    DragStartListener, edu.nps.util.DirectoryWatch.DirectoryChangeListener
 {
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
@@ -64,6 +67,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private JPanel assemblyEditorContent;
   private JMenuBar myMenuBar;
   private JMenuItem quitMenuItem;
+  private JButton runButt;
 
   public AssemblyViewFrame(AssemblyModel model, AssemblyController controller)
   {
@@ -124,7 +128,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   private void initUI(boolean contentOnly)
   {
     buildMenus(contentOnly);
-    buildToolbar();
+    buildToolbar(contentOnly);
     //buildVCRToolbar();
 
     // Set up a assemblyEditorContent level pane that will be the content pane. This
@@ -182,10 +186,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", null,null));
     fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_G),null));
     fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
+    if(contentOnly)
+      fileMenu.add(buildMenuItem(controller,"export2grid","Export to Cluster Format",new Integer(KeyEvent.VK_C),null));
     fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
     if(!contentOnly) {
       fileMenu.addSeparator();
       fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
+    }
+    if(contentOnly) {
+      fileMenu.addSeparator();
+      fileMenu.add(buildMenuItem(controller,"settings",        "Settings",null,null));
     }
     fileMenu.addSeparator();
     fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
@@ -273,7 +283,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return 0;
   }
 
-  private void buildToolbar()
+  private void buildToolbar(boolean contentOnly)
   {
     ButtonGroup modeButtonGroup = new ButtonGroup();
     toolBar = new JToolBar();
@@ -314,7 +324,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         "Zoom out on the graph");
 
     Action runAction = ActionIntrospector.getAction(getController(),"runAssembly");
-    JButton runButt = makeButton(runAction, "viskit/images/Play24.gif",
+    runButt = makeButton(runAction, "viskit/images/Play24.gif",
         "Run the assembly");
     modeButtonGroup.add(selectMode);
     modeButtonGroup.add(adapterMode);
@@ -339,11 +349,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     toolBar.add(zoomIn);
     toolBar.addSeparator(new Dimension(5,24));
     toolBar.add(zoomOut);
-
-    toolBar.addSeparator(new Dimension(24,24));
-    toolBar.add(new JLabel("  Run: "));
-    toolBar.add(runButt);
-
+    if(!contentOnly) {
+      toolBar.addSeparator(new Dimension(24,24));
+      toolBar.add(new JLabel("  Run: "));
+      toolBar.add(runButt);
+    }
     zoomIn.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -864,6 +874,33 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     titlkey = key;
   }
 
+  public void fileChanged(File file, int action, DirectoryWatch source)
+  {
+    switch(action)
+    {
+      case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
+        SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            runButt.doClick();  // This sets up run panel
+          }
+        });
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
+        break;
+      case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
+        SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            runButt.doClick();  // This sets up Run panel
+          }
+        });
+        break;
+      default:
+    }
+  }
 }
 
 interface DragStartListener

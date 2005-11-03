@@ -72,14 +72,17 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     addWindowListener(new myWlistener());
 
     leftP = new JPanel(new BorderLayout());
-    rightP = new JPanel(new BorderLayout());
-    split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
+    //rightP = new JPanel(new BorderLayout());
+    //split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
 
     content = new JPanel();
     content.setLayout(new BorderLayout());
 
-    content.add(split,BorderLayout.CENTER);
-
+    //content.add(split,BorderLayout.CENTER);
+    //content.add(leftP,BorderLayout.CENTER);
+    JLabel lab =new JLabel("Do File-open, or initialize from Assembly Editor tab.");
+    lab.setHorizontalAlignment(JLabel.CENTER);
+    content.add(lab,BorderLayout.NORTH);
     getContentPane().setLayout(new BorderLayout());
     //getContentPane().add(split,BorderLayout.CENTER);
   }
@@ -88,9 +91,13 @@ public class DoeMainFrame extends JFrame implements DoeEvents
   public void setModel(DoeFileModel dfm)
   {
     this.dfm = dfm;
-    if(dfm != null) {
+    if(dfm == null)
+      doTitle("");
+    else {
+      dfm.paramTable.setBorder(new EtchedBorder()); // double etched with below
       leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
       leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
+      doTitle(dfm.userFile.getName());
     }
   }
 
@@ -143,12 +150,24 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     }
   }
 
+  private String namePrefix = "Viskit Design of Experiments";
+  private String currentTitle = namePrefix;
+  private void doTitle(String nm)
+  {
+    if(nm != null && nm.length()>0)
+      currentTitle = namePrefix +": "+nm;
+
+    if(titlLis != null)
+      titlLis.setTitle(currentTitle,titlLisIdx);
+  }
+
   TitleListener titlLis;
   int titlLisIdx;
   public void setTitleListener(TitleListener tLis, int idx)
   {
     titlLis = tLis;
     titlLisIdx = idx;
+    doTitle(null);
   }
 
 }

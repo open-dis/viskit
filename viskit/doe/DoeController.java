@@ -121,8 +121,10 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
         break;
 
       case EXIT_APP:
-        if(preQuit())
+        if(preQuit()){
           postQuit();
+          System.exit(0);
+        }
          break;
 
       case RUN_JOB:
@@ -137,7 +139,7 @@ public class DoeController implements DoeEvents, ActionListener, DirectoryWatch.
   }
   public void postQuit()
   {
-    VGlobals.instance().sysExit(0); //System.exit(0);
+    //VGlobals.instance().sysExit(0); //System.exit(0);
   }
   private int checkDirty()
   {

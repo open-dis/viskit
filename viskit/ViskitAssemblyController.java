@@ -59,6 +59,8 @@ public interface ViskitAssemblyController
   void save();
   void saveAs();
 
+  void settings();
+
   boolean preQuit();
   void    postQuit();
 
@@ -69,6 +71,6 @@ public interface ViskitAssemblyController
 
   void generateJavaSource();
   void runAssembly();
-
+  void export2grid();
   void captureWindow();
 }

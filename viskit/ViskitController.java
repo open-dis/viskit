@@ -60,6 +60,8 @@ public interface ViskitController
   void saveAs();
   void selectNodeOrEdge(Vector v);
 
+  void settings();
+
   boolean preClose();
   boolean preQuit();
   void    postClose();

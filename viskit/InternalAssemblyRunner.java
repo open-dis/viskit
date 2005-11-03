@@ -80,7 +80,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   public InternalAssemblyRunner()
   {
     saver = new saveListener();
-    runPanel = new RunnerPanel("Initialize using Assembly Edit tab, then Run button",true);
+    runPanel = new RunnerPanel(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
     doMenus();
     runPanel.vcrStop.addActionListener(new stopListener());
     runPanel.vcrPlay.addActionListener(new startResumeListener());
@@ -145,8 +145,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     myCmdLine = parms;
 
     targetClassName = parms[4];
-    if(titlList != null)
-      titlList.setTitle(parms[4],titlkey);
+    doTitle(parms[4]);
+
     targetClassPath = parms[2];
     boolean defaultVerbose = Boolean.valueOf(parms[5]).booleanValue();
     double defaultStopTime = Double.parseDouble(parms[6]);
@@ -503,6 +503,10 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     clrAll.addActionListener(new clearListener());
 
     file.add(save);
+
+    file.addSeparator();
+    file.add(new JMenuItem("Settings"));
+    
     edit.add(copy);
     edit.add(selAll);
     edit.add(clrAll);
@@ -780,11 +784,22 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
   }
 
+  private String namePrefix = "Viskit Assembly Runner";
+  private String currentTitle = namePrefix;
+  private void doTitle(String nm)
+  {
+    if(nm != null && nm.length()>0)
+      currentTitle = namePrefix +": "+nm;
+    
+    if(titlList != null)
+      titlList.setTitle(currentTitle,titlkey);
+  }
   private TitleListener titlList;
   private int titlkey;
   public void setTitleListener(TitleListener lis, int key)
   {
     titlList = lis;
     titlkey = key;
+    doTitle(null);
   }
 }

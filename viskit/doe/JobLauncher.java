@@ -235,6 +235,7 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     catch (Exception e) {
       e.printStackTrace();
     }
+    doTitle(title);
   }
 
   private void getParams() throws Exception
@@ -342,7 +343,8 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
         case 'r':
           runButt.setEnabled(false);
           canButt.setEnabled(true);
-          closeButt.setEnabled(false);
+          if(!isSubComponent)
+            closeButt.setEnabled(false);
           thread = new Thread(JobLauncher.this);
           thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
           thread.start();
@@ -404,7 +406,8 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     outputList.clear();
 
     canButt.setEnabled(false);
-    closeButt.setEnabled(true);
+    if(!isSubComponent)
+      closeButt.setEnabled(true);
     runButt.setEnabled(true);
 
     if (thread == null)
@@ -824,12 +827,25 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     double resultsStdDev;
   }
 
+  private String namePrefix = "Viskit Cluster Job Controller";
+  private String currentTitle = namePrefix;
+  private void doTitle(String nm)
+  {
+    if(nm != null && nm.length()>0)
+      currentTitle = namePrefix +": "+nm;
+
+    if(titlLis != null)
+      titlLis.setTitle(currentTitle,titlIdx);
+  }
+
+
   TitleListener titlLis;
   int titlIdx;
   public void setTitleListener(TitleListener tLis, int idx)
   {
     titlLis = tLis;
     titlIdx = idx;
+    doTitle(null);
   }
 
   public JMenuItem getQuitMenuItem()

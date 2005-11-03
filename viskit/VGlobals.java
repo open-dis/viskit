@@ -822,7 +822,10 @@ public class VGlobals
       workLoader = new SimpleDirectoryClassLoader(workDirectory);
     return workLoader;
   }
-
+  public String getUserConfigFile()
+  {
+    return userConfigPath;
+  }
   public XMLConfiguration getHistoryConfig()
   {
     if (hConfig == null) {
