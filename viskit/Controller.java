@@ -406,6 +406,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       view.setSelectedEventGraphName(n);
 
       fileWatchOpen(saveFile);
+      adjustRecentList(saveFile);
     }
   }
 

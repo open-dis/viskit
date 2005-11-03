@@ -1,5 +1,6 @@
 package viskit.model;
 
+import edu.nps.util.FileIO;
 import viskit.ModelEvent;
 import viskit.VGlobals;
 import viskit.ViskitController;
@@ -196,49 +197,69 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
   public void saveModel(File f)
   {
-    if(f == null)
+    if (f == null)
       f = currentFile;
-     try {
-       FileWriter fw = new FileWriter(f);
-       Marshaller m = jc.createMarshaller();
-       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
-       m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,schemaLoc);
 
-       String nm = f.getName();
-       int dot=-1;
-       if((dot=nm.indexOf('.')) != -1)
-         nm = nm.substring(0,dot);
-       
-       jaxbRoot.setName(nIe(metaData.name));
-       jaxbRoot.setVersion(nIe(metaData.version));
-       jaxbRoot.setAuthor(nIe(metaData.author));
-       jaxbRoot.setPackage(nIe(metaData.pkg));
-       jaxbRoot.setExtend(nIe(metaData.extend));
-       List clis = jaxbRoot.getComment();
-       clis.clear();;
-       String cmt = nIe(metaData.comment);
-       if(cmt != null)
-         clis.add(cmt.trim());
+    // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
+    // file on a marshal error.
 
-       m.marshal(jaxbRoot,fw);
-       fw.close();
+    File tmpF=null;
+    try {
+      tmpF = File.createTempFile("tmpEGmarshal",".xml");
+      tmpF.deleteOnExit();
+    }
+    catch (IOException e) {
+      JOptionPane.showMessageDialog(null, "Exception creating temporary file, Model.saveModel():" +
+          "\n" + e.getMessage(),
+          "I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
-       setDirty(false);
-       currentFile = f;
-     }
-     catch (JAXBException e) {
-       JOptionPane.showMessageDialog(null,"Exception on JAXB marshalling" +
-                                  "\n"+ f.getName() +
-                                  "\n"+ e.getMessage(),
-                                  "XML I/O Error",JOptionPane.ERROR_MESSAGE);
-       return;
-     }
-     catch (IOException ex) {
-       JOptionPane.showMessageDialog(null,"Exception on writing "+ f.getName() +
-                                  "\n"+ ex.getMessage(),
-                                  "File I/O Error",JOptionPane.ERROR_MESSAGE);
-       return;
-     }
+    try {
+      FileWriter fw = new FileWriter(tmpF);
+      Marshaller m = jc.createMarshaller();
+      m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+
+      String nm = f.getName();
+      int dot = -1;
+      if ((dot = nm.indexOf('.')) != -1)
+        nm = nm.substring(0, dot);
+
+      jaxbRoot.setName(nIe(metaData.name));
+      jaxbRoot.setVersion(nIe(metaData.version));
+      jaxbRoot.setAuthor(nIe(metaData.author));
+      jaxbRoot.setPackage(nIe(metaData.pkg));
+      jaxbRoot.setExtend(nIe(metaData.extend));
+      List clis = jaxbRoot.getComment();
+      clis.clear();
+      ;
+      String cmt = nIe(metaData.comment);
+      if (cmt != null)
+        clis.add(cmt.trim());
+
+      m.marshal(jaxbRoot, fw);
+      fw.close();
+
+      // OK, made it through the marshal, overwrite the "real" file
+      FileIO.copyFile(tmpF,f,true);
+
+      setDirty(false);
+      currentFile = f;
+    }
+    catch (JAXBException e) {
+      JOptionPane.showMessageDialog(null, "Exception on JAXB marshalling" +
+          "\n" + f.getName() +
+          "\n" + e.getMessage(),
+          "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    catch (IOException ex) {
+      JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
+          "\n" + ex.getMessage(),
+          "File I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
   }
 
   /**

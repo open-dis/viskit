@@ -256,6 +256,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       view.fileName(lastFile.getName());
 
       fileWatchOpen(lastFile);
+      adjustRecentList(saveFile);
     }
   }
 

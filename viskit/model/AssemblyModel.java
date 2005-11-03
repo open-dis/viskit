@@ -1,5 +1,6 @@
 package viskit.model;
 
+import edu.nps.util.FileIO;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
 import viskit.VGlobals;
@@ -66,35 +67,49 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   {
     return currentFile;
   }
-  
+
   public void saveModel(File f)
   {
-
-    if(f == null)
+    if (f == null)
       f = currentFile;
-     try {
-       FileWriter fw = new FileWriter(f);
-       Marshaller m = jc.createMarshaller();
-       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
-       m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,schemaLoc);
+    // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
+    // file on a marshal error.
 
-       String nm = f.getName();
-       int dot=-1;
-       if((dot=nm.indexOf('.')) != -1)
-         nm = nm.substring(0,dot);
+    File tmpF = null;
+    try {
+      tmpF = File.createTempFile("tmpAsymarshal", ".xml");
+      tmpF.deleteOnExit();
+    }
+    catch (IOException e) {
+      JOptionPane.showMessageDialog(null, "Exception creating temporary file, AssemblyModel.saveModel():" +
+          "\n" + e.getMessage(),
+          "I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
-       jaxbRoot.setName(nIe(metaData.name));
-       jaxbRoot.setVersion(nIe(metaData.version));
-       jaxbRoot.setPackage(nIe(metaData.pkg));
-       if(jaxbRoot.getSchedule() == null) {
-         jaxbRoot.setSchedule(oFactory.createSchedule());
-       }
-       if(metaData.stopTime != "")
-         jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
-       else
-         jaxbRoot.getSchedule().setStopTime("100.");
+    try {
+      FileWriter fw = new FileWriter(tmpF);
+      Marshaller m = jc.createMarshaller();
+      m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 
-       jaxbRoot.getSchedule().setVerbose(""+metaData.verbose);
+      String nm = f.getName();
+      int dot = -1;
+      if ((dot = nm.indexOf('.')) != -1)
+        nm = nm.substring(0, dot);
+
+      jaxbRoot.setName(nIe(metaData.name));
+      jaxbRoot.setVersion(nIe(metaData.version));
+      jaxbRoot.setPackage(nIe(metaData.pkg));
+      if (jaxbRoot.getSchedule() == null) {
+        jaxbRoot.setSchedule(oFactory.createSchedule());
+      }
+      if (metaData.stopTime != "")
+        jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+      else
+        jaxbRoot.getSchedule().setStopTime("100.");
+
+      jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
 /*
        jaxbRoot.setAuthor(nIe(metaData.author));
@@ -106,26 +121,29 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
          clis.add(cmt.trim());
 */
 
-       m.marshal(jaxbRoot,fw);
-       fw.close();
+      m.marshal(jaxbRoot, fw);
+      fw.close();
 
-       modelDirty = false;
-       currentFile = f;
-     }
-     catch (JAXBException e) {
-       JOptionPane.showMessageDialog(null,"Exception on JAXB marshalling" +
-                                  "\n"+ f.getName() +
-                                  "\n"+ e.getMessage() +
-                                  "\n(check for blank data fields)",
-                                  "XML I/O Error",JOptionPane.ERROR_MESSAGE);
-       return;
-     }
-     catch (IOException ex) {
-       JOptionPane.showMessageDialog(null,"Exception on writing "+ f.getName() +
-                                  "\n"+ ex.getMessage(),
-                                  "File I/O Error",JOptionPane.ERROR_MESSAGE);
-       return;
-     }
+      // OK, made it through the marshal, overwrite the "real" file
+      FileIO.copyFile(tmpF, f, true);
+
+      modelDirty = false;
+      currentFile = f;
+    }
+    catch (JAXBException e) {
+      JOptionPane.showMessageDialog(null, "Exception on JAXB marshalling" +
+          "\n" + f.getName() +
+          "\n" + e.getMessage() +
+          "\n(check for blank data fields)",
+          "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    catch (IOException ex) {
+      JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
+          "\n" + ex.getMessage(),
+          "File I/O Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
   }
 
@@ -263,7 +281,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       pcNode.setPosition(new Point(100,100));
     else
       pcNode.setPosition(p);
-    
+
     PropertyChangeListener jaxbPCL = null;
     try {
       jaxbPCL = oFactory.createPropertyChangeListener();
@@ -277,7 +295,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbPCL.setType(className);
 
     VInstantiator.Constr vc = new VInstantiator.Constr(jaxbPCL.getType(),new Vector());
-    pcNode.setInstantiator(vc);    
+    pcNode.setInstantiator(vc);
 
     pcNode.opaqueModelObject = jaxbPCL;
     if(!nameCheck()) {
@@ -287,7 +305,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
     modelDirty = true;
-    notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));    
+    notifyChanged(new ModelEvent(pcNode,ModelEvent.PCLADDED, "Property Change Node added to assembly"));
   }
 
   public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p)
