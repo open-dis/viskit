@@ -532,17 +532,24 @@ public class SimkitXML2Java {
 
 	// local variable decls
 	while ( lci.hasNext() ) {
-	    LocalVariableType local = (LocalVariableType) lci.next();
+            LocalVariableType local = (LocalVariableType) lci.next();
+            String[] lines = {" "};
+            String value = local.getValue();
+            if ( !( "".equals(value)) ) {
+                lines = value.split("\\;");
+            }
 	    pw.print(sp8 + local.getType() + sp + local.getName() + sp + eq);
-	    pw.print(sp + lp + local.getType() + rp);
-	    pw.println(sp + local.getValue() + sc);
+	    pw.println(sp + lp + local.getType() + rp + lines[0].trim() + sc);
+            for ( int i = 1; i < lines.length; i++ ) {
+                pw.println(sp8 + lines[i].trim() + sc);
+            }
 	}
 	
 	if ( locs.size() > 0 ) pw.println();
 
         if ( e.getCode() != null ) {
             pw.println(sp8 + "/* Code block for Event " + e.getName() + " */");
-            String[] lines = e.getCode().split(";");
+            String[] lines = e.getCode().split("\\;");
             for ( int i = 0; i < lines.length ; i++ ) {
                 pw.println(sp8 + lines[i] + sc);
             }
@@ -823,7 +830,6 @@ public class SimkitXML2Java {
     // note a subclass should have at least the superclass's
     // parameters and maybe some more
     private List resolveSuperParams(List params) {
-        System.out.println("resolveSuperParams" + params);
 	List superParams = new ArrayList();
         if (this.root.getExtend().equals("simkit.SimEntityBase") ||
             this.root.getExtend().equals("simkit.BasicSimEntity"))
