@@ -63,7 +63,7 @@
 <!ATTLIST Schedule
     stopTime CDATA "0.0"
     verbose  (true|false) "true"
-    numberReplications CDATA "1"
+    numberReplications CDATA "2"
     printReplicationReports     (true|false) "true"
     printSummaryReport  (true|false) "true" 
     saveReplicationData (true|false) "true"
