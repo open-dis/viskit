@@ -24,7 +24,7 @@ import java.beans.PropertyChangeListener;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
-    public LinkedHashMap entities = new LinkedHashMap();
+    public LinkedHashMap entities;
     public LinkedHashMap replicationStatistics;
     public LinkedHashMap designPointStatistics;
     public LinkedHashMap propertyChangeListeners;
@@ -33,31 +33,42 @@ public class ViskitAssembly extends BasicAssembly {
     public LinkedHashMap replicationStatsListenerConnections;
     public LinkedHashMap simEventListenerConnections;
     public LinkedHashMap adapters;
+    boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
-
-    }
+        
+    }  
     
     public void createObjects() {
         entities = new LinkedHashMap();
         replicationStatistics = new LinkedHashMap();
         designPointStatistics = new LinkedHashMap();
         propertyChangeListeners = new LinkedHashMap();
-        simEventListenerConnections = new LinkedHashMap();
         propertyChangeListenerConnections = new LinkedHashMap();
-        simEventListenerConnections = new LinkedHashMap();
         designPointStatsListenerConnections = new LinkedHashMap();
         replicationStatsListenerConnections = new LinkedHashMap();
+        simEventListenerConnections = new LinkedHashMap();
         adapters = new LinkedHashMap();
         super.createObjects();
+    }
+    
+    public void performHookups() {
+        super.performHookups();
     }
     
     public void hookupReplicationListeners() {
         String[] listeners = (String[]) replicationStatsListenerConnections.keySet().toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
-            PropertyConnector pc = (PropertyConnector)replicationStatsListenerConnections.get(listeners[i]);
-            connectReplicationStat(listeners[i], pc);
+            LinkedList repStatsConnects = (LinkedList) replicationStatsListenerConnections.get(listeners[i]);
+            if ( repStatsConnects != null ) {
+                ListIterator li = repStatsConnects.listIterator();
+                while ( li.hasNext() ) {
+                    PropertyConnector pc = (PropertyConnector) li.next();
+                    connectReplicationStats(listeners[i], pc);
+                }
+            }
+ 
         }
         
     }
@@ -74,8 +85,14 @@ public class ViskitAssembly extends BasicAssembly {
     public void hookupPropertyChangeListeners() {
         String[] listeners = (String[]) propertyChangeListenerConnections.keySet().toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
-            PropertyConnector pc = (PropertyConnector)propertyChangeListenerConnections.get(listeners[i]);
-            connectPropertyChangeListener(listeners[i], pc);
+            LinkedList propertyConnects = (LinkedList) propertyChangeListenerConnections.get(listeners[i]);
+            if ( propertyConnects != null ) {
+                ListIterator li = propertyConnects.listIterator();
+                while ( li.hasNext() ) {
+                    PropertyConnector pc = (PropertyConnector) li.next();
+                    connectPropertyChangeListener(listeners[i], pc);
+                }
+            }
         }
     }
     
@@ -86,8 +103,14 @@ public class ViskitAssembly extends BasicAssembly {
         // a Class to create instances selected by each ReplicationStats listener.
         if (listeners.length > 0) {
             for ( int i = 0; i < listeners.length; i++ ) {
-                PropertyConnector pc = (PropertyConnector)designPointStatsListenerConnections.get(listeners[i]);
-                if (pc != null) connectDesignPointStat(listeners[i], pc);
+                LinkedList designPointConnects = (LinkedList) designPointStatsListenerConnections.get(listeners[i]);
+                if ( designPointConnects != null ) {
+                    ListIterator li = designPointConnects.listIterator();
+                    while ( li.hasNext() ) {
+                        PropertyConnector pc = (PropertyConnector) li.next();
+                        connectDesignPointStats(listeners[i], pc);
+                    }
+                }
             }
         }
     }
@@ -97,15 +120,34 @@ public class ViskitAssembly extends BasicAssembly {
     } 
     
     void connectPropertyChangeListener(String listener, PropertyConnector pc) {
+        System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
         getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
     }
     
-    void connectReplicationStat(String listener, PropertyConnector pc) {
-        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatByName(listener));
+    void connectReplicationStats(String listener, PropertyConnector pc) {
+        System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
+        if ( pc.property.equals(null) ) {
+            pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName();
+        }
+        
+        if ( pc.property.equals(null) ) {
+            getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatsByName(listener));
+        } else {
+            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatsByName(listener));
+        }
     }
     
-    void connectDesignPointStat(String listener, PropertyConnector pc) {
-        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatByName(listener));
+    void connectDesignPointStats(String listener, PropertyConnector pc) {
+        if ( pc.property.equals(null) ) {
+            pc.property = ((SampleStatistics) (getDesignPointStatsByName(listener))).getName();
+        }
+        
+        if ( pc.property.equals(null) ) {
+            getSimEntityByName(pc.source).addPropertyChangeListener(getDesignPointStatsByName(listener));
+        } else {
+            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatsByName(listener));
+        }
+        
     }
     
 
@@ -126,13 +168,21 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void createReplicationStats() {
+        System.out.println("Replication stats creating");
         replicationStats = 
                 (SampleStatistics[]) replicationStatistics.values().toArray(new SampleStatistics[0]);
+        for ( int i = 0; debug && i < replicationStats.length; i++ ) {
+            System.out.println(replicationStats[i].getName());
+        }
     }
     
     public void createPropertyChangeListeners() {
+        System.out.println("PropertyChangeListener creating");
         propertyChangeListener = 
                 (PropertyChangeListener[]) propertyChangeListeners.values().toArray(new PropertyChangeListener[0]);
+        for ( int i = 0; debug && i < propertyChangeListener.length; i++ ) {
+            System.out.println(propertyChangeListener[i]);
+        }
     }
     
     public void addSimEntity(String name, SimEntity entity) {
@@ -140,11 +190,11 @@ public class ViskitAssembly extends BasicAssembly {
         entities.put(name,entity);
     }
     
-    public void addDesignPointStat(String listenerName, PropertyChangeListener pcl) {
+    public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
         designPointStatistics.put(listenerName,pcl);
     }
    
-    public void addReplicationStat(String listenerName, PropertyChangeListener pcl) {
+    public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
         replicationStatistics.put(listenerName,pcl);
     }
     
@@ -153,15 +203,30 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void addPropertyChangeListenerConnection(String listener, String property, String source) {
-        propertyChangeListenerConnections.put(listener,new PropertyConnector(property,source));
+        LinkedList propertyConnects = (LinkedList)(propertyChangeListenerConnections.get(listener));
+        if ( propertyConnects == null ) {
+            propertyConnects = new LinkedList();
+            propertyChangeListenerConnections.put(listener,propertyConnects);
+        }
+        propertyConnects.add(new PropertyConnector(property,source));
     }
     
-    public void addDesignPointStatListenerConnection(String listener, String property, String source) {
-        designPointStatsListenerConnections.put(listener,new PropertyConnector(property,source));
+    public void addDesignPointStatsListenerConnection(String listener, String property, String source) {
+        LinkedList designPointConnects = (LinkedList)(designPointStatsListenerConnections.get(listener));
+        if ( designPointConnects == null ) {
+            designPointConnects = new LinkedList();
+            designPointStatsListenerConnections.put(listener,designPointConnects);
+        }
+        designPointConnects.add(new PropertyConnector(property,source));
     }
         
     public void addReplicationStatsListenerConnection(String listener, String property, String source) {
-        replicationStatsListenerConnections.put(listener,new PropertyConnector(property,source));
+        LinkedList repStatsConnects = (LinkedList)(replicationStatsListenerConnections.get(listener));
+        if ( repStatsConnects == null ) {
+            repStatsConnects = new LinkedList();
+            replicationStatsListenerConnections.put(listener,repStatsConnects);
+        }
+        repStatsConnects.add(new PropertyConnector(property,source));
     } 
     
     public void addSimEventListenerConnection(String listener, String source) {
@@ -179,11 +244,11 @@ public class ViskitAssembly extends BasicAssembly {
         return (PropertyChangeListener) propertyChangeListeners.get(name);
     }
     
-    public SampleStatistics getDesignPointStatByName(String name) {
+    public SampleStatistics getDesignPointStatsByName(String name) {
         return (SampleStatistics) designPointStatistics.get(name);
     }
     
-    public SampleStatistics getReplicationStatByName(String name) {
+    public SampleStatistics getReplicationStatsByName(String name) {
         return (SampleStatistics) replicationStatistics.get(name);
     }
     

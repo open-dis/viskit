@@ -252,6 +252,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         String name = this.root.getName();
         String pkg  = this.root.getPackage();
         String extend = this.root.getExtend();
+        ScheduleType schedule;
         
         pw.println("package " + pkg + sc);
         pw.println();
@@ -268,6 +269,28 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println();
         pw.println();
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
+        if ( (schedule = this.root.getSchedule()) != null ) {
+            
+            pw.print(sp8 + "setStopTime");
+            pw.println(lp + schedule.getStopTime() + rp + sc);
+            
+            pw.print(sp8 + "setVerbose");
+            pw.println(lp + schedule.getVerbose() + rp + sc);
+            
+            pw.print(sp8 + "setNumberReplications");
+            pw.println(lp + schedule.getNumberReplications() + rp + sc);
+            
+            pw.print(sp8 + "setSaveReplicationData");
+            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
+            
+            pw.print(sp8 + "setPrintReplicationReports");
+            pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
+            
+            pw.print(sp8 + "setPrintSummaryReport");
+            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
+            
+        }
+        //pw.println(sp8 + "super" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
         
@@ -659,7 +682,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             ListIterator pli = pl.listIterator();
             PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.println(sp8 + "addReplicationStat" + lp + qu + pcls[i] + qu + cm);
+            pw.println(sp8 + "addReplicationStats" + lp + qu + pcls[i] + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
             
             if ( pli.hasNext() ) {
@@ -672,7 +695,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
             pw.println(sp8 + rp + sc);
             pw.println();
-            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
+            pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
             pw.println();
         }
@@ -690,7 +713,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             ListIterator pli = pl.listIterator();
             PropertyChangeListenerConnectionType pclc =
                     (PropertyChangeListenerConnectionType) propertyChangeListenerConnections.get(pcls[i]);
-            pw.println(sp8 + "addDesignPointStat" + lp + qu + pcls[i] + qu + cm);
+            pw.println(sp8 + "addDesignPointStats" + lp + qu + pcls[i] + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
             
             if ( pli.hasNext() ) {
@@ -703,7 +726,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             
             pw.println(sp8 + rp + sc);
             pw.println();
-            pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
+            pw.print(sp8 + "addDesignPointStatsListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntityType)pclc.getSource()).getName() + qu + rp + sc);
             pw.println();
         }
@@ -749,31 +772,9 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     void buildTail(StringWriter t) {
         
         PrintWriter pw = new PrintWriter(t);
-        ScheduleType schedule;
+        String nAsm = nameAsm();
         
-        if ( (schedule = this.root.getSchedule()) != null ) {
-            
-            pw.print(sp8 + nameAsm() + pd + "setStopTime");
-            pw.println(lp + schedule.getStopTime() + rp + sc);
-            
-            pw.print(sp8 + nameAsm() + pd + "setVerbose");
-            pw.println(lp + schedule.getVerbose() + rp + sc);
-            
-            pw.print(sp8 + nameAsm() + pd + "setNumberReplications");
-            pw.println(lp + schedule.getNumberReplications() + rp + sc);
-            
-            pw.print(sp8 + nameAsm() + pd + "setSaveReplicationData");
-            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
-            
-            pw.print(sp8 + nameAsm() + pd + "setPrintReplicationReports");
-            pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
-            
-            pw.print(sp8 + nameAsm() + pd + "setPrintSummaryReport");
-            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
-            
-        }
-        
-        pw.println(sp8 + nw + sp + "Thread" + lp + nameAsm() + rp + pd + "start" + lp + rp + sc);
+        pw.println(sp8 + nw + sp + "Thread" + lp + nAsm + rp + pd + "start" + lp + rp + sc);
         
         pw.println();
         pw.println(sp4 + cb);
