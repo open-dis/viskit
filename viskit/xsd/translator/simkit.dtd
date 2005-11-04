@@ -1,4 +1,4 @@
-<!ELEMENT SimEntity ( Head?, Comment*, Parameter*, StateVariable*, Event*, Function* ) >
+<!ELEMENT SimEntity ( Head?, Comment*, Parameter*, StateVariable*, Event*, Code? ) >
 
 <!ELEMENT Head (Meta*) >
 
@@ -47,13 +47,6 @@
 <!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) > 
 <!ATTLIST Event
 	name		ID	#REQUIRED
->
-
-<!ELEMENT Function ( Comment*, Parameter* , LocalVariable*, Code ) >
-<!ATTLIST Function
-        name        CDATA   #REQUIRED
-        returnType  CDATA   #REQUIRED
-        scope       CDATA   "public"
 >
 
 <!ELEMENT Code (#PCDATA) >
