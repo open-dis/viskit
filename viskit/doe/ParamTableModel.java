@@ -87,7 +87,9 @@ public class ParamTableModel extends DefaultTableModel
     prefixes = new Vector();
     for (Iterator itr = simEntitiesJDom.iterator(); itr.hasNext();) {
       Element elm = (Element) itr.next();
-      assert elm.getName().equalsIgnoreCase("SimEntity");
+      //assert elm.getName().equalsIgnoreCase("SimEntity");
+      if(!elm.getName().equalsIgnoreCase("SimEntity"))
+        System.err.println("Error ParamTableModel(), element not named SimEntity");
       processRow(elm);
     }
     mydata = (Object[][]) rows.toArray(mydata);
@@ -95,7 +97,9 @@ public class ParamTableModel extends DefaultTableModel
     if(designParamsJDom != null) {
       for (Iterator itr = designParamsJDom.iterator(); itr.hasNext();) {
         Element elm = (Element) itr.next();
-        assert elm.getName().equalsIgnoreCase("TerminalParameter");
+        //assert elm.getName().equalsIgnoreCase("TerminalParameter");
+        if(!elm.getName().equalsIgnoreCase("TerminalParameter"))
+          System.err.println("Error ParamTableModel(), element not named TerminalParameter");
         processDesignParam(elm);
       }
     }
@@ -108,7 +112,9 @@ public class ParamTableModel extends DefaultTableModel
     String typ = (at==null?"":at.getValue());
     at = elm.getAttribute("name");
     String nm = (at==null?"":at.getValue());
-    assert nm.length()>0:"Terminal param w/out name ref!";
+    //assert nm.length()>0:"Terminal param w/out name ref!";
+    if(nm.length()<=0)
+      System.err.println("Terminal param w/out name ref!");
     int row = ((Integer)termHashMap.get(nm)).intValue();
 
     at = elm.getAttribute("value");
@@ -229,7 +235,9 @@ public class ParamTableModel extends DefaultTableModel
       termHashMap.put(nam,new Integer(rows.size()-1));
     }
     else {
-      assert nm.equalsIgnoreCase("MultiParameter");
+      //assert nm.equalsIgnoreCase("MultiParameter");
+      if(!nm.equalsIgnoreCase("MultiParameter"))
+        System.err.println("Error ParamTableModel.processRow, unknown type");
       Attribute at = el.getAttribute("nameRef");
       oa[NAME_COL] = (at == null ? dumpPrefixes() : at.getValue());
       at = el.getAttribute("type");
@@ -308,7 +316,8 @@ public class ParamTableModel extends DefaultTableModel
       case FACTOR_COL:
         return Boolean.class;
       default:
-        assert false:"Column error in ParamTableModel";
+        //assert false:"Column error in ParamTableModel";
+        System.err.println("Column error in ParamTableModel");
     }
     return null;
   }
@@ -356,7 +365,8 @@ public class ParamTableModel extends DefaultTableModel
         // nothing here
         break;
       default:
-        assert false: "Program error, ParamTableModel.setValueAt()";
+        // assert false: "Program error, ParamTableModel.setValueAt()";
+        System.err.println("Program error, ParamTableModel.setValueAt()");
     }
 
     mydata[row][col] = value;

@@ -71,7 +71,10 @@ public class ParamTree extends JTree
 
     for(Iterator itr = lis.iterator(); itr.hasNext();) {
       Element elm = (Element)itr.next();
-      assert elm.getName().equalsIgnoreCase("SimEntity");
+      // assert elm.getName().equalsIgnoreCase("SimEntity");
+      if(!elm.getName().equalsIgnoreCase("SimEntity")) {
+        System.err.println("ParamTree.setParams, unknown element type: "+elm.getName());
+      }
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(elm);
       root.add(node);
       addChildren(elm,node);
@@ -88,7 +91,11 @@ public class ParamTree extends JTree
       if(nm.equalsIgnoreCase("MultiParameter"))
         addChildren(e,n); // recurse
       else {
-        assert nm.equalsIgnoreCase("TerminalParameter");
+        // assert nm.equalsIgnoreCase("TerminalParameter");
+        if(!nm.equalsIgnoreCase("TerminalParameter")) {
+          System.err.println("ParamTree.addChildren, unknown element type: "+nm);
+        }
+
       }
         node.add(n);
     }

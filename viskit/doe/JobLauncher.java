@@ -378,7 +378,8 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
           setVisible(false);
           break;
         default:
-          assert false:"Program error JobLauncher.java";
+          //assert false:"Program error JobLauncher.java";
+          System.err.println("Program error JobLauncher.java");
       }
     }
   }
@@ -621,10 +622,14 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     res.listener = listenerName;
     res.property = property;
     res.run = Integer.parseInt(run);
-    assert res.run == nrun :"JobLauncher.doResults";
+    //assert res.run == nrun :"JobLauncher.doResults";
+    if(res.run != nrun)
+      System.err.println("JobLauncher.doResults");
 
     res.dp = Integer.parseInt(design);
-    assert res.dp == dp : "JobLauncher.doResults1";
+    //assert res.dp == dp : "JobLauncher.doResults1";
+    if(res.dp != dp)
+      System.err.println("JobLauncher.doResults1");
 
     res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);
     res.resultsMinObs = Double.parseDouble(nums[Gresults.MINOBS]);
