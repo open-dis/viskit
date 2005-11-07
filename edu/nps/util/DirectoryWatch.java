@@ -143,8 +143,9 @@ public class DirectoryWatch
 
     else {
       File[] fa = f.listFiles();
-      for (int i = 0; i < fa.length; i++)
-        recurseTree(fa[i], lis);
+      if(fa != null)
+        for (int i = 0; i < fa.length; i++)
+          recurseTree(fa[i], lis);
     }
   }
 

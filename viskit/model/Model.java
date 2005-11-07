@@ -167,7 +167,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         buildEventsFromJaxb(jaxbRoot.getEvent());
         buildParametersFromJaxb(jaxbRoot.getParameter());
         buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
-
+        buildCodeBlockFromJaxb(jaxbRoot.getCode());
       }
       catch (JAXBException ee) {
         // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
@@ -403,6 +403,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
 
     node.getComments().clear();
     node.getComments().addAll(ev.getComment());
+    
+    node.setCodeBLock(ev.getCode());
 
     node.getLocalVariables().clear();
     for(Iterator itr = ev.getLocalVariable().iterator(); itr.hasNext();) {
@@ -458,6 +460,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
       ArrayList cmt = new ArrayList();
       cmt.addAll(sv.getComment());
       est.setComments(cmt);
+
       est.opaqueModelObject = st;
       node.getTransitions().add(est);
     }
@@ -549,6 +552,14 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     return alis;
   }
+
+  private void buildCodeBlockFromJaxb(String code)
+  {
+    code = (code == null)?"":code;
+    
+    notifyChanged(new ModelEvent(code,ModelEvent.CODEBLOCKCHANGED,"Code block changed"));
+  }
+
   private void buildStateVariablesFromJaxb(List lis)
   {
     for(Iterator itr = lis.iterator(); itr.hasNext();) {
@@ -665,6 +676,12 @@ public class Model extends mvcAbstractModel implements ViskitModel
     setDirty(true);
     simParameters.remove(vp);
     notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
+  }
+
+  public void changeCodeBlock(String s)
+  {
+    jaxbRoot.setCode(s);
+    setDirty(true);
   }
 
   public boolean changeSimParameter(vParameter vp)
@@ -1010,6 +1027,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
     cloneLocalVariables(jaxbEv.getLocalVariable(),node.getLocalVariables());
     // following must follow above
     cloneTransitions(jaxbEv.getStateTransition(),node.getTransitions(),jaxbEv.getLocalVariable());
+
+    jaxbEv.setCode(node.getCodeBlock());
 
     setDirty(true);
     notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));

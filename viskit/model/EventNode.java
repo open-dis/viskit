@@ -29,6 +29,7 @@ public class EventNode extends ViskitElement
   private Vector    localVariables = new Vector();
   private ArrayList arguments = new ArrayList();
   private Point     position = new Point(0,0);
+  private String    codeblock = "";
 
   EventNode(String name)      // package access on constructor
   {
@@ -47,6 +48,7 @@ public class EventNode extends ViskitElement
     en.localVariables = localVariables;
     en.arguments   = arguments;
     en.connections = connections;
+    en.codeblock   = codeblock;
     return en;
   }
   public String getName()
@@ -85,6 +87,16 @@ public class EventNode extends ViskitElement
     this.comments = comments;
   }
 
+  public void setCodeBLock(String s)
+  {
+    this.codeblock = s;
+  }
+
+  public String getCodeBlock()
+  {
+    return codeblock;
+  }
+  
   public Vector getConnections()
   {
     return connections;

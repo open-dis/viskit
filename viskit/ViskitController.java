@@ -46,7 +46,8 @@ public interface ViskitController
   void canArcEdit       (CancellingEdge ed);
   void simParameterEdit (vParameter param);
   void stateVariableEdit(vStateVariable var);
-
+  void codeBlockEdit    (String s);
+  
   /* menu selections */
   void copy();
   void cut();        // to remove nodes and edges

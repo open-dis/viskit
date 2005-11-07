@@ -59,7 +59,8 @@ public class VgraphComponentWrapper extends vGraphComponent
   public JSplitPane      stateParamSplitPane;
   public ParametersPanel paramPan;
   public VariablesPanel  varPan;
-
+  public CodeBlockPanel  codeBlockPan;
+  
   public boolean isActive = true;
   
   public VgraphComponentWrapper(vGraphModel model, EventGraphViewFrame frame)

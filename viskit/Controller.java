@@ -428,7 +428,10 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ((viskit.model.ViskitModel) getModel()).changeSimParameter(param);
     }
   }
-
+  public void codeBlockEdit(String s)
+  {
+    ((viskit.model.ViskitModel)getModel()).changeCodeBlock(s);
+  }
   public void stateVariableEdit(vStateVariable var)
   {
     boolean modified = ((ViskitView) getView()).doEditStateVariable(var);

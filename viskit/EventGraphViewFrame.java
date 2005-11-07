@@ -12,6 +12,7 @@ import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -292,14 +293,53 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       }
     });
 
+    CodeBlockPanel codeblockPan = buildCodeBlockPanel();
+
+    JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                                                 new JScrollPane(stateVariablesPanel),
+                                                 buildCodeBlockComponent(codeblockPan));
     // Split pane that has state variables on top, parameters on bottom.
     JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                                    new JScrollPane(stateVariablesPanel),
+                                                    stateCblockSplt,
+                                                    //new JScrollPane(stateVariablesPanel),
                                                     new JScrollPane(parametersPanel));
     spltPn.setMinimumSize(new Dimension(20,20));
+
     vgcw.stateParamSplitPane = spltPn;
     vgcw.paramPan = pp;
     vgcw.varPan = vp;
+    vgcw.codeBlockPan = codeblockPan;
+  }
+  private CodeBlockPanel buildCodeBlockPanel()
+  {
+    CodeBlockPanel cbp = new CodeBlockPanel(this,true,"Event Graph Code Block");
+    cbp.addUpdateListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        String s = (String)e.getSource();
+        if(s != null)
+          ((ViskitController)getController()).codeBlockEdit((String)e.getSource());
+      }
+    });
+    return cbp;
+  }
+
+  private JComponent buildCodeBlockComponent(CodeBlockPanel cbp)
+  {
+    JPanel p = new JPanel();
+    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
+    JLabel lab = new JLabel("Code Block");
+    lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    p.add(lab);
+    cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    p.add(cbp);
+    p.setBorder(new EmptyBorder(5,5,5,2));
+    Dimension d = new Dimension(p.getPreferredSize());
+    d.width = Integer.MAX_VALUE;
+    p.setMaximumSize(d);
+
+    return p;
   }
 
   int untitledCount=0;
@@ -1005,6 +1045,10 @@ cancelArcMode.setIcon(new CanArcIcon());
       case ModelEvent.STATEVARIABLECHANGED:
         vp.updateRow(event.getSource());
         //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
+        break;
+
+      case ModelEvent.CODEBLOCKCHANGED:
+        vgcw.codeBlockPan.setData((String)event.getSource());
         break;
 
       case ModelEvent.NEWMODEL:

@@ -11,9 +11,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Vector;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -39,6 +39,7 @@ public class EventInspectorDialog extends JDialog
   private LocalVariablesPanel localVariables;
   private JFrame fr;
   private myChangeActionListener myChangeListener;
+  private CodeBlockPanel codeblockPanel;
 
   /**
    * Set up and show the dialog.  The first Component argument
@@ -148,6 +149,12 @@ public class EventInspectorDialog extends JDialog
     threePanels.add(localVariables);
     threePanels.add(Box.createVerticalStrut(5));
 
+    // code block
+    codeblockPanel = new CodeBlockPanel(this,false, "Event Code Block");
+    codeblockPanel.setBorder(BorderFactory.createTitledBorder("Code block"));
+    threePanels.add(codeblockPanel);
+    threePanels.add(Box.createVerticalStrut(5));
+    
     // state transitions
     transitions = new TransitionsPanel();
     transitions.setBorder(BorderFactory.createTitledBorder("State transitions"));
@@ -177,6 +184,7 @@ public class EventInspectorDialog extends JDialog
     KeyListener klis = new myKeyListener();
     name.addKeyListener(klis);
     comment.addKeyListener(klis);
+    codeblockPanel.addKeyListener(klis);
     edComment.addActionListener(new commentListener());
     arguments.addPlusListener(myChangeListener);
     arguments.addMinusListener(myChangeListener);
@@ -262,6 +270,7 @@ public class EventInspectorDialog extends JDialog
     comment.setText(fillString(node.getComments()));
     comment.setCaretPosition(0);
     comment.setPreferredSize(d);
+    codeblockPanel.setData(node.getCodeBlock());
     transitions.setTransitions(node.getTransitions());
     arguments.setData(node.getArguments());
     localVariables.setData(node.getLocalVariables());
@@ -280,6 +289,7 @@ public class EventInspectorDialog extends JDialog
       en.setLocalVariables(new Vector(localVariables.getData()));
       en.getComments().clear();
       en.getComments().add(comment.getText().trim());
+      en.setCodeBLock(codeblockPanel.getData());
     }
   }
   private String fillString (ArrayList lis)
@@ -397,7 +407,9 @@ public class EventInspectorDialog extends JDialog
     public void actionPerformed(ActionEvent e)
     {
       StringBuffer sb = new StringBuffer(EventInspectorDialog.this.comment.getText().trim());
-      boolean modded = EventCommentDialog.showDialog(fr,EventInspectorDialog.this,sb);
+      //boolean modded = EventCommentDialog.showDialog(fr,EventInspectorDialog.this,sb);
+      boolean modded = TextAreaDialog.showTitledDialog("Event Description",EventInspectorDialog.this,
+                                                       EventInspectorDialog.this,sb);
       if(modded) {
         EventInspectorDialog.this.comment.setText(sb.toString().trim());
         EventInspectorDialog.this.comment.setCaretPosition(0);

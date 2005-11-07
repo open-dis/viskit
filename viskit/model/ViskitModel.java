@@ -88,6 +88,7 @@ public interface ViskitModel
   public void    newSimParameter     (String name, String type, String initVal, String comment);
   public boolean changeStateVariable (vStateVariable st);
   public boolean changeSimParameter  (vParameter p);
+  public void    changeCodeBlock     (String s);
   public void    deleteStateVariable (vStateVariable sv);
   public void    deleteSimParameter  (vParameter p);
 

@@ -114,6 +114,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents
         content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
       }
       content.add(leftJsp, BorderLayout.CENTER);
+      content.validate();
     }
     if (!contentOnly) {
       getContentPane().add(content, BorderLayout.CENTER);
