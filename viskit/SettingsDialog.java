@@ -47,11 +47,13 @@ import org.apache.commons.configuration.XMLConfiguration;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 public class SettingsDialog extends JDialog
 {
@@ -257,6 +259,7 @@ public class SettingsDialog extends JDialog
   }
 
   JFileChooser addChooser;
+
   class addCPhandler implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
@@ -264,6 +267,33 @@ public class SettingsDialog extends JDialog
       if (addChooser == null) {
         addChooser = new JFileChooser(System.getProperty("user.dir"));
         addChooser.setMultiSelectionEnabled(false);
+        addChooser.setAcceptAllFileFilterUsed(false);
+        addChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        addChooser.setFileFilter(new FileFilter()
+        {
+          public boolean accept(File f)
+          {
+            if (f.isDirectory()) {
+              return true;
+            }
+            String nm = f.getName();
+            int idx = nm.lastIndexOf('.');
+            if (idx != -1) {
+              String extension = nm.substring(idx).toLowerCase();
+              if (extension != null && (
+                  extension.equals(".jar") ||
+                  extension.equals(".zip"))) {
+                return true;
+              }
+            }
+            return false;
+          }
+
+          public String getDescription()
+          {
+            return "Directories, jars and zips";
+          }
+        });
       }
 
       int retv = addChooser.showOpenDialog(SettingsDialog.this);
