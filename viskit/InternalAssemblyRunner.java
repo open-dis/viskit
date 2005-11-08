@@ -362,21 +362,18 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         send(getVerbose());
 
         send(ExternalSimRunner.DUMP_OUTPUTS);
-        // The following one blocks in the running VM.  We're just queing up commands here.
-        send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
 
+        send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
+        // doesn't block, but we'll wait here for a response
         try {
-          System.out.println("waiting for sim to complete");
-          response = backChan.readLine();  // wait for reply
-          System.out.println("sim completed");
+          response = backChan.readLine();
         }
         catch (IOException e) {
-          System.out.println("error in InternalAssemblyRunner");
+          e.printStackTrace();
         }
 
         send(ExternalSimRunner.DUMP_OUTPUTS);
 
-        System.out.println("waiting to get time");
         String tm;
         try {
           tm = sendAndWait(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
@@ -384,7 +381,6 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         catch (IOException e) {
           tm = "Error";
         }
-        System.out.println("got time " + tm);
         final String time = tm;
         // get answer and update GUI stuff in GUI thread
         SwingUtilities.invokeLater(new Runnable()
@@ -664,17 +660,12 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
       execLoop();
     }
-
+    Thread simThread;
     private void execLoop()
     {
       Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
       try {
-        // Setup the sim by spawning an assembly thread
-        Thread t = new Thread((Runnable)targetObject,"SimThread");
-        t.setPriority(Thread.NORM_PRIORITY);
-        t.start();
 
         while(true) {
           String cmd = in.readLine();
@@ -691,47 +682,67 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
                 backChannel.println("BackChannelOK");
               break;
             case SCHEDULE_RESET:
+              System.err.println("Got reset (not error)");
               Schedule.reset();
               break;
             case SCHEDULE_STOPSIMULATION:
-              System.err.println("Got stop sim.");
+              System.err.println("Got stop sim (not error)");
               Schedule.stopSimulation();
               break;
             case SCHEDULE_STARTSIMULATION:
-              Thread tt = new Thread(new Runnable()
-              {
-                public void run()
+              // If it hasn't been started, just start the thread, which internally does Schedule.startSimulation()
+              // else, Schedule.startSimulation();
+              System.err.println("Got start sim (not error)");
+              if(simThread != null)
+                Schedule.startSimulation();
+              else{
+                simThread = new Thread((Runnable)targetObject,"SimThread");
+                simThread.setPriority(Thread.NORM_PRIORITY);
+                simThread.start();
+                Thread watcherThread = new Thread(new Runnable()
                 {
-                  Schedule.startSimulation();
-                  if(backChannel != null)
-                    backChannel.println("SimDone");
-                  else
-                    System.out.println("SimDone");
-                }
-              },"startSimThread");
-              tt.setPriority(Thread.NORM_PRIORITY);
-              tt.start();
+                  public void run()
+                  {
+                    try {
+                      simThread.join();
+                    }
+                    catch (InterruptedException e) {
+                    }
+                    simThread = null;
+                    backChannel.println("SimStopped");
+                    System.err.println("Sim stopped (not error)");
+                  }
+                },"simEndWatcher");
+                watcherThread.setPriority(Thread.NORM_PRIORITY);
+                watcherThread.start();
+              }
              break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();
+              System.err.println("Got setPauseAfterEachEvent (not error) = "+which);;
               Schedule.setPauseAfterEachEvent(Boolean.valueOf(which).booleanValue());
               break;
             case SCHEDULE_SETVERBOSE:
               String verb = in.readLine();
+              System.err.println("Got setVerbose (not error) = "+verb);
               Schedule.setVerbose(Boolean.valueOf(verb).booleanValue());
               break;
             case SCHEDULE_GETSIMTIMESTR:
+              System.err.println("Got getSimTimeString (not error)");
               backChannel.println(Schedule.getSimTimeStr());
               break;
             case SCHEDULE_STOPATTIME:
               String tm = in.readLine();
+              System.err.println("Got stopAtTime (not error) =" + tm);
               Schedule.stopAtTime(Double.parseDouble(tm));
               break;
 
             case DUMP_OUTPUTS:
+              System.err.println("Got dumpOutputs (not error)");
               dumpOutputs();
               break;
             case QUIT:
+              System.err.println("Got quit (not error)");
               System.exit(0);
               break;
 
