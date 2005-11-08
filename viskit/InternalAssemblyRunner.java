@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit;
 
+import edu.nps.util.DirectoryWatch;
 import simkit.Schedule;
 
 import javax.swing.*;
@@ -59,8 +60,6 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import edu.nps.util.DirectoryWatch;
 
 /** Analogous to ExternalAssemblyRunner, but puts gui in calling thread and runs
  * sim in external VM.
@@ -337,6 +336,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   {
     Thread t = new Thread(new Runnable()
     {
+      String response;
       public void run()
       {
         Thread.yield(); // let dialog show up
@@ -349,7 +349,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
           Socket sock = svrsocket.accept();
 
           backChan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-          String response = backChan.readLine();
+          response = backChan.readLine();
           //System.out.println("Back channel opened, response: " + response);
         }
         catch (IOException e) {
@@ -367,8 +367,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
         try {
           System.out.println("waiting for sim to complete");
-          String response = backChan.readLine();  // wait for sim to complete
-          System.out.println("sim completed"); //, response = "+response);
+          response = backChan.readLine();  // wait for reply
+          System.out.println("sim completed");
         }
         catch (IOException e) {
           System.out.println("error in InternalAssemblyRunner");
@@ -376,7 +376,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
         send(ExternalSimRunner.DUMP_OUTPUTS);
 
-        //System.out.println("waiting to get time");
+        System.out.println("waiting to get time");
         String tm;
         try {
           tm = sendAndWait(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
@@ -384,7 +384,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         catch (IOException e) {
           tm = "Error";
         }
-        //System.out.println("got time " + tm);
+        System.out.println("got time " + tm);
         final String time = tm;
         // get answer and update GUI stuff in GUI thread
         SwingUtilities.invokeLater(new Runnable()
@@ -506,12 +506,12 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
     file.addSeparator();
     file.add(new JMenuItem("Settings"));
-    
+
     edit.add(copy);
     edit.add(selAll);
     edit.add(clrAll);
     myMenuBar.add(file);
-    myMenuBar.add(edit);    
+    myMenuBar.add(edit);
   }
 
   class copyListener implements ActionListener
@@ -671,6 +671,11 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
       try {
+        // Setup the sim by spawning an assembly thread
+        Thread t = new Thread((Runnable)targetObject,"SimThread");
+        t.setPriority(Thread.NORM_PRIORITY);
+        t.start();
+
         while(true) {
           String cmd = in.readLine();
 
@@ -693,20 +698,20 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               Schedule.stopSimulation();
               break;
             case SCHEDULE_STARTSIMULATION:
-              // test
-              Thread t = new Thread(new Runnable()
+              Thread tt = new Thread(new Runnable()
               {
                 public void run()
                 {
                   Schedule.startSimulation();
                   if(backChannel != null)
                     backChannel.println("SimDone");
+                  else
+                    System.out.println("SimDone");
                 }
               },"startSimThread");
-              t.setPriority(Thread.NORM_PRIORITY);
-              t.start();
-              //Schedule.startSimulation();
-              break;
+              tt.setPriority(Thread.NORM_PRIORITY);
+              tt.start();
+             break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();
               Schedule.setPauseAfterEachEvent(Boolean.valueOf(which).booleanValue());
