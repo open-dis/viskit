@@ -149,8 +149,8 @@ public class RunnerPanel extends JPanel
   private void setupPipes()
   {
     if ((outInpStr != null) && (errInpStr != null)) {
-      new ReaderThread(outInpStr, soutTA).start();
-      new ReaderThread(errInpStr, serrTA).start();
+      new ReaderThread(outInpStr, soutTA, true).start();
+      new ReaderThread(errInpStr, serrTA, false).start();
     }
     else {
       try {
@@ -161,8 +161,8 @@ public class RunnerPanel extends JPanel
         PipedOutputStream poErr = new PipedOutputStream(piErr);
         System.setErr(new PrintStream(poErr, true));
 
-        new ReaderThread(piOut, soutTA).start();
-        new ReaderThread(piErr, serrTA).start();
+        new ReaderThread(piOut, soutTA, true).start();
+        new ReaderThread(piErr, serrTA, false).start();
       }
       catch (IOException e) {
         JOptionPane.showMessageDialog(null, "exep in setupPipes " + e.getMessage());
@@ -174,12 +174,14 @@ public class RunnerPanel extends JPanel
   {
     InputStream pi;
     JTextArea myTa;
+    boolean clampSize;
 
-    ReaderThread(InputStream pi, JTextArea ta)
+    ReaderThread(InputStream pi, JTextArea ta , boolean clampSize)
     {
       super("rdrThr");
       this.pi = pi;
       this.myTa = ta;
+      this.clampSize = clampSize;
     }
 
     public void run()
@@ -226,8 +228,8 @@ public class RunnerPanel extends JPanel
         }
       }
     }
-  }
 
+  StringBuffer stsb = new StringBuffer(); // we're single threaded
   /**
    * Class to encapsulate a packet containing a JTextArea reference and a string, and append the
    * string to the TextArea in the GUI thread.
@@ -250,7 +252,16 @@ public class RunnerPanel extends JPanel
 
     public void run()
     {
-      ta.append(s);
+      if(clampSize) {
+        stsb.append(s);
+        if(stsb.length() > 0x8000) {
+          stsb.delete(0,stsb.length()-0x8000-1);
+        }
+        ta.setText(stsb.toString());
+      }
+      else
+        ta.append(s);
+
       ta.setCaretPosition(doc.getLength());
 
       if(pos != null)
@@ -263,4 +274,6 @@ public class RunnerPanel extends JPanel
         }
     }
   }
+  }
+
 }
