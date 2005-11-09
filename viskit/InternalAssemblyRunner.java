@@ -451,30 +451,35 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   {
     switch(evnt) {
       case START:
+        System.out.println("twbutt start");
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrStop.setEnabled(true);
         runPanel.vcrStep.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
         break;
       case STOP:
+        System.out.println("twbutt stop");
         runPanel.vcrPlay.setEnabled(true);
         runPanel.vcrStop.setEnabled(false);
         runPanel.vcrStep.setEnabled(true);
         runPanel.vcrRewind.setEnabled(true);
         break;
       case STEP:
+        System.out.println("twbutt step");
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrStop.setEnabled(true);
         runPanel.vcrStep.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
         break;
       case REWIND:
+        System.out.println("twbutt rewind");
         runPanel.vcrPlay.setEnabled(true);
         runPanel.vcrStop.setEnabled(false);
         runPanel.vcrStep.setEnabled(true);
         runPanel.vcrRewind.setEnabled(false);
         break;
       case OFF:
+        System.out.println("twbutt off");
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrStop.setEnabled(false);
         runPanel.vcrStep.setEnabled(false);
@@ -690,6 +695,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
             case SCHEDULE_STOPSIMULATION:
               System.err.println("Got stop sim (not error)");
               Schedule.stopSimulation();
+              System.err.println("Back from Schedule.stopSimulation()");
               break;
             case SCHEDULE_STARTSIMULATION:
               // If it hasn't been started, just start the thread, which internally does Schedule.startSimulation()
@@ -718,7 +724,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
                 watcherThread.setPriority(Thread.NORM_PRIORITY);
                 watcherThread.start();
               }
-              
+
              break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();
@@ -755,7 +761,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         }
       }
       catch (Exception e) {
-        System.out.println("external assembly runner terminating.");
+        System.out.println("external assembly runner terminating. "+e.getMessage());
       }
 
     }
