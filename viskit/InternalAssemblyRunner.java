@@ -249,6 +249,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       send(ExternalSimRunner.SCHEDULE_RESET);
       twiddleButtons(InternalAssemblyRunner.REWIND);
 
+/*
       String timeString = null;
       try {
         timeString = sendAndWait(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
@@ -257,6 +258,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         timeString = e1.getMessage();
       }
       runPanel.vcrSimTime.setText(timeString);
+*/
     }
   }
   class stepListener implements ActionListener
@@ -716,6 +718,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
                 watcherThread.setPriority(Thread.NORM_PRIORITY);
                 watcherThread.start();
               }
+              
              break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();
