@@ -716,7 +716,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         System.exit(-1);
       }
       targetAssembly = (BasicAssembly)targetObject;
-      targetAssembly.setVerbose(Boolean.parseBoolean(args[RUNNER_ARG_VERBOSE]));
+      targetAssembly.setVerbose(Boolean.valueOf(args[RUNNER_ARG_VERBOSE]).booleanValue());
       targetAssembly.setStopTime(Double.parseDouble(args[RUNNER_ARG_STOPTIME]));
       outputs.clear();
       if (args != null && args.length > 0) {
