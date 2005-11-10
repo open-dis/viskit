@@ -31,7 +31,10 @@ public class RunnerPanel extends JPanel
   public JTextField vcrSimTime, vcrStopTime;
 
   private InputStream outInpStr, errInpStr;
-  JPanel vcrToolBar;
+  public JCheckBox saveRepDataCB;
+  public JCheckBox printRepReportsCB;
+  public JCheckBox printSummReportsCB;
+  public JTextField numRepsTF;
 
   public RunnerPanel(boolean verbose, boolean skipCloseButt)
   {
@@ -80,7 +83,10 @@ public class RunnerPanel extends JPanel
 
   JPanel makeVCRPanel(boolean skipCloseButt)
   {
-    vcrToolBar = new JPanel();
+    JPanel doubleVcrToolBar = new JPanel();
+    doubleVcrToolBar.setLayout(new BoxLayout(doubleVcrToolBar,BoxLayout.Y_AXIS));
+
+    JPanel vcrToolBar = new JPanel();
     vcrToolBar.setLayout(new BoxLayout(vcrToolBar, BoxLayout.X_AXIS));
     vcrToolBar.add(Box.createHorizontalGlue());
 
@@ -142,7 +148,29 @@ public class RunnerPanel extends JPanel
     vcrToolBar.add(Box.createHorizontalGlue());
     vcrToolBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    return vcrToolBar;
+    JPanel lowerToolBar = new JPanel();
+    lowerToolBar.setLayout(new BoxLayout(lowerToolBar,BoxLayout.X_AXIS));
+
+    numRepsTF = new JTextField(8);
+    Vstatics.clampSize(numRepsTF,numRepsTF,numRepsTF);
+    JLabel numRepsLab = new JLabel("Number of replications");
+    saveRepDataCB = new JCheckBox("Save rep data");
+    printRepReportsCB = new JCheckBox("Print rep reports");
+    printSummReportsCB = new JCheckBox("Print summary reports");
+    lowerToolBar.add(Box.createHorizontalGlue());
+    lowerToolBar.add(numRepsLab);
+    lowerToolBar.add(numRepsTF);
+    lowerToolBar.add(Box.createHorizontalStrut(10));
+    lowerToolBar.add(saveRepDataCB);
+    lowerToolBar.add(Box.createHorizontalStrut(10));
+    lowerToolBar.add(printRepReportsCB);
+    lowerToolBar.add(Box.createHorizontalStrut(10));
+    lowerToolBar.add(printSummReportsCB);
+    lowerToolBar.add(Box.createHorizontalGlue());
+    doubleVcrToolBar.add(vcrToolBar);
+    doubleVcrToolBar.add(lowerToolBar);
+    //return vcrToolBar;
+    return doubleVcrToolBar;
   }
 
   private boolean piping=false;

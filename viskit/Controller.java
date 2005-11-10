@@ -590,7 +590,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
       if(ret != JOptionPane.YES_OPTION)
         return false;
-      this.saveAs();
+      // saveAs();     7 Nov 05
+      save();
     }
     return true;
   }

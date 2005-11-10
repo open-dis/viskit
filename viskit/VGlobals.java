@@ -18,6 +18,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
@@ -52,7 +53,7 @@ public class VGlobals
 
   private VGlobals()
   {
-    initBeanShell();
+    //initBeanShell();
 
     cbMod = new DefaultComboBoxModel(new Vector(Arrays.asList(defaultTypeStrings)));
     myListener = new myTypeListener();
@@ -191,7 +192,7 @@ public class VGlobals
     cont.setView(egvf);
     return egvf;
   }
-  
+
   public ViskitModel getActiveEventGraphModel()
   {
     return  (ViskitModel)egvf.getModel();
@@ -258,6 +259,19 @@ public class VGlobals
   {
     interpreter = new Interpreter();
     interpreter.setStrictJava(true);       // no loose typeing
+
+    String[] extraCP = Vstatics.getExtraClassPathArray();
+    if(extraCP != null && extraCP.length>0) {
+      for(int i=0;i<extraCP.length;i++) {
+        try {
+          interpreter.getClassManager().addClassPath(new URL("file","localhost",extraCP[i]));
+        }
+        catch (IOException e) {
+          System.err.println("bad extra classpath: "+extraCP[i]);
+        }
+      }
+    }
+
     NameSpace ns = interpreter.getNameSpace();
     ns.importPackage("simkit.*");
     ns.importPackage("simkit.examples.*");
@@ -266,12 +280,14 @@ public class VGlobals
     ns.importPackage("simkit.stat.*");
     ns.importPackage("simkit.util.*");
     ns.importPackage("diskit.*");         // 17 Nov 2004
+    
   }
   String bshErr = "BeanShell eval error";
   private Vector nsSets = new Vector();
 
   public String parseCode(EventNode node, String s)
   {
+    initBeanShell();
     // Load the interpreter with the state variables and the sim parameters
     // Load up the local variables and event parameters for this particular node
     // Then do the parse.
@@ -388,7 +404,8 @@ public class VGlobals
       Class c = Vstatics.classForName(typ);
       interpreter.eval(typ + " " + name + ";");
     }
-    catch (Exception e) {
+    //catch (Exception e) {
+    catch(Throwable e) {
       clearNamespace();
       return e.getMessage();
     }
@@ -819,7 +836,7 @@ public class VGlobals
   public ClassLoader getWorkClassLoader()
   {
     if(workLoader == null)
-      workLoader = new SimpleDirectoryClassLoader(workDirectory);
+      workLoader = new SimpleDirectoryClassLoader(VGlobals.class.getClassLoader(),workDirectory);
     return workLoader;
   }
   public String getUserConfigFile()

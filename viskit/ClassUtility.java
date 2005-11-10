@@ -62,7 +62,7 @@ import java.util.HashSet;
      
      try
      {
-       Class.forName(pClassName);
+       Class.forName(pClassName,false,null);
        resolvedNames.add(pClassName);
      }
      catch(ClassNotFoundException cnfe)

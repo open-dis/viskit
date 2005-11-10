@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.DirectoryWatch;
+import simkit.BasicAssembly;
 import simkit.Schedule;
 
 import javax.swing.*;
@@ -73,6 +74,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   ActionListener closer,saver;
   static String lineSep = System.getProperty("line.separator");
   JMenuBar myMenuBar;
+  BufferedReader backChan;
 
   private Process externalSimRunner;
 
@@ -85,6 +87,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     runPanel.vcrPlay.addActionListener(new startResumeListener());
     runPanel.vcrRewind.addActionListener(new rewindListener());
     runPanel.vcrStep.addActionListener(new stepListener());
+    runPanel.vcrVerbose.addActionListener(new verboseListener());
 
     runPanel.vcrStop.setEnabled(false);
     runPanel.vcrPlay.setEnabled(false);
@@ -150,20 +153,43 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     boolean defaultVerbose = Boolean.valueOf(parms[5]).booleanValue();
     double defaultStopTime = Double.parseDouble(parms[6]);
 
-    //outputs = outputEntities;
-
-    //setTitle("Assembly Run Panel -- "+targetClassName);
-
-    twiddleButtons(InternalAssemblyRunner.REWIND);
-
     runPanel.vcrStopTime.setText(""+defaultStopTime);
     runPanel.vcrSimTime.setText("0"); //Schedule.getSimTimeStr());
     runPanel.vcrVerbose.setSelected(defaultVerbose);
+
+    fillRepWidgetsFromBasicAssemblyObject(targetClassName);
+    twiddleButtons(InternalAssemblyRunner.REWIND);
 
     if (externalSimRunner != null) {
       send(ExternalSimRunner.QUIT);
       externalSimRunner = null;
     }
+  }
+  private void fillRepWidgetsFromBasicAssemblyObject(String clName)
+  {
+    Class targetClass;
+    Object targetObject;
+    BasicAssembly targetBasicAssembly;
+
+    try {
+      targetClass = Vstatics.classForName(targetClassName);
+        if(targetClass == null) throw new ClassNotFoundException();
+      targetObject = targetClass.newInstance();
+      if(! (targetObject instanceof BasicAssembly))
+        throw new Throwable("Target class not instance of BasicAssembly");
+    }
+    catch(Throwable t) {
+      System.err.println("Error instantiating BasicAssembly");
+      return;
+    }
+    targetBasicAssembly = (BasicAssembly)targetObject;
+
+    runPanel.numRepsTF.setText(""+targetBasicAssembly.getNumberReplications());
+    runPanel.saveRepDataCB.setSelected(targetBasicAssembly.isSaveReplicationData());
+    runPanel.printRepReportsCB.setSelected(targetBasicAssembly.isPrintReplicationReports());
+    runPanel.printSummReportsCB.setSelected(targetBasicAssembly.isPrintSummaryReport());
+    runPanel.vcrVerbose.setSelected(targetBasicAssembly.isVerbose());
+    runPanel.vcrStopTime.setText(""+targetBasicAssembly.getStopTime());
   }
 
   PrintWriter pWriter;
@@ -179,11 +205,19 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       }
       catch (Exception e) {
         System.out.println("Error launching virtual machine: "+e.getMessage());
+        return;
       }
+      send(ExternalSimRunner.SCHEDULE_RESET);
+      pWriter.flush();
     }
-
-    send(ExternalSimRunner.SCHEDULE_RESET);
-    pWriter.flush();
+    send(ExternalSimRunner.ASSY_NUM_REPS);
+    send(runPanel.numRepsTF.getText().trim());
+    send(ExternalSimRunner.ASSY_SAVE_REP_DATA);
+    send(runPanel.saveRepDataCB.isSelected());
+    send(ExternalSimRunner.ASSY_PRINT_REP_REPORTS);
+    send(runPanel.printRepReportsCB.isSelected());
+    send(ExternalSimRunner.ASSY_PRINT_SUMM_REPORTS);
+    send(runPanel.printSummReportsCB.isSelected());
   }
 
   private void showLaunchingDialog(int msToShow)
@@ -228,17 +262,28 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     public void actionPerformed(ActionEvent e)
     {
       initRun();
+      twiddleButtons(InternalAssemblyRunner.START);
       send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
       send(false);
-      twiddleButtons(InternalAssemblyRunner.START);
-      _start();
+      _startLocalEnd();              // sends start command in different thread
+    }
+  }
+  class stepListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      initRun();
+      twiddleButtons(InternalAssemblyRunner.STEP);
+      send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
+      send(true);
+      _startLocalEnd();
     }
   }
   class stopListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
-      send(ExternalSimRunner.SCHEDULE_STOPSIMULATION);
+      send(ExternalSimRunner.SCHEDULE_PAUSESIMULATION);   // Our stop button pauses, because we want to rewind
       twiddleButtons(InternalAssemblyRunner.STOP);
     }
   }
@@ -248,28 +293,17 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     {
       send(ExternalSimRunner.SCHEDULE_RESET);
       twiddleButtons(InternalAssemblyRunner.REWIND);
-
-/*
-      String timeString = null;
-      try {
-        timeString = sendAndWait(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
-      }
-      catch (IOException e1) {
-        timeString = e1.getMessage();
-      }
-      runPanel.vcrSimTime.setText(timeString);
-*/
+      send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
     }
   }
-  class stepListener implements ActionListener
+  class verboseListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
-      send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
-      send(true);
-
-      twiddleButtons(InternalAssemblyRunner.STEP);
-      _start();
+      if(externalSimRunner != null) {
+        send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
+        send(((JCheckBox)e.getSource()).isSelected());
+      }
     }
   }
   private JFileChooser saveChooser;
@@ -332,73 +366,83 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     return fil;
   }
 
-  BufferedReader backChan;
-
-  private void _start()
+  private void _startLocalEnd()
   {
-    Thread t = new Thread(new Runnable()
+    try {
+      ServerSocket svrsocket = new ServerSocket(0);  // any port
+
+      send(ExternalSimRunner.OPEN_BACKCHANNEL);
+      send("" + svrsocket.getLocalPort());
+
+      Socket sock = svrsocket.accept();
+
+      backChan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+      initBackChanReader();
+    }
+    catch (IOException e) {
+      System.err.println("Bad Back Channel build: "+e.getMessage());
+      return;
+    }
+
+    send(ExternalSimRunner.SCHEDULE_STOPATTIME);
+    send(getStopTime());
+    send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
+    send(getVerbose());
+    //here for setting rep stuff
+    send(ExternalSimRunner.DUMP_OUTPUTS);
+
+    send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
+  }
+
+  private void initBackChanReader()
+  {
+    Thread bkChanRdr = new Thread(new BackChannelReader(), "BackChannelReader");
+    bkChanRdr.setPriority(Thread.NORM_PRIORITY);
+    bkChanRdr.start();
+  }
+
+  String returnedSimTime;
+
+  class BackChannelReader implements Runnable
+  {
+    public void run()
     {
-      String response;
-      public void run()
-      {
-        Thread.yield(); // let dialog show up
-        try {
-          ServerSocket svrsocket = new ServerSocket(0);  // any port
+      try {
+        while (true) {
+          String line = backChan.readLine();
+          System.out.println("backchannel reader got "+line);
+          if (line.startsWith(ExternalSimRunner.RESP_BACKCHANNEL))
+            ;
+          else if (line.startsWith(ExternalSimRunner.RESP_TIMESTR)) {
+            System.out.println("bc handling time str");
+            returnedSimTime = line.substring(ExternalSimRunner.RESP_TIMESTR.length());
+            SwingUtilities.invokeLater(new Runnable()
+            {
+              public void run()
+              {
 
-          send(ExternalSimRunner.OPEN_BACKCHANNEL);
-          send("" + svrsocket.getLocalPort());
-
-          Socket sock = svrsocket.accept();
-
-          backChan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-          response = backChan.readLine();
-          //System.out.println("Back channel opened, response: " + response);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-
-        send(ExternalSimRunner.SCHEDULE_STOPATTIME);
-        send(getStopTime());
-        send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
-        send(getVerbose());
-
-        send(ExternalSimRunner.DUMP_OUTPUTS);
-
-        send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
-        // doesn't block, but we'll wait here for a response
-        try {
-          response = backChan.readLine();
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-
-        send(ExternalSimRunner.DUMP_OUTPUTS);
-
-        String tm;
-        try {
-          tm = sendAndWait(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
-        }
-        catch (IOException e) {
-          tm = "Error";
-        }
-        final String time = tm;
-        // get answer and update GUI stuff in GUI thread
-        SwingUtilities.invokeLater(new Runnable()
-        {
-          public void run()
-          {
-            twiddleButtons(InternalAssemblyRunner.STOP);
-            runPanel.vcrSimTime.setText(time);
+                runPanel.vcrSimTime.setText(returnedSimTime);
+              }
+            });
+          }
+          else if (line.startsWith(ExternalSimRunner.RESP_SIMSTOPPED)) {
+            System.out.println("bc handling stopped");
+            send(ExternalSimRunner.DUMP_OUTPUTS);
+            send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
+            SwingUtilities.invokeLater(new Runnable()
+            {
+              public void run()
+              {
+                twiddleButtons(InternalAssemblyRunner.STOP);
+              }
+            });
           }
         }
-        );
-
       }
-    }, "asyRnr");
-    t.setPriority(Thread.NORM_PRIORITY);
-    t.start();
+      catch (Exception e) {
+        System.out.println("Back channel reader dead");
+      }
+    }
   }
 
   double getStopTime()
@@ -419,7 +463,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
   private void send(int cmd)
   {
-    //System.out.println("Queing "+ExternalSimRunner.cmdNames[cmd]);
+    System.out.println("Queing "+ExternalSimRunner.cmdNames[cmd]);
     pWriter.println(cmd);
   }
 
@@ -610,21 +654,33 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     public static final int SCHEDULE_GETSIMTIMESTR = 1;          // Schedule.getSimTimeStr());
     public static final int SCHEDULE_SETPAUSEAFTEREACHEVENT = 2; // Schedule.setPauseAfterEachEvent(false);
     public static final int SCHEDULE_STOPSIMULATION = 3;         // Schedule.stopSimulation();
-    public static final int SCHEDULE_SETVERBOSE = 4;             // Schedule.setVerbose(getVerbose());
-    public static final int SCHEDULE_STARTSIMULATION =5;         // Schedule.startSimulation();
-    public static final int SCHEDULE_STOPATTIME = 6;             // Schedule.stopAtTime(double);
+    public static final int SCHEDULE_PAUSESIMULATION = 4;
+    public static final int SCHEDULE_SETVERBOSE = 5;             // Schedule.setVerbose(getVerbose());
+    public static final int SCHEDULE_STARTSIMULATION =6;         // Schedule.startSimulation();
+    public static final int SCHEDULE_STOPATTIME = 7;             // Schedule.stopAtTime(double);
 
-    public static final int DUMP_OUTPUTS = 7;
-    public static final int OPEN_BACKCHANNEL = 8;
-    public static final int QUIT = 9;
+    public static final int DUMP_OUTPUTS = 8;
+    public static final int OPEN_BACKCHANNEL = 9;
+    public static final int QUIT = 10;
+
+    public static final int ASSY_NUM_REPS = 11;
+    public static final int ASSY_SAVE_REP_DATA = 12;
+    public static final int ASSY_PRINT_REP_REPORTS = 13;
+    public static final int ASSY_PRINT_SUMM_REPORTS= 14;
 
     public static String[] cmdNames = {"Reset","GetSimTimeString","SetPause",
-                                       "StopSim","SetVerbose","StartSim","StopAtTime",
-                                       "DumpOutputs","OpenBackchannel","Quit"};
+                                       "StopSim","PauseSim","SetVerbose","StartSim","StopAtTime",
+                                       "DumpOutputs","OpenBackchannel","Quit",
+                                       "SetNumReps","SaveRepData","PrintRepReports","PrintSummReports"};
+
+    public static final String RESP_TIMESTR     = "R1/";
+    public static final String RESP_SIMSTOPPED  = "R2/";
+    public static final String RESP_BACKCHANNEL = "R3/";
 
     private Vector outputs = new Vector();
-    private PrintStream backChannel;
+    private PrintStream extBackChannel;
     private Object targetObject;
+    private BasicAssembly targetAssembly;
 
     public static void main(String[] args)
     {
@@ -640,6 +696,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         targetClass = Vstatics.classForName(targetClassName);
           if(targetClass == null) throw new ClassNotFoundException();
         targetObject = targetClass.newInstance();
+        if(! (targetObject instanceof BasicAssembly))
+          errMsg = "targetClassName not instanceof BasicAssembly";
       }
       // Error cases for instantiation:
       catch (ClassNotFoundException e) {
@@ -657,10 +715,12 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         System.out.flush();
         System.exit(-1);
       }
-
+      targetAssembly = (BasicAssembly)targetObject;
+      targetAssembly.setVerbose(Boolean.parseBoolean(args[RUNNER_ARG_VERBOSE]));
+      targetAssembly.setStopTime(Double.parseDouble(args[RUNNER_ARG_STOPTIME]));
       outputs.clear();
       if (args != null && args.length > 0) {
-        for (int i = 3; i < args.length; i++)
+        for (int i = RUNNER_ARG_OUTPUTS; i < args.length; i++)
           outputs.add(args[i]);
       }
       Schedule.reset();
@@ -685,8 +745,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
             case OPEN_BACKCHANNEL:
               String port = in.readLine();
               openChannel(port);
-              if(backChannel != null)
-                backChannel.println("BackChannelOK");
+              if(extBackChannel != null)
+                extBackChannel.println(RESP_BACKCHANNEL+"BackChannelOK");
               break;
             case SCHEDULE_RESET:
               System.err.println("Got reset (not error)");
@@ -695,55 +755,95 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
             case SCHEDULE_STOPSIMULATION:
               System.err.println("Got stop sim (not error)");
               Schedule.stopSimulation();
-              System.err.println("Back from Schedule.stopSimulation()");
+              extBackChannel.println(RESP_SIMSTOPPED+"SimStopped");
+              break;
+            case SCHEDULE_PAUSESIMULATION:
+              System.err.println("Got pause sim (not error)");
+              Schedule.pause();
               break;
             case SCHEDULE_STARTSIMULATION:
-              // If it hasn't been started, just start the thread, which internally does Schedule.startSimulation()
-              // else, Schedule.startSimulation();
               System.err.println("Got start sim (not error)");
-              if(simThread != null)
-                Schedule.startSimulation();
-              else{
-                simThread = new Thread((Runnable)targetObject,"SimThread");
-                simThread.setPriority(Thread.NORM_PRIORITY);
-                simThread.start();
-                Thread watcherThread = new Thread(new Runnable()
-                {
-                  public void run()
-                  {
-                    try {
-                      simThread.join();
-                    }
-                    catch (InterruptedException e) {
-                    }
-                    simThread = null;
-                    backChannel.println("SimStopped");
-                    System.err.println("Sim stopped (not error)");
-                  }
-                },"simEndWatcher");
-                watcherThread.setPriority(Thread.NORM_PRIORITY);
-                watcherThread.start();
+
+              if (simThread != null) {
+                System.err.println("Previous run not done");
+                break;
               }
 
-             break;
+              simThread = new Thread((Runnable) targetObject, "SimThread");
+              ((BasicAssembly) targetObject).setNumberReplications(1); //todo test
+              simThread.setPriority(Thread.NORM_PRIORITY);
+              simThread.start();   // This does Schedule.startSimulation()
+              Thread watcherThread = new Thread(new Runnable()
+              {
+                public void run()
+                {
+                  try {
+                    simThread.join();
+                  }
+                  catch (InterruptedException e) {
+                  }
+                  simThread = null;
+                  extBackChannel.println(RESP_SIMSTOPPED + "SimStopped");
+                  System.err.println("Sim stopped (not error)");
+                }
+              }, "simEndWatcher");
+              watcherThread.setPriority(Thread.NORM_PRIORITY);
+              watcherThread.start();
+
+              break;
             case SCHEDULE_SETPAUSEAFTEREACHEVENT:
               String which = in.readLine();
-              System.err.println("Got setPauseAfterEachEvent (not error) = "+which);;
-              Schedule.setPauseAfterEachEvent(Boolean.valueOf(which).booleanValue());
+              boolean bool = Boolean.valueOf(which).booleanValue();
+              System.err.println("Got setPauseAfterEachEvent (not error) = "+bool);;
+              Schedule.setPauseAfterEachEvent(bool);
               break;
             case SCHEDULE_SETVERBOSE:
               String verb = in.readLine();
-              System.err.println("Got setVerbose (not error) = "+verb);
-              Schedule.setVerbose(Boolean.valueOf(verb).booleanValue());
+              bool = Boolean.valueOf(verb).booleanValue();
+              System.err.println("Got setVerbose (not error) = "+bool);
+              Schedule.setVerbose(bool);
               break;
             case SCHEDULE_GETSIMTIMESTR:
               System.err.println("Got getSimTimeString (not error)");
-              backChannel.println(Schedule.getSimTimeStr());
+              extBackChannel.println(RESP_TIMESTR+Schedule.getSimTimeStr());
               break;
             case SCHEDULE_STOPATTIME:
               String tm = in.readLine();
               System.err.println("Got stopAtTime (not error) =" + tm);
               Schedule.stopAtTime(Double.parseDouble(tm));
+              break;
+            case ASSY_NUM_REPS:
+              String n = in.readLine();
+              int nint = 0;
+              try {
+                nint = Integer.parseInt(n);
+                targetAssembly.setNumberReplications(nint);
+              }
+              catch (NumberFormatException e) {
+                System.err.println("Error parsing number of reps: "+n);
+              }
+              System.err.println("Got ASSY_NUM_REPS " + nint);
+              break;
+
+            case ASSY_SAVE_REP_DATA:
+              String boolSt = in.readLine();
+              bool = Boolean.valueOf(boolSt).booleanValue();
+              targetAssembly.setSaveReplicationData(bool);
+              System.err.println("Got ASSY_SAVE_REP_DATA "+bool);
+              break;
+
+            case ASSY_PRINT_REP_REPORTS:
+              boolSt = in.readLine();
+              bool = Boolean.valueOf(boolSt).booleanValue();
+              targetAssembly.setPrintReplicationReports(bool);
+              System.err.println("Got ASSY_PRINT_REP_REPORTS "+bool);
+              break;
+
+            case ASSY_PRINT_SUMM_REPORTS:
+              boolSt = in.readLine();
+              bool = Boolean.valueOf(boolSt).booleanValue();
+              targetAssembly.setPrintSummaryReport(bool);
+              System.err.println("Got ASSY_PRINT_SUMM_REPORTS "+bool);
               break;
 
             case DUMP_OUTPUTS:
@@ -769,12 +869,12 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     private void openChannel(String port)
     {
       try {
-        if(backChannel != null) {
-          backChannel.close();
-          backChannel = null;
+        if(extBackChannel != null) {
+          extBackChannel.close();
+          extBackChannel = null;
         }
         Socket s = new Socket("localhost",Integer.parseInt(port));
-        backChannel = new PrintStream(s.getOutputStream(),true);
+        extBackChannel = new PrintStream(s.getOutputStream(),true);
       }
       catch (IOException e) {
         System.out.println("bad backChannel open");

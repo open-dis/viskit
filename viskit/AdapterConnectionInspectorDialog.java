@@ -314,9 +314,12 @@ public class AdapterConnectionInspectorDialog extends JDialog
         selection.setText((String)evsv.get(which));
       }
     }
-    catch (ClassNotFoundException e) {
-      e.printStackTrace();
+    catch (Throwable t) {
+      System.err.println("Error connecting: "+t.getMessage());
     }
+//    catch (ClassNotFoundException e) {
+//      e.printStackTrace();
+//    }
   }
 
   class myCloseListener extends WindowAdapter

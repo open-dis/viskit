@@ -298,8 +298,12 @@ public class SettingsDialog extends JDialog
 
       int retv = addChooser.showOpenDialog(SettingsDialog.this);
       if (retv == JFileChooser.APPROVE_OPTION) {
-        ((DefaultListModel)classPathJlist.getModel()).addElement(
-            addChooser.getSelectedFile().getAbsolutePath());
+        File selFile = addChooser.getSelectedFile();
+        String absPath = selFile.getAbsolutePath();
+        String sep = System.getProperty("file.separator");
+        if(selFile.isDirectory() && !absPath.endsWith(sep))
+          absPath = absPath + sep;
+        ((DefaultListModel)classPathJlist.getModel()).addElement(absPath);
         installClassPathIntoConfig();
       }
     }

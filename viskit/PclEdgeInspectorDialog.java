@@ -10,8 +10,8 @@ package viskit;
  * Time: 9:19:41 AM
  */
 
-import viskit.model.PropChangeEdge;
 import viskit.model.EvGraphNode;
+import viskit.model.PropChangeEdge;
 import viskit.model.PropChangeListenerNode;
 
 import javax.swing.*;
@@ -23,11 +23,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Constructor;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.Arrays;
 import java.util.Vector;
 
 public class PclEdgeInspectorDialog extends JDialog
@@ -232,7 +230,7 @@ public class PclEdgeInspectorDialog extends JDialog
 
       try {
         ClassLoader cl = VGlobals.instance().getWorkClassLoader();
-        Class c = Class.forName(classname,true,cl);
+        Class c = Class.forName(classname,false,cl);
         if(c == null)
           throw new ClassNotFoundException(classname+" not found");
         

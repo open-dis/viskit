@@ -148,7 +148,8 @@ public class SourceWindow extends JFrame
         System.setOut(newSysOut);
         System.setErr(newSysOut);
 
-        AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
+        //AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
+        int retc = AssemblyController.compileJavaFromStringAndHandleDependencies(src);
         
         newSysOut.flush();
         System.setOut(origSysOut);
@@ -159,6 +160,10 @@ public class SourceWindow extends JFrame
           Thread.yield();
 
         // Display the commpile results:
+
+        if(retc != 0)
+          JOptionPane.showMessageDialog(SourceWindow.this,"Compiler returned error code "+retc,"Compile Error",JOptionPane.ERROR_MESSAGE);
+
         sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
       }
     });
@@ -299,6 +304,7 @@ class sysOutDialog extends JDialog implements ActionListener
 
     //main part of the dialog
     jta = new JTextArea(text);
+    jta.setCaretPosition(text.length());
     jsp = new JScrollPane(jta);
     jsp.setPreferredSize(new Dimension(frame.getWidth()-50,frame.getHeight()-50));
     jsp.setAlignmentX(LEFT_ALIGNMENT);

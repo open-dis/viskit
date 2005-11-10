@@ -336,9 +336,9 @@ public class EventInspectorDialog extends JDialog
           if(idxv != null && idxv.length()>0)
             addPotentialLocalIndexVariable(evn,est.getIndexingExpression());
         }
-
-        if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
-          String parseResults = VGlobals.instance().parseCode(evn, parseThis.toString().trim());
+        String ps = parseThis.toString().trim();
+        if(ps.length()>0 && ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+          String parseResults = VGlobals.instance().parseCode(evn, ps);
           if (parseResults != null) {
             boolean ret = BeanshellErrorDialog.showDialog(parseResults,EventInspectorDialog.this);
             if(ret == false) // don't ignore

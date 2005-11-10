@@ -789,12 +789,34 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     handleFileBasedClasses();
     return compileJavaClassFromString(src);
   }
-
+  public static int compileJavaFromStringAndHandleDependencies(String src)
+  {
+    handleFileBasedClasses();
+    return compileJavaFromString(src);
+  }
   public static File compileJavaClassFromString(String src)
   {
     return compileJavaClassFromString(src,false);
   }
-  public static File compileJavaClassFromString(String src, boolean completeOnBadCompile)
+
+  public static int compileJavaFromString(String src)
+  {
+    File f = makeFile(src);
+    if(f == null)
+      return -1;
+    String cp = getCustomClassPath();
+    String canPath;
+    try {
+      canPath = f.getCanonicalPath();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return -1;
+    }
+    return com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
+  }
+
+  private static File makeFile(String src)
   {
     String baseName=null;
 
@@ -835,17 +857,65 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       fw.write(src);
       fw.flush();
       fw.close();
-
-      String cp = getCustomClassPath();
-
-      int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
-      if(reti == 0 || completeOnBadCompile)
-        return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
+      return f;
     }
-    catch(Exception e) {
-      e.printStackTrace();
+    catch(IOException e) {
+      return null;
     }
-    return null;
+  }
+
+  public static File compileJavaClassFromString(String src, boolean completeOnBadCompile)
+  {
+    String baseName=null;
+
+       // Find the package subdirectory
+       Pattern pat = Pattern.compile("package.+;");
+       Matcher mat = pat.matcher(src);
+       boolean fnd = mat.find();
+
+       String packagePath = "";
+       if(fnd) {
+         int st = mat.start();
+         int end = mat.end();
+         String s = src.substring(st,end);
+         s = s.replace(';','/');
+         String[] sa = s.split("\\s");
+         sa[1] = sa[1].replace('.','/');
+         packagePath = sa[1].trim();
+       }
+       // done finding the package subdir (just to mark the file as "deleteOnExit")
+
+       pat = Pattern.compile("public\\s+class\\s+");
+       mat = pat.matcher(src);
+       fnd = mat.find();
+      // if(fnd) {
+         int end = mat.end();
+         String s = src.substring(end,end+128).trim();
+         String[]sa = s.split("\\s+");
+
+         baseName = sa[0];
+      // }
+       try {
+         File f = VGlobals.instance().getWorkDirectory();
+         f = new File(f,baseName+".java");
+         f.createNewFile();
+         f.deleteOnExit();
+
+         FileWriter fw = new FileWriter(f);
+         fw.write(src);
+         fw.flush();
+         fw.close();
+
+         String cp = getCustomClassPath();
+
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+         if(reti == 0 || completeOnBadCompile)
+           return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
+       }
+       catch(Exception e) {
+         e.printStackTrace();
+       }
+       return null;
   }
 
   /** do a temporary file gig to point to a java class file which we created from
@@ -953,7 +1023,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void runAssembly()
   {
     // These have to be on the classpath:
-    // done abovehandleFileBasedClasses();
+    // done above handleFileBasedClasses();
 
     String src = produceJavaClass();                   // asks to save
     PkgAndFile paf = compileJavaClassAndSetPackage(src,true);
@@ -975,6 +1045,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   static String getCustomClassPath()
   {
+    return Vstatics.getCustomClassPath();
+/*
     // The order of the class path is 1) work dir, 2) extra paths, 3) existing classpath
     String sep = Vstatics.getPathSeparator();
     StringBuffer cPath = new StringBuffer();
@@ -995,6 +1067,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
     cPath.append(appclassPath);
     return cPath.toString();
+*/
   }
 
   private static void handleFileBasedClasses()

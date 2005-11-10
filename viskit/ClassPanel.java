@@ -3,8 +3,8 @@ package viskit;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
@@ -141,7 +141,7 @@ public class ClassPanel extends JPanel
 
       if(c != null) {
         try {
-          Class.forName(c.getName());
+          Class.forName(c.getName(),false,null);
           return null;         // this is the negative case
         }
         catch (ClassNotFoundException e) {}        // positive case

@@ -1,7 +1,10 @@
 package viskit;
 
+import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -90,6 +93,43 @@ public class Vstatics
     c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
   }
 
+  static String getCustomClassPath()
+  {
+    // The order of the class path is 1) work dir, 2) extra paths, 3) existing classpath
+    String sep = Vstatics.getPathSeparator();
+    StringBuffer cPath = new StringBuffer();
+
+    String appclassPath = System.getProperty("java.class.path");
+    File workDir = VGlobals.instance().getWorkDirectory();
+    // if the workDir is not already in the list, add it
+    if(appclassPath.indexOf(workDir.getAbsolutePath()) == -1){
+      cPath.append(workDir.getAbsolutePath());
+      cPath.append(sep);
+    }
+    cPath.append(getExtraClassPaths());
+    cPath.append(appclassPath);
+    return cPath.toString();
+  }
+
+  static String getExtraClassPaths()
+  {
+    String sep = Vstatics.getPathSeparator();
+    StringBuffer cPath = new StringBuffer();
+
+    String[] extraPaths = SettingsDialog.getExtraClassPath();
+    if(extraPaths != null && extraPaths.length>0) {
+      for(int i=0;i<extraPaths.length;i++) {
+        cPath.append(extraPaths[i]);
+        cPath.append(sep);
+      }
+    }
+    return cPath.toString();
+  }
+  static String[] getExtraClassPathArray()
+  {
+    return SettingsDialog.getExtraClassPath();
+  }
+
   /**
    * Call this method to inst a class representation of an entity.  We'll try first
    * the "standard" classpath-classloader, then try to inst any that were loaded by file.
@@ -101,6 +141,10 @@ public class Vstatics
     Class c = cForName(s,Vstatics.class.getClassLoader());
     if(c == null)
       c = FileBasedClassManager.inst().getFileClass(s);
+    if(c == null)
+      c = cForName(s,VGlobals.instance().getWorkClassLoader());
+    if(c == null)
+      c = cForName(s,new SimpleDirectoriesAndJarsClassLoader(Vstatics.class.getClassLoader(),getExtraClassPathArray()));
     return c;
   }
 
