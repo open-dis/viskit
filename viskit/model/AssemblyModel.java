@@ -970,8 +970,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       AssemblyNode frNode = (AssemblyNode)nodeCache.get(jaxbAdapter.getFrom());
       ae.setTo(toNode);
       ae.setFrom(frNode);
-      ae.setSourceEvent(jaxbAdapter.getEventSent());
-      ae.setTargetEvent(jaxbAdapter.getEventHeard());
+      ae.setSourceEvent(jaxbAdapter.getEventHeard());
+      ae.setTargetEvent(jaxbAdapter.getEventSent());
       ae.setName(jaxbAdapter.getName());
       ae.opaqueModelObject = jaxbAdapter;
       toNode.getConnections().add(ae);
