@@ -102,10 +102,13 @@ public class RunnerPanel extends JPanel
     vcrRewind.setEnabled(false);
     vcrRewind.setBorder(BorderFactory.createEtchedBorder());
     vcrRewind.setText(null);
-    vcrToolBar.add(vcrRewind);
+    if(!skipCloseButt)
+      vcrToolBar.add(vcrRewind);
 
     vcrPlay = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Play24.gif")));
     vcrPlay.setToolTipText("Begin or resume the simulation run");
+    if(skipCloseButt)
+      vcrPlay.setToolTipText("Begin the simulation run");
     vcrPlay.setBorder(BorderFactory.createEtchedBorder());
     vcrPlay.setText(null);
     vcrToolBar.add(vcrPlay);
@@ -114,7 +117,8 @@ public class RunnerPanel extends JPanel
     vcrStep.setToolTipText("Step the simulation");
     vcrStep.setBorder(BorderFactory.createEtchedBorder());
     vcrStep.setText(null);
-    vcrToolBar.add(vcrStep);
+    if(!skipCloseButt)
+      vcrToolBar.add(vcrStep);
 
     vcrToolBar.add(Box.createHorizontalStrut(20));
 
@@ -282,8 +286,8 @@ public class RunnerPanel extends JPanel
     {
       if(clampSize) {
         stsb.append(s);
-        if(stsb.length() > 0x8000) {
-          stsb.delete(0,stsb.length()-0x8000-1);
+        if(stsb.length() > 0x100000) {
+          stsb.delete(0,stsb.length()-0x100000-1);
         }
         ta.setText(stsb.toString());
       }
