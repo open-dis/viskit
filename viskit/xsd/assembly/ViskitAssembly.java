@@ -33,14 +33,14 @@ public class ViskitAssembly extends BasicAssembly {
     public LinkedHashMap replicationStatsListenerConnections;
     public LinkedHashMap simEventListenerConnections;
     public LinkedHashMap adapters;
-    boolean debug = false;
+    private static boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
         
     }  
     
-    public void createObjects() {
+    public synchronized void createObjects() {
         entities = new LinkedHashMap();
         replicationStatistics = new LinkedHashMap();
         designPointStatistics = new LinkedHashMap();
@@ -53,7 +53,7 @@ public class ViskitAssembly extends BasicAssembly {
         super.createObjects();
     }
     
-    public void performHookups() {
+    public synchronized void performHookups() {
         super.performHookups();
     }
     
@@ -75,11 +75,24 @@ public class ViskitAssembly extends BasicAssembly {
     
     public void hookupSimEventListeners() {
         String[] listeners = (String[]) simEventListenerConnections.keySet().toArray(new String[0]);
-        for ( int i = 0; i < listeners.length; i++ ) {
-            String source = (String) simEventListenerConnections.get(listeners[i]);
-            connectSimEventListener(listeners[i], source);
+        if(debug) {
+            System.out.println("hookupSimEventListeners called " + listeners.length);
         }
-        
+        for ( int i = 0; i < listeners.length; i++ ) {
+            LinkedList simEventListenerConnects = (LinkedList)simEventListenerConnections.get(listeners[i]);
+            if ( simEventListenerConnects != null ) {
+                ListIterator li = simEventListenerConnects.listIterator();
+                while( li.hasNext() ) {
+                    String source = (String)li.next();
+                    connectSimEventListener(listeners[i],source);
+                    if(debug) {
+                        System.out.println("hooking up SimEvent source " + source + " to listener " + listeners[i]);
+                    }
+                }
+            }
+            
+        }
+
     }
     
     public void hookupPropertyChangeListeners() {
@@ -120,12 +133,12 @@ public class ViskitAssembly extends BasicAssembly {
     } 
     
     void connectPropertyChangeListener(String listener, PropertyConnector pc) {
-        System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
+        if ( debug ) System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
         getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
     }
     
     void connectReplicationStats(String listener, PropertyConnector pc) {
-        System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
+        if ( debug ) System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
         if ( pc.property.equals(null) ) {
             pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName();
         }
@@ -162,13 +175,13 @@ public class ViskitAssembly extends BasicAssembly {
         super.createDesignPointStats();
         // to be consistent; should be getting the designPointStats from 
         // the super. 
+        
         for ( int i = 0 ; i < designPointStats.length; i ++ ) {
             designPointStatistics.put(designPointStats[i].getName(),designPointStats[i]);
         }
     }
     
     public void createReplicationStats() {
-        System.out.println("Replication stats creating");
         replicationStats = 
                 (SampleStatistics[]) replicationStatistics.values().toArray(new SampleStatistics[0]);
         for ( int i = 0; debug && i < replicationStats.length; i++ ) {
@@ -177,7 +190,6 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public void createPropertyChangeListeners() {
-        System.out.println("PropertyChangeListener creating");
         propertyChangeListener = 
                 (PropertyChangeListener[]) propertyChangeListeners.values().toArray(new PropertyChangeListener[0]);
         for ( int i = 0; debug && i < propertyChangeListener.length; i++ ) {
@@ -230,7 +242,15 @@ public class ViskitAssembly extends BasicAssembly {
     } 
     
     public void addSimEventListenerConnection(String listener, String source) {
-        simEventListenerConnections.put(listener,source);
+        LinkedList simEventListenerConnects = (LinkedList)(simEventListenerConnections.get(listener));
+        if ( simEventListenerConnects == null ) {
+            simEventListenerConnects = new LinkedList();
+            simEventListenerConnections.put(listener, simEventListenerConnects);
+        }
+        if ( debug ) {
+            System.out.println("addSimEventListenerConnection source " + source + " to listener " + listener );
+        }
+        simEventListenerConnects.add(source);
     }
     
     public void addAdapter(String name, String heard, String sent, String from, String to) {
