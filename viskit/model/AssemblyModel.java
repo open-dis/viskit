@@ -47,6 +47,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public AssemblyModel(ViskitAssemblyController cont)
   {
     controller = cont;
+    metaData = new GraphMetaData();
   }
 
   public void init()
