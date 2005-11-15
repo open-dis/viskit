@@ -57,6 +57,8 @@ public class TestCodeFormat extends Thread {
             // add some code block
             modifyEventGraph();
             showXML(System.out);
+            System.out.println("Code inserted was:");
+            System.out.println(root.getCode());
             showXML(bufferOut);
             byte[] buff = bufferOut.toByteArray();
             bufferIn = new ByteArrayInputStream(buff);
@@ -114,18 +116,18 @@ public class TestCodeFormat extends Thread {
     // a <Code> element then setValue(String)
     // on that.
     // String here is 
-    //  "   System.out.println("this is a test");
+    //     "System.out.println("this is a test");
     //      if ( true ) {
     //          System.out.println();
-    //      }
-    //  "
+    //      }"
+    //  
     void modifyEventGraph() throws Exception {
 
         root.setCode(""+
-                "\tSystem.out.println(\"this is a test\");\n" +
-                "\tif ( true ) {\n" +
-                "\t\tSystem.out.println();\n" +
-                "\t}"
+                "System.out.println(\"this is a test\");\n" +
+                "if ( true ) {\n" +
+                "\tSystem.out.println();\n" +
+                "}"
         );
         
     }
