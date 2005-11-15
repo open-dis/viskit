@@ -198,11 +198,19 @@
     </target>
 <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
+    <!-- remove for dist 
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
+    -->
+        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar"/>
+    
     </target>
 
     <target depends="compile.bindings" name="jar-stage1">
+    <!-- remove for dist
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
+    -->    
+        <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
+       
     </target>
 
     <target name="splashy">
@@ -267,6 +275,7 @@
     
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
         <javac destdir="${dir.build.classes}"
+	    debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -279,6 +288,7 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
+	    debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -296,6 +306,7 @@
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
        
         <javac destdir="${dir.build.classes}"
+	    debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -365,6 +376,12 @@
       <arg value="viskit.Main"/>
     </java>
   </target>
+  
+  <target description="TestCodeFormat runner" name="test-code-format">
+    <java classname="viskit.test.TestCodeFormat" classpathref="runtime.classpath" fork="true">
+        <arg value="viskit/test/ArrayTester.xml"/>
+    </java>
+  </target>
 
   <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
@@ -386,4 +403,12 @@
             <classpath refid="runtime.classpath"/>
         </java>
     </target>
+<!--
+    <taskdef name="izpack" classpath="installer/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+
+    <izpack input="installer/viskit-install.xml"
+	output="${dir.dist}/Viskit-install-${ver).${rel}.jar"
+	installerType="standard" basedir="installer"
+	izPackDir="${izpack.dir}/"/>
+-->
 </project>
