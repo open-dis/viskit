@@ -149,7 +149,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       watchDir.deleteOnExit();
 
       dirWatch = new DirectoryWatch(watchDir);
-      dirWatch.setLoopSleepTime(2*1000); // 2 secs
+      dirWatch.setLoopSleepTime(1*1000); // 1 secs
       dirWatch.startWatcher();
     }
     catch (IOException e) {
@@ -1020,11 +1020,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     model.saveModel(tFile);
     //todo switch to DOE
   }
-  public void runAssembly()
-  {
-    // These have to be on the classpath:
-    // done above handleFileBasedClasses();
 
+  private String[] execStrings;
+  public void initAssemblyRun()
+  {
     String src = produceJavaClass();                   // asks to save
     PkgAndFile paf = compileJavaClassAndSetPackage(src,true);
     if(paf != null) {
@@ -1034,13 +1033,22 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
       String classPath = getCustomClassPath();
 
-      String[] execStrings = buildExecStrings(clNam,classPath);
+      execStrings = buildExecStrings(clNam,classPath);
+    }
+    else
+      execStrings = null;
+  }
 
+  public void runAssembly()
+  {
+    initAssemblyRun();
+    if(execStrings == null) {
+      JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
+    }
+    else {
       /** call the potentially overridden exec'er */
       runner.exec(execStrings,3);   // see buildExecStrings for the 3
     }
-    else
-      JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
   }
 
   static String getCustomClassPath()

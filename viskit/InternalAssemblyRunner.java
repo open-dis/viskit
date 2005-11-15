@@ -46,6 +46,7 @@ package viskit;
 import edu.nps.util.DirectoryWatch;
 import simkit.BasicAssembly;
 import simkit.Schedule;
+import viskit.xsd.assembly.ViskitAssembly;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -58,6 +59,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -211,8 +213,8 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         System.out.println("Error launching virtual machine: "+e.getMessage());
         return;
       }
-      send(ExternalSimRunner.SCHEDULE_RESET);
-      pWriter.flush();
+      // not right placesend(ExternalSimRunner.SCHEDULE_RESET);
+      //pWriter.flush();
     }
     send(ExternalSimRunner.ASSY_NUM_REPS);
     send(runPanel.numRepsTF.getText().trim());
@@ -266,24 +268,43 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     public void actionPerformed(ActionEvent e)
     {
       runPanel.vcrSimTime.setText("0.0");    // because no pausing
-      initRun();
       twiddleButtons(InternalAssemblyRunner.START);
-      send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
-      send(false);
-      _startLocalEnd();              // sends start command in different thread
+      Thread t = new Thread(new Runnable()
+      {
+        public void run()
+        {
+          initRun();
+          send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
+          send(false);
+          send(ExternalSimRunner.SCHEDULE_RESET); // because no pausing
+          _startLocalEnd();              // sends start command in different thread
+        }
+      }, "initRun");
+      t.setPriority(Thread.NORM_PRIORITY);
+      t.start();
     }
   }
+
   class stepListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
-      initRun();
       twiddleButtons(InternalAssemblyRunner.STEP);
-      send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
-      send(true);
-      _startLocalEnd();
+      Thread t = new Thread(new Runnable()
+      {
+        public void run()
+        {
+          initRun();
+          send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
+          send(true);
+          _startLocalEnd();
+        }
+      }, "stepInitRun");
+      t.setPriority(Thread.NORM_PRIORITY);
+      t.start();
     }
   }
+
   class stopListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
@@ -291,6 +312,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       // not with no pause butt: send(ExternalSimRunner.SCHEDULE_PAUSESIMULATION);   // Our stop button pauses, because we want to rewind
       send(ExternalSimRunner.SCHEDULE_STOPSIMULATION);
       twiddleButtons(InternalAssemblyRunner.STOP);
+      send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
     }
   }
   class rewindListener implements ActionListener
@@ -374,22 +396,28 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
   private void _startLocalEnd()
   {
+    if(backChan == null) {
     try {
       ServerSocket svrsocket = new ServerSocket(0);  // any port
 
       send(ExternalSimRunner.OPEN_BACKCHANNEL);
       send("" + svrsocket.getLocalPort());
 
+      svrsocket.setSoTimeout(3000); // 3 secs should be plenty
       Socket sock = svrsocket.accept();
-
       backChan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
       initBackChanReader();
+      svrsocket.close();
     }
-    catch (IOException e) {
-      System.err.println("Bad Back Channel build: "+e.getMessage());
+    catch (SocketTimeoutException tmo) {
+      _startLocalBail("Back channel socket timeout");
       return;
     }
-
+    catch (IOException e) {
+      _startLocalBail("Bad Back Channel build: " + e.getMessage());
+      return;
+    }
+    }
     send(ExternalSimRunner.SCHEDULE_STOPATTIME);
     send(getStopTime());
     send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
@@ -397,6 +425,24 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     send(ExternalSimRunner.DUMP_OUTPUTS);
 
     send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
+  }
+
+  private void _startLocalBail(String msg)
+  {
+    System.err.println(msg);
+    if (externalSimRunner != null){
+      externalSimRunner.destroy();
+      externalSimRunner = null;
+    }
+    backChan = null;
+    SwingUtilities.invokeLater(new Runnable()
+    {
+      public void run()
+      {
+        //twiddleButtons(InternalAssemblyRunner.STOP);
+        runPanel.vcrStop.doClick();
+      }
+    });
   }
 
   private void initBackChanReader()
@@ -415,23 +461,19 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       try {
         while (true) {
           String line = backChan.readLine();
-          //System.out.println("backchannel reader got "+line);
           if (line.startsWith(ExternalSimRunner.RESP_BACKCHANNEL))
             ;
           else if (line.startsWith(ExternalSimRunner.RESP_TIMESTR)) {
-            //System.out.println("bc handling time str");
             returnedSimTime = line.substring(ExternalSimRunner.RESP_TIMESTR.length());
             SwingUtilities.invokeLater(new Runnable()
             {
               public void run()
               {
-
                 runPanel.vcrSimTime.setText(returnedSimTime);
               }
             });
           }
           else if (line.startsWith(ExternalSimRunner.RESP_SIMSTOPPED)) {
-            //System.out.println("bc handling stopped");
             send(ExternalSimRunner.DUMP_OUTPUTS);
             send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
             SwingUtilities.invokeLater(new Runnable()
@@ -445,7 +487,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
         }
       }
       catch (Exception e) {
-        //System.out.println("Back channel reader dead");
+        System.out.println("Back channel reader dead");
       }
     }
   }
@@ -714,6 +756,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       catch (IllegalAccessException e) {
         errMsg = targetClassName+" could not be accessed.";
       }
+
       if(errMsg != null) {
         JOptionPane.showMessageDialog(null,errMsg);
         System.out.println(errMsg);
@@ -732,11 +775,11 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
 
       execLoop();
     }
+
     Thread simThread;
     private void execLoop()
     {
       Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-      System.err.println(System.getProperty("java.class.path"));
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
       try {
 
@@ -756,15 +799,19 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               break;
             case SCHEDULE_RESET:
               System.err.println("Got reset (not error)");
-              Schedule.reset();
+              // todo remove the check if we always get a ViskitAssembly
+              if(targetAssembly instanceof ViskitAssembly)
+                ((ViskitAssembly)targetAssembly).reset();
+              else
+                Schedule.reset();
               break;
             case SCHEDULE_STOPSIMULATION:
               System.err.println("Got stop sim (not error)");
-              // todo the followingwill be replaced by "targetAssembly.stopAssembly()" when
-              // Arnie puts the code in.
-              Schedule.stopSimulation();
-              //targetAssembly.stopAssembly();
-              //extBackChannel.println(RESP_SIMSTOPPED+"SimStopped");
+              // todo remove the check if we always get a ViskitAssembly
+              if(targetAssembly instanceof ViskitAssembly)
+                ((ViskitAssembly)targetAssembly).setStopRun(true);
+              else
+                Schedule.stopSimulation();
               break;
             case SCHEDULE_PAUSESIMULATION:
               System.err.println("Got pause sim (not error)");
@@ -823,33 +870,34 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               int nint = 0;
               try {
                 nint = Integer.parseInt(n);
-                targetAssembly.setNumberReplications(1); // todo when fixed nint);
+                if(!(targetAssembly instanceof ViskitAssembly))
+                    targetAssembly.setNumberReplications(1); // todo when fixed nint);
               }
               catch (NumberFormatException e) {
                 System.err.println("Error parsing number of reps: "+n);
               }
-              System.err.println("Got ASSY_NUM_REPS " + nint);
+              System.err.println("Got ASSY_NUM_REPS (not error) " + nint);
               break;
 
             case ASSY_SAVE_REP_DATA:
               String boolSt = in.readLine();
               bool = Boolean.valueOf(boolSt).booleanValue();
               targetAssembly.setSaveReplicationData(bool);
-              System.err.println("Got ASSY_SAVE_REP_DATA "+bool);
+              System.err.println("Got ASSY_SAVE_REP_DATA (not error) "+bool);
               break;
 
             case ASSY_PRINT_REP_REPORTS:
               boolSt = in.readLine();
               bool = Boolean.valueOf(boolSt).booleanValue();
               targetAssembly.setPrintReplicationReports(bool);
-              System.err.println("Got ASSY_PRINT_REP_REPORTS "+bool);
+              System.err.println("Got ASSY_PRINT_REP_REPORTS (not error) "+bool);
               break;
 
             case ASSY_PRINT_SUMM_REPORTS:
               boolSt = in.readLine();
               bool = Boolean.valueOf(boolSt).booleanValue();
               targetAssembly.setPrintSummaryReport(bool);
-              System.err.println("Got ASSY_PRINT_SUMM_REPORTS "+bool);
+              System.err.println("Got ASSY_PRINT_SUMM_REPORTS (not error) "+bool);
               break;
 
             case DUMP_OUTPUTS:
@@ -921,7 +969,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
   {
     if(nm != null && nm.length()>0)
       currentTitle = namePrefix +": "+nm;
-    
+
     if(titlList != null)
       titlList.setTitle(currentTitle,titlkey);
   }

@@ -11,10 +11,17 @@
 
 package viskit.xsd.assembly;
 
-import simkit.*;
-import simkit.stat.*;
-import java.util.*;
+import simkit.Adapter;
+import simkit.BasicAssembly;
+import simkit.Schedule;
+import simkit.SimEntity;
+import simkit.stat.SampleStatistics;
+
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 
 
@@ -287,5 +294,111 @@ public class ViskitAssembly extends BasicAssembly {
             this.property = p;
             this.source = s;
         }
+    }
+
+  /*
+   * 14 NOV 05, the run method is lifted straight from the parent class, BasicAssembly.
+   * The reason for the duplication is to allow the gui a bit of control over
+   * starting and stopping the run.
+   * A few booleans have been added to remember run state.
+  */
+
+    protected boolean stopRun;
+
+    public void setStopRun(boolean wh)
+    {
+        stopRun = wh;
+        if(stopRun == true)
+          Schedule.stopSimulation();
+    }
+
+    protected int startRepNumber = 0;
+
+    /**
+     * Execute the simulation for the desired number of replications.
+     */
+    public void run() {
+        stopRun = false;
+
+        if (!hookupsCalled) {
+            throw new RuntimeException("performHookups() hasn't been called!");
+        }
+
+        Schedule.stopAtTime(getStopTime());
+        if (isVerbose()) {
+            Schedule.setVerbose(isVerbose());
+        }
+        if (isSingleStep()) {
+            Schedule.setSingleStep(isSingleStep());
+        }
+
+        if (isSaveReplicationData()) {
+            replicationData.clear();
+            for (int i = 0; i < replicationStats.length; ++i) {
+                replicationData.put(new Integer(i), new ArrayList());
+            }
+        }
+        int replication;
+        for (replication = startRepNumber;
+             !stopRun && (replication < getNumberReplications());
+             ++replication) {
+
+            maybeReset();
+            Schedule.startSimulation();
+
+            for (int i = 0; i < replicationStats.length; ++i) {
+                fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
+                fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+            }
+            if (isPrintReplicationReports()) {
+                System.out.println(getReplicationReport(replication));
+            }
+            if (isSaveReplicationData()) {
+                saveReplicationStats();
+            }
+        }
+
+        if (isPrintSummaryReport()) {
+            System.out.println(getSummaryReport());
+        }
+
+        saveState(replication);
+    }
+
+    private void saveState(int lastRepNum) {
+        boolean midRun = !Schedule.getDefaultEventList().isFinished();
+        boolean midReps = lastRepNum < getNumberReplications();
+
+        if (midReps) {
+            // middle of some rep, fell out because of GUI stop
+            startRepNumber = lastRepNum;
+        }
+        else if (!midReps && !midRun) {
+            // done with all reps
+            startRepNumber = 0;
+        }
+        else if (!midReps && midRun) {
+            // n/a can't be out of reps but in a run
+            throw new RuntimeException("Bad state in ViskitAssembly");
+        }
+    }
+
+    /**
+     * Called at top of rep loop;  This will support "pause", but the GUI
+     * is not taking advantage of it presently.
+     */
+    private void maybeReset() {
+        // We reset if we're not in the middle of a run
+        if (Schedule.getDefaultEventList().isFinished())
+            Schedule.reset();
+    }
+
+    /**
+     * Called by GUI instead of Schedule.reset(); resets rep loop, too
+     */
+    public void reset()
+    {
+      super.reset();
+      startRepNumber = 0;
     }
 }

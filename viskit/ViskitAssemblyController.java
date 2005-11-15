@@ -71,6 +71,7 @@ public interface ViskitAssemblyController
 
   void generateJavaSource();
   void runAssembly();
+  void initAssemblyRun();
   void export2grid();
   void captureWindow();
 }

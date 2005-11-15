@@ -2,6 +2,7 @@ package viskit;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
+import edu.nps.util.DirectoryWatch;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
@@ -27,8 +28,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.nps.util.DirectoryWatch;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -349,11 +348,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     toolBar.add(zoomIn);
     toolBar.addSeparator(new Dimension(5,24));
     toolBar.add(zoomOut);
-    if(!contentOnly) {
+   // if(!contentOnly) {
       toolBar.addSeparator(new Dimension(24,24));
-      toolBar.add(new JLabel("  Run: "));
+      toolBar.add(new JLabel("  Initialize assembly runner: "));
       toolBar.add(runButt);
-    }
+  //  }
     zoomIn.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -883,7 +882,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         {
           public void run()
           {
-            runButt.doClick();  // This sets up run panel
+            //runButt.doClick();
+            ((ViskitAssemblyController)getController()).initAssemblyRun();    // This sets up run panel
           }
         });
         break;
@@ -894,7 +894,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         {
           public void run()
           {
-            runButt.doClick();  // This sets up Run panel
+            //runButt.doClick();
+            ((ViskitAssemblyController)getController()).initAssemblyRun();    // This sets up run panel
           }
         });
         break;

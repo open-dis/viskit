@@ -188,11 +188,27 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Start the controllers
     ((ViskitController)egFrame.getController()).begin();
-    ((AssemblyController)asyFrame.getController()).begin();
+
+    runLater(3000,new Runnable(){
+      public void run(){((AssemblyController)asyFrame.getController()).begin();}
+    });
 
     // Swing:
     getContentPane().add(tabbedPane);
     tabbedPane.addChangeListener(new myTabChangeListener());
+  }
+  private void runLater(final long ms, final Runnable runr)
+  {
+    Thread t = new Thread(new Runnable()
+    {
+      public void run()
+      {
+        try {Thread.sleep(ms);}catch (InterruptedException e) {}
+        SwingUtilities.invokeLater(runr);
+      }
+    },"runLater");
+    t.setPriority(Thread.NORM_PRIORITY);
+    t.start();
   }
 
   class myTabChangeListener implements ChangeListener
@@ -342,7 +358,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
-      // tabbedPane.setSelectedIndex(2);
+      tabbedPane.setSelectedIndex(2);
       asyRunComponent.initParams(execStrings,runnerClassIndex);
     }
   }

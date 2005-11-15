@@ -50,6 +50,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     initFileWatch();
     this._setFileLists();
   }
+
   public void begin()
   //-----------------
   {
@@ -202,7 +203,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       watchDir.deleteOnExit();
 
       dirWatch = new DirectoryWatch(watchDir);
-      dirWatch.setLoopSleepTime(3*1000); // 3 secs
+      dirWatch.setLoopSleepTime(1*1000); // 1 secs
       dirWatch.startWatcher();
     }
     catch (IOException e) {

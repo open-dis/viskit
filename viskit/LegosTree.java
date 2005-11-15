@@ -173,7 +173,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   {
     if (f.getName().toLowerCase().endsWith(".jar"))
       addJarFile(f.getPath());
-    addContentRoot(f, false);
+    else // new 15 NOV 05
+      addContentRoot(f, false);
   }
 
   public void addContentRoot(File f, boolean recurse)
