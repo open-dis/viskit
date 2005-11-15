@@ -388,7 +388,7 @@ public class SimkitXML2Java {
             li = superPList.listIterator();
             pw.print(sp8 + "super" + lp);
             while ( li.hasNext() ) {
-                Parameter pt = (Parameter) li.next();
+                ParameterType pt = (ParameterType) li.next();
                 pw.print(shortinate(pt.getName()));
                 if ((superPList.size() > 1) && (superPList.indexOf(pt) < superPList.size() - 1)) {
                     pw.print(cm);
@@ -401,7 +401,7 @@ public class SimkitXML2Java {
 	li = this.root.getParameter().listIterator();
 
 	while ( li.hasNext() ) {
-	    Parameter pt = (Parameter) li.next();
+	    ParameterType pt = (ParameterType) li.next();
 	    pw.println(sp8 + "set" + capitalize(pt.getName()) + 
 		lp + shortinate(pt.getName()) + rp + sc);
 	    
@@ -548,12 +548,14 @@ public class SimkitXML2Java {
 	if ( locs.size() > 0 ) pw.println();
 
         if ( e.getCode() != null ) {
-            pw.println(sp8 + "/* Code block for Event " + e.getName() + " */");
-            String[] lines = e.getCode().split("\\;");
+            pw.println(sp8 + "/* Code insertion for Event " + e.getName() + " */");
+            String[] lines = e.getCode().split("\\n");
             for ( int i = 0; i < lines.length ; i++ ) {
-                pw.println(sp8 + lines[i] + sc);
+                pw.println(sp8 + lines[i]);
             }
+            pw.println(sp8 + "/* End Code insertion */");
         }
+        
         LinkedList decls = new LinkedList();
 	while ( sli.hasNext() ) {
    	    StateTransition st = (StateTransition) sli.next();
@@ -753,8 +755,15 @@ public class SimkitXML2Java {
     
     void buildTail(StringWriter t) {
 	PrintWriter pw = new PrintWriter(t);
-        
-
+        String code = root.getCode();
+        if ( code != null ) {
+            pw.println(sp4 + "/* Inserted code for " + this.root.getName() + " */");
+            String[] lines = code.split("\\n");
+            for ( int i = 0 ; i < lines.length ; i ++ ) {
+                pw.println(sp4 + lines[i]);
+            }
+            pw.println(sp4 + "/* End inserted code */");
+        } 
 	pw.println();
 	pw.println(cb);
     }
