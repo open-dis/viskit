@@ -68,9 +68,11 @@
 
     <path id="runtime.classpath">
     
-        <!-- use local JDK for tools.jar -->
-        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-   <!-- JDK1.4 version of tools.jar is currently checked in, should remove since that is not a legitimate distribution mode. -->
+        <!-- Can't use local JDK for tools.jar since the local install might be 1.5, which won't work to compile -->
+        <!-- Redistribution of tools.jar should be resolved...the readme from 1.4 sais it may be redistributed, -->
+        <!-- but only as par of a full JRE. -->
+        <!--<pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>-->
+
         <pathelement location="${dir.lib}/tools.jar"/>
         
         <pathelement location="${dir.build}/lib/viskit.jar"/>
