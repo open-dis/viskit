@@ -176,7 +176,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
   public void openRecent()
   {
-    ArrayList v = getRecentFileList(false);
+    ArrayList v = getRecentFileList(true); // have a settings panel now ... false);
     if(v.size() <= 0)
       open();
     else {

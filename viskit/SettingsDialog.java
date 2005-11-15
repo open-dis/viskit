@@ -166,8 +166,10 @@ public class SettingsDialog extends JDialog
     recentP.setLayout(new BoxLayout(recentP,BoxLayout.Y_AXIS));
 
     JButton clearEGRecent = new JButton("Clear recent event graphs list");
+    clearEGRecent.addActionListener(new clearEGHandler());
     clearEGRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
     JButton clearAssRecent = new JButton("Clear recent assemblies list");
+    clearAssRecent.addActionListener(new clearAssHandler());
     clearAssRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
     recentP.add(Box.createVerticalGlue());
     recentP.add(clearEGRecent);
@@ -181,7 +183,9 @@ public class SettingsDialog extends JDialog
   private static XMLConfiguration vConfig;
   private static String xClassPathKey = "extraClassPath.path";
   private static String xClassPathClearKey = "extraClassPath";
-
+  private static String recentEGClearKey = "history.EventGraphEditor.Recent";
+  private static String recentAssyClearKey = "history.AssemblyEditor.Recent";
+  
   private static void initConfig()
   {
     try {
@@ -190,6 +194,21 @@ public class SettingsDialog extends JDialog
     catch (Exception e) {
       System.out.println("Error loading config file: "+e.getMessage());
       vConfig = null;
+    }
+  }
+
+  class clearEGHandler implements ActionListener
+  {
+    public void actionPerformed(ActionEvent actionEvent)
+    {
+      vConfig.clearTree(recentEGClearKey);
+    }
+  }
+  class clearAssHandler implements ActionListener
+  {
+    public void actionPerformed(ActionEvent actionEvent)
+    {
+      vConfig.clearTree(recentAssyClearKey);
     }
   }
 

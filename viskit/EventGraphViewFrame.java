@@ -80,6 +80,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private TitleListener titlList;
   private int titlKey;
 
+  private final static String frameDefaultTitle = "Viskit Event Graph Editor";
+
   /**
    * Constructor; lays out initial GUI objects
    */
@@ -205,6 +207,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       VgraphComponentWrapper myVgcw = getCurrentVgcw();
 
       if(myVgcw == null) {     // last tab has been closed
+        setSelectedEventGraphName(null);
         return;
       }
       setModel((Model)myVgcw.model);                  // hold on locally
@@ -946,9 +949,12 @@ cancelArcMode.setIcon(new CanArcIcon());
   public void setSelectedEventGraphName(String s)
   //----------------------------
   {
-    String ttl = "Viskit Event Graph: "+s;
+    boolean nullString = !(s != null && s.length()>0);
+    String ttl = nullString ? frameDefaultTitle :"Viskit Event Graph: "+s;
     setTitle(ttl);
-    tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),s);
+    if(!nullString) {
+      tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(),s);
+    }
     if(this.titlList != null)
       titlList.setTitle(ttl,titlKey);
   }
@@ -1124,6 +1130,10 @@ cancelArcMode.setIcon(new CanArcIcon());
   {
     titlList = lis;
     titlKey = key;
+
+    // default
+    if(titlList != null)
+      titlList.setTitle(frameDefaultTitle,titlKey);
   }
 }
 

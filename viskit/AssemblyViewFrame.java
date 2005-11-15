@@ -871,6 +871,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
     titlList = lis;
     titlkey = key;
+
+    // default
+    if(titlList != null)
+      titlList.setTitle("Viskit Assembly Editor",titlkey);    
   }
 
   public void fileChanged(File file, int action, DirectoryWatch source)
