@@ -125,6 +125,11 @@ public class SimkitXML2Java {
 	String name = this.root.getName();
         String pkg  = this.root.getPackage();
         String extend = this.root.getExtend();
+        String implement = this.root.getImplement();
+        
+        if ( implement != null ) {
+            extend += sp + implement;
+        }
 	
 	pw.println("package " + pkg + sc);
 	pw.println();
