@@ -212,10 +212,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       mod.removeNodeFromParent(n);
     }
 */
-    JOptionPane.showMessageDialog(LegosTree.this,"No classes of type " + targetClass.getName() +
-                                                 " found in "+f.getName() + ",\n" +
-                        "or only duplicate class type(s) encountered,"+"\n" +
-                        "or compile error.","Error",JOptionPane.WARNING_MESSAGE);
+    JOptionPane.showMessageDialog(LegosTree.this,"Compile error in "+f.getName() +",\n"+
+                                                 "or no classes of type " + targetClass.getName() +
+                                                 " found,\n" +
+                        "or only duplicate class type(s) encountered.",
+                        "Error",JOptionPane.WARNING_MESSAGE);
   }
 
   // The two above are the public ones.
