@@ -10,25 +10,16 @@ package viskit;
  * Time: 9:19:41 AM
  */
 
-import viskit.model.*;
-import viskit.xsd.bindings.assembly.SimEntity;
+import viskit.model.EvGraphNode;
+import viskit.model.SimEvListenerEdge;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.util.Vector;
 
 public class SimEventListenerConnectionInspectorDialog extends JDialog
 {
@@ -69,8 +60,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
    // lis = new enableApplyButtonListener();
 
 
-    sourceLab = new JLabel("source event graph",JLabel.TRAILING);
-    targetLab = new JLabel("target event graph",JLabel.TRAILING);
+    sourceLab = new JLabel("listening event graph",JLabel.TRAILING);
+    targetLab = new JLabel("producing event graph",JLabel.TRAILING);
 
     sourceTF = new JTextField();
     targetTF = new JTextField();

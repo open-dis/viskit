@@ -256,44 +256,29 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         if (c instanceof vAssemblyEdgeCell) {
           vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
           AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
+          Object to = se.getTo();
+          Object from = se.getFrom();
 
-          if(vc.getUserObject() instanceof AdapterEdge) {
-            tt = "<center>Adapter</center>";
+          if(se instanceof AdapterEdge) {
+            Object toEv = ((AdapterEdge)se).getTargetEvent();
+            Object frEv = ((AdapterEdge)se).getSourceEvent();
+            tt = "<center>Adapter<br><u>" +
+                from+"."+frEv + "</u> connected to <u>" +
+                to  +"."+toEv + "</center>";
           }
-          else if(vc.getUserObject() instanceof SimEvListenerEdge) {
-            tt = "<center>SimEvent Listener</center>";
+          else if(se instanceof SimEvListenerEdge) {
+            tt = "<center>SimEvent Listener<br><u>"+
+                  from+"</u> listening to <u>"+to+"</center>";
           }
           else /*if(vc.getUserObject() instanceof PropChangeEdge)*/ {
-            tt = "<center>Property Change Listener</center>";
+            String prop = ((PropChangeEdge)se).getProperty();
+            prop = (prop != null &&prop.length()>0) ? prop : "*all*";
+            tt = "<center>Property Change Listener<br><u>"+
+                 from+"</u> listening to <u>"+to+"."+prop+"</center>";
           }
-/*
-          if (vc.getUserObject() instanceof SchedulingEdge) {
-            tt = "<center>Schedule</center>";
-            if (se.delay != null && se.delay.length() > 0)
-              tt += "<u>delay</u><br>&nbsp;" + se.delay + "<br>";
-          }
-          else
-            tt = "<center>Cancel</center>";
-
-          if (se.conditional != null && se.conditional.length() > 0)
-            tt += "<u>condition</u><br>&nbsp;if( " + se.conditional + " )<br>";
-
-          StringBuffer epSt = new StringBuffer();
-          int idx = 1;
-          for (Iterator itr = se.parameters.iterator(); itr.hasNext();) {
-            vEdgeParameter ep = (vEdgeParameter) itr.next();
-            epSt.append("&nbsp;" + idx++ + " ");
-            epSt.append(ep.getValue());
-            epSt.append("<br>");
-          }
-          if (epSt.length() > 0) {
-            epSt.setLength(epSt.length() - 4); // lose the last <br>
-            tt += "<u>edge parameters</u><br>" + epSt.toString();
-          }
-*/
-          return "<HTML>" + tt + "</HTML>";
-
+         return "<HTML>" + tt + "</HTML>";
         }
+        
         else if (c instanceof AssemblyCircleCell) {
           AssemblyCircleCell cc = (AssemblyCircleCell) c;
           EvGraphNode en = (EvGraphNode) cc.getUserObject();
