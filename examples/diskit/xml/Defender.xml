@@ -515,12 +515,13 @@
             <Assignment value="diskit.AssetState.INTERDICTING"/>
         </StateTransition>
         <StateTransition state="weapon">
-            <Operation method="fireAt(target.getLocation())"/>
+            <Operation method="fireAt(target)"/>
         </StateTransition>
         <StateTransition state="kills">
             <Assignment value="kills + 1"/>
         </StateTransition>
         <Schedule event="EndInterdict"/>
+        <Code/>
         <Coordinate x="530" y="30"/>
     </Event>
     <Event name="EndInterdict">
