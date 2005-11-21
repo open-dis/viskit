@@ -70,9 +70,8 @@
     
         <!-- use local JDK for tools.jar -->
 	<!-- remember to override your environment variable for -->
-	<!-- JDKHOME to point to the JDK version you are building -->
-	<!-- against.                                            -->
-
+	<!-- JAVA_HOME to point to the JDK version you are building -->
+	<!-- against. Netbeans sets this in the NEBEANS_HOME/etc/netbeans.conf file -->
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${dir.build}/lib/viskit.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
