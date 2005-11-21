@@ -70,8 +70,8 @@
     
         <!-- use local JDK for tools.jar -->
 	<!-- remember to override your environment variable for -->
-	<!-- JAVA_HOME to point to the JDK version you are building -->
-	<!-- against.                                            --->
+	<!-- JDKHOME to point to the JDK version you are building -->
+	<!-- against.                                            -->
 
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${dir.build}/lib/viskit.jar"/>
@@ -116,6 +116,7 @@
         <echo message="Base directory: ${basedir}"/>
         <echo message="Source directory: ${dir.src}"/>
         <echo message="Build directory: ${dir.build}"/>
+        <echo message="JAVA_HOME: ${env.JAVA_HOME}"/>
     </target>
 
 <!--  === TARGET: build.init === -->
@@ -355,7 +356,7 @@
   </target>
 
   <!-- TARGET: Run - no ant splash -->
-  <target depends="jar, examples" description="Run Viskit, include example modules if any" name="build-run-default">
+  <target depends="jar, examples, checkJAVA_HOME" description="Run Viskit, include example modules if any" name="build-run-default">
     <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
       <arg value="viskit.EventGraphAssemblyComboMain"/>
     </java>
