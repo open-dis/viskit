@@ -68,13 +68,12 @@
 
     <path id="runtime.classpath">
     
-        <!-- Can't use local JDK for tools.jar since the local install might be 1.5, which won't work to compile -->
-        <!-- Redistribution of tools.jar should be resolved...the readme from 1.4 sais it may be redistributed, -->
-        <!-- but only as par of a full JRE. -->
-        <!--<pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>-->
+        <!-- use local JDK for tools.jar -->
+	<!-- remember to override your environment variable for -->
+	<!-- JAVA_HOME to point to the JDK version you are building -->
+	<!-- against.                                            --->
 
-        <pathelement location="${dir.lib}/tools.jar"/>
-        
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${dir.build}/lib/viskit.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
         <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
