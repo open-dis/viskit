@@ -150,7 +150,8 @@ public class EventInspectorDialog extends JDialog
     threePanels.add(Box.createVerticalStrut(5));
 
     // code block
-    codeblockPanel = new CodeBlockPanel(this,false, "Event Code Block");
+    codeblockPanel = new CodeBlockPanel(this,true, "Event Code Block");
+    codeblockPanel.setVisibleLines(1);
     codeblockPanel.setBorder(BorderFactory.createTitledBorder("Code block"));
     threePanels.add(codeblockPanel);
     threePanels.add(Box.createVerticalStrut(5));
@@ -184,7 +185,7 @@ public class EventInspectorDialog extends JDialog
     KeyListener klis = new myKeyListener();
     name.addKeyListener(klis);
     comment.addKeyListener(klis);
-    codeblockPanel.addKeyListener(klis);
+    codeblockPanel.addUpdateListener(myChangeListener);
     edComment.addActionListener(new commentListener());
     arguments.addPlusListener(myChangeListener);
     arguments.addMinusListener(myChangeListener);

@@ -44,6 +44,8 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
@@ -106,6 +108,16 @@ public class CodeBlockPanel extends JPanel
 
     editButt.addActionListener(new buttListener());
   }
+
+  public void setVisibleLines(int n)
+  {
+    if(jtf instanceof JTextArea) {
+      ((JTextArea)jtf).setRows(n);
+      Dimension d = new Dimension(jtf.getPreferredScrollableViewportSize());
+      d.width = Integer.MAX_VALUE;
+      setMaximumSize(d);
+    }
+  }
   private ActionListener updateListener;
   public void addUpdateListener(ActionListener lis)
   {
@@ -144,47 +156,74 @@ public class CodeBlockPanel extends JPanel
       }
     }
   }
-  class myJTextArea extends JTextArea
+  class myJTextArea extends JTextArea implements DocumentListener
   {
     public myJTextArea()
     {
       super();
       setPreferredSize(new Dimension(50,50));
+      getDocument().addDocumentListener(this);
     }
     public String getToolTipText(MouseEvent event)
     {
-      if (myMultiLineTextString == null || myMultiLineTextString.trim().length() <= 0)
+      String txt = getText();
+      if(txt == null || txt.length() <=0)
         return null;
-      return "<html><pre>"+myMultiLineTextString;
+      return "<html><pre>"+txt;
     }
 
-    String myMultiLineTextString;
-    public void setText(String t)
+    public void changedUpdate(DocumentEvent documentEvent)
     {
-      super.setText(t);
-      myMultiLineTextString = t;
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
     }
 
+    public void insertUpdate(DocumentEvent documentEvent)
+    {
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
+    }
+
+    public void removeUpdate(DocumentEvent documentEvent)
+    {
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
+    }
   }
-  class myJTextField extends JTextField
+
+  class myJTextField extends JTextField implements DocumentListener
   {
     public myJTextField(String s)
     {
       super(s);
+      getDocument().addDocumentListener(this);
     }
 
     public String getToolTipText(MouseEvent event)
     {
-      if (myMultiLineTextString == null || myMultiLineTextString.trim().length() <= 0)
+      String txt = getText();
+      if(txt == null || txt.length() <=0)
         return null;
-      return "<html><pre>"+myMultiLineTextString;
+
+      return "<html><pre>"+txt;
     }
 
-    String myMultiLineTextString;
-    public void setText(String t)
+    public void changedUpdate(DocumentEvent documentEvent)
     {
-      super.setText(t);
-      myMultiLineTextString = t;
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
+    }
+
+    public void insertUpdate(DocumentEvent documentEvent)
+    {
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
+    }
+
+    public void removeUpdate(DocumentEvent documentEvent)
+    {
+      if(updateListener != null)
+        updateListener.actionPerformed(new ActionEvent(getText(),0,""));
     }
   }
 
