@@ -92,10 +92,12 @@ public class JobResults extends JFrame
     setContentPane(cpan);
 
     pack();
-    Dimension moms = mother.getSize();
-    Point momp = mother.getLocation();
+    if(mother != null) {
+      Dimension moms = mother.getSize();
+      Point momp = mother.getLocation();
 
-    setLocation(momp.x+moms.width,momp.y);    // to left of mother frame
+      setLocation(momp.x+moms.width,momp.y);    // to left of mother frame
+    }
 /*
     Dimension mine = getSize();
     setLocation(momp.x + (moms.width - mine.width) / 2,  // centered on mother frame
@@ -109,7 +111,10 @@ public class JobResults extends JFrame
   {
     dset.addToTail(res);
   }
+  public void addPoint(JobLauncherTab.Gresults res)
+  {
 
+  }
   JFreeChart chart;
   private JFreeChart createChart(XYDataset dset)
   {
