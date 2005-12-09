@@ -40,11 +40,11 @@ public class ViskitAssembly extends BasicAssembly {
     public LinkedHashMap replicationStatsListenerConnections;
     public LinkedHashMap simEventListenerConnections;
     public LinkedHashMap adapters;
-    private static boolean debug = false;
+    private static boolean debug = true;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
-        
+        super();
     }  
     
     public synchronized void createObjects() {
@@ -74,6 +74,8 @@ public class ViskitAssembly extends BasicAssembly {
                     PropertyConnector pc = (PropertyConnector) li.next();
                     connectReplicationStats(listeners[i], pc);
                 }
+            } else if (debug) {
+                System.out.println("No replicationListeners");
             }
  
         }
@@ -92,7 +94,7 @@ public class ViskitAssembly extends BasicAssembly {
                 while( li.hasNext() ) {
                     String source = (String)li.next();
                     connectSimEventListener(listeners[i],source);
-                    if(debug) {
+                    if (debug) {
                         System.out.println("hooking up SimEvent source " + source + " to listener " + listeners[i]);
                     }
                 }
@@ -112,6 +114,8 @@ public class ViskitAssembly extends BasicAssembly {
                     PropertyConnector pc = (PropertyConnector) li.next();
                     connectPropertyChangeListener(listeners[i], pc);
                 }
+            } else if (debug) {
+                System.out.println("No propertyConnectors");
             }
         }
     }
@@ -132,6 +136,8 @@ public class ViskitAssembly extends BasicAssembly {
                     }
                 }
             }
+        } else if ( debug ) {
+            System.out.println("No external designPointListeners to add");
         }
     }
     
@@ -140,29 +146,50 @@ public class ViskitAssembly extends BasicAssembly {
     } 
     
     void connectPropertyChangeListener(String listener, PropertyConnector pc) {
+        if ( pc.property.equals("null") ) {
+            pc.property = "";
+            getSimEntityByName(pc.source).addPropertyChangeListener(getPropertyChangeListenerByName(listener));
+        } else {
+            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
+        }
         if ( debug ) System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
-        getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
+        
     }
     
     void connectReplicationStats(String listener, PropertyConnector pc) {
-        if ( debug ) System.out.println("connecting entity " + pc.source + "to " + listener + " property " + pc.property );
-        if ( pc.property.equals(null) ) {
-            pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName();
+        if ( "null".equals(pc.property) ) {
+            pc.property = "";
+        }
+        if ( debug ) System.out.println("Cnnecting entity " + pc.source + "to replicationStat " + listener + " property " + pc.property );
+        if ( "".equals(pc.property) ) {
+            pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName().trim();
+            if ( debug ) {
+                System.out.println("Property unspecified, attempting with lookup " + pc.property);
+            }
         }
         
-        if ( pc.property.equals(null) ) {
+        if ( "".equals(pc.property) ) {
+            if ( debug ) {
+                System.out.println("Null property, replicationStats connecting "+pc.source+" to "+listener);
+            }
             getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatsByName(listener));
         } else {
+            if ( debug ) {
+                System.out.println("Connecting replicationStats from "+pc.source+" to "+listener);
+            }
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatsByName(listener));
         }
     }
     
     void connectDesignPointStats(String listener, PropertyConnector pc) {
-        if ( pc.property.equals(null) ) {
+        if ( pc.property.equals("null") ) {
+            pc.property = "";
+        }
+        if ( "".equals(pc.property) ) {
             pc.property = ((SampleStatistics) (getDesignPointStatsByName(listener))).getName();
         }
         
-        if ( pc.property.equals(null) ) {
+        if ( "".equals(pc.property) ) {
             getSimEntityByName(pc.source).addPropertyChangeListener(getDesignPointStatsByName(listener));
         } else {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatsByName(listener));
@@ -184,6 +211,9 @@ public class ViskitAssembly extends BasicAssembly {
         // the super. 
         
         for ( int i = 0 ; i < designPointStats.length; i ++ ) {
+            if ( debug ) {
+                System.out.println(designPointStats[i].getName() + " designPointStat created");
+            }
             designPointStatistics.put(designPointStats[i].getName(),designPointStats[i]);
         }
     }
@@ -192,7 +222,7 @@ public class ViskitAssembly extends BasicAssembly {
         replicationStats = 
                 (SampleStatistics[]) replicationStatistics.values().toArray(new SampleStatistics[0]);
         for ( int i = 0; debug && i < replicationStats.length; i++ ) {
-            System.out.println(replicationStats[i].getName());
+            System.out.println(replicationStats[i].getName() + " replicationStat created");
         }
     }
     
@@ -200,7 +230,7 @@ public class ViskitAssembly extends BasicAssembly {
         propertyChangeListener = 
                 (PropertyChangeListener[]) propertyChangeListeners.values().toArray(new PropertyChangeListener[0]);
         for ( int i = 0; debug && i < propertyChangeListener.length; i++ ) {
-            System.out.println(propertyChangeListener[i]);
+            System.out.println(propertyChangeListener[i] + " propertyChangeListener created");
         }
     }
     
