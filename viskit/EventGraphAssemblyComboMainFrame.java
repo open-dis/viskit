@@ -50,7 +50,7 @@ import org.jdom.output.XMLOutputter;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.FileHandler;
-import viskit.doe.JobLauncher;
+import viskit.doe.JobLauncherTab;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -70,16 +70,16 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   EventGraphViewFrame egFrame;
   AssemblyViewFrame asyFrame;
   InternalAssemblyRunner asyRunComponent;
-  JobLauncher runGridComponent;
+  JobLauncherTab runGridComponent;
 
   Action myQuitAction;
   private DoeMain doeMain;
 
-  public EventGraphAssemblyComboMainFrame(String[] args)
+  public EventGraphAssemblyComboMainFrame()
   {
     super("Viskit");
 
-    initUI(args);
+    initUI();
 
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     this.setLocation((d.width - 800) / 2, (d.height - 600) / 2);
@@ -100,7 +100,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
   ArrayList menus = new ArrayList();
 
-  private void initUI(String[] args)
+  private void initUI()
   {
     VGlobals.instance().setAssemblyQuitHandler(null);
     VGlobals.instance().setEventGraphQuitHandler(null);
@@ -159,33 +159,32 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamQuitHandler(doeMain.getQuitMenuItem(),myQuitAction,menuBar);
 
     // Grid run panel
-    runGridComponent = new JobLauncher(true,null,null,this);
+    runGridComponent = new JobLauncherTab(doeMain.getController(),null,null,this);
+    doeFrame.getController().setJobLauncher(runGridComponent);
     //tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
     tabbedPane.addTab("Launch Cluster Job",new ImageIcon(ClassLoader.getSystemResource("viskit/images/grid.png")),
                       runGridComponent.getContent());
-    menuBar = runGridComponent.getJMenuBar();
-    if(menuBar == null) {
-      menuBar = new JMenuBar();
-      menuBar.add(new JMenu("File"));
-    }
+    menuBar = new JMenuBar();
+    menuBar.add(new JMenu("File"));
+    jamQuitHandler(null,myQuitAction,menuBar);
     menus.add(menuBar);
     doCommonHelp(menuBar);
     runGridComponent.setTitleListener(myTitleListener,4);
-    jamQuitHandler(runGridComponent.getQuitMenuItem(),myQuitAction,menuBar);
 
 
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
 
-    asyCntlr.addAssemblyFileListener(asyFrame);
+    asyCntlr.addAssemblyFileListener(asyCntlr.getAssemblyChangeListener());
+    //asyCntlr.addAssemblyFileListener(asyFrame);
     asyCntlr.addAssemblyFileListener(asyRunComponent);
-    //asyCntlr.addAssemblyFileListener(doeFrame.getController());
-    //asyCntlr.addAssemblyFileListener(runGridComponent);
-
+    asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
+    asyCntlr.addAssemblyFileListener(runGridComponent);
+    
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
     cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());
-
+    cntl.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
     // Start the controllers
     ((ViskitController)egFrame.getController()).begin();
 
