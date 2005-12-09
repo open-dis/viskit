@@ -49,28 +49,28 @@ import java.awt.event.ActionListener;
 public class DoeMenuBar extends JMenuBar implements DoeEvents
 {
   private DoeController controller;
-  private JMenu file, edit, run;
+  private JMenu file, run;
+
   public DoeMenuBar(DoeController controller, boolean isSubComponent)
   {
     this.controller = controller;
 
     // Top-level menus
-    file = new fileMenu();
+    file = new fileMenu(isSubComponent);
     add(file);
-   // edit = new editMenu();
-   // add(edit);
-    if(!isSubComponent) {
+
+    if (!isSubComponent) {
       run = new runMenu();
       add(run);
     }
- }
+  }
 
   JMenuItem buildMI(String label, ActionListener lis, char cmd)
   {
     return buildMI(new JMenuItem(label), lis, cmd);
   }
 
- JMenuItem buildMI(JMenuItem mi, ActionListener lis, char cmd)
+  JMenuItem buildMI(JMenuItem mi, ActionListener lis, char cmd)
   {
     mi.setActionCommand(new String(new char[]{cmd}));
     mi.addActionListener(lis);
@@ -79,33 +79,29 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
 
   class fileMenu extends JMenu
   {
-    fileMenu()
+    fileMenu(boolean isSubComponent)
     {
       super("File");
       JMenuItem mi;
 
-      mi = buildMI("Open file",controller, OPEN_FILE_CHOOSE);
-      add(mi);
+      if (!isSubComponent) {
+        mi = buildMI("Open file", controller, OPEN_FILE_CHOOSE);
+        add(mi);
 
-      addSeparator();
+        addSeparator();
 
-      mi = buildMI("Save DOE file", controller, SAVE_FILE);
-      add(mi);
-      mi = buildMI("Save DOE file as ...", controller, SAVE_FILE_AS);
-      add(mi);
+        mi = buildMI("Save DOE file", controller, SAVE_FILE);
+        add(mi);
+        mi = buildMI("Save DOE file as ...", controller, SAVE_FILE_AS);
+        add(mi);
 
-      addSeparator();
-      mi = buildMI("Quit",controller,EXIT_APP);
+        addSeparator();
+      }
+      mi = buildMI("Quit", controller, EXIT_APP);
       add(mi);
     }
   }
-  class editMenu extends JMenu
-  {
-    editMenu()
-    {
-      super("Edit");
-    }
-  }
+
   class runMenu extends JMenu
   {
     runMenu()
@@ -113,7 +109,7 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
       super("Run");
       JMenuItem mi;
 
-      mi = buildMI("Launch Doe job",controller, RUN_JOB);
+      mi = buildMI("Launch Doe job", controller, RUN_JOB);
       add(mi);
     }
   }
