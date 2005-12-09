@@ -83,7 +83,7 @@ public class DoeMain implements DoeEvents
   private void buildMainFrame(boolean contentOnly)
   {
     mainFrame = new DoeMainFrame(contentOnly,controller);
-    controller.setMainFrame(mainFrame);
+    controller.setDoeFrame(mainFrame);
   }
 
   private void buildController()
