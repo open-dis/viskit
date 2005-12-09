@@ -1,6 +1,7 @@
 package viskit;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
@@ -26,6 +27,7 @@ public class RunnerPanel extends JPanel
   public JSplitPane splPn;
 
   public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButt;
+  public JButton saveParms;
   public JCheckBox vcrVerbose;
 
   public JTextField vcrSimTime, vcrStopTime;
@@ -46,12 +48,12 @@ public class RunnerPanel extends JPanel
 
   public RunnerPanel(String title, boolean skipCloseButt)
   {
-    setLayout(new BorderLayout());
+    setLayout(new BoxLayout(this,BoxLayout.Y_AXIS)); //BorderLayout());
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     if(title != null) {
       JLabel titl = new JLabel(title);
       titl.setHorizontalAlignment(JLabel.CENTER);
-      add(titl,BorderLayout.NORTH);
+      add(titl); //,BorderLayout.NORTH);
     }
     soutTA = new JTextArea("Assembly output stream:" + lineEnd +
         "----------------------" + lineEnd);
@@ -70,8 +72,32 @@ public class RunnerPanel extends JPanel
     JScrollPane jspErr = new JScrollPane(serrTA);
 
     splPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false,jsp,jspErr);
-    add(splPn, BorderLayout.CENTER);
-    add(makeVCRPanel(skipCloseButt), BorderLayout.SOUTH);
+    splPn.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    add(splPn); //, BorderLayout.CENTER);
+    //add(makeVCRPanel(skipCloseButt), BorderLayout.SOUTH);
+
+    JComponent vcrPanel = makeVCRPanel(skipCloseButt);
+    vcrPanel.setBorder(new EtchedBorder());
+    Dimension d = vcrPanel.getPreferredSize();
+    vcrPanel.setMaximumSize(new Dimension(d));
+    vcrPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
+
+    JPanel buttAndSave = new JPanel();
+    buttAndSave.setLayout(new BoxLayout(buttAndSave,BoxLayout.X_AXIS));
+    vcrPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
+    buttAndSave.add(Box.createHorizontalGlue());
+    buttAndSave.add(vcrPanel);
+    saveParms = new JButton("Save");
+    saveParms.setToolTipText("<html><center>Save execution parameters<br>to assembly file<br>"+
+                            "(not required to run job)");
+    saveParms.setAlignmentY(JComponent.CENTER_ALIGNMENT);
+    buttAndSave.add(Box.createHorizontalStrut(5));
+    buttAndSave.add(saveParms);
+    buttAndSave.add(Box.createHorizontalGlue());
+    add(Box.createVerticalStrut(5));
+    add(buttAndSave);
+    //add(vcrPanel); //,BorderLayout.SOUTH);
   }
 
   public void setStreams(InputStream out, InputStream err)
