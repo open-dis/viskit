@@ -27,7 +27,7 @@ public class RunnerPanel extends JPanel
   public JSplitPane splPn;
 
   public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButt;
-  public JButton saveParms;
+  //public JButton saveParms;
   public JCheckBox vcrVerbose;
 
   public JTextField vcrSimTime, vcrStopTime;
@@ -88,12 +88,12 @@ public class RunnerPanel extends JPanel
     vcrPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
     buttAndSave.add(Box.createHorizontalGlue());
     buttAndSave.add(vcrPanel);
-    saveParms = new JButton("Save");
-    saveParms.setToolTipText("<html><center>Save execution parameters<br>to assembly file<br>"+
-                            "(not required to run job)");
-    saveParms.setAlignmentY(JComponent.CENTER_ALIGNMENT);
-    buttAndSave.add(Box.createHorizontalStrut(5));
-    buttAndSave.add(saveParms);
+    //saveParms = new JButton("Save");
+    //saveParms.setToolTipText("<html><center>Save execution parameters<br>to assembly file<br>"+
+    //                        "(not required to run job)");
+    //saveParms.setAlignmentY(JComponent.CENTER_ALIGNMENT);
+    //buttAndSave.add(Box.createHorizontalStrut(5));
+    //buttAndSave.add(saveParms);
     buttAndSave.add(Box.createHorizontalGlue());
     add(Box.createVerticalStrut(5));
     add(buttAndSave);
