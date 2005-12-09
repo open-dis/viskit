@@ -878,10 +878,11 @@ cancelArcMode.setIcon(new CanArcIcon());
   public File openFileAsk()
   //-----------------------
   {
-    if (jfc == null)
+    if (jfc == null) {
       jfc = new JFileChooser(System.getProperty("user.dir")+
                              System.getProperty("file.separator")+"examples");
-
+      jfc.setDialogTitle("Open Event Graph File");
+    }
     int retv = jfc.showOpenDialog(this);
     if (retv == JFileChooser.APPROVE_OPTION)
       return jfc.getSelectedFile();
