@@ -43,7 +43,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit;
 
-import edu.nps.util.DirectoryWatch;
 import simkit.BasicAssembly;
 import simkit.Schedule;
 import viskit.xsd.assembly.ViskitAssembly;
@@ -67,7 +66,7 @@ import java.util.Vector;
 /** Analogous to ExternalAssemblyRunner, but puts gui in calling thread and runs
  * sim in external VM.
  */
-public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.DirectoryChangeListener
+public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
 {
   String targetClassName;
   String targetClassPath;
@@ -90,6 +89,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     runPanel.vcrRewind.addActionListener(new rewindListener());
     runPanel.vcrStep.addActionListener(new stepListener());
     runPanel.vcrVerbose.addActionListener(new verboseListener());
+    //runPanel.saveParms.addActionListener(new saveParmListener());
 
     runPanel.vcrStop.setEnabled(false);
     runPanel.vcrPlay.setEnabled(false);
@@ -112,17 +112,29 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
     return null;
   }
 
-  /**
-   * Here's where we get notified that the assembly file has changed
-   * @param file
-   * @param action
-   * @param source
-   */
-  public void fileChanged(File file, int action, DirectoryWatch source)
+  public String getHandle()
   {
-    // temp:
-        System.out.println("InternalAssemblyRunner got assembly change message: "+action+
-                                  " " + file.getAbsolutePath());
+    return "";
+  }
+
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+  {
+    switch (action) {
+      case JAXB_CHANGED:
+        break;
+      case NEW_ASSY:
+        // fill out the parameters here..
+        // todo
+        break;
+
+      case CLOSE_ASSY:
+        break;
+      case PARAM_LOCALLY_EDITTED:
+        break;
+
+      default:
+        System.err.println("Program error InternalAssemblyRunner.assyChanged");
+    }
   }
 
   private String[] myCmdLine;
@@ -334,6 +346,18 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
       }
     }
   }
+
+  /* to handle the saving of the execution parms to the assembly file
+  class saveParmListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      //todo getexecution parms from runpanel
+      //todo makesure the dirwatch listeners don't get hit
+      //todo save the parmeters into the xml.
+    }
+  }
+  */
   private JFileChooser saveChooser;
 
   class saveListener implements ActionListener
@@ -871,7 +895,7 @@ public class InternalAssemblyRunner implements edu.nps.util.DirectoryWatch.Direc
               try {
                 nint = Integer.parseInt(n);
                 if(!(targetAssembly instanceof ViskitAssembly))
-                    targetAssembly.setNumberReplications(1); // todo when fixed nint);
+                    targetAssembly.setNumberReplications(1); // todo when fixed   nint);
               }
               catch (NumberFormatException e) {
                 System.err.println("Error parsing number of reps: "+n);
