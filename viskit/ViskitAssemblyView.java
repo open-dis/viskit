@@ -37,6 +37,8 @@ public interface ViskitAssemblyView
   public void    removeFromPropChangePallette(File f);
   
   public int     genericAsk             ( String title, String prompt );      // returns JOptionPane constants
+  public int     genericAskYN           ( String title, String prompt );
+  public int     genericAsk2Butts       ( String title, String prompt, String button1, String button2 );
   public void    genericErrorReport     ( String title, String message );
   public String  promptForStringOrCancel( String title, String message, String initval);
 
