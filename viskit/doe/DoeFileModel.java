@@ -47,9 +47,18 @@ import org.jdom.CDATA;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
+import viskit.OpenAssembly;
+import viskit.xsd.bindings.assembly.EventGraph;
+import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.bindings.assembly.TerminalParameter;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.io.FileReader;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class DoeFileModel
@@ -88,7 +97,7 @@ public class DoeFileModel
         continue;
 
       Object[] rData = ptm.getRowData(r);
-      Element el = ptm.getElementAtRow(r);
+      Element el = (Element)ptm.getElementAtRow(r);
 
       String val = (String)rData[ParamTableModel.VALUE_COL];
       if(val != null && val.length()>0)
@@ -129,6 +138,20 @@ public class DoeFileModel
     return f;
   }
 
+  public File marshallJaxb() throws Exception
+  {
+    File f = File.createTempFile("DOEtemp",".grd");
+    return marshallJaxb(f);
+  }
+
+
+  public File marshallJaxb(File f) throws Exception
+  {
+    FileHandler.marshallJaxb(f);
+    return f;
+  }
+
+
   private static String s0 = "Double[] ";
   private static String s1 = "() {return new Double[] { new Double(";
   private static String s2 = "), new Double(";
@@ -154,8 +177,146 @@ public class DoeFileModel
 
     return sb.toString();
   }
+  private String buildTPContent(Object[] rData, String nmrf)
+  {
+    //String type = (String)rData[ParamTableModel.TYPE_COL];
+    //String valu = (String)rData[ParamTableModel.VALUE_COL];
+    String min  = (String)rData[ParamTableModel.MIN_COL];
+    String max  = (String)rData[ParamTableModel.MAX_COL];
 
-/*
+
+    StringBuffer sb = new StringBuffer();
+    sb.append(s0);
+    sb.append(nmrf);
+    sb.append(s1);
+    sb.append(min);
+    sb.append(s2);
+    sb.append(max);
+    sb.append(s3);
+
+   return sb.toString();
+  }
+
+  public void saveEventGraphsToJaxb(Collection evGraphs)
+  {
+    SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
+    List lis = assy.getEventGraph();
+    lis.clear();
+
+    for(Iterator itr = evGraphs.iterator(); itr.hasNext();) {
+      File f = (File)itr.next();
+      try {
+        //SimkitXML2Java s2j = new SimkitXML2Java(f);
+        //s2j.unmarshal();
+        //String src = s2j.translate();
+
+        FileReader fr = new FileReader(f);
+        StringBuffer sb = new StringBuffer();
+        char[] cbuf = new char[4096];
+        int retc;
+        while ((retc = fr.read(cbuf)) != -1) {
+          sb.append(cbuf,0,retc);
+        }
+
+        EventGraph eg = OpenAssembly.inst().jaxbFactory.createEventGraph();
+        eg.setFileName(f.getName());
+        String s = sb.toString();
+        String[]sa = s.split("<\\?xml.*\\?>"); // remove the hdr if present
+        if(sa.length == 2)
+          s = sa[1];
+        //eg.getContent().add(0,"<![CDATA["+s.trim() + "]]>");
+        eg.getContent().add(0,s.trim());
+
+        //eg.getContent().add(0,src.trim());
+        lis.add(eg);
+      }
+      catch (Exception e) {
+        System.err.println("IOException inserting into GRID file "+f.getName()+" :"+e.getMessage());
+      }
+    }
+  }
+
+  public void saveTableEditsToJaxb()
+  {
+    SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
+    ObjectFactory factory = OpenAssembly.inst().jaxbFactory;
+
+    List designParms = assy.getDesignParameters();
+
+    // Throw away existing design points
+    designParms.clear();
+
+    // Go down rows, update the nameRef and value fields (type, content aren't changed)
+    // For each row that's a factor (design point) add a design point TP at top
+    // If experiment tag doesn't exist add it with default values
+
+    ParamTableModel ptm = (ParamTableModel)paramTable.getModel();
+    int n = ptm.getRowCount();
+
+    //Element root = jdomDocument.getRootElement();
+    //root.removeChildren("TerminalParameter"); // design points at the top
+
+    int dpCount = 0;
+    for(int r=0;r<n;r++)  {
+      if(!ptm.isCellEditable(r,ParamTableModel.FACTOR_COL))
+        continue;
+
+      Object[] rData = ptm.getRowData(r);
+      Object el = ptm.getElementAtRow(r);
+      TerminalParameter tp = (TerminalParameter)el;
+
+      String val = (String)rData[ParamTableModel.VALUE_COL];
+      if(val != null && val.length()>0)
+        tp.setValue(val);
+
+      if(((Boolean)rData[ParamTableModel.FACTOR_COL]).booleanValue() == true) {
+        String name = (String)rData[ParamTableModel.NAME_COL];
+        name = name.replace('.','_');  // periods illegal in java identifiers
+        // Create a designpoint TP with a name
+        TerminalParameter newTP;
+        try {
+          newTP = factory.createTerminalParameter();
+        }
+        catch (JAXBException e) {
+          System.err.println("Can't create TerminalParameter.");
+          designParms.clear();
+          return;
+        }
+        newTP.setName(name);
+        newTP.setNameRef(null);
+        newTP.setType(tp.getType());
+        newTP.setValue(tp.getValue());
+        newTP.getContent().add(0,buildTPContent(rData,name));
+
+        designParms.add(dpCount++,newTP);
+
+        // Set the nameref of the SimEntity TP to be a ref to the design point tp
+        // todo the following is permanently changing the jaxbroot, and will thusly get saved into xml.
+        //  The user has not necessarily requested that at this point, so we need to be able to undo the change
+        //   after marshalling.
+        tp.setNameRef(newTP);
+        tp.setName(null);
+
+      }
+    }
+    /* dont do this here.  do it in the runpanel
+    Element elm = root.getChild("Experiment");
+    if(elm == null) {
+      elm = new Element("Experiment");
+      elm.setAttribute("type","latin-hypercube");
+      elm.setAttribute("totalSamples","5");
+      elm.setAttribute("runsPerDesignPoint","7");
+      elm.setAttribute("timeout","30000");
+      List lis = root.getChildren();
+      lis.add(lis.size(),elm);   //at bottom
+    }
+
+    FileHandler.marshallJdom(f,jdomDocument);
+    return f;
+ */
+
+  }
+ /*
   public void jaxbMarshall() throws Exception
   {
     JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
@@ -185,6 +346,7 @@ public class DoeFileModel
     jaxbRoot.setExperiment(exp);
 
   }
+
 */
 /*
   private void setDesignPoints(ObjectFactory oFactory)
