@@ -1088,15 +1088,27 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     *
     * @return true means changes have been made and it needs to be flushed.
     */
-   public boolean isDirty()
-   {
-     return modelDirty;
-   }
+
+  public boolean isDirty()
+  {
+    return modelDirty;
+  }
+
+  public void setDirty(boolean wh)
+  {
+    modelDirty = wh;
+  }
+
+  public SimkitAssembly getJaxbRoot()
+  {
+    return jaxbRoot;
+  }
 
   public GraphMetaData getMetaData()
   {
     return metaData;
   }
+
   public void changeMetaData   (GraphMetaData gmd)
   {
     metaData = gmd;

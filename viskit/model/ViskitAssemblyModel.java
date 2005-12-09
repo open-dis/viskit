@@ -1,6 +1,7 @@
 package viskit.model;
 
 import viskit.FileBasedAssyNode;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 import java.awt.*;
 import java.io.File;
@@ -26,7 +27,8 @@ public interface ViskitAssemblyModel
   /**
     *  Reports saved state of model.  Becomes "clean" after a save.
     */
-   public boolean isDirty       ();
+  public boolean isDirty       ();
+  public void    setDirty      (boolean tf);  // to force save
   /**
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
@@ -38,6 +40,7 @@ public interface ViskitAssemblyModel
   public GraphMetaData getMetaData();
   public void changeMetaData    (GraphMetaData gmd);
 
+  public SimkitAssembly getJaxbRoot();
   public AdapterEdge    newAdapterEdge    (String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
   public PropChangeEdge newPclEdge        (AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
   public void           newSimEvLisEdge   (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
