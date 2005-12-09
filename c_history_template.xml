@@ -11,6 +11,9 @@
       <Recent>
       </Recent>
     </AssemblyEditor>
+    <Cluster>
+      <Account last="true"  server="cluster.moves.nps.navy.mil" port="4444" username="" password=""/>
+    </Cluster>
   </history>
   <extraClassPath>
     <path>
