@@ -64,9 +64,10 @@ public interface ViskitAssemblyController
   boolean preQuit();
   void    postQuit();
 
-  void addAssemblyFileListener   (DirectoryWatch.DirectoryChangeListener lis);
-  void removeAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis);
+  void addAssemblyFileListener   (OpenAssembly.AssyChangeListener lis);
+  void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
+  OpenAssembly.AssyChangeListener        getAssemblyChangeListener();
   DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener ();
 
   void generateJavaSource();
