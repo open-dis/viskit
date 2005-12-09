@@ -49,6 +49,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -80,7 +82,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents
 
     //content.add(split,BorderLayout.CENTER);
     //content.add(leftP,BorderLayout.CENTER);
-    JLabel lab =new JLabel("Do File-open, or initialize from Assembly Editor tab.");
+    JLabel lab =new JLabel("This is initialized when an assembly is opened.");
     lab.setHorizontalAlignment(JLabel.CENTER);
     content.add(lab,BorderLayout.NORTH);
     getContentPane().setLayout(new BorderLayout());
@@ -96,7 +98,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents
     else {
       dfm.paramTable.setBorder(new EtchedBorder()); // double etched with below
       leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
-      leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,10,10),new EtchedBorder()));
+      leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,5,10),new EtchedBorder()));
       doTitle(dfm.userFile.getName());
     }
   }
@@ -109,11 +111,28 @@ public class DoeMainFrame extends JFrame implements DoeEvents
   public void installContent()
   {
     removeContent();
+    content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
     if (leftJsp != null) {
+/*
       if (contentOnly) {
         content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
       }
-      content.add(leftJsp, BorderLayout.CENTER);
+*/
+      content.add(leftJsp); //, BorderLayout.CENTER);
+      JButton sv = new JButton("Save");
+      sv.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e)
+        {
+          controller.saveDoeParams();
+        }
+      });
+      sv.setToolTipText("<html><center>Save experiment parameters<br>to assembly file<br>"+
+                        "(not required to run job)");
+      sv.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0,0,10,10),sv.getBorder()));
+      JPanel moveRight = new JPanel();moveRight.setLayout(new BoxLayout(moveRight,BoxLayout.X_AXIS));
+      moveRight.add(Box.createHorizontalGlue());
+      moveRight.add(sv);
+      content.add(moveRight);
       content.validate();
     }
     if (!contentOnly) {

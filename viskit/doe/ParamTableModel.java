@@ -42,19 +42,20 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
-import org.jdom.Attribute;
-import org.jdom.Element;
-
-import javax.swing.table.DefaultTableModel;
-import java.util.*;
-import java.util.regex.Pattern;
-
 import bsh.Interpreter;
 import bsh.NameSpace;
-import bsh.EvalError;
+import org.jdom.Attribute;
+import org.jdom.Element;
+import viskit.OpenAssembly;
+import viskit.xsd.bindings.assembly.*;
+
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import java.util.*;
 
 
-public class ParamTableModel extends DefaultTableModel
+public class ParamTableModel extends DefaultTableModel implements TableModelListener
 {
   public static final int NUM_COLS = 6;
 
@@ -78,7 +79,33 @@ public class ParamTableModel extends DefaultTableModel
   public HashSet noEditRows = new HashSet();
   public HashSet multiRows = new HashSet();
   public boolean dirty = false;
-  public ParamTableModel(List simEntitiesJDom, List designParamsJDom)
+
+  public ParamTableModel(List simEntitiesJaxb, List designParamsJaxb)
+  {
+    super(0, 0);
+
+    initBeanShell();
+    rows = new Vector();
+    prefixes = new Vector();
+    for (Iterator itr = simEntitiesJaxb.iterator(); itr.hasNext();) {
+      Object o = itr.next();
+      if(!(o instanceof SimEntity))
+        System.err.println("Error ParamTableModel(), element not SimEntity");
+      processRow(o);
+    }
+    mydata = (Object[][]) rows.toArray(mydata);
+    if(designParamsJaxb != null) {
+      for (Iterator itr = designParamsJaxb.iterator(); itr.hasNext();) {
+        Object o = itr.next();
+        if(!(o instanceof TerminalParameter))
+          System.err.println("Error ParamTableModel(), element not TerminalParameter");
+        processDesignParam(o);
+      }
+    }
+    dirty=false;
+    this.addTableModelListener(this);
+  }
+  public ParamTableModel(List simEntitiesJDom, List designParamsJDom, boolean obsoleteEqTrue)
   {
     super(0, 0);
 
@@ -106,7 +133,46 @@ public class ParamTableModel extends DefaultTableModel
     dirty = false;
   }
 
-  private void processDesignParam(Element elm)
+  public void tableChanged(TableModelEvent e)
+  {
+    System.out.println("Sending paramlocally editted from ParamTableModel");
+    OpenAssembly.inst().doParamLocallyEditted(dummyListener);
+  }
+
+  private void processDesignParam(Object o)
+  {
+    TerminalParameter tp = (TerminalParameter)o;
+    String typ = tp.getType();
+    typ = (typ==null?"":typ);
+
+    //Object nameRefObj = tp.getNameRef();
+    //String nm = (nameRefObj == null ? dumpPrefixes():nameRefObj.toString()); // todo fix
+    String nm = tp.getName();
+    if(nm.length()<=0)
+      System.err.println("Terminal param w/out name ref!");
+    int row = ((Integer)termHashMap.get(nm)).intValue();
+
+    String val = tp.getValue();
+    val = (val==null?"":val);
+    setValueAt(val,row,VALUE_COL);
+
+    // todo jmb here where's the code?
+
+    List content = tp.getContent();
+    Double[] minMax = parseMinMax(nm,(String)content.get(0));
+    if(minMax != null) {
+      setValueAt(""+(minMax[0]).doubleValue(),row,MIN_COL);
+      setValueAt(""+(minMax[1]).doubleValue(),row,MAX_COL);
+    }
+    else {
+      setValueAt("0.0",row,MIN_COL);
+      setValueAt("1.0",row,MAX_COL);
+    }
+    setValueAt(new Boolean(true),row,FACTOR_COL); //cb
+
+  }
+
+  private void oldprocessDesignParam(Element elm)
   {
     Attribute at = elm.getAttribute("type");
     String typ = (at==null?"":at.getValue());
@@ -190,7 +256,89 @@ public class ParamTableModel extends DefaultTableModel
   HashMap termHashMap = new HashMap();
   ArrayList elementsByRow = new ArrayList();
   Vector prefixes;
-  private void processRow(Element el)
+
+  private void processRow(Object obj)
+  {
+    Object[] oa = new Object[6];
+
+    if (obj instanceof SimEntity) {
+      SimEntity se = (SimEntity)obj;
+      String nm = se.getName();
+      currentSEname = (nm == null ? "" : nm);
+      oa[NAME_COL] = "<html><b>"+currentSEname;
+
+      String typ = se.getType();
+      typ = (typ == null ? "" : typ);
+      oa[TYPE_COL] = "<html><b>"+loseDots(typ);
+      oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
+      oa[FACTOR_COL] = new Boolean(false);
+      rows.add(oa);
+      elementsByRow.add(obj);
+
+      noEditRows.add(new Integer(rows.size()-1));
+      prefixes.clear();
+      prefixes.add(currentSEname);
+      List children = se.getParameters(); //.getChildren();
+      int i=1;
+      for (Iterator itr = children.iterator(); itr.hasNext();) {
+        prefixes.add("."+i++);
+        processRow(itr.next());
+        prefixes.remove(prefixes.size()-1);
+      }
+    }
+    else if (obj instanceof TerminalParameter) {
+      TerminalParameter tp = (TerminalParameter)obj;
+      Object nameRefObj = tp.getNameRef();
+      String nameRef = dumpPrefixes(); // default
+      if(nameRefObj != null) {
+        if(nameRefObj instanceof String)
+          nameRef = (String)nameRefObj;
+        else if(nameRefObj instanceof TerminalParameter)
+          nameRef = ((TerminalParameter)nameRefObj).getName();
+      }
+      oa[NAME_COL] = nameRef;
+      String typ = tp.getType();
+      typ = (typ == null ? "" : typ);
+      oa[TYPE_COL] = loseDots(typ);
+      String value = tp.getValue();
+      oa[VALUE_COL] = (value == null ? "" : value);
+      oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
+      oa[FACTOR_COL] = new Boolean(false);
+      rows.add(oa);
+      elementsByRow.add(obj);
+
+      termHashMap.put(nameRef,new Integer(rows.size()-1));
+    }
+    else if(obj instanceof MultiParameter) {
+      MultiParameter mp = (MultiParameter)obj;
+      oa[NAME_COL] = dumpPrefixes();
+      String typ = mp.getType();
+      oa[TYPE_COL] = loseDots(typ == null ? "" : typ);
+      oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
+      oa[FACTOR_COL] = new Boolean(false);
+      rows.add(oa);
+      elementsByRow.add(obj);
+
+      multiRows.add(new Integer(rows.size()-1));
+
+      List children = mp.getParameters(); //el.getChildren();
+      int i=1;
+      for (Iterator itr = children.iterator(); itr.hasNext();) {
+        prefixes.add("."+i++);
+        processRow(itr.next());
+        prefixes.remove(prefixes.size()-1);
+      }
+    }
+    else if(obj instanceof Coordinate)
+      ;
+    else if(obj instanceof FactoryParameter)
+      System.out.println("TODO support FactoryParameter in DOE table...?");
+    else
+      System.err.println("Error ParamTableModel.processRow, unknown type: "+obj);
+
+  }
+
+  private void obsprocessRow(Element el)
   {
     Object[] oa = new Object[6];
 
@@ -234,10 +382,7 @@ public class ParamTableModel extends DefaultTableModel
 
       termHashMap.put(nam,new Integer(rows.size()-1));
     }
-    else {
-      //assert nm.equalsIgnoreCase("MultiParameter");
-      if(!nm.equalsIgnoreCase("MultiParameter"))
-        System.err.println("Error ParamTableModel.processRow, unknown type");
+    else if(nm.equalsIgnoreCase("MultiParameter")) {
       Attribute at = el.getAttribute("nameRef");
       oa[NAME_COL] = (at == null ? dumpPrefixes() : at.getValue());
       at = el.getAttribute("type");
@@ -257,11 +402,16 @@ public class ParamTableModel extends DefaultTableModel
         prefixes.remove(prefixes.size()-1);
       }
     }
+    else if(nm.equalsIgnoreCase("Coordinate"))
+      ;
+    else
+      System.err.println("Error ParamTableModel.processRow, unknown type: "+nm);
+
   }
 
-  public Element getElementAtRow(int r)
+  public Object getElementAtRow(int r)
   {
-    return (Element)elementsByRow.get(r);
+    return elementsByRow.get(r);
   }
   public Object[] getRowData(int r)
   {
@@ -344,6 +494,9 @@ public class ParamTableModel extends DefaultTableModel
    */
   public void setValueAt(Object value, int row, int col)
   {
+    //todo mike fix
+/*
+    System.out.println("bp");
     Element el = (Element)elementsByRow.get(row);
     switch(col) {
       case NAME_COL:
@@ -369,10 +522,23 @@ public class ParamTableModel extends DefaultTableModel
         System.err.println("Program error, ParamTableModel.setValueAt()");
     }
 
+*/
     mydata[row][col] = value;
-    dirty=true;
+    //dirty=true;
 
     fireTableCellUpdated(row, col);
   }
+
+  OpenAssembly.AssyChangeListener dummyListener = new OpenAssembly.AssyChangeListener()
+  {
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+    {
+    }
+
+    public String getHandle()
+    {
+      return "Design of Experiments";
+    }
+  };
 
 }

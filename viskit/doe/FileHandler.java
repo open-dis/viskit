@@ -48,15 +48,21 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import viskit.OpenAssembly;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
 public class FileHandler
 {
+  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
+
   public static DoeFileModel openFile(File f) throws Exception
   {
     SAXBuilder builder;
@@ -70,7 +76,11 @@ public class FileHandler
       doc = null;
       throw new Exception("Error parsing or finding file " + f.getAbsolutePath());
     }
+    return _openFile(doc,f);
+  }
 
+  public static DoeFileModel _openFile(Document doc, File f) throws Exception
+  {
     Element elm = doc.getRootElement();
     if (!elm.getName().equalsIgnoreCase("SimkitAssembly"))
       throw new Exception("Root element must be named \"SimkitAssembly\".");
@@ -82,6 +92,19 @@ public class FileHandler
     dfm.designParms = getDesignParams(doc);
     dfm.setSimEntities(getSimEntities(doc));
     dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
+
+    return dfm;
+  }
+
+  // todo replace above
+  public static DoeFileModel _openFileJaxb(SimkitAssembly assy, File f)
+  {
+    DoeFileModel dfm = new DoeFileModel();
+    dfm.userFile = f;
+    // todo dfm.jaxbRoot = assy;
+    dfm.designParms = assy.getDesignParameters();
+    dfm.setSimEntities(assy.getSimEntity());
+    dfm.paramTable = new ParamTable(dfm.getSimEntities(),dfm.designParms);
 
     return dfm;
   }
@@ -104,16 +127,31 @@ public class FileHandler
     xmlOut.output(doc,fow);
   }
 
-  public static void runFile(File fil, String title, JFrame mainFrame)
+  public static void marshallJaxb(File of) throws Exception
+  {
+    JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+    FileOutputStream fos  = new FileOutputStream(of);
+    Marshaller m = jaxbCtx.createMarshaller();
+    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+    m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+
+    //fillRoot();
+    m.marshal(OpenAssembly.inst().jaxbRoot,fos);
+  }
+
+   public static void runFile(File fil, String title, JFrame mainFrame)
   {
     try {
-      new JobLauncher(true,fil.getAbsolutePath(),title,mainFrame);
+      new JobLauncher(true,fil.getAbsolutePath(),title,mainFrame);      // broken
     }
     catch (Exception e) {
       e.printStackTrace();
     }
   }
-
+  public static void runFile(File fil, String title, JobLauncherTab jobLauncher)
+  {
+    jobLauncher.setFile(fil.getAbsolutePath(),title);
+  }
   private static List getDesignParams(Document doc) throws Exception
   {
     Element elm = doc.getRootElement();
