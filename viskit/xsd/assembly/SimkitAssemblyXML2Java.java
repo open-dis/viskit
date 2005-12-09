@@ -66,6 +66,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     int count; // of design points
     int totalResults; // of total runs
     boolean busy = false;
+    boolean debug = true;
     
     /* convenience Strings for formatting */
     
@@ -156,6 +157,10 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
         } catch (Exception e) { e.printStackTrace(); }
+        
+        if ( debug ) {
+            marshal();
+        }
     }
     
     public javax.xml.bind.Element unmarshalAny(String bindings) {
