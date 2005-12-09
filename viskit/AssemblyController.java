@@ -8,19 +8,18 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.SimkitXML2Java;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,9 +79,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     if(lastFile != null)
       markConfigOpen(lastFile);
 
-    if (((AssemblyModel)getModel()).isDirty())
-      return askToSaveAndContinue();
-    return true;
+//    if (((AssemblyModel)getModel()).isDirty())
+//      return askToSaveAndContinue();
+//    return true;
+    return checkSaveIfDirty();
   }
 
   public void postQuit()
@@ -97,6 +97,38 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       postQuit();
   }
 
+  private boolean checkSaveIfDirty()
+  {
+    if(localDirty) {
+      StringBuffer sb = new StringBuffer("<html><center>Execution parameters have been modified.<br>(");
+
+      for(Iterator itr = isLocalDirty.iterator(); itr.hasNext();) {
+        sb.append(((OpenAssembly.AssyChangeListener)itr.next()).getHandle());
+        sb.append(", ");
+      }
+      sb.setLength(sb.length()-2); // last comma-space
+      sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
+      sb.append("save the execution parameters.");
+
+      //int ynx = (((ViskitAssemblyView) getView()).genericAskYN("Question", sb.toString()));
+      int yn = (((ViskitAssemblyView) getView()).genericAsk2Butts("Question", sb.toString(), "Stop and let me save",
+                                                                  "Ignore my execution parameter changes"));
+      // n == -1 if dialog was just closed
+      //   ==  0 for first option
+      //   ==  1 for second option
+
+      // be conservative, stop for first 2 choices
+      if(yn != 1)
+        return false;
+    }
+
+    if(((AssemblyModel)getModel()).isDirty()) {
+      return askToSaveAndContinue();
+    }
+    return true;  // proceed
+  }
+
+
   public void settings()
   {
     // placeholder for combo gui
@@ -105,9 +137,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   File lastFile;
   public void open()
   {
-    if (((AssemblyModel)getModel()).isDirty())
-      if(!askToSaveAndContinue())
-        return;
+//    if (((AssemblyModel)getModel()).isDirty())
+//      if(!askToSaveAndContinue())
+//        return;
+    if(!checkSaveIfDirty())
+      return;
 
     File file = ((ViskitAssemblyView) getView()).openFileAsk();
     if (file != null) {
@@ -122,15 +156,74 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     lastFile = f;
 
-    boolean goodOpen = ((ViskitAssemblyModel) getModel()).newModel(lastFile);
+    ViskitAssemblyModel mod = (ViskitAssemblyModel)getModel();
+    boolean goodOpen = mod.newModel(lastFile);
     if(goodOpen) {
-      GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
+      mod = (ViskitAssemblyModel)getModel();
+      GraphMetaData gmd = mod.getMetaData();
       ((ViskitAssemblyView) getView()).fileName(gmd.name); //lastFile.getName());
 
       adjustRecentList(lastFile);
-      fileWatchOpen(lastFile);
+     // replaced by below fileWatchOpen(lastFile);
+      initOpenAssyWatch(lastFile,mod.getJaxbRoot());
     }
   }
+
+  private void initOpenAssyWatch(File f, SimkitAssembly jaxbroot)
+  {
+    try {
+      OpenAssembly.inst().setFile(f,jaxbroot);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public OpenAssembly.AssyChangeListener getAssemblyChangeListener()
+  {
+    return assyChgListener;
+  }
+
+  private boolean localDirty = false;
+  private HashSet isLocalDirty = new HashSet();
+
+  OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener()
+  {
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+    {
+      switch(action) {
+        case JAXB_CHANGED:
+          isLocalDirty.remove(source);
+          if(isLocalDirty.isEmpty())
+            localDirty = false;
+
+          ((ViskitAssemblyModel)getModel()).setDirty(true);
+          break;
+
+        case NEW_ASSY:
+          isLocalDirty.clear();
+          localDirty = false;
+          break;
+
+        case PARAM_LOCALLY_EDITTED:
+          // This gets hit when you type something in the last three tabs
+          isLocalDirty.add(source);
+          localDirty = true;
+          break;
+
+        case CLOSE_ASSY:
+          break;
+
+        default:
+          System.err.println("Program error AssemblyController.assyChanged");
+      }
+    }
+
+    public String getHandle()
+    {
+      return "Assembly Controller";
+    }
+  };
 
   /////////////////////////////////////////////////////////////////////////////////////
   // Methods to implement a scheme where other modules will be informed of file changes //
@@ -179,14 +272,16 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     ofile.delete();
   }
 
-  public void addAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis)
+  public void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis) //DirectoryWatch.DirectoryChangeListener lis)
   {
-    dirWatch.addListener(lis);
+    //dirWatch.addListener(lis);
+    OpenAssembly.inst().addListener(lis);
   }
 
-  public void removeAssemblyFileListener(DirectoryWatch.DirectoryChangeListener lis)
+  public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis) //DirectoryWatch.DirectoryChangeListener lis)
   {
-    dirWatch.removeListener(lis);
+    //dirWatch.removeListener(lis);
+    OpenAssembly.inst().removeListener(lis);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////
@@ -270,9 +365,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   }
   public void newAssembly()
   {
-    if (((AssemblyModel)getModel()).isDirty())
-      if(!askToSaveAndContinue())
-        return;
+//    if (((AssemblyModel)getModel()).isDirty())
+//      if(!askToSaveAndContinue())
+//        return;
+    if(!checkSaveIfDirty())
+      return;
 
     if(lastFile != null) {
       fileWatchClose(lastFile);
@@ -726,13 +823,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   /* from menu:*/
   public void showXML()
   {
-    if(checkSave() == false || lastFile == null)
+    if(checkSaveForSourceCompile() == false || lastFile == null)
       return;
 
     ((ViskitAssemblyView)getView()).displayXML(lastFile);
   }
 
-  private boolean checkSave()
+  private boolean checkSaveForSourceCompile()
   {
     if(((ViskitAssemblyModel)getModel()).isDirty() || lastFile == null) {
       int ret = JOptionPane.showConfirmDialog(null,"The model will be saved.\nContinue?","Confirm",JOptionPane.YES_NO_OPTION);
@@ -752,7 +849,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   private String produceJavaClass()
   {
-    if(checkSave() == false || lastFile == null)
+    if(checkSaveForSourceCompile() == false || lastFile == null)
       return null;
 
     return buildJavaAssemblySource(((ViskitAssemblyModel)getModel()).getFile());
