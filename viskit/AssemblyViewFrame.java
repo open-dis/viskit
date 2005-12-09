@@ -39,8 +39,7 @@ import java.util.Map;
  * Time: 2:07:37 PM
  */
 
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView,
-    DragStartListener, edu.nps.util.DirectoryWatch.DirectoryChangeListener
+public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
 {
   private JSplitPane jsp;
   private Color background = new Color(0xFB,0xFB,0xE5);
@@ -717,7 +716,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   {
     return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_CANCEL_OPTION);
   }
+  public int genericAskYN(String title, String msg)
+  //-----------------------------------------------
+  {
+    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_OPTION);
+  }
 
+  public int genericAsk2Butts(String title, String msg, String butt1, String butt2)
+  {
+    return JOptionPane.showOptionDialog(this,msg,title,JOptionPane.DEFAULT_OPTION,
+                                           JOptionPane.QUESTION_MESSAGE,null,
+                                           new String[]{butt1,butt2},butt1);
+  }
   public String promptForStringOrCancel(String title, String message, String initval)
   //---------------------------------------------------------------------------------
   {
@@ -730,9 +740,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   public File openFileAsk()
   //-----------------------
   {
-    if (jfc == null)
-      jfc = new JFileChooser(System.getProperty("user.dir"));
-
+    if (jfc == null) {
+      jfc = new JFileChooser(System.getProperty("user.dir")+
+                             System.getProperty("file.separator")+"examples");
+      jfc.setDialogTitle("Open Assembly File");
+    }
     int retv = jfc.showOpenDialog(this);
     if (retv == JFileChooser.APPROVE_OPTION)
       return jfc.getSelectedFile();
@@ -875,36 +887,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // default
     if(titlList != null)
       titlList.setTitle("Viskit Assembly Editor",titlkey);    
-  }
-
-  public void fileChanged(File file, int action, DirectoryWatch source)
-  {
-    switch(action)
-    {
-      case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-        SwingUtilities.invokeLater(new Runnable()
-        {
-          public void run()
-          {
-            //runButt.doClick();
-            ((ViskitAssemblyController)getController()).initAssemblyRun();    // This sets up run panel
-          }
-        });
-        break;
-      case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-        break;
-      case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-        SwingUtilities.invokeLater(new Runnable()
-        {
-          public void run()
-          {
-            //runButt.doClick();
-            ((ViskitAssemblyController)getController()).initAssemblyRun();    // This sets up run panel
-          }
-        });
-        break;
-      default:
-    }
   }
 }
 
