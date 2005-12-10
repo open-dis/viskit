@@ -468,7 +468,7 @@
     </SimEntity>
     <SimEntity name="X3DCreateObstacles" type="diskit.util.X3DCreateObstacles">
         <TerminalParameter type="boolean" value="false"/>
-        <TerminalParameter type="java.lang.String" value="C:/DISKIT/IITSEC2005/x3d/Bremerton/"/>
+        <TerminalParameter type="java.lang.String" value="../DISKIT/IITSEC2005/x3d/Bremerton/"/>
         <Coordinate x="780" y="600"/>
     </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="BremPiers"/>
