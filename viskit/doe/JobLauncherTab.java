@@ -158,11 +158,15 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     portTF.setToolTipText("dummy"); // overridden
     portTF.setText(portCfg);
     JLabel unameLab = new JLabel("User name");
+    unameLab.setEnabled(false);
     unameTF = new JTextField(10);
-    unameTF.setText(unameDec);
+    unameTF.setText("unimplemented"); //unameDec);
+    unameTF.setEnabled(false);
     JLabel upwLab = new JLabel("Password");
+    upwLab.setEnabled(false);
     upwPF = new JPasswordField(10);
     upwPF.setText(pwordDec);
+    upwPF.setEnabled(false);
     clusPan.add(clusLab);
     clusPan.add(clusterTF);
     clusPan.add(unameLab);
