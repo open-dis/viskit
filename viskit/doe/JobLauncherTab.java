@@ -114,6 +114,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
   private String title;
   private DoeController cntlr;
+  public JCheckBox doClusterStat;
+  public JCheckBox doGraphOutput;
 
   public JobLauncherTab(DoeController controller, String file, String title, JFrame mainFrame)
   {
@@ -204,6 +206,11 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     canButt = new JButton("Cancel job");
     canButt.setEnabled(false);
     runButt = new JButton("Run job");
+    doClusterStat = new JCheckBox("Display cluster status in browser",false);
+    doGraphOutput = new JCheckBox("Graph job output",false);
+    botBar.add(doClusterStat);
+    botBar.add(Box.createHorizontalStrut(5));
+    botBar.add(doGraphOutput);
     botBar.add(Box.createHorizontalGlue());
     botBar.add(canButt);
     botBar.add(runButt);
@@ -423,6 +430,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     designPts = Integer.parseInt(dps.getText());
     numRuns = Integer.parseInt(runs.getText());
     chosenPort = Integer.parseInt(portTF.getText());
+
+    clusterDNS = clusterTF.getText().trim();
   }
 
   private void doListeners()
@@ -613,6 +622,9 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
   public void run()
   {
+    boolean doClustStat = this.doClusterStat.isSelected();
+    boolean doGraphOut    = this.doGraphOutput.isSelected();
+
     outputDirty = true;
     outputList = new ArrayList();
     lp3:
@@ -652,8 +664,10 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         break lp3;
       }
       // Bring up the 2 other windows
-      showClusterStatus(clusterWebStatus);
-      //chartter = new JobResults(null, title);
+      if(doClustStat)
+        showClusterStatus(clusterWebStatus);
+      if(doGraphOut)
+        chartter = new JobResults(null, title);
 
       //writeStatus("10 second wait before getting results.");
       try {
@@ -682,8 +696,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
               kickOffClusterUpdate();
               writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
               int idx = saveOutput((String) o, dp, nrun);
-              if (idx != -1)
-                ; //plotOutput(idx);
+              if (idx != -1 && doGraphOut)
+                plotOutput(idx);
               else
                 System.out.println("Output not saved");
             }
