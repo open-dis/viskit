@@ -72,13 +72,15 @@ public class DoeFileModel
 
   public HashMap seTerminalParamsHM;
 
-  public File marshall() throws Exception
+  // todo remove the jdom stuff
+  public File xmarshall() throws Exception
   {
     File f = File.createTempFile("DOEtemp",".grd");
-    return marshall(f);
+    return xmarshall(f);
   }
 
-  public File marshall(File f) throws Exception
+  // todo remove the jdom stuff 
+  public File xmarshall(File f) throws Exception
   {
     // Throw away existing design points
     // Go down rows, update the nameRef and value fields (type, content aren't changed)
@@ -140,7 +142,7 @@ public class DoeFileModel
 
   public File marshallJaxb() throws Exception
   {
-    File f = File.createTempFile("DOEtemp",".grd");
+    File f = File.createTempFile("DOEtemp",".xml");
     return marshallJaxb(f);
   }
 
