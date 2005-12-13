@@ -803,7 +803,7 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
   public static void main(String[] args)
   {
     if (args.length != 1)
-      System.out.println("Give .grd file as argument");
+      System.out.println("Give .xml file as argument");
     else
       new JobLauncher(false, args[0], args[0], null);
   }
