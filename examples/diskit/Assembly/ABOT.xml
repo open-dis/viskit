@@ -777,6 +777,11 @@
         <TerminalParameter type="int" value="300"/>
         <Coordinate x="60" y="410"/>
     </SimEntity>
+    <SimEntity name="X3DCreateObstacles" type="diskit.util.X3DCreateObstacles">
+        <TerminalParameter type="boolean" value="true"/>
+        <TerminalParameter type="java.lang.String" value="../DISKIT/IITSEC2005/x3d/ABOT/"/>
+        <Coordinate x="250" y="730"/>
+    </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="RHIB1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPacketSender"/>
     <SimEventListenerConnection listener="RHIB1" source="SceneZoneCreator"/>
@@ -813,6 +818,8 @@
     <SimEventListenerConnection listener="ScenarioManager" source="ABOTEast"/>
     <SimEventListenerConnection listener="ScenarioManager" source="BasicTerrorist"/>
     <SimEventListenerConnection listener="ScenarioManager" source="OilTanker"/>
+    <SimEventListenerConnection listener="X3DCreateObstacles" source="ABOTObstacles"/>
     <Schedule stopTime="10000" verbose="false"/>
+    <Experiment runsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
 

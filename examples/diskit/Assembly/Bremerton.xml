@@ -466,10 +466,10 @@
         <TerminalParameter type="int" value="401"/>
         <Coordinate x="730" y="330"/>
     </SimEntity>
-    <SimEntity name="X3DCreateObstacles" type="diskit.util.X3DCreateObstacles">
-        <TerminalParameter type="boolean" value="false"/>
+    <SimEntity name="X3DCreateZoneGeometry" type="diskit.util.X3DCreateZoneGeometry">
+        <TerminalParameter type="boolean" value="true"/>
         <TerminalParameter type="java.lang.String" value="../DISKIT/IITSEC2005/x3d/Bremerton/"/>
-        <Coordinate x="780" y="600"/>
+        <Coordinate x="230" y="80"/>
     </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="BremPiers"/>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPacketSender"/>
@@ -490,8 +490,9 @@
     <SimEventListenerConnection listener="ScenarioManager" source="Terrorist"/>
     <SimEventListenerConnection listener="BTBRadio" source="Carrier"/>
     <SimEventListenerConnection listener="ScenarioManager" source="Carrier"/>
-    <SimEventListenerConnection listener="X3DCreateObstacles" source="BremPiers"/>
+    <SimEventListenerConnection listener="X3DCreateZoneGeometry" source="SceneZoneCreator"/>
     <Output entity="ScenarioManager"/>
     <Schedule stopTime="10000.0" verbose="false"/>
+    <Experiment runsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
 
