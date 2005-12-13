@@ -54,6 +54,9 @@ import java.io.File;
 import java.util.Date;
 import java.util.Vector;
 
+/**
+ * Note:  The filechooser stuff is not used since the DOE panel does not expose the corresponding menu items.
+ */
 public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssyChangeListener
 {
   private JFileChooser openSaveFileChooser;
@@ -180,7 +183,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     File f = openSaveFileChooser.getSelectedFile();
     try {
-      dfm.marshall(f);
+      dfm.marshallJaxb(f);
     }
     catch (Exception e) {
       JOptionPane.showMessageDialog(doeFrame,"Error on file save-as: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
@@ -192,7 +195,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
   private void doSave(DoeFileModel dfm)
   {
     try {
-      dfm.marshall(dfm.userFile);
+      dfm.marshallJaxb(dfm.userFile);
     }
     catch (Exception e) {
       JOptionPane.showMessageDialog(doeFrame,"Error on file save: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
