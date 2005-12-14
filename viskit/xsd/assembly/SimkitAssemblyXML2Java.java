@@ -66,7 +66,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
     int count; // of design points
     int totalResults; // of total runs
     boolean busy = false;
-    boolean debug = true;
+    boolean debug = false;
     
     /* convenience Strings for formatting */
     
@@ -151,11 +151,17 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         this.fileInputStream = new FileInputStream(f);
     }
     
+    public SimkitAssemblyXML2Java(InputStream is) throws Exception {
+        this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+        this.fileInputStream = is;
+    }
+    
     public void unmarshal() {
         Unmarshaller u;
         try {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssemblyType) u.unmarshal(fileInputStream);
+            this.fileBaseName = root.getName();
         } catch (Exception e) { e.printStackTrace(); }
         
         if ( debug ) {
