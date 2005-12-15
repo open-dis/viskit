@@ -36,7 +36,11 @@ public class Help {
         "  Rick Goldberg" + CR +
         "  Don McGregor" + CR +
         "  Don Brutzman";
-    
+
+    public static final String SIMKITPAGE =
+        CR +
+        "Visit the Simkit home page at" + CR +
+        "  http://diana.gl.nps.navy.mil/Simkit/"+CR;
 
     private static HelpBroker hb;
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
@@ -73,13 +77,13 @@ public class Help {
     
     public void aboutEventGraphEditor() {
         JOptionPane.showMessageDialog(parent, ABOUT_EG_STRING +
-            DEVELOPERS, "About Viskit Event Graph Editor...",
+            DEVELOPERS + CR + SIMKITPAGE, "About Viskit Event Graph Editor...",
             JOptionPane.OK_OPTION, icon);
     }
     
     public void aboutAssemblyEditor() {
         JOptionPane.showMessageDialog(parent, ABOUT_ASSEMBLY_STRING +
-            DEVELOPERS, "About Viskit Event Graph Editor...",
+            DEVELOPERS + CR + SIMKITPAGE, "About Viskit Event Graph Editor...",
             JOptionPane.OK_OPTION, icon);
     }
 
