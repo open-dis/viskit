@@ -40,6 +40,7 @@
     type CDATA #REQUIRED
     name ID    #REQUIRED
     mode (replicationStat|designPointStat|listener) "listener"
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT SimEventListenerConnection EMPTY >
