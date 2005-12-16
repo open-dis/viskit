@@ -44,18 +44,19 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 
 public class CodeBlockPanel extends JPanel
 {
-  private JTextComponent jtf;
+  private JTextComponent jtc;
   private Window owner;
   private String title;
+  private JButton editButt;
 
   public CodeBlockPanel(Window owner, boolean multilined, String title)
   {
@@ -63,21 +64,22 @@ public class CodeBlockPanel extends JPanel
     this.title = title;
     setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
     setOpaque(false);
+
     if(multilined)
-      jtf = new myJTextArea();
+      jtc = new myJTextArea();
     else
-      jtf = new myJTextField("");
+      jtc = new myJTextField("");
 
-    jtf.setOpaque(true);
-    jtf.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-    jtf.setToolTipText("bogus");
+    jtc.setOpaque(true);
+    jtc.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+    jtc.setToolTipText("bogus");
 
-    jtf.addKeyListener(new KeyListener()
+    jtc.addKeyListener(new KeyListener()
     {
       public void keyTyped(KeyEvent e)
       {
         if(updateListener != null)
-          updateListener.actionPerformed(new ActionEvent(jtf.getText(),0,""));
+          updateListener.actionPerformed(new ActionEvent(jtc.getText(),0,""));
       }
 
       public void keyPressed(KeyEvent e)
@@ -90,14 +92,14 @@ public class CodeBlockPanel extends JPanel
     });
 
 
-    add(jtf);
+    add(jtc);
     add(Box.createHorizontalStrut(3));
     if(!multilined) {
       Dimension d = getPreferredSize();
       d.width = Integer.MAX_VALUE;
       setMaximumSize(d);
     }
-    JButton editButt = new JButton(" ... ");
+    editButt = new JButton(" ... ");
     editButt.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
     editButt.setToolTipText("Click to edit a long code block");
     Dimension dd = new Dimension(editButt.getPreferredSize());
@@ -109,13 +111,20 @@ public class CodeBlockPanel extends JPanel
     editButt.addActionListener(new buttListener());
   }
 
+  /**
+   * This sets the preferredSize of the codeblock panel to borders plus
+   * number of lines specified
+   * @param n
+   */
   public void setVisibleLines(int n)
   {
-    if(jtf instanceof JTextArea) {
-      ((JTextArea)jtf).setRows(n);
-      Dimension d = new Dimension(jtf.getPreferredScrollableViewportSize());
-      d.width = Integer.MAX_VALUE;
-      setMaximumSize(d);
+    if(jtc instanceof JTextArea) {
+      ((JTextArea)jtc).setRows(n);
+      Dimension d = new Dimension(jtc.getPreferredScrollableViewportSize());
+      int ph = Math.max(d.height, editButt.getPreferredSize().height);
+      ph += getInsets().top+getInsets().bottom;
+      setPreferredSize(new Dimension(getPreferredSize().width, ph));
+      invalidate();
     }
   }
   private ActionListener updateListener;
@@ -126,7 +135,7 @@ public class CodeBlockPanel extends JPanel
 
   public String getData()
   {
-    String s = jtf.getText();
+    String s = jtc.getText();
     if(s == null)
       s = "";
     return s;
@@ -134,14 +143,14 @@ public class CodeBlockPanel extends JPanel
 
   public void setData(String s)
   {
-    jtf.setText(s);
+    jtc.setText(s);
   }
 
   class buttListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
-      StringBuffer sb = new StringBuffer(jtf.getText().trim());
+      StringBuffer sb = new StringBuffer(jtc.getText().trim());
       boolean modded;
       if(owner instanceof JDialog)
         modded = TextAreaDialog.showTitledDialog(title,(JDialog)owner,owner,sb);
@@ -149,10 +158,10 @@ public class CodeBlockPanel extends JPanel
         modded = TextAreaDialog.showTitledDialog(title,(JFrame)owner,(JFrame)owner,sb);
 
       if(modded) {
-        jtf.setText(sb.toString().trim());
-        jtf.setCaretPosition(0);
+        jtc.setText(sb.toString().trim());
+        jtc.setCaretPosition(0);
         if(updateListener != null)
-          updateListener.actionPerformed(new ActionEvent(jtf.getText(),0,""));
+          updateListener.actionPerformed(new ActionEvent(jtc.getText(),0,""));
       }
     }
   }
