@@ -151,7 +151,6 @@ public class EventInspectorDialog extends JDialog
 
     // code block
     codeblockPanel = new CodeBlockPanel(this,true, "Event Code Block");
-    codeblockPanel.setVisibleLines(1);
     codeblockPanel.setBorder(BorderFactory.createTitledBorder("Code block"));
     threePanels.add(codeblockPanel);
     threePanels.add(Box.createVerticalStrut(5));
@@ -272,6 +271,7 @@ public class EventInspectorDialog extends JDialog
     comment.setCaretPosition(0);
     comment.setPreferredSize(d);
     codeblockPanel.setData(node.getCodeBlock());
+    codeblockPanel.setVisibleLines(1);
     transitions.setTransitions(node.getTransitions());
     arguments.setData(node.getArguments());
     localVariables.setData(node.getLocalVariables());
