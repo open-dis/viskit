@@ -38,12 +38,15 @@
               
     <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
     
+    <property description="Generated JAXB bindings for CLI config" location="${dir.src}/viskit/xsd/bindings/cli" name="dir.src.cli"/>
+    
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
     
     <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
     
+    <property description="CLI utility" location="${dir.src}/viskit/xsd/cli" name="dir.src.cli.util"/>
     
     <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
 
@@ -126,6 +129,7 @@
         <mkdir dir="${dir.build.doc}"/>
         <mkdir dir="${dir.src.simtran}"/>
         <mkdir dir="${dir.src.simasm}"/>
+        <mkdir dir="${dir.src.cli}"/>
         <mkdir dir="${dir.lib.ext}"/>
     </target>
 
@@ -148,6 +152,7 @@
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
         <delete dir="${dir.src.simtran}"/>
         <delete dir="${dir.src.simasm}"/>
+        <delete dir="${dir.src.cli)"/>
         <delete dir="${dir.build}"/>
         <delete dir="${dir.dist}"/>
     </target>
@@ -231,6 +236,7 @@
             <package name="viskit.xsd"/>
             <package name="viskit.xsd.bindings"/>
             <package name="viskit.xsd.bindings.assembly"/>
+            <package name="viskit.xsd.bindings.cli"/>
             <package name="viskit.xsd.assembly"/>
             <package name="viskit.xsd.translator"/>
         </javadoc>
@@ -266,12 +272,16 @@
         </xjc>
         <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}">
             <produces dir="${dir.src.simasm}" includes="* impl/* impl/runtime/*" />
+        </xjc>       
+        <xjc extension="true" package="viskit.xsd.bindings.cli" schema="${dir.src.cli.util}/cli.xsd" target="${dir.src}">
+            <produces dir="${dir.src.cli}" includes="* impl/* impl/runtime/*" />
         </xjc>
     </target>
     
     <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
         <trang failonerror="true" input="${dir.src.simtran.util}/simkit.dtd" output="${dir.src.simtran.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
@@ -300,6 +310,19 @@
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="jaxb.properties"/>
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}"
+	    debug="on"
+            source="1.4"
+            target="1.4">
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+            </classpath>
+            <src path="${dir.src.cli}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/cli">
+            <fileset dir="${dir.src}/viskit/xsd/bindings/cli" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings/cli" includes="bgm.ser"/>
         </copy>
     </target>
     
@@ -331,6 +354,18 @@
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
             <include name="ViskitAssembly.java"/>
+        </javac>
+        
+        <javac destdir="${dir.build.classes}"
+            debug="on"
+            source="1.4"
+            target="1.4">
+            <classpath>
+                <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+            </classpath>
+            <src path="${dir.src.cli.util}"/>
+            <include name="Launcher.java"/>
         </javac>
         <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
     </target>   
