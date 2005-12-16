@@ -72,6 +72,18 @@ public class Vstatics
   }
 
   /**
+   * Set the size(s) of c to be exactly those of src
+   * @param c
+   * @param src
+   */
+  public static void cloneSize(JComponent c, JComponent src)
+  {
+    Dimension d = new Dimension(src.getPreferredSize());
+    c.setMaximumSize(d);
+    c.setMinimumSize(d);
+    c.setPreferredSize(d);
+  }
+  /**
    * Clamp the height of comp to it's preferred height
    * @param comp
    */
@@ -89,8 +101,12 @@ public class Vstatics
   public static void clampHeight(JComponent c, JComponent h)
   {
     int height =  h.getPreferredSize().height;
-    c.setMaximumSize(new Dimension(Integer.MAX_VALUE,height));
-    c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
+    Dimension dmx = c.getMaximumSize();
+    Dimension dmn = c.getMinimumSize();
+    //c.setMaximumSize(new Dimension(Integer.MAX_VALUE,height));
+    //c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
+    c.setMaximumSize(new Dimension(dmx.width,height));
+    c.setMinimumSize(new Dimension(dmn.width,height));
   }
 
   static String getCustomClassPath()
