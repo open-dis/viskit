@@ -152,7 +152,7 @@
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
         <delete dir="${dir.src.simtran}"/>
         <delete dir="${dir.src.simasm}"/>
-        <delete dir="${dir.src.cli)"/>
+        <delete dir="${dir.src.cli}"/>
         <delete dir="${dir.build}"/>
         <delete dir="${dir.dist}"/>
     </target>
