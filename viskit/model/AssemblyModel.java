@@ -470,6 +470,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection)pclEdge.opaqueModelObject;
     //pclc.setListener(targ.opaqueModelObject);  never changes
     pclc.setProperty(pclEdge.getProperty());
+    pclc.setDescription(pclEdge.getDescription());
 
     modelDirty = true;
     notifyChanged(new ModelEvent(pclEdge,ModelEvent.PCLEDGECHANGED, "PCL edge changed"));
@@ -489,6 +490,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     jaxbAE.setEventSent(ae.getTargetEvent());
 
     jaxbAE.setName(ae.getName());
+    jaxbAE.setDescription(ae.getDescription());
 
     modelDirty = true;
     notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGECHANGED, "Adapter edge changed"));
@@ -502,6 +504,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     selc.setListener(targ.opaqueModelObject);
     selc.setSource(src.opaqueModelObject);
+    selc.setDescription(seEdge.getDescription());
 
     modelDirty = true;
     notifyChanged(new ModelEvent(seEdge,ModelEvent.SIMEVLISTEDGECHANGED, "SimEvListener edge changed"));
@@ -520,6 +523,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     viskit.xsd.bindings.assembly.PropertyChangeListener jaxBPcl =  (viskit.xsd.bindings.assembly.PropertyChangeListener)pclNode.opaqueModelObject;
     jaxBPcl.setName(pclNode.getName());
     jaxBPcl.setType(pclNode.getType());
+    jaxBPcl.setDescription(pclNode.getDescription());
 
     if(pclNode.isSampleStats()) {
       if(pclNode.isClearStatsAfterEachRun())
@@ -585,6 +589,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     jaxbSE.setName(evNode.getName());
     jaxbSE.setType(evNode.getType());
+    jaxbSE.setDescription(evNode.getDescription());
+
     viskit.xsd.bindings.assembly.Coordinate coor = null;
     try {
       coor = oFactory.createCoordinate();
@@ -933,6 +939,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) itr.next();
       PropChangeEdge pce = new PropChangeEdge();
       pce.setProperty(pclc.getProperty());
+      pce.setDescription(pclc.getDescription());
       AssemblyNode toNode = (AssemblyNode)nodeCache.get(pclc.getListener());
       AssemblyNode frNode = (AssemblyNode)nodeCache.get(pclc.getSource());
       pce.setTo(toNode);
@@ -956,6 +963,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       sele.setTo(toNode);
       sele.setFrom(frNode);
       sele.opaqueModelObject = selc;
+      sele.setDescription(selc.getDescription());
       toNode.getConnections().add(sele);
       frNode.getConnections().add(sele);
       assEdgeCache.put(selc,sele);
@@ -974,6 +982,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       ae.setSourceEvent(jaxbAdapter.getEventHeard());
       ae.setTargetEvent(jaxbAdapter.getEventSent());
       ae.setName(jaxbAdapter.getName());
+      ae.setDescription(jaxbAdapter.getDescription());
       ae.opaqueModelObject = jaxbAdapter;
       toNode.getConnections().add(ae);
       frNode.getConnections().add(ae);
@@ -1017,7 +1026,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     pNode = new PropChangeListenerNode(pcl.getName(),pcl.getType());
     pNode.setClearStatsAfterEachRun(pcl.getMode().equals("replicationStats"));
-
+    pNode.setDescription(pcl.getDescription());
     CoordinateType coor = pcl.getCoordinate();
     if(coor == null) {
       pNode.setPosition(pointLess);
@@ -1062,6 +1071,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       en.setPosition(new Point(Integer.parseInt(coor.getX()),
                              Integer.parseInt(coor.getY())));
 
+    en.setDescription(se.getDescription());
     en.setOutputMarked(isOutputNode);
     List lis = se.getParameters();
     VInstantiator.Constr vc = new VInstantiator.Constr(se.getType(),
