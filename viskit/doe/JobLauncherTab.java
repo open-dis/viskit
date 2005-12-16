@@ -92,15 +92,15 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   private JButton canButt;
   private JButton runButt;
   private SimkitAssembly jaxbRoot;
-  private JTextField sampsTF;
+  private JTextField numCubesTF;
   private JTextField portTF;
-  private JTextField runs;
-  private JTextField dps;
+  private JTextField numRepsTF;
+  private JTextField numDPsTF;
   private JTextField tmo;
 
   private Thread thread;
   private boolean outputDirty = false;
-  private int numRuns, designPts, samps;
+  private int numReps, numDesignPts, numCubes;
 
   private String serverCfg;
   private String portCfg;
@@ -178,27 +178,28 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
 
     JLabel dpLab = new JLabel("Design point variables");
-    dps = new JTextField(6);
+    numDPsTF = new JTextField(6);
 
     JLabel sampLab = new JLabel("Hypercubes");
-    sampsTF = new ttJTextField(20);
-    runs = new JTextField(6);
-    JLabel runLab = new JLabel("Replications");
+    numCubesTF = new ttJTextField(20);
+
+    numRepsTF = new JTextField(6);
+    JLabel repLab = new JLabel("Replications");
     tmo = new JTextField(6);
     JLabel tmoLab = new JLabel("Replication time out (ms)");
 
-    dps.setEditable(false);
+    numDPsTF.setEditable(false);
 
 //    topPan.add(clusLab);
 //    topPan.add(clusterCB);
 //    topPan.add(portLab);
 //    topPan.add(portTF);
     topPan.add(dpLab);
-    topPan.add(dps);
+    topPan.add(numDPsTF);
     topPan.add(sampLab);
-    topPan.add(sampsTF);
-    topPan.add(runLab);
-    topPan.add(runs);
+    topPan.add(numCubesTF);
+    topPan.add(repLab);
+    topPan.add(numRepsTF);
     topPan.add(tmoLab);
     topPan.add(tmo);
 
@@ -307,16 +308,16 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     Experiment exp = (Experiment)jaxbRoot.getExperiment();    // todo cast requirement jaxb error?
     if(exp != null) {
       //designPts = exp.getDesignPoint().size();
-      designPts = jaxbRoot.getDesignParameters().size();        //todo  which is it?
-      dps.setText("" + designPts);
+      numDesignPts = jaxbRoot.getDesignParameters().size();        //todo  which is it?
+      numDPsTF.setText("" + numDesignPts);
       String s = exp.getTotalSamples();
       if(s != null)
-        sampsTF.setText(s);
+        numCubesTF.setText(s);
       s = exp.getRunsPerDesignPoint();
       if(s != null)
-        runs.setText(s);
+        numRepsTF.setText(s);
 
-      numRuns = Integer.parseInt(s);
+      numReps = Integer.parseInt(s);
       s = exp.getTimeout();
       if(s != null)
         tmo.setText(s);
@@ -332,13 +333,13 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
       jaxbRoot.setExperiment(exp);
 
       exp.setTotalSamples("1");
-      sampsTF.setText("1");
+      numCubesTF.setText("1");
       exp.setRunsPerDesignPoint("1");
-      runs.setText("1");
+      numRepsTF.setText("1");
       exp.setTimeout("5000");
       tmo.setText("5000");
-      designPts = jaxbRoot.getDesignParameters().size();
-      dps.setText(""+designPts);
+      numDesignPts = jaxbRoot.getDesignParameters().size();
+      numDPsTF.setText(""+numDesignPts);
 
     }
 
@@ -367,14 +368,14 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   {
     // Put the params from the GUI into the jaxbRoot
     Experiment exp = (Experiment)jaxbRoot.getExperiment();
-    exp.setTotalSamples(sampsTF.getText().trim());
-    exp.setRunsPerDesignPoint(runs.getText().trim());
+    exp.setTotalSamples(numCubesTF.getText().trim());
+    exp.setRunsPerDesignPoint(numRepsTF.getText().trim());
     exp.setTimeout(tmo.getText().trim());
     // todo resolve designpoints
 
-    samps = Integer.parseInt(sampsTF.getText());
-    designPts = Integer.parseInt(dps.getText());
-    numRuns = Integer.parseInt(runs.getText());
+    numCubes = Integer.parseInt(numCubesTF.getText());
+    numDesignPts = Integer.parseInt(numDPsTF.getText());
+    numReps = Integer.parseInt(numRepsTF.getText());
     chosenPort = Integer.parseInt(portTF.getText());
 
     Schedule sch = (Schedule)jaxbRoot.getSchedule();
@@ -430,9 +431,9 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   */
   private void setLocalParamVars() throws Exception
   {
-    samps = Integer.parseInt(sampsTF.getText());
-    designPts = Integer.parseInt(dps.getText());
-    numRuns = Integer.parseInt(runs.getText());
+    numCubes = Integer.parseInt(numCubesTF.getText());
+    numDesignPts = Integer.parseInt(numDPsTF.getText());
+    numReps = Integer.parseInt(numRepsTF.getText());
     chosenPort = Integer.parseInt(portTF.getText());
 
     clusterDNS = clusterTF.getText().trim();
@@ -446,8 +447,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     canButt.addActionListener(al);
     runButt.addActionListener(al);
 
-    sampsTF.addKeyListener(myEditListener);
-    runs.addKeyListener(myEditListener);
+    numCubesTF.addKeyListener(myEditListener);
+    numRepsTF.addKeyListener(myEditListener);
     tmo.addKeyListener(myEditListener);
   }
 
@@ -685,11 +686,11 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
       Vector parms = new Vector();
       Object o = null;
       int i = 0;
-      int n = designPts * samps * numRuns;
+      int n = numDesignPts * numCubes * numReps;
       lp:
       {
-        for (int dp = 0; dp < designPts * samps; dp++) {
-          for (int nrun = 0; nrun < numRuns; nrun++, i++) {
+        for (int dp = 0; dp < numDesignPts * numCubes; dp++) {
+          for (int nrun = 0; nrun < numReps; nrun++, i++) {
             try {
               parms.clear();
               parms.add(new Integer(dp));
