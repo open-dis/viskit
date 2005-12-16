@@ -28,8 +28,8 @@ import java.util.Vector;
 
 public class AdapterConnectionInspectorDialog extends JDialog
 {
-  private JLabel sourceLab, targetLab, nameLab;
-  private JTextField sourceTF, targetTF, nameTF;
+  private JLabel sourceLab, targetLab, nameLab, descLab;
+  private JTextField sourceTF, targetTF, nameTF, descTF;
 
   private JTextField sourceEventTF, targetEventTF;
   private JLabel sourceEventLab, targetEventLab;
@@ -82,16 +82,20 @@ public class AdapterConnectionInspectorDialog extends JDialog
     sourceEventTF = new JTextField();
     sourceEventTF.setEditable(false); // events are chosen from list
     sourceEventTF.setBackground(tfBack);
+    Vstatics.clampHeight(sourceEventTF);
     targetEventTF = new JTextField();
     targetEventTF.setEditable(false); // events are chosen from list
     targetEventTF.setBackground(tfBack);
+    Vstatics.clampHeight(targetEventTF);
 
     evSourceNavButt = new JButton("...");
     evSourceNavButt.addActionListener(new findSourceEventsAction());
     evSourceNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),BorderFactory.createEmptyBorder(3,3,3,3)));
+    Vstatics.clampHeight(evSourceNavButt,sourceEventTF);
     evTargetNavButt = new JButton("...");
     evTargetNavButt.addActionListener(new findTargetEventsAction());
     evTargetNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),BorderFactory.createEmptyBorder(3,3,3,3)));
+    Vstatics.clampHeight(evTargetNavButt,targetEventTF);
 
     sourceEventLab = new JLabel("source event",JLabel.TRAILING);
     sourceEventPan = new JPanel();
@@ -105,11 +109,16 @@ public class AdapterConnectionInspectorDialog extends JDialog
     targetEventPan.add(targetEventTF);
     targetEventPan.add(evTargetNavButt);
 
+    descLab = new JLabel("description",JLabel.TRAILING);
+    descTF  = new JTextField();
+
     pairWidgets(nameLab,nameTF,true);
     pairWidgets(sourceLab,sourceTF,false);
     pairWidgets(targetLab,targetTF,false);
     pairWidgets(sourceEventLab,sourceEventPan,true);
     pairWidgets(targetEventLab,targetEventPan,true);
+    pairWidgets(descLab,descTF,true);
+
     nameTF.addCaretListener(lis);
     sourceEventTF.addCaretListener(lis);
     targetEventTF.addCaretListener(lis);
@@ -148,8 +157,9 @@ public class AdapterConnectionInspectorDialog extends JDialog
     Vstatics.clampHeight(tf);
     lab.setLabelFor(tf);
     if(tf instanceof JTextField){
-      ((JTextField)tf).addCaretListener(lis);
       ((JTextField)tf).setEditable(edit);
+      if(edit)
+        ((JTextField)tf).addCaretListener(lis);
     }
   }
   public void setParams(Component c, AdapterEdge ae)
@@ -176,12 +186,14 @@ public class AdapterConnectionInspectorDialog extends JDialog
       targetEVG = (EvGraphNode)adapterEdge.getTo();
       targetTF.setText(targetEVG.getName() + " (" + targetEVG.getType()+")");
       targetEventTF.setText(adapterEdge.getTargetEvent());
+      descTF.setText(adapterEdge.getDescription());
     }
     else {
       sourceTF.setText("");
       sourceEventTF.setText("");
       targetTF.setText("");
       targetEventTF.setText("");
+      descTF.setText("");
     }
 
     JPanel content = new JPanel();
@@ -194,8 +206,9 @@ public class AdapterConnectionInspectorDialog extends JDialog
     cont.add(sourceEventLab); cont.add(sourceEventPan);
     cont.add(targetLab);      cont.add(targetTF);
     cont.add(targetEventLab); cont.add(targetEventPan);
+    cont.add(descLab);        cont.add(descTF);
 
-    SpringUtilities.makeCompactGrid(cont,5,2,10,10,5,5);
+    SpringUtilities.makeCompactGrid(cont,6,2,10,10,5,5);
     content.add(cont);
     content.add(buttPan);
     content.add(Box.createVerticalStrut(5));
@@ -208,6 +221,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
       adapterEdge.setName(nameTF.getText().trim());
       adapterEdge.setSourceEvent(sourceEventTF.getText().trim());
       adapterEdge.setTargetEvent(targetEventTF.getText().trim());
+      adapterEdge.setDescription(descTF.getText().trim());
     }
     //todo implement
     //newTarget,newTargetEvent,newSource,newSourceEvent;
