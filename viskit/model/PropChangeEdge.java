@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -14,16 +12,12 @@ import java.util.ArrayList;
 
 public class PropChangeEdge extends AssemblyEdge
 {
+  protected String property;
+
   PropChangeEdge()       // package-limited
   {
-    setComment("Property change listener connection");
   }
 
-  //protected String type;
-  protected String property;
-  
-  //public String getType(){return type;}
-  //public void   setType(String t){type=t;}
   public String getProperty(){return property;}
   public void   setProperty(String p){property=p;}
 }
