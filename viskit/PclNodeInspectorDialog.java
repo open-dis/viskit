@@ -22,8 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Constructor;
-
 
 public class PclNodeInspectorDialog extends JDialog
 {
@@ -43,7 +41,9 @@ public class PclNodeInspectorDialog extends JDialog
 
   private JCheckBox clearStatsCB;
 
-  public static String newName, newConstrValue;
+  //public static String newName, newConstrValue;
+  private JTextField descTF;
+  private JLabel descLab;
 
   public static boolean showDialog(JFrame f, Component comp, PropChangeListenerNode parm)
   {
@@ -90,6 +90,12 @@ public class PclNodeInspectorDialog extends JDialog
     handleField.addCaretListener(lis);
     handleLab = new JLabel("handle",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
+
+    descTF = new JTextField();
+    Vstatics.clampHeight(descTF);
+    descTF.addCaretListener(lis);
+    descLab = new JLabel("description",JLabel.TRAILING);
+    descLab.setLabelFor(descTF);
 
     typeLab = new JLabel("type",JLabel.TRAILING);
     //typeField = new JLabel("bogus",JLabel.CENTER);
@@ -150,10 +156,11 @@ public class PclNodeInspectorDialog extends JDialog
         return;
       }
 
-      Constructor[] cons = myClass.getConstructors();
+      //Constructor[] cons = myClass.getConstructors();
 
       handleField.setText(pclNode.getName());
       typeField.setText(pclNode.getType());
+      descTF.setText(pclNode.getDescription());
 
       ip = new InstantiationPanel(this,lis,true);
       setupIP();
@@ -171,9 +178,12 @@ public class PclNodeInspectorDialog extends JDialog
       cont.add(handleLab);
       cont.add(handleField);
 
+      cont.add(descLab);
+      cont.add(descTF);
+
       cont.add(typeLab);
       cont.add(typeField);
-      SpringUtilities.makeCompactGrid(cont, 2 , 2, 10, 10, 5, 5);
+      SpringUtilities.makeCompactGrid(cont, 3 , 2, 10, 10, 5, 5);
 
       content.add(cont);
 
@@ -201,15 +211,18 @@ public class PclNodeInspectorDialog extends JDialog
     nm = nm.replaceAll("\\s", "");
     if (pclNode != null) {
       pclNode.setName(nm);
+      pclNode.setDescription(descTF.getText().trim());
       pclNode.setInstantiator(ip.getData());
       if(pclNode.isSampleStats()) {
         pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
       }
     }
+/*
     else {
       newName = nm;
    //   newConstrValue = constrParmFields[0].getText().trim();
     }
+*/
   }
 
   /**

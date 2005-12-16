@@ -30,8 +30,8 @@ import java.util.Vector;
 
 public class PclEdgeInspectorDialog extends JDialog
 {
-  private JLabel sourceLab, targetLab, propertyLab;
-  private JTextField sourceTF, targetTF, propertyTF;
+  private JLabel sourceLab, targetLab, propertyLab, descLab;
+  private JTextField sourceTF, targetTF, propertyTF, descTF;
   private JPanel propertyTFPan;
   private JLabel emptyLab,emptyTF;
 
@@ -44,7 +44,7 @@ public class PclEdgeInspectorDialog extends JDialog
 
   private JPanel  buttPan;
   private enableApplyButtonListener lis;
-  public static String newProperty;
+  //public static String newProperty;
 
   public static boolean showDialog(JFrame f, Component comp, PropChangeEdge parm)
   {
@@ -74,10 +74,13 @@ public class PclEdgeInspectorDialog extends JDialog
     targetLab = new JLabel("property change listener",JLabel.TRAILING);
     propertyLab = new JLabel("property",JLabel.TRAILING);
     emptyLab = new JLabel();
+    descLab = new JLabel("description");
 
     sourceTF = new JTextField();
     targetTF = new JTextField();
     propertyTF = new JTextField();
+    descTF   = new JTextField();
+
     emptyTF  = new JLabel("(an empty entry signifies ALL properties in source)");
       int fsz = emptyTF.getFont().getSize();
       emptyTF.setFont(emptyTF.getFont().deriveFont(fsz-2));
@@ -90,6 +93,8 @@ public class PclEdgeInspectorDialog extends JDialog
     pairWidgets(propertyLab,propertyTFPan,true);
       propertyTF.addCaretListener(lis);
     pairWidgets(emptyLab,emptyTF,false);
+    pairWidgets(descLab,descTF,true);
+
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
     canButt = new JButton("Cancel");
@@ -124,8 +129,9 @@ public class PclEdgeInspectorDialog extends JDialog
     Vstatics.clampHeight(tf);
     lab.setLabelFor(tf);
     if(tf instanceof JTextField){
-      ((JTextField)tf).addCaretListener(lis);
       ((JTextField)tf).setEditable(edit);
+      if(edit)
+        ((JTextField)tf).addCaretListener(lis);
     }
   }
 
@@ -150,11 +156,13 @@ public class PclEdgeInspectorDialog extends JDialog
       sourceTF.setText(pclEdge.getFrom().toString());
       targetTF.setText(pclEdge.getTo().toString());
       propertyTF.setText(pclEdge.getProperty());
+      descTF.setText(pclEdge.getDescription());
     }
     else {
       propertyTF.setText("listened-to property");
       sourceTF.setText("unset...shouldn't see this");
       targetTF.setText("unset...shouldn't see this");
+      descTF.setText("");
     }
 
     JPanel content = new JPanel();
@@ -166,7 +174,8 @@ public class PclEdgeInspectorDialog extends JDialog
     cont.add(targetLab)  ;cont.add(targetTF);
     cont.add(propertyLab);cont.add(propertyTFPan);
     cont.add(emptyLab)   ;cont.add(emptyTF);
-    SpringUtilities.makeCompactGrid(cont, 4 , 2, 10, 10, 5, 5);
+    cont.add(descLab)    ;cont.add(descTF);
+    SpringUtilities.makeCompactGrid(cont, 5 , 2, 10, 10, 5, 5);
     content.add(cont);
 
     content.add(buttPan);
@@ -178,10 +187,13 @@ public class PclEdgeInspectorDialog extends JDialog
   {
     if (pclEdge != null) {
       pclEdge.setProperty(propertyTF.getText().trim());
+      pclEdge.setDescription(descTF.getText().trim());
     }
+/*
     else {
       newProperty = propertyTF.getText().trim();
     }
+*/
   }
 
   class cancelButtonListener implements ActionListener

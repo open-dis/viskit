@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-
 public class EvGraphNodeInspectorDialog extends JDialog
 {
   private JLabel handleLab; //,outputLab;
@@ -40,6 +39,8 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
   public static String newName;
   public static VInstantiator newInstantiator;
+  private JTextField descField;
+  private JLabel descLab;
 
   public static boolean showDialog(JFrame f, Component comp, EvGraphNode parm)
   {
@@ -78,12 +79,16 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
     handleField = new JTextField();
     Vstatics.clampHeight(handleField);
-    handleField.addCaretListener(lis);
     handleLab = new JLabel("handle",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
     //outputLab = new JLabel("detailed output",JLabel.TRAILING);
     outputCheck = new JCheckBox("detailed output");
-    outputCheck.addActionListener(lis);
+
+    descField = new JTextField();
+    Vstatics.clampHeight(descField);
+    descLab = new JLabel("description",JLabel.TRAILING);
+    descLab.setLabelFor(descField);
+    Vstatics.cloneSize(handleLab,descLab);    // make handle same size
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -106,6 +111,10 @@ public class EvGraphNodeInspectorDialog extends JDialog
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
+
+    handleField.addCaretListener(lis);
+    descField.addCaretListener(lis);
+    outputCheck.addActionListener(lis);
   }
 
   public void setParams(Component c, EvGraphNode p) throws ClassNotFoundException
@@ -128,6 +137,8 @@ public class EvGraphNodeInspectorDialog extends JDialog
     if (egNode != null) {
       handleField.setText(egNode.getName());
       outputCheck.setSelected(egNode.isOutputMarked());
+      descField.setText(egNode.getDescription());
+      //ArrayList alis = egNode.getComments();
 
       ip = new InstantiationPanel(this,lis,true);
       ip.setData(egNode.getInstantiator());
@@ -157,6 +168,13 @@ public class EvGraphNodeInspectorDialog extends JDialog
       bcont.add(Box.createHorizontalGlue());
       content.add(bcont);
 
+      JPanel dcont = new JPanel();
+      dcont.setLayout(new BoxLayout(dcont,BoxLayout.X_AXIS));
+      dcont.add(descLab);
+      dcont.add(Box.createHorizontalStrut(5));
+      dcont.add(descField);
+      content.add(dcont);
+
       ip.setAlignmentX(Box.CENTER_ALIGNMENT);
       content.add(ip);
       content.add(Box.createVerticalStrut(5));
@@ -174,6 +192,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     nm = nm.replaceAll("\\s", "");
     if (egNode != null) {
       egNode.setName(nm);
+      egNode.setDescription(descField.getText().trim());
       egNode.setInstantiator(ip.getData());
       egNode.setOutputMarked(outputCheck.isSelected());
     }

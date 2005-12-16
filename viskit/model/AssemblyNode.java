@@ -23,6 +23,7 @@ abstract public class AssemblyNode extends ViskitElement
   private ArrayList comments = new ArrayList();
   private Point     position = new Point(0,0);
   private VInstantiator instantiator;
+  private String    description = "";  // instance information
 
   AssemblyNode(String name, String type)      // package access on constructor
   {
@@ -95,5 +96,14 @@ abstract public class AssemblyNode extends ViskitElement
     this.instantiator = instantiator;
   }
 
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
 
 }
