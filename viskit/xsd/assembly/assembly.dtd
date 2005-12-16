@@ -32,6 +32,7 @@
     type CDATA #REQUIRED
     name ID    #REQUIRED
     url  CDATA #IMPLIED
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?)) >
@@ -45,6 +46,7 @@
 <!ATTLIST SimEventListenerConnection
     listener IDREF #REQUIRED
     source   IDREF #REQUIRED
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT PropertyChangeListenerConnection EMPTY >
@@ -52,6 +54,7 @@
     property CDATA #IMPLIED
     listener IDREF #REQUIRED
     source   IDREF #REQUIRED
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT Output EMPTY >
@@ -76,6 +79,7 @@
     eventSent  CDATA #REQUIRED
     from    IDREF    #REQUIRED
     to      IDREF    #REQUIRED
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT Log (#PCDATA) >
