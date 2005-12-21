@@ -3,11 +3,14 @@ package viskit;
 import viskit.model.VInstantiator;
 
 import javax.swing.*;
-import javax.swing.event.CaretListener;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -24,8 +27,8 @@ import java.util.Vector;
 
 public class ObjListPanel extends JPanel implements ActionListener, CaretListener
 {
-  private JLabel label[];
-  private JTextField field[];
+  private JLabel typeLab[];
+  private JTextField entryTF[];
   private VInstantiator shadow[];
   private ActionListener changeListener;
 
@@ -44,22 +47,33 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
   public void setData(List lis, boolean showLabels)  // of Vinstantiators
   {
-    label = new JLabel[lis.size()];
-    field = new JTextField[label.length];
-    shadow = new VInstantiator[label.length];
+    int sz = lis.size();
+    typeLab = new JLabel[sz];
+    JLabel[] nameLab = (sz<=0?null:new JLabel[sz]);
+    entryTF = new JTextField[sz];
+    shadow = new VInstantiator[sz];
+    JComponent[] contentObj = new JComponent[sz];
 
      int i = 0;
      for (Iterator itr = lis.iterator(); itr.hasNext();i++) {
        VInstantiator inst = (VInstantiator) itr.next();
        shadow[i] = inst;
 
-       label[i] = new JLabel(inst.getType(), JLabel.TRAILING);
-       if(showLabels)
-         add(label[i]);
-       field[i] = new JTextField();
-       Vstatics.clampHeight(field[i]);
-       field[i].setText(inst.toString());
-       field[i].addCaretListener(this);
+       typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
+       String nm = inst.getName();
+       if(nm != null && nm.length()>0 && nameLab != null) {
+         nameLab[i] = new JLabel(nm);
+         nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(0,2,0,2))); // some space at sides
+         nameLab[i].setOpaque(true);
+         nameLab[i].setBackground(new Color(255,255,255,64));
+       }
+       else
+         nameLab = null; // if one is bad, disable all
+
+       entryTF[i] = new JTextField();
+       Vstatics.clampHeight(entryTF[i]);
+       entryTF[i].setText(inst.toString());
+       entryTF[i].addCaretListener(this);
 
        Class c = Vstatics.classForName(inst.getType());
        if(c == null)
@@ -69,31 +83,49 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
          if (!c.isPrimitive() || c.isArray()) {
            JPanel tinyP = new JPanel();
            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
-           tinyP.add(field[i]);
+           tinyP.add(entryTF[i]);
            JButton b = new JButton("...");
            b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-           Vstatics.clampSize(b, field[i], b);
+           Vstatics.clampSize(b, entryTF[i], b);
 
            tinyP.add(b);
            if(showLabels)
-             label[i].setLabelFor(tinyP);
-           add(tinyP);
+             typeLab[i].setLabelFor(tinyP);
+           //add(tinyP);
+           contentObj[i] = tinyP;
            b.setToolTipText("Edit with Instantiation Wizard");
            b.addActionListener(this);
            b.setActionCommand(""+i);
          }
          else {
            if(showLabels)
-             label[i].setLabelFor(field[i]);
-           add(field[i]);
+             typeLab[i].setLabelFor(entryTF[i]);
+           //add(entryTF[i]);
+           contentObj[i] = entryTF[i];
          }
        }
      }
-     if(showLabels)
-       SpringUtilities.makeCompactGrid(this, label.length, 2, 5, 5, 5, 5);
-     else
-       SpringUtilities.makeCompactGrid(this, field.length, 1, 5, 5, 5, 5);
-   }
+    if (showLabels) {
+      for (int x = 0; x < typeLab.length; x++) {
+        if (nameLab != null){
+          if(nameLab[x].getText().length() <= 0)
+          {nameLab[x].setText("flop"); nameLab[x].setBorder(new LineBorder(Color.cyan));}
+          add(nameLab[x]);
+        }
+        add(typeLab[x]);
+        add(contentObj[x]);
+      }
+      if (nameLab != null)
+        SpringUtilities.makeCompactGrid(this, typeLab.length, 3, 5, 5, 5, 5);
+      else
+        SpringUtilities.makeCompactGrid(this, typeLab.length, 2, 5, 5, 5, 5);
+    }
+    else {
+      for (int x = 0; x < typeLab.length; x++)
+        add(contentObj[x]);
+      SpringUtilities.makeCompactGrid(this, entryTF.length, 1, 5, 5, 5, 5);
+    }
+  }
 
   public void caretUpdate(CaretEvent e)
   {
@@ -105,9 +137,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
    public List getData()
    {
      Vector v = new Vector();
-     for(int i=0;i<label.length;i++) {
+     for(int i=0;i<typeLab.length;i++) {
        if(shadow[i] instanceof VInstantiator.FreeF)
-         ((VInstantiator.FreeF)shadow[i]).setValue(field[i].getText().trim());
+         ((VInstantiator.FreeF)shadow[i]).setValue(entryTF[i].getText().trim());
        v.add(shadow[i]);
      }
      return v;
@@ -127,7 +159,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
       ai.setVisible(true); // blocks
       if (ai.modified) {
         shadow[idx] = ai.getData();
-        field[idx].setText(shadow[idx].toString());
+        entryTF[idx].setText(shadow[idx].toString());
         if (changeListener != null)
           changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
       }
@@ -147,7 +179,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
       oi.setVisible(true); // blocks
       if (oi.modified) {
         shadow[idx] = oi.getData();
-        field[idx].setText(oi.getData().toString());
+        entryTF[idx].setText(oi.getData().toString());
         if (changeListener != null)
           changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
       }
