@@ -38,7 +38,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     GraphConstants.setLineEnd  (viskitAssyAdapterEdgeStyle,GraphConstants.ARROW_TECHNICAL);
     GraphConstants.setEndFill  (viskitAssyAdapterEdgeStyle, true);
     GraphConstants.setEndSize  (viskitAssyAdapterEdgeStyle, 10);
-    GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
+//todo    GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
     GraphConstants.setBendable   (viskitAssyAdapterEdgeStyle, true);
     GraphConstants.setLineStyle  (viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
     GraphConstants.setLineWidth  (viskitAssyAdapterEdgeStyle, 2.0f);
