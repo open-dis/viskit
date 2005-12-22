@@ -260,14 +260,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       }
     });
 
-    // Simulation parameters area
+    // Event graph parameters area
     JPanel parametersPanel = new JPanel();
     parametersPanel.setLayout(new BoxLayout(parametersPanel,BoxLayout.Y_AXIS)); //BorderLayout());
     parametersPanel.add(Box.createVerticalStrut(5));
      p = new JPanel();
      p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
      p.add(Box.createHorizontalGlue());
-     p.add(new JLabel("Simulation parameters"));
+     p.add(new JLabel("Event graph parameters"));
      p.add(Box.createHorizontalGlue());
     parametersPanel.add(p);
 
