@@ -3,8 +3,12 @@ package viskit.model;
 import viskit.Vstatics;
 import viskit.xsd.translator.SimkitXML2Java;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -64,7 +68,7 @@ public abstract class VInstantiator
     {
       return new VInstantiator.FreeF(getType(),getValue());
     }
-    
+
     public boolean isValid()
     {
       String t = getType();
@@ -92,6 +96,13 @@ public abstract class VInstantiator
      */
     private void findArgNames(String type, List args)
     {
+      if(!findArgNamesFromSourceMangle(type,args))
+        findArgNamesFromBeanStuff(type,args);
+    }
+    private boolean findArgNamesFromSourceMangle(String type, List args)
+    {
+//      if(type.indexOf("DISPinger") != -1)
+//        System.out.println("bp");
       // "Jam the names into the source at create-source-from-xml time" method
       // 1 get constructor list of this class
       // 2. get the one we want by matching against args
@@ -111,7 +122,7 @@ public abstract class VInstantiator
             break;
         }
         if(j>=ca.length)
-          return;  // found nothing
+          return false;  // found nothing
 
         Field fld = cls.getDeclaredField(SimkitXML2Java.constructorParmNamesID);
         String[][] nms = (String[][])fld.get(null);
@@ -122,15 +133,89 @@ public abstract class VInstantiator
             }
             catch (Throwable e) {
               // if the names are manually editted, the author may have screwed up; don't crash
-              if(args.size()>n)
+              if(args.size()>n) {
                 ((VInstantiator)args.get(n)).setName("error, check source");
+                return false;
+              }
             }
         }
       }
       catch (Exception e) {
         //System.out.println("can't find constructor param names");
+        return false;
       }
+      return true;
+    }
 
+    private void findArgNamesFromBeanStuff(String type, List args)
+    {
+      // Alternate method
+      // 1. The parameters to an event graph have both getters and setters.  State vars do not
+      //
+
+      try {
+        Class cls = Vstatics.classForName(type);
+        if(cls == null)
+            return;
+
+        Class[] argArr = new Class[args.size()];
+        for(int i=0;i<args.size();i++)
+          argArr[i] = Vstatics.classForName((String)((VInstantiator)args.get(i)).getType());
+        Constructor c = cls.getDeclaredConstructor(argArr);  // that's the one we want
+
+       //Introspector.flushCaches();
+        BeanInfo bi = Introspector.getBeanInfo(cls,cls.getSuperclass());
+        ArrayList parms = new ArrayList();
+        PropertyDescriptor[] pd = bi.getPropertyDescriptors();
+        for(int i=0;i<pd.length;i++) {
+          if(pd[i].getReadMethod() != null &&
+             pd[i].getWriteMethod() != null )
+            parms.add(pd[i]);
+        }
+        if(unambiguousMatch(argArr,parms))
+          setNames(args,parms);
+      }
+      catch (Throwable e) {
+        //e.printStackTrace();
+      }
+    }
+
+    private boolean unambiguousMatch(Class[]args, ArrayList propDesc)
+    {
+      // if can find unambiguous match by type, put propDesc into proper order
+      if(args.length <= 0 || propDesc.size() <= 0)
+        return false;
+      Vector holder = new Vector();
+      for(int i=0;i<args.length;i++) {
+        holder.clear();
+        Class c = args[i];
+        for(int j=0;j<propDesc.size();j++) {
+          PropertyDescriptor pd = (PropertyDescriptor)propDesc.get(j);
+          if(typeMatch(c,pd))
+            holder.add(new Integer(j));
+        }
+        if(holder.size() != 1)
+          return false;
+        int jj = ((Integer)holder.get(0)).intValue();
+        // put pd at j into i
+        Object i_ob = propDesc.get(i);
+        propDesc.set(i,propDesc.get(jj));
+        propDesc.set(jj,i_ob);
+
+      }
+      return true;
+    }
+
+    private boolean typeMatch(Class c, PropertyDescriptor pd)
+    {
+      return pd.getPropertyType().equals(c);
+    }
+    private void setNames(List instanc, ArrayList propDesc)
+    {
+      for(int i=0;i<instanc.size();i++) {
+        VInstantiator vi = (VInstantiator)instanc.get(i);
+        vi.setName(((PropertyDescriptor)propDesc.get(i)).getName());
+      }
     }
     public List getArgs()         {return args;}
     public void setArgs(List args){this.args = args;}
