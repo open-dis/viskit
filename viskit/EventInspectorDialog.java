@@ -207,7 +207,7 @@ public class EventInspectorDialog extends JDialog
       public void mouseClicked(MouseEvent e)
       {
         EventStateTransition est = (EventStateTransition) e.getSource();
-        boolean modified = EventTransitionDialog.showDialog((EventGraphViewFrame)fr, locationComponent, est);
+        boolean modified = EventTransitionDialog.showDialog(EventInspectorDialog.this, locationComponent, est);
         if (modified) {
           /*
           // experiment

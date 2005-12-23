@@ -45,8 +45,8 @@ public class EventTransitionDialog extends JDialog
   public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
   public static boolean newIsOperation;
 
-  private EventGraphViewFrame parentFrame;
-  public static boolean showDialog(EventGraphViewFrame f, Component comp, EventStateTransition parm)
+  //private EventGraphViewFrame parentFrame;
+  public static boolean showDialog(JDialog f, Component comp, EventStateTransition parm)
   {
     if(dialog == null)
       dialog = new EventTransitionDialog(f,comp,parm);
@@ -58,12 +58,11 @@ public class EventTransitionDialog extends JDialog
     return modified;
   }
 
-  private EventTransitionDialog(EventGraphViewFrame parent, Component comp, EventStateTransition param)
+  private EventTransitionDialog(JDialog parent, Component comp, EventStateTransition param)
   {
     super(parent, "State Transition", true);
     this.param = param;
     this.locationComp = comp;
-    this.parentFrame = parent;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
@@ -155,7 +154,7 @@ public class EventTransitionDialog extends JDialog
     {
       public void actionPerformed(ActionEvent e)
       {
-        String nm = ((EventGraphViewFrame)parentFrame).addStateVariableDialog();
+        String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
         if(nm != null) {
           stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
           for(int i=0;i<stateVarsCB.getItemCount();i++) {
@@ -227,7 +226,7 @@ public class EventTransitionDialog extends JDialog
       actionField.setText(param.getOperationOrAssignment());
       String ie = param.getIndexingExpression();
       if(ie == null || ie.equals(""))
-        arrayIndexField.setText(((ViskitModel)parentFrame.getModel()).generateIndexVariableName());
+        arrayIndexField.setText(((ViskitModel)VGlobals.instance().getEventGraphEditor().getModel()).generateIndexVariableName());
       else
         arrayIndexField.setText(param.getIndexingExpression());
       opOn.setSelected(param.isOperation());
@@ -244,7 +243,7 @@ public class EventTransitionDialog extends JDialog
     else {
       //nameField.setText("");
       actionField.setText("");
-      arrayIndexField.setText( ((ViskitModel)parentFrame.getModel()).generateIndexVariableName());
+      arrayIndexField.setText( ((ViskitModel)VGlobals.instance().getEventGraphEditor().getModel()).generateIndexVariableName());
       arrayIndexField.setEditable(false);
       stateVarsCB.setSelectedIndex(0);
       commentField.setText("");

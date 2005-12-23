@@ -55,6 +55,7 @@ public class EventGraphAssemblyComboMain
   {
     setLandFandFonts();
     JFrame mainFrame = new EventGraphAssemblyComboMainFrame();
+    VGlobals.instance().setMainAppWindow(mainFrame);
     mainFrame.setVisible(true);
   }
   public static void setLandFandFonts()

@@ -43,6 +43,8 @@ public class VGlobals
   private JPopupMenu popup;
   private myTypeListener myListener;
 
+  private JFrame mainAppWindow;
+
   public static synchronized VGlobals instance()
   {
     if (me == null) {
@@ -883,4 +885,15 @@ public class VGlobals
   {
     sysexithandler.doSysExit(status);
   }
+  public JFrame getMainAppWindow()
+  {
+    return mainAppWindow;
+  }
+
+  public void setMainAppWindow(JFrame mainAppWindow)
+  {
+    this.mainAppWindow = mainAppWindow;
+  }
+
+  
 }

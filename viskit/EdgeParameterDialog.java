@@ -37,10 +37,10 @@ public class EdgeParameterDialog extends JDialog
 
   public static String newValue; //, newType; //, newComment;
 
-  public static boolean showDialog(JFrame f, Component comp, vEdgeParameter parm)
+  public static boolean showDialog(JDialog d, Component comp, vEdgeParameter parm)
   {
     if(dialog == null)
-      dialog = new EdgeParameterDialog(f,comp,parm);
+      dialog = new EdgeParameterDialog(d,comp,parm);
     else
       dialog.setParams(comp,parm);
 
@@ -49,7 +49,7 @@ public class EdgeParameterDialog extends JDialog
     return modified;
   }
 
-  private EdgeParameterDialog(JFrame parent, Component comp, vEdgeParameter param)
+  private EdgeParameterDialog(JDialog parent, Component comp, vEdgeParameter param)
   {
     super(parent, "Edge Parameter", true);
     this.param = param;
