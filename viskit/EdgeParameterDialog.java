@@ -32,7 +32,6 @@ public class EdgeParameterDialog extends JDialog
   private static boolean modified = false;
   private vEdgeParameter param;
   private String type;
-  private Component locationComp;
   private JButton okButt, canButt;
 
   public static String newValue; //, newType; //, newComment;
@@ -53,7 +52,6 @@ public class EdgeParameterDialog extends JDialog
   {
     super(parent, "Edge Parameter", true);
     this.param = param;
-    this.locationComp = comp;
     this.type = param.bogus!=null?param.bogus:"";
 
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -99,13 +97,13 @@ public class EdgeParameterDialog extends JDialog
 
     fillWidgets();     // put the data into the widgets
 
-    modified        = (param==null?true:false);     // if it's a new param, they can always accept defaults with no typing
-    okButt.setEnabled((param==null?true:false));
+    modified        = (param==null);     // if it's a new param, they can always accept defaults with no typing
+    okButt.setEnabled((param==null));
 
     getRootPane().setDefaultButton(canButt);
 
     pack();     // do this prior to next
-    this.setLocationRelativeTo(locationComp);
+    this.setLocationRelativeTo(comp);
 
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
@@ -136,13 +134,12 @@ public class EdgeParameterDialog extends JDialog
   public void setParams(Component c, vEdgeParameter p)
   {
     param = p;
-    locationComp = c;
     type = p.bogus!=null?p.bogus:"";
 
     fillWidgets();
 
-    modified        = (p==null?true:false);
-    okButt.setEnabled((p==null?true:false));
+    modified        = (p==null);
+    okButt.setEnabled((p==null));
 
     getRootPane().setDefaultButton(canButt);
 
@@ -223,7 +220,7 @@ public class EdgeParameterDialog extends JDialog
   {
     public void windowClosing(WindowEvent e)
     {
-      if(modified == true) {
+      if(modified) {
         int ret = JOptionPane.showConfirmDialog(EdgeParameterDialog.this,"Apply changes?",
             "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
         if(ret == JOptionPane.YES_OPTION)

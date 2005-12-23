@@ -36,15 +36,12 @@ public class EdgeInspectorDialog extends JDialog
   private static boolean modified = false;
   private JButton canButt,okButt;
   private JRadioButton schrb,canrb;
-  private ButtonGroup bGroup;
-  private Component locationComp;
   private JLabel srcEvent,targEvent;
   private JTextField delay;
   private EdgeParametersPanel parameters;
   private ConditionalsPanel conditionals;
   private JPanel delayPan;
   private Border delayPanBorder,delayPanDisabledBorder;
-  private JFrame myFrame;
   private JPanel myParmPanel;
 
   /**
@@ -75,15 +72,12 @@ public class EdgeInspectorDialog extends JDialog
                               Edge edge)
   {
     super(frame, "Edge Inspector", true);
-    myFrame = frame;
     this.edge = edge;
-
-    this.locationComp = locationComp;
 
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
-    mod = (Model)((EventGraphViewFrame)frame).getModel();       // todo fix this
+    mod = (Model)(VGlobals.instance().getEventGraphEditor().getModel());
    // nodeList = mod.getAllNodes();
 
     //Collections.sort(nodeList);             // todo get working
@@ -92,7 +86,7 @@ public class EdgeInspectorDialog extends JDialog
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
     JPanel con = new JPanel();
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-    con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+    con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     con.add(Box.createVerticalStrut(5));
       // edge type
       JPanel typeP = new JPanel();
@@ -102,7 +96,7 @@ public class EdgeInspectorDialog extends JDialog
       schrb = new JRadioButton("Scheduling");
       schrb.setSelected(true);
       canrb = new JRadioButton("Cancelling");
-      bGroup = new ButtonGroup();
+      ButtonGroup bGroup = new ButtonGroup();
       bGroup.add(schrb);
       bGroup.add(canrb);
       typeP.add(schrb);
@@ -268,7 +262,7 @@ public class EdgeInspectorDialog extends JDialog
       {
         vEdgeParameter ep = (vEdgeParameter)event.getSource();
 
-        boolean wasModified = EdgeParameterDialog.showDialog(myFrame,EdgeInspectorDialog.this,ep);
+        boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this,EdgeInspectorDialog.this,ep);
         if(wasModified) {
           parameters.updateRow(ep);
           okButt.setEnabled(true);
@@ -280,7 +274,6 @@ public class EdgeInspectorDialog extends JDialog
   public void setParams(Component c, Edge e)
   {
     edge = e;
-    locationComp = c;
 
     fillWidgets();
     modified = false;
@@ -393,7 +386,8 @@ public class EdgeInspectorDialog extends JDialog
       if(modified) {
         StringBuffer sb = new StringBuffer();
         if(edge instanceof SchedulingEdge) {
-          sb.append("double delay = "+ delay.getText());
+          sb.append("double delay = ");
+          sb.append(delay.getText());
           sb.append(";\n");
         }
         sb.append("if(");
@@ -404,7 +398,7 @@ public class EdgeInspectorDialog extends JDialog
           String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionals.getText()+post);
           if(parseResults != null) {
             boolean ret = BeanshellErrorDialog.showDialog(parseResults,EdgeInspectorDialog.this);
-            if(ret == false) // don't ignore
+            if(!ret) // don't ignore
               return;
  /*           int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
                                           "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
@@ -436,6 +430,7 @@ public class EdgeInspectorDialog extends JDialog
     }
   }
 */
+/*
   private void setTargEventTT(JComboBox jcb)
   {
     EventNode en = (EventNode)jcb.getSelectedItem();
@@ -443,7 +438,8 @@ public class EdgeInspectorDialog extends JDialog
     int idx = 0;
     for(Iterator itr = en.getArguments().iterator(); itr.hasNext();) {
       EventArgument ea = (EventArgument)itr.next();
-      sb.append(""+idx++);
+      sb.append("");
+      sb.append(idx++);
       sb.append(" ");
       sb.append(ea.getName());
       sb.append(" (");
@@ -459,11 +455,12 @@ public class EdgeInspectorDialog extends JDialog
     }
 
   }
+*/
   class myCloseListener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)
     {
-      if(modified == true) {
+      if(modified) {
         int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Apply changes?",
             "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
         if(ret == JOptionPane.YES_OPTION)

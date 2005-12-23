@@ -229,7 +229,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   // Methods to implement a scheme where other modules will be informed of file changes //
   // (Would Java Beans do this with more or less effort?
 
-  private DirectoryWatch dirWatch;
   private File watchDir;
   private void initFileWatch()
   {
@@ -241,7 +240,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       watchDir.mkdir();
       watchDir.deleteOnExit();
 
-      dirWatch = new DirectoryWatch(watchDir);
+      DirectoryWatch dirWatch = new DirectoryWatch(watchDir);
       dirWatch.setLoopSleepTime(1*1000); // 1 secs
       dirWatch.startWatcher();
     }
@@ -502,7 +501,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     //--------------------------
     {
       GraphMetaData gmd = ((ViskitAssemblyModel)getModel()).getMetaData();
-      boolean modified = AssemblyMetaDataDialog.showDialog((AssemblyViewFrame)getView(),(AssemblyViewFrame)getView(),gmd);
+      boolean modified = AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
+                                                           VGlobals.instance().getMainAppWindow(),gmd);
       if(modified)
         ((ViskitAssemblyModel)getModel()).changeMetaData(gmd);
     }
@@ -591,17 +591,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     Class ca = findClass(a);
     Class cb = findClass(b);
-    AssemblyNode [] ra = orderSELSrcAndLis(a,b,ca,cb);
-    return ra;
+    return orderSELSrcAndLis(a,b,ca,cb);
   }
 
   AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b)
   {
     Class ca = findClass(a);
     Class cb = findClass(b);
-    AssemblyNode [] ra = orderPCLSrcAndLis(a,b,ca,cb);
-    return ra;
-
+    return orderPCLSrcAndLis(a,b,ca,cb);
   }
   Class findClass(AssemblyNode o)
   {
@@ -697,7 +694,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   //------------------------------------
   {
     selectionVector = v;
-    boolean ccbool = (selectionVector.size() > 0 ? true : false);
+    boolean ccbool = (selectionVector.size() > 0);
     ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
     ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
   }
@@ -823,7 +820,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   /* from menu:*/
   public void showXML()
   {
-    if(checkSaveForSourceCompile() == false || lastFile == null)
+    if(!checkSaveForSourceCompile() || lastFile == null)
       return;
 
     ((ViskitAssemblyView)getView()).displayXML(lastFile);
@@ -849,7 +846,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   private String produceJavaClass()
   {
-    if(checkSaveForSourceCompile() == false || lastFile == null)
+    if(!checkSaveForSourceCompile() || lastFile == null)
       return null;
 
     return buildJavaAssemblySource(((ViskitAssemblyModel)getModel()).getFile());
@@ -922,7 +919,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     Matcher mat = pat.matcher(src);
     boolean fnd = mat.find();
 
-    String packagePath = "";
     if(fnd) {
       int st = mat.start();
       int end = mat.end();
@@ -930,7 +926,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       s = s.replace(';','/');
       String[] sa = s.split("\\s");
       sa[1] = sa[1].replace('.','/');
-      packagePath = sa[1].trim();
     }
     // done finding the package subdir (just to mark the file as "deleteOnExit")
 
@@ -1220,7 +1215,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
      StringBuffer sb = new StringBuffer();
      sb.append(System.getProperty("java.home"));
-     sb.append(fsep+"bin"+fsep+"java");
+     sb.append(fsep);
+     sb.append("bin");
+     sb.append(fsep);
+     sb.append("java");
     v.add(sb.toString());   //0
 
     v.add("-cp");         //1

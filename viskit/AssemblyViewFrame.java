@@ -638,27 +638,27 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   // permit user to edit existing entities
   public boolean doEditEvGraphNode(EvGraphNode evNode)
   {
-    return EvGraphNodeInspectorDialog.showDialog(this,this,evNode);
+    return EvGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),evNode);
   }
 
   public boolean doEditPclNode(PropChangeListenerNode pclNode)
   {
-    return PclNodeInspectorDialog.showDialog(this,this,pclNode); // blocks
+    return PclNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),pclNode); // blocks
   }
 
   public boolean doEditPclEdge(PropChangeEdge pclEdge)
   {
-    return PclEdgeInspectorDialog.showDialog(this,this,pclEdge);
+    return PclEdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),pclEdge);
   }
 
   public boolean doEditAdapterEdge(AdapterEdge aEdge)
   {
-    return AdapterConnectionInspectorDialog.showDialog(this,this,aEdge);
+    return AdapterConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),aEdge);
   }
 
   public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge)
   {
-    return SimEventListenerConnectionInspectorDialog.showDialog(this,this,seEdge);
+    return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),seEdge);
   }
 
   public void fileName(String s)    // informative, tells view what we're working on
@@ -753,7 +753,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   public File openRecentFilesAsk(Collection lis)
   {
-    String fn = RecentFilesDialog.showDialog(this, this, lis);
+    String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(), lis);
     if (fn != null) {
       File f = new File(fn);
       if (f.exists())
