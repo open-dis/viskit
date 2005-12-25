@@ -1,0 +1,1 @@
+Main-Class: viskit.xsd.cli.Boot
