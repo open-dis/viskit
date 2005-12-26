@@ -137,7 +137,11 @@ public class Boot extends URLClassLoader implements Runnable {
                         fos.flush();
                         fos.close();
                         addURL(extJar.toURL());
+                        System.out.println("File to new jar "+extJar.getCanonicalPath());
                         System.out.println("Added jar "+extJar.toURL().toString());
+                        String systemClassPath = System.getProperty("java.class.path");
+                        System.out.println("ClassPath "+systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
+                        System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
                     }
                     
                     
