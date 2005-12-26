@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 public class Launcher extends Thread implements Runnable {
+    ClassLoader cloader;
     Hashtable bytes;
     static String assembly;
     static String assemblyName;
@@ -38,20 +39,27 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
   
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            InputStream configIn = classLoader.getResourceAsStream("config.properties");
+            cloader = Thread.currentThread().getContextClassLoader();
+            InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);
             
-            u = classLoader.getResource(p.getProperty("Assembly"));
-            setAssembly(u);
+            try {
+                u = cloader.getResource(p.getProperty("Assembly"));
+                setAssembly(u);
+            } catch (Exception e) { // no assembly resource, launch viskit
+                launchGUI();
+            }
+            
             
             StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
             
             while ( st.hasMoreTokens() ) {
-                u = classLoader.getResource( st.nextToken() );
+                u = cloader.getResource( st.nextToken() );
                 addEventGraph(u);
             }
+            
+            
                         
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,7 +112,6 @@ public class Launcher extends Thread implements Runnable {
         }
                 
         // get the class name as defined in the XML
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         System.out.println("Trying ClassLoader "+cloader);
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
         
@@ -148,8 +155,6 @@ public class Launcher extends Thread implements Runnable {
         }
         
         // get the class name as defined in the XML
-        
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
         Class jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
         Method m = jclz.getDeclaredMethod("newInstance", new Class[] {String.class, ClassLoader.class} );
@@ -200,8 +205,7 @@ public class Launcher extends Thread implements Runnable {
         Constructor c;
         ByteArrayInputStream bais;
         String assemblyJava;
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-
+        
         xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
         bshz = cloader.loadClass("bsh.Interpreter");
@@ -359,5 +363,17 @@ public class Launcher extends Thread implements Runnable {
             e.printStackTrace();
         }
      */   
+    }
+    
+    void launchGUI() {
+        try {
+            Class viskitz = cloader.loadClass("viskit.Splash2");
+            Method m = viskitz.getDeclaredMethod("main", new Class[]{ String[].class });
+            m.invoke(null, new Object[] { new String[]{"viskit.EventGraphAssemblyComboMain"} });
+        } catch (Exception e) {
+            System.out.println("Package error, can't run Viskit");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }
