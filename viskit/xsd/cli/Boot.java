@@ -130,8 +130,9 @@ public class Boot extends URLClassLoader implements Runnable {
                         FileOutputStream fos = new FileOutputStream(extJar);
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         int c = 0;
-                        while ( (c = jis.read()) > -1 ) {
-                            baos.write(c);
+                        byte[] buff = new byte[512];
+                        while ((c = jis.read(buff)) > -1 ) {
+                            baos.write(buff,0,c);
                         }
                         fos.write(baos.toByteArray());
                         fos.flush();
