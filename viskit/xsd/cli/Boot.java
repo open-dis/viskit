@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
  */
 
 public class Boot extends URLClassLoader implements Runnable {
-    boolean debug = true;
+    static boolean debug = true;
     String[] args;
 
     public Boot(URL[] urls) {
@@ -115,8 +115,17 @@ public class Boot extends URLClassLoader implements Runnable {
             urlc = jarURL.openConnection();
             jis = new JarInputStream(urlc.getInputStream());
             if ( urlc instanceof JarURLConnection ) {
-                System.out.println("Help jar url"); // ? shouldn't be here
-                
+                // ? shouldn't be here, but save for 
+                // other possible configurations,
+                // would require a full blown resource manager
+                // and class loader to make use of 
+                // bytecode within jars within jars,
+                // as no such URL can be formed, but
+                // one could read in bytes and define
+                // resources. the advantage of this would
+                // only be that no temp files would be
+                // needed to externalize the jars.
+                System.out.println("Help jar url"); 
             } else { // from a file, cache internal jars externally
                 super.addURL(jarURL);
 
@@ -124,7 +133,7 @@ public class Boot extends URLClassLoader implements Runnable {
                     String name = je.getName();
                     
                     if ( name.endsWith("jar") ) {
-                        System.out.println("Found internal jar externalizing "+name);
+                        if (debug) System.out.println("Found internal jar externalizing "+name);
                         String tmpDir = System.getProperty("java.io.tmpdir");
                         File extJar = new File(tmpDir, name);
                         FileOutputStream fos = new FileOutputStream(extJar);
@@ -137,15 +146,16 @@ public class Boot extends URLClassLoader implements Runnable {
                         fos.write(baos.toByteArray());
                         fos.flush();
                         fos.close();
+                        // capture any jars within the jar in the jar...
                         addURL(extJar.toURL());
-                        System.out.println("File to new jar "+extJar.getCanonicalPath());
-                        System.out.println("Added jar "+extJar.toURL().toString());
+                        if (debug) System.out.println("File to new jar "+extJar.getCanonicalPath());
+                        if (debug) System.out.println("Added jar "+extJar.toURL().toString());
                         String systemClassPath = System.getProperty("java.class.path");
-                        System.out.println("ClassPath "+systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
+                        if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));
+                        
                     }
-                    
-                    
+
                 }
             }
         } catch (Exception e) {
@@ -154,10 +164,10 @@ public class Boot extends URLClassLoader implements Runnable {
     }
     
     protected Class findClass(String name) throws ClassNotFoundException {
-        System.out.println("Finding class "+name);
+        if (debug) System.out.println("Finding class "+name);
         Class clz = super.findClass(name);
-        resolveClass(clz);
-        System.out.println(clz);
+        resolveClass(clz); // still needed?
+        if (debug) System.out.println(clz);
         return clz;
     }
     
@@ -179,12 +189,12 @@ public class Boot extends URLClassLoader implements Runnable {
     
     public static void main(String[] args) throws Exception {
         URL u = Boot.class.getClassLoader().getResource("viskit/xsd/cli/Boot.class");
-        System.out.println(u);
+        if (debug) System.out.println(u);
         URLConnection urlc = u.openConnection();
         if ( urlc instanceof JarURLConnection ) {
             u = ((JarURLConnection)urlc).getJarFileURL();
         }
-        System.out.println("Booting "+u);
+        if (debug) System.out.println("Booting "+u);
         Boot b = new Boot(new URL[] { u });
         b.setArgs(args);
         new Thread(b).start();

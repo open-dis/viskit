@@ -10,7 +10,6 @@ import java.net.URLConnection;
 import java.net.JarURLConnection;
 import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
-import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -23,9 +22,9 @@ import java.util.StringTokenizer;
 public class Launcher extends Thread implements Runnable {
     ClassLoader cloader;
     Hashtable bytes;
-    static String assembly;
-    static String assemblyName;
-    static Hashtable eventGraphs = new Hashtable();
+    String assembly;
+    String assemblyName;
+    Hashtable eventGraphs = new Hashtable();
     boolean debug = true;
     
     /**
@@ -112,7 +111,7 @@ public class Launcher extends Thread implements Runnable {
         }
                 
         // get the class name as defined in the XML
-        System.out.println("Trying ClassLoader "+cloader);
+        if (debug) System.out.println("Trying ClassLoader "+cloader);
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
         
         if ( debug )
@@ -218,7 +217,7 @@ public class Launcher extends Thread implements Runnable {
         bshcm = m.invoke(bsh,new Object[]{});
         m = bshcmz.getDeclaredMethod("classExists",  new Class[]{ String.class });
         out = m.invoke(bshcm, new Object[]{"simkit.BasicAssembly"});
-        System.out.println("Checking if simkit.BasicAssembly exists... "+((Boolean)out).toString());
+        if (debug) System.out.println("Checking if simkit.BasicAssembly exists... "+((Boolean)out).toString());
         
         try {
             Enumeration e = eventGraphs.keys();
