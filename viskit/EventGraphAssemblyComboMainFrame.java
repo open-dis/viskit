@@ -93,7 +93,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
         myQuitAction.actionPerformed(null);
       }
     });
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+    ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
     this.setIconImage(icon.getImage());
 
   }
@@ -145,7 +145,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     // Design of experiments
     doeMain = DoeMain.main2();
     DoeMainFrame doeFrame = doeMain.getMainFrame();
-    tabbedPane.addTab("Design of Experiments",new ImageIcon(ClassLoader.getSystemResource("viskit/images/grid.png")),
+    tabbedPane.addTab("Design of Experiments",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
                       doeFrame.getContent());
     //tabbedPane.add("Design of Experiments",doeFrame.getContent());
     menuBar = doeMain.getMenus();
@@ -162,7 +162,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     runGridComponent = new JobLauncherTab(doeMain.getController(),null,null,this);
     doeFrame.getController().setJobLauncher(runGridComponent);
     //tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
-    tabbedPane.addTab("Launch Cluster Job",new ImageIcon(ClassLoader.getSystemResource("viskit/images/grid.png")),
+    tabbedPane.addTab("Launch Cluster Job",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
                       runGridComponent.getContent());
     menuBar = new JMenuBar();
     menuBar.add(new JMenu("File"));
