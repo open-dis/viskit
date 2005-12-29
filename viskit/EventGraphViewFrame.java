@@ -439,7 +439,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public String addParameterDialog()
   {
 
-    if( ParameterDialog.showDialog(this,this,null)) {      // blocks here
+    if( ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(),this,null)) {      // blocks here
       ((ViskitController)getController()).buildNewSimParameter(ParameterDialog.newName,
                                                           ParameterDialog.newType,
                                                           "new value here",
@@ -451,7 +451,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
   public String addStateVariableDialog()
   {
-    if( StateVariableDialog.showDialog(this,this,null)) {      // blocks here
+    if( StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(),this,null)) {      // blocks here
       ((ViskitController)getController()).buildNewStateVariable(StateVariableDialog.newName,
                                                           StateVariableDialog.newType,
                                                           "new value here",
@@ -936,7 +936,7 @@ cancelArcMode.setIcon(new CanArcIcon());
 
   public File openRecentFilesAsk(Collection lis)
   {
-    String fn = RecentFilesDialog.showDialog(this, this, lis);
+    String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, lis);
     if (fn != null) {
       File f = new File(fn);
       if (f.exists())
@@ -964,54 +964,54 @@ cancelArcMode.setIcon(new CanArcIcon());
   //---------------------------------------
   {
     selectMode.doClick();     // always go back into select mode
-    return EventInspectorDialog.showDialog(this,this,node); // blocks
+    return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),node); // blocks
   }
 
   public boolean doEditEdge(SchedulingEdge edge)
   //--------------------------------------------
   {
     selectMode.doClick();     // always go back into select mode
-    return EdgeInspectorDialog.showDialog(this,getCurrentVgcw(),edge); // blocks
+    return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),edge); // blocks
   }
 
   public boolean doEditCancelEdge(CancellingEdge edge)
   //--------------------------------------------------
   {
     selectMode.doClick();     // always go back into select mode
-    return EdgeInspectorDialog.showDialog(this,getCurrentVgcw(),edge); // blocks
+    return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(),VGlobals.instance().getMainAppWindow(),edge); // blocks
   }
 
   public boolean doEditParameter(vParameter param)
   {
-    return ParameterDialog.showDialog(this,getCurrentVgcw(),param);    // blocks
+    return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(),getCurrentVgcw(),param);    // blocks
   }
   public boolean doEditStateVariable(vStateVariable var)
   {
-    return StateVariableDialog.showDialog(this,getCurrentVgcw(),var);
+    return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(),getCurrentVgcw(),var);
   }
 
   public boolean doMetaGraphEdit(GraphMetaData gmd)
   //-----------------------------------------------
   {
-    return EvGraphMetaDataDialog.showDialog(this,getCurrentVgcw(),gmd);
+    return EvGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),getCurrentVgcw(),gmd);
   }
 
   public int genericAsk(String title, String msg)
   //---------------------------------------------
   {
-    return JOptionPane.showConfirmDialog(this,msg,title,JOptionPane.YES_NO_CANCEL_OPTION);
+    return JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(),msg,title,JOptionPane.YES_NO_CANCEL_OPTION);
   }
 
   public void genericErrorReport(String title, String msg)
   //-----------------------------------------------------
   {
-    JOptionPane.showMessageDialog(this,msg,title,JOptionPane.ERROR_MESSAGE);
+    JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(),msg,title,JOptionPane.ERROR_MESSAGE);
   }
 
   public String promptForStringOrCancel(String title, String message, String initval)
   //---------------------------------------------------------------------------------
   {
-    return (String)JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
+    return (String)JOptionPane.showInputDialog(VGlobals.instance().getMainAppWindow(), message, title, JOptionPane.PLAIN_MESSAGE,
                                                null, null, initval);
   }
 
