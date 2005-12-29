@@ -92,7 +92,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
       });
 
-      ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+      ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
       setIconImage(icon.getImage());
     }
   }
@@ -416,7 +416,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   }
   private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt)
   {
-    b.setIcon(new ImageIcon(ClassLoader.getSystemResource(icPath)));
+    b.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
     return buttonCommon2(b,tt);
   }
   private AbstractButton buttonCommon2(AbstractButton b, String tt)
@@ -593,7 +593,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       //select    = new Cursor(Cursor.MOVE_CURSOR);
       arc       = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
-      Image img = new ImageIcon(ClassLoader.getSystemResource("viskit/images/canArcCursor.png")).getImage();
+      Image img = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
       cancel    = Toolkit.getDefaultToolkit().createCustomCursor(img,new Point(0,0),"CancelArcCursor");
     }
 

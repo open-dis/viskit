@@ -116,14 +116,14 @@ public class RunnerPanel extends JPanel
     vcrToolBar.setLayout(new BoxLayout(vcrToolBar, BoxLayout.X_AXIS));
     vcrToolBar.add(Box.createHorizontalGlue());
 
-    vcrStop = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Stop24.gif")));
+    vcrStop = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Stop24.gif")));
     vcrStop.setToolTipText("Stop the simulation run");
     vcrStop.setEnabled(false);
     vcrStop.setBorder(BorderFactory.createEtchedBorder());
     vcrStop.setText(null);
     vcrToolBar.add(vcrStop);
 
-    vcrRewind = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Rewind24.gif")));
+    vcrRewind = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Rewind24.gif")));
     vcrRewind.setToolTipText("Reset the simulation run");
     vcrRewind.setEnabled(false);
     vcrRewind.setBorder(BorderFactory.createEtchedBorder());
@@ -131,7 +131,7 @@ public class RunnerPanel extends JPanel
     if(!skipCloseButt)
       vcrToolBar.add(vcrRewind);
 
-    vcrPlay = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/Play24.gif")));
+    vcrPlay = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Play24.gif")));
     vcrPlay.setToolTipText("Begin or resume the simulation run");
     if(skipCloseButt)
       vcrPlay.setToolTipText("Begin the simulation run");
@@ -139,7 +139,7 @@ public class RunnerPanel extends JPanel
     vcrPlay.setText(null);
     vcrToolBar.add(vcrPlay);
 
-    vcrStep = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/StepForward24.gif")));
+    vcrStep = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/StepForward24.gif")));
     vcrStep.setToolTipText("Step the simulation");
     vcrStep.setBorder(BorderFactory.createEtchedBorder());
     vcrStep.setText(null);

@@ -43,10 +43,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit;
 
-import simkit.BasicAssembly;
+import edu.nps.util.DirectoryWatch;
 import simkit.Schedule;
 import viskit.xsd.assembly.ViskitAssembly;
-
+import viskit.xsd.assembly.BasicAssembly;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;

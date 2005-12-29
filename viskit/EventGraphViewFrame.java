@@ -107,7 +107,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
           // else, the controller will Sys.exit()
         }
       });
-      ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+      ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
       setIconImage(icon.getImage());
     }
   }
@@ -587,7 +587,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   }
   private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt)
   {
-    b.setIcon(new ImageIcon(ClassLoader.getSystemResource(icPath)));
+    b.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
     b.setToolTipText(tt);
     b.setBorder(BorderFactory.createEtchedBorder());
     b.setText(null);
@@ -595,7 +595,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   }
   private JLabel makeJLabel(String icPath, String tt)
   {
-    JLabel jlab = new JLabel(new ImageIcon(ClassLoader.getSystemResource(icPath)));
+    JLabel jlab = new JLabel(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
     jlab.setToolTipText(tt);
     return jlab;
   }
@@ -727,7 +727,7 @@ cancelArcMode.setIcon(new CanArcIcon());
       select = Cursor.getDefaultCursor();
       //select    = new Cursor(Cursor.MOVE_CURSOR);
       arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
-      Image img = new ImageIcon(ClassLoader.getSystemResource("viskit/images/canArcCursor.png")).getImage();
+      Image img = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
 
       // Check if we should size the cursor
       Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);

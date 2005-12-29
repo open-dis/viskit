@@ -174,12 +174,17 @@ public class Vstatics
     catch (ClassNotFoundException e) {
       c = tryPrimsAndArrays(s,clsLoader);
       if(c == null) {
-        c = tryCommonClasses(s,clsLoader);
-        if(c == null)
-          ; //System.err.println("Vstatics what to do here... "+s);
+          c = tryCommonClasses(s,clsLoader);
+          if(c == null) {
+              try {
+                  c = Thread.currentThread().getContextClassLoader().loadClass(s);
+              } catch (ClassNotFoundException cnfe ) {
+                  ; //System.err.println("Vstatics what to do here... "+s);
+              }
+          }
       }
       return c;
-  }
+    }
   }
   static class retrnChar
   {

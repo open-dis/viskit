@@ -36,7 +36,7 @@ public class Splash2 extends JFrame
     super();
     setUndecorated(true);
 
-    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/ViskitSplash2.png"));
+    ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
     JLabel label = new JLabel(icon);
     label.setOpaque(false);
     contentPanel.add(label,BorderLayout.CENTER);
