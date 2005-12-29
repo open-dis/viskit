@@ -6,7 +6,7 @@
  */
 
 package viskit.test;
-import viskit.xsd.bindings.*;
+import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.SimkitXML2Java;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
