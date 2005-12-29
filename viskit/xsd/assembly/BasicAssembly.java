@@ -1,0 +1,422 @@
+package viskit.xsd.assembly;
+
+import java.beans.PropertyChangeListener;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import simkit.BasicSimEntity;
+import simkit.Schedule;
+import simkit.SimEntity;
+import simkit.SimEvent;
+import simkit.stat.SavedStats;
+import simkit.stat.SampleStatistics;
+import simkit.stat.SimpleStatsTally;
+/**
+ * Base class for creating Simkit scenarios. 
+ * Modified to be BeanShellable and Viskit VCR aware - rmgoldbe, jmbailey
+ *
+ * @version $Id$
+ * @author ahbuss
+ */
+public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
+    
+    protected LinkedHashMap replicationData;
+    
+    protected SampleStatistics[] replicationStats;
+    protected SampleStatistics[] designPointStats;
+    protected SimEntity[] simEntity;
+    protected PropertyChangeListener[] propertyChangeListener;
+    
+    protected boolean hookupsCalled;
+    protected boolean stopRun;
+    protected int startRepNumber = 0;
+    
+    private double stopTime;
+    private boolean verbose;
+    private boolean singleStep;
+    private int numberReplications;
+    
+    private boolean printReplicationReports;
+    private boolean printSummaryReport;
+    private boolean saveReplicationData;
+    
+    private int designPointID;
+    
+    private DecimalFormat form;
+    
+    /**
+     * Default constructor sets paameters of BasicAssembly to their
+     * default values.  These are:
+     *<pre>
+     * printReplicationReports = false
+     * printSummaryReport = true
+     * saveReplicationData = false
+     * numberReplications = 1
+     *</pre>
+     * 
+     */
+    public BasicAssembly() {
+        form = new DecimalFormat("0.0000");
+        setPrintReplicationReports(false);
+        setPrintSummaryReport(true);
+        replicationData = new LinkedHashMap();
+        simEntity= new SimEntity[0];
+        replicationStats = new SampleStatistics[0];
+        designPointStats = new SampleStatistics[0];
+        propertyChangeListener = new PropertyChangeListener[0];
+        setNumberReplications(1);
+        hookupsCalled = false;
+        
+        //moved to run() to avoid beanshell upcall error
+        //createObjects();
+        //performHookups();
+    }
+    
+    /** <p>Resets all inner stats.  State resetting for SimEntities is their
+     * responsibility.  Outer stats are not reset.
+     */
+    public void reset() {
+        super.reset();
+        for (int i = 0; i < replicationStats.length; ++i) {
+            replicationStats[i].reset();
+        }
+        startRepNumber = 0;
+    }
+    
+    /**
+     * Create all the objects used.  This is called from the constructor.
+     * The <code>createSimEntities()</code> method is abstract and will
+     * be implemented in the concrete subclass.  The others are empty by
+     * default.  The <code>createReplicationStats()</code> method must be
+     * overridden if any replications stats are needed.
+     */
+    protected void createObjects() {
+        createSimEntities();
+        createReplicationStats();
+        createDesignPointStats();
+        createPropertyChangeListeners();
+    }
+    
+    /**
+     * Call all the hookup methods.
+     */
+    protected void performHookups() {
+        hookupSimEventListeners();
+        hookupReplicationListeners();
+        hookupDesignPointListeners();
+        hookupPropertyChangeListeners();
+        hookupsCalled = true;
+    }
+   
+    protected abstract void createSimEntities();
+    
+    protected abstract void hookupSimEventListeners();
+    
+    protected abstract void hookupReplicationListeners();
+    
+    /** This method is left concrete so subclasses don't have to worry about
+     * it if no additional PropertyChangeListeners are desired.
+     */
+    protected void hookupPropertyChangeListeners() {  }
+    
+    /**
+     * The default behavior is to create a <code>SimplStatsTally</code>
+     * instance for each element in <code>replicationStats</code> with the
+     * corresponding name + "mean".
+     */
+    protected void createDesignPointStats() {
+        designPointStats = new SampleStatistics[replicationStats.length];
+        for (int i = 0; i < designPointStats.length; ++i) {
+            designPointStats[i] = new SimpleStatsTally(replicationStats[i].getName() + ".mean");
+        }
+    }
+    
+    protected void createReplicationStats() { }
+    
+    protected void createPropertyChangeListeners() { }
+    
+    /** Set up all outer stats propertyChangeListeners
+     */
+    protected void hookupDesignPointListeners() {
+        for (int i = 0; i < designPointStats.length; ++i) {
+            this.addPropertyChangeListener(designPointStats[i]);
+        }
+    }
+    
+    
+    public void setStopTime(double time) {
+        if (time < 0.0) {
+            throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
+        }
+        stopTime = time;
+    }
+    
+    public double getStopTime() { return stopTime; }
+    
+    public void setVerbose(boolean b) { verbose = b; }
+    
+    public boolean isVerbose() { return verbose; }
+    
+    public void setSingleStep(boolean b) { singleStep = b; }
+    
+    public boolean isSingleStep() { return singleStep; }
+    
+    public void setStopRun(boolean wh) {
+        stopRun = wh;
+        if(stopRun == true)
+            Schedule.stopSimulation();
+    }
+    
+    private void saveState(int lastRepNum) {
+        boolean midRun = !Schedule.getDefaultEventList().isFinished();
+        boolean midReps = lastRepNum < getNumberReplications();
+
+        if (midReps) {
+            // middle of some rep, fell out because of GUI stop
+            startRepNumber = lastRepNum;
+        }
+        else if (!midReps && !midRun) {
+            // done with all reps
+            startRepNumber = 0;
+        }
+        else if (!midReps && midRun) {
+            // n/a can't be out of reps but in a run
+            throw new RuntimeException("Bad state in ViskitAssembly");
+        }
+    }
+    
+    /**
+     * Called at top of rep loop;  This will support "pause", but the GUI
+     * is not taking advantage of it presently.
+     */ 
+    private void maybeReset() {
+        // We reset if we're not in the middle of a run
+        if (Schedule.getDefaultEventList().isFinished())
+            Schedule.reset();
+    }
+    
+    public void setNumberReplications(int num) {
+        if (num < 1) {
+            throw new IllegalArgumentException("Number replications must be > 0: " + num);
+        }
+        numberReplications = num;
+    }
+    
+    public int getNumberReplications() { return numberReplications; }
+    
+    public void setPrintReplicationReports(boolean b) { printReplicationReports = b; }
+    
+    public boolean isPrintReplicationReports() { return printReplicationReports; }
+    
+    public void setPrintSummaryReport(boolean b) { printSummaryReport = b; }
+    
+    public boolean isPrintSummaryReport() { return printSummaryReport; }
+    
+    public void setDesignPointID(int id) { designPointID = id; }
+    
+    public int getDesignPointID() { return designPointID; }
+    
+    public void setSaveReplicationData(boolean b) { saveReplicationData = b; }
+    
+    public boolean isSaveReplicationData() { return saveReplicationData; }
+    
+    /** Empty, needed to implement SimEntity
+     */
+    public void handleSimEvent(SimEvent simEvent) {
+    }
+    /** Empty, needed to implement SimEntity
+     */
+    public void processSimEvent(SimEvent simEvent) {
+    }
+    
+    public SampleStatistics[] getDesignPointStats() { 
+        return (SampleStatistics[]) designPointStats.clone();
+    } 
+    
+    public SampleStatistics[] getReplicationStats(int id) {
+        SampleStatistics[] stats = null;
+        ArrayList reps = (ArrayList) replicationData.get(new Integer(id));
+        if (reps != null) {
+            stats = (SampleStatistics[]) reps.toArray(new SampleStatistics[0]);
+        }
+        return stats;
+    }
+    
+    public SampleStatistics getReplicationStat(String name, int replication) {
+        SampleStatistics stats = null;
+        int id = getIDforReplicationStateName(name);
+        if (id >= 0) {
+            stats = getReplicationStats(id)[replication];
+        }
+        return stats;
+    }
+    
+    public int getIDforReplicationStateName(String state) {
+        int id = -1;
+        for (int i = 0; i < replicationStats.length; ++i) {
+            if (replicationStats[i].getName().equals(state)) {
+                id = i;
+                break;
+            }
+        }
+        return id;
+    }
+    
+    public Map getReplicationData() {
+        return new LinkedHashMap(replicationData);
+    }
+    
+    /** Save all replicationStats for a given iteration.  This assumes that the
+     * replicationData map has been instntaied and initialized.
+     */
+    protected void saveReplicationStats() {
+        for (int i = 0; i < replicationStats.length; ++i) {
+            ArrayList reps = (ArrayList) replicationData.get(new Integer(i));
+            reps.add(new SavedStats(replicationStats[i]));
+        }
+    }
+    
+    /** For each inner stats, print name, count, min, max, mean, variance, and
+     * standard deviation.  This can be done generically.
+     * @param rep The replication number for this report
+     */
+    protected String getReplicationReport(int rep) {
+        StringBuffer buf = new StringBuffer("Output Report for Replication #");
+        buf.append(rep);
+        for (int i = 0; i < replicationStats.length; ++i) {
+            buf.append(System.getProperty("line.separator"));
+            buf.append(replicationStats[i].getName());
+            buf.append('[');
+            buf.append(i);
+            buf.append(']');
+            buf.append('\t');
+            buf.append(replicationStats[i].getCount());
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getMinObs()));
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getMaxObs()));
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getMean()));
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getVariance()));
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getStandardDeviation()));
+        }
+        return buf.toString();
+    }
+    /** For each outer stats, print name, count, min, max, mean, variance, and
+     * standard deviation.  This can be done generically.
+     */
+    protected String getSummaryReport() {
+         StringBuffer buf = new StringBuffer("Summary Output Report:");
+        buf.append(System.getProperty("line.separator"));
+        buf.append(super.toString());
+        for (int i = 0; i < designPointStats.length; ++i) {
+            buf.append(System.getProperty("line.separator"));
+            buf.append(designPointStats[i]);
+        }
+       return buf.toString();
+    }
+    
+    /**
+     * These are the actual SimEnties in the array, but the array itself is 
+     * a copy.
+     * @return the SimEntities in this scenario in a copy of the array.
+     */
+    public SimEntity[] getSimEntities() { 
+        return (SimEntity[]) simEntity.clone(); 
+    }
+    
+    /**
+     * Execute the simulation for the desired number of replications.
+     */
+    public void run() {
+        stopRun = false;
+        
+        createObjects();
+        performHookups();
+        
+        if (!hookupsCalled) {
+            throw new RuntimeException("performHookups() hasn't been called!");
+        }
+
+        Schedule.stopAtTime(getStopTime());
+        if (isVerbose()) {
+            Schedule.setVerbose(isVerbose());
+        }
+        if (isSingleStep()) {
+            Schedule.setSingleStep(isSingleStep());
+        }
+
+        if (isSaveReplicationData()) {
+            replicationData.clear();
+            for (int i = 0; i < replicationStats.length; ++i) {
+                replicationData.put(new Integer(i), new ArrayList());
+            }
+        }
+        int replication;
+        for (replication = startRepNumber;
+             !stopRun && (replication < getNumberReplications());
+            ++replication) {
+
+            maybeReset();
+            Schedule.startSimulation();
+
+            for (int i = 0; i < replicationStats.length; ++i) {
+                fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
+                fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+            }
+            if (isPrintReplicationReports()) {
+                System.out.println(getReplicationReport(replication));
+            }
+            if (isSaveReplicationData()) {
+                saveReplicationStats();
+            }
+        }
+
+        if (isPrintSummaryReport()) {
+            System.out.println(getSummaryReport());
+        }
+
+        saveState(replication);
+        /*
+        if (!hookupsCalled) {
+            throw new RuntimeException("performHookups() hasn't been called!");
+        }
+        
+        Schedule.stopAtTime(getStopTime());
+        if (isVerbose()) {
+            Schedule.setVerbose(isVerbose());
+        }
+        if (isSingleStep()) {
+            Schedule.setSingleStep(isSingleStep());
+        }
+        
+        if (isSaveReplicationData()) {
+            replicationData.clear();
+            for (int i = 0; i < replicationStats.length; ++i) {
+                replicationData.put(new Integer(i), new ArrayList());
+            }
+        }
+        
+        for (int replication = 0; replication < getNumberReplications(); ++replication) {
+            Schedule.reset();
+            Schedule.startSimulation();
+            for (int i = 0; i < replicationStats.length; ++i) {
+                fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
+                fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+            }
+            if (isPrintReplicationReports()) {
+                System.out.println(getReplicationReport(replication));
+            }
+            if (isSaveReplicationData()) {
+                saveReplicationStats();
+            }
+        }
+        if (isPrintSummaryReport()) {
+            System.out.println(getSummaryReport());
+        } */
+    }
+    
+}

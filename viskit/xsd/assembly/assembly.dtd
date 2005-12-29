@@ -1,5 +1,6 @@
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter" > 
 <!ENTITY % DesignParameters "TerminalParameter" >   
+<!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics" >
 
 <!ELEMENT MultiParameter (%Parameters;)* >  
 <!ATTLIST MultiParameter
@@ -84,12 +85,33 @@
 >
 
 <!ELEMENT Log (#PCDATA) >
+
 <!ELEMENT Errors (#PCDATA) >
-<!ELEMENT PropertyChange (#PCDATA) >
+
+<!ELEMENT PropertyChange (%Statistics;)* >
 <!ATTLIST PropertyChange
     listenerName CDATA #REQUIRED
     property CDATA #IMPLIED
 >
+
+<!ELEMENT SampleStatistics EMPTY >
+<!ATTLIST SampleStatistics
+    mean CDATA "0.0"
+    variance CDATA "0.0"
+    standardDeviation CDATA "0.0"
+    count CDATA "0"
+    minObs CDATA "0.0"
+    maxObs CDATA "0.0"
+    sampleType (TALLY|TIME_VARYING) "TALLY"
+    name CDATA #IMPLIED
+>
+
+<!ELEMENT IndexedSampleStatistics (SampleStatistics)* >
+<!ATTLIST IndexedSampleStatistics
+    name CDATA #IMPLIED
+>
+    
+    
 <!ELEMENT Results ( Log | PropertyChange | Errors )* >
 <!ATTLIST Results 
     design  CDATA #REQUIRED

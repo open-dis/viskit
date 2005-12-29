@@ -12,7 +12,7 @@
 package viskit.xsd.assembly;
 
 import simkit.Adapter;
-import simkit.BasicAssembly;
+//import simkit.BasicAssembly;
 import simkit.Schedule;
 import simkit.SimEntity;
 import simkit.stat.SampleStatistics;
@@ -31,23 +31,23 @@ import java.util.ListIterator;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
-    public LinkedHashMap entities;
-    public LinkedHashMap replicationStatistics;
-    public LinkedHashMap designPointStatistics;
-    public LinkedHashMap propertyChangeListeners;
-    public LinkedHashMap propertyChangeListenerConnections;
-    public LinkedHashMap designPointStatsListenerConnections;
-    public LinkedHashMap replicationStatsListenerConnections;
-    public LinkedHashMap simEventListenerConnections;
-    public LinkedHashMap adapters;
+    protected LinkedHashMap entities;
+    protected LinkedHashMap replicationStatistics;
+    protected LinkedHashMap designPointStatistics;
+    protected LinkedHashMap propertyChangeListeners;
+    protected LinkedHashMap propertyChangeListenerConnections;
+    protected LinkedHashMap designPointStatsListenerConnections;
+    protected LinkedHashMap replicationStatsListenerConnections;
+    protected LinkedHashMap simEventListenerConnections;
+    protected LinkedHashMap adapters;
     private static boolean debug = true;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
-        super();
+        
     }  
     
-    public synchronized void createObjects() {
+    public void createObjects() {
         entities = new LinkedHashMap();
         replicationStatistics = new LinkedHashMap();
         designPointStatistics = new LinkedHashMap();
@@ -57,10 +57,14 @@ public class ViskitAssembly extends BasicAssembly {
         replicationStatsListenerConnections = new LinkedHashMap();
         simEventListenerConnections = new LinkedHashMap();
         adapters = new LinkedHashMap();
-        super.createObjects();
+        //super.createObjects();
+        createSimEntities();
+        createReplicationStats();
+        createDesignPointStats();
+        createPropertyChangeListeners();
     }
     
-    public synchronized void performHookups() {
+    public void performHookups() {
         super.performHookups();
     }
     
@@ -104,7 +108,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     }
     
-    public void hookupPropertyChangeListeners() {
+    protected void hookupPropertyChangeListeners() {
         String[] listeners = (String[]) propertyChangeListenerConnections.keySet().toArray(new String[0]);
         for ( int i = 0; i < listeners.length; i++ ) {
             LinkedList propertyConnects = (LinkedList) propertyChangeListenerConnections.get(listeners[i]);
@@ -120,7 +124,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
-    public void hookupDesignPointListeners() {
+    protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();
         String[] listeners = (String[]) designPointStatsListenerConnections.keySet().toArray(new String[0]);
         // if not the default case, need to really do this with
@@ -160,7 +164,7 @@ public class ViskitAssembly extends BasicAssembly {
         if ( "null".equals(pc.property) ) {
             pc.property = "";
         }
-        if ( debug ) System.out.println("Cnnecting entity " + pc.source + "to replicationStat " + listener + " property " + pc.property );
+        if ( debug ) System.out.println("Connecting entity " + pc.source + "to replicationStat " + listener + " property " + pc.property );
         if ( "".equals(pc.property) ) {
             pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName().trim();
             if ( debug ) {
@@ -201,11 +205,12 @@ public class ViskitAssembly extends BasicAssembly {
     /** to be called after all entities have been added as a super() */
     /*  note not using template version of ArrayList... */
     public void createSimEntities() {
+        if (entities != null) if (entities.values() != null)
         simEntity = 
                 (SimEntity[]) entities.values().toArray(new SimEntity[0]);
     }
     
-    public void createDesignPointStats() {
+    protected void createDesignPointStats() {
         super.createDesignPointStats();
         // to be consistent; should be getting the designPointStats from 
         // the super. 
@@ -218,7 +223,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
-    public void createReplicationStats() {
+    protected void createReplicationStats() {
         replicationStats = 
                 (SampleStatistics[]) replicationStatistics.values().toArray(new SampleStatistics[0]);
         for ( int i = 0; debug && i < replicationStats.length; i++ ) {
@@ -226,7 +231,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
-    public void createPropertyChangeListeners() {
+    protected void createPropertyChangeListeners() {
         propertyChangeListener = 
                 (PropertyChangeListener[]) propertyChangeListeners.values().toArray(new PropertyChangeListener[0]);
         for ( int i = 0; debug && i < propertyChangeListener.length; i++ ) {
@@ -237,6 +242,9 @@ public class ViskitAssembly extends BasicAssembly {
     public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name,entity);
+        if (debug) {
+            System.out.println("ViskitAssembly addSimEntity "+name);
+        }
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
@@ -313,10 +321,7 @@ public class ViskitAssembly extends BasicAssembly {
         return (SimEntity) entities.get(name);
     }
     
-    /* not exactly sure if this is needed when a property is set as in the constructor
-     * of a SampleStatisics type 
-     */
-    class PropertyConnector {
+    protected class PropertyConnector {
         String property;
         String source;
         
@@ -326,109 +331,4 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
 
-  /*
-   * 14 NOV 05, the run method is lifted straight from the parent class, BasicAssembly.
-   * The reason for the duplication is to allow the gui a bit of control over
-   * starting and stopping the run.
-   * A few booleans have been added to remember run state.
-  */
-
-    protected boolean stopRun;
-
-    public void setStopRun(boolean wh)
-    {
-        stopRun = wh;
-        if(stopRun == true)
-          Schedule.stopSimulation();
-    }
-
-    protected int startRepNumber = 0;
-
-    /**
-     * Execute the simulation for the desired number of replications.
-     */
-    public void run() {
-        stopRun = false;
-
-        if (!hookupsCalled) {
-            throw new RuntimeException("performHookups() hasn't been called!");
-        }
-
-        Schedule.stopAtTime(getStopTime());
-        if (isVerbose()) {
-            Schedule.setVerbose(isVerbose());
-        }
-        if (isSingleStep()) {
-            Schedule.setSingleStep(isSingleStep());
-        }
-
-        if (isSaveReplicationData()) {
-            replicationData.clear();
-            for (int i = 0; i < replicationStats.length; ++i) {
-                replicationData.put(new Integer(i), new ArrayList());
-            }
-        }
-        int replication;
-        for (replication = startRepNumber;
-             !stopRun && (replication < getNumberReplications());
-             ++replication) {
-
-            maybeReset();
-            Schedule.startSimulation();
-
-            for (int i = 0; i < replicationStats.length; ++i) {
-                fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
-                fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
-            }
-            if (isPrintReplicationReports()) {
-                System.out.println(getReplicationReport(replication));
-            }
-            if (isSaveReplicationData()) {
-                saveReplicationStats();
-            }
-        }
-
-        if (isPrintSummaryReport()) {
-            System.out.println(getSummaryReport());
-        }
-
-        saveState(replication);
-    }
-
-    private void saveState(int lastRepNum) {
-        boolean midRun = !Schedule.getDefaultEventList().isFinished();
-        boolean midReps = lastRepNum < getNumberReplications();
-
-        if (midReps) {
-            // middle of some rep, fell out because of GUI stop
-            startRepNumber = lastRepNum;
-        }
-        else if (!midReps && !midRun) {
-            // done with all reps
-            startRepNumber = 0;
-        }
-        else if (!midReps && midRun) {
-            // n/a can't be out of reps but in a run
-            throw new RuntimeException("Bad state in ViskitAssembly");
-        }
-    }
-
-    /**
-     * Called at top of rep loop;  This will support "pause", but the GUI
-     * is not taking advantage of it presently.
-     */
-    private void maybeReset() {
-        // We reset if we're not in the middle of a run
-        if (Schedule.getDefaultEventList().isFinished())
-            Schedule.reset();
-    }
-
-    /**
-     * Called by GUI instead of Schedule.reset(); resets rep loop, too
-     */
-    public void reset()
-    {
-      super.reset();
-      startRepNumber = 0;
-    }
 }

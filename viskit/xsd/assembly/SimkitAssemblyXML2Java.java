@@ -252,7 +252,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         buildOutput(output);
         buildTail(tail);
         
-        buildSource(source, head, entities, listeners, /*connectors,*/ output, tail);
+        buildSource(source, head, entities, listeners, output, tail);
         
         return source.toString();
     }
@@ -280,6 +280,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         pw.println();
         pw.println();
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
+        pw.println(sp8 + "super" + lp + rp + sc);
         if ( (schedule = this.root.getSchedule()) != null ) {
             
             pw.print(sp8 + "setStopTime");
@@ -301,7 +302,7 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
             
         }
-        //pw.println(sp8 + "super" + lp + rp + sc);
+        
         pw.println(sp4 + cb);
         pw.println();
         
@@ -432,7 +433,8 @@ public class SimkitAssemblyXML2Java implements XmlRpcHandler {
         PrintWriter pw = new PrintWriter(entities);
         ListIterator li = this.root.getSimEntity().listIterator();
         
-        pw.println(sp4+"public void createSimEntities"+ lp + rp + sp + ob);
+        pw.println(sp4+"protected void createSimEntities"+ lp + rp + sp + ob);
+        
         while ( li.hasNext() ) {
             
             SimEntity se = (SimEntity) li.next();
