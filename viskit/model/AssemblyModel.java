@@ -259,7 +259,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     node.opaqueModelObject = jaxbEG;
     jaxbEG.setType(className);
 
-    VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(),new Vector());
+    VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(),null);  // null means undefined
     node.setInstantiator(vc);
 
     nodeCache.put(jaxbEG,node);   // key = ev
@@ -695,6 +695,27 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     return v;
   }
+  private List getNamesFromParmList(List lis)
+  {
+    Vector v = new Vector();
+    for(Iterator itr = lis.iterator();itr.hasNext();) {
+      Object o = itr.next();
+      if(o instanceof TerminalParameter) {
+        String n = ((TerminalParameter)o).getName();
+        if(n == null || n.length()<=0) {
+          Object nr = ((TerminalParameter)o).getNameRef();
+          if(nr != null)
+            n = nr.toString();
+        }
+        if(n == null)
+          n = "";
+        v.add(n);
+      }
+      else
+        v.add("");
+    }
+    return v;
+  }
 
   private VInstantiator buildInstantiatorFromJaxbParameter(Object o)
   {
@@ -771,6 +792,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     tp.setType(viff.getType());
     tp.setValue(viff.getValue());
+    tp.setName(viff.getName());
     return tp;
   }
 
@@ -814,6 +836,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     fp.setType(vifact.getType());
     fp.setFactory(vifact.getFactoryClass()); //todo when method supported +"."+vifact.getMethod()+"()");
+
     for (Iterator itr = vifact.getParams().iterator(); itr.hasNext();) {
       VInstantiator vi = (VInstantiator) itr.next();
       fp.getParameters().add(buildParam(vi));
@@ -833,6 +856,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
     }
     mp.setType(viarr.getType());
+
     for (Iterator itr = viarr.getInstantiators().iterator(); itr.hasNext();) {
       VInstantiator vi = (VInstantiator) itr.next();
       mp.getParameters().add(buildParam(vi));
@@ -1075,7 +1099,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     en.setOutputMarked(isOutputNode);
     List lis = se.getParameters();
     VInstantiator.Constr vc = new VInstantiator.Constr(se.getType(),
-                    getInstantiatorListFromJaxbParmList(lis));
+                    getInstantiatorListFromJaxbParmList(lis),getNamesFromParmList(lis));
     en.setInstantiator(vc);
 
     en.opaqueModelObject = se;
