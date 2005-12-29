@@ -25,7 +25,7 @@ public class Launcher extends Thread implements Runnable {
     String assembly;
     String assemblyName;
     Hashtable eventGraphs = new Hashtable();
-    boolean debug = true;
+    private static final boolean debug = false;
     
     /**
      *  args -A ssemblyFile [-E ventGraphFile]
@@ -216,8 +216,8 @@ public class Launcher extends Thread implements Runnable {
         m = bshz.getDeclaredMethod("getClassManager", new Class[]{});
         bshcm = m.invoke(bsh,new Object[]{});
         m = bshcmz.getDeclaredMethod("classExists",  new Class[]{ String.class });
-        out = m.invoke(bshcm, new Object[]{"simkit.BasicAssembly"});
-        if (debug) System.out.println("Checking if simkit.BasicAssembly exists... "+((Boolean)out).toString());
+        out = m.invoke(bshcm, new Object[]{"viskit.xsd.assembly.BasicAssembly"});
+        if (debug) System.out.println("Checking if viskit.xsd.assembly.BasicAssembly exists... "+((Boolean)out).toString());
         
         try {
             Enumeration e = eventGraphs.keys();
@@ -237,6 +237,7 @@ public class Launcher extends Thread implements Runnable {
                 m = out.getClass().getDeclaredMethod("translate", new Class[]{});
                 out = m.invoke(out, new Object[]{});
                 eventGraphJava = (String)out;
+                if (debug) System.out.println(eventGraphJava);
                 
                 // bsh eval generated java source
                 m = bshz.getDeclaredMethod("eval", new Class[]{ String.class });
@@ -260,15 +261,19 @@ public class Launcher extends Thread implements Runnable {
             m = axml2jz.getDeclaredMethod("translate", new Class[]{});
             out = m.invoke(out,new Object[]{});
             assemblyJava = (String)out;
+            if (debug) System.out.println(assemblyJava);
             
             // bsh eval the generated source
             m = bshz.getDeclaredMethod("eval", new Class[]{ String.class });
+            if (debug) m.invoke(bsh,new Object[]{ "debug();" });
             m.invoke(bsh,new Object[]{ assemblyJava });
             
             // sanity check the bsh class loaders if assembly exists 
             m = bshcmz.getDeclaredMethod("classExists",  new Class[]{ String.class });
             out = m.invoke(bshcm, new Object[]{assemblyName});
-            System.out.println("Checking if "+assemblyName+" exists... "+((Boolean)out).toString());
+            if (debug) System.out.println("Checking if "+assemblyName+" exists... "+((Boolean)out).toString());
+            out = m.invoke(bshcm, new Object[]{"simkit.random.RandomVariateFactory"});
+            if (debug) System.out.println("Checking if simkit.random.RandomVariateFactory exists... "+((Boolean)out).toString());
             
             // get the assembly class, create instance and thread it
             m = bshcmz.getDeclaredMethod("classForName",  new Class[]{ String.class });

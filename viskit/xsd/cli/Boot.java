@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
  */
 
 public class Boot extends URLClassLoader implements Runnable {
-    static boolean debug = true;
+    private static final boolean debug = false;
     String[] args;
 
     public Boot(URL[] urls) {
@@ -104,8 +104,8 @@ public class Boot extends URLClassLoader implements Runnable {
         }
     }
     
- 
-    public void addURL(URL jarURL) {
+
+    protected void addURL(URL jarURL) {
         URLConnection urlc;
         URL u;
         JarEntry je;
