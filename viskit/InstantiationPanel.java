@@ -184,7 +184,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   public void setData(VInstantiator vi) throws ClassNotFoundException
   {
     myVi = vi.vcopy();
-    String typ = vi.getType();
+    String typ = myVi.getType();
     typeTF.setText(typ);
 
     // inform all panels of the type of the object
@@ -193,15 +193,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     ffPan.setType(typ);
 
     if(vi instanceof VInstantiator.Constr) {
-      conPan.setData((VInstantiator.Constr)vi);
+      conPan.setData((VInstantiator.Constr)myVi);
       methodCB.setSelectedIndex(CONSTR);
     }
     else if(vi instanceof VInstantiator.Factory) {
-      factPan.setData((VInstantiator.Factory)vi);
+      factPan.setData((VInstantiator.Factory)myVi);
       methodCB.setSelectedIndex(FACT);
     }
     else if(vi instanceof VInstantiator.FreeF) {
-      ffPan.setData((VInstantiator.FreeF)vi);
+      ffPan.setData((VInstantiator.FreeF)myVi);
       methodCB.setSelectedIndex(FF);
     }
     else {
