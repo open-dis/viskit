@@ -46,6 +46,25 @@ public abstract class VInstantiator
   abstract public VInstantiator vcopy();
   abstract public boolean isValid();
 
+  public static List buildDummyInstantiators(Constructor con)
+  {
+    Vector v = new Vector();
+    Class[] cs = con.getParameterTypes();
+    for(int i=0;i<cs.length;i++) {
+      if(cs[i].isArray()) {
+        VInstantiator.Array va = new VInstantiator.Array(Vstatics.convertClassName(cs[i].getName()),
+                                                         new Vector());
+        v.add(va);
+      }
+      else {
+        VInstantiator.FreeF vff = new VInstantiator.FreeF(Vstatics.convertClassName(cs[i].getName()),
+                                                          "");
+        v.add(vff);
+      }
+    }
+    return v;
+  }
+
   /***********************************************************************/
   public static class FreeF extends VInstantiator
   {
@@ -66,7 +85,9 @@ public abstract class VInstantiator
 
     public VInstantiator vcopy()
     {
-      return new VInstantiator.FreeF(getType(),getValue());
+      VInstantiator rv = new VInstantiator.FreeF(getType(),getValue());
+      rv.setName(this.getName());
+      return rv;
     }
 
     public boolean isValid()
@@ -88,7 +109,13 @@ public abstract class VInstantiator
       setArgs(args);
       findArgNames(type,args);
     }
-
+    public Constr(String type, List args, List names)
+    {
+      this(type,args);
+      for(int i=0;i<args.size();i++) {
+        ((VInstantiator)args.get(i)).setName((String)names.get(i));
+      }
+    }
     /**
      * Find the names of the arguments
      * @param type
@@ -96,9 +123,14 @@ public abstract class VInstantiator
      */
     private void findArgNames(String type, List args)
     {
+      if(args == null) {
+        setArgs(getDefaultArgs(type));
+        args = getArgs();
+      }
       if(!findArgNamesFromSourceMangle(type,args))
         findArgNamesFromBeanStuff(type,args);
     }
+
     private boolean findArgNamesFromSourceMangle(String type, List args)
     {
 //      if(type.indexOf("DISPinger") != -1)
@@ -217,6 +249,18 @@ public abstract class VInstantiator
         vi.setName(((PropertyDescriptor)propDesc.get(i)).getName());
       }
     }
+
+    private List getDefaultArgs(String type)
+    {
+      Class clazz = Vstatics.classForName(type);
+      if(clazz != null) {
+        Constructor[] construct = clazz.getConstructors();
+        if(construct != null && construct.length > 0)
+          return VInstantiator.buildDummyInstantiators(construct[0]);
+      }
+      return new Vector(); // null
+    }
+
     public List getArgs()         {return args;}
     public void setArgs(List args){this.args = args;}
 
@@ -234,7 +278,9 @@ public abstract class VInstantiator
         VInstantiator vi = (VInstantiator) itr.next();
         lis.add(vi.vcopy());
       }
-      return new VInstantiator.Constr(getType(),lis);
+      VInstantiator rv = new VInstantiator.Constr(getType(),lis);
+      rv.setName(this.getName());
+      return rv;
     }
     public boolean isValid()
     {
@@ -265,7 +311,9 @@ public abstract class VInstantiator
         VInstantiator vi = (VInstantiator) itr.next();
         lis.add(vi.vcopy());
       }
-      return new VInstantiator.Array(getType(),getInstantiators());
+      VInstantiator rv = new VInstantiator.Array(getType(),getInstantiators());
+      rv.setName(this.getName());
+      return rv;
     }
 
     public List getInstantiators()
@@ -334,7 +382,9 @@ public abstract class VInstantiator
         VInstantiator vi = (VInstantiator) itr.next();
         lis.add(vi.vcopy());
       }
-      return new VInstantiator.Factory(getType(),getFactoryClass(),getMethod(),lis);
+      VInstantiator rv = new VInstantiator.Factory(getType(),getFactoryClass(),getMethod(),lis);
+      rv.setName(this.getName());
+      return rv;
     }
     public boolean isValid()
     {
