@@ -34,7 +34,7 @@
           
     <property description="Root of the javadoc tree for Viskit." location="${dir.build}/doc" name="dir.build.doc"/>
               
-    <property description="Generated JAXB bindings for Simtran" location="${dir.src}/viskit/xsd/bindings" name="dir.src.simtran"/>
+    <property description="Generated JAXB bindings for Simevg" location="${dir.src}/viskit/xsd/bindings/eventgraph" name="dir.src.simevg"/>
               
     <property description="Generated JAXB bindings for Simasm" location="${dir.src}/viskit/xsd/bindings/assembly" name="dir.src.simasm"/>
     
@@ -48,7 +48,7 @@
     
     <property description="CLI utility" location="${dir.src}/viskit/xsd/cli" name="dir.src.cli.util"/>
     
-    <property description="Simtran utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simtran.util"/>
+    <property description="Simevg utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simevg.util"/>
 
     <property description="where the help source sits" location="${dir.src}/viskit/javahelp" name="javahelp"/>
     
@@ -127,7 +127,7 @@
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
         <mkdir dir="${dir.build.doc}"/>
-        <mkdir dir="${dir.src.simtran}"/>
+        <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
         <mkdir dir="${dir.src.cli}"/>
         <mkdir dir="${dir.lib.ext}"/>
@@ -150,7 +150,7 @@
 
 <!--  === TARGET: clean === -->
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
-        <delete dir="${dir.src.simtran}"/>
+        <delete dir="${dir.src.simevg}"/>
         <delete dir="${dir.src.simasm}"/>
         <delete dir="${dir.src.cli}"/>
         <delete dir="${dir.build}"/>
@@ -234,11 +234,12 @@
             </classpath>
             <package name="viskit"/>
             <package name="viskit.xsd"/>
-            <package name="viskit.xsd.bindings"/>
+            <package name="viskit.xsd.bindings.eventgraph"/>
             <package name="viskit.xsd.bindings.assembly"/>
+            <package name="viskit.xsd.bindings.assembly.stats"/>
             <package name="viskit.xsd.bindings.cli"/>
             <package name="viskit.xsd.assembly"/>
-            <package name="viskit.xsd.translator"/>
+            <package name="viskit.xsd.eventgraph"/>
         </javadoc>
     </target>
 
@@ -267,11 +268,14 @@
     </taskdef>   
 
     <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
-        <xjc package="viskit.xsd.bindings" schema="${dir.src.simtran.util}/simkit.xsd" target="${dir.src}">
-            <produces dir="${dir.src.simtran}" includes="* impl/* impl/runtime/*" />
+        <xjc package="viskit.xsd.bindings.eventgraph" schema="${dir.src.simevg.util}/simkit.xsd" target="${dir.src}">
+            <produces dir="${dir.src.simevg}" includes="* impl/* impl/runtime/*" />
         </xjc>
         <xjc extension="true" package="viskit.xsd.bindings.assembly" schema="${dir.src.simasm.util}/assembly.xsd" target="${dir.src}">
             <produces dir="${dir.src.simasm}" includes="* impl/* impl/runtime/*" />
+        </xjc>
+        <xjc extension="true" package="viskit.xsd.bindings.assembly.stats" schema="${dir.src.simasm.util}/statistics.xsd" target="${dir.src}">
+            <produces dir="${dir.src.simasm}/stats" includes="* impl/* impl/runtime/*" />
         </xjc>       
         <xjc extension="true" package="viskit.xsd.bindings.cli" schema="${dir.src.cli.util}/cli.xsd" target="${dir.src}">
             <produces dir="${dir.src.cli}" includes="* impl/* impl/runtime/*" />
@@ -279,8 +283,10 @@
     </target>
     
     <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
-        <trang failonerror="true" input="${dir.src.simtran.util}/simkit.dtd" output="${dir.src.simtran.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd" /> 
         <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
@@ -292,11 +298,11 @@
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
-            <src path="${dir.src.simtran}"/>
+            <src path="${dir.src.simevg}"/>
         </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings">
-            <fileset dir="${dir.src}/viskit/xsd/bindings" includes="jaxb.properties"/>
-            <fileset dir="${dir.src}/viskit/xsd/bindings" includes="bgm.ser"/>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/eventgraph">
+            <fileset dir="${dir.src}/viskit/xsd/bindings/eventgraph" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings/eventgraph" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
 	    debug="on"
@@ -310,6 +316,19 @@
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="jaxb.properties"/>
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}"
+	    debug="on"
+            source="1.4"
+            target="1.4">
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+            </classpath>
+            <src path="${dir.src.simasm}/stats"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly/stats">
+            <fileset dir="${dir.src}/viskit/xsd/bindings/assembly/stats" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings/assembly/stats" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
 	    debug="on"
@@ -337,7 +356,7 @@
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
             </classpath>
-            <src path="${dir.src.simtran.util}"/>
+            <src path="${dir.src.simevg.util}"/>
         </javac>
         
         <javac destdir="${dir.build.classes}"
@@ -354,6 +373,7 @@
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
             <include name="ViskitAssembly.java"/>
+            <include name="BasicAssembly.java"/>
         </javac>
         
         <javac destdir="${dir.build.classes}"
@@ -366,6 +386,7 @@
             </classpath>
             <src path="${dir.src.cli.util}"/>
             <include name="Launcher.java"/>
+            <include name="Boot.java"/>
         </javac>
         <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
     </target>   
