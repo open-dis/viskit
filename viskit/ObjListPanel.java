@@ -40,10 +40,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
   public void setDialogInfo(JDialog parent, Component locComp)
   {
     this.parent = parent;
-    this.locComp = locComp;
   }
   private JDialog parent;
-  private Component locComp;
 
   public void setData(List lis, boolean showLabels)  // of Vinstantiators
   {
@@ -70,7 +68,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
        else
          nameLab = null; // if one is bad, disable all
 
-       entryTF[i] = new JTextField();
+       entryTF[i] = new JTextField(8);
        Vstatics.clampHeight(entryTF[i]);
        entryTF[i].setText(inst.toString());
        entryTF[i].addCaretListener(this);
@@ -115,6 +113,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         add(typeLab[x]);
         add(contentObj[x]);
       }
+
       if (nameLab != null)
         SpringUtilities.makeCompactGrid(this, typeLab.length, 3, 5, 5, 5, 5);
       else
@@ -124,7 +123,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
       for (int x = 0; x < typeLab.length; x++)
         add(contentObj[x]);
       SpringUtilities.makeCompactGrid(this, entryTF.length, 1, 5, 5, 5, 5);
-    }
+    }    
   }
 
   public void caretUpdate(CaretEvent e)
