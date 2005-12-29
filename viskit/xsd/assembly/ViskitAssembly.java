@@ -204,7 +204,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     /** to be called after all entities have been added as a super() */
     /*  note not using template version of ArrayList... */
-    public void createSimEntities() {
+    protected void createSimEntities() {
         if (entities != null) if (entities.values() != null)
         simEntity = 
                 (SimEntity[]) entities.values().toArray(new SimEntity[0]);
