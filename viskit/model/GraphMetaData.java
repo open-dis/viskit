@@ -1,6 +1,6 @@
 package viskit.model;
 
-import viskit.xsd.bindings.SimEntityType;
+import viskit.xsd.bindings.eventgraph.SimEntityType;
 import viskit.xsd.bindings.assembly.SimkitAssemblyType;
 
 /**
@@ -30,8 +30,8 @@ public class GraphMetaData
 
     /** get defaults from Schema */
     try {
-      viskit.xsd.bindings.ObjectFactory of =
-          new viskit.xsd.bindings.ObjectFactory();
+      viskit.xsd.bindings.eventgraph.ObjectFactory of =
+          new viskit.xsd.bindings.eventgraph.ObjectFactory();
       SimEntityType tmp = of.createSimEntityType();
       extend = tmp.getExtend();
     }
@@ -57,8 +57,8 @@ public class GraphMetaData
     }
     else {
       try {
-        viskit.xsd.bindings.ObjectFactory of =
-            new viskit.xsd.bindings.ObjectFactory();
+        viskit.xsd.bindings.eventgraph.ObjectFactory of =
+            new viskit.xsd.bindings.eventgraph.ObjectFactory();
         SimEntityType tmp = of.createSimEntityType();
         extend = tmp.getExtend();
       }

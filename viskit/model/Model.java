@@ -5,8 +5,8 @@ import viskit.ModelEvent;
 import viskit.VGlobals;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
-import viskit.xsd.bindings.*;
-import viskit.xsd.bindings.Event;
+import viskit.xsd.bindings.eventgraph.*;
+import viskit.xsd.bindings.eventgraph.Event;
 import viskit.xsd.translator.SimkitXML2Java;
 
 import javax.swing.*;
@@ -67,7 +67,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   public void init()
   {
     try {
-      jc = JAXBContext.newInstance("viskit.xsd.bindings");
+      jc = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
       oFactory = new ObjectFactory();
       jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
     }
@@ -786,7 +786,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     catch (JAXBException e) {
       //assert false : "Model.newEvent, error creating viskit.xsd.bindings.Event.";
-      System.err.println("Model.newEvent, error creating viskit.xsd.bindings.Event.");
+      System.err.println("Model.newEvent, error creating viskit.xsd.bindings.eventgraph.Event.");
       return;
     }
     evNodeCache.put(jaxbEv,node);   // key = ev
@@ -1051,7 +1051,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     catch (JAXBException e) {
       //assert false : "Model.newEdge, error creating viskit.xsd.bindings.Schedule.";
-      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.Schedule.");
+      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.eventgraph.Schedule.");
       return;
     }
     se.opaqueModelObject = sch;
@@ -1089,7 +1089,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     }
     catch (JAXBException e) {
       //assert false : "Model.newEdge, error creating viskit.xsd.bindings.Cancel.";
-      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.Cancel.");
+      System.err.println("Model.newEdge, error creating viskit.xsd.bindings.eventgraph.Cancel.");
       return;
     }
     ce.opaqueModelObject = can;

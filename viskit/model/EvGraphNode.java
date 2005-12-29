@@ -1,6 +1,6 @@
 package viskit.model;
 
-import viskit.xsd.bindings.Event;
+import viskit.xsd.bindings.eventgraph.Event;
 import viskit.xsd.bindings.assembly.SimEntity;
 
 import java.awt.*;

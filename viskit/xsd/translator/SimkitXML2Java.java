@@ -24,7 +24,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import viskit.xsd.bindings.*;
+import viskit.xsd.bindings.eventgraph.*;
 
 /**
  *
@@ -70,7 +70,7 @@ public class SimkitXML2Java {
     public SimkitXML2Java(String xmlFile) {
 	fileBaseName = baseNameOf(xmlFile);
 	try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
 	    fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
 	} catch ( Exception e ) {
 	    e.printStackTrace();
@@ -80,7 +80,7 @@ public class SimkitXML2Java {
 
     public SimkitXML2Java(InputStream stream) {
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             fileInputStream = stream;
         } catch ( Exception e ) {
 	    e.printStackTrace();
@@ -89,7 +89,7 @@ public class SimkitXML2Java {
 
     public SimkitXML2Java(File f) throws Exception {
 	fileBaseName = baseNameOf(f.getName());
-	jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+	jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
 	fileInputStream = new FileInputStream(f);
     }
 
