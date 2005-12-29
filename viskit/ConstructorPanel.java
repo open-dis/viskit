@@ -49,9 +49,9 @@ public class ConstructorPanel extends JPanel
     olp = new ObjListPanel(modLis); // may have to intercept
     olp.setDialogInfo(parent,parent);
     olp.setData(args,true);
-    if(args.size() > 0) {
+    if(args.size() > 0)
       add(olp);
-    }
+
     else {
       JLabel lab = new JLabel("zero argument constructor");
       lab.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -73,6 +73,7 @@ public class ConstructorPanel extends JPanel
       add(Box.createVerticalGlue());
       setSelected(true);
     }
+    validate();    
   }
 /*
   public ConstructorPanel(Constructor construct, ActionListener selectListener, CaretListener modifiedListener)
