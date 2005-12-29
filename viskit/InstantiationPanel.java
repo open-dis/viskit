@@ -308,7 +308,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       else {
         for (int i = 0; i < construct.length; ++i) {
           constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this,packMe);
-          constructorPanels[i].setData(buildDummyInstantiators(construct[i]));
+          constructorPanels[i].setData(VInstantiator.buildDummyInstantiators(construct[i]));
           String sign = ConstructorPanel.getSignature(construct[i].getParameterTypes());
 
           if (construct[i].getParameterTypes().length == 0)
@@ -320,24 +320,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       add(tp);
 
       actionPerformed(null);    // set icon for initially selected pane
-    }
-    private List buildDummyInstantiators(Constructor con)
-    {
-      Vector v = new Vector();
-      Class[] cs = con.getParameterTypes();
-      for(int i=0;i<cs.length;i++) {
-        if(cs[i].isArray()) {
-          VInstantiator.Array va = new VInstantiator.Array(Vstatics.convertClassName(cs[i].getName()),
-                                                           new Vector());
-          v.add(va);
-        }
-        else {
-          VInstantiator.FreeF vff = new VInstantiator.FreeF(Vstatics.convertClassName(cs[i].getName()),
-                                                            "");
-          v.add(vff);
-        }
-      }
-      return v;
     }
 
     public void caretUpdate(CaretEvent e)
