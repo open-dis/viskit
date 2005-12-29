@@ -281,7 +281,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
       List children = se.getParameters(); //.getChildren();
       int i=1;
       for (Iterator itr = children.iterator(); itr.hasNext();) {
-        prefixes.add("."+i++);
+        prefixes.add("_"+i++);
         processRow(itr.next());
         prefixes.remove(prefixes.size()-1);
       }
@@ -295,6 +295,9 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
           nameRef = (String)nameRefObj;
         else if(nameRefObj instanceof TerminalParameter)
           nameRef = ((TerminalParameter)nameRefObj).getName();
+      }
+      else if(tp.getName() != null && tp.getName().length() >0) {
+        nameRef = tp.getName();
       }
       oa[NAME_COL] = nameRef;
       String typ = tp.getType();
@@ -324,7 +327,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
       List children = mp.getParameters(); //el.getChildren();
       int i=1;
       for (Iterator itr = children.iterator(); itr.hasNext();) {
-        prefixes.add("."+i++);
+        prefixes.add("_"+i++);
         processRow(itr.next());
         prefixes.remove(prefixes.size()-1);
       }
