@@ -301,11 +301,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                  new JScrollPane(stateVariablesPanel),
                                                  buildCodeBlockComponent(codeblockPan));
-    // Split pane that has state variables on top, parameters on bottom.
+    // Split pane that has parameters, state variables and code block.
     JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                                    stateCblockSplt,
-                                                    //new JScrollPane(stateVariablesPanel),
-                                                    new JScrollPane(parametersPanel));
+                                                    new JScrollPane(parametersPanel),
+                                                    stateCblockSplt);
     spltPn.setMinimumSize(new Dimension(20,20));
 
     vgcw.stateParamSplitPane = spltPn;
