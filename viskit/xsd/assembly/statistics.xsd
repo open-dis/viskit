@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="SampleStatistics">
+    <xs:complexType>
+      <xs:attribute name="mean" default="0.0" type="xs:decimal"/>
+      <xs:attribute name="variance" default="0.0" type="xs:decimal"/>
+      <xs:attribute name="standardDeviation" default="0.0" type="xs:decimal"/>
+      <xs:attribute name="count" default="0" type="xs:integer"/>
+      <xs:attribute name="minObs" default="0.0" type="xs:decimal"/>
+      <xs:attribute name="maxObs" default="0.0" type="xs:decimal"/>
+      <xs:attribute name="sampleType" default="TALLY">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="TALLY"/>
+            <xs:enumeration value="TIME_VARYING"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IndexedSampleStatistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SampleStatistics"/>
+      </xs:sequence>
+      <xs:attribute name="name"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
