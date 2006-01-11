@@ -373,12 +373,15 @@ public abstract class VInstantiator
 
     public String toString()
     {
+      if(params.size()<=0) {
+        return "";
+      }
       return factoryClass+"."+method+"("+((VInstantiator)params.get(0)).getType()+",...)";
     }
     public VInstantiator vcopy()
     {
       Vector lis = new Vector();
-      for (Iterator itr = lis.iterator(); itr.hasNext();) {
+      for (Iterator itr = getParams().iterator(); itr.hasNext();) {
         VInstantiator vi = (VInstantiator) itr.next();
         lis.add(vi.vcopy());
       }
