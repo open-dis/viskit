@@ -445,7 +445,25 @@
   <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
-
+    
+    <target name="debug-quick"  description="Quick debug">
+        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+        <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
+            <classpath path="runtime.classpath"/>
+    <!-- Optional - If source roots are properly declared in project, should
+                    work without setting source path.     
+        <sourcepath path="debug.sourcepath"/> -->
+        </nbjpdastart>
+        <java classname="viskit.Splash2" fork="true">
+            <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Djava.compiler=none"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <classpath refid="runtime.classpath"/>
+        </java>
+    </target>
+    
     <target name="debug" depends="compile" description="Debug Project">
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
