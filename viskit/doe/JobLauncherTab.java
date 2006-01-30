@@ -313,7 +313,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
       String s = exp.getTotalSamples();
       if(s != null)
         numCubesTF.setText(s);
-      s = exp.getRunsPerDesignPoint();
+      s = exp.getReplicationsPerDesignPoint();
       if(s != null)
         numRepsTF.setText(s);
 
@@ -334,7 +334,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
       exp.setTotalSamples("1");
       numCubesTF.setText("1");
-      exp.setRunsPerDesignPoint("1");
+      exp.setReplicationsPerDesignPoint("1");
       numRepsTF.setText("1");
       exp.setTimeout("5000");
       tmo.setText("5000");
@@ -369,7 +369,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     // Put the params from the GUI into the jaxbRoot
     Experiment exp = (Experiment)jaxbRoot.getExperiment();
     exp.setTotalSamples(numCubesTF.getText().trim());
-    exp.setRunsPerDesignPoint(numRepsTF.getText().trim());
+    exp.setReplicationsPerDesignPoint(numRepsTF.getText().trim());
     exp.setTimeout(tmo.getText().trim());
     // todo resolve designpoints
 
@@ -461,7 +461,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     //eType = exp.getType();
     eTmo = exp.getTimeout();
     //eJitter = exp.getJitter();
-    eRpdp = exp.getRunsPerDesignPoint();
+    eRpdp = exp.getReplicationsPerDesignPoint();
     eTotSamp = exp.getTotalSamples();
     //eBatchID = exp.getBatchID();
     //eDbg = exp.getDebug();
@@ -484,7 +484,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   private void restoreExp(Experiment exp)
   {
     exp.setTotalSamples(eTmo);
-    exp.setRunsPerDesignPoint(eRpdp);
+    exp.setReplicationsPerDesignPoint(eRpdp);
     exp.setTotalSamples(eTotSamp);
   }
 
