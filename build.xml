@@ -376,6 +376,13 @@
             <include name="SimkitAssemblyXML2Java.java"/>
             <include name="ViskitAssembly.java"/>
             <include name="BasicAssembly.java"/>
+            <include name="LatinPermutator.java"/>
+            <include name="SessionManager.java"/>
+            <include name="AssemblyServer.java"/>
+            <include name="SecureAssemblyServer.java"/>
+            <include name="AssemblyHandler.java"/>
+            <include name="GridRunner.java"/>
+            <include name="Gridlet.java"/>
         </javac>
         
         <javac destdir="${dir.build.classes}"
