@@ -192,7 +192,7 @@ public class SessionManager {
                     users.add(user);
                     
                     // write out to XML user database
-                    URLConnection url = Thread.currentThread().getContextClassLoader().getResource("passwd.xml").openConnection();
+                    URLConnection url = Thread.currentThread().getContextClassLoader().getResource(PASSWD).openConnection();
                     OutputStream os = url.getOutputStream();
                     jaxbCtx.createMarshaller().marshal(passwd,os);
                     os.flush();
@@ -271,7 +271,7 @@ public class SessionManager {
             OutputStream os =
                     Thread.currentThread()
                     .getContextClassLoader()
-                    .getResource("WTMP")
+                    .getResource(WTMP)
                     .openConnection()
                     .getOutputStream();
             os.write(message.getBytes());

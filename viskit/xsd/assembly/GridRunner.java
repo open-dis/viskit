@@ -23,7 +23,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import simkit.random.MersenneTwister;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.bindings.eventgraph.*;
+import viskit.xsd.bindings.eventgraph.*; //?
 
 /**
  * The GridRunner launches a number of Gridlets to
@@ -72,7 +72,7 @@ public class GridRunner {
     // same synchronized way.
     SimkitAssemblyType root;
     viskit.xsd.bindings.assembly.ObjectFactory assemblyFactory;
-    viskit.xsd.bindings.eventgraph.ObjectFactory eventGraphFactory;
+    viskit.xsd.bindings.eventgraph.ObjectFactory eventGraphFactory; //?
     // total number of Results received
     int resultsReceived;
     // count of DesignPoints
@@ -87,14 +87,14 @@ public class GridRunner {
         this.eventGraphs = new Vector();
         try {
             assemblyFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
-            eventGraphFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
+            eventGraphFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory(); //?
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
      
     /**
-     * hook for experiment.setAssembly XML-RPC call, used to initialize
+     * hook for gridkit.setAssembly XML-RPC call, used to initialize
      * From DOE panel. Accepts raw XML String of Assembly.
      */
     
@@ -112,13 +112,7 @@ public class GridRunner {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssemblyType) u.unmarshal(inputStream);
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
-        
-        //fileBaseName = root.getName();
-        //System.out.println("got fileBaseName of "+fileBaseName);
-        //tasker = new GridTaskGetter(this);
-        //tasker.start();
-        
-        
+    
         // clear results count
         this.resultsReceived = 0;
         // set number replications per DesignPoint
@@ -166,7 +160,7 @@ public class GridRunner {
             
             this.resultsReceived++;
             
-            // done! write out all results to storage
+            // if all results in, done! write out all results to storage
             if ( resultsReceived == designPointCount * replicationsPerDesignPoint) {
                 (new SimkitAssemblyXML2Java())
                     .marshal((javax.xml.bind.Element)root, 
@@ -200,7 +194,7 @@ public class GridRunner {
      */
     
     public synchronized String getResult(int designPt, int run) {
-        RunType runner = (RunType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getReplication().get(run));
+        ReplicationType runner = (ReplicationType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getReplication().get(run));
         ResultsType r = runner.getResults();
         int timeout = Integer.parseInt(root.getExperiment().getTimeout());
         if ( r == null ) { // not while
@@ -246,7 +240,6 @@ public class GridRunner {
         }
         
         try {
-            //ObjectFactory of = new ObjectFactory();
             ResultsType r = (ResultsType)(assemblyFactory.createResults());
             r.setDesign(""+designPt);
             r.setReplication(""+run);
@@ -328,6 +321,7 @@ public class GridRunner {
         // calculate DesignPoints
         
         if ( calculateDesignPoints() == Boolean.FALSE ) return Boolean.FALSE;
+        
         // deposit the Experiment file
         String experimentFileName = root.getName() + "Exp.xml";
         try {
@@ -338,6 +332,7 @@ public class GridRunner {
             return Boolean.FALSE;
         }
         
+        // spawn Gridlets
         int totalRuns = designPointCount*replicationsPerDesignPoint;
         try {
             Runtime.getRuntime().exec( new String[] {"qsub","-v","FILENAME="+experimentFileName,"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalRuns,"-S","/bin/bash","./gridrun.sh"});
@@ -369,7 +364,7 @@ public class GridRunner {
             } else { // take a Script or use built ins
                 ExperimentType e = root.getExperiment();
                 String expType = e.getType();
-                bsh.Interpreter bsh = new bsh.Interpreter();
+                //bsh.Interpreter bsh = new bsh.Interpreter();
                 
                 if (expType.equals("full-factorial")) {
                     doFullFactorial();
@@ -500,7 +495,7 @@ public class GridRunner {
      *
      * In general, the number of Latin square combinations is far
      * less than the number of FullFactorial combinations and converges as fast,
-     * even so, there can be a large number of Latin squares, so in the case of
+     * or better; there can be a large number of Latin squares, so in the case of
      * a large number of variates, it may not be essential to select more than
      * one sample set from each Latin square.
      *

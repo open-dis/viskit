@@ -12,17 +12,14 @@
 package viskit.xsd.assembly;
 
 import simkit.Adapter;
-//import simkit.BasicAssembly;
 import simkit.Schedule;
 import simkit.SimEntity;
 import simkit.stat.SampleStatistics;
-
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
 
 
 /**

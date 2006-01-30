@@ -8,6 +8,7 @@
  * Assumes environment properties set:
  * USID : Unique Session ID
  * FILENAME : Name of experiement file.
+ * PORT: Port number to report back to.
  * SGE : any SGE environment
  * TBD - XmlRpcClient may need to be either clear or 
  * ssl. 
@@ -15,9 +16,24 @@
 
 package viskit.xsd.assembly;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Vector;
+import org.apache.xmlrpc.XmlRpcClientLite;
 import bsh.Interpreter;
+import viskit.xsd.bindings.assembly.*;
+import viskit.xsd.bindings.eventgraph.*;
+import javax.xml.bind.Element;
+import simkit.stat.SampleStatistics;
+
 
 /**
  *
@@ -25,9 +41,8 @@ import bsh.Interpreter;
  */
 
 public class Gridlet extends Thread {
-    SimkitAssemblyXML2Java inst;
-    boolean isTask;
-    int task;
+    SimkitAssemblyXML2Java sax2j;
+    int taskID;
     int numTasks;
     int jobID;
     int port;
@@ -43,38 +58,37 @@ public class Gridlet extends Thread {
             Properties p = System.getProperties();
             p.load(is);
             
-            if (isTask=p.getProperty("SGE_TASK_ID")!=null) {
-                task=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
+            if (p.getProperty("SGE_TASK_ID")!=null) {
+                taskID=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
                 jobID=Integer.parseInt(p.getProperty("JOB_ID"));
                 numTasks=Integer.parseInt(p.getProperty("SGE_TASK_LAST"));
                 frontHost = p.getProperty("SGE_O_HOST");
                 usid = p.getProperty("USID");
                 filename = p.getProperty("FILENAME");
+                port = Integer.parseInt(p.getProperty("PORT"));
+                sax2j = new SimkitAssemblyXML2Java(filename);
+            } else {
+                throw new RuntimeException("Not running as SGE job?");
             }
-        } catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    
-    public void run() {
-        doGridTask(frontHost,task,numTasks,jobID);
-    }
-    
     
     
     public static void main(String[] args) {
         
     }
     
-    public void doGridTask(String frontHost, int taskID, int lastTask, int jobID) {
+    public void run() {
+        SimkitAssemblyType root;
         
-        System.out.println("Doing GridTask "+taskID+" of "+lastTask+" for "+frontHost+" as jobID "+jobID);
         
-        
-        unmarshal();
+        sax2j.unmarshal();
+        root = sax2j.getRoot();
         
         ExperimentType exp = root.getExperiment();
-        int runsPerDesignPt = getReplicationsPerDesignPoint();
+        int runsPerDesignPt = Integer.parseInt(exp.getReplicationsPerDesignPoint());
         List designPoints = exp.getDesignPoint();
         int designPtsSize = designPoints.size(); // aka getCount() on local side
         int designPtIndex = (taskID-1)/runsPerDesignPt;
@@ -87,7 +101,7 @@ public class Gridlet extends Thread {
         Iterator itp = params.iterator();
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
         
-        System.out.println(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
+        if(sax2j.debug)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
         //exp.setBatchID(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
         
         while ( itd.hasNext() && itp.hasNext() ) {
@@ -144,13 +158,17 @@ public class Gridlet extends Thread {
                 
             }
             
-            System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
-            System.out.println(translate());
-            bsh.eval(translate());
-            //bsh.eval("sim = new "+ root.getName() +"();");
-            //bsh.eval("sim.main(new String[0])");
-            
-            bsh.eval(root.getName()+".main(new String[0]);");
+            if (sax2j.debug) {
+                System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
+                System.out.println(sax2j.translate());
+            }
+            bsh.eval(sax2j.translate());
+            bsh.eval("sim = new "+ root.getName() +"();");
+            bsh.eval("sim.main(new String[0])"); // or sim.start();
+            ViskitAssembly sim = (ViskitAssembly) bsh.get("sim");
+            SampleStatistics[] designPointStats = sim.getDesignPointStats();
+            // really want rep stats?
+            //SampleStatistics[] replicationStats = sim.getReplicationStats(i);
             
             if(!debug_io) {
                 System.setOut(new PrintStream(oldOut));
@@ -174,7 +192,7 @@ public class Gridlet extends Thread {
                 
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
-                
+                String qu  = "\"";
                 out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" design="+qu+designPtIndex+qu+" run="+qu+runIndex+qu+">");
                 while( (line = br.readLine()) != null ) {
                     if (line.indexOf("<PropertyChange") < 0) {
@@ -221,13 +239,14 @@ public class Gridlet extends Thread {
                 
                 //send results back to front end
                 Vector parms = new Vector();
+                parms.add(usid);
                 parms.add(new String(sw.toString()));
                 
                 //debug
                 System.out.println("sending Result ");
                 System.out.println(sw.toString());
                 
-                xmlrpc.execute("experiment.addResult", parms);
+                xmlrpc.execute("gridkit.addResult", parms);
                 
             } catch (Exception e) {
                 e.printStackTrace();

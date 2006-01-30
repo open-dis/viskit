@@ -115,18 +115,18 @@
 <!ELEMENT Results ( Log | PropertyChange | Errors )* >
 <!ATTLIST Results 
     design  CDATA #REQUIRED
-    run     CDATA #REQUIRED
+    replication  CDATA #REQUIRED
     index   CDATA #IMPLIED
     job     CDATA #IMPLIED
 >
 
-<!ELEMENT DesignPoint (TerminalParameter*,Script?,Run*) >
+<!ELEMENT DesignPoint (TerminalParameter*,Script?,Replication*,(%Statistics;)?) >
 <!ATTLIST DesignPoint
     index CDATA #IMPLIED
 >
 
-<!ELEMENT Run (Results?,Script?) >
-<!ATTLIST Run
+<!ELEMENT Replication (Results?,Script?,(%Statistics;)?) >
+<!ATTLIST Replication
     index CDATA #IMPLIED
 >
 
@@ -134,9 +134,9 @@
 
 <!ELEMENT Experiment (Script?,DesignPoint*) >
 <!ATTLIST Experiment
-    batchID CDATA #IMPLIED
+    jobID CDATA #IMPLIED
     type (latin-hypercube | full-factorial)  "latin-hypercube"
-    runsPerDesignPoint CDATA "1"
+    replicationsPerDesignPoint CDATA "1"
     totalSamples CDATA "1"
     jitter ( true | false ) "true"
     timeout CDATA "0"
@@ -162,4 +162,11 @@
 	version	CDATA	#REQUIRED
 	package CDATA   #REQUIRED
         extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
+>
+
+<!ELEMENT PasswordFile ( User* )>
+<!ELEMENT User EMPTY>
+<!ATTLIST User
+        name    ID   #REQUIRED
+        password CDATA  #REQUIRED
 >
