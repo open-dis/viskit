@@ -45,7 +45,7 @@ public class Launcher extends Thread implements Runnable {
             
             try {
                 if (p.getProperty("Gridkit") != null) {
-                    launchGridkit(p.getProperty("port"));
+                    launchGridkit(p.getProperty("Gridkit"));
                 }
             } catch (Exception e) {;}
             
