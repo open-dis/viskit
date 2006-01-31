@@ -12,7 +12,7 @@
  * Also provides admin hooks for creating users and fixing passwords.
  *
  * Assembly and EventGraph XML are sent via XML-RPC from the DOE
- * Panel, DesignPoints are calculated and sent to the grid.
+ * Panel.
  *
  */
 
@@ -92,8 +92,14 @@ public class AssemblyHandler implements XmlRpcHandler {
             }
             return usid;
         }
+
+        usid = "null";
+        if (parameters.size() > 0) {
+            if (parameters.elementAt(0)!=null) {
+                usid = new String((String)parameters.elementAt(0));
+            }
+        }
         
-        usid = new String((String)parameters.elementAt(0));
         
         if (sessionManager.authenticate(usid)) {
             
@@ -149,10 +155,10 @@ public class AssemblyHandler implements XmlRpcHandler {
                 // referenced by jobID.taskID
                 // the USID is something we know ahead of time
                 // and the Gridlet can obtain to use to
-                // up call its own jobID, to inform the registered
+                // up-call its own jobID, to inform the registered
                 // GridRunner which will need to known how to
                 // manage the task via SGE (see wc_job_range_list in
-                // SGE man pages) Note, only the first gridlet
+                // SGE man pages.) Note, only the first Gridlet
                 // from a jobID batch will use this call.
                 String jobID = (String) parameters.elementAt(1);
                 gridRunner.setJobID(jobID);

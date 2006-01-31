@@ -42,6 +42,7 @@ import simkit.stat.SampleStatistics;
 
 public class Gridlet extends Thread {
     SimkitAssemblyXML2Java sax2j;
+    XmlRpcClientLite xmlrpc;
     int taskID;
     int numTasks;
     int jobID;
@@ -53,12 +54,14 @@ public class Gridlet extends Thread {
     public Gridlet() {
        
         try {
+           
             Process pr = Runtime.getRuntime().exec("env");
             InputStream is = pr.getInputStream();
             Properties p = System.getProperties();
             p.load(is);
             
             if (p.getProperty("SGE_TASK_ID")!=null) {
+                
                 taskID=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
                 jobID=Integer.parseInt(p.getProperty("JOB_ID"));
                 numTasks=Integer.parseInt(p.getProperty("SGE_TASK_LAST"));
@@ -67,6 +70,14 @@ public class Gridlet extends Thread {
                 filename = p.getProperty("FILENAME");
                 port = Integer.parseInt(p.getProperty("PORT"));
                 sax2j = new SimkitAssemblyXML2Java(filename);
+                //FIXME: should also check if SSL
+                //FIXME: output stream goes
+                if (taskID == 1) {
+                    Vector v = new Vector();
+                    v.add(new Integer(jobID));
+                    xmlrpc = new XmlRpcClientLite(frontHost,port);
+                    xmlrpc.execute("gridkit.setJobID", v);
+                }
             } else {
                 throw new RuntimeException("Not running as SGE job?");
             }
@@ -182,7 +193,7 @@ public class Gridlet extends Thread {
             java.io.BufferedReader ebr = new java.io.BufferedReader(sr);
             
             try {
-                XmlRpcClientLite xmlrpc = new XmlRpcClientLite(frontHost,port);
+
                 PrintWriter out;
                 StringWriter sw;
                 String line;

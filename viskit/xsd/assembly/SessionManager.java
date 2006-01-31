@@ -42,10 +42,10 @@ import viskit.xsd.bindings.assembly.UserType;
  * @author Rick Goldberg
  */
 public class SessionManager {
-    Hashtable sessions;
-    JAXBContext jaxbCtx;
-    public static final String WTMP = "wtmp.xml";
-    public static final String PASSWD = "passwd.xml";
+    private Hashtable sessions;
+    private JAXBContext jaxbCtx;
+    private static final String WTMP = "wtmp.xml";
+    private static final String PASSWD = "passwd.xml";
     private static final String SALT = "gridkit!";
     
     /** Creates a new instance of SessionManager */
