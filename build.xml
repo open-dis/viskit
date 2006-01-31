@@ -367,6 +367,19 @@
             target="1.4">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+            </classpath>
+            <src path="${dir.src.cli.util}"/>
+            <include name="Launcher.java"/>
+            <include name="Boot.java"/>
+        </javac>
+        
+        <javac destdir="${dir.build.classes}"
+            debug="on"
+            source="1.4"
+            target="1.4">
+            <classpath>
+                <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
@@ -385,18 +398,7 @@
             <include name="Gridlet.java"/>
         </javac>
         
-        <javac destdir="${dir.build.classes}"
-            debug="on"
-            source="1.4"
-            target="1.4">
-            <classpath>
-                <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
-            </classpath>
-            <src path="${dir.src.cli.util}"/>
-            <include name="Launcher.java"/>
-            <include name="Boot.java"/>
-        </javac>
+
         <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
     </target>   
     
