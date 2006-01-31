@@ -139,7 +139,8 @@ public class SessionManager {
     }
     
     // tag the username with the login time, can auto-logout
-    // after inactivity check (TBD)
+    // after inactivity check (TBD). see note about cookie
+    // randomness and decide if following is redundant:
     private void createSession(String cookie, String username) {
         sessions.put(cookie, username+" "+new java.util.Date().getTime());
     }
@@ -154,7 +155,7 @@ public class SessionManager {
     Boolean addUser(String ssid, String newUser) {
         if ( isAdmin(ssid) ) {
             
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("PASSWD");
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PASSWD);
             try {
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
                 PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
@@ -227,7 +228,7 @@ public class SessionManager {
         try {
             String passcrypt = null;
             Unmarshaller u = jaxbCtx.createUnmarshaller();
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("PASSWD");
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PASSWD);
             PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
             List users = passwd.getUser();
             Iterator it = users.iterator();
