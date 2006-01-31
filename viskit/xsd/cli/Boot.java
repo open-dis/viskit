@@ -104,6 +104,11 @@ public class Boot extends URLClassLoader implements Runnable {
         }
     }
     
+    // provided mainly for Gridlets
+    // to install 3rd pty jars
+    public void addJar(URL jarURL) {
+        addURL(jarURL);
+    }
 
     protected void addURL(URL jarURL) {
         URLConnection urlc;

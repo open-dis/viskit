@@ -44,6 +44,12 @@ public class Launcher extends Thread implements Runnable {
             p.load(configIn);
             
             try {
+                if (p.getProperty("Gridkit") != null) {
+                    launchGridkit(p.getProperty("port"));
+                }
+            } catch (Exception e) {;}
+            
+            try {
                 u = cloader.getResource(p.getProperty("Assembly"));
                 setAssembly(u);
             } catch (Exception e) { // no assembly resource, launch viskit
@@ -376,6 +382,49 @@ public class Launcher extends Thread implements Runnable {
             m.invoke(null, new Object[] { new String[]{"viskit.EventGraphAssemblyComboMain"} });
         } catch (Exception e) {
             System.out.println("Package error, can't run Viskit");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    void launchGridkit(String port) {
+        try {
+            Process pr = Runtime.getRuntime().exec("env");
+            InputStream is = pr.getInputStream();
+            Properties p = System.getProperties();
+            p.load(is);
+            
+            if (p.getProperty("SGE_TASK_ID") != null) {
+                launchGridlet();
+            } else {
+                launchAssemblyServer(Integer.parseInt(port));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    // this would be invoked as a result of an SGE qsub
+    // Gridlet actually does use the Boot class loader for 
+    // appending 3rd pty jars.
+    // Gridlets also do their own to get PORT and other env
+    void launchGridlet() {
+        try {
+            Class gridletz = cloader.loadClass("viskit.xsd.assembly.Gridlet");
+            Method m = gridletz.getDeclaredMethod("main", new Class[]{ String[].class });
+            m.invoke(null, new Object[] { new String[]{} });
+        } catch (Exception e) {
+            System.out.println("Package error, can't run Gridlet");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    void launchAssemblyServer(int port) {
+        try {
+            Class serverz = cloader.loadClass("viskit.xsd.assembly.AssemblyServer");
+            Method m = serverz.getDeclaredMethod("main", new Class[]{ String[].class });
+            m.invoke(null, new Object[] { new String[]{"-p",""+port} });
+        } catch (Exception e) {
+            System.out.println("Package error, can't run AssemblyServer");
             e.printStackTrace();
             System.exit(1);
         }
