@@ -11,20 +11,11 @@ import org.apache.xmlrpc.WebServer;
 /**
  *
  * XML-RPC service for Gridkit
- * @author rmgold
+ * @author Rick Goldberg
  */
 
 public class AssemblyServer extends WebServer {
     public static final int DEFAULT_PORT=4444;
-    // keep for backwards compat until tested
-    SimkitAssemblyXML2Java inst;
-    
-    AssemblyServer(SimkitAssemblyXML2Java inst, int port) {
-        super(port);
-        this.inst=inst;
-        addHandler("experiment",inst);
-        
-    }
     
     // server is typically started here from main();
     AssemblyServer(int port) {
