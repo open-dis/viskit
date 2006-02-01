@@ -328,8 +328,8 @@ public class SessionManager {
             }
             FileOutputStream fos = new FileOutputStream(f,true);
             fos.write(line.getBytes());
-            fos.close();
             fos.flush();
+            fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
