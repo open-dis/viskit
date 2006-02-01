@@ -54,6 +54,7 @@ public class SessionManager {
     
     /** Creates a new instance of SessionManager */
     public SessionManager() {
+        sessions = new Hashtable();
         log("SessionManager initialized");
     }
     
@@ -171,12 +172,8 @@ public class SessionManager {
                 List users = passwd.getUser();
                 if (pwd.exists()) {
                     passwd = (PasswordFileType) u.unmarshal(is);
-                    
                     is.close();
-                    
-                    
                     users = passwd.getUser();
-                    
                     Iterator it = users.iterator();
                     while (it.hasNext()) {
                         UserType user = (UserType) it.next();
