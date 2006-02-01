@@ -31,12 +31,25 @@ public class TestGridkitLogin extends Thread {
         params.add(user); // just something to create bogus usid
         params.add(user); // to initialize a password file
         try {
+            // test assumes no /tmp/passwd.xml exists!
+            // when addUser is called the first time
+            // with admin, it initializes the passwd
+            // database and creates a temporary password
+            // for admin, "admin". This is a required
+            // part of installing Gridkit by the admin,
+            // before the port is made external.
             ret = xmlrpc.execute("gridkit.addUser",params);
             System.out.println("addUser returns "+ret.toString());
             // users are initialized with their usernames a password
             // and should change them asap.
             usid = (String) xmlrpc.execute("gridkit.login", params);
             System.out.println("login returned "+usid);
+            
+            params.clear();
+            params.add(usid);
+            ret = xmlrpc.execute("gridkit.logout", params);
+            System.out.println("logout "+usid+" "+ret);
+            
         } catch (Exception e) { e.printStackTrace(); }
         
     }
