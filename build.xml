@@ -255,6 +255,42 @@
         </copy>
     </target>
 
+    <target depends="jar" name="gridkit-jar">
+        <delete dir="${dir.dist}/gridkit-stage"/>
+        <mkdir dir="${dir.dist}/gridkit-stage"/>
+        <mkdir dir="${dir.dist}/gridkit"/>
+        <copy todir="${dir.dist}/gridkit-stage">
+            <fileset dir="${dir.build.lib}">
+                <include name="visxml.jar"/>
+            </fileset>
+            <fileset dir="${dir.lib}">
+                <include name="simkit.jar"/>
+                <include name="xmlrpc-2.0.jar"/>
+                <include name="bsh-2.0b1.jar"/>
+            </fileset>
+            <fileset dir="${dir.lib}/jwsdp-1.5">
+                <include name="jaxb-api.jar"/>
+                <include name="jaxb-impl.jar"/>
+                <include name="jaxb-libs.jar"/>
+            </fileset>
+            <fileset dir="${dir.src.cli.util}">
+                <include name="config.properties"/>
+            </fileset>
+        </copy>
+        <mkdir dir="${dir.dist}/gridkit-stage/viskit/xsd/cli"/>
+        <copy todir="${dir.dist}/gridkit-stage/viskit/xsd/cli" >
+            <fileset dir="${dir.build}/classes/viskit/xsd/cli" >
+                <include name="Boot.class"/>
+                <include name="Launcher.class"/>
+            </fileset>
+        </copy>
+       
+        <jar basedir="${dir.dist}/gridkit-stage" 
+            destfile="${dir.dist}/gridkit.jar"
+            manifest="${dir.src.cli.util}/manif.txt" />
+            
+    </target>
+    
     <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
          <classpath>
              <fileset dir="${dir.lib.xml}" includes="*.jar"/>
