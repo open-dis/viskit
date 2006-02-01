@@ -110,7 +110,7 @@ public class SessionManager {
                 }
             }
         } catch (Exception e) {
-            log(new java.util.Date().toString()+": Login error");
+            log(new java.util.Date().toString()+": Login error "+e.toString());
             return "LOGIN-ERROR";
         }
         
@@ -173,7 +173,11 @@ public class SessionManager {
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
 
                 ObjectFactory of = new ObjectFactory();
-                PasswordFileType passwd = of.createPasswordFileType();
+                //JAXB feature
+                //createPasswordFileType returns an Object which
+                //when marshalled doesn't contain proper <PasswordFile>
+                //tags, but createPasswordFile() does.
+                PasswordFileType passwd = of.createPasswordFile();
                 List users = passwd.getUser();
                 if (pwd.exists()) {
                     FileInputStream is = new FileInputStream(pwd);
