@@ -12,6 +12,17 @@
  * SGE : any SGE environment
  * TBD - XmlRpcClient may need to be either clear or 
  * ssl. 
+ *
+ * First one in a batch array of tasks, reports back
+ * the assigned SGE jobID for further administration
+ * at the front end.
+ *
+ * Third party jars can be added to the runtime classpath
+ * prior to reconstituting an Assembly and running it. See
+ * GridRunner for XML-RPC details. To do this though, Gridlets
+ * should be launched from viskit.xsd.cli.Launcher to
+ * have access to the Boot ClassLoader.
+ *
  */
 
 package viskit.xsd.assembly;
@@ -22,7 +33,9 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
@@ -31,6 +44,7 @@ import org.apache.xmlrpc.XmlRpcClientLite;
 import bsh.Interpreter;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.eventgraph.*;
+import viskit.xsd.cli.Boot;
 import javax.xml.bind.Element;
 import simkit.stat.SampleStatistics;
 
@@ -71,13 +85,29 @@ public class Gridlet extends Thread {
                 port = Integer.parseInt(p.getProperty("PORT"));
                 sax2j = new SimkitAssemblyXML2Java(filename);
                 //FIXME: should also check if SSL
-                //FIXME: output stream goes
+                xmlrpc = new XmlRpcClientLite(frontHost,port);
+
                 if (taskID == 1) {
                     Vector v = new Vector();
+                    v.add(usid);
                     v.add(new Integer(jobID));
-                    xmlrpc = new XmlRpcClientLite(frontHost,port);
                     xmlrpc.execute("gridkit.setJobID", v);
                 }
+                
+                // get any thirdPartyJars and install them now
+                Vector v = new Vector();
+                v.add(usid);
+                v = (Vector)xmlrpc.execute("gridkit.getJars",v);
+                Enumeration e = v.elements();
+                ClassLoader boot = Thread.currentThread().getContextClassLoader();
+                if (boot instanceof Boot) while ( e.hasMoreElements() ) {
+                    ((Boot)boot).addJar(new URL((String)e.nextElement()));
+                } else {
+                    if (!v.isEmpty())
+                        throw 
+                            new RuntimeException("You should really be using viskit.xsd.cli.Boot loader to launch Gridlets!");
+                }
+                
             } else {
                 throw new RuntimeException("Not running as SGE job?");
             }
@@ -88,7 +118,8 @@ public class Gridlet extends Thread {
     
     
     public static void main(String[] args) {
-        
+        Gridlet gridlet = new Gridlet();
+        gridlet.start();
     }
     
     public void run() {

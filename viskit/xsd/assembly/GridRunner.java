@@ -8,14 +8,17 @@
 package viskit.xsd.assembly;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
@@ -61,7 +64,7 @@ public class GridRunner {
     int port;
     static final boolean debug = true;
     Vector eventGraphs;
-    
+    Hashtable thirdPartyJars;
     // This SimkitAssemblyType is used to set up 
     // the experiment. Read in by the setAssembly()
     // method, subsequently augmented by addEventGraph().
@@ -127,6 +130,61 @@ public class GridRunner {
         eventGraphs.add(eventGraph);
         return Boolean.TRUE;
     }
+    
+    // unknown what the max buffer size is, 
+    // but won't assume any particular length here
+    // just that the last one sent's length is less
+    // than any previous. will check sequence id
+    // but doubt sequence would be an issue ( can 
+    // probably eliminate ).
+    int lastDataSize = 0;
+    int lastSequence = 0;
+    Integer transferJar(String filename, byte[] data, int sequence) {
+        ByteArrayOutputStream jarData;
+        try {
+            if ( !thirdPartyJars.containsKey(filename) ) {
+                lastDataSize = data.length;
+                lastSequence = sequence;
+                jarData = new ByteArrayOutputStream();
+                jarData.write(data);
+                thirdPartyJars.put(filename,jarData);
+            } else {
+                jarData = (ByteArrayOutputStream)thirdPartyJars.get(filename);
+                jarData.write(data);
+                if (data.length < lastDataSize) {
+                    if(filename.endsWith(".jar")) {
+                        filename = filename.substring(0,filename.length()-4);
+                    }
+                    File jarFile = File.createTempFile(filename,"jar");
+                    FileOutputStream fos = new FileOutputStream(jarFile);
+                    fos.write(jarData.toByteArray());
+                    fos.flush();
+                    fos.close();
+                    URL u = jarFile.toURL();
+                    // replace buffer, any further attempt to
+                    // send this file during this session results
+                    // in no transfer
+                    thirdPartyJars.put(filename,u);
+                    
+                }
+            }
+            return Integer.valueOf(data.length);
+        } catch (Exception e) {
+            return Integer.valueOf(-1);
+        }
+    }
+
+    // called by Gridlet to install 3rd pty jars into
+    // its own Boot class loader
+    public Vector getJars() {
+        Vector ret = new Vector();
+        Enumeration e = thirdPartyJars.elements();
+        while ( e.hasMoreElements() ) {
+            ret.add(((URL)e.nextElement()).toString());
+        }
+        return ret;
+    }
+    
     /**
      * hook for gridkit.addResult XML-RPC call, used to report
      * back results from grid node run. Accepts raw XML String of Report.

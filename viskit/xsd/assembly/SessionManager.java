@@ -26,6 +26,10 @@ import java.util.Iterator;
 import java.net.URLConnection;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -44,22 +48,21 @@ import viskit.xsd.bindings.assembly.UserType;
 public class SessionManager {
     private Hashtable sessions;
     private JAXBContext jaxbCtx;
-    private static final String WTMP = "wtmp.xml";
-    private static final String PASSWD = "passwd.xml";
+    private static final String WTMP = "/tmp/wtmp.xml";
+    private static final String PASSWD = "/tmp/passwd.xml";
     private static final String SALT = "gridkit!";
     
     /** Creates a new instance of SessionManager */
     public SessionManager() {
-        log("SessionManager initialized "+new java.util.Date().toString());
+        log("SessionManager initialized");
     }
     
     String login(String username, String password) {
-        
-        InputStream is = 
-                Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(PASSWD);
+ 
         try {
+            File pwf = new File(PASSWD);
+            FileInputStream is = 
+                new FileInputStream(PASSWD);
             Unmarshaller u = jaxbCtx.createUnmarshaller();
             PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
             List users = passwd.getUser();
@@ -92,20 +95,20 @@ public class SessionManager {
                     String cookie = generateCookie(username);
                     if (! cookie.equals("BAD-COOKIE")) {
                         createSession(cookie, username);
-                        log("Session created: "+username+" "+new java.util.Date().toString());
+                        log("Session created for "+username);
                     }
                     return cookie;
                } else {
-                    log("Failed login attempt: "+username+" "+new java.util.Date().toString());
+                    log("Failed login attempt for "+username);
                     return "BAD-LOGIN";
                 }
             }
         } catch (Exception e) {
-            log("Login error: "+new java.util.Date().toString());
+            log(new java.util.Date().toString()+": Login error");
             return "LOGIN-ERROR";
         }
         
-        log("Unknown user "+username+": "+new java.util.Date().toString());
+        log("Unknown user "+username);
         return "UNKNOWN-USER";
     }
     
@@ -148,25 +151,38 @@ public class SessionManager {
                    
     /**
      * create a new user identity with default password as
-     * uid encrypted with uid.
+     * uid encrypted with uid. To bootstrap a password file,
+     * addUser will check if file exists, enabling if it doesn't
+     * without a valid ssid, once.
      */
    
     
     Boolean addUser(String ssid, String newUser) {
         if ( isAdmin(ssid) ) {
             
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PASSWD);
+            File pwd = new File(PASSWD);
+            
             try {
-                Unmarshaller u = jaxbCtx.createUnmarshaller();
-                PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
-                is.close();
-                List users = passwd.getUser();
                 String passcrypt = null;
-                Iterator it = users.iterator();
-                while (it.hasNext()) {
-                    UserType user = (UserType) it.next();
-                    if (user.getName().equals(newUser)) {
-                        passcrypt = user.getPassword();
+                Unmarshaller u = jaxbCtx.createUnmarshaller();
+                FileInputStream is = new FileInputStream(pwd);
+                ObjectFactory of = new ObjectFactory();
+                PasswordFileType passwd = of.createPasswordFileType();
+                List users = passwd.getUser();
+                if (pwd.exists()) {
+                    passwd = (PasswordFileType) u.unmarshal(is);
+                    
+                    is.close();
+                    
+                    
+                    users = passwd.getUser();
+                    
+                    Iterator it = users.iterator();
+                    while (it.hasNext()) {
+                        UserType user = (UserType) it.next();
+                        if (user.getName().equals(newUser)) {
+                            passcrypt = user.getPassword();
+                        }
                     }
                 }
                 if (passcrypt == null) {
@@ -193,12 +209,12 @@ public class SessionManager {
                     users.add(user);
                     
                     // write out to XML user database
-                    URLConnection url = Thread.currentThread().getContextClassLoader().getResource(PASSWD).openConnection();
-                    OutputStream os = url.getOutputStream();
-                    jaxbCtx.createMarshaller().marshal(passwd,os);
-                    os.flush();
-                    os.close();
-                    log("New user created: "+newUser+" "+new java.util.Date().toString());
+                    FileOutputStream fos = new FileOutputStream(pwd);
+                    
+                    jaxbCtx.createMarshaller().marshal(passwd,fos);
+                    fos.flush();
+                    fos.close();
+                    log("New user created for "+newUser);
                     return Boolean.TRUE;
                 } else {
                     return Boolean.FALSE;
@@ -212,10 +228,44 @@ public class SessionManager {
         return Boolean.FALSE;
     }
     
-    public Boolean changePassword(String usid, String user, String newPassword) {
-        if ( getUser(usid).equals(user) || isAdmin(usid) ) {
-            // TBD
-            log("Password changed: "+user+" "+new java.util.Date().toString());
+    public Boolean changePassword(String usid, String username, String newPassword) {
+        File pwd = new File(PASSWD);
+        if ( getUser(usid).equals(username) || isAdmin(usid) ) {
+            try {
+                Unmarshaller u = jaxbCtx.createUnmarshaller();
+                FileInputStream is = new FileInputStream(pwd);
+                PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
+                is.close();
+                List users = passwd.getUser();
+                Iterator it = users.iterator();
+                while (it.hasNext()) {
+                    UserType user = (UserType) it.next();
+                    if (user.getName().equals(username)) {
+                        //TBD could refactor out the crypto stuff 
+                        byte[] salt = SALT.getBytes();
+                        PBEKeySpec keySpec = new PBEKeySpec(newPassword.toCharArray(), salt, 18);
+                        SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
+                        Cipher encipher = Cipher.getInstance(key.getAlgorithm());
+                        PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
+                        encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
+                        
+                        // encrypt username id with newPassword for temporary password token
+                        byte[] utf8 = username.getBytes("UTF8");
+                        byte[] enc = encipher.doFinal(utf8);
+                        
+                        // Encode bytes to base64 to get a string and write out to passwd.xml file
+                        user.setPassword( new sun.misc.BASE64Encoder().encode(enc) );
+                    }
+                }
+                FileOutputStream fos = new FileOutputStream(pwd);
+                jaxbCtx.createMarshaller().marshal(passwd,fos);
+                fos.flush();
+                fos.close();
+            } catch (Exception e) {
+                log("Error changing password for"+username);
+                return Boolean.FALSE;
+            }
+            log("Password changed for "+username);
             return Boolean.TRUE;
         }
         
@@ -228,7 +278,8 @@ public class SessionManager {
         try {
             String passcrypt = null;
             Unmarshaller u = jaxbCtx.createUnmarshaller();
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PASSWD);
+            File pwd = new File(PASSWD);
+            FileInputStream is = new FileInputStream(pwd);
             PasswordFileType passwd = (PasswordFileType) u.unmarshal(is);
             List users = passwd.getUser();
             Iterator it = users.iterator();
@@ -254,7 +305,8 @@ public class SessionManager {
     
     boolean isAdmin(String usid) {
         if (getUser(usid).equals("admin")) return true;
-        
+        File f = new File(PASSWD);
+        if(!f.exists()) return true; // init passwd with addUser for admin
         return false;
     }
     
@@ -267,17 +319,17 @@ public class SessionManager {
     }
     
     void log(String message) {
-        message = "<Log>"+message+"</Log>\n";
+        int z;
+        String line = "<Log>"+new java.util.Date().toString()+": "+message+"</Log>"+'\n';
         try {
-            OutputStream os =
-                    Thread.currentThread()
-                    .getContextClassLoader()
-                    .getResource(WTMP)
-                    .openConnection()
-                    .getOutputStream();
-            os.write(message.getBytes());
-            os.close();
-            os.flush();
+            File f = new File(WTMP);
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(f,true);
+            fos.write(line.getBytes());
+            fos.close();
+            fos.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }

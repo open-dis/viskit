@@ -115,6 +115,17 @@ public class AssemblyHandler implements XmlRpcHandler {
                 xmlData=(String) parameters.elementAt(1);
                 ret = gridRunner.addEventGraph(xmlData);
                 
+            } else if (call.equals("gridkit.transferJar")) {
+                // used by DOE to send a 1024 byte or less chunk of a jar
+                // jarTransfer(filename,byte[1024])
+                ret = gridRunner.transferJar((String)parameters.elementAt(1),
+                        (byte[])parameters.elementAt(2),
+                        ((Integer)parameters.elementAt(3)).intValue());
+            
+            } else if (call.equals("gridkit.getJars")) {
+                // used Gridlet to update its own Boot class loader
+                ret = gridRunner.getJars();
+            
             } else if (call.equals("gridkit.run")) {
                 
                 ret = gridRunner.run();
