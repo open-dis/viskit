@@ -31,7 +31,7 @@ public class TestGridkitLogin extends Thread {
         params.add(user); // just something to create bogus usid
         params.add(user); // to initialize a password file
         try {
-            // test assumes no /tmp/passwd.xml exists!
+            // test can be used to init a passwd.xml file
             // when addUser is called the first time
             // with admin, it initializes the passwd
             // database and creates a temporary password
@@ -44,11 +44,35 @@ public class TestGridkitLogin extends Thread {
             // and should change them asap.
             usid = (String) xmlrpc.execute("gridkit.login", params);
             System.out.println("login returned "+usid);
-            
+            // logout this session
             params.clear();
             params.add(usid);
             ret = xmlrpc.execute("gridkit.logout", params);
             System.out.println("logout "+usid+" "+ret);
+            // log back in
+            params.clear();
+            params.add("admin");
+            params.add("admin");
+            usid = (String)xmlrpc.execute("gridkit.login", params);
+            System.out.println("login returned "+usid);
+            // change admin's password
+            params.clear();
+            params.add(usid);
+            params.add("admin");
+            params.add("hello");
+            ret = xmlrpc.execute("gridkit.changePassword", params);
+            System.out.println("changePassword returned "+ret);
+            // logout again
+            params.clear();
+            params.add(usid);
+            ret = xmlrpc.execute("gridkit.logout", params);
+            System.out.println("logout "+usid+" "+ret);
+            // test new password with login
+            params.clear();
+            params.add("admin");
+            params.add("hello");
+            usid = (String)xmlrpc.execute("gridkit.login", params);
+            System.out.println("login returned "+usid);
             
         } catch (Exception e) { e.printStackTrace(); }
         
