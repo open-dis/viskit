@@ -116,8 +116,13 @@ public class AssemblyHandler implements XmlRpcHandler {
                 ret = gridRunner.addEventGraph(xmlData);
                 
             } else if (call.equals("gridkit.transferJar")) {
-                // used by DOE to send a 1024 byte or less chunk of a jar
-                // jarTransfer(filename,byte[1024])
+                // used by DOE to send a chunk of a jar
+                // jarTransfer(filename,byte[]). Assumes
+                // chunks are same sized until the last one.
+                // might need to tune this a bit as then
+                // you'd have to send a 0 length byte[]
+                // if it turned out the filesize was exactly
+                // modulo.
                 ret = gridRunner.transferJar((String)parameters.elementAt(1),
                         (byte[])parameters.elementAt(2),
                         ((Integer)parameters.elementAt(3)).intValue());
