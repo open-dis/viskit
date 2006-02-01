@@ -118,6 +118,19 @@ public class TestGridkitLogin extends Thread {
             ret = xmlrpc.execute("gridkit.addUser", params);
             System.out.println("addUser of newbie returned "+ret);
             
+            // this time don't logout, see if multi session works
+            // for newbie to login and changePassword from default
+            params.clear();
+            params.add("newbie");
+            params.add("newbie");
+            usid = (String)xmlrpc.execute("gridkit.login",params);
+            params.clear();
+            params.add(usid);
+            params.add("newbie");
+            params.add("newpass");
+            ret = xmlrpc.execute("gridkit.changePassword", params);
+            System.out.println("newbie login and changePassword returned "+ret);
+            
         } catch (Exception e) { e.printStackTrace(); }
         
     }
