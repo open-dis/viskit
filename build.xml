@@ -267,6 +267,13 @@
                 <include name="simkit.jar"/>
                 <include name="xmlrpc-2.0.jar"/>
                 <include name="bsh-2.0b1.jar"/>
+                <include name="commons-configuration-1.1.jar"/>
+                <include name="commons-beanutils-1.7.0.jar"/>
+                <include name="commons-codec-1.3.jar"/>
+                <include name="commons-collections-3.1.jar"/>
+                <include name="commons-digester-1.6.jar"/>
+                <include name="commons-lang-2.0.jar"/>
+                <include name="commons-logging-1.0.4.jar"/>
             </fileset>
             <fileset dir="${dir.lib}/jwsdp-1.5">
                 <include name="jaxb-api.jar"/>
@@ -435,7 +442,7 @@
         </javac>
         
 
-        <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" excludes="*/test/*" />
+        <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" />
     </target>   
     
     <!-- just add new modules to the depends variable here -->
@@ -484,6 +491,13 @@
   <target description="TestCodeFormat runner" name="test-code-format">
     <java classname="viskit.test.TestCodeFormat" classpathref="runtime.classpath" fork="true">
         <arg value="viskit/test/ArrayTester.xml"/>
+    </java>
+  </target>
+  
+  <target description="Test Gridkit login" name="test-gridkit-login">
+    <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
+        <arg value="localhost" />
+        <arg value="4444" />
     </java>
   </target>
 
