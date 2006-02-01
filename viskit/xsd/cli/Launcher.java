@@ -34,7 +34,7 @@ public class Launcher extends Thread implements Runnable {
     public Launcher() { }
     
     public void setup() {
-        
+
         try {
             URL u;
   
@@ -46,25 +46,20 @@ public class Launcher extends Thread implements Runnable {
             try {
                 if (p.getProperty("Gridkit") != null) {
                     launchGridkit(p.getProperty("Gridkit"));
+                    Thread.currentThread().join();
+                } else if (p.getProperty("Assembly") != null ){
+                    System.out.println("Running Assembly "+p.getProperty("Assembly"));
+                    u = cloader.getResource(p.getProperty("Assembly"));
+                    setAssembly(u);
+                    StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
+                    while ( st.hasMoreTokens() ) {
+                        u = cloader.getResource( st.nextToken() );
+                        addEventGraph(u);
+                    }
+                } else if (p.getProperty("Viskit") != null) {
+                    launchGUI();
                 }
             } catch (Exception e) {;}
-            
-            try {
-                u = cloader.getResource(p.getProperty("Assembly"));
-                setAssembly(u);
-            } catch (Exception e) { // no assembly resource, launch viskit
-                launchGUI();
-            }
-            
-            
-            StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
-            
-            while ( st.hasMoreTokens() ) {
-                u = cloader.getResource( st.nextToken() );
-                addEventGraph(u);
-            }
-            
-            
                         
         } catch (Exception e) {
             e.printStackTrace();
