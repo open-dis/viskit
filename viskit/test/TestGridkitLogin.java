@@ -73,6 +73,34 @@ public class TestGridkitLogin extends Thread {
             params.add("hello");
             usid = (String)xmlrpc.execute("gridkit.login", params);
             System.out.println("login returned "+usid);
+            // logout again
+            params.clear();
+            params.add(usid);
+            ret = xmlrpc.execute("gridkit.logout",params);
+            System.out.println("logout "+usid+" "+ret);
+            // now try a bogus password for admin and force an error
+            params.clear();
+            params.add("admin");
+            params.add("bogus");
+            usid = (String)xmlrpc.execute("gridkit.login", params);
+            System.out.println("bogus login attempt returned "+usid+((usid.equals("LOGIN-ERROR"))?" which is cool":" which is not cool"));
+            // now see if bogus usid allows me to create a user
+            params.clear();
+            params.add(usid);
+            params.add("newbie");
+            ret = xmlrpc.execute("gridkit.addUser", params);
+            System.out.println("bogus addUser attempt returned "+ret+((((Boolean)ret).booleanValue())?" which is not cool":" which is cool"));
+            // now login as admin to create newbie
+            params.clear();
+            params.add("admin");
+            params.add("hello");
+            usid = (String)xmlrpc.execute("gridkit.login", params);
+            System.out.println("login returned "+usid);
+            params.clear();
+            params.add(usid);
+            params.add("newbie");
+            ret = xmlrpc.execute("gridkit.addUser", params);
+            System.out.println("addUser of newbie returned "+ret);
             
         } catch (Exception e) { e.printStackTrace(); }
         
