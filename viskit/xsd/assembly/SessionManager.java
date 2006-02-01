@@ -55,6 +55,11 @@ public class SessionManager {
     /** Creates a new instance of SessionManager */
     public SessionManager() {
         sessions = new Hashtable();
+        try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+        } catch (Exception e) {
+            log("Package Error");
+        }
         log("SessionManager initialized");
     }
     
@@ -166,11 +171,12 @@ public class SessionManager {
             try {
                 String passcrypt = null;
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
-                FileInputStream is = new FileInputStream(pwd);
+
                 ObjectFactory of = new ObjectFactory();
                 PasswordFileType passwd = of.createPasswordFileType();
                 List users = passwd.getUser();
                 if (pwd.exists()) {
+                    FileInputStream is = new FileInputStream(pwd);
                     passwd = (PasswordFileType) u.unmarshal(is);
                     is.close();
                     users = passwd.getUser();
@@ -188,7 +194,7 @@ public class SessionManager {
                     // new user id itself
                     UserType user = (new ObjectFactory()).createUserType();
                     user.setName(newUser);
-                    
+                    log("Trying to add user "+newUser);
                     // set up crypto stuff
                     byte[] salt = SALT.getBytes();
                     PBEKeySpec keySpec = new PBEKeySpec(newUser.toCharArray(), salt, 18);
@@ -293,7 +299,9 @@ public class SessionManager {
     }
  
     boolean authenticate(String usid) {
-        if ( sessions.get(usid) != null ) {
+        // isAdmin only happens if no password file
+        // has yet been created. 
+        if ( sessions.get(usid) != null || isAdmin(usid)) {
             return true;
         } else {
             return false;
@@ -301,8 +309,10 @@ public class SessionManager {
     }
     
     boolean isAdmin(String usid) {
+        System.out.println("isAdmin?"+usid);
         if (getUser(usid).equals("admin")) return true;
         File f = new File(PASSWD);
+        System.out.println(f.exists());
         if(!f.exists()) return true; // init passwd with addUser for admin
         return false;
     }
