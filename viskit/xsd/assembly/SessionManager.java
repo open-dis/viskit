@@ -118,15 +118,16 @@ public class SessionManager {
         return "UNKNOWN-USER";
     }
     
-    void logout(String ssid) {
+    public Boolean logout(String ssid) {
         if (sessions.containsKey(ssid)) {
             String[] session = (((String) sessions.get(ssid)).trim()).split("\\s+");
             long startTime = Long.parseLong(session[session.length - 1]);
             long endTime = new java.util.Date().getTime();
             sessions.remove(ssid);
             log("Logout "+session[0]+" after "+(endTime-startTime)/1000+" seconds");
-            
+            return Boolean.TRUE;
         }
+        return Boolean.FALSE;
     }
        
     private String generateCookie(String username) {

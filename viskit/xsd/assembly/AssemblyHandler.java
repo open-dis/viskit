@@ -191,6 +191,10 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
                 ret = sessionManager.changePassword(usid, username, newPassword);
                 
+            } else if (call.equals("gridkit.logout")) {
+                
+                ret = sessionManager.logout(usid);
+                
             } else {
                ret = new String("No such method \""+methodName+"\"! ");
             }
