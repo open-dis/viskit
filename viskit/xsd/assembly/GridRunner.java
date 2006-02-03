@@ -133,25 +133,23 @@ public class GridRunner {
     
     // unknown what the max buffer size is, 
     // but won't assume any particular length here
-    // just that the last one sent's length is less
-    // than any previous. will check sequence id
-    // but doubt sequence would be an issue ( can 
-    // probably eliminate ).
-    int lastDataSize = 0;
+    // sequence starts at
+    // file.size() / buffer.length + file.size() % buffer.length > 0 ? 0 : -1
+    // and decrements to 0, which is the id of the last chunk
     int lastSequence = 0;
     Integer transferJar(String filename, byte[] data, int sequence) {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
-                lastDataSize = data.length;
                 lastSequence = sequence;
                 jarData = new ByteArrayOutputStream();
                 jarData.write(data);
                 thirdPartyJars.put(filename,jarData);
-            } else {
+            } else if (lastSequence - 1 == sequence) {
                 jarData = (ByteArrayOutputStream)thirdPartyJars.get(filename);
                 jarData.write(data);
-                if (data.length < lastDataSize) {
+                lastSequence = sequence;
+                if (sequence == 0) { // sender counts down to 0
                     if(filename.endsWith(".jar")) {
                         filename = filename.substring(0,filename.length()-4);
                     }
@@ -161,9 +159,10 @@ public class GridRunner {
                     fos.flush();
                     fos.close();
                     URL u = jarFile.toURL();
-                    // replace buffer, any further attempt to
+                    // replace buffer with URL, any further attempt to
                     // send this file during this session results
-                    // in no transfer
+                    // in no transfer. URL will be retrieved by Gridlets
+                    // later.
                     thirdPartyJars.put(filename,u);
                     
                 }
