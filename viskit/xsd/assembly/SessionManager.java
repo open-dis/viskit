@@ -53,7 +53,7 @@ public class SessionManager {
     private static final String SALT = "gridkit!";
     
     /** Creates a new instance of SessionManager */
-    public SessionManager() {
+    public SessionManager() { // public?
         sessions = new Hashtable();
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
@@ -66,7 +66,6 @@ public class SessionManager {
     String login(String username, String password) {
  
         try {
-            File pwf = new File(PASSWD);
             FileInputStream is = 
                 new FileInputStream(PASSWD);
             Unmarshaller u = jaxbCtx.createUnmarshaller();
@@ -129,52 +128,24 @@ public class SessionManager {
         }
         return Boolean.FALSE;
     }
-       
-    private String generateCookie(String username) {
-        try {
-            byte[] salt = SALT.getBytes();
-            // use passcrypt to encrypt date, or hard random if needed
-            PBEKeySpec keySpec = new PBEKeySpec(getPasscrypt(username).toCharArray(), salt, 18);
-            SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
-            Cipher encipher = Cipher.getInstance(key.getAlgorithm());
-            PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
-            encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
-            byte[] utf8 = (""+new java.util.Date().getTime()).getBytes("UTF8");
-            byte[] enc = encipher.doFinal(utf8);
-            // Encode bytes to base64 to get a String
-            return new sun.misc.BASE64Encoder().encode(enc);
-        } catch (Exception e) {
-            return "BAD-COOKIE";
-        }
-    }
-    
-    // tag the username with the login time, can auto-logout
-    // after inactivity check (TBD). see note about cookie
-    // randomness and decide if following is redundant:
-    private void createSession(String cookie, String username) {
-        sessions.put(cookie, username+" "+new java.util.Date().getTime());
-    }
-    
-                   
+                      
     /**
      * create a new user identity with default password as
      * uid encrypted with uid. To bootstrap a password file,
      * addUser will check if file exists, enabling if it doesn't
-     * without a valid ssid, once.
+     * without a valid usid, once.
      */
-   
     
-    Boolean addUser(String ssid, String newUser) {
-        if ( isAdmin(ssid) ) {
+    Boolean addUser(String usid, String newUser) {
+        if ( isAdmin(usid) ) {
             
             File pwd = new File(PASSWD);
             
             try {
                 String passcrypt = null;
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
-
                 ObjectFactory of = new ObjectFactory();
-                //JAXB feature
+                //JAXB feature(?)
                 //createPasswordFileType returns an Object which
                 //when marshalled doesn't contain proper <PasswordFile>
                 //tags, but createPasswordFile() does.
@@ -225,14 +196,17 @@ public class SessionManager {
                     log("New user created for "+newUser);
                     return Boolean.TRUE;
                 } else {
+                    log("Add existing user failed for "+newUser);
                     return Boolean.FALSE;
                 }
             } catch (Exception e) {
+                log("Add user error with "+newUser+" check with admin");
                 return Boolean.FALSE;
             }
             
             
         }
+        log("Attempted add user by non-admin!");
         return Boolean.FALSE;
     }
     
@@ -282,6 +256,33 @@ public class SessionManager {
   
     // end of XML-RPC direct back-ends
     
+    
+     private String generateCookie(String username) {
+        try {
+            byte[] salt = SALT.getBytes();
+            // use passcrypt to encrypt date, or hard random if needed
+            PBEKeySpec keySpec = new PBEKeySpec(getPasscrypt(username).toCharArray(), salt, 18);
+            SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
+            Cipher encipher = Cipher.getInstance(key.getAlgorithm());
+            PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
+            encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
+            byte[] utf8 = (""+new java.util.Date().getTime()).getBytes("UTF8");
+            byte[] enc = encipher.doFinal(utf8);
+            // Encode bytes to base64 to get a String
+            return new sun.misc.BASE64Encoder().encode(enc);
+        } catch (Exception e) {
+            return "BAD-COOKIE";
+        }
+    }
+     
+    // tag the username with the login time, can auto-logout
+    // after inactivity check (TBD). see note about cookie
+    // randomness and decide if following is redundant:
+     
+    private void createSession(String cookie, String username) {
+        sessions.put(cookie, username+" "+new java.util.Date().getTime());
+    }
+    
     private String getPasscrypt(String username) {
         try {
             String passcrypt = null;
@@ -314,11 +315,11 @@ public class SessionManager {
     }
     
     boolean isAdmin(String usid) {
-        System.out.println("isAdmin?"+usid);
         if (getUser(usid).equals("admin")) return true;
+        
         File f = new File(PASSWD);
-        System.out.println(f.exists());
         if(!f.exists()) return true; // init passwd with addUser for admin
+        
         return false;
     }
     
@@ -331,7 +332,6 @@ public class SessionManager {
     }
     
     void log(String message) {
-        int z;
         String line = "<Log>"+new java.util.Date().toString()+": "+message+"</Log>"+'\n';
         try {
             File f = new File(WTMP);
