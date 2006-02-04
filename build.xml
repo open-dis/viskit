@@ -501,6 +501,13 @@
     </java>
   </target>
 
+  <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
+    <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
+        <arg value="localhost" />
+        <arg value="4444" />
+    </java>
+  </target>
+  
   <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
