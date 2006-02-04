@@ -88,6 +88,7 @@ public class GridRunner {
         this.usid = usid;
         this.port = port;
         this.eventGraphs = new Vector();
+        this.thirdPartyJars = new Hashtable();
         try {
             assemblyFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
             eventGraphFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory(); //?
@@ -141,6 +142,7 @@ public class GridRunner {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
+                System.out.println("Accepting jar transfer: "+filename+" of "+sequence);
                 lastSequence = sequence;
                 jarData = new ByteArrayOutputStream();
                 jarData.write(data);
@@ -153,7 +155,7 @@ public class GridRunner {
                     if(filename.endsWith(".jar")) {
                         filename = filename.substring(0,filename.length()-4);
                     }
-                    File jarFile = File.createTempFile(filename,"jar");
+                    File jarFile = File.createTempFile(filename,".jar");
                     FileOutputStream fos = new FileOutputStream(jarFile);
                     fos.write(jarData.toByteArray());
                     fos.flush();
@@ -164,6 +166,7 @@ public class GridRunner {
                     // in no transfer. URL will be retrieved by Gridlets
                     // later.
                     thirdPartyJars.put(filename,u);
+                    System.out.println("Cached jar "+u);
                     
                 }
             }
