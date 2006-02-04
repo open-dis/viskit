@@ -8,6 +8,9 @@
 
 package viskit.test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
 /**
@@ -130,6 +133,47 @@ public class TestGridkitLogin extends Thread {
             params.add("newpass");
             ret = xmlrpc.execute("gridkit.changePassword", params);
             System.out.println("newbie login and changePassword returned "+ret);
+            
+            // now send a jar to newbies new session
+            
+            URL u = Thread.currentThread().getContextClassLoader().getResource("diskit/DISMover3D.class");
+            System.out.println("Opening "+ u);
+            u = new URL((u.getFile().split("!"))[0].trim());
+            File jar = new File(u.getFile());
+            System.out.println("Opening "+jar);
+            FileInputStream fis = new FileInputStream(jar);
+            long fileSize = jar.length();
+            System.out.println("which is "+fileSize+ " bytes");
+            byte[] buf = new byte[1024];
+            int chunks = (int)(fileSize/1024L + (fileSize % 1024L > 0L ? 0L : -1L));
+            System.out.println("into "+chunks+1+ " of "+buf.length);
+            while ( chunks > -1 ) {
+                params.clear();
+                params.add(usid);
+                params.add("diskit.jar");
+                int readIn = fis.read(buf);
+                byte[] outBuf;
+                if (readIn < buf.length) {
+                    // this effectively trims excess 0's
+                    // from last chunk (#0)
+                    outBuf = new byte[readIn];
+                    System.arraycopy(buf, 0, outBuf, 0, readIn);
+                    // but if not #0 io error
+                    if (chunks != 0) {
+                        System.out.println("File io error");
+                    }
+                } else {
+                    outBuf = buf;
+                }
+                
+                System.out.println("read in "+readIn);
+
+                params.add(outBuf);
+                params.add(new Integer(chunks));
+                ret = xmlrpc.execute("gridkit.transferJar", params);
+                System.out.println("Transferred "+ret+" bytes in chunk # "+chunks);
+                chunks --;
+            }
             
         } catch (Exception e) { e.printStackTrace(); }
         
