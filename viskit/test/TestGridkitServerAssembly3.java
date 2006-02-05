@@ -206,6 +206,9 @@ public class TestGridkitServerAssembly3 extends Thread {
             ExperimentType exp = of.createExperiment();
             exp.setTotalSamples("5");
             exp.setReplicationsPerDesignPoint("10");
+            exp.setType("latin-hypercube");
+            //exp.setDebug("true");
+            exp.setJitter("true");
             root.setExperiment(exp);
             
             // editing XML directly would have been less involved
