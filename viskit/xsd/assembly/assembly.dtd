@@ -102,7 +102,7 @@
     count CDATA "0"
     minObs CDATA "0.0"
     maxObs CDATA "0.0"
-    sampleType (TALLY|TIME_VARYING) "TALLY"
+    samplingType (TALLY|TIME_VARYING|LINEAR) "TALLY"
     name CDATA #IMPLIED
 >
 
@@ -114,25 +114,30 @@
     
 <!ELEMENT Results ( Log | PropertyChange | Errors )* >
 <!ATTLIST Results 
-    design  CDATA #REQUIRED
-    replication  CDATA #REQUIRED
+    sample CDATA #REQUIRED
+    designPoint  CDATA #REQUIRED
     index   CDATA #IMPLIED
     job     CDATA #IMPLIED
 >
 
-<!ELEMENT DesignPoint (TerminalParameter*,Script?,Replication*,(%Statistics;)?) >
+<!ELEMENT DesignPoint (TerminalParameter*,Script?,Replication*,Results?,(%Statistics;)*) >
 <!ATTLIST DesignPoint
     index CDATA #IMPLIED
 >
 
-<!ELEMENT Replication (Results?,Script?,(%Statistics;)?) >
+<!ELEMENT Replication ((%Statistics;)*) >
 <!ATTLIST Replication
     index CDATA #IMPLIED
 >
 
 <!ELEMENT Script (#PCDATA) >
 
-<!ELEMENT Experiment (Script?,DesignPoint*) >
+<!ELEMENT Sample (DesignPoint*) >
+<!ATTLIST Sample
+    index CDATA #IMPLIED
+>
+
+<!ELEMENT Experiment (Script?,Sample*) >
 <!ATTLIST Experiment
     jobID CDATA #IMPLIED
     type (latin-hypercube | full-factorial)  "latin-hypercube"

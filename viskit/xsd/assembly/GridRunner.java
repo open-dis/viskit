@@ -82,6 +82,8 @@ public class GridRunner {
     int designPointCount;
     // replications per DesignPoint
     int replicationsPerDesignPoint;
+    // total sample sets
+    int totalSamples;
     
     /** Creates a new instance of GridRunner */
     public GridRunner(String usid, int port) {
@@ -121,6 +123,10 @@ public class GridRunner {
         this.resultsReceived = 0;
         // set number replications per DesignPoint
         this.replicationsPerDesignPoint = Integer.parseInt(root.getExperiment().getReplicationsPerDesignPoint());
+        // set totalSamples
+        this.totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
+        //
+        this.designPointCount = root.getDesignParameters().size();
         
         return Boolean.TRUE;
     }
@@ -194,34 +200,39 @@ public class GridRunner {
     
     public Boolean addResult(String report) {
         boolean error = false;
+        
         StreamSource strsrc =
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
         
         try {
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
             Unmarshaller u = jc.createUnmarshaller();
-            ResultsType r = (ResultsType) ( u.unmarshal(strsrc) );
+            Results r = (Results) ( u.unmarshal(strsrc) );
+            int sample = Integer.parseInt(r.getSample());
+            int designPt = Integer.parseInt(r.getDesignPoint());
+            // note replication is not indexed, yet.
+            // after sim has finished run(), then is queried
+            // directly for replicationStats and designPointStats
+            // which is the real "result" and is handled 
+            // differently. this result is mainly to dump
+            // a lot of logs.
             
-            int index = Integer.parseInt(r.getDesign());
-            
-            
-            List designPoints = Collections.synchronizedList(root.getExperiment().getDesignPoint());
+            List samples = root.getExperiment().getSample();
+            List designPoints = Collections.synchronizedList(((Sample)(samples.get(sample))).getDesignPoint());
             
             synchronized(designPoints) {
                 
-                DesignPointType designPoint = (DesignPointType) designPoints.get(index);
-                List runList = designPoint.getReplication();
-                ReplicationType run = (ReplicationType)runList.get(Integer.parseInt(r.getReplication()));
-                run.setResults(r);
-                synchronized(run) {
-                    run.notify();
+                DesignPointType designPoint = (DesignPointType) designPoints.get(designPt);
+                designPoint.setResults(r);
+                synchronized(designPoint) {
+                    designPoint.notify();
                 }
             }
             
             this.resultsReceived++;
             
             // if all results in, done! write out all results to storage
-            if ( resultsReceived == designPointCount * replicationsPerDesignPoint) {
+            if ( resultsReceived == designPointCount * totalSamples) {
                 (new SimkitAssemblyXML2Java())
                     .marshal((javax.xml.bind.Element)root, 
                         (OutputStream)new FileOutputStream(new File(root.getName()+"Exp.xml")));
@@ -253,8 +264,9 @@ public class GridRunner {
      * is supplied in the XML-GRD, then it waits indefinitely.
      */
     
-    public synchronized String getResult(int designPt, int run) {
-        ReplicationType runner = (ReplicationType)(((DesignPointType)(root.getExperiment().getDesignPoint().get(designPt))).getReplication().get(run));
+    public synchronized String getResult(int sample, int designPt) {
+        Sample s = (Sample)(root.getExperiment().getSample().get(sample));
+        DesignPointType runner = (DesignPointType)(s.getDesignPoint().get(designPt));
         ResultsType r = runner.getResults();
         int timeout = Integer.parseInt(root.getExperiment().getTimeout());
         if ( r == null ) { // not while
@@ -275,8 +287,8 @@ public class GridRunner {
         if ( r == null ) {
             try {
                 r = (ResultsType)(assemblyFactory.createResults());
-                r.setDesign(""+designPt);
-                r.setReplication(""+run);
+                r.setDesignPoint(""+designPt);
+                r.setSample(""+sample);
                 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -285,13 +297,25 @@ public class GridRunner {
         return (new SimkitAssemblyXML2Java()).marshalToString(r);
     }
 
+    public Boolean addDesignPointStat(int sample, int desingPt, String stat) {
+        System.out.println(stat);
+        return Boolean.TRUE;
+    }
+    
+    public Boolean addReplicationStat(int sample, int designPt, int replication, String stat) {
+        System.out.println(stat);
+        return Boolean.TRUE;
+    }
     // qdel format is "jobID.taskID" in array jobs, so only way to
     // get jobID to parent process was by tagging the experiment
     // with the usid, so that the first Gridlet would report its
     // SGE_JOB_ID ( subsequently every other Gridlet's in the array ).
-    public Integer removeTask(int designPt, int run) {
-        int taskID = designPt * Integer.parseInt(root.getExperiment().getReplicationsPerDesignPoint());
-        taskID += run;
+    
+    // TBD replications are really now handled by the BasicAssembly
+    // so taskID's are now multi-relplicationed.
+    public Integer removeTask(int sampleIndex, int designPtIndex) {
+        int taskID = sampleIndex * designPointCount;
+        taskID += designPtIndex;
         taskID += 1;
         try {
             Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
@@ -301,8 +325,8 @@ public class GridRunner {
         
         try {
             ResultsType r = (ResultsType)(assemblyFactory.createResults());
-            r.setDesign(""+designPt);
-            r.setReplication(""+run);
+            r.setDesignPoint(""+designPtIndex);
+            r.setSample(""+sampleIndex);
             // release Results lock on thread
             addResult((new SimkitAssemblyXML2Java()).marshalToString(r));
         } catch (Exception e) {
@@ -319,7 +343,7 @@ public class GridRunner {
     
   
     public Integer flushQueue() {
-        Integer remainingJobs = new Integer(( designPointCount * replicationsPerDesignPoint ) - resultsReceived );
+        Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - resultsReceived );
         try {
             Runtime.getRuntime().exec( new String[] {"qdel",jobID} ) ;
         } catch (java.io.IOException ioe) {
@@ -345,7 +369,7 @@ public class GridRunner {
      */
     
     public Integer getRemainingTasks() {
-        return new Integer(( designPointCount * replicationsPerDesignPoint ) - resultsReceived );
+        return new Integer(( designPointCount * totalSamples ) - resultsReceived );
     }
     
     public void setJobID(String jobID) {
@@ -393,9 +417,9 @@ public class GridRunner {
         }
         
         // spawn Gridlets
-        int totalRuns = designPointCount*replicationsPerDesignPoint;
+        int totalTasks = designPointCount*totalSamples;
         try {
-            Runtime.getRuntime().exec( new String[] {"qsub","-v","FILENAME="+experimentFileName,"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalRuns,"-S","/bin/bash","./gridrun.sh"});
+            Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFileName,"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
             return Boolean.FALSE;
@@ -416,6 +440,9 @@ public class GridRunner {
                 
                 try {
                     ExperimentType e = assemblyFactory.createExperiment();
+                    SampleType s = assemblyFactory.createSample();
+                    s.setIndex(""+0);
+                    e.getSample().add(s);
                     e.setType("full-factorial");
                     root.setExperiment(e);
                     doFullFactorial();
@@ -425,15 +452,15 @@ public class GridRunner {
                 ExperimentType e = root.getExperiment();
                 String expType = e.getType();
                 //bsh.Interpreter bsh = new bsh.Interpreter();
-                
-                if (expType.equals("full-factorial")) {
-                    doFullFactorial();
-                } else if (expType.equals("latin-hypercube")) {
-                    doLatinHypercube();
-                }
-                //could script via jaxb and beanshell
-                //bsh.eval(root.getExperiment().getScript());
-                
+                try {
+                    if (expType.equals("full-factorial")) {
+                        doFullFactorial();
+                    } else if (expType.equals("latin-hypercube")) {
+                        doLatinHypercube();
+                    }
+                    //could script via jaxb and beanshell
+                    //bsh.eval(root.getExperiment().getScript());
+                } catch (Exception ex) { return Boolean.FALSE; }
             }
    
             return Boolean.TRUE;
@@ -497,7 +524,8 @@ public class GridRunner {
                 
                 try {
                     ExperimentType experiment = root.getExperiment();
-                    List designPoints = experiment.getDesignPoint();
+                    Sample sample = (Sample) experiment.getSample().get(0);
+                    List designPoints = sample.getDesignPoint();
                     DesignPointType designPoint = assemblyFactory.createDesignPoint();
                     List terminalParams = designPoint.getTerminalParameter();
                     
@@ -509,7 +537,6 @@ public class GridRunner {
                     }
                     
                     designPoints.add(designPoint);
-                    designPointCount++;
                     
                 } catch (javax.xml.bind.JAXBException jaxe) {jaxe.printStackTrace();}
             }
@@ -561,25 +588,35 @@ public class GridRunner {
      *
      */
     
-    public void doLatinHypercube() {
+    
+    // totalSamples is number of unique squares
+    // size of designParams list is dimension of square
+    // and number of designPoints to generate
+    // each taskID is multi-replicationed
+    // 
+    // taskID is sampleNumber * 
+    public void doLatinHypercube() throws Exception {
         ExperimentType experiment = root.getExperiment();
-        int runs = replicationsPerDesignPoint; // fewer keystrokes
+        //int runs = replicationsPerDesignPoint; 
         String initScript = experiment.getScript();
         bsh.Interpreter bsh = new bsh.Interpreter();
         
-        int totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
-        int size = root.getDesignParameters().size();
-        int runsPerDesignPt = replicationsPerDesignPoint;  // check ?
+        int size = designPointCount;
+        //int runsPerDesignPt = replicationsPerDesignPoint;  // check ?
         LatinPermutator latinSquares = new LatinPermutator(size);
         List designParams = root.getDesignParameters();
-        List designPoints = root.getExperiment().getDesignPoint();
+        List samples = root.getExperiment().getSample();
+        List designPoints;// = root.getExperiment().getDesignPoint();
     
         HashMap values = new java.util.HashMap();
         MersenneTwister rnd = new MersenneTwister();
         designPointCount = 0;
         
         for ( int i = 0; i < totalSamples; i++ ) {
-            
+            SampleType sample = assemblyFactory.createSample();
+            sample.setIndex(""+i);
+            samples.add(sample);
+            designPoints = sample.getDesignPoint();
             int[][] latinSquare = latinSquares.getRandomLatinSquare();
             int[] row;
             
@@ -631,9 +668,9 @@ public class GridRunner {
                             double dt = h - l;
                             double ddt = dt/(double)size;
                             double sampleJitter = ddt*(rnd.draw()-.5); // fits in bin +/- .5ddt
-                            double sample = l + ddt*((double)row[ct]) + (enableJitter?sampleJitter:0.0);
+                            double value = l + ddt*((double)row[ct]) + (enableJitter?sampleJitter:0.0);
                             
-                            tp.setValue(""+sample);
+                            tp.setValue(""+value);
                             tp.setType(dp.getType());
                             
                             
@@ -649,13 +686,13 @@ public class GridRunner {
                     }
                     
                     List runList = designPt.getReplication();
-                    for ( int ri = 0; ri < runsPerDesignPt ; ri++ ) {
+                    for ( int ri = 0; ri < replicationsPerDesignPoint ; ri++ ) {
                         ReplicationType r = assemblyFactory.createReplication();
                         r.setIndex(""+ri);
                         runList.add(r);
                     }
                     
-                    designPt.setIndex(""+designPointCount);
+                    designPt.setIndex(""+j);
                     designPoints.add(designPt);
                     designPointCount++;
                     

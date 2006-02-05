@@ -2,6 +2,7 @@
  * SimkitAssemblyXML2Java.java
  *
  * Created on April 1, 2004, 10:09 AM
+ *
  */
 
 package viskit.xsd.assembly;
