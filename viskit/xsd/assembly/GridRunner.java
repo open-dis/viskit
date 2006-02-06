@@ -78,7 +78,7 @@ public class GridRunner {
     viskit.xsd.bindings.eventgraph.ObjectFactory eventGraphFactory; //?
     // running total number of tasks done
     int tasksCompleted;
-    // count of DesignPoints
+    // count of DesignPoints per Sample
     int designPointCount;
     // replications per DesignPoint
     int replicationsPerDesignPoint;
@@ -290,6 +290,65 @@ public class GridRunner {
         return (new SimkitAssemblyXML2Java()).marshalToString(r);
     }
 
+    // this method does not need to be synchronized as getResults
+    // as stats are guaranteed to be in before getResults unlocks,
+    // so getting stats after results always should work, but not
+    // necessarily the other way around.
+    
+    // Hashtable returned is name keyed to String of xml
+    public Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) {
+        Sample s = (Sample)(root.getExperiment().getSample().get(sampleIndex));
+        DesignPointType dp = (DesignPointType) s.getDesignPoint().get(designPtIndex);
+        Hashtable ret = new Hashtable();
+        List stats = dp.getStatistics();
+        Iterator it = stats.iterator();
+        while (it.hasNext()) {
+            String name = null;
+            String xml = null;
+            Object st = it.next();
+            if ( st instanceof SampleStatistics ) {
+                name = ((SampleStatistics)st).getName();
+                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+            } else if ( st instanceof IndexedSampleStatistics ) {
+                name = ((IndexedSampleStatistics)st).getName();
+                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+            }
+            if ( name != null && xml != null ) ret.put(name,xml);
+        }
+        
+        return ret;
+    }
+    
+    // this method does not need to be synchronized as getResults
+    // as stats are guaranteed to be in before getResults unlocks,
+    // so getting stats after results always should work, but not
+    // necessarily the other way around.
+    
+    // Hashtable returned is name keyed to String of xml
+    public Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) {
+        Sample s = (Sample)(root.getExperiment().getSample().get(sampleIndex));
+        DesignPointType dp = (DesignPointType) s.getDesignPoint().get(designPtIndex);
+        ReplicationType rp = (ReplicationType) dp.getReplication().get(replicationIndex);
+        Hashtable ret = new Hashtable();
+        List stats = rp.getStatistics();
+        Iterator it = stats.iterator();
+        while (it.hasNext()) {
+            String name = null;
+            String xml = null;
+            Object st = it.next();
+            if ( st instanceof SampleStatistics ) {
+                name = ((SampleStatistics)st).getName();
+                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+            } else if ( st instanceof IndexedSampleStatistics ) {
+                name = ((IndexedSampleStatistics)st).getName();
+                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+            }
+            if ( name != null && xml != null ) ret.put(name,xml);
+        }
+        
+        return ret;
+    }
+    
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, String stat) {
         try {
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
@@ -358,6 +417,12 @@ public class GridRunner {
             tasksCompleted++;
             
             // if all results in, done! write out all results to storage
+            // TBD, filename should include some session info since same
+            // Assembly may be experimented on repeatedly. Really TBD,
+            // SessionManager should keep a persistent cache of active
+            // sessions in case of server shutdown, and that would be 
+            // a good place to also store this "core dump" filename for the 
+            // session.
             if ( tasksCompleted == designPointCount * totalSamples) {
                 (new SimkitAssemblyXML2Java())
                 .marshal((javax.xml.bind.Element)root,
@@ -373,12 +438,12 @@ public class GridRunner {
     
     /**
      * XML-RPC handler for clearing the grid queue,
-     * @return number of remaining jobs still in the queue
+     * @return number of remaining tasks still in the queue
      * that will be terminated.
      */
   
     public Integer flushQueue() {
-        Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - tasksCompleted );
+        Integer remainingTasks = new Integer(( designPointCount * totalSamples ) - tasksCompleted );
         try {
             Runtime.getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (java.io.IOException ioe) {
@@ -394,7 +459,7 @@ public class GridRunner {
         }
 
         
-        return remainingJobs;
+        return remainingTasks;
     }
     
     /**
@@ -640,7 +705,6 @@ public class GridRunner {
         bsh.Interpreter bsh = new bsh.Interpreter();
         
         int size = designPointCount;
-        //int runsPerDesignPt = replicationsPerDesignPoint;  // check ?
         LatinPermutator latinSquares = new LatinPermutator(size);
         List designParams = root.getDesignParameters();
         List samples = root.getExperiment().getSample();

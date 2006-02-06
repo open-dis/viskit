@@ -187,7 +187,6 @@ public class Gridlet extends Thread {
             }
             
             bsh.Interpreter bsh = new bsh.Interpreter();
-            //bsh.setClassLoader(SimkitAssemblyXML2Java.class.getClassLoader());
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
@@ -207,14 +206,16 @@ public class Gridlet extends Thread {
                 
                 bais = new ByteArrayInputStream(s.toString().getBytes());
                 
-                viskit.xsd.translator.SimkitXML2Java sx2j = new viskit.xsd.translator.SimkitXML2Java(bais);
+                viskit.xsd.translator.SimkitXML2Java sx2j = 
+                        new viskit.xsd.translator.SimkitXML2Java(bais);
                 sx2j.unmarshal();
                 
-                System.out.println("Evaluating generated java Event Graph:");
-                System.out.println(sx2j.translate());
+                if (debug_io) {
+                    System.out.println("Evaluating generated java Event Graph:");
+                    System.out.println(sx2j.translate());
+                }
                 
                 bsh.eval(sx2j.translate());
-                
             }
             
             if (debug_io) {
@@ -246,7 +247,7 @@ public class Gridlet extends Thread {
             String statXml;
             
             // first designPoint stats
-            
+            // TBD synchronize designPointStats to notify front end
             if (designPointStats != null ) try {
                 
                 for ( int i = 0; i < designPointStats.length; i++) {
