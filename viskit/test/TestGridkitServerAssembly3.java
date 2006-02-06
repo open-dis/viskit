@@ -25,12 +25,13 @@ import java.util.Vector;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.apache.xmlrpc.AsyncCallback;
 
 /**
  *
  * @author Rick Goldberg
  */
-public class TestGridkitServerAssembly3 extends Thread {
+public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback {
     XmlRpcClientLite xmlrpc;
     Vector args;
     String usid;
@@ -106,7 +107,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             
             System.out.println(simpleServer);
             
-            
+            // send SimpleServer.xml
             args.clear();
             args.add(usid);
             args.add(simpleServer);
@@ -121,7 +122,10 @@ public class TestGridkitServerAssembly3 extends Thread {
             
             // need to set unique names for TerminalParameters
             // will pick out the double from Exponential
-            // and the two doubles from Gamma
+            // and the two doubles from Gamma. Refer to 
+            // ServerAssembly3.xml for documentation on
+            // where they are. Ordinarily, would be done
+            // by DOE panel, or by editing the XML directly.
             SimEntityType arrival, server;
             List entities = root.getSimEntity();
             List designParams = root.getDesignParameters();
@@ -142,19 +146,24 @@ public class TestGridkitServerAssembly3 extends Thread {
             mParam = (MultiParameterType) params.get(0);
             params = mParam.getParameters();
             TerminalParameterType tParamExponential = (TerminalParameterType) params.get(0);
-            // now give this one a unique name
-            //tParamExponential.setName("exponential");
-            // add this one's reference to the DesignParameters
+
             ObjectFactory of = new ObjectFactory();
-            // WARNING: jaxb has some funny business with droping the outter
-            // tags of an Element that was created with a of.createXYZType()
-            // vs. of.createXYZ(), which works as expected. This may be frustrating.
+            // link up the entity's parameter to the
+            // range-valued design parameter. once the
+            // design parameter receives arguments
+            // from the design points during a run
+            // then it passes by reference design arguments
+            // to the entity's parameter.
             TerminalParameterType designParam0 = of.createTerminalParameter();
             designParam0.setName("exponential");
             designParam0.setType("double");
             tParamExponential.setNameRef(designParam0);
-            List content = designParam0.getContent();
-            content.add("public Double[] exponential() { return new Double[] {new Double(1.0),new Double(2.0)}; }"); // TBD this gets modernized soon
+            
+            DoubleRange drange0 = of.createDoubleRange();
+            drange0.setLowValue("1.0");
+            drange0.setHighValue("2.0");
+
+            designParam0.setValueRange(drange0);
             designParams.add(designParam0);
             
             // now for server's 
@@ -174,23 +183,27 @@ public class TestGridkitServerAssembly3 extends Thread {
             params = mParam.getParameters();
             TerminalParameterType tParamGamma2 = (TerminalParameterType) params.get(0);
             
-            // got Terminals now
-            //tParamGamma1.setName("gamma1");
-            //tParamGamma2.setName("gamma2");
+            // got Terminals now hook them up
             TerminalParameterType designParam1 = of.createTerminalParameter();
             TerminalParameterType designParam2 = of.createTerminalParameter();
             designParam1.setName("gamma1");
             designParam1.setType("double");
-            tParamGamma1.setNameRef(designParam1); // hook them up
+            tParamGamma1.setNameRef(designParam1); 
             
-            // ugh.. this will change, getting rid of scripted design params. maybe even nameRefs.
-            content = designParam1.getContent();
-            content.add("public Double[] gamma1() { return new Double[] {new Double(2.0),new Double(3.0)}; }");
+            DoubleRange drange1 = of.createDoubleRange();
+            drange1.setLowValue("2.0");
+            drange1.setHighValue("3.0");
+            designParam1.setValueRange(drange1);
+            
             designParam2.setName("gamma2");
             designParam2.setType("double");
             tParamGamma2.setNameRef(designParam2);
-            content = designParam2.getContent();
-            content.add("public Double[] gamma2() { return new Double[] {new Double(3.0),new Double(4.0)}; }");
+            
+            DoubleRange drange2 = of.createDoubleRange();
+            drange2.setLowValue("3.0");
+            drange2.setHighValue("4.0");
+            designParam2.setValueRange(drange2);
+            
             designParams.add(designParam1);
             designParams.add(designParam2);
             
@@ -201,16 +214,44 @@ public class TestGridkitServerAssembly3 extends Thread {
             
             
             
-            // add the Experiment tag
+            // add the Experiment tag, ordinary Assemblies
+            // don't usually have one, but should not make
+            // a difference to Viskit if they do, however,
+            // Gridkit requires one.
             
             ExperimentType exp = of.createExperiment();
+            
+            // A Gridkit "Sample" is one Latin Hyper Square
+            // randomly drawn from the design parameter space.
+            // Setting the number of Samples will create
+            // that many NxN squares where N is number of
+            // design parameters. Each row of the square
+            // represents a design point, which will be
+            // used as arguments to the design parameters
+            // of the Assembly. Each design point is 
+            // run as a single SGE node task, which carries out 
+            // so many Replications within the task, ie,
+            // a taskID is multiple runs of an Assembly
+            // under the same DesignPoint with a different
+            // set of random variate values each. So, if 
+            // an Assembly has a high degree of built in
+            // randomness, fewer Samples might need to be
+            // taken, or if an Assemlby has no randomVariates
+            // built in or few, then more Samples can be
+            // generated. The Jitter is meant to be able
+            // to create a fuzzy sample near some design
+            // space, so that a single Sample can be sampled
+            // repeatedly. One way you rotate the bulb, one
+            // way you can rotate the socket. (TBD currently
+            // you can only rotate the bulb, but the socket
+            // is different from room to room. )
             exp.setTotalSamples("5");
             // TBD these MUST be the same, probably can refactor
             // replicationsPerDesignPoint out, for now slave it to
             // what was in Schedule.getNumberReplications(();
             exp.setReplicationsPerDesignPoint(root.getSchedule().getNumberReplications()); 
             exp.setType("latin-hypercube");
-            exp.setDebug("true");
+            //exp.setDebug("true");
             exp.setJitter("true");
             root.setExperiment(exp);
             
@@ -236,11 +277,34 @@ public class TestGridkitServerAssembly3 extends Thread {
             ret = xmlrpc.execute("gridkit.run", args);
             System.out.println("run returned "+ ret);
             
+            // async call for Results 
+            // total of 5 samples x 3 designPoints
+            for ( int i = 0; i < 5; i ++ ) {
+                for ( int j = 0; j < 3; j ++) {
+                    args.clear();
+                    args.add(usid);
+                    args.add(new Integer(i));
+                    args.add(new Integer(j));
+                    xmlrpc.executeAsync("gridkit.getResult",args, this);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
+    // xml-rpc async callbacks for getResults
+    
+    public void handleError(java.lang.Exception exception, java.net.URL url, java.lang.String method) {
+        System.out.println("Error: " + exception+ url+method);
+    }
+    
+    public void handleResult(java.lang.Object result, java.net.URL url, java.lang.String method) {
+        if ( method.equals("gridkit.getResult")) {
+            System.out.println(result);
+            
+        }
+    }
     
     public static void main(String[] args) {
         try {
