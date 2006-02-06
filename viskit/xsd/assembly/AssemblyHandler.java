@@ -169,11 +169,17 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
                 ret = gridRunner.clear();
                 
-            } else if (call.equals("gridkit.removeTask")) {
+            } else if (call.equals("gridkit.removeIndexedTask")) {
                 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
                 ret = gridRunner.removeTask(sample.intValue(),designPt.intValue());
+                
+            } else if (call.equals("gridkit.removeTask")) {
+                
+                Integer jobID = (Integer) arguments.elementAt(1);
+                Integer taskID = (Integer) arguments.elementAt(2);
+                ret = gridRunner.removeTask(jobID.intValue(),taskID.intValue());
                 
             } else if (call.equals("gridkit.setJobID")) {
                 // SGE jobID's are only known to the Gridlets

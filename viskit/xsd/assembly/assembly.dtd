@@ -145,7 +145,7 @@
 
 <!ELEMENT Script (#PCDATA) >
 
-<!ELEMENT Sample (DesignPoint*) >
+<!ELEMENT Sample (DesignPoint)* >
 <!ATTLIST Sample
     index CDATA #IMPLIED
 >

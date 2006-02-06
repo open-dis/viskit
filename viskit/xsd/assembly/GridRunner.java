@@ -76,8 +76,8 @@ public class GridRunner {
     SimkitAssemblyType root;
     viskit.xsd.bindings.assembly.ObjectFactory assemblyFactory;
     viskit.xsd.bindings.eventgraph.ObjectFactory eventGraphFactory; //?
-    // total number of Results received
-    int resultsReceived;
+    // running total number of tasks done
+    int tasksCompleted;
     // count of DesignPoints
     int designPointCount;
     // replications per DesignPoint
@@ -120,7 +120,7 @@ public class GridRunner {
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
     
         // clear results count
-        this.resultsReceived = 0;
+        this.tasksCompleted = 0;
         // set number replications per DesignPoint
         this.replicationsPerDesignPoint = Integer.parseInt(root.getExperiment().getReplicationsPerDesignPoint());
         // set totalSamples
@@ -229,14 +229,7 @@ public class GridRunner {
                 }
             }
             
-            this.resultsReceived++;
-            
-            // if all results in, done! write out all results to storage
-            if ( resultsReceived == designPointCount * totalSamples) {
-                (new SimkitAssemblyXML2Java())
-                    .marshal((javax.xml.bind.Element)root, 
-                        (OutputStream)new FileOutputStream(new File(root.getName()+"Exp.xml")));
-            }
+          
             
         } catch (Exception e) { error = true; e.printStackTrace(); }
         
@@ -297,14 +290,30 @@ public class GridRunner {
         return (new SimkitAssemblyXML2Java()).marshalToString(r);
     }
 
-    //TBD
-    public Boolean addDesignPointStat(int sample, int designPt, String stat) {
-        System.out.println("addDesignPointStat "+sample+" "+designPt+" "+stat);
+    public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, String stat) {
+        try {
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            Unmarshaller u = jc.createUnmarshaller();
+            SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
+            DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
+            Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
+            designPoint.getStatistics().add(stats);
+        } catch (Exception e) { return Boolean.FALSE; }
+        
         return Boolean.TRUE;
     }
-    //TBD
-    public Boolean addReplicationStat(int sample, int designPt, int replication, String stat) {
-        System.out.println("addReplicationStat "+sample+" "+designPt+" "+replication+" "+stat);
+
+    public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
+        try {
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            Unmarshaller u = jc.createUnmarshaller();
+            SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
+            DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
+            ReplicationType rep = (ReplicationType) designPoint.getReplication().get(replicationIndex);
+            Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
+            rep.getStatistics().add(stats);
+        } catch (Exception e) { return Boolean.FALSE; }
+       
         return Boolean.TRUE;
     }
     
@@ -313,19 +322,19 @@ public class GridRunner {
     // with the usid, so that the first Gridlet would report its
     // SGE_JOB_ID ( subsequently every other Gridlet's in the array ).
     
-    // TBD replications are really now handled by the BasicAssembly
-    // so taskID's are now multi-relplicationed.
-    public Integer removeTask(int sampleIndex, int designPtIndex) {
+    // called by DOE or anybody that indexes by sample and designPt
+    public Integer removeIndexedTask(int sampleIndex, int designPtIndex) {
         int taskID = sampleIndex * designPointCount;
         taskID += designPtIndex;
         taskID += 1;
         try {
-            System.out.println("qdel "+jobID+"."+taskID);        
+            System.out.println("Task removed: "+jobID+"."+taskID);        
             Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
         
+        // TBD check if result first then make an empty result if needed
         try {
             ResultsType r = (ResultsType)(assemblyFactory.createResults());
             r.setDesignPoint(""+designPtIndex);
@@ -338,6 +347,30 @@ public class GridRunner {
         return new Integer(taskID);
     }
     
+    // called by Gridlet to remove itself after
+    // completion
+    public Integer removeTask(int jobID, int taskID) {
+        try {
+            System.out.println("Task complete: "+jobID+"."+taskID);        
+            Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
+            
+            
+            tasksCompleted++;
+            
+            // if all results in, done! write out all results to storage
+            if ( tasksCompleted == designPointCount * totalSamples) {
+                (new SimkitAssemblyXML2Java())
+                .marshal((javax.xml.bind.Element)root,
+                        (OutputStream)new FileOutputStream(new File(root.getName()+"Exp.xml")));
+            }
+        } catch (java.io.IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return new Integer(taskID);
+        
+    }
+    
     /**
      * XML-RPC handler for clearing the grid queue,
      * @return number of remaining jobs still in the queue
@@ -345,7 +378,7 @@ public class GridRunner {
      */
   
     public Integer flushQueue() {
-        Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - resultsReceived );
+        Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - tasksCompleted );
         try {
             Runtime.getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (java.io.IOException ioe) {
@@ -370,8 +403,9 @@ public class GridRunner {
      * @return number of remaining jobs in the queue still running.
      */
     
+    // TBD this might be better as an array of pending taskID's?
     public Integer getRemainingTasks() {
-        return new Integer(( designPointCount * totalSamples ) - resultsReceived );
+        return new Integer(( designPointCount * totalSamples ) - tasksCompleted );
     }
     
     public void setJobID(Integer jobID) {

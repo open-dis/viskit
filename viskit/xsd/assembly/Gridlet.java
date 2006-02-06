@@ -89,7 +89,16 @@ public class Gridlet extends Thread {
                 System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd); 
                 //FIXME: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
-
+                
+                // not as needed as before
+                // still handy but possible
+                // 1 never starts or returns
+                // after 2 or any of the 
+                // concurrently running jobs
+                // see removeTask which
+                // handles the main case 
+                // where you'd need jobID
+                // better
                 if (taskID == 1) {
                     Vector v = new Vector();
                     v.add(usid);
@@ -418,8 +427,8 @@ public class Gridlet extends Thread {
                 // this could be a new feature of SGE 6.0
                 parms.clear();
                 parms.add(usid);
-                parms.add(new Integer(sampleIndex));
-                parms.add(new Integer(designPtIndex));
+                parms.add(new Integer(jobID));
+                parms.add(new Integer(taskID));
                 xmlrpc.execute("gridkit.removeTask", parms);
                 
             } catch (Exception e) {
