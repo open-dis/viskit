@@ -288,7 +288,7 @@ public class DoeFileModel
         newTP.setNameRef(null);
         newTP.setType(tp.getType());
         newTP.setValue(tp.getValue());
-        newTP.getContent().add(0,buildTPContent(rData,name));
+       // newTP.getContent().add(0,buildTPContent(rData,name));
 
         designParms.add(dpCount++,newTP);
 

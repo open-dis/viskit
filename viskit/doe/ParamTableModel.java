@@ -157,7 +157,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     setValueAt(val,row,VALUE_COL);
 
     // todo jmb here where's the code?
-
+/*
     List content = tp.getContent();
     Double[] minMax = parseMinMax(nm,(String)content.get(0));
     if(minMax != null) {
@@ -167,7 +167,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     else {
       setValueAt("0.0",row,MIN_COL);
       setValueAt("1.0",row,MAX_COL);
-    }
+    }*/
     setValueAt(new Boolean(true),row,FACTOR_COL); //cb
 
   }
