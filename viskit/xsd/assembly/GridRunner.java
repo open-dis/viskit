@@ -483,22 +483,24 @@ public class GridRunner {
             
             TerminalParameterType t = (TerminalParameterType) (it.next());
             System.out.println("Batch Mode "+t);
-            List exprList = t.getContent();
-            Iterator itex = exprList.iterator();
-            Object returns = null;
-            while (itex.hasNext()) {
-                String expr = (String)itex.next();
-                bsh.Interpreter bsh = new bsh.Interpreter();
-                try {
-                    bsh.eval(expr);
-                    returns = bsh.eval(t.getName()+"();");
-                    System.out.println(expr+" returns "+returns);
-                    values.put(t,returns);
-                    
-                } catch (bsh.EvalError ee) {
-                    ee.printStackTrace();
-                }
+            ValueRangeType range = t.getValueRange();
+            Object returns;
+            if ( range instanceof DoubleRange ) {
+                returns = new Double[] { 
+                    new Double(((DoubleRange)range).getLowValue()), 
+                    new Double(((DoubleRange)range).getHighValue()) 
+                };
+            } else {
+                returns = new Integer[] {
+                    new Integer(((IntegerRange)range).getLowValue()),
+                    new Integer(((IntegerRange)range).getHighValue())
+                };
             }
+            
+            
+            values.put(t,returns);
+                    
+            
         }
         if (values.size() > 0) {
             iterate(values,values.size()-1);
@@ -633,28 +635,24 @@ public class GridRunner {
                         
                         TerminalParameterType tp = assemblyFactory.createTerminalParameter();
                         TerminalParameterType dp = (TerminalParameterType)it.next();
-                        List exprList = dp.getContent();
-                        Iterator itex = exprList.iterator();
-                        Object returns = null;
+                        Object[] range;
                         
-                        // evaluate each TerminalParameter script within the
-                        // DesignParameter group
-                        while (itex.hasNext()) {
-                            String expr = (String)itex.next();
-                            bsh = new bsh.Interpreter();
-                            try {
-                                bsh.eval(expr);
-                                returns = bsh.eval(dp.getName()+"();");
-                                
-                                values.put(dp,returns);
-                                
-                            } catch (bsh.EvalError ee) {
-                                ee.printStackTrace();
-                            }
+                        if (dp.getType().equals("double")) {
+                            
+                            range = new Double[]{
+                                new Double(dp.getValueRange().getLowValue()),
+                                new Double(dp.getValueRange().getHighValue())
+                            };
+                            
+                        } else {
+                            
+                            range = new Integer[]{
+                                new Integer(dp.getValueRange().getLowValue()),
+                                new Integer(dp.getValueRange().getHighValue())
+                            };
+                            
                         }
-                        
-                        Object[] range = (Object[]) values.get(dp);
-                        
+        
                         // create sample "stratified" from n=size equal probability bins
                         // over range; this will "jitter" the sample if used repeatedly,
                         // while maintaining proximity to the same hypersurface anchor points

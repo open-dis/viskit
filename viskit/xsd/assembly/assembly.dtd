@@ -1,18 +1,31 @@
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter" > 
 <!ENTITY % DesignParameters "TerminalParameter" >   
 <!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics" >
+<!ENTITY % ValueRange "DoubleRange | IntegerRange" >
 
 <!ELEMENT MultiParameter (%Parameters;)* >  
 <!ATTLIST MultiParameter
     type  CDATA #REQUIRED
 >
 
-<!ELEMENT TerminalParameter (#PCDATA) >
+<!ELEMENT TerminalParameter (%ValueRange;)? >
 <!ATTLIST TerminalParameter
     nameRef IDREF #IMPLIED
     name    ID    #IMPLIED
     value   CDATA #IMPLIED
     type    CDATA #REQUIRED
+>
+
+<!ELEMENT DoubleRange EMPTY >
+<!ATTLIST DoubleRange
+    lowValue    CDATA #IMPLIED
+    highValue   CDATA #IMPLIED
+>
+
+<!ELEMENT IntegerRange EMPTY >
+<!ATTLIST IntegerRange
+    lowValue    CDATA #IMPLIED
+    highValue   CDATA #IMPLIED
 >
 
 <!ELEMENT FactoryParameter (%Parameters;)* >
