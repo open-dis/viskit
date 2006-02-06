@@ -140,7 +140,10 @@ public class Boot extends URLClassLoader implements Runnable {
                     if ( name.endsWith("jar") ) {
                         if (debug) System.out.println("Found internal jar externalizing "+name);
                         String tmpDir = System.getProperty("java.io.tmpdir");
-                        File extJar = new File(tmpDir, name);
+                        File extJar;
+                        extJar = File.createTempFile(name,".jar");
+                        // note this file gets created for the duration of the server, is ok to use deleteOnExit
+                        extJar.deleteOnExit(); 
                         FileOutputStream fos = new FileOutputStream(extJar);
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         int c = 0;
@@ -202,6 +205,8 @@ public class Boot extends URLClassLoader implements Runnable {
         if (debug) System.out.println("Booting "+u);
         Boot b = new Boot(new URL[] { u });
         b.setArgs(args);
-        new Thread(b).start();
+        Thread boot = new Thread(b);
+        boot.start();
+        boot.join();
     }
 }

@@ -22,7 +22,7 @@ import java.util.StringTokenizer;
 public class Launcher extends Thread implements Runnable {
     ClassLoader cloader;
     Hashtable bytes;
-    String assembly;
+    String assembly = null;
     String assemblyName;
     Hashtable eventGraphs = new Hashtable();
     private static final boolean debug = false;
@@ -46,7 +46,6 @@ public class Launcher extends Thread implements Runnable {
             try {
                 if (p.getProperty("Gridkit") != null) {
                     launchGridkit(p.getProperty("Gridkit"));
-                    Thread.currentThread().join();
                 } else if (p.getProperty("Assembly") != null ){
                     System.out.println("Running Assembly "+p.getProperty("Assembly"));
                     u = cloader.getResource(p.getProperty("Assembly"));
@@ -184,7 +183,7 @@ public class Launcher extends Thread implements Runnable {
         
         try {
             setup();
-            exec();
+            if (assemblyName != null) exec();
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -283,7 +282,7 @@ public class Launcher extends Thread implements Runnable {
             out = c.newInstance(new Object[]{});
             Thread t = new Thread((Runnable)out);
             t.start();
-            
+
             // another one of many ways to do run the resulting assembly
             //m = bshz.getDeclaredMethod("eval", new Class[]{ String.class });
             //m.invoke(bsh,new Object[]{ "Thread t = new Thread(new "+assemblyName+"());"});
