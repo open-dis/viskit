@@ -60,7 +60,7 @@ import viskit.xsd.bindings.eventgraph.*; //?
 
 public class GridRunner {
     String usid;
-    String jobID;
+    Integer jobID;
     int port;
     static final boolean debug = true;
     Vector eventGraphs;
@@ -320,6 +320,7 @@ public class GridRunner {
         taskID += designPtIndex;
         taskID += 1;
         try {
+            System.out.println("qdel "+jobID+"."+taskID);        
             Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
@@ -346,7 +347,7 @@ public class GridRunner {
     public Integer flushQueue() {
         Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - resultsReceived );
         try {
-            Runtime.getRuntime().exec( new String[] {"qdel",jobID} ) ;
+            Runtime.getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
@@ -373,8 +374,8 @@ public class GridRunner {
         return new Integer(( designPointCount * totalSamples ) - resultsReceived );
     }
     
-    public void setJobID(String jobID) {
-        jobID = new String(jobID);
+    public void setJobID(Integer jobID) {
+        this.jobID = jobID;
     }
     
     /**
@@ -611,7 +612,7 @@ public class GridRunner {
     
         HashMap values = new java.util.HashMap();
         MersenneTwister rnd = new MersenneTwister();
-        designPointCount = 0;
+        
         
         for ( int i = 0; i < totalSamples; i++ ) {
             SampleType sample = assemblyFactory.createSample();
@@ -695,7 +696,6 @@ public class GridRunner {
                     
                     designPt.setIndex(""+j);
                     designPoints.add(designPt);
-                    designPointCount++;
                     
                 } catch (javax.xml.bind.JAXBException jaxbe) { jaxbe.printStackTrace(); }
             }

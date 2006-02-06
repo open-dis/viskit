@@ -415,6 +415,13 @@ public class Gridlet extends Thread {
                 }
                 xmlrpc.execute("gridkit.addResult", parms);
                 
+                // this could be a new feature of SGE 6.0
+                parms.clear();
+                parms.add(usid);
+                parms.add(new Integer(sampleIndex));
+                parms.add(new Integer(designPtIndex));
+                xmlrpc.execute("gridkit.removeTask", parms);
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }

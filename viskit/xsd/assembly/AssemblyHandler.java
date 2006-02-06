@@ -171,9 +171,9 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
             } else if (call.equals("gridkit.removeTask")) {
                 
-                Integer designPt = (Integer) arguments.elementAt(1);
-                Integer run = (Integer) arguments.elementAt(2);
-                ret = gridRunner.removeTask(designPt.intValue(),run.intValue());
+                Integer sample = (Integer) arguments.elementAt(1);
+                Integer designPt = (Integer) arguments.elementAt(2);
+                ret = gridRunner.removeTask(sample.intValue(),designPt.intValue());
                 
             } else if (call.equals("gridkit.setJobID")) {
                 // SGE jobID's are only known to the Gridlets
@@ -186,7 +186,7 @@ public class AssemblyHandler implements XmlRpcHandler {
                 // manage the task via SGE (see wc_job_range_list in
                 // SGE man pages.) Note, only the first Gridlet
                 // from a jobID batch will use this call.
-                String jobID = (String) arguments.elementAt(1);
+                Integer jobID = (Integer) arguments.elementAt(1);
                 gridRunner.setJobID(jobID);
                 ret = jobID;
                 
