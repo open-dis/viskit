@@ -52,6 +52,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     shadow = new VInstantiator[sz];
     JComponent[] contentObj = new JComponent[sz];
 
+    System.out.println("really has "+sz+"parameters");
      int i = 0;
      for (Iterator itr = lis.iterator(); itr.hasNext();i++) {
        VInstantiator inst = (VInstantiator) itr.next();
@@ -59,14 +60,15 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
        typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
        String nm = inst.getName();
-       if(nm != null && nm.length()>0 && nameLab != null) {
+       ///if(nm != null && nm.length()>0 && nameLab != null) {
          nameLab[i] = new JLabel(nm);
          nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(0,2,0,2))); // some space at sides
          nameLab[i].setOpaque(true);
          nameLab[i].setBackground(new Color(255,255,255,64));
-       }
-       else
-         nameLab = null; // if one is bad, disable all
+         System.out.println("really set label "+nm);
+       //}
+       //else
+         //nameLab = null; // if one is bad, disable all
 
        entryTF[i] = new JTextField(8);
        Vstatics.clampHeight(entryTF[i]);

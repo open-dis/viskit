@@ -1,7 +1,7 @@
 package viskit;
 
 import viskit.model.VInstantiator;
-
+import viskit.xsd.bindings.eventgraph.ParameterType;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
@@ -307,8 +307,21 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       }
       else {
         for (int i = 0; i < construct.length; ++i) {
+            List dummies = VInstantiator.buildDummyInstantiators(construct[i]);
+            List parameters = Vstatics.resolveParameters(clName); 
+            if ( parameters != null ) { 
+                //then this came from an XML, safe
+                //to assume only 1 constructor needed
+                //and the dummies match the parameters
+                //btw, why are these called dummy?
+                VInstantiator.Constr dummy = new VInstantiator.Constr(clName);
+                dummies = dummy.getArgs();
+                //for (int j = 0; j < dummies.size(); j++) {
+                 //   ((VInstantiator)dummies.get(j)).setName(((ParameterType)parameters.get(j)).getName());
+                //}
+            }
           constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this,packMe);
-          constructorPanels[i].setData(VInstantiator.buildDummyInstantiators(construct[i]));
+          constructorPanels[i].setData(dummies);
           String sign = ConstructorPanel.getSignature(construct[i].getParameterTypes());
 
           if (construct[i].getParameterTypes().length == 0)

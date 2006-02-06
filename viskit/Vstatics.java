@@ -1,7 +1,7 @@
 package viskit;
 
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
-
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -305,5 +305,9 @@ public class Vstatics
   static public String getFileSeparator()
   {
     return System.getProperty("file.separator");
+  }
+  
+  static public List resolveParameters(String type) {
+      return FileBasedClassManager.inst().resolveParameters(type);
   }
 }

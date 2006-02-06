@@ -5,7 +5,12 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import viskit.xsd.bindings.eventgraph.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -28,12 +33,13 @@ public class FileBasedClassManager implements Runnable
     return me;
   }
 
-  private HashMap classMap, fileMap;
+  private HashMap classMap, fileMap, parameterMap;
 
   private FileBasedClassManager()
   {
     classMap = new HashMap();
     fileMap = new HashMap();
+    parameterMap = new HashMap();
     new Thread(this,"FileBasedClsMgr").start();
   }
 
@@ -72,6 +78,16 @@ public class FileBasedClassManager implements Runnable
       fclass = FindClassesForInterface.classFromFile(paf.f);   // Throwable from here possibly
 
       fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
+      
+      // since we're here, cache the parameter names
+      JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+      Unmarshaller um = jaxbCtx.createUnmarshaller();
+      try {
+          SimEntityType simEntity =  (SimEntityType) um.unmarshal(f);
+          parameterMap.remove(fclass.getName());
+          parameterMap.put(fclass.getName(),simEntity.getParameter());
+          System.out.println("Put "+fclass.getName()+simEntity.getParameter());
+      } catch (Exception e) {;}
     }
     else if (f.getName().toLowerCase().endsWith(".class")) {
       fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly
@@ -87,6 +103,10 @@ public class FileBasedClassManager implements Runnable
     return fban;
   }
 
+  public List resolveParameters(String type) {
+      return (List) (parameterMap.get(type));
+  }
+  
   public Collection getFileLoadedClasses()
   {
     Collection c;
