@@ -205,11 +205,16 @@ public class TestGridkitServerAssembly3 extends Thread {
             
             ExperimentType exp = of.createExperiment();
             exp.setTotalSamples("5");
-            exp.setReplicationsPerDesignPoint("10");
+            // TBD these MUST be the same, probably can refactor
+            // replicationsPerDesignPoint out, for now slave it to
+            // what was in Schedule.getNumberReplications(();
+            exp.setReplicationsPerDesignPoint(root.getSchedule().getNumberReplications()); 
             exp.setType("latin-hypercube");
-            //exp.setDebug("true");
+            exp.setDebug("true");
             exp.setJitter("true");
             root.setExperiment(exp);
+            
+            
             
             // editing XML directly would have been less involved
             // but similar steps would likely take place in the DOE editor
