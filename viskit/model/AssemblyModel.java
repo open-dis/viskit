@@ -1098,8 +1098,8 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     en.setDescription(se.getDescription());
     en.setOutputMarked(isOutputNode);
     List lis = se.getParameters();
-    VInstantiator.Constr vc = new VInstantiator.Constr(se.getType(),
-                    getInstantiatorListFromJaxbParmList(lis),getNamesFromParmList(lis));
+    VInstantiator.Constr vc = new VInstantiator.Constr(se.getType());//,
+                   // getInstantiatorListFromJaxbParmList(lis));//,getNamesFromParmList(lis));
     en.setInstantiator(vc);
 
     en.opaqueModelObject = se;

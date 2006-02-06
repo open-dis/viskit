@@ -93,7 +93,7 @@ abstract public class AssemblyNode extends ViskitElement
 
   public void setInstantiator(VInstantiator instantiator)
   {
-    this.instantiator = instantiator;
+    this.instantiator = instantiator.vcopy();
   }
 
   public String getDescription()
