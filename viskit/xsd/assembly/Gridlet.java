@@ -64,6 +64,7 @@ public class Gridlet extends Thread {
     String frontHost;
     String usid;
     String filename;
+    String pwd;
     
     public Gridlet() {
        
@@ -83,7 +84,9 @@ public class Gridlet extends Thread {
                 usid = p.getProperty("USID");
                 filename = p.getProperty("FILENAME");
                 port = Integer.parseInt(p.getProperty("PORT"));
-                sax2j = new SimkitAssemblyXML2Java(filename);
+                pwd = p.getProperty("PWD");
+                sax2j = new SimkitAssemblyXML2Java(new URL("file:"+pwd+"/"+filename).openStream());
+                System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd); 
                 //FIXME: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
 
@@ -123,33 +126,36 @@ public class Gridlet extends Thread {
     }
     
     public void run() {
+        
         SimkitAssemblyType root;
-        
-        
         sax2j.unmarshal();
         root = sax2j.getRoot();
         
         ExperimentType exp = root.getExperiment();
-        int runsPerDesignPt = Integer.parseInt(exp.getReplicationsPerDesignPoint());
-        List designPoints = exp.getDesignPoint();
-        int designPtsSize = designPoints.size(); // aka getCount() on local side
-        int designPtIndex = (taskID-1)/runsPerDesignPt;
-        int runIndex = (taskID-1)%runsPerDesignPt;
+        int replicationsPerDesignPoint = Integer.parseInt(exp.getReplicationsPerDesignPoint());
+        List samples = exp.getSample();
+        
+        List designParams = root.getDesignParameters();
+        int sampleIndex = (taskID-1) / designParams.size();
+        int designPtIndex = (taskID-1) % designParams.size();
+        
+        Sample sample = (Sample) samples.get(sampleIndex);
+        List designPoints = sample.getDesignPoint();
         
         DesignPointType designPoint = (DesignPointType)(designPoints.get(designPtIndex));
-        List designParams = designPoint.getTerminalParameter();
-        List params = root.getDesignParameters();
+        List designArgs = designPoint.getTerminalParameter();
         Iterator itd = designParams.iterator();
-        Iterator itp = params.iterator();
+        Iterator itp = designArgs.iterator();
+        
+        
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
         
-        if(sax2j.debug)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
-        //exp.setBatchID(fileBaseName+" Grid Task ID "+taskID+" of "+lastTask+" tasks in jobID "+jobID+" which is Run "+ runIndex + " in DesignPoint "+designPtIndex);
-        
+        if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
+     
         while ( itd.hasNext() && itp.hasNext() ) {
-            TerminalParameterType param = (TerminalParameterType)(itp.next());
+            TerminalParameterType arg = (TerminalParameterType)(itp.next());
             TerminalParameterType designParam = (TerminalParameterType)(itd.next());
-            param.setValue(designParam.getValue());
+            designParam.setValue(arg.getValue());
         }
         
         try {
@@ -163,6 +169,8 @@ public class Gridlet extends Thread {
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             PrintStream err = new PrintStream(baos2);
             java.io.OutputStream oldErr = System.err;
+            
+            // disconnect io
             
             if(!debug_io) {
                 System.setErr(err);
@@ -200,22 +208,139 @@ public class Gridlet extends Thread {
                 
             }
             
-            if (sax2j.debug) {
+            if (debug_io) {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
                 System.out.println(sax2j.translate());
             }
+            
+            // beanshell "compile" and instance
             bsh.eval(sax2j.translate());
             bsh.eval("sim = new "+ root.getName() +"();");
-            bsh.eval("sim.main(new String[0])"); // or sim.start();
             ViskitAssembly sim = (ViskitAssembly) bsh.get("sim");
-            SampleStatistics[] designPointStats = sim.getDesignPointStats();
-            // really want rep stats?
-            //SampleStatistics[] replicationStats = sim.getReplicationStats(i);
-            //tbd
+
+            Thread runner = new Thread(sim);
+            runner.start();
+            try {
+                runner.join();
+            } catch (InterruptedException ie) {;} // done
+            
+            // finished running, collect some statistics
+            // from the beanshell context to java
+            
+            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
+            simkit.stat.SampleStatistics replicationStat;
+            
+            // go through and copy in the statistics
+            
+            viskit.xsd.bindings.assembly.ObjectFactory of = 
+                    new viskit.xsd.bindings.assembly.ObjectFactory();
+            String statXml;
+            
+            // first designPoint stats
+            
+            if (designPointStats != null ) try {
+                
+                for ( int i = 0; i < designPointStats.length; i++) {
+                    
+                    if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics ) {
+                        
+                        viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = 
+                                of.createIndexedSampleStatistics();
+                        iss.setName(designPointStats[i].getName());
+                        List args = iss.getSampleStatistics();
+                        simkit.stat.SampleStatistics[] allStat = 
+                                ((simkit.stat.IndexedSampleStatistics)designPointStats[i]).getAllSampleStat();
+                        
+                        for ( int j = 0; j < allStat.length; j++) {
+                            
+                            args.add(statForStat(allStat[j]));
+
+                        }
+                        statXml = sax2j.marshalToString(iss);
+                    } else {
+                        statXml = sax2j.marshalToString(statForStat(designPointStats[i]));
+                        
+                    }
+                    
+                    if (debug_io)
+                        System.out.println(statXml);
+                    
+                    Vector args = new Vector();
+                    args.add(usid);
+                    args.add(new Integer(sampleIndex));
+                    args.add(new Integer(designPtIndex));
+                    args.add(statXml);
+                    if (debug_io) {
+                       System.out.println("sending DesignPointStat "+sampleIndex+" "+designPtIndex);
+                       System.out.println(statXml);
+                    }
+                    xmlrpc.execute("gridkit.addDesignPointStat", args);
+                    
+                    // replication stats similarly
+                    
+                    String repName = designPointStats[i].getName();
+                    repName = repName.substring(0, repName.length()-5);  // strip off ".mean"
+                    
+                    for ( int j = 0 ; j < replicationsPerDesignPoint ; j++ ) {
+                        replicationStat = sim.getReplicationStat(repName,j);
+                        if (replicationStat != null) {
+                            try {
+                                if (replicationStat instanceof simkit.stat.IndexedSampleStatistics ) {
+                                    viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = 
+                                            of.createIndexedSampleStatistics();
+                                    iss.setName(replicationStat.getName());
+                                    List arg = iss.getSampleStatistics();
+                                    simkit.stat.SampleStatistics[] allStat =
+                                            ((simkit.stat.IndexedSampleStatistics)replicationStat).getAllSampleStat();
+                                    for ( int k = 0; k < allStat.length; k++) {
+                                        
+                                        arg.add(statForStat(allStat[j]));
+                                        
+                                    }
+                                    statXml = sax2j.marshalToString(iss);
+                                } else {
+                                    statXml = sax2j.marshalToString(statForStat(replicationStat));
+                                    
+                                }
+                                if (debug_io)
+                                    System.out.println(statXml);
+                                args.clear();
+                                args.add(usid);
+                                args.add(new Integer(sampleIndex));
+                                args.add(new Integer(designPtIndex));
+                                args.add(new Integer(j));
+                                args.add(statXml);
+                                if (debug_io) {
+                                    System.out.println("sending ReplicationStat"+sampleIndex+" "+designPtIndex+" "+j);
+                                    System.out.println(statXml);
+                                }
+                                xmlrpc.execute("gridkit.addReplicationStat", args);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        
+                    }
+                }
+                
+            } catch (Exception e) { e.printStackTrace(); }
+            else System.out.println("No DesignPointStats");
+            
+            
+            // reconnect io
+            
             if(!debug_io) {
                 System.setOut(new PrintStream(oldOut));
                 System.setErr(new PrintStream(oldErr));
             }
+            
+            // skim through console chatter and organize
+            // into log, error, and if non stats property
+            // change messages which are wrapped in xml,
+            // then so sent as a Results tag. Results 
+            // should probably not be named Results as
+            // it is really LogMessages, results themselves
+            // end up as SampleStatistics as above.
             
             java.io.StringReader sr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
@@ -235,7 +360,7 @@ public class Gridlet extends Thread {
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
                 String qu  = "\"";
-                out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" design="+qu+designPtIndex+qu+" run="+qu+runIndex+qu+">");
+                out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" designPoint="+qu+designPtIndex+qu+" sample="+qu+sampleIndex+qu+">");
                 while( (line = br.readLine()) != null ) {
                     if (line.indexOf("<PropertyChange") < 0) {
                         logs.add(line);
@@ -284,10 +409,10 @@ public class Gridlet extends Thread {
                 parms.add(usid);
                 parms.add(new String(sw.toString()));
                 
-                //debug
-                System.out.println("sending Result ");
-                System.out.println(sw.toString());
-                
+                if (debug_io) {
+                    System.out.println("sending Result ");
+                    System.out.println(sw.toString());
+                }
                 xmlrpc.execute("gridkit.addResult", parms);
                 
             } catch (Exception e) {
@@ -297,6 +422,20 @@ public class Gridlet extends Thread {
         } catch (bsh.EvalError ee) {
             ee.printStackTrace();
         }
+    }
+    
+    private viskit.xsd.bindings.assembly.SampleStatistics statForStat(simkit.stat.SampleStatistics stat) throws Exception {
+        viskit.xsd.bindings.assembly.ObjectFactory of = new viskit.xsd.bindings.assembly.ObjectFactory();
+        viskit.xsd.bindings.assembly.SampleStatistics sampleStat = of.createSampleStatistics();
+        sampleStat.setCount(""+stat.getCount());
+        sampleStat.setMaxObs(""+stat.getCount());
+        sampleStat.setMean(""+stat.getMean());
+        sampleStat.setMinObs(""+stat.getMinObs());
+        sampleStat.setName(stat.getName());
+        sampleStat.setSamplingType(stat.getSamplingType().toString());
+        sampleStat.setStandardDeviation(""+stat.getStandardDeviation());
+        sampleStat.setVariance(""+stat.getVariance());
+        return sampleStat;
     }
     
 }

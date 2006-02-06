@@ -297,15 +297,17 @@ public class GridRunner {
         return (new SimkitAssemblyXML2Java()).marshalToString(r);
     }
 
-    public Boolean addDesignPointStat(int sample, int desingPt, String stat) {
-        System.out.println(stat);
+    //TBD
+    public Boolean addDesignPointStat(int sample, int designPt, String stat) {
+        System.out.println("addDesignPointStat "+sample+" "+designPt+" "+stat);
+        return Boolean.TRUE;
+    }
+    //TBD
+    public Boolean addReplicationStat(int sample, int designPt, int replication, String stat) {
+        System.out.println("addReplicationStat "+sample+" "+designPt+" "+replication+" "+stat);
         return Boolean.TRUE;
     }
     
-    public Boolean addReplicationStat(int sample, int designPt, int replication, String stat) {
-        System.out.println(stat);
-        return Boolean.TRUE;
-    }
     // qdel format is "jobID.taskID" in array jobs, so only way to
     // get jobID to parent process was by tagging the experiment
     // with the usid, so that the first Gridlet would report its
@@ -340,7 +342,6 @@ public class GridRunner {
      * @return number of remaining jobs still in the queue
      * that will be terminated.
      */
-    
   
     public Integer flushQueue() {
         Integer remainingJobs = new Integer(( designPointCount * totalSamples ) - resultsReceived );

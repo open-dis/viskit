@@ -163,7 +163,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
     public boolean isSingleStep() { return singleStep; }
     
     public void setStopRun(boolean wh) {
-        stopRun = wh;
+        stopRun = wh; //?
         if(stopRun == true)
             Schedule.stopSimulation();
     }
@@ -189,9 +189,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
     /**
      * Called at top of rep loop;  This will support "pause", but the GUI
      * is not taking advantage of it presently.
+     *
+     * rg - try using Schedule.pause() directly from GUI?
      */ 
     private void maybeReset() {
         // We reset if we're not in the middle of a run
+        
+        // but, isFinished didn't happen for the 0th
+        // replication
         if (Schedule.getDefaultEventList().isFinished())
             Schedule.reset();
     }
@@ -332,7 +337,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
      * Execute the simulation for the desired number of replications.
      */
     public void run() {
-        stopRun = false;
+        //stopRun = false;
         
         createObjects();
         performHookups();
@@ -355,54 +360,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
                 replicationData.put(new Integer(i), new ArrayList());
             }
         }
-        int replication;
-        for (replication = startRepNumber;
-             !stopRun && (replication < getNumberReplications());
-            ++replication) {
 
-            maybeReset();
-            Schedule.startSimulation();
+        for (int replication = 0; replication < getNumberReplications(); replication++) {
 
-            for (int i = 0; i < replicationStats.length; ++i) {
-                fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
-                fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
-            }
-            if (isPrintReplicationReports()) {
-                System.out.println(getReplicationReport(replication));
-            }
-            if (isSaveReplicationData()) {
-                saveReplicationStats();
-            }
-        }
-
-        if (isPrintSummaryReport()) {
-            System.out.println(getSummaryReport());
-        }
-
-        saveState(replication);
-        /*
-        if (!hookupsCalled) {
-            throw new RuntimeException("performHookups() hasn't been called!");
-        }
-        
-        Schedule.stopAtTime(getStopTime());
-        if (isVerbose()) {
-            Schedule.setVerbose(isVerbose());
-        }
-        if (isSingleStep()) {
-            Schedule.setSingleStep(isSingleStep());
-        }
-        
-        if (isSaveReplicationData()) {
-            replicationData.clear();
-            for (int i = 0; i < replicationStats.length; ++i) {
-                replicationData.put(new Integer(i), new ArrayList());
-            }
-        }
-        
-        for (int replication = 0; replication < getNumberReplications(); ++replication) {
             Schedule.reset();
             Schedule.startSimulation();
+
             for (int i = 0; i < replicationStats.length; ++i) {
                 fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
                 fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
@@ -414,9 +377,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
                 saveReplicationStats();
             }
         }
+
         if (isPrintSummaryReport()) {
             System.out.println(getSummaryReport());
-        } */
+        }
+
+
+        //saveState(replication);
+
     }
     
 }

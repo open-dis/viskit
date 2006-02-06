@@ -72,7 +72,7 @@ public class AssemblyHandler implements XmlRpcHandler {
      * methods. Realize that many users will be calling this all at once, globals strong-bad.
      */
     
-    public Object execute(String methodName, Vector parameters) throws java.lang.Exception {
+    public Object execute(String methodName, Vector arguments) throws java.lang.Exception {
         Object ret;
         String call = new String(methodName);
         String xmlData = new String("empty");
@@ -83,8 +83,8 @@ public class AssemblyHandler implements XmlRpcHandler {
         // methods may or may not seem to work but don't. special case for admin
         // whose cookie is good for addUser() and changePassword()
         if (call.equals("gridkit.login")) {
-            String username = (String)parameters.elementAt(0);
-            String password = (String)parameters.elementAt(1);
+            String username = (String)arguments.elementAt(0);
+            String password = (String)arguments.elementAt(1);
             usid = sessionManager.login(username,password);
             if (sessionManager.authenticate(usid) && !sessionManager.isAdmin(usid)) {
                 GridRunner gridRunner = new GridRunner(usid,port);
@@ -94,9 +94,9 @@ public class AssemblyHandler implements XmlRpcHandler {
         }
 
         usid = "null";
-        if (parameters.size() > 0) {
-            if (parameters.elementAt(0)!=null) {
-                usid = new String((String)parameters.elementAt(0));
+        if (arguments.size() > 0) {
+            if (arguments.elementAt(0)!=null) {
+                usid = new String((String)arguments.elementAt(0));
             }
         }
         
@@ -107,20 +107,20 @@ public class AssemblyHandler implements XmlRpcHandler {
             
             if (call.equals("gridkit.setAssembly")) {
                 
-                xmlData=(String) parameters.elementAt(1);
+                xmlData=(String) arguments.elementAt(1);
                 ret = gridRunner.setAssembly(xmlData);
                 
             } else if (call.equals("gridkit.addEventGraph")) {
                 
-                xmlData=(String) parameters.elementAt(1);
+                xmlData=(String) arguments.elementAt(1);
                 ret = gridRunner.addEventGraph(xmlData);
                 
             } else if (call.equals("gridkit.transferJar")) {
                 // used by DOE to send a chunk of a jar
                 // jarTransfer(filename,byte[]). 
-                ret = gridRunner.transferJar((String)parameters.elementAt(1),
-                        (byte[])parameters.elementAt(2),
-                        ((Integer)parameters.elementAt(3)).intValue());
+                ret = gridRunner.transferJar((String)arguments.elementAt(1),
+                        (byte[])arguments.elementAt(2),
+                        ((Integer)arguments.elementAt(3)).intValue());
             
             } else if (call.equals("gridkit.getJars")) {
                 // used Gridlet to update its own Boot class loader
@@ -133,28 +133,28 @@ public class AssemblyHandler implements XmlRpcHandler {
             } else if (call.equals("gridkit.addResult") ||
                     call.equals("gridkit.addReport")) {
                 
-                xmlData= (String) parameters.elementAt(1);
+                xmlData= (String) arguments.elementAt(1);
                 ret = gridRunner.addResult(xmlData);
                 
             } else if (call.equals("gridkit.getResult")) {
                 
-                Integer sample = (Integer) parameters.elementAt(1);
-                Integer designPt = (Integer) parameters.elementAt(2);
+                Integer sample = (Integer) arguments.elementAt(1);
+                Integer designPt = (Integer) arguments.elementAt(2);
                 ret = gridRunner.getResult(sample.intValue(), designPt.intValue());
                 
             } else if (call.equals("gridkit.addDesignPointStat")) {
                 
-                Integer sample = (Integer) parameters.elementAt(1);
-                Integer designPt = (Integer) parameters.elementAt(2);
-                String stat = (String) parameters.elementAt(3);
+                Integer sample = (Integer) arguments.elementAt(1);
+                Integer designPt = (Integer) arguments.elementAt(2);
+                String stat = (String) arguments.elementAt(3);
                 ret = gridRunner.addDesignPointStat(sample.intValue(), designPt.intValue(), stat);
                 
             } else if (call.equals("gridkit.addReplicationStat")) {
                 
-                Integer sample = (Integer) parameters.elementAt(1);
-                Integer designPt = (Integer) parameters.elementAt(2);
-                Integer replication = (Integer) parameters.elementAt(3);
-                String stat = (String) parameters.elementAt(4);
+                Integer sample = (Integer) arguments.elementAt(1);
+                Integer designPt = (Integer) arguments.elementAt(2);
+                Integer replication = (Integer) arguments.elementAt(3);
+                String stat = (String) arguments.elementAt(4);
                 ret = gridRunner.addReplicationStat(sample.intValue(), designPt.intValue(), replication.intValue(), stat);
                 
             } else if (call.equals("gridkit.flushQueue")) {
@@ -171,8 +171,8 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
             } else if (call.equals("gridkit.removeTask")) {
                 
-                Integer designPt = (Integer) parameters.elementAt(1);
-                Integer run = (Integer) parameters.elementAt(2);
+                Integer designPt = (Integer) arguments.elementAt(1);
+                Integer run = (Integer) arguments.elementAt(2);
                 ret = gridRunner.removeTask(designPt.intValue(),run.intValue());
                 
             } else if (call.equals("gridkit.setJobID")) {
@@ -186,18 +186,18 @@ public class AssemblyHandler implements XmlRpcHandler {
                 // manage the task via SGE (see wc_job_range_list in
                 // SGE man pages.) Note, only the first Gridlet
                 // from a jobID batch will use this call.
-                String jobID = (String) parameters.elementAt(1);
+                String jobID = (String) arguments.elementAt(1);
                 gridRunner.setJobID(jobID);
                 ret = jobID;
                 
             } else if (call.equals("gridkit.addUser")) {
                     // sessionManager will of course check if admin
-                    ret = sessionManager.addUser(usid,(String)(parameters.elementAt(1)));
+                    ret = sessionManager.addUser(usid,(String)(arguments.elementAt(1)));
                     
             } else if (call.equals("gridkit.changePassword")) {
                 // sessionManager will of course check if either user or admin
-                String username = (String) parameters.elementAt(1);
-                String newPassword = (String) parameters.elementAt(2);
+                String username = (String) arguments.elementAt(1);
+                String newPassword = (String) arguments.elementAt(2);
                 
                 ret = sessionManager.changePassword(usid, username, newPassword);
                 

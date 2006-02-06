@@ -222,7 +222,7 @@ public class ViskitAssembly extends BasicAssembly {
     
     protected void createReplicationStats() {
         replicationStats = 
-                (SampleStatistics[]) replicationStatistics.values().toArray(new SampleStatistics[0]);
+                (simkit.stat.SampleStatistics[]) replicationStatistics.values().toArray(new simkit.stat.SampleStatistics[0]);
         for ( int i = 0; debug && i < replicationStats.length; i++ ) {
             System.out.println(replicationStats[i].getName() + " replicationStat created");
         }
