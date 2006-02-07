@@ -160,7 +160,8 @@ public class Gridlet extends Thread {
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
         
         if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
-     
+        
+        //pass design args into design params
         while ( itd.hasNext() && itp.hasNext() ) {
             TerminalParameterType arg = (TerminalParameterType)(itp.next());
             TerminalParameterType designParam = (TerminalParameterType)(itd.next());
