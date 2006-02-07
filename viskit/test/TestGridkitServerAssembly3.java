@@ -236,9 +236,11 @@ public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback 
             // set of random variate values each. So, if 
             // an Assembly has a high degree of built in
             // randomness, fewer Samples might need to be
-            // taken, or if an Assemlby has no randomVariates
-            // built in or few, then more Samples can be
-            // generated. The Jitter is meant to be able
+            // taken and more replications, or if an Assemlby 
+            // has no or few randomVariates built in, then 
+            // more Samples can be generated. 
+            // 
+            // The Jitter is meant to be able
             // to create a fuzzy sample near some design
             // space, so that a single Sample can be sampled
             // repeatedly. One way you rotate the bulb, one
