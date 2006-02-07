@@ -116,7 +116,11 @@ public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback 
             
             // send ServerAssembly3.xml now that deps are loaded
             // first make a jaxb tree to add DesignParameters
-            SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java((new URL(basedir+"examples/ServerAssembly3.xml").openStream()));
+            SimkitAssemblyXML2Java sax2j = 
+                    new SimkitAssemblyXML2Java(
+                        (new URL(basedir+"examples/ServerAssembly3.xml")
+                            .openStream())
+                    );
             sax2j.unmarshal();
             SimkitAssemblyType root = sax2j.getRoot();
             
@@ -153,7 +157,7 @@ public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback 
             // design parameter receives arguments
             // from the design points during a run
             // then it passes by reference design arguments
-            // to the entity's parameter.
+            // to the entity's parameter, automatically.
             TerminalParameterType designParam0 = of.createTerminalParameter();
             designParam0.setName("exponential");
             designParam0.setType("double");
