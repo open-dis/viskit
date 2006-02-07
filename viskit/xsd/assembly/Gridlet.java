@@ -445,7 +445,7 @@ public class Gridlet extends Thread {
         viskit.xsd.bindings.assembly.ObjectFactory of = new viskit.xsd.bindings.assembly.ObjectFactory();
         viskit.xsd.bindings.assembly.SampleStatistics sampleStat = of.createSampleStatistics();
         sampleStat.setCount(""+stat.getCount());
-        sampleStat.setMaxObs(""+stat.getCount());
+        sampleStat.setMaxObs(""+stat.getMaxObs());
         sampleStat.setMean(""+stat.getMean());
         sampleStat.setMinObs(""+stat.getMinObs());
         sampleStat.setName(stat.getName());
