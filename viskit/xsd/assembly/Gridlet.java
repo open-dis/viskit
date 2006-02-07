@@ -13,10 +13,6 @@
  * TBD - XmlRpcClient may need to be either clear or 
  * ssl. 
  *
- * First one in a batch array of tasks, reports back
- * the assigned SGE jobID for further administration
- * at the front end.
- *
  * Third party jars can be added to the runtime classpath
  * prior to reconstituting an Assembly and running it. See
  * GridRunner for XML-RPC details. To do this though, Gridlets
@@ -192,6 +188,7 @@ public class Gridlet extends Thread {
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
             
+            // submit all EventGraphs to the beanshell context
             while ( di.hasNext() ) {
                 
                 EventGraphType d = (EventGraphType)(di.next());
@@ -206,16 +203,18 @@ public class Gridlet extends Thread {
                 }
                 
                 bais = new ByteArrayInputStream(s.toString().getBytes());
-                
+                // generate java for the eventGraph and evaluate a loaded
+                // class
                 viskit.xsd.translator.SimkitXML2Java sx2j = 
                         new viskit.xsd.translator.SimkitXML2Java(bais);
+                // first convert XML to java source
                 sx2j.unmarshal();
                 
                 if (debug_io) {
                     System.out.println("Evaluating generated java Event Graph:");
                     System.out.println(sx2j.translate());
                 }
-                
+                // pass the source for this SimEntity in for "compile"
                 bsh.eval(sx2j.translate());
             }
             
@@ -223,12 +222,17 @@ public class Gridlet extends Thread {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
                 System.out.println(sax2j.translate());
             }
-            
-            // beanshell "compile" and instance
+            // 
+            // Now do the Assembly
+            //
+            // first beanshell "compile" and instance
+            //
             bsh.eval(sax2j.translate());
             bsh.eval("sim = new "+ root.getName() +"();");
             ViskitAssembly sim = (ViskitAssembly) bsh.get("sim");
-
+            //
+            // thread obtained ViskitAssembly and run it
+            //
             Thread runner = new Thread(sim);
             runner.start();
             try {
