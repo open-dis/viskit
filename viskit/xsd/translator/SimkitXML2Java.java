@@ -58,9 +58,6 @@ public class SimkitXML2Java {
     private final String lb  = "[";
     private final String rb  = "]";
 
-  /* for gui introspection */
-  public static final String constructorParmNamesID = "constructorParameterNames";
-
     /**
      * Creates a new instance of SimkitXML2Java
      * when used from another class, instance this
@@ -169,22 +166,6 @@ public class SimkitXML2Java {
 	}
 
 	pw.println();
-
-      // added by Mike Bailey, 21 Dec 2005
-       pw.println(sp4 + "/* Used by gui via introspection. */");
-       pw.println(sp4 + "/* For manually created event graphs, enter name arrays in order */");
-       pw.println(sp4 + "/* of constructor declaration. */");
-       pw.println(sp4 + "public static String[][] " + constructorParmNamesID + " =");
-       pw.print(sp8 + "{{");
-       for (li = this.root.getParameter().listIterator(); li.hasNext();) {
-         pw.print("\"");
-         pw.print(((Parameter) li.next()).getName());
-         pw.print("\",");
-       }
-       pw.println("}};");
-       pw.println();
-       // end added by Mike
-      
 
   li = this.root.getStateVariable().listIterator();
 
