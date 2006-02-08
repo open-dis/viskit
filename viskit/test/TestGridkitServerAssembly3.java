@@ -303,6 +303,8 @@ public class TestGridkitServerAssembly3 extends Thread {
                 // this will block until a task ends which could be
                 // because it died, or because it completed, either way
                 // check the logs returned by getResults will tell.
+                args.clear();
+                args.add(usid);
                 Vector queue = (Vector) xmlrpc.execute("gridkit.getTaskQueue",args);
                 for ( int i = 0; i < queue.size(); i ++ ) {
                     // trick: any change between queries indicates a transition at 
@@ -330,6 +332,10 @@ public class TestGridkitServerAssembly3 extends Thread {
                         System.out.println(ret);
                         for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
                             System.out.println("ReplicationStats from task "+(i+1)+" replication "+j);
+                            args.clear();
+                            args.add(usid);
+                            args.add(new Integer(sampleIndex));
+                            args.add(new Integer(designPtIndex));
                             args.add(new Integer(j));
                             ret = xmlrpc.execute("gridkit.getReplicationStats",args);
                             System.out.println(ret);
