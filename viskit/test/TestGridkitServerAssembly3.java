@@ -25,19 +25,19 @@ import java.util.Vector;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
-import org.apache.xmlrpc.AsyncCallback;
 
 /**
  *
  * @author Rick Goldberg
  */
-public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback {
+public class TestGridkitServerAssembly3 extends Thread {
     XmlRpcClientLite xmlrpc;
     Vector args;
     String usid;
     String basedir;
     ByteArrayOutputStream buffer;
     Object ret;
+    public static final boolean verbose = false; // turns off console output from simkit
     
     /** Creates a new instance of TestGridkitServerAssembly3 */
     public TestGridkitServerAssembly3(String server, int port) throws Exception {
@@ -283,34 +283,73 @@ public class TestGridkitServerAssembly3 extends Thread implements AsyncCallback 
             ret = xmlrpc.execute("gridkit.run", args);
             System.out.println("run returned "+ ret);
             
-            // async call for Results 
-            // total of 5 samples x 3 designPoints
-            for ( int i = 0; i < 5; i ++ ) {
-                for ( int j = 0; j < 3; j ++) {
-                    args.clear();
-                    args.add(usid);
-                    args.add(new Integer(i));
-                    args.add(new Integer(j));
-                    xmlrpc.executeAsync("gridkit.getResult",args, this);
+            
+            // synchronous single threaded results, uses
+            // a status buffer that locks until results are
+            // in, at which point a select can be performed.
+            // this saves server thread resources
+      
+            Vector lastQueue;
+            args.clear();
+            args.add(usid);
+            // this shouldn't block on the very first call, the queue
+            // is born dirty. 
+            lastQueue = (Vector) xmlrpc.execute("gridkit.getTaskQueue",args);
+            
+            // initial number of tasks ( can also query getRemainingTasks )
+            int tasksRemaining = 5 * 3; 
+            
+            while ( tasksRemaining > 0 ) {
+                // this will block until a task ends which could be
+                // because it died, or because it completed, either way
+                // check the logs returned by getResults will tell.
+                Vector queue = (Vector) xmlrpc.execute("gridkit.getTaskQueue",args);
+                for ( int i = 0; i < queue.size(); i ++ ) {
+                    // trick: any change between queries indicates a transition at 
+                    // taskID = i
+                    if ( !((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i))) ) {
+                        int sampleIndex = i / 3; // number of designPoints is 3
+                        int designPtIndex = i % 3; // can also just use getResultByTaskID(int)
+                        args.clear();
+                        args.add(usid);
+                        args.add(new Integer(sampleIndex));
+                        args.add(new Integer(designPtIndex));
+                        // this is reallllly verbose, you may wish to consider
+                        // not getting the output logs unless there is a problem
+                        // even so at that point the design points can be run
+                        // as a regular assembly to reproduce. the complete
+                        // logs are so far stored on the server.
+                        
+                        if (verbose) {
+                            ret = xmlrpc.execute("gridkit.getResult",args);
+                            System.out.println("Result returned from task "+i);
+                            System.out.println(ret);
+                        }
+                        System.out.println("DesignPointStats from task "+i);
+                        ret = xmlrpc.execute("gridkit.getDesignPointStats",args);
+                        System.out.println(ret);
+                        for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
+                            System.out.println("ReplicationStats from task "+i+" replication "+j);
+                            args.add(new Integer(j));
+                            ret = xmlrpc.execute("gridkit.getReplicationStats",args);
+                            System.out.println(ret);
+                        }
+                        tasksRemaining --;
+                        // could also call to get tasksRemaining:
+                        // ((Integer)xmlrpc.execute("gridkit.getRemainingTasks",args)).intValue();
+                    }
                 }
+                lastQueue = queue;
+                
             }
+            
+            System.out.println("Test complete!");
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    // xml-rpc async callbacks for getResults
-    
-    public void handleError(java.lang.Exception exception, java.net.URL url, java.lang.String method) {
-        System.out.println("Error: " + exception+ url+method);
-    }
-    
-    public void handleResult(java.lang.Object result, java.net.URL url, java.lang.String method) {
-        if ( method.equals("gridkit.getResult")) {
-            System.out.println(result);
-            
-        }
-    }
     
     public static void main(String[] args) {
         try {
