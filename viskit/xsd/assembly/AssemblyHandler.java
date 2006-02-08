@@ -142,6 +142,11 @@ public class AssemblyHandler implements XmlRpcHandler {
                 Integer designPt = (Integer) arguments.elementAt(2);
                 ret = gridRunner.getResult(sample.intValue(), designPt.intValue());
                 
+            } else if (call.equals("gridkit.getResultByTaskID")) {
+                
+                Integer taskID = (Integer) arguments.elementAt(1);
+                ret = gridRunner.getResultByTaskID(taskID.intValue());
+                
             } else if (call.equals("gridkit.getDesignPointStats")) {
                 
                 Integer sample = (Integer) arguments.elementAt(1);
@@ -159,8 +164,9 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
-                String stat = (String) arguments.elementAt(3);
-                ret = gridRunner.addDesignPointStat(sample.intValue(), designPt.intValue(), stat);
+                Integer numberOfStats = (Integer) arguments.elementAt(3);
+                String stat = (String) arguments.elementAt(4);
+                ret = gridRunner.addDesignPointStat(sample.intValue(), designPt.intValue(), numberOfStats.intValue(), stat);
                 
             } else if (call.equals("gridkit.addReplicationStat")) {
                 
@@ -177,6 +183,10 @@ public class AssemblyHandler implements XmlRpcHandler {
             } else if (call.equals("gridkit.getRemainingTasks")) {
                 
                 ret = gridRunner.getRemainingTasks();
+                
+            } else if (call.equals("gridkit.getTaskQueue")) {
+                
+                ret = gridRunner.getTaskQueue();
                 
             } else if (call.equals("gridkit.clear")) {
                 

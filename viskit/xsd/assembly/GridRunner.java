@@ -84,7 +84,18 @@ public class GridRunner {
     int replicationsPerDesignPoint;
     // total sample sets
     int totalSamples;
-    
+    // numberOfStats used to synchronize access to getDesignPointStats
+    int numberOfStats = Integer.MAX_VALUE;
+    // timeout in ms for any synchronized requests
+    long timeout;
+    // list of Booleans in order
+    // indicating if a taskID is in the queue
+    // True: in queue
+    // False: Complete or DOA, check Results to determine.
+    // gets updated by removeTask or removeIndexedTask
+    // can be used by client by synchronized checking
+    Vector queue;
+    boolean queueClean = false; // dirty means unclaimed info
     /** Creates a new instance of GridRunner */
     public GridRunner(String usid, int port) {
         this.usid = usid;
@@ -125,9 +136,17 @@ public class GridRunner {
         this.replicationsPerDesignPoint = Integer.parseInt(root.getExperiment().getReplicationsPerDesignPoint());
         // set totalSamples
         this.totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
-        //
+        // totalSample * designPointCount = queue size
+        // also handy, sampleIndex = taskID / designPointCount; 
+        // and         designPtIndex = taskID % designPointCount; 
         this.designPointCount = root.getDesignParameters().size();
-        
+        // timeout for synchronized calls as set by Experiment tag, or not means indefinite wait
+        String to = root.getExperiment().getTimeout();
+        this.timeout = Long.parseLong(to==null?"0":to);
+        this.queue = new Vector();
+        for ( int i = 0; i < totalSamples * designPointCount; i ++) {
+            queue.add(Boolean.TRUE);
+        }
         return Boolean.TRUE;
     }
     
@@ -236,6 +255,13 @@ public class GridRunner {
         return new Boolean(error);
     }
     
+    public synchronized String getResultByTaskID(int taskID) {
+        taskID --;
+        int sampleIndex = taskID / designPointCount;
+        int designPtIndex = taskID % designPointCount;
+        return getResult(sampleIndex,designPtIndex);
+        
+    }
     /**
      * XML-RPC hook to retrieve results from an experimental run.
      * The call is synchronized, the calling client thread
@@ -258,49 +284,63 @@ public class GridRunner {
      */
     
     public synchronized String getResult(int sample, int designPt) {
-        Sample s = (Sample)(root.getExperiment().getSample().get(sample));
-        DesignPointType runner = (DesignPointType)(s.getDesignPoint().get(designPt));
-        ResultsType r = runner.getResults();
-        int timeout = Integer.parseInt(root.getExperiment().getTimeout());
-        if ( r == null ) { // not while
-            synchronized(runner) {
+        try {
+            Sample s = (Sample)(root.getExperiment().getSample().get(sample));
+            DesignPointType runner = (DesignPointType)(s.getDesignPoint().get(designPt));
+            ResultsType r = runner.getResults();
+            if ( r == null ) { // not while
+                synchronized(runner) {
+                    try {
+                        if (timeout == 0)
+                            runner.wait();
+                        else
+                            runner.wait(timeout);
+                    } catch (InterruptedException ie) {
+                        ;
+                    }
+                }
+                r = runner.getResults();
+                
+            }
+            
+            if ( r == null ) {
                 try {
-                    if (timeout == 0)
-                        runner.wait();
-                    else
-                        runner.wait(timeout);
-                } catch (InterruptedException ie) {
-                    ;
+                    r = (ResultsType)(assemblyFactory.createResults());
+                    r.setDesignPoint(""+designPt);
+                    r.setSample(""+sample);
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            r = runner.getResults();
-            
+            return (new SimkitAssemblyXML2Java()).marshalToString(r);
+        } catch (NullPointerException npe) {
+            ; // do nothing, the request came before design was in
         }
         
-        if ( r == null ) {
-            try {
-                r = (ResultsType)(assemblyFactory.createResults());
-                r.setDesignPoint(""+designPt);
-                r.setSample(""+sample);
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return (new SimkitAssemblyXML2Java()).marshalToString(r);
+        return "WAIT";
     }
-
+    
     // this method does not need to be synchronized as getResults
     // as stats are guaranteed to be in before getResults unlocks,
     // so getting stats after results always should work, but not
     // necessarily the other way around.
     
     // Hashtable returned is name keyed to String of xml
-    public Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) {
+    public synchronized Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) {
         Sample s = (Sample)(root.getExperiment().getSample().get(sampleIndex));
         DesignPointType dp = (DesignPointType) s.getDesignPoint().get(designPtIndex);
         Hashtable ret = new Hashtable();
-        List stats = dp.getStatistics();
+        List stats = dp.getStatistics(); 
+        synchronized(stats) {
+            while ( stats.size() < numberOfStats ) {
+                try {
+                    stats.wait();
+                } catch (InterruptedException ie) {
+                    ;
+                }
+            }
+        }
         Iterator it = stats.iterator();
         while (it.hasNext()) {
             String name = null;
@@ -325,12 +365,21 @@ public class GridRunner {
     // necessarily the other way around.
     
     // Hashtable returned is name keyed to String of xml
-    public Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) {
+    public synchronized Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) {
         Sample s = (Sample)(root.getExperiment().getSample().get(sampleIndex));
         DesignPointType dp = (DesignPointType) s.getDesignPoint().get(designPtIndex);
         ReplicationType rp = (ReplicationType) dp.getReplication().get(replicationIndex);
         Hashtable ret = new Hashtable();
         List stats = rp.getStatistics();
+        synchronized(stats) {
+            while ( stats.size() < numberOfStats ) {
+                try {
+                    stats.wait();
+                } catch (InterruptedException ie) {
+                    ;
+                }
+            }
+        }
         Iterator it = stats.iterator();
         while (it.hasNext()) {
             String name = null;
@@ -349,14 +398,19 @@ public class GridRunner {
         return ret;
     }
     
-    public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, String stat) {
+    public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
             Unmarshaller u = jc.createUnmarshaller();
             SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
             Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
-            designPoint.getStatistics().add(stats);
+            List statses = designPoint.getStatistics();
+            this.numberOfStats = numberOfStats; // this really only needs to be set the first time
+            synchronized(statses) {
+                statses.add(stats);
+                statses.notify();
+            }
         } catch (Exception e) { return Boolean.FALSE; }
         
         return Boolean.TRUE;
@@ -370,7 +424,11 @@ public class GridRunner {
             DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
             ReplicationType rep = (ReplicationType) designPoint.getReplication().get(replicationIndex);
             Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
-            rep.getStatistics().add(stats);
+            List statses = rep.getStatistics();
+            synchronized(statses) {
+                statses.add(stats);
+                statses.notify();
+            }
         } catch (Exception e) { return Boolean.FALSE; }
        
         return Boolean.TRUE;
@@ -386,12 +444,8 @@ public class GridRunner {
         int taskID = sampleIndex * designPointCount;
         taskID += designPtIndex;
         taskID += 1;
-        try {
-            System.out.println("Task removed: "+jobID+"."+taskID);        
-            Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
-        } catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
-        }
+       
+        removeTask(jobID.intValue(),taskID);
         
         // TBD check if result first then make an empty result if needed
         try {
@@ -408,14 +462,19 @@ public class GridRunner {
     
     // called by Gridlet to remove itself after
     // completion
+    
     public Integer removeTask(int jobID, int taskID) {
         try {
-            System.out.println("Task complete: "+jobID+"."+taskID);        
+            if (debug) System.out.println("qdel: "+jobID+"."+taskID);        
             Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
             
             
             tasksCompleted++;
-            
+            synchronized(queue) {
+                queue.set(taskID,Boolean.FALSE);
+                queueClean = false;
+                queue.notify();
+            }
             // if all results in, done! write out all results to storage
             // TBD, filename should include some session info since same
             // Assembly may be experimented on repeatedly. Really TBD,
@@ -468,9 +527,32 @@ public class GridRunner {
      * @return number of remaining jobs in the queue still running.
      */
     
-    // TBD this might be better as an array of pending taskID's?
     public Integer getRemainingTasks() {
         return new Integer(( designPointCount * totalSamples ) - tasksCompleted );
+    }
+    
+    // idea is to reduce waiting threads to avoid hitting the xml-rpc
+    // server thread limit of 100 requests. This call will block until
+    // there has been some change in the queue, and returns a Vector
+    // of Booleans which can be compared to the previous return Vector
+    // to see which was updated.
+    public synchronized Vector getTaskQueue() {
+        
+        if (queueClean) {
+            synchronized(queue) {
+                try {
+                    if (timeout == 0)
+                        queue.wait(); // wait for dirtyness
+                    else
+                        queue.wait(timeout);
+                } catch (InterruptedException ie) {
+                    ;
+                }
+            } return queue;
+        }
+        
+        queueClean = true;
+        return queue;
     }
     
     public void setJobID(Integer jobID) {

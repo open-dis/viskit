@@ -284,6 +284,7 @@ public class Gridlet extends Thread {
                     args.add(usid);
                     args.add(new Integer(sampleIndex));
                     args.add(new Integer(designPtIndex));
+                    args.add(new Integer(designPointStats.length));
                     args.add(statXml);
                     if (debug_io) {
                        System.out.println("sending DesignPointStat "+sampleIndex+" "+designPtIndex);
