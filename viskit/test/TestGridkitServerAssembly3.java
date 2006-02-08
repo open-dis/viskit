@@ -306,9 +306,9 @@ public class TestGridkitServerAssembly3 extends Thread {
                 Vector queue = (Vector) xmlrpc.execute("gridkit.getTaskQueue",args);
                 for ( int i = 0; i < queue.size(); i ++ ) {
                     // trick: any change between queries indicates a transition at 
-                    // taskID = i
+                    // taskID = i (well i+1 really, taskID's in SGE start at 1)
                     if ( !((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i))) ) {
-                        int sampleIndex = i / 3; // number of designPoints is 3
+                        int sampleIndex = i / 3; // number of designPoints chosed in this experiemnt was 3
                         int designPtIndex = i % 3; // can also just use getResultByTaskID(int)
                         args.clear();
                         args.add(usid);
@@ -322,19 +322,19 @@ public class TestGridkitServerAssembly3 extends Thread {
                         
                         if (verbose) {
                             ret = xmlrpc.execute("gridkit.getResult",args);
-                            System.out.println("Result returned from task "+i);
+                            System.out.println("Result returned from task "+(i+1));
                             System.out.println(ret);
                         }
-                        System.out.println("DesignPointStats from task "+i);
+                        System.out.println("DesignPointStats from task "+(i+1));
                         ret = xmlrpc.execute("gridkit.getDesignPointStats",args);
                         System.out.println(ret);
                         for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
-                            System.out.println("ReplicationStats from task "+i+" replication "+j);
+                            System.out.println("ReplicationStats from task "+(i+1)+" replication "+j);
                             args.add(new Integer(j));
                             ret = xmlrpc.execute("gridkit.getReplicationStats",args);
                             System.out.println(ret);
                         }
-                        tasksRemaining --;
+                        --tasksRemaining;
                         // could also call to get tasksRemaining:
                         // ((Integer)xmlrpc.execute("gridkit.getRemainingTasks",args)).intValue();
                     }
