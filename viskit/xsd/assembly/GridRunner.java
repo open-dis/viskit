@@ -409,7 +409,7 @@ public class GridRunner {
             this.numberOfStats = numberOfStats; // this really only needs to be set the first time
             synchronized(statses) {
                 statses.add(stats);
-                statses.notify();
+                statses.notifyAll();
             }
         } catch (Exception e) { return Boolean.FALSE; }
         
@@ -427,7 +427,7 @@ public class GridRunner {
             List statses = rep.getStatistics();
             synchronized(statses) {
                 statses.add(stats);
-                statses.notify();
+                statses.notifyAll();
             }
         } catch (Exception e) { return Boolean.FALSE; }
        
@@ -471,7 +471,7 @@ public class GridRunner {
             
             tasksCompleted++;
             synchronized(queue) {
-                queue.set(taskID,Boolean.FALSE);
+                queue.set(taskID-1,Boolean.FALSE);
                 queueClean = false;
                 queue.notify();
             }
