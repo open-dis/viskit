@@ -321,11 +321,6 @@ public class GridRunner {
         return "WAIT";
     }
     
-    // this method does not need to be synchronized as getResults
-    // as stats are guaranteed to be in before getResults unlocks,
-    // so getting stats after results always should work, but not
-    // necessarily the other way around.
-    
     // Hashtable returned is name keyed to String of xml
     public synchronized Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) {
         Sample s = (Sample)(root.getExperiment().getSample().get(sampleIndex));
@@ -358,11 +353,6 @@ public class GridRunner {
         
         return ret;
     }
-    
-    // this method does not need to be synchronized as getResults
-    // as stats are guaranteed to be in before getResults unlocks,
-    // so getting stats after results always should work, but not
-    // necessarily the other way around.
     
     // Hashtable returned is name keyed to String of xml
     public synchronized Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) {

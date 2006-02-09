@@ -251,8 +251,7 @@ public class Gridlet extends Thread {
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             String statXml;
             
-            // first designPoint stats
-            // TBD synchronize designPointStats to notify front end
+            // first get designPoint stats
             if (designPointStats != null ) try {
                 
                 for ( int i = 0; i < designPointStats.length; i++) {
