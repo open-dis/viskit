@@ -512,9 +512,8 @@ public class GridRunner {
     }
     
     /**
-     * XML-RPC handler for returning number of remaining jobs in queue,
-     * could be used to estimate when a set of jobs becomes stuck.
-     * @return number of remaining jobs in the queue still running.
+     * XML-RPC handler for returning number of remaining tasks in queue.
+     * @return number of remaining tasks in the queue still running.
      */
     
     public Integer getRemainingTasks() {
@@ -525,7 +524,7 @@ public class GridRunner {
     // server thread limit of 100 requests. This call will block until
     // there has been some change in the queue, and returns a Vector
     // of Booleans which can be compared to the previous return Vector
-    // to see which was updated.
+    // to see which was updated. It won't block the first time called.
     public synchronized Vector getTaskQueue() {
         
         if (queueClean) {
