@@ -349,6 +349,10 @@ public class TestGridkitServerAssembly3 extends Thread {
                 
             }
             
+            args.clear();
+            args.add(usid);
+            System.out.println("Loging out:"+xmlrpc.execute("gridkit.logout",args));
+            
             System.out.println("Test complete!");
             
         } catch (Exception e) {
