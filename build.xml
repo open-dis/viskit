@@ -496,14 +496,14 @@
   
   <target description="Test Gridkit login" name="test-gridkit-login">
     <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
-        <arg value="localhost" />
+        <arg value="cluster.moves.nps.navy.mil" />
         <arg value="4444" />
     </java>
   </target>
 
   <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
     <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
-        <arg value="localhost" />
+        <arg value="cluster.moves.nps.navy.mil" />
         <arg value="4444" />
     </java>
   </target>
