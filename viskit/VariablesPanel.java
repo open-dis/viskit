@@ -14,7 +14,7 @@ import viskit.model.vStateVariable;
 
 public class VariablesPanel extends ViskitTablePanel
 {
-  private String[] mytitles = {"name","type","comment"};
+  private String[] mytitles = {"name","type","description"};
 
   private String plusToolTip = "Add a state variable";
   private String minusToolTip = "Removed the selected state variable";
@@ -41,7 +41,7 @@ public class VariablesPanel extends ViskitTablePanel
 
   public Object newRowObject()
   {
-    vStateVariable ea = new vStateVariable("name","int","comment");
+    vStateVariable ea = new vStateVariable("name","int","description");
     return ea;
   }
 

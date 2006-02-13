@@ -81,7 +81,7 @@ public class LocalVariableDialog extends JDialog
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("comment");
+        JLabel commLab = new JLabel("description");
         int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,commLab});
 
         nameField = new JTextField(15);   setMaxHeight(nameField);

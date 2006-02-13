@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class ArgumentsPanel extends ViskitTablePanel
 {
-  private String[] mytitles = {"name","type","comment"};
+  private String[] mytitles = {"name","type","description"};
   private static int count=0;
 
   ArgumentsPanel(int wid)

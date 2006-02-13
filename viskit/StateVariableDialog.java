@@ -71,7 +71,7 @@ public class StateVariableDialog extends ViskitSmallDialog
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("comment");
+        JLabel commLab = new JLabel("description");
             arrSizeLab = new JLabel("array size");
 
         int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,commLab});

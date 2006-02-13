@@ -14,7 +14,7 @@ import viskit.model.EventLocalVariable;
 
 public class LocalVariablesPanel extends ViskitTablePanel
 {
-  private String[] mytitles = {"name","type","initial value","comment"};
+  private String[] mytitles = {"name","type","initial value","description"};
   private static int count = 0;
   
   LocalVariablesPanel(int wid)

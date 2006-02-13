@@ -70,7 +70,7 @@ public class EdgeParameterDialog extends JDialog
 
         JLabel valueLab = new JLabel("value");
         JLabel typeLab = new JLabel("type");
-        //JLabel commLab = new JLabel("comment");
+        //JLabel commLab = new JLabel("description");
         int w = maxWidth(new JComponent[]{valueLab,typeLab}); //commLab});
 
         valueField         = new JTextField(25);   setMaxHeight(valueField);

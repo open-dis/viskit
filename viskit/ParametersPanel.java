@@ -14,7 +14,7 @@ import viskit.model.vParameter;
 
 public class ParametersPanel extends ViskitTablePanel
 {
-  private String[] mytitles = {"name","type","comment"};
+  private String[] mytitles = {"name","type","description"};
 
   private String plusToolTip = "Add a simulation parameter";
   private String minusToolTip = "Removed the selected parameter";
@@ -46,7 +46,7 @@ public class ParametersPanel extends ViskitTablePanel
 
   public Object newRowObject()
   {
-    vParameter ea = new vParameter("name","int","comment");
+    vParameter ea = new vParameter("name","int","description");
     return ea;
   }
 
