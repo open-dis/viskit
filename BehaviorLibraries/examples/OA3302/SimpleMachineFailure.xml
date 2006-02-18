@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity name="SimpleMachineFailure" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter type="int" name="totalNumberMachines"/>
+    <Parameter type="int" name="totalNumberRepairPeople"/>
+    <Parameter type="simkit.random.RandomVariate" name="timeToFailure"/>
+    <Parameter type="simkit.random.RandomVariate" name="repairTime"/>
+    <StateVariable name="numberFailedMachines" type="int" />
+    <StateVariable name="numberAvailableRepairPeople" type="int" />
+    <Event name="Run">
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="totalNumberMachines"/>
+        </StateTransition>
+        <StateTransition state="numberAvailableRepairPeople">
+            <Assignment value="totalNumberRepairPeople"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartMachine"/>
+        <Coordinate y="0" x="0"/>
+    </Event>
+    <Event name="StartMachine">
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="numberFailedMachines - 1"/>
+        </StateTransition>
+        <Schedule delay="timeToFailure.generate()" event="Failure"/>
+        <Schedule condition="numberFailedMachines &gt; 0" delay="0.0" event="StartMachine"/>
+        <Coordinate y="0" x="80"/>
+    </Event>
+    <Event name="Failure">
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="numberFailedMachines + 1"/>
+        </StateTransition>
+        <Schedule condition="numberAvailableRepairPeople &gt; 0" delay="0.0" event="StartRepair"/>
+        <Coordinate y="160" x="80"/>
+    </Event>
+    <Event name="StartRepair">
+        <StateTransition state="numberAvailableRepairPeople">
+            <Assignment value="numberAvailableRepairPeople - 1"/>
+        </StateTransition>
+        <Schedule delay="repairTime.generate()" event="EndRepair"/>
+        <Coordinate y="160" x="280"/>
+    </Event>
+    <Event name="EndRepair">
+        <StateTransition state="numberAvailableRepairPeople">
+            <Assignment value="numberAvailableRepairPeople + 1"/>
+        </StateTransition>
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="numberFailedMachines - 1"/>
+        </StateTransition>
+        <Schedule condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="1.0" delay="0.0" event="StartRepair"/>
+        <Schedule delay="timeToFailure.generate()" event="Failure"/>
+        <Coordinate y="10" x="280"/>
+    </Event>
+</SimEntity>
+
