@@ -141,8 +141,10 @@ public class TestGridkitLogin extends Thread {
             u = new URL((u.getFile().split("!"))[0].trim());
             File jar = new File(u.getFile());
             System.out.println("Opening "+jar);
-            FileInputStream fis = new FileInputStream(jar);
-            long fileSize = jar.length();
+            //FileInputStream fis = new FileInputStream(jar);
+            //FileInputStream fis = new FileInputStream(u.getFile());
+            java.io.InputStream fis = u.openStream();
+            long fileSize = jar.length(); fileSize = fis.available();
             System.out.println("which is "+fileSize+ " bytes");
             byte[] buf = new byte[1024];
             int chunks = (int)(fileSize/1024L + (fileSize % 1024L > 0L ? 0L : -1L));
