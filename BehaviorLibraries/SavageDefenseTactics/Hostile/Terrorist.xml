@@ -18,6 +18,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="startPositions" type="diskit.ZoneGeometry[]">
         <Comment/>
     </Parameter>
+    <Parameter name="harborLocation" type="diskit.Vec3d">
+        <Comment>The general location of the harbor</Comment>
+    </Parameter>
     <StateVariable name="avoidanceRange" type="double">
         <Comment/>
     </StateVariable>
@@ -158,14 +161,20 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Event name="BeginAttack">
         <Comment>TODO: Move Harbor Center to the constructor for this event graph</Comment>
         <Argument name="attackStart" type="diskit.WaypointCreator"/>
-        <LocalVariable name="harborLocation" type="diskit.Vec3d[]" value="new diskit.Vec3d[1]">
+        <LocalVariable name="harbor" type="diskit.Vec3d[]" value="new diskit.Vec3d[1]">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="harborCenter" type="diskit.Vec3d" value="new diskit.Vec3d(-1235.309, -887.534, 0.0)">
-            <Comment/>
-        </LocalVariable>
+        <StateTransition state="initialMoverManager">
+            <Assignment value="new diskit.PathMoverManager(this, harbor, true)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="initialMoverManager"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
         <Schedule event="Start"/>
-        <Code>setStartPosition(attackStart.createWaypoint()); harborLocation[0] = harborCenter; initialMoverManager = new diskit.PathMoverManager(this, harborLocation, true); </Code>
+        <Code>setStartPosition(attackStart.createWaypoint());  harbor[0] = getHarborLocation();</Code>
         <Coordinate x="30" y="320"/>
     </Event>
     <Event name="Start">
@@ -181,7 +190,6 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     </Event>
     <Event name="EndMove">
         <Comment/>
-        <Schedule event="BeginAttack"/>
         <Code/>
         <Coordinate x="230" y="430"/>
     </Event>
@@ -201,14 +209,16 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <LocalVariable name="amm" type="diskit.MoverManager" value="getActiveMoverManager()">
             <Comment/>
         </LocalVariable>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="interceptMoverManager"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
         <StateTransition state="interceptMoverManager">
             <Operation method="interceptToOffset(target,2.0*blastRadius)"/>
         </StateTransition>
-        <Schedule condition="this.getLocation() == interceptMoverManager.getInterceptPoint() " delay="0.0" event="ChooseStartPosition" priority="0">
-            <Comment/>
-            <EdgeParameter value="startPositions"/>
-        </Schedule>
-        <Code>this.setStartPosition(getLocation()); this.setCruisingSpeed(getMaxSpeed());interceptMoverManager = new diskit.InterceptMoverManager(this);System.out.println("I am attacking "  + target.getMoverID() );</Code>
+        <Code>amm.setMover(null);this.setStartPosition(getLocation()); interceptMoverManager = new diskit.InterceptMoverManager(this); </Code>
         <Coordinate x="220" y="310"/>
     </Event>
 </SimEntity>
