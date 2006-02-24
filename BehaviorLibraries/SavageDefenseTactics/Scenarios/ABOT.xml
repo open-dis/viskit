@@ -11,17 +11,17 @@
         <Coordinate x="280" y="280"/>
     </SimEntity>
     <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
-        <TerminalParameter type="boolean" value="false"/>
-        <TerminalParameter type="java.lang.String" value="239.255.5.5"/>
-        <TerminalParameter type="int" value="62040"/>
-        <TerminalParameter type="int" value="0"/>
-        <TerminalParameter type="int" value="1"/>
-        <Coordinate x="380" y="580"/>
+        <TerminalParameter name="" type="boolean" value="false"/>
+        <TerminalParameter name="" type="java.lang.String" value="239.255.5.5"/>
+        <TerminalParameter name="" type="int" value="62040"/>
+        <TerminalParameter name="" type="int" value="0"/>
+        <TerminalParameter name="" type="int" value="1"/>
+        <Coordinate x="380" y="610"/>
     </SimEntity>
     <SimEntity name="DISPacketSender" type="diskit.DISPinger">
-        <TerminalParameter type="double" value=".2"/>
-        <TerminalParameter type="long" value="200"/>
-        <Coordinate x="130" y="570"/>
+        <TerminalParameter name="" type="double" value=".2"/>
+        <TerminalParameter name="" type="long" value="200"/>
+        <Coordinate x="130" y="600"/>
     </SimEntity>
     <SimEntity name="SceneZoneCreator" type="diskit.SceneZoneCreator">
         <MultiParameter type="diskit.ZoneGeometry[]">
@@ -401,386 +401,386 @@
         <MultiParameter type="diskit.DISMover3D[]">
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2685.65"/>
-                    <TerminalParameter type="double" value="-1.27"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2685.65"/>
+                    <TerminalParameter name="" type="double" value="-1.27"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="900"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="900"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2646.57"/>
-                    <TerminalParameter type="double" value="-1.27"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2646.57"/>
+                    <TerminalParameter name="" type="double" value="-1.27"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="901"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="901"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2607.56"/>
-                    <TerminalParameter type="double" value="-1.27"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2607.56"/>
+                    <TerminalParameter name="" type="double" value="-1.27"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="902"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="902"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2568.48"/>
-                    <TerminalParameter type="double" value="-1.27"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2568.48"/>
+                    <TerminalParameter name="" type="double" value="-1.27"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="903"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="903"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2529.46"/>
-                    <TerminalParameter type="double" value="39.569"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2529.46"/>
+                    <TerminalParameter name="" type="double" value="39.569"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="904"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="904"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2529.46"/>
-                    <TerminalParameter type="double" value="-1.27"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2529.46"/>
+                    <TerminalParameter name="" type="double" value="-1.27"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="905"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="905"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2529.4"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2529.4"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="906"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="906"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2507.72"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2507.72"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="907"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="907"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2483.62"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2483.62"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="908"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="908"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2467.573"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2467.573"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="909"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="909"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2444.662"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2444.662"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="910"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="910"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2423.017"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2423.017"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="911"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="911"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2507.72"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2507.72"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="912"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="912"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2483.62"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2483.62"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="913"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="913"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2467.573"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2467.573"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="914"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="914"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2444.662"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2444.662"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="915"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="915"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2423.017"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2423.017"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="916"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="916"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2421.855"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2421.855"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="917"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="917"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2383.985"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2383.985"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="918"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="918"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2305.604"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2305.604"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="919"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="919"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2227.917"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2227.917"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="920"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="920"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2189.524"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2189.524"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="921"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="921"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2149.260"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2149.260"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="922"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="922"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2109.950"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2109.950"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="923"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="923"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2423.017"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2423.017"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="924"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="924"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2109.443"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2109.443"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="925"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="925"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2065.284"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2065.284"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="926"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="926"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2046.608"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2046.608"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="927"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="927"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2003.323"/>
-                    <TerminalParameter type="double" value="-50.593"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2003.323"/>
+                    <TerminalParameter name="" type="double" value="-50.593"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="928"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="928"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2423.017"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2423.017"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="929"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="929"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2109.443"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2109.443"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="930"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="930"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2065.284"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2065.284"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="931"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="931"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2046.608"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2046.608"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="932"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="932"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2003.323"/>
-                    <TerminalParameter type="double" value="41.62"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2003.323"/>
+                    <TerminalParameter name="" type="double" value="41.62"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="933"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="933"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2109.443"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2109.443"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="934"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="934"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-2423.017"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-2423.017"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="935"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="935"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-1924.578"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-1924.578"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="936"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="936"/>
             </MultiParameter>
             <MultiParameter type="diskit.DISMover3D">
                 <MultiParameter type="diskit.Vec3d">
-                    <TerminalParameter type="double" value="-1847.348"/>
-                    <TerminalParameter type="double" value="-2.518"/>
-                    <TerminalParameter type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-1847.348"/>
+                    <TerminalParameter name="" type="double" value="-2.518"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
                 </MultiParameter>
-                <TerminalParameter type="double" value="0.0"/>
-                <TerminalParameter type="int" value="937"/>
+                <TerminalParameter name="" type="double" value="0.0"/>
+                <TerminalParameter name="" type="int" value="937"/>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="380" y="720"/>
+        <Coordinate x="380" y="750"/>
     </SimEntity>
     <SimEntity name="BasicTerrorist" type="diskit.BasicTerrorist">
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter type="double" value="-2500"/>
-            <TerminalParameter type="double" value="-4300"/>
-            <TerminalParameter type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="-2500"/>
+            <TerminalParameter name="" type="double" value="-4300"/>
+            <TerminalParameter name="" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter type="double" value="30"/>
-        <TerminalParameter type="int" value="600"/>
+        <TerminalParameter name="" type="double" value="30"/>
+        <TerminalParameter name="" type="int" value="600"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
-                <TerminalParameter type="double" value="-1556"/>
-                <TerminalParameter type="double" value="-935"/>
-                <TerminalParameter type="double" value="0"/>
+                <TerminalParameter name="" type="double" value="-1556"/>
+                <TerminalParameter name="" type="double" value="-935"/>
+                <TerminalParameter name="" type="double" value="0"/>
             </MultiParameter>
             <MultiParameter type="diskit.Vec3d">
-                <TerminalParameter type="double" value="-2043.989"/>
-                <TerminalParameter type="double" value="-91.335"/>
-                <TerminalParameter type="double" value="0"/>
+                <TerminalParameter name="" type="double" value="-2043.989"/>
+                <TerminalParameter name="" type="double" value="-91.335"/>
+                <TerminalParameter name="" type="double" value="0"/>
             </MultiParameter>
         </MultiParameter>
-        <TerminalParameter type="double" value="10"/>
-        <Coordinate x="20" y="280"/>
+        <TerminalParameter name="" type="double" value="10"/>
+        <Coordinate x="60" y="510"/>
     </SimEntity>
     <SimEntity name="OilTanker" type="diskit.HVU">
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter type="double" value="-2043.989"/>
-            <TerminalParameter type="double" value="-91.335"/>
-            <TerminalParameter type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="-2043.989"/>
+            <TerminalParameter name="" type="double" value="-91.335"/>
+            <TerminalParameter name="" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter type="double" value="0"/>
-        <TerminalParameter type="int" value="300"/>
-        <Coordinate x="60" y="410"/>
+        <TerminalParameter name="" type="double" value="0"/>
+        <TerminalParameter name="" type="int" value="300"/>
+        <Coordinate x="60" y="440"/>
     </SimEntity>
-    <SimEntity name="X3DCreateObstacles" type="diskit.util.X3DCreateObstacles">
-        <TerminalParameter type="boolean" value="true"/>
-        <TerminalParameter type="java.lang.String" value="../DISKIT/IITSEC2005/x3d/ABOT/"/>
-        <Coordinate x="250" y="730"/>
+    <SimEntity description="" name="X3DCreateObstacles" type="diskit.util.X3DCreateObstacles">
+        <TerminalParameter name="" type="boolean" value="false"/>
+        <TerminalParameter name="" type="java.lang.String" value="../WINDOWS/Profiles/pjsulliv/Desktop/ATFP/Scenarios/ABOT/"/>
+        <Coordinate x="250" y="760"/>
     </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="RHIB1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPacketSender"/>
