@@ -206,7 +206,7 @@
             <Assignment value="new WaypointCreator(duties)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator, avoidanceRange)"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
             <Assignment value="patrolManager"/>
@@ -218,6 +218,7 @@
     <Event name="ClearExclusionZone">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
         <StateTransition state="interceptMoverManager">
             <Operation method="setMover(null)"/>
         </StateTransition>

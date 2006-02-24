@@ -42,5 +42,12 @@
         <Code>System.out.println("[Bridge to Bridge Radio CH: " + channel + "]    Patrol Craft, this is HVU# " + originator.getMoverID() + ", I have an unkown contact # " +contact.getMoverID() + " in the exclusion zone, Over.\n");</Code>
         <Coordinate x="30" y="210"/>
     </Event>
+    <Event name="ClearExclusionZone">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Code/>
+        <Coordinate x="30" y="320"/>
+    </Event>
 </SimEntity>
 

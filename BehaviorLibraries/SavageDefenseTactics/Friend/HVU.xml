@@ -21,10 +21,10 @@
     <Event name="Run">
         <Comment/>
         <StateTransition state="tacticalMode">
-            <Assignment value="diskit.TacticalMode.IDLE"/>
+            <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
         <StateTransition state="exclusionBounds">
-            <Assignment value="500"/>
+            <Assignment value="700"/>
         </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
@@ -81,14 +81,6 @@
         </LocalVariable>
         <Code>sensor.addSimEventListener(this);</Code>
         <Coordinate x="210" y="110"/>
-    </Event>
-    <Event name="Start">
-        <Comment/>
-        <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(getMaxSpeed()/2); start()">
-            <Comment/>
-        </LocalVariable>
-        <Code/>
-        <Coordinate x="140" y="240"/>
     </Event>
 </SimEntity>
 

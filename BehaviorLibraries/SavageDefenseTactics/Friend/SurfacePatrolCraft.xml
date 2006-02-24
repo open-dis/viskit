@@ -73,7 +73,7 @@
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
         <StateTransition state="avoidanceRange">
-            <Assignment value="50"/>
+            <Assignment value="30"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="null"/>
@@ -96,6 +96,9 @@
     <Event name="Patrol">
         <Comment/>
         <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(getMaxSpeed()/2); start()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="currLoc" type="diskit.Vec3d" value="getLocation()">
             <Comment/>
         </LocalVariable>
         <StateTransition state="tacticalMode">
@@ -131,12 +134,12 @@
             <EdgeParameter value="reach"/>
         </Schedule>
         <Code/>
-        <Coordinate x="90" y="30"/>
+        <Coordinate x="90" y="50"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
-        <Coordinate x="200" y="30"/>
+        <Coordinate x="200" y="0"/>
     </Event>
     <Event name="RegisterSensor">
         <Comment>Registering of Sensor with the Scenario Manager</Comment>
@@ -145,7 +148,7 @@
             <Comment/>
         </LocalVariable>
         <Code>sensor.addSimEventListener(this);</Code>
-        <Coordinate x="200" y="110"/>
+        <Coordinate x="190" y="100"/>
     </Event>
     <Event name="Detection">
         <Comment/>
@@ -163,7 +166,7 @@
             <Comment>if target is not an obstacle or friend</Comment>
         </Schedule>
         <Cancel event="StandOff"/>
-        <Code>System.out.println(moverID + " detected " + newTarget.getMoverID());</Code>
+        <Code/>
         <Coordinate x="440" y="440"/>
     </Event>
     <Event name="AssessObstacle">
@@ -199,15 +202,32 @@
     </Event>
     <Event name="StartIntercept">
         <Comment/>
-        <Schedule event="EndIntercept"/>
         <Schedule event="StandOff"/>
         <Code/>
         <Coordinate x="440" y="230"/>
     </Event>
     <Event name="EndIntercept">
         <Comment/>
-        <Schedule event="Patrol"/>
-        <Code/>
+        <Argument name="thisMover" type="diskit.Mover3D"/>
+        <LocalVariable name="amm" type="diskit.MoverManager" value="getActiveMoverManager()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="target" type="diskit.Mover3D" value="interceptMoverManager.getTarget()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="escortDestination" type="diskit.Vec3d" value="target.getDestination()">
+            <Comment>Current Destination of the target</Comment>
+        </LocalVariable>
+        <LocalVariable name="escortSpeed" type="double" value="target.getCruisingSpeed() /2">
+            <Comment>TESTING ONLY - trail target at 80% of the speed</Comment>
+        </LocalVariable>
+        <StateTransition state="patrolManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="patrolManager"/>
+        </StateTransition>
+        <Code>this.setDestination(escortDestination); this.setCruisingSpeed(escortSpeed);System.out.println("End Intercept called");</Code>
         <Coordinate x="280" y="230"/>
     </Event>
     <Event name="StandOff">
@@ -255,7 +275,7 @@
             <Assignment value="new WaypointCreator(duties)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator, avoidanceRange)"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
             <Assignment value="patrolManager"/>
@@ -280,16 +300,18 @@
         <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="this.getLocation() == interceptMoverManager.getInterceptPoint() " delay="0.0" event="ClearExclusionZone" priority="0">
+        <Schedule condition="this.getLocation() == interceptMoverManager.getInterceptPoint()" delay="10" event="ClearExclusionZone" priority="0">
             <Comment/>
             <EdgeParameter value="target"/>
+            <EdgeParameter value="sensor"/>
         </Schedule>
-        <Code>this.setStartPosition(getLocation()); this.setCruisingSpeed(getMaxSpeed());interceptMoverManager = new diskit.InterceptMoverManager(this);System.out.println("Roger, this is patrol craft " + this.getMoverID() +  " enroute to contact #"+target.getMoverID() + " - Out");</Code>
+        <Code>this.setStartPosition(getLocation()); this.setCruisingSpeed(getMaxSpeed());interceptMoverManager = new diskit.InterceptMoverManager(this);System.out.println("Roger, this is patrol craft " + this.getMoverID() +  "\nEnroute to contact #"+target.getMoverID() + " - Out");</Code>
         <Coordinate x="440" y="150"/>
     </Event>
     <Event name="ClearExclusionZone">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
         <StateTransition state="interceptMoverManager">
             <Operation method="setMover(null)"/>
         </StateTransition>
