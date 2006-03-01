@@ -7,6 +7,7 @@
 package viskit.xsd.translator;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -344,11 +345,12 @@ public class SimkitXML2Java {
 
         if (!didRun) {
             try {
-                EventType r = (new ObjectFactory()).createEventType();
+                Event r = (new ObjectFactory()).createEvent();
                 r.setName("Run");
-                doRunBlock(e,runBlock);
+                doRunBlock(r,runBlock);
             } catch (javax.xml.bind.JAXBException ex) { ex.printStackTrace(); }
         }
+
     }
 
     void doRunBlock(Event run, StringWriter runBlock) {
@@ -357,7 +359,7 @@ public class SimkitXML2Java {
 	ListIterator li;
 	List sched = run.getScheduleOrCancel();
 	ListIterator schi = sched.listIterator();
-	List superPList;
+	List superPList = new ArrayList();
 
 
 	pw.println();
@@ -402,10 +404,11 @@ public class SimkitXML2Java {
             pw.println(rp + sc);
 
         }
-	li = this.root.getParameter().listIterator();
-
-	while ( li.hasNext() ) {
-	    ParameterType pt = (ParameterType) li.next();
+	
+        // skip over any sets that would get done in the superclass
+        for ( int l = superPList.size(); l < this.root.getParameter().size(); l ++) {
+            
+	    ParameterType pt = (ParameterType) this.root.getParameter().get(l);
 	    pw.println(sp8 + "set" + capitalize(pt.getName()) +
 		lp + shortinate(pt.getName()) + rp + sc);
 
@@ -479,7 +482,13 @@ public class SimkitXML2Java {
 	pw.println(sp4 + "public void doRun() {");
 
         if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
-            pw.println(sp8 + "super.doRun();");
+            // check if super has a doRun()
+            Method doRun = null;
+            try {
+                Class sup = Class.forName(this.root.getExtend());
+                doRun = sup.getDeclaredMethod("doRun", new Class[] { });
+            } catch (Exception e) {;}
+            if (doRun != null) pw.println(sp8 + "super.doRun();");
         }
 
 	li = run.getStateTransition().listIterator();
@@ -812,10 +821,9 @@ public class SimkitXML2Java {
 	    int maxIndex = 0;
 	    int maxParamCount = 0;
 	    for ( int i = 0; i < ca.length; i++ ) {
-                //find largest array of super parameters constructor
-	        //int tmpCount = (paramsInSuper(ca[i],params)).size();
+                //find largest fitting array of super parameters constructor
                 int tmpCount = (ca[i].getParameterTypes()).length;
- 	        if ( tmpCount > maxParamCount ) {
+ 	        if ( tmpCount > maxParamCount && tmpCount <= params.size() ) {
 		    maxParamCount = tmpCount;
 		    maxIndex = i;
 	        }
@@ -828,11 +836,12 @@ public class SimkitXML2Java {
                 Object po = it.next();
                 ParameterType p = (ParameterType)po;
                 Class[] sparams = ca[maxIndex].getParameterTypes();
-                for ( int i = 0; i < sparams.length ; i ++) {
-                    if ( p.getType().equals(sparams[i].getName()) && pi < maxParamCount ) {
+                for ( int i = pi; i < sparams.length ; i ++) {
+                    if ( unqualifiedMatch( p.getType(), sparams[i].getName()) && pi < maxParamCount ) {
                         parray[pi] = p;
                         ++pi;
-                    }
+                        break;
+                    } 
                 }
 
             }
@@ -849,11 +858,27 @@ public class SimkitXML2Java {
 	return superParams;
 
     }
+    
+    // check equivalence of eg. java.lang.Integer vs. Integer
+    private boolean unqualifiedMatch(String fromXml, String fromClazz) {
+        if (fromXml.equals(fromClazz)) {
+            return true;
+        }
+        String nm[] = fromClazz.split("\\.");
+        if (nm != null) {
+            if (fromXml.equals(nm[nm.length - 1])) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
 
     // returns List of params from super that match
     // should be the number of params for the constructor,
     // or 0 for an oddball constructor. typically constructor
-    // list size should be at minimum the same set as the super
+    // list size should be at minimum the same set as the super.
+    // unused?
     private List paramsInSuper(Constructor c, List params) {
 	Class[] cTypes = c.getParameterTypes();
 	java.util.Vector pTypes = new java.util.Vector();
