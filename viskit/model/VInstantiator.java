@@ -1,13 +1,12 @@
 package viskit.model;
 
 import viskit.Vstatics;
-import viskit.xsd.translator.SimkitXML2Java;
 import viskit.xsd.bindings.eventgraph.ParameterType;
+
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +20,11 @@ import java.util.Vector;
  * By:   Mike Bailey
  * Date: Jun 15, 2004
  * Time: 9:43:42 AM
+ *
+ * CVS Revision information:
+ * $Revision$
+ * $Date$
+ * $Author$
  */
 
 public abstract class VInstantiator
