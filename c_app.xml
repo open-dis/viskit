@@ -7,7 +7,7 @@
       <warning>true</warning>
     </beanshell>
     <EventGraphEditor>
-      <FrameBounds h="34" w="123" x="0" y="0"/>
+      <FrameBounds h="600" w="800" x="400" y="212"/>
     </EventGraphEditor>
     <AssemblyEditor>
       <FrameBounds h="600" w="800" x="400" y="212"/>
