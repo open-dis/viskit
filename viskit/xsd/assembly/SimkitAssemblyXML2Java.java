@@ -519,8 +519,8 @@ public class SimkitAssemblyXML2Java {
         
         String type = term.getType();
         String value = term.getValue();
-        if ( term.getNameRef() != null ) {
-            value=((TerminalParameterType)(term.getNameRef())).getValue();
+        if ( term.getLinkRef() != null ) {
+            value=((TerminalParameterType)(term.getLinkRef())).getValue();
         }
         if ( isPrimitive(type) ) {
             pw.print(indent + sp4 + value);

@@ -5,13 +5,15 @@
 
 <!ELEMENT MultiParameter (%Parameters;)* >  
 <!ATTLIST MultiParameter
+    name  CDATA #IMPLIED
     type  CDATA #REQUIRED
 >
 
 <!ELEMENT TerminalParameter (%ValueRange;)? >
 <!ATTLIST TerminalParameter
-    nameRef IDREF #IMPLIED
-    name    ID    #IMPLIED
+    name    CDATA #IMPLIED
+    linkRef IDREF #IMPLIED
+    link    ID    #IMPLIED
     value   CDATA #IMPLIED
     type    CDATA #REQUIRED
 >
@@ -30,6 +32,7 @@
 
 <!ELEMENT FactoryParameter (%Parameters;)* >
 <!ATTLIST FactoryParameter
+    name    CDATA #IMPLIED
     factory CDATA #REQUIRED
     method  CDATA "getInstance"
     type    CDATA #REQUIRED
