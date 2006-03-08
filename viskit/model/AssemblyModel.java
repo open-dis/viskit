@@ -702,13 +702,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       Object o = itr.next();
       if(o instanceof TerminalParameter) {
         String n = ((TerminalParameter)o).getName();
-        if(n == null || n.length()<=0) {
-          Object nr = ((TerminalParameter)o).getNameRef();
-          if(nr != null)
-            n = nr.toString();
-        }
-        if(n == null)
-          n = "";
+        
         v.add(n);
       }
       else
@@ -1098,7 +1092,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     en.setDescription(se.getDescription());
     en.setOutputMarked(isOutputNode);
     List lis = se.getParameters();
-    VInstantiator.Constr vc = new VInstantiator.Constr(se.getType());//,
+    VInstantiator.Constr vc = new VInstantiator.Constr(lis, se.getType());//,
                    // getInstantiatorListFromJaxbParmList(lis));//,getNamesFromParmList(lis));
     en.setInstantiator(vc);
 
