@@ -161,7 +161,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             TerminalParameterType designParam0 = of.createTerminalParameter();
             designParam0.setName("exponential");
             designParam0.setType("double");
-            tParamExponential.setNameRef(designParam0);
+            tParamExponential.setLinkRef(designParam0);
             
             DoubleRange drange0 = of.createDoubleRange();
             drange0.setLowValue("1.0");
@@ -192,7 +192,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             TerminalParameterType designParam2 = of.createTerminalParameter();
             designParam1.setName("gamma1");
             designParam1.setType("double");
-            tParamGamma1.setNameRef(designParam1); 
+            tParamGamma1.setLinkRef(designParam1); 
             
             DoubleRange drange1 = of.createDoubleRange();
             drange1.setLowValue("2.0");
@@ -201,7 +201,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             
             designParam2.setName("gamma2");
             designParam2.setType("double");
-            tParamGamma2.setNameRef(designParam2);
+            tParamGamma2.setLinkRef(designParam2);
             
             DoubleRange drange2 = of.createDoubleRange();
             drange2.setLowValue("3.0");
