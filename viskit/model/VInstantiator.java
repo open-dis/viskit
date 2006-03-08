@@ -1,12 +1,16 @@
 package viskit.model;
 
 import viskit.Vstatics;
+import viskit.xsd.translator.SimkitXML2Java;
 import viskit.xsd.bindings.eventgraph.ParameterType;
-
+import viskit.xsd.bindings.assembly.TerminalParameterType;
+import viskit.xsd.bindings.assembly.FactoryParameterType;
+import viskit.xsd.bindings.assembly.MultiParameterType;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,11 +24,6 @@ import java.util.Vector;
  * By:   Mike Bailey
  * Date: Jun 15, 2004
  * Time: 9:43:42 AM
- *
- * CVS Revision information:
- * $Revision$
- * $Date$
- * $Author$
  */
 
 public abstract class VInstantiator
@@ -107,16 +106,29 @@ public abstract class VInstantiator
   {
     private List args;
 
-    public Constr(String type) {
+    public Constr(List params, String type) {
         super(type);
         Class clz = Vstatics.classForName(type);
-        List params = Vstatics.resolveParameters(type);
+        // 
+        System.out.println("Building Constr for "+type);
+        List[] eparams = Vstatics.resolveParameters(type);
+        int indx = 0;
+        while ( indx < eparams.length-1 ) {
+            if (paramsMatch(params,eparams[indx])) break;
+            else indx++;
+        }
+        System.out.println("Using constructor #"+indx);
         Class[] cparams = new Class[]{};
-        if (params != null) {
-            cparams = new Class[params.size()];
-            for ( int j = 0; j < cparams.length; j++ ) {
+        if (eparams[indx] != null) {
+            cparams = new Class[eparams[indx].size()];
+            Iterator it = eparams[indx].iterator();
+            int j = 0;
+            while (it.hasNext()) {
+                Object o = it.next();
+                System.out.println("\t p["+j+"] "+o);
+                ParameterType pt = (ParameterType) (o);
                 Class cparam;
-                String typ = ((ParameterType)params.get(j)).getType();
+                String typ = pt.getType();
                 if (typ.equals("boolean")) {
                     cparam = boolean.class;
                 } else if (typ.equals("char")) {
@@ -136,14 +148,14 @@ public abstract class VInstantiator
                 } else {
                     cparam = Vstatics.classForName(typ);
                 }
-                cparams[j] = cparam;
+                cparams[j++] = cparam;
             }
         }
         try { // for XML all above could have been just clz.getConstructors()[0]
             Constructor constr = clz.getConstructor(cparams);
             args = VInstantiator.buildDummyInstantiators(constr);
             if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
-                ((VInstantiator)args.get(j)).setName(((ParameterType)params.get(j)).getName());
+                ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
             }
             // ie, findArgNames(type,args);
         } catch (NoSuchMethodException nsme) {
@@ -164,6 +176,31 @@ public abstract class VInstantiator
       for(int i=0;i<args.size();i++) {
         ((VInstantiator)args.get(i)).setName((String)names.get(i));
       }
+    }
+    
+    boolean paramsMatch(List aparams,List eparams) {
+        if ( aparams.size() != eparams.size() ) {
+            return false;
+        }
+        
+        for (int i = 0; i < aparams.size(); i++) {
+            Object o = aparams.get(i);
+            if ( o instanceof TerminalParameterType ) {
+                if (!((TerminalParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
+                    return false;
+                }
+            } else if ( o instanceof MultiParameterType ) {
+                if (!((MultiParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
+                    return false;
+                }
+            } else if ( o instanceof FactoryParameterType ) {
+                if (!((FactoryParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
+                    return false;
+                }
+            } else return false;
+        }
+        return true;
+        
     }
     /**
      * Find the names of the arguments
@@ -191,10 +228,8 @@ public abstract class VInstantiator
       // 2. get the one we want by matching against args
       // 3. compare the single vs. the list, if equal get the index within the list
       // 4. use that to index into names to set the names to the params.
-        
-        
       // this technique uses the info from when the file was loaded.  
-      List parameters = Vstatics.resolveParameters(type);
+      List parameters = Vstatics.resolveParameters(type)[0];
       System.out.println("Resolving "+type+" "+parameters);
       // the class manager caches Parameter List jaxb from the SimEntity.
       // if it didn't come from XML, then a null is returned. Probably
@@ -206,10 +241,11 @@ public abstract class VInstantiator
       while ( i.hasNext() ) {
           int index = 0;
           ParameterType p = (ParameterType) (i.next());
-          ((VInstantiator)(args.get(index))).setName(p.getName());
-          System.out.println("parameter resolved as "+((VInstantiator)(args.get(index))).getName());
-          ++index;
-          
+          if (args.size() > 0) {
+            ((VInstantiator)(args.get(index))).setName(p.getName());
+            System.out.println("parameter resolved as "+((VInstantiator)(args.get(index))).getName());
+            ++index;
+          }
       }
       
               
