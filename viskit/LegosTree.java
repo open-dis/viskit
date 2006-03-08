@@ -13,6 +13,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.jar.JarFile;
+import java.lang.reflect.Constructor;
+import viskit.xsd.bindings.eventgraph.ParameterType;
+import viskit.xsd.bindings.eventgraph.ObjectFactory;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -451,6 +454,36 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private void jarFileCommon(JarFile jarFile)
   {
     java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
+    for ( int j = 0; j < list.size(); j++ ) {
+        Class c = (Class)list.get(j);
+        System.out.println("adding "+c.getName());
+        ObjectFactory of = new ObjectFactory();
+        Constructor[] constr = c.getConstructors();
+        ArrayList[] plist = new ArrayList[constr.length]; 
+        System.out.println("\t # constructors: "+constr.length);
+        for ( int i = 0; i < constr.length; i ++ ) {
+            Class[] ptypes = constr[i].getParameterTypes();
+            plist[i] = new ArrayList();
+            System.out.println("\t # params "+ptypes.length+" in constructor "+i);
+            for ( int k = 0; k < ptypes.length; k++ ) {
+                try {
+                    ParameterType p = of.createParameter();
+                    String ptname = ptypes[k].getName();
+                    if ( ptname.indexOf(".class")>0 ) {
+                        ptname = ptname.split("\\.")[0];
+                    }
+                    p.setName("p["+k+"] = ");
+                    p.setType(ptname);
+                    plist[i].add(p);
+                    System.out.println("\t "+p.getName()+p.getType());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Vstatics.putParameterList(c.getName(),plist);
+        
+    }
     if (list == null || list.size() <= 0) {
       JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
           "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);

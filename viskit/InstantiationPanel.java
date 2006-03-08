@@ -308,13 +308,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       else {
         for (int i = 0; i < construct.length; ++i) {
             List dummies = VInstantiator.buildDummyInstantiators(construct[i]);
-            List parameters = Vstatics.resolveParameters(clName); 
+            List parameters = Vstatics.resolveParameters(clName)[i]; 
             if ( parameters != null ) { 
-                //then this came from an XML, safe
-                //to assume only 1 constructor needed
-                //and the dummies match the parameters
-                //btw, why are these called dummy?
-                VInstantiator.Constr dummy = new VInstantiator.Constr(clName);
+                
+                VInstantiator.Constr dummy = new VInstantiator.Constr(parameters, clName);
                 dummies = dummy.getArgs();
                 //for (int j = 0; j < dummies.size(); j++) {
                  //   ((VInstantiator)dummies.get(j)).setName(((ParameterType)parameters.get(j)).getName());

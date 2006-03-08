@@ -2,6 +2,7 @@ package viskit;
 
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.util.List;
+import java.util.HashMap;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -307,7 +308,14 @@ public class Vstatics
     return System.getProperty("file.separator");
   }
   
-  static public List resolveParameters(String type) {
-      return FileBasedClassManager.inst().resolveParameters(type);
+  static HashMap parameterMap = new HashMap();
+  static void putParameterList(String type, List[] p) {
+      System.out.println("Vstatics putting "+type+" "+p);
+      parameterMap.remove(type);
+      parameterMap.put(type,p);
+  }
+  static public List[] resolveParameters(String type) {
+      return (List[]) (parameterMap.get(type));
+      
   }
 }

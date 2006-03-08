@@ -285,7 +285,8 @@ public class DoeFileModel
           return;
         }
         newTP.setName(name);
-        newTP.setNameRef(null);
+        newTP.setLink(((Object)newTP).toString()+"_"+name); // fixme, should take tree graph strings
+        newTP.setLinkRef(null);
         newTP.setType(tp.getType());
         newTP.setValue(tp.getValue());
        // newTP.getContent().add(0,buildTPContent(rData,name));
@@ -296,7 +297,7 @@ public class DoeFileModel
         // todo the following is permanently changing the jaxbroot, and will thusly get saved into xml.
         //  The user has not necessarily requested that at this point, so we need to be able to undo the change
         //   after marshalling.
-        tp.setNameRef(newTP);
+        tp.setLinkRef(newTP);
         tp.setName(null);
 
       }

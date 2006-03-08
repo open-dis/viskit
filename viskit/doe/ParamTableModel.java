@@ -288,7 +288,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     }
     else if (obj instanceof TerminalParameter) {
       TerminalParameter tp = (TerminalParameter)obj;
-      Object nameRefObj = tp.getNameRef();
+      Object nameRefObj = tp.getLinkRef();
       String nameRef = dumpPrefixes(); // default
       if(nameRefObj != null) {
         if(nameRefObj instanceof String)

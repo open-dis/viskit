@@ -2,9 +2,11 @@ package viskit;
 
 import javax.swing.*;
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
@@ -33,7 +35,8 @@ public class FileBasedClassManager implements Runnable
     return me;
   }
 
-  private HashMap classMap, fileMap, parameterMap;
+  private HashMap classMap, fileMap;
+  static HashMap parameterMap;
 
   private FileBasedClassManager()
   {
@@ -84,14 +87,16 @@ public class FileBasedClassManager implements Runnable
       Unmarshaller um = jaxbCtx.createUnmarshaller();
       try {
           SimEntityType simEntity =  (SimEntityType) um.unmarshal(f);
-          parameterMap.remove(fclass.getName());
-          parameterMap.put(fclass.getName(),simEntity.getParameter());
+          List[] pa = new List[] { simEntity.getParameter() };
+          Vstatics.putParameterList(fclass.getName(),pa);
           System.out.println("Put "+fclass.getName()+simEntity.getParameter());
       } catch (Exception e) {;}
     }
     else if (f.getName().toLowerCase().endsWith(".class")) {
       fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly
       fban = new FileBasedAssyNode(f,fclass.getName(),fclass.getPackage().getName());
+      
+      Vstatics.putParameterList(fclass.getName(), listOfParamNamesForNakedClass(fclass));
     }
     else {
       throw new Exception ("Unsupported file type.");
@@ -103,8 +108,45 @@ public class FileBasedClassManager implements Runnable
     return fban;
   }
 
-  public List resolveParameters(String type) {
-      return (List) (parameterMap.get(type));
+  // there are two available generic solutions we can enforce
+  // upon plugin writers, either way going to cause some effort
+  // on the part of the plugin, falling through, this method 
+  // should kick in for the "naked" case. 
+  // the "wetsuit" case would be to either embed or subclass each 
+  // class in the plugin to provide an array of names individually;
+  // the "drysuit" case would be to provide an xml registry file
+  // for the plugin inside its own jar that is simkit.xsd tags
+  // for all the parameters in the package. the nice thing about
+  // that is it requires no recompile of the base package, and
+  // can be customized for end user taste without recompile of
+  // base package.
+  protected List[] listOfParamNamesForNakedClass(Class c) {
+      // brrr. 
+      // lets just take case 0
+      ObjectFactory of = new ObjectFactory();
+      Constructor[] constr = c.getConstructors();
+      ArrayList[] l = new ArrayList[constr.length];
+      for ( int j = 0; j < constr.length; j++ ) {
+          Class[] clz = constr[j].getParameterTypes();
+          l[j] = new ArrayList();
+          for (int i = 0; i < clz.length; i++) {
+              try {
+                  String zName = clz[i].getName();
+                  if (zName.indexOf(".class")>0) {
+                      zName = zName.split("\\.")[0];
+                  }
+                  ParameterType p;
+                  p = of.createParameter();
+                  p.setName(" ");
+                  System.out.println("setting type "+zName);
+                  p.setType(zName);
+                  l[j].add(p);
+              } catch (javax.xml.bind.JAXBException e) {
+                  ;
+              }
+          }
+      }
+      return l;
   }
   
   public Collection getFileLoadedClasses()
