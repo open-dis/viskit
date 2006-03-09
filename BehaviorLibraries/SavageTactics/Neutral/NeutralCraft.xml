@@ -74,7 +74,7 @@
     </Event>
     <Event name="Patrol">
         <Comment/>
-        <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(getMaxSpeed()); start()">
+        <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(maxSpeed); start()">
             <Comment/>
         </LocalVariable>
         <StateTransition state="tacticalMode">
@@ -138,7 +138,14 @@
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
-        <Code>System.out.println(getMoverID() + " Detected entity# " + newTarget.getMoverID());</Code>
+        <Code>/*System.out.println("***Simulation Time ***");
+System.out.println(Schedule.getSimTime());
+System.out.println("----------EVENT------------");
+System.out.println(getMoverID() + " Detected entity# " + newTarget.getMoverID());
+System.out.println("\n");
+*/
+//System.out.println("Entity Speed: " + newTarget.getCruisingSpeed());
+//System.out.println("Entity Dest:    " + newTarget.getDestination());</Code>
         <Coordinate x="440" y="440"/>
     </Event>
     <Event name="AssessObstacle">
@@ -206,7 +213,7 @@
             <Assignment value="new WaypointCreator(duties)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator,avoidanceRange)"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
             <Assignment value="patrolManager"/>

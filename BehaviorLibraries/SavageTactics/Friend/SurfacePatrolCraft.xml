@@ -255,7 +255,7 @@
             <Assignment value="new WaypointCreator(duties)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator,avoidanceRange)"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
             <Assignment value="patrolManager"/>

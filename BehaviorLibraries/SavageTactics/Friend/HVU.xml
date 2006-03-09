@@ -39,7 +39,7 @@
             <EdgeParameter value="sensor"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Code>System.out.println("HVU detected entity# " + contact.getMoverID());</Code>
+        <Code>//System.out.println("HVU detected entity# " + contact.getMoverID());</Code>
         <Coordinate x="30" y="150"/>
     </Event>
     <Event name="CommsOrderIDContact">
@@ -47,7 +47,7 @@
         <Argument name="contact" type="diskit.Mover3D"/>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Argument name="originator" type="diskit.Mover3D"/>
-        <Code>System.out.println( "[OIL PLATFORM] - Patrol Craft, ID contact number " + contact.getMoverID()); </Code>
+        <Code>//System.out.println( "[OIL PLATFORM] - Patrol Craft, ID contact number " + contact.getMoverID());</Code>
         <Coordinate x="30" y="250"/>
     </Event>
     <Event name="Init">
