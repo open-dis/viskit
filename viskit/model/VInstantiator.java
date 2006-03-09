@@ -106,13 +106,23 @@ public abstract class VInstantiator
   {
     private List args;
 
+    // takes List of Assembly parameters and args for type
     public Constr(List params, String type) {
         super(type);
         Class clz = Vstatics.classForName(type);
         // 
         System.out.println("Building Constr for "+type);
+        // gets lists of EventGraph parameters for type
+        
+        // bug: if Viskit is first starting up, and had
+        // stored an eventgraph from a previous session,
+        // some reason it isn't actually loading in such
+        // a way as to be added to Vstatics parameter map
+        // so this throws NPE
         List[] eparams = Vstatics.resolveParameters(type);
         int indx = 0;
+        // pick the EventGraph list that matches the
+        // Assembly arguments
         while ( indx < eparams.length-1 ) {
             if (paramsMatch(params,eparams[indx])) break;
             else indx++;
@@ -229,24 +239,46 @@ public abstract class VInstantiator
       // 3. compare the single vs. the list, if equal get the index within the list
       // 4. use that to index into names to set the names to the params.
       // this technique uses the info from when the file was loaded.  
-      List parameters = Vstatics.resolveParameters(type)[0];
-      System.out.println("Resolving "+type+" "+parameters);
+      List[] parameters = Vstatics.resolveParameters(type);
+      if (parameters == null) return false; 
+      int indx = 0;
+      boolean found = false;
+      while ( indx < parameters.length - 1 && !found ) {
+          if ( parameters[indx].size() == args.size() ) {
+              boolean match = true;
+              for ( int j = 0; j < args.size(); j++ ) {
+                  
+                  System.out.print("touching "+((ParameterType)(parameters[indx].get(j))).getType()+" "+((VInstantiator)(args.get(j))).getType());
+                  
+                  match &=
+                   
+                      ((ParameterType)(parameters[indx].get(j))).getType().equals(
+                                ((VInstantiator)(args.get(j))).getType()
+                      );
+                  
+                  // set the names, the final iteration of while cleans up any
+                  // foo
+                  
+                  ((VInstantiator)(args.get(j))).setName(
+                        ((ParameterType)(parameters[indx].get(j))).getName()
+                  );
+                  System.out.println("to "+((ParameterType)(parameters[indx].get(j))).getName());
+                          
+              } 
+              found = match;
+              
+              
+          } 
+          if (!found) indx++;
+          else break;
+          
+      }
+      System.out.println("Resolving "+type+" "+parameters[indx]);
       // the class manager caches Parameter List jaxb from the SimEntity.
       // if it didn't come from XML, then a null is returned. Probably
       // better to move the findArgNamesFromBeansStuff() to the class manager
       // to resolve the bean there, then in that case, a null could
       // indicate a zero-parameter constructor.
-      if (parameters == null) return false; 
-      Iterator i = parameters.iterator();
-      while ( i.hasNext() ) {
-          int index = 0;
-          ParameterType p = (ParameterType) (i.next());
-          if (args.size() > 0) {
-            ((VInstantiator)(args.get(index))).setName(p.getName());
-            System.out.println("parameter resolved as "+((VInstantiator)(args.get(index))).getName());
-            ++index;
-          }
-      }
       
               
       /*

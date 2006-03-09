@@ -56,7 +56,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
      int i = 0;
      for (Iterator itr = lis.iterator(); itr.hasNext();i++) {
        VInstantiator inst = (VInstantiator) itr.next();
-       shadow[i] = inst;
+       shadow[i] = inst.vcopy();
 
        typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
        String nm = inst.getName();
@@ -141,7 +141,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
      for(int i=0;i<typeLab.length;i++) {
        if(shadow[i] instanceof VInstantiator.FreeF)
          ((VInstantiator.FreeF)shadow[i]).setValue(entryTF[i].getText().trim());
-       v.add(shadow[i]);
+       v.add(shadow[i].vcopy());
      }
      return v;
    }
@@ -150,7 +150,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
   {
     int idx = Integer.parseInt(e.getActionCommand());
 
-    VInstantiator vinst = shadow[idx];
+    VInstantiator vinst = shadow[idx].vcopy();
     Class c = Vstatics.classForName(vinst.getType());
     if (c.isArray()) {
       ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
