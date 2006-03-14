@@ -159,7 +159,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             // then it passes by reference design arguments
             // to the entity's parameter, automatically.
             TerminalParameterType designParam0 = of.createTerminalParameter();
-            designParam0.setName("exponential");
+            designParam0.setLink("exponential");
             designParam0.setType("double");
             tParamExponential.setLinkRef(designParam0);
             
@@ -190,7 +190,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             // got Terminals now hook them up
             TerminalParameterType designParam1 = of.createTerminalParameter();
             TerminalParameterType designParam2 = of.createTerminalParameter();
-            designParam1.setName("gamma1");
+            designParam1.setLink("gamma1");
             designParam1.setType("double");
             tParamGamma1.setLinkRef(designParam1); 
             
@@ -199,7 +199,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             drange1.setHighValue("3.0");
             designParam1.setValueRange(drange1);
             
-            designParam2.setName("gamma2");
+            designParam2.setLink("gamma2");
             designParam2.setType("double");
             tParamGamma2.setLinkRef(designParam2);
             
