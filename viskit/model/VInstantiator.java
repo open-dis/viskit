@@ -253,15 +253,10 @@ public abstract class VInstantiator
               boolean match = true;
               for ( int j = 0; j < args.size(); j++ ) {
                   
-                  System.out.print("touching "+((ParameterType)(parameters[i].get(j))).getType()+" "+((VInstantiator)(args.get(j))).getType());
-                  String pType = ((ParameterType)(parameters[i].get(j))).getType();
+                  System.out.print("touching "+Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType())+" "+((VInstantiator)(args.get(j))).getType());
+                  String pType = Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType());
                   String vType = ((VInstantiator)(args.get(j))).getType();
-                  match &=
-                   
-                      ((ParameterType)(parameters[i].get(j))).getType().equals(
-                                ((VInstantiator)(args.get(j))).getType()
-                      );
-                  
+                  match &= pType.equals(vType);                
                   // set the names, the final iteration of while cleans up any
                   // foo
                   

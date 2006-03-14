@@ -337,13 +337,13 @@ public class Vstatics
                   try {
                       ParameterType p = of.createParameter();
                       String ptname = ptypes[k].getName();
-                      if ( ptname.indexOf(".class")>0 ) {
-                          ptname = ptname.split("\\.")[0];
+                      if ( ptname.indexOf(".class")>0 ) { //??
+                          ptname = ptname.split("\\.")[0]; 
                       }
                       // could be from class loader, which would
                       // prepend [L, etc. to an array, fix it up here
                       if ( ptname.startsWith("[")) {
-                          System.out.println("oops, an array "+ptname);
+                          System.out.println("[] an array "+ptname);
                           // java has it if array of some type then [Lclassname, long
                           // pointer? so for all cases of prims [x except [L
                           // then just convert to full name, otherwise if begins with [L
@@ -368,9 +368,7 @@ public class Vstatics
                                   ptname = "boolean[]";
                               }
                           } else {
-                              ptname = ptname.substring(2);
-                              ptname = ptname.substring(0,ptname.length() - 2); // fix rid of ; if not prim
-                              ptname += "[]"; // match VInstantiator style
+                              ptname = convertClassName(ptname);
                           }
                       }
                       p.setName("p["+k+"] : ");
