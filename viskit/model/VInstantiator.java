@@ -107,70 +107,36 @@ public abstract class VInstantiator
     private List args;
 
     // takes List of Assembly parameters and args for type
+    // note this gets used in recursion, so it may not be top-level
     public Constr(List params, String type) {
         super(type);
-        Class clz = Vstatics.classForName(type);
-        // 
-        System.out.println("Building Constr for "+type);
-        // gets lists of EventGraph parameters for type
         
-        // bug: if Viskit is first starting up, and had
-        // stored an eventgraph from a previous session,
-        // some reason it isn't actually loading in such
-        // a way as to be added to Vstatics parameter map
-        // so this throws NPE
+        System.out.println("Building Constr for "+type);
+        // gets lists of EventGraph parameters for type if top-level
+        // or null if type is a basic class ie. java.lang.Double
+        // todo use same block as LegosTree to resolve any type
         List[] eparams = Vstatics.resolveParameters(type);
         int indx = 0;
+        
+        args = buildInstantiators(params);
         // pick the EventGraph list that matches the
         // Assembly arguments
-        while ( indx < eparams.length-1 ) {
-            if (paramsMatch(params,eparams[indx])) break;
-            else indx++;
-        }
-        System.out.println("Using constructor #"+indx);
-        Class[] cparams = new Class[]{};
-        if (eparams[indx] != null) {
-            cparams = new Class[eparams[indx].size()];
-            Iterator it = eparams[indx].iterator();
-            int j = 0;
-            while (it.hasNext()) {
-                Object o = it.next();
-                System.out.println("\t p["+j+"] "+o);
-                ParameterType pt = (ParameterType) (o);
-                Class cparam;
-                String typ = pt.getType();
-                if (typ.equals("boolean")) {
-                    cparam = boolean.class;
-                } else if (typ.equals("char")) {
-                    cparam = char.class;
-                } else if (typ.equals("byte")) {
-                    cparam = byte.class;
-                } else if (typ.equals("double")) {
-                    cparam = double.class;
-                } else if (typ.equals("float")) {
-                    cparam = float.class;
-                } else if (typ.equals("int")) {
-                    cparam = int.class;
-                } else if (typ.equals("long")) {
-                    cparam = long.class;
-                } else if (typ.equals("short")) {
-                    cparam = short.class;
-                } else {
-                    cparam = Vstatics.classForName(typ);
+        if (eparams != null) {
+            while ( indx < eparams.length-1 ) {
+                
+                if (paramsMatch(params,eparams[indx])) break;
+                else indx++;
+            }
+            System.out.println("Using constructor #"+indx);
+            
+            if (eparams[indx] != null) { 
+                // now that the values, types, etc set, grab names from eg parameters
+                if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
+                    System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
+                    ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
+                    
                 }
-                cparams[j++] = cparam;
             }
-        }
-        try { // for XML all above could have been just clz.getConstructors()[0]
-            Constructor constr = clz.getConstructor(cparams);
-            args = VInstantiator.buildDummyInstantiators(constr);
-            if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
-                ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
-            }
-            // ie, findArgNames(type,args);
-        } catch (NoSuchMethodException nsme) {
-            System.err.println("ClassLoader error, classes don't match XML");
-            nsme.printStackTrace();
         }
     }
     
@@ -188,6 +154,52 @@ public abstract class VInstantiator
       }
     }
     
+    // return a List of VInstantiators given a List of Assembly Parameters
+    List buildInstantiators(List assemblyParameters) {
+        ArrayList instr = new ArrayList();
+        Iterator it = assemblyParameters.iterator();
+        while (it.hasNext()) {
+            Object o = it.next();
+            if (o instanceof TerminalParameterType) {
+                instr.add(buildTerminalParameter((TerminalParameterType)o));
+            } else if (o instanceof MultiParameterType) { 
+                instr.add(buildMultiParameter((MultiParameterType)o));
+            } else if (o instanceof FactoryParameterType) {
+                instr.add(buildFactoryParameter((FactoryParameterType)o));
+            }
+        }
+        return instr;
+    }
+    
+    VInstantiator.FreeF buildTerminalParameter(TerminalParameterType p) {
+        VInstantiator.FreeF vf = new VInstantiator.FreeF(p.getType(),p.getValue());
+        return vf;
+    }
+    
+    VInstantiator.Array buildMultiParameter(MultiParameterType p, boolean dummy) {
+        VInstantiator.Array va = new VInstantiator.Array(p.getType(),buildInstantiators(p.getParameters()));
+        return va;
+    }
+    
+    VInstantiator buildMultiParameter(MultiParameterType p) {
+        VInstantiator vAorC;
+        if (p.getType().endsWith("]")) {
+            vAorC = buildMultiParameter(p,true);
+        } else {
+            vAorC = new VInstantiator.Constr(p.getParameters(),p.getType());
+        }
+        return vAorC;
+    }
+    
+    VInstantiator.Factory buildFactoryParameter(FactoryParameterType p) {
+        VInstantiator.Factory vf = 
+                new VInstantiator.Factory(
+                    p.getType(),p.getFactory(),p.getMethod(),
+                    buildInstantiators(p.getParameters())
+                );
+        return vf;
+    }
+    
     boolean paramsMatch(List aparams,List eparams) {
         if ( aparams.size() != eparams.size() ) {
             return false;
@@ -195,19 +207,20 @@ public abstract class VInstantiator
         
         for (int i = 0; i < aparams.size(); i++) {
             Object o = aparams.get(i);
+            String s1 = ((ParameterType)(eparams.get(i))).getType();
+            String s2;
             if ( o instanceof TerminalParameterType ) {
-                if (!((TerminalParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
-                    return false;
-                }
+                s2 = ((TerminalParameterType)o).getType();
             } else if ( o instanceof MultiParameterType ) {
-                if (!((MultiParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
-                    return false;
-                }
+                s2 = ((MultiParameterType)o).getType();
             } else if ( o instanceof FactoryParameterType ) {
-                if (!((FactoryParameterType)o).getType().equals(((ParameterType)(eparams.get(i))).getType())) {
-                    return false;
-                }
+                s2 = ((FactoryParameterType)o).getType();
             } else return false;
+            System.out.print("Type match "+s1 + " "+ s2);
+            s1 = s1.split("\\.")[ s1.split("\\.").length - 1 ];
+            s2 = s2.split("\\.")[ s2.split("\\.").length - 1 ];
+            System.out.println(s1 + " " + s2);
+            if (!s1.equals(s2)) return false;
         }
         return true;
         
@@ -223,36 +236,29 @@ public abstract class VInstantiator
         setArgs(getDefaultArgs(type));
         args = getArgs();
       }
-      if(!findArgNamesFromEventGraphXML(type,args))
-        findArgNamesFromBeanStuff(type,args);
+      if(indexOfArgNames(type,args)<0) {System.out.println(type + " not loaded?");}
+        //findArgNamesFromBeanStuff(type,args);
     }
 
-    private boolean findArgNamesFromEventGraphXML(String type, List args)
-    {
-//      if(type.indexOf("DISPinger") != -1)
-//        System.out.println("bp");
-      // "Jam the names into the source at create-source-from-xml time" method
-      // 1 get constructor list of this class
-            // n.b. this class would only have one constructor as it was 
-            // generated from eventgraph.xsd
-      // 2. get the one we want by matching against args
-      // 3. compare the single vs. the list, if equal get the index within the list
-      // 4. use that to index into names to set the names to the params.
-      // this technique uses the info from when the file was loaded.  
+    // also returns the index into the found matching constructor
+    public int indexOfArgNames(String type, List args)
+    {  
       List[] parameters = Vstatics.resolveParameters(type);
-      if (parameters == null) return false; 
+      if (parameters == null) return -1; 
       int indx = 0;
       boolean found = false;
-      while ( indx < parameters.length - 1 && !found ) {
-          if ( parameters[indx].size() == args.size() ) {
+      for (int i = 0; i < parameters.length; i++) {
+      //while ( indx <= parameters.length - 1 && !found ) {
+          if ( parameters[i].size() == args.size() ) {
               boolean match = true;
               for ( int j = 0; j < args.size(); j++ ) {
                   
-                  System.out.print("touching "+((ParameterType)(parameters[indx].get(j))).getType()+" "+((VInstantiator)(args.get(j))).getType());
-                  
+                  System.out.print("touching "+((ParameterType)(parameters[i].get(j))).getType()+" "+((VInstantiator)(args.get(j))).getType());
+                  String pType = ((ParameterType)(parameters[i].get(j))).getType();
+                  String vType = ((VInstantiator)(args.get(j))).getType();
                   match &=
                    
-                      ((ParameterType)(parameters[indx].get(j))).getType().equals(
+                      ((ParameterType)(parameters[i].get(j))).getType().equals(
                                 ((VInstantiator)(args.get(j))).getType()
                       );
                   
@@ -260,17 +266,19 @@ public abstract class VInstantiator
                   // foo
                   
                   ((VInstantiator)(args.get(j))).setName(
-                        ((ParameterType)(parameters[indx].get(j))).getName()
+                        ((ParameterType)(parameters[i].get(j))).getName()
                   );
-                  System.out.println("to "+((ParameterType)(parameters[indx].get(j))).getName());
+                  System.out.println(" to "+((ParameterType)(parameters[i].get(j))).getName());
                           
               } 
               found = match;
-              
+              if (found) {
+                  indx = i;
+                  i = parameters.length;
+              }
               
           } 
-          if (!found) indx++;
-          else break;
+          
           
       }
       System.out.println("Resolving "+type+" "+parameters[indx]);
@@ -280,46 +288,8 @@ public abstract class VInstantiator
       // to resolve the bean there, then in that case, a null could
       // indicate a zero-parameter constructor.
       
-              
-      /*
-      try {
-        Class cls = Vstatics.classForName(type);
-        Constructor[] ca = cls.getDeclaredConstructors();   // List of constructors
-
-        Class[] argArr = new Class[args.size()];
-        for(int i=0;i<args.size();i++)
-          argArr[i] = Vstatics.classForName((String)((VInstantiator)args.get(i)).getType());
-        Constructor c = cls.getDeclaredConstructor(argArr);  // that's the one we want
-        int j;
-        for(j=0;j<ca.length;j++) {
-          if(ca[j].equals(c))
-            break;
-        }
-        if(j>=ca.length)
-          return false;  // found nothing
-
-        Field fld = cls.getDeclaredField(SimkitXML2Java.constructorParmNamesID);
-        String[][] nms = (String[][])fld.get(null);
-        if(nms != null && nms.length>0) {
-          for(int n=0;n<nms[j].length;n++)
-            try {
-              ((VInstantiator)args.get(n)).setName(nms[j][n]);
-            }
-            catch (Throwable e) {
-              // if the names are manually editted, the author may have screwed up; don't crash
-              if(args.size()>n) {
-                ((VInstantiator)args.get(n)).setName("error, check source");
-                return false;
-              }
-            }
-        }
-      }
-      catch (Exception e) {
-        //System.out.println("can't find constructor param names");
-        return false;
-      }
-       */
-      return true;
+      if (!found) indx = -1;
+      return indx;
     }
 
     private void findArgNamesFromBeanStuff(String type, List args)

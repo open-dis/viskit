@@ -2,10 +2,14 @@ package viskit;
 
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.Constructor;
+import viskit.xsd.bindings.eventgraph.ObjectFactory;
+import viskit.xsd.bindings.eventgraph.ParameterType;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -314,8 +318,74 @@ public class Vstatics
       parameterMap.remove(type);
       parameterMap.put(type,p);
   }
+  
+  
   static public List[] resolveParameters(String type) {
-      return (List[]) (parameterMap.get(type));
+      List[] resolved = (List[])(parameterMap.get(type));
+      if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
+          Class c = classForName(type);
+          System.out.println("adding "+c.getName());
+          ObjectFactory of = new ObjectFactory();
+          Constructor[] constr = c.getConstructors();
+          ArrayList[] plist = new ArrayList[constr.length];
+          System.out.println("\t # constructors: "+constr.length);
+          for ( int i = 0; i < constr.length; i ++ ) {
+              Class[] ptypes = constr[i].getParameterTypes();
+              plist[i] = new ArrayList();
+              System.out.println("\t # params "+ptypes.length+" in constructor "+i);
+              for ( int k = 0; k < ptypes.length; k++ ) {
+                  try {
+                      ParameterType p = of.createParameter();
+                      String ptname = ptypes[k].getName();
+                      if ( ptname.indexOf(".class")>0 ) {
+                          ptname = ptname.split("\\.")[0];
+                      }
+                      // could be from class loader, which would
+                      // prepend [L, etc. to an array, fix it up here
+                      if ( ptname.startsWith("[")) {
+                          System.out.println("oops, an array "+ptname);
+                          // java has it if array of some type then [Lclassname, long
+                          // pointer? so for all cases of prims [x except [L
+                          // then just convert to full name, otherwise if begins with [L
+                          // check if length of string is > 2, then it is [classname
+                          // also, note name is followed by ;
+                          if (ptname.length() == 2) { // must be a prim type
+                              if (ptname.equals("[B")) {
+                                  ptname = "byte[]";
+                              } else if (ptname.equals("[C")) {
+                                  ptname = "char[]";
+                              } else if (ptname.equals("[D")) {
+                                  ptname = "double[]";
+                              } else if (ptname.equals("[F")) {
+                                  ptname = "float[]";
+                              } else if (ptname.equals("[I")) {
+                                  ptname = "int[]";
+                              } else if (ptname.equals("[L")) {
+                                  ptname = "long[]";
+                              } else if (ptname.equals("[S")) {
+                                  ptname = "short[]";
+                              } else if (ptname.equals("[Z")) {
+                                  ptname = "boolean[]";
+                              }
+                          } else {
+                              ptname = ptname.substring(2);
+                              ptname = ptname.substring(0,ptname.length() - 2); // fix rid of ; if not prim
+                              ptname += "[]"; // match VInstantiator style
+                          }
+                      }
+                      p.setName("p["+k+"] = ");
+                      p.setType(ptname);
+                      plist[i].add(p);
+                      System.out.println("\t "+p.getName()+p.getType());
+                  } catch (Exception e) {
+                      e.printStackTrace();
+                  }
+              }
+          }
+          putParameterList(c.getName(),plist);
+          
+      }
+      return resolved;
       
   }
 }

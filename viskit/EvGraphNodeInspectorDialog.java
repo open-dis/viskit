@@ -141,6 +141,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
       //ArrayList alis = egNode.getComments();
 
       ip = new InstantiationPanel(this,lis,true);
+      
       ip.setData(egNode.getInstantiator());
       ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                       "Object creation",TitledBorder.CENTER,TitledBorder.DEFAULT_POSITION));

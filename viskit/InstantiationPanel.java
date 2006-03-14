@@ -183,7 +183,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   VInstantiator myVi;
   public void setData(VInstantiator vi) throws ClassNotFoundException
   {
-    myVi = vi.vcopy();
+    myVi = vi;
+    //myVi = vi.vcopy();
     String typ = myVi.getType();
     typeTF.setText(typ);
 
@@ -289,47 +290,35 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     }
     String typ;
     public void setType(String clName) throws ClassNotFoundException
-    {
-      typ = clName;
-      removeAll();
-      tp.removeAll();
-      //modifiedListener = changedListener;
-
-      clazz = Vstatics.classForName(clName);
-      if(clazz == null)
-        throw new ClassNotFoundException(clName);
-      construct = clazz.getConstructors();
-      constructorPanels = new ConstructorPanel[construct.length];
-
-      if (construct == null || construct.length <= 0) {
-        // here if there is no way to directly build an object of this class.
-        tp.addTab("Constructor 0", null, new JLabel("Abstract class of some kind.  Use free-form construction."));
-      }
-      else {
-        for (int i = 0; i < construct.length; ++i) {
-            List dummies = VInstantiator.buildDummyInstantiators(construct[i]);
-            List parameters = Vstatics.resolveParameters(clName)[i]; 
-            if ( parameters != null ) { 
+   {
+        List[] parameters = Vstatics.resolveParameters(clName);
+        typ = clName;
+        removeAll();
+        tp.removeAll();
+        //modifiedListener = changedListener;
+        
+        if (parameters == null) {
+            tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface, "));
+        } else {
+            constructorPanels = new ConstructorPanel[parameters.length];
+            for (int i = 0; i < parameters.length; ++i) {
                 
-                VInstantiator.Constr dummy = new VInstantiator.Constr(parameters, clName);
-                dummies = dummy.getArgs();
-                //for (int j = 0; j < dummies.size(); j++) {
-                 //   ((VInstantiator)dummies.get(j)).setName(((ParameterType)parameters.get(j)).getName());
-                //}
+                VInstantiator.Constr constr = new VInstantiator.Constr(parameters[i], clName);
+                String sign = noParamString;
+                for (int j = 0; j < constr.getArgs().size(); j++) {
+                    sign += ((ParameterType)(parameters[i].get(j))).getType()+", ";
+                    ((VInstantiator)(constr.getArgs().get(j))).setName(((ParameterType)(parameters[i].get(j))).getName());
+                }
+                sign = sign.substring(0,sign.length()-3);
+                
+                constructorPanels[i] = new ConstructorPanel(this,parameters.length != 1,this,packMe);
+                constructorPanels[i].setData(constr.getArgs());
+                
+                tp.addTab("Constructor " + i, null, constructorPanels[i], sign);
             }
-          constructorPanels[i] = new ConstructorPanel(this,construct.length != 1,this,packMe);
-          constructorPanels[i].setData(dummies);
-          String sign = ConstructorPanel.getSignature(construct[i].getParameterTypes());
-
-          if (construct[i].getParameterTypes().length == 0)
-            sign = noParamString;
-
-          tp.addTab("Constructor " + i, null, constructorPanels[i], sign);
         }
-      }
-      add(tp);
-
-      actionPerformed(null);    // set icon for initially selected pane
+        add(tp);
+        actionPerformed(null);    // set icon for initially selected pane
     }
 
     public void caretUpdate(CaretEvent e)
@@ -359,38 +348,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
       ip.actionPerformed(e);
     }
 
-    public void setData(VInstantiator.Constr vi)
-    {
-      if(vi == null)
-        return;
-      List args = vi.getArgs();
-      for(int i = 0;i<constructorPanels.length;i++) {    //give to everyone...they must cho
-        Constructor con = construct[i];
-        Class[] params = con.getParameterTypes();
-        noMatch:
-        {
-          for(int j=0;j<params.length;j++) {
-            if(j >= args.size())
-              break noMatch;
-            VInstantiator argVi = (VInstantiator)args.get(j);
-            if(! Vstatics.convertClassName(params[j].getName()).equals(argVi.getType())) {
-              break noMatch;
-            }
-          }
-          // here if we matched all the arguments to the constructor
-          constructorPanels[i].setData(args);
-          tp.setSelectedIndex(i);
-          actionPerformed(null);
-          return;
-
-        } // nomatch
-      } // next Constructor
-
-      // If a new node is dragged onto the canvas, there are no constructor arguments specified.
-      // Therefore, it's not an error if we don't find a match.
-
-      //assert false: "Internal error ConstrPanel.setData";
-      //System.err.println("assert false: \"Internal error ConstrPanel.setData\"");
+    public void setData(VInstantiator.Constr vi) {
+        if(vi == null)
+            return;
+        // oddly enough this is exactly what VInstantiator.indexOfArgNames(String type, List args)
+        // 
+        System.out.println("setting data for "+vi.getType());
+        int indx = vi.indexOfArgNames(vi.getType(),vi.getArgs());
+        System.out.println("found a matching constructor at "+indx);
+        constructorPanels[indx].setData(vi.getArgs());
+        tp.setSelectedIndex(indx);
+        actionPerformed(null);
+        
+        
     }
 
     public VInstantiator getData()
