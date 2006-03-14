@@ -468,11 +468,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             for ( int k = 0; k < ptypes.length; k++ ) {
                 try {
                     ParameterType p = of.createParameter();
-                    String ptname = ptypes[k].getName();
-                    if ( ptname.indexOf(".class")>0 ) {
+                    String ptname = Vstatics.convertClassName(ptypes[k].getName());
+                    if ( ptname.indexOf(".class")>0 ) { //??
                         ptname = ptname.split("\\.")[0];
                     }
-                    p.setName("p["+k+"] = ");
+                    p.setName("p["+k+"] : ");
                     p.setType(ptname);
                     plist[i].add(p);
                     System.out.println("\t "+p.getName()+p.getType());
