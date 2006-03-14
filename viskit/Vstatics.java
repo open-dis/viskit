@@ -360,7 +360,7 @@ public class Vstatics
                                   ptname = "float[]";
                               } else if (ptname.equals("[I")) {
                                   ptname = "int[]";
-                              } else if (ptname.equals("[L")) {
+                              } else if (ptname.equals("[J")) {
                                   ptname = "long[]";
                               } else if (ptname.equals("[S")) {
                                   ptname = "short[]";
@@ -373,7 +373,7 @@ public class Vstatics
                               ptname += "[]"; // match VInstantiator style
                           }
                       }
-                      p.setName("p["+k+"] = ");
+                      p.setName("p["+k+"] : ");
                       p.setType(ptname);
                       plist[i].add(p);
                       System.out.println("\t "+p.getName()+p.getType());
