@@ -6,26 +6,17 @@
 
 package viskit.xsd.translator;
 
+import viskit.xsd.bindings.eventgraph.*;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import viskit.xsd.bindings.eventgraph.*;
 
 /**
  *
@@ -91,15 +82,19 @@ public class SimkitXML2Java {
 	fileInputStream = new FileInputStream(f);
     }
 
-    public void unmarshal() {
-	Unmarshaller u;
-	try {
-	    u = jaxbCtx.createUnmarshaller();
-	    this.root = (SimEntity) u.unmarshal(fileInputStream);
-	} catch (Exception e) { e.printStackTrace(); }
+  public void unmarshal()
+  {
+    Unmarshaller u;
+    try {
+      u = jaxbCtx.createUnmarshaller();
+      this.root = (SimEntity) u.unmarshal(fileInputStream);
     }
+    catch (Exception e) {
+      System.err.println("Error unmarshalling "+fileBaseName+": "+e.getMessage());
+    }
+  }
 
-    public String translate() {
+  public String translate() {
 
 	StringBuffer source = new StringBuffer();
 	StringWriter head = new StringWriter();

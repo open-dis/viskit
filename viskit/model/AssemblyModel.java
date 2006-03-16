@@ -860,7 +860,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public boolean newModel(File f)
   {
-    GraphMetaData mymetaData;
+    GraphMetaData mymetaData=null;
     if (f == null) {
       try {
         jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
@@ -944,7 +944,12 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
         return false; // from both exceptions
       }
 
-
+      catch (Exception ex) {
+        JOptionPane.showMessageDialog(null,"Exception constructing assembly" +
+                                   "\n"+ f.getName(),
+                                   "Error",JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
     }
     metaData = mymetaData;
     currentFile = f;

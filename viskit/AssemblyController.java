@@ -866,18 +866,20 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      }
      return null;
   }
+
   public static String buildJavaEventGraphSource(File f)
   {
     try {
       SimkitXML2Java x2j = new SimkitXML2Java(f);
       x2j.unmarshal();
       return x2j.translate();
-     }
-     catch (Exception e) {
-       e.printStackTrace();
-     }
-     return null;
+    }
+    catch (Exception e) {
+      System.err.println("Error building Java from " + f.getName() + ": " + e.getMessage());
+    }
+    return null;
   }
+
   public static File compileJavaClassFromStringAndHandleDependencies(String src)
   {
     handleFileBasedClasses();
@@ -1046,7 +1048,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       return compileJavaClassAndSetPackage(src);
      }
      catch (Exception e) {
-       e.printStackTrace();
+       System.err.println("Error creating Java class file from "+xmlFile+": "+e.getMessage());
      }
      return null;
 
