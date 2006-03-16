@@ -26,7 +26,7 @@ public class ClassPanel extends JPanel
   public ClassPanel(LegosTree ltree, String title, String plusTT, String minusTT)
   {
     this.tree = ltree;
-    jfc = new JFileChooser(System.getProperty("user.dir"));
+    jfc = new JFileChooser(System.getProperty("user.dir") + "/BehaviorLibraries");
 
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     JLabel lab = new JLabel(title); //"Event Graphs");
