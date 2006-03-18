@@ -201,7 +201,7 @@ NOTE: Visual perception and communications are behaviors representing the person
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
         <Code>setCruisingSpeed(maxSpeed/2);
-setStartPosition(getLocation());
+setStartPosition(startPosition);
 setDestination(waypoint);
 
 //System.out.println("doPatrol Event:");
