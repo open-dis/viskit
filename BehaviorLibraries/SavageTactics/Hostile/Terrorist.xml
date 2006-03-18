@@ -84,6 +84,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="entitySensors" type="diskit.Sensor[0]">
         <Comment/>
     </StateVariable>
+    <StateVariable name="plasticExplosives" type="diskit.Explosive">
+        <Comment>Explosives that this entity is carrying</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="avoidanceRange">
@@ -132,6 +135,7 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <Schedule condition="entity == this" delay="0.0" event="CreateSensors" priority="0">
             <Comment/>
         </Schedule>
+        <Schedule event="CreateExplosive"/>
         <Code>//TODO: Elegant construction of sensors array
 sensors[0] = visualPerception;
 sensors[1] = detonateProximity;
@@ -160,6 +164,7 @@ sensors[1] = detonateProximity;
         <Schedule condition="sensor == detonateProximity &amp;&amp; !hostileForces.contains(contact.getMoverID())" delay="0.0" event="Fire" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code/>
@@ -252,12 +257,16 @@ this.setCruisingSpeed(getMaxSpeed());</Code>
     <Event name="Fire">
         <Comment/>
         <Argument name="shooter" type="diskit.Mover3D"/>
-        <Argument name="target" type="diskit.Mover3D"/>
+        <Argument name="explosives" type="diskit.Munition">
+            <Comment>Our explosives to detonate</Comment>
+        </Argument>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The entity we are trying to blow up</Comment>
+        </Argument>
         <Schedule condition="true" delay="0.0" event="Stop" priority="0">
             <Comment/>
         </Schedule>
-        <Code>//setStartPosition(new Vec3d(0, 0, 5));
-System.out.println(moverID + " Going after: " + target.getMoverID());</Code>
+        <Code>System.out.println(moverID + " Going after: " + target.getMoverID());</Code>
         <Coordinate x="300" y="420"/>
     </Event>
     <Event name="Evade">
@@ -343,6 +352,29 @@ sensors[1] = detonateProximity;</Code>
         <Comment/>
         <Code>Schedule.stopSimulation();</Code>
         <Coordinate x="300" y="550"/>
+    </Event>
+    <Event name="CreateExplosive">
+        <Comment>Creates the explosive for this entity</Comment>
+        <StateTransition state="plasticExplosives">
+            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, moverID, blastRadius)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
+            <Comment/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="120" y="0"/>
+    </Event>
+    <Event name="RegisterMunition">
+        <Comment>Register the explosive with scenario Manager</Comment>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The explosives just created</Comment>
+        </Argument>
+        <StateTransition state="plasticExplosives">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code>this.addSimEventListener(munition);</Code>
+        <Coordinate x="220" y="0"/>
     </Event>
 </SimEntity>
 
