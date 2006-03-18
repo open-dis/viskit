@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="Obstacles" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Accepts as its argument an array of DISMover3D objects which represent both stationary and moving obstacles.  Normally the speed will be set to zero but the class uses DISMover3D to allow for obstacles that can move such as barriers and buoys.</Comment>
+    <Parameter name="obstacles" type="DISMover3D[]">
+        <Comment>Array of all obstacles for a port or scene.</Comment>
+    </Parameter>
+    <StateVariable name="numOfObstacles" type="int">
+        <Comment>Index variable for creating obstacles sensors and targets</Comment>
+    </StateVariable>
+    <StateVariable name="obstacleSensorRange" type="double">
+        <Comment>Can be any size, but should be variable if needed</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="numOfObstacles">
+            <Assignment value="obstacles.length"/>
+        </StateTransition>
+        <StateTransition state="obstacleSensorRange">
+            <Assignment value="20"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RefereeRegister" priority="0">
+            <Comment/>
+            <EdgeParameter value="obstacles"/>
+            <EdgeParameter value="numOfObstacles"/>
+            <EdgeParameter value="obstacleSensorRange"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="150" y="30"/>
+    </Event>
+    <Event name="CreateSensors">
+        <Comment>Adds simple SphereCutterSensor to all obstacles.  A sensor is required as an argument for the doDetectionEvent of other entities</Comment>
+        <Argument name="arraySize" type="int">
+            <Comment>index variable for array construction</Comment>
+        </Argument>
+        <Argument name="targets" type="diskit.Mover3D[]">
+            <Comment>Target array to pair targets and sensors</Comment>
+        </Argument>
+        <Argument name="sensorRange" type="double">
+            <Comment>Fixed range for all sensors of obstacles</Comment>
+        </Argument>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[arraySize]">
+            <Comment>Array for sensors for each obstacle</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+            <EdgeParameter value="targets"/>
+        </Schedule>
+        <Code>for(int i = 0; i &lt; arraySize; i++){     sensors[i] = new diskit.SphereCutterSensor(targets[i], sensorRange); }</Code>
+        <Coordinate x="250" y="200"/>
+    </Event>
+    <Event name="CreateTargets">
+        <Comment>Creates an array of DISMover3D objects for registering as targets</Comment>
+        <Argument name="newObstacles" type="diskit.DISMover3D[]">
+            <Comment>Passed from the constructor</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="RegisterTargets" priority="0">
+            <Comment/>
+            <EdgeParameter value="newObstacles"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="260" y="90"/>
+    </Event>
+    <Event name="RegisterTargets">
+        <Comment>Registers each DISMover3D in the array as it's own target</Comment>
+        <Argument name="newTargets" type="diskit.Mover3D[]"/>
+        <Code/>
+        <Coordinate x="350" y="90"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers each (sensor,target) pair of obstacles</Comment>
+        <Argument name="newSensors" type="diskit.Sensor[]"/>
+        <Argument name="movers" type="diskit.Mover3D[]">
+            <Comment>Movers pass to register simEventListeners for each sensor</Comment>
+        </Argument>
+        <Code>for(int i = 0; i &lt; newSensors.length; i++){    newSensors[i].addSimEventListener(movers[i]); }</Code>
+        <Coordinate x="350" y="200"/>
+    </Event>
+    <Event name="RefereeRegister">
+        <Comment>Sends each mover one at a time and passes it to the Init event which is required for all entities</Comment>
+        <Argument name="newMovers" type="diskit.Mover3D[]">
+            <Comment>Array of movers to be registered</Comment>
+        </Argument>
+        <Argument name="numOfObst" type="int"/>
+        <Argument name="range" type="double"/>
+        <LocalVariable name="done" type="boolean" value="false">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="idx" type="int" value="0">
+            <Comment>variable for loop control</Comment>
+        </LocalVariable>
+        <LocalVariable name="arraySize" type="int" value="numOfObst">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="done" delay="0.0" event="CreateTargets" priority="0">
+            <Comment>Check to make sure that that all movers are registered with the referee and then proceed</Comment>
+            <EdgeParameter value="newMovers"/>
+        </Schedule>
+        <Schedule condition="done" delay="0.0" event="CreateSensors" priority="0">
+            <Comment>Check to make sure all movers have been registered and then proceed</Comment>
+            <EdgeParameter value="numOfObst"/>
+            <EdgeParameter value="newMovers"/>
+            <EdgeParameter value="range"/>
+        </Schedule>
+        <Schedule condition="!done" delay="0.0" event="RefereeRegister" priority="0">
+            <Comment/>
+            <EdgeParameter value="newMovers"/>
+            <EdgeParameter value="numOfObst"/>
+            <EdgeParameter value="range"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0">
+            <Comment/>
+            <EdgeParameter value="newMovers[idx]"/>
+        </Schedule>
+        <Code>if(idx &lt;  arraySize){    done = true; }else{  idx++; }</Code>
+        <Coordinate x="150" y="140"/>
+    </Event>
+    <Event name="Init">
+        <Comment>Registers each mover with the referee</Comment>
+        <Argument name="thisMover" type="diskit.Mover3D"/>
+        <Code/>
+        <Coordinate x="40" y="140"/>
+    </Event>
+</SimEntity>
+
