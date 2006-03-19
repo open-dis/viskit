@@ -879,7 +879,8 @@ cancelArcMode.setIcon(new CanArcIcon());
   {
     if (jfc == null) {
       jfc = new JFileChooser(System.getProperty("user.dir")+
-                             System.getProperty("file.separator")+"examples");
+                             System.getProperty("file.separator")+"BehaviorLibraries"+
+									  System.getProperty("file.separator")+"SavageTactics");
       jfc.setDialogTitle("Open Event Graph File");
     }
     int retv = jfc.showOpenDialog(this);
