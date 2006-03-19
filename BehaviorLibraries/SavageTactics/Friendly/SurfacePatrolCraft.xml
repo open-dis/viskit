@@ -10,6 +10,12 @@
     <Parameter name="moverID" type="int">
         <Comment>DIS entity ID</Comment>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>Should match interface</Comment>
+    </Parameter>
+    <Parameter name="entityName" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
     <StateVariable name="tacticalMode" type="diskit.TacticalMode">
         <Comment>Tactical Mode of this entity</Comment>
     </StateVariable>
@@ -163,7 +169,7 @@
             <Comment>if target is not an obstacle or friend</Comment>
         </Schedule>
         <Cancel event="StandOff"/>
-        <Code>System.out.println(moverID + " detected " + newTarget.getMoverID());</Code>
+        <Code>//System.out.println(moverID + " detected " + newTarget.getMoverID());</Code>
         <Coordinate x="440" y="440"/>
     </Event>
     <Event name="AssessObstacle">

@@ -12,6 +12,12 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique DIS entity ID number</Comment>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>Should match interface</Comment>
+    </Parameter>
+    <Parameter name="entityName" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
     <Parameter name="blastRadius" type="double">
         <Comment>proximity to a target required to effectively destroy it</Comment>
     </Parameter>
@@ -165,7 +171,7 @@ sensors[1] = detonateProximity;
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
-            <EdgeParameter value="contact"/>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
         <Coordinate x="450" y="320"/>
@@ -228,6 +234,7 @@ startHeading[0] = harborDirector.createWaypoint();</Code>
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="target"/>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code>setStartPosition(getLocation());setDestination(attackGoal);
 this.setCruisingSpeed(getMaxSpeed());</Code>
@@ -261,10 +268,15 @@ this.setCruisingSpeed(getMaxSpeed());</Code>
             <Comment>Our explosives to detonate</Comment>
         </Argument>
         <Argument name="target" type="diskit.Mover3D">
-            <Comment>The entity we are trying to blow up</Comment>
+            <Comment>Suicide so target is yourself</Comment>
         </Argument>
-        <Schedule condition="true" delay="0.0" event="Stop" priority="0">
+        <Schedule condition="true" delay="3" event="Stop" priority="0">
             <Comment/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
         </Schedule>
         <Code>System.out.println(moverID + " Going after: " + target.getMoverID());</Code>
         <Coordinate x="300" y="420"/>
@@ -309,10 +321,11 @@ System.out.println(moverID + " is evading");</Code>
             <EdgeParameter value="threat"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Cancel condition="true" event="Fire">
+        <Cancel condition="calc.willCollide() &amp;&amp; threat.getMoverID() == 101" event="Fire">
             <Comment/>
             <EdgeParameter value="this"/>
-            <EdgeParameter value="threat"/>
+            <EdgeParameter value="plasticExplosives"/>
+            <EdgeParameter value="this"/>
         </Cancel>
         <Code>System.out.println("Terrorist Assessing Attack Plan");</Code>
         <Coordinate x="210" y="320"/>
@@ -350,13 +363,14 @@ sensors[1] = detonateProximity;</Code>
     </Event>
     <Event name="Stop">
         <Comment/>
-        <Code>Schedule.stopSimulation();</Code>
+        <Code>System.out.println("doStop called in Terrorist");
+Schedule.stopSimulation();</Code>
         <Coordinate x="300" y="550"/>
     </Event>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
         <StateTransition state="plasticExplosives">
-            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, moverID, blastRadius)"/>
+            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, getMoverID(), diskit.EntityType.HOSTILEFORCE, &quot;Plastic Explosives&quot;, blastRadius)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
             <Comment/>
@@ -375,6 +389,13 @@ sensors[1] = detonateProximity;</Code>
         </StateTransition>
         <Code>this.addSimEventListener(munition);</Code>
         <Coordinate x="220" y="0"/>
+    </Event>
+    <Event name="Detonate">
+        <Comment/>
+        <Argument name="shooter" type="diskit.Mover3D"/>
+        <Argument name="munition" type="diskit.Munition"/>
+        <Code>System.out.println("Terrorist doDetonate event");</Code>
+        <Coordinate x="410" y="480"/>
     </Event>
 </SimEntity>
 

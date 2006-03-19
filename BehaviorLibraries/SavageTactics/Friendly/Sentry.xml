@@ -10,6 +10,12 @@
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0-999]</Comment>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>Should match interface</Comment>
+    </Parameter>
+    <Parameter name="entityName" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>

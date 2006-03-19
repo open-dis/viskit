@@ -11,6 +11,12 @@ NOTE: Visual perception and communications are behaviors representing the person
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0 - 999]</Comment>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>Should match super class type</Comment>
+    </Parameter>
+    <Parameter name="entityName" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -202,10 +208,7 @@ NOTE: Visual perception and communications are behaviors representing the person
         </StateTransition>
         <Code>setCruisingSpeed(maxSpeed/2);
 setStartPosition(startPosition);
-setDestination(waypoint);
-
-//System.out.println("doPatrol Event:");
-//System.out.println("Heading to: " + waypoint);</Code>
+setDestination(waypoint);</Code>
         <Coordinate x="140" y="520"/>
     </Event>
     <Event name="Detection">
