@@ -11,9 +11,6 @@ NOTE: Visual perception and communications are behaviors representing the person
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0 - 999]</Comment>
     </Parameter>
-    <Parameter name="entityType" type="diskit.EntityType">
-        <Comment>Should match super class type</Comment>
-    </Parameter>
     <Parameter name="entityName" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
@@ -225,16 +222,19 @@ setDestination(waypoint);</Code>
         <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
             <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
         </LocalVariable>
+        <LocalVariable name="entityType" type="diskit.EntityType" value="contact.getEntityType()">
+            <Comment>Entity type for this contact</Comment>
+        </LocalVariable>
         <Schedule condition="sensor == collisionAvoidance &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.INTERCEPTING) &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.INTERDICTING)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>Should not avoid contacts if you are intercepting them</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="!friendlyForces.contains(entityID)  &amp;&amp; calc.canIntercept(contact, interceptOffset) &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.INTERDICTING)" delay="0.0" event="Intercept" priority="0">
+        <Schedule condition="!friendlyForces.contains(entityID)  &amp;&amp; calc.canIntercept(contact, interceptOffset) &amp;&amp;  !tacticalMode.equals(diskit.TacticalMode.INTERDICTING) &amp;&amp; !entityType.equals(diskit.EntityType.HOSTILE)" delay="0.0" event="Intercept" priority="0">
             <Comment>Check to see if contact is a friend, if not, close contact for ID</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="calc.canIntercept(contact, 0) &amp;&amp; contact.getMoverID() &gt; 599 &amp;&amp; contact.getMoverID() &lt; 700" delay="0.0" event="PursueHostile" priority="0">
-            <Comment>TODO: getEntityType call instead of entity ID numbers</Comment>
+        <Schedule condition="calc.canIntercept(contact, 0) &amp;&amp; entityType.equals(diskit.EntityType.HOSTILE)" delay="0.0" event="PursueHostile" priority="0">
+            <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>contact.addSimEventListener(this);</Code>
@@ -412,7 +412,7 @@ System.out.println("RHIB doIDContact");</Code>
         </Cancel>
         <Schedule event="StandOff"/>
         <Code>setCruisingSpeed(getMaxSpeed());
-//setStartPosition(getLocation());
+setStartPosition(getLocation());
 setDestination(interdictPoint);
 System.out.println(moverID + " is Pursuing");</Code>
         <Coordinate x="400" y="280"/>
@@ -440,9 +440,11 @@ sensors[1] = collisionAvoidance;</Code>
     </Event>
     <Event name="Evade">
         <Comment/>
+        <Argument name="m1" type="diskit.Mover3D"/>
+        <Argument name="m2" type="diskit.Mover3D"/>
         <Schedule event="PursueHostile"/>
         <Cancel event="Interdict"/>
-        <Code/>
+        <Code>System.out.println("Do Evade heard by " + getEntityName());</Code>
         <Coordinate x="400" y="400"/>
     </Event>
     <Code>

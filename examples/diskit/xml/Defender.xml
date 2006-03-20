@@ -10,6 +10,12 @@
     <Parameter name="moverID" type="int">
         <Comment/>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>Should match interface</Comment>
+    </Parameter>
+    <Parameter name="entityName" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
     <Parameter name="patrolMoverManager" type="diskit.PatrolMoverManager">
         <Comment/>
     </Parameter>
@@ -421,12 +427,13 @@
     </Event>
     <Event name="EndEscort">
         <Comment/>
-        <LocalVariable name="mover" type="diskit.DISMover3D" value="(diskit.DISMover3D)this; mover.setCruisingSpeed(getMaxSpeed())">
+        <LocalVariable name="mover" type="diskit.Contact" value="this; mover.setCruisingSpeed(getMaxSpeed())">
             <Comment/>
         </LocalVariable>
         <StateTransition state="assetState">
             <Assignment value="diskit.AssetState.PATROLLING"/>
         </StateTransition>
+        <Code/>
         <Coordinate x="600" y="190"/>
     </Event>
     <Event name="StopIntercept">

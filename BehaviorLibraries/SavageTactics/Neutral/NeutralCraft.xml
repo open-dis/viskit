@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Patrick Sullivan" extend="diskit.DISMover3D" name="NeutralCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Patrick Sullivan" extend="diskit.NeutralForce" name="NeutralCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A Neutral Craft which will navigate through it's assigned zones. Most common use for this class is as traffic for a harbor or any other entity type that is neither a defender or an attacker.</Comment>
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Start Position - different than first waypoint</Comment>
@@ -9,9 +9,6 @@
     </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>DIS entity ID</Comment>
-    </Parameter>
-    <Parameter name="entityType" type="diskit.EntityType">
-        <Comment>Should match interface</Comment>
     </Parameter>
     <Parameter name="entityName" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>

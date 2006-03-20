@@ -8,7 +8,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="20"/>
         <TerminalParameter type="int" value="101"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="RHIB1"/>
         <Coordinate x="280" y="280"/>
     </SimEntity>
@@ -182,7 +181,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="150"/>
         <TerminalParameter type="int" value="103"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="Super Cobra"/>
         <Coordinate x="100" y="280"/>
     </SimEntity>
@@ -194,7 +192,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="15"/>
         <TerminalParameter type="int" value="104"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="DDG1"/>
         <Coordinate x="160" y="280"/>
     </SimEntity>
@@ -206,7 +203,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="15"/>
         <TerminalParameter type="int" value="105"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="DDG2"/>
         <Coordinate x="220" y="280"/>
     </SimEntity>
@@ -218,7 +214,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="20"/>
         <TerminalParameter type="int" value="102"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="RHIB2"/>
         <Coordinate x="360" y="280"/>
     </SimEntity>
@@ -230,7 +225,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="9"/>
         <TerminalParameter type="int" value="206"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="CommerShip1"/>
         <Coordinate x="430" y="280"/>
     </SimEntity>
@@ -242,7 +236,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="9"/>
         <TerminalParameter type="int" value="207"/>
-       <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="CommerShip2"/> 
         <Coordinate x="510" y="280"/>
     </SimEntity>
@@ -254,7 +247,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="200"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow1"/>
         <Coordinate x="610" y="470"/>
     </SimEntity>
@@ -266,7 +258,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="201"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow2"/>
         <Coordinate x="610" y="530"/>
     </SimEntity>
@@ -278,7 +269,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="202"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow3"/>
         <Coordinate x="610" y="590"/>
     </SimEntity>
@@ -290,7 +280,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="203"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow4"/>
         <Coordinate x="610" y="660"/>
     </SimEntity>
@@ -302,7 +291,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="204"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow5"/>
         <Coordinate x="610" y="730"/>
     </SimEntity>
@@ -314,7 +302,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="10"/>
         <TerminalParameter type="int" value="205"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Dhow6"/>
         <Coordinate x="620" y="800"/>
     </SimEntity>
@@ -407,7 +394,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="0"/>
         <TerminalParameter type="int" value="500"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="ABOTWest"/>
         <Coordinate x="590" y="280"/>
     </SimEntity>
@@ -419,7 +405,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="0"/>
         <TerminalParameter type="int" value="501"/>
-			<TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="ABOTEast"/>
         <Coordinate x="680" y="280"/>
     </SimEntity>
@@ -858,7 +843,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="30"/>
         <TerminalParameter type="int" value="600"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.HOSTILEFORCE"/>
 			    <TerminalParameter type="java.lang.String" value="Terrorist"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
@@ -883,7 +867,6 @@
         </MultiParameter>
         <TerminalParameter type="double" value="0"/>
         <TerminalParameter type="int" value="300"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
 			    <TerminalParameter type="java.lang.String" value="OilTanker"/>
         <Coordinate x="60" y="410"/>
     </SimEntity>

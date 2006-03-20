@@ -12,9 +12,6 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique DIS entity ID number</Comment>
     </Parameter>
-    <Parameter name="entityType" type="diskit.EntityType">
-        <Comment>Should match interface</Comment>
-    </Parameter>
     <Parameter name="entityName" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
@@ -370,7 +367,7 @@ Schedule.stopSimulation();</Code>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
         <StateTransition state="plasticExplosives">
-            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, getMoverID(), diskit.EntityType.HOSTILEFORCE, &quot;Plastic Explosives&quot;, blastRadius)"/>
+            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, getMoverID(), diskit.EntityType.HOSTILE, &quot;Plastic Explosives&quot;, blastRadius)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
             <Comment/>

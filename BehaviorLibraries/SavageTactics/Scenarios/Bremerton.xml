@@ -117,7 +117,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="19"/>
         <TerminalParameter name="moverID" type="int" value="101"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="RHIB"/>
         <Coordinate x="170" y="130"/>
     </SimEntity>
@@ -129,7 +128,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="5"/>
         <TerminalParameter name="moverID" type="int" value="121"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.NEUTRALFORCE"/>
         <TerminalParameter type="java.lang.String" value="Trawler"/>
         <Coordinate x="170" y="10"/>
     </SimEntity>
@@ -141,7 +139,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="8"/>
         <TerminalParameter name="moverID" type="int" value="102"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="Sea Fox"/>
         <Coordinate x="170" y="70"/>
     </SimEntity>
@@ -153,7 +150,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="50"/>
         <TerminalParameter name="moverID" type="int" value="103"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="Sea Scan"/>
         <Coordinate x="170" y="190"/>
     </SimEntity>
@@ -242,7 +238,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="600"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.HOSTILEFORCE"/>
         <TerminalParameter type="java.lang.String" value="Terrorist 1"/>
         <TerminalParameter name="blastRadius" type="double" value="40"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
@@ -269,7 +264,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="601"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.HOSTILEFORCE"/>
         <TerminalParameter type="java.lang.String" value="Terrorist 2"/>
         <TerminalParameter name="blastRadius" type="double" value="40"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
@@ -296,7 +290,6 @@
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="602"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.HOSTILEFORCE"/>
         <TerminalParameter type="java.lang.String" value="Terrorist 3"/>
         <TerminalParameter name="blastRadius" type="double" value="40"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
@@ -323,7 +316,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="403"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="USS Carl Vinson"/>
         <Coordinate x="700" y="480"/>
     </SimEntity>
@@ -400,7 +392,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="0"/>
         <TerminalParameter name="moverID" type="int" value="400"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="USS O'Kane"/>
         <Coordinate x="470" y="480"/>
     </SimEntity>
@@ -412,7 +403,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="401"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="USS Russell"/>
         <Coordinate x="350" y="480"/>
     </SimEntity>
@@ -424,7 +414,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="402"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="USS Princeton"/>
         <Coordinate x="0" y="480"/>
     </SimEntity>
@@ -436,7 +425,6 @@
         </MultiParameter>
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="404"/>
-        <TerminalParameter type="diskit.EntityType" value="EntityType.FRIENDLYFORCE"/>
         <TerminalParameter type="java.lang.String" value="USS R.M. Davis"/>
         <Coordinate x="120" y="480"/>
     </SimEntity>
