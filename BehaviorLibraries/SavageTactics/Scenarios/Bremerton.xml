@@ -232,78 +232,78 @@
     </SimEntity>
     <SimEntity description="" name="Terrorist1" type="diskit.Terrorist">
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="600"/>
-        <TerminalParameter type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="blastRadius" type="double" value="40"/>
+        <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 1"/>
+        <TerminalParameter name="blastRadius" type="double" value="10"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="entityID" type="int" value="600"/>
-                <TerminalParameter name="probability" type="double" value="1"/>
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value="1"/>
                 <MultiParameter type="double[]">
                     <TerminalParameter name="" type="double" value="-1149.324"/>
                     <TerminalParameter name="" type="double" value="0.0"/>
                     <TerminalParameter name="" type="double" value="-900.123"/>
                 </MultiParameter>
-                <TerminalParameter name="zoneLength" type="double" value="100"/>
-                <TerminalParameter name="zoneWidth" type="double" value="100"/>
-                <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
+                <TerminalParameter name="p[3] : " type="double" value="100"/>
+                <TerminalParameter name="p[4] : " type="double" value="100"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
             </MultiParameter>
         </MultiParameter>
         <Coordinate x="500" y="40"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist2" type="diskit.Terrorist">
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="601"/>
-        <TerminalParameter type="java.lang.String" value="Terrorist 2"/>
-        <TerminalParameter name="blastRadius" type="double" value="40"/>
+        <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 2"/>
+        <TerminalParameter name="blastRadius" type="double" value="10"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="entityID" type="int" value="601"/>
-                <TerminalParameter name="probability" type="double" value="1"/>
+                <TerminalParameter name="p[0] : " type="int" value="601"/>
+                <TerminalParameter name="p[1] : " type="double" value="1"/>
                 <MultiParameter type="double[]">
                     <TerminalParameter name="" type="double" value="-1149.324"/>
                     <TerminalParameter name="" type="double" value="0.0"/>
                     <TerminalParameter name="" type="double" value="-900.123"/>
                 </MultiParameter>
-                <TerminalParameter name="zoneLength" type="double" value="500"/>
-                <TerminalParameter name="zoneWidth" type="double" value="500"/>
-                <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
             </MultiParameter>
         </MultiParameter>
         <Coordinate x="500" y="100"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist3" type="diskit.Terrorist">
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
-            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="602"/>
-        <TerminalParameter type="java.lang.String" value="Terrorist 3"/>
-        <TerminalParameter name="blastRadius" type="double" value="40"/>
+        <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 3"/>
+        <TerminalParameter name="blastRadius" type="double" value="10"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="entityID" type="int" value="602"/>
-                <TerminalParameter name="probability" type="double" value="1"/>
+                <TerminalParameter name="p[0] : " type="int" value="602"/>
+                <TerminalParameter name="p[1] : " type="double" value="1"/>
                 <MultiParameter type="double[]">
                     <TerminalParameter name="" type="double" value="-1149.324"/>
                     <TerminalParameter name="" type="double" value="0.0"/>
                     <TerminalParameter name="" type="double" value="-900.123"/>
                 </MultiParameter>
-                <TerminalParameter name="zoneLength" type="double" value="500"/>
-                <TerminalParameter name="zoneWidth" type="double" value="500"/>
-                <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
             </MultiParameter>
         </MultiParameter>
         <Coordinate x="500" y="160"/>
@@ -337,7 +337,6 @@
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="175.341"/>
         <TerminalParameter name="width" type="double" value="34.276"/>
-        
         <Coordinate x="240" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierDelta" type="diskit.Pier">
@@ -348,7 +347,6 @@
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="437.082"/>
         <TerminalParameter name="width" type="double" value="49.33"/>
-        
         <Coordinate x="410" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringE" type="diskit.Pier">
@@ -359,7 +357,6 @@
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="370.166"/>
         <TerminalParameter name="width" type="double" value="11.898"/>
-        
         <Coordinate x="640" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringF" type="diskit.Pier">
@@ -370,7 +367,6 @@
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="299.833"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
-        
         <Coordinate x="810" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringG" type="diskit.Pier">
@@ -381,7 +377,6 @@
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="276.551"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
-        
         <Coordinate x="910" y="480"/>
     </SimEntity>
     <SimEntity description="" name="DDG77/O'Kane" type="diskit.HVU">
