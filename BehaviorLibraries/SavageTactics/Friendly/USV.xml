@@ -163,13 +163,18 @@
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Provides a waypoint within the geometry specified</Comment>
         </LocalVariable>
+        <LocalVariable name="startPosition" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>Pick a random start position</Comment>
+        </LocalVariable>
         <StateTransition state="speed">
             <Assignment value="currentSpeed"/>
         </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruisingSpeed(currentSpeed);setDestination(waypoint);
+        <Code>setCruisingSpeed(currentSpeed);
+setStartPosition(startPosition);
+setDestination(waypoint);
 //System.out.println("doPatrol Event:");
 //System.out.println("Heading to: " + waypoint);</Code>
         <Coordinate x="240" y="230"/>

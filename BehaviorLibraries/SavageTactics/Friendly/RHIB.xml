@@ -237,7 +237,14 @@ setDestination(waypoint);</Code>
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>contact.addSimEventListener(this);</Code>
+        <Code>contact.addSimEventListener(this);
+/*
+System.out.println("Cruising Speed: " + contact.getCruisingSpeed());
+System.out.println("Max Speed:       " + contact.getMaxSpeed());
+System.out.println("Destination:       " + contact.getDestination());
+System.out.println("Location:            " + contact.getLocation());
+System.out.println("Name:                " + contact.getEntityName());
+*/</Code>
         <Coordinate x="400" y="80"/>
     </Event>
     <Event name="EvaluateContact">
@@ -265,7 +272,7 @@ if(target.getMoverID() &gt; 599 &amp;&amp; target.getMoverID() &lt; 700){
    setCruisingSpeed(getMaxSpeed()/4);
 }
 setStartPosition(getLocation());
-setDestination(target.getLocation());
+setDestination(target.getDestination());
 //System.out.println("Intercept Complete");
 //System.out.println(target.getCruisingSpeed());
 //System.out.println(target.getDestination());</Code>
@@ -414,6 +421,7 @@ System.out.println("RHIB doIDContact");</Code>
         <Code>setCruisingSpeed(getMaxSpeed());
 setStartPosition(getLocation());
 setDestination(interdictPoint);
+//setDestination(interdictPoint);
 System.out.println(moverID + " is Pursuing");</Code>
         <Coordinate x="400" y="280"/>
     </Event>
