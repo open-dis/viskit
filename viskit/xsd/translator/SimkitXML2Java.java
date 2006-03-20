@@ -121,9 +121,12 @@ public class SimkitXML2Java {
         String pkg  = this.root.getPackage();
         String extend = this.root.getExtend();
         String implement = this.root.getImplement();
-
+        // TBD: should be checking the class definitinons
+        // of the Interfaces and create a code block
+        // if none exists with template methods, and
+        // Events for any "do" methods if none exists.
         if ( implement != null ) {
-            extend += sp + implement;
+            extend += sp + "implements" + sp + implement;
         }
 
 	pw.println("package " + pkg + sc);
@@ -811,7 +814,10 @@ public class SimkitXML2Java {
             return superParams;
 
 	try {
-	    Class c = Class.forName(this.root.getExtend());
+            // the extend field may also contain an implemnts
+            // tail.
+            
+	    Class c = Class.forName(this.root.getExtend().split("\\s")[0]);
 	    Constructor[] ca = c.getConstructors();
 	    int maxIndex = 0;
 	    int maxParamCount = 0;
