@@ -20,23 +20,41 @@ NOTE: Visual perception and communications are behaviors representing the person
     <StateVariable name="visualRange" type="double">
         <Comment>Visual Range for the crew</Comment>
     </StateVariable>
+    <StateVariable name="collisionAvoidance" type="diskit.Sensor">
+        <Comment>Sensor that is used for collision avoidance</Comment>
+    </StateVariable>
     <StateVariable name="avoidanceRange" type="double">
         <Comment>Proximity tolerance for this contact. Will maneuver to avoid objects that will breach this range</Comment>
-    </StateVariable>
-    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
-        <Comment>Tactical State that the RHIB is in (e.g. Patrolling, Intercepting)</Comment>
     </StateVariable>
     <StateVariable name="patrolManager" type="diskit.ZoneMoverManager">
         <Comment>Mover manager that manages entity movement based on diskit.ZoneGeometry patrol zones</Comment>
     </StateVariable>
+    <StateVariable name="amm" type="diskit.AvoidanceMoverManager">
+        <Comment>MoverManager for avoiding collision</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>Tactical State that the RHIB is in (e.g. Patrolling, Intercepting)</Comment>
+    </StateVariable>
     <StateVariable name="waypointGenerator" type="diskit.WaypointCreator">
         <Comment>Generates waypoints based on the diskit.ZoneGeometry for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="calc" type="diskit.util.MovementCalculator">
+        <Comment>Calculates intercept and avoidance</Comment>
     </StateVariable>
     <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
         <Comment>Stores and sorts obstacles based on proximity</Comment>
     </StateVariable>
     <StateVariable name="targetQueue" type="diskit.TargetQueue">
         <Comment>Stores and sorts targets based on proximity</Comment>
+    </StateVariable>
+    <StateVariable name="contactPicture" type="LinkedList">
+        <Comment>List of all contacts in this entities contact picture</Comment>
+    </StateVariable>
+    <StateVariable name="canIntercept" type="boolean">
+        <Comment>Whether or not entity can catch up to contact</Comment>
+    </StateVariable>
+    <StateVariable name="idAttempts" type="int">
+        <Comment>TODO: GET RID OF number of times it should take to id a contact</Comment>
     </StateVariable>
     <StateVariable name="successfulIntercepts" type="int">
         <Comment>DATA: Total number of successful intercepts</Comment>
@@ -50,32 +68,8 @@ NOTE: Visual perception and communications are behaviors representing the person
     <StateVariable name="contactIDs" type="int">
         <Comment>DATA: Total number of contacts ID'd</Comment>
     </StateVariable>
-    <StateVariable name="canIntercept" type="boolean">
-        <Comment>Whether or not entity can catch up to contact</Comment>
-    </StateVariable>
-    <StateVariable name="missedIDs" type="int">
-        <Comment>DATA: Total number of missed IDs due to distance</Comment>
-    </StateVariable>
     <StateVariable name="distanceFromMissedAttacker" type="double">
         <Comment>DATA: Distance from attacker at time of successful attack</Comment>
-    </StateVariable>
-    <StateVariable name="destination" type="diskit.Vec3d">
-        <Comment>This entities current destination</Comment>
-    </StateVariable>
-    <StateVariable name="calc" type="diskit.util.MovementCalculator">
-        <Comment>Calculates intercept and avoidance</Comment>
-    </StateVariable>
-    <StateVariable name="idAttempts" type="int">
-        <Comment>number of times it should take to id a contact</Comment>
-    </StateVariable>
-    <StateVariable name="amm" type="diskit.AvoidanceMoverManager">
-        <Comment>MoverManager for avoiding collision</Comment>
-    </StateVariable>
-    <StateVariable name="collisionAvoidance" type="diskit.Sensor">
-        <Comment>Sensor that is used for collision avoidance</Comment>
-    </StateVariable>
-    <StateVariable name="contactPicture" type="LinkedList">
-        <Comment>List of all contacts in this entities contact picture</Comment>
     </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
@@ -99,9 +93,6 @@ NOTE: Visual perception and communications are behaviors representing the person
         </StateTransition>
         <StateTransition state="canIntercept">
             <Assignment value="false"/>
-        </StateTransition>
-        <StateTransition state="missedIDs">
-            <Assignment value="0"/>
         </StateTransition>
         <StateTransition state="distanceFromMissedAttacker">
             <Assignment value="0"/>
@@ -194,7 +185,7 @@ NOTE: Visual perception and communications are behaviors representing the person
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Provides a waypoint within the geometry specified</Comment>
         </LocalVariable>
-        <LocalVariable name="startPosition" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Start somewhere different each time</Comment>
         </LocalVariable>
         <StateTransition state="speed">
@@ -233,7 +224,7 @@ setDestination(waypoint);</Code>
             <Comment>Check to see if contact is a friend, if not, close contact for ID</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="calc.canIntercept(contact, 0) &amp;&amp; entityType.equals(diskit.EntityType.HOSTILE)" delay="0.0" event="PursueHostile" priority="0">
+        <Schedule condition="calc.canIntercept(contact, 1) &amp;&amp; entityType.equals(diskit.EntityType.HOSTILE)" delay="0.0" event="PursueHostile" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -253,29 +244,22 @@ System.out.println("Name:                " + contact.getEntityName());
             <Comment>Creates time loop for doing an ID</Comment>
         </Argument>
         <Argument name="target" type="diskit.Mover3D"/>
+        <LocalVariable name="adjustedSpeed" type="double" value="target.getCruisingSpeed()  - .2">
+            <Comment>Trail slightly behind the contact</Comment>
+        </LocalVariable>
         <StateTransition state="idAttempts">
             <Assignment value="idAttempts + 1"/>
         </StateTransition>
-        <Schedule condition="idAttempts &lt; 40" delay="2" event="EvaluateContact" priority="0">
-            <Comment/>
-            <EdgeParameter value="idAttempts"/>
-        </Schedule>
-        <Schedule condition="idAttempts == 40" delay="0.0" event="IDContact" priority="0">
+        <StateTransition state="successfulIntercepts">
+            <Assignment value="successfulIntercepts + 1"/>
+        </StateTransition>
+        <Schedule condition="3 &gt; 7 &amp;&amp; idAttempts == 40" delay="0.0" event="IDContact" priority="0">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Code>//System.out.println("RHIB doEvaluateContact");
-//stop();
-if(target.getMoverID() &gt; 599 &amp;&amp; target.getMoverID() &lt; 700){
-   setCruisingSpeed(getMaxSpeed());
-}else{
-   setCruisingSpeed(getMaxSpeed()/4);
-}
+        <Code>setCruisingSpeed(adjustedSpeed);
 setStartPosition(getLocation());
-setDestination(target.getDestination());
-//System.out.println("Intercept Complete");
-//System.out.println(target.getCruisingSpeed());
-//System.out.println(target.getDestination());</Code>
+setDestination(target.getDestination());</Code>
         <Coordinate x="600" y="290"/>
     </Event>
     <Event name="Interdict">
@@ -326,7 +310,7 @@ System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
     <Event name="ResumePatrol">
         <Comment/>
         <Schedule event="Patrol"/>
-        <Code>System.out.println("RHIB doResumePatrol");</Code>
+        <Code/>
         <Coordinate x="410" y="520"/>
     </Event>
     <Event name="Intercept">
@@ -352,9 +336,10 @@ System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
         <StateTransition state="idAttempts">
             <Assignment value="0"/>
         </StateTransition>
-        <Schedule condition="!tacticalMode.equals(diskit.TacticalMode.INTERDICTING)" delay="timeToIntercept" event="EvaluateContact" priority="0">
+        <Schedule condition="!tacticalMode.equals(diskit.TacticalMode.INTERDICTING)" delay="timeToIntercept - .05" event="EvaluateContact" priority="0">
             <Comment/>
             <EdgeParameter value="idAttempts"/>
+            <EdgeParameter value="contact"/>
         </Schedule>
         <Code>System.out.println("RHIB doIntercept");
 setCruisingSpeed(getMaxSpeed());
@@ -378,6 +363,9 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         <StateTransition state="contactPicture">
             <Operation method="add(target)"/>
         </StateTransition>
+        <StateTransition state="contactIDs">
+            <Assignment value="contactIDs + 1"/>
+        </StateTransition>
         <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
             <Comment/>
         </Schedule>
@@ -396,6 +384,9 @@ System.out.println("RHIB doIDContact");</Code>
         </LocalVariable>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.INTERDICTING"/>
+        </StateTransition>
+        <StateTransition state="speed">
+            <Assignment value="maxSpeed"/>
         </StateTransition>
         <Schedule condition="true" delay="timeToInterdict" event="Interdict" priority="0">
             <Comment/>
@@ -420,9 +411,7 @@ System.out.println("RHIB doIDContact");</Code>
         <Schedule event="StandOff"/>
         <Code>setCruisingSpeed(getMaxSpeed());
 setStartPosition(getLocation());
-setDestination(interdictPoint);
-//setDestination(interdictPoint);
-System.out.println(moverID + " is Pursuing");</Code>
+setDestination(interdictPoint);</Code>
         <Coordinate x="400" y="280"/>
     </Event>
     <Event name="CreateSensors">
