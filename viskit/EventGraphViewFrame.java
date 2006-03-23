@@ -2,6 +2,7 @@ package viskit;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
+import edu.nps.util.JSplitPaneInitDivider;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
@@ -354,7 +355,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     buildStateParamSplit(graphPane);
     // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
-    graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+    graphPane.drawingSplitPane = new JSplitPaneInitDivider(JSplitPane.HORIZONTAL_SPLIT,
                                        new JLabel(), //new JScrollPane(graphPane),
                                        new JLabel()); //dummy stateParameterSplit);
 
@@ -378,10 +379,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
     // If a new one, the splitpane is off
-    if(isNewEG)
+    if (isNewEG)
       graphPane.drawingSplitPane.setDividerLocation(250);
 
-    setModel((mvcModel)mod); // the view holds only one model, so it gets overwritten with each tab
+    setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
     // but this call serves also to register the view with the passed model
   }
 
