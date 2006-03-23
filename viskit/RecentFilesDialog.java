@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
@@ -66,8 +67,12 @@ public class RecentFilesDialog extends JDialog
 {
   private static RecentFilesDialog dialog;
 
-  private Collection lis;
+  private final Collection lis;
   private JList jlist;
+  private JButton closeButt;
+  private Color defaultColor;
+  private MouseListener myRollOverHandler = new mHandler();
+  
   public static String showDialog(JFrame f, Component comp, Collection lis)
   {
     if(dialog == null)
@@ -91,7 +96,8 @@ public class RecentFilesDialog extends JDialog
     JPanel cont = new JPanel();
     setContentPane(cont);
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
-    JButton closeButt = new JButton("X");
+    closeButt = new JButton("X");
+    defaultColor = closeButt.getForeground();
     closeButt.setFocusable(false);
     closeButt.setBorder(new EmptyBorder(2,2,2,2)); //null); //new LineBorder(Color.gray,1));
     closeButt.addActionListener(new ActionListener()
@@ -101,10 +107,19 @@ public class RecentFilesDialog extends JDialog
         RecentFilesDialog.this.setVisible(false);
       }
     });
+    closeButt.addMouseListener(myRollOverHandler);
+    JButton clearButt = new JButton("clear");
+    clearButt.setFocusable(false);
+    clearButt.setBorder(new EmptyBorder(2,2,2,2));
+    clearButt.addActionListener(myClearer=new clearAction(lis));
+    clearButt.addMouseListener(myRollOverHandler);
+    
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
     p.add(new JLabel("Recent Eventgraphs"));
     p.add(Box.createHorizontalGlue());
+    p.add(clearButt);
+    p.add(Box.createHorizontalStrut(5));
     p.add(closeButt);
     cont.add(p);
 
@@ -115,10 +130,24 @@ public class RecentFilesDialog extends JDialog
     cont.setBorder(new LineBorder(Color.black,1));
     setParams(comp,lis);
   }
-
+  
+  clearAction myClearer;
+  class clearAction implements ActionListener
+  {
+    Collection nlis;
+    clearAction(Collection lis)
+    {
+      this.nlis = lis;
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+      nlis.clear();
+      closeButt.doClick();
+    }    
+  }
   public void setParams(Component c, Collection lis)
   {
-    this.lis = lis;
+    myClearer.nlis = lis;
 
     fillWidgets();
 
@@ -170,7 +199,20 @@ public class RecentFilesDialog extends JDialog
     }
   }
 
+  class mHandler extends MouseAdapter
+  {
+    public void mouseExited(MouseEvent e) {
+      JButton butt = (JButton)e.getSource();
+      butt.setForeground(defaultColor);
+    }
 
+    public void mouseEntered(MouseEvent e) {
+     JButton butt = (JButton)e.getSource();
+      butt.setForeground(Color.red);
+ 
+    }
+    
+  }
 }
 
 

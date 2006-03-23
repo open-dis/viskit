@@ -183,6 +183,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       File file = ((ViskitView)getView()).openRecentFilesAsk(v);
       if(file != null)
         _doOpen(file);
+      
+      // v might have been changed
+      setRecentFileList(v);
     }
   }
 
@@ -285,11 +288,18 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
     historyConfig.getDocument().normalize();
   }
+  
+  private void setRecentFileList(ArrayList lis)
+  {
+    saveHistoryXML(lis);
+  }
+  
   private void markConfigAllClosed()
   {
     for(int i=0;i<recentFileList.size();i++)
       historyConfig.setProperty(egHistoryKey+"("+i+")[@open]","false");
   }
+  
   private void markConfigOpen(File f)
   {
     int idx = recentFileList.indexOf(f.getAbsolutePath());
