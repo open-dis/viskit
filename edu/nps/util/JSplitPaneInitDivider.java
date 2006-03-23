@@ -67,7 +67,13 @@ public class JSplitPaneInitDivider extends JSplitPane
       firstTime = false;
       Dimension d = getLeftComponent().getPreferredSize();
       if (d.width > 500) {
-        setDividerLocation(0.50d);
+        SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            setDividerLocation(0.50d);            
+          }
+        });
       }
     }
   }
