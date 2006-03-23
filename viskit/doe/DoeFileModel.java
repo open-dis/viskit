@@ -43,15 +43,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
-import org.jdom.CDATA;
-import org.jdom.Content;
 import org.jdom.Document;
-import org.jdom.Element;
 import viskit.OpenAssembly;
-import viskit.xsd.bindings.assembly.EventGraph;
-import viskit.xsd.bindings.assembly.ObjectFactory;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.bindings.assembly.TerminalParameter;
+import viskit.xsd.bindings.assembly.*;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -72,6 +66,7 @@ public class DoeFileModel
 
   public HashMap seTerminalParamsHM;
 
+/*
   // todo remove the jdom stuff
   public File xmarshall() throws Exception
   {
@@ -139,6 +134,7 @@ public class DoeFileModel
     FileHandler.marshallJdom(f,jdomDocument);
     return f;
   }
+*/
 
   public File marshallJaxb() throws Exception
   {
@@ -154,11 +150,14 @@ public class DoeFileModel
   }
 
 
+/*
   private static String s0 = "Double[] ";
   private static String s1 = "() {return new Double[] { new Double(";
   private static String s2 = "), new Double(";
   private static String s3 = ") };}";
+*/
 
+/*
   private String buildTPContent(Object[] rData, Element elm)
   {
     String name = elm.getAttribute("nameRef").getValue();
@@ -198,6 +197,7 @@ public class DoeFileModel
 
    return sb.toString();
   }
+*/
 
   public void saveEventGraphsToJaxb(Collection evGraphs)
   {
@@ -255,9 +255,6 @@ public class DoeFileModel
     ParamTableModel ptm = (ParamTableModel)paramTable.getModel();
     int n = ptm.getRowCount();
 
-    //Element root = jdomDocument.getRootElement();
-    //root.removeChildren("TerminalParameter"); // design points at the top
-
     int dpCount = 0;
     for(int r=0;r<n;r++)  {
       if(!ptm.isCellEditable(r,ParamTableModel.FACTOR_COL))
@@ -267,13 +264,17 @@ public class DoeFileModel
       Object el = ptm.getElementAtRow(r);
       TerminalParameter tp = (TerminalParameter)el;
 
+      // 20 Mar 2006, RG's new example for setting design points does not use "setValue", only "setValueRange"
+      // I'm going to retain the value bit
       String val = (String)rData[ParamTableModel.VALUE_COL];
       if(val != null && val.length()>0)
         tp.setValue(val);
 
-      if(((Boolean)rData[ParamTableModel.FACTOR_COL]).booleanValue() == true) {
+      if(((Boolean)rData[ParamTableModel.FACTOR_COL]).booleanValue()) {
         String name = (String)rData[ParamTableModel.NAME_COL];
         name = name.replace('.','_');  // periods illegal in java identifiers
+        tp.setName(name);
+        
         // Create a designpoint TP with a name
         TerminalParameter newTP;
         try {
@@ -285,20 +286,44 @@ public class DoeFileModel
           return;
         }
         newTP.setName(name);
-        newTP.setLink(((Object)newTP).toString()+"_"+name); // fixme, should take tree graph strings
-        newTP.setLinkRef(null);
+        newTP.setLink(tp.getName());
         newTP.setType(tp.getType());
-        newTP.setValue(tp.getValue());
-       // newTP.getContent().add(0,buildTPContent(rData,name));
+        newTP.setValue(tp.getValue());  //may not be required with below:
 
+        // put range
+        String lowRange = tp.getValue();     // default
+        String highRange = tp.getValue();
+
+        String lowTable = (String)rData[ParamTableModel.MIN_COL];
+        String hiTable = (String)rData[ParamTableModel.MAX_COL];
+        if(lowTable != null && lowTable.length()>0)
+          lowRange = lowTable;
+        if(hiTable != null && hiTable.length()>0)
+          highRange = hiTable;
+
+        DoubleRange dr = null;
+        try {
+          dr = (DoubleRange)factory.createDoubleRange();
+        }
+        catch (JAXBException e) {
+          System.err.println("Can't create DoubleRange.");
+          designParms.clear();
+          return;
+        }
+
+        dr.setLowValue(lowRange);
+        dr.setHighValue(highRange);
+        newTP.setValueRange(dr);
+        
         designParms.add(dpCount++,newTP);
+
 
         // Set the nameref of the SimEntity TP to be a ref to the design point tp
         // todo the following is permanently changing the jaxbroot, and will thusly get saved into xml.
         //  The user has not necessarily requested that at this point, so we need to be able to undo the change
         //   after marshalling.
         tp.setLinkRef(newTP);
-        tp.setName(null);
+        //tp.setName(null);
 
       }
     }
