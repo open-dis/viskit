@@ -17,7 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
 
@@ -251,8 +250,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     if (event != null) {
       Object c = this.getFirstCellForLocation(event.getX(), event.getY());
       if (c != null) {
-        String tt = "";
-
+        StringBuffer sb = new StringBuffer("<html>");
         if (c instanceof vAssemblyEdgeCell) {
           vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
           AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
@@ -262,83 +260,108 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
           if(se instanceof AdapterEdge) {
             Object toEv = ((AdapterEdge)se).getTargetEvent();
             Object frEv = ((AdapterEdge)se).getSourceEvent();
-            tt = "<center>Adapter<br><u>" +
-                from+"."+frEv + "</u> connected to <u>" +
-                to  +"."+toEv + "</center>";
+            sb.append("<center>Adapter<br><u>");// +
+            sb.append(from);
+            sb.append(".");
+            sb.append(frEv);
+            sb.append("</u> connected to <u>");
+            sb.append(to);
+            sb.append(".");
+            sb.append(toEv);
+            sb.append("</center>");
           }
           else if(se instanceof SimEvListenerEdge) {
-            tt = "<center>SimEvent Listener<br><u>"+
-                  from+"</u> listening to <u>"+to+"</center>";
+            sb.append("<center>SimEvent Listener<br><u>");
+            sb.append(from);
+            sb.append("</u> listening to <u>");
+            sb.append(to);
+            sb.append("</center>");
           }
           else /*if(vc.getUserObject() instanceof PropChangeEdge)*/ {
             String prop = ((PropChangeEdge)se).getProperty();
             prop = (prop != null &&prop.length()>0) ? prop : "*all*";
-            tt = "<center>Property Change Listener<br><u>"+
-                 from+"</u> listening to <u>"+to+"."+prop+"</center>";
+            sb.append("<center>Property Change Listener<br><u>");
+            sb.append(from);
+            sb.append("</u> listening to <u>");
+            sb.append(to);
+            sb.append(".");
+            sb.append(prop);
+            sb.append("</center>");
           }
-         return "<HTML>" + tt + "</HTML>";
+          if(se.getDescription() != null) {
+            String desc = se.getDescription().trim();
+            sb.append("<u>description</u><br>");
+            sb.append(wrapAtPos(escapeLTGT(desc),60));
+          }
+          sb.append("</html>");
+          return sb.toString();
         }
-        
         else if (c instanceof AssemblyCircleCell) {
           AssemblyCircleCell cc = (AssemblyCircleCell) c;
           EvGraphNode en = (EvGraphNode) cc.getUserObject();
-          tt += "<center><u>" + en.getType() + "</u>" +
-                "<br>"+ en.getName() + "</center>";
-
-/*
-          ArrayList st = en.getTransitions();
-          String sttrans = "";
-          for (Iterator itr = st.iterator(); itr.hasNext();) {
-            EventStateTransition est = (EventStateTransition) itr.next();
-
-            if (!est.isOperation())
-              sttrans += "&nbsp;" + est.getStateVarName() + "=" + est.getOperationOrAssignment() + "<br>";
-            else
-              sttrans += "&nbsp;" + est.getStateVarName() + "." + est.getOperationOrAssignment() + "<br>";
+          sb.append("<center><u>");
+          sb.append(en.getType());
+          sb.append("</u><br>");
+          sb.append(en.getName());
+          sb.append("</center>");
+          if(en.getDescription() != null) {
+            String desc = en.getDescription().trim();
+            sb.append("<u>description</u><br>");
+            sb.append(wrapAtPos(escapeLTGT(desc),60));
           }
-          if (sttrans.length() > 0) {
-            sttrans = sttrans.substring(0, sttrans.length() - 4);
-            tt += "<u>state transitions</u><br>" + sttrans;
-          }
-          ArrayList argLis = en.getArguments();
-          String args = "";
-          int n = 1;
-          for (Iterator itr = argLis.iterator(); itr.hasNext();) {
-            EventArgument arg = (EventArgument) itr.next();
-            String as = arg.getName() + " (" + arg.getType() + ")";
-            args += "&nbsp;" + n + " " + as + "<br>";
-          }
-          if (args.length() > 0) {
-            args = args.substring(0, args.length() - 4);  // remove last <br>
-            tt += "<br><u>arguments</u><br>" + args;
-          }
-
-          Vector locVarLis = en.getLocalVariables();
-          String lvs = "";
-          for (Iterator itr = locVarLis.iterator(); itr.hasNext();) {
-            EventLocalVariable lv = (EventLocalVariable) itr.next();
-            String vs = lv.getName() + " (" + lv.getType() + ") = ";
-            String val = lv.getValue();
-            vs += (val.length() <= 0 ? "<i><default></i>" : val);
-            lvs += "&nbsp;" + vs + "<br>";
-          }
-          if (lvs.length() > 0) {
-            lvs = lvs.substring(0, lvs.length() - 4); // remove last <br>
-            tt += "<br><u>local variables</u><br>" + lvs;
-          }
-*/
-          return "<HTML>" + tt + "</HTML>";
+          sb.append("</HTML>");
+          return sb.toString();
         }
         else if (c instanceof AssemblyPropListCell) {
           AssemblyPropListCell cc = (AssemblyPropListCell) c;
-           PropChangeListenerNode en = (PropChangeListenerNode) cc.getUserObject();
-           tt += "<center><u>" + en.getType() + "</u><br>" +
-                  en.getName() + "</center>";
-           return "<HTML>" + tt + "</HTML>";
+          PropChangeListenerNode en = (PropChangeListenerNode) cc.getUserObject();
+          sb.append("<center><u>");
+          sb.append(en.getType());
+          sb.append("</u><br>");
+          sb.append(en.getName());
+          sb.append("</center>");
+          if(en.getDescription() != null) {
+            String desc = en.getDescription().trim();
+            sb.append("<u>description</u><br>");
+            sb.append(wrapAtPos(escapeLTGT(desc),60));
+          }
+          sb.append("</HTML>");
+          return sb.toString();
         }
       }
     }
     return null;
+  }
+
+  private String wrapAtPos(String s, int len)
+  {
+    String[] sa = s.split(" ");
+    StringBuffer sb = new StringBuffer();
+    int idx=0;
+    do {
+      int ll=0;
+      sb.append("&nbsp;");
+      do {
+        ll+= sa[idx].length() + 1;
+        sb.append(sa[idx++]);
+        sb.append(" ");
+      }
+      while(idx < sa.length && ll < len);
+      sb.append("<br>");
+    }
+    while(idx < sa.length);
+
+    String st = sb.toString();
+    if(st.endsWith("<br>"))
+      st = st.substring(0,st.length()-4);
+    return st.trim();
+  }
+
+  private String escapeLTGT(String s)
+  {
+    s = s.replaceAll("<","&lt;");
+    s = s.replaceAll(">","&gt;");
+    return s;
   }
 
   public String convertValueToString(Object value)
@@ -472,15 +495,15 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       // If Right Mouse Button
       if (SwingUtilities.isRightMouseButton(e)) {
         // Scale From Screen to Model
-        Point loc = vGraphAssemblyComponent.this.fromScreen(e.getPoint());
+        // Point loc = vGraphAssemblyComponent.this.fromScreen(e.getPoint());
         // Find Cell in Model Coordinates
-        Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(loc.x, loc.y);
+        // Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(loc.x, loc.y);
         // Create PopupMenu for the Cell
-        JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
+        // JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
         // Display PopupMenu
 
         // jmb...not today
-        //menu.show(vGraphComponent.this, e.getX(), e.getY());
+        // menu.show(vGraphComponent.this, e.getX(), e.getY());
 
         // Else if in ConnectMode and Remembered Port is Valid
       }
@@ -642,10 +665,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
       GraphConstants.setBackground(map, Color.white);
       // Make Vertex Opaque
       GraphConstants.setOpaque(map, true);
+
       // Construct a Map from cells to Maps (for insert)
-      Hashtable attributes = new Hashtable();
+      //Hashtable attributes = new Hashtable();
       // Associate the Vertex with its Attributes
-      attributes.put(vertex, map);
+      //attributes.put(vertex, map);
 
       // Insert the Vertex and its Attributes
       //   graphPane.getModel().insert(new Object[]{vertex}, null, null, attributes);

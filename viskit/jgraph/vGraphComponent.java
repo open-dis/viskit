@@ -223,102 +223,168 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     if (event != null) {
       Object c = this.getFirstCellForLocation(event.getX(), event.getY());
       if (c != null) {
-        String tt = "";
-
+        StringBuffer sb = new StringBuffer("<HTML>");
         if (c instanceof vEdgeCell) {
           vEdgeCell vc = (vEdgeCell) c;
           Edge se = (Edge) vc.getUserObject();
 
           if (vc.getUserObject() instanceof SchedulingEdge) {
-            tt = "<center>Schedule</center>";
-            if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
-              tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(se.conditionalsComment) + "<br>";
+            sb.append("<center>Schedule</center>");
+            if (se.conditionalsComment != null) {
+              String cmt = se.conditionalsComment.trim();
+              if (cmt.length() > 0) {
+                sb.append("<br><u>description</u><br>");
+                sb.append(wrapAtPos(escapeLTGT(cmt), 60));
+                sb.append("<br>");
+              }
             }
-            if (se.delay != null && se.delay.length() > 0)
-              tt += "<u>delay</u><br>&nbsp;" + se.delay + "<br>";
+
+            if (se.delay != null) {
+              String dly = se.delay.trim();
+              if (dly.length() > 0) {
+                sb.append("<u>delay</u><br>&nbsp;");
+                sb.append(dly);
+                sb.append("<br>");
+              }
+            }
           }
           else
           {
-            tt = "<center>Cancel</center>";
-            if (se.conditionalsComment != null && se.conditionalsComment.length() > 0) {
-              tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(se.conditionalsComment) + "<br>";
+            sb.append("<center>Cancel</center>");
+            if (se.conditionalsComment != null) {
+              String cmt = se.conditionalsComment.trim();
+              if (cmt.length() > 0)
+                sb.append("<br><u>description</u><br>");
+                sb.append(wrapAtPos(escapeLTGT(cmt), 60));
+                sb.append("<br>");
             }
           }
 
-          if (se.conditional != null && se.conditional.length() > 0)
-            tt += "<u>condition</u><br>&nbsp;if( " + escapeLTGT(se.conditional) + " )<br>";
-
+          if (se.conditional != null) {
+            String cond = se.conditional.trim();
+            if(cond.length() > 0) {
+              sb.append("<u>condition</u><br>&nbsp;if( ");
+              sb.append(escapeLTGT(cond));
+              sb.append(" )<br>");
+            }
+          }
           StringBuffer epSt = new StringBuffer();
           int idx = 1;
           for (Iterator itr = se.parameters.iterator(); itr.hasNext();) {
             vEdgeParameter ep = (vEdgeParameter) itr.next();
-            epSt.append("&nbsp;" + idx++ + " ");
+            epSt.append("&nbsp;");
+            epSt.append(idx++);
+            epSt.append(" ");
             epSt.append(ep.getValue());
             epSt.append("<br>");
           }
           if (epSt.length() > 0) {
-            epSt.setLength(epSt.length() - 4); // lose the last <br>
-            tt += "<u>edge parameters</u><br>" + epSt.toString();
+            sb.append("<u>edge parameters</u><br>");
+            sb.append(epSt.toString());
           }
-          return "<HTML>" + tt + "</HTML>";
+          if(sb.substring(sb.length()-4).equalsIgnoreCase("<br>"))
+            sb.setLength(sb.length()-4);
+          sb.append("</HTML>");
+          return sb.toString();
 
         }
         else if (c instanceof CircleCell) {
           CircleCell cc = (CircleCell) c;
           EventNode en = (EventNode) cc.getUserObject();
-          tt += "<center>" + en.getName() + "</center>";
+          sb.append("<center>");
+          sb.append(en.getName());
+          sb.append("</center>");
+
+          if (!en.getComments ().isEmpty() ) {
+            String stripBrackets = new String ((String)en.getComments().get(0)).trim();
+            if(stripBrackets.length()>0) {
+              sb.append("<u>description</u><br>");
+              sb.append(wrapAtPos(escapeLTGT(stripBrackets),60));
+              sb.append("<br>");
+            }
+          }
 
           ArrayList st = en.getTransitions();
-          String sttrans = "";
+          StringBuffer sttrans = new StringBuffer();
           for (Iterator itr = st.iterator(); itr.hasNext();) {
             EventStateTransition est = (EventStateTransition) itr.next();
-
-            if (!est.isOperation())
-              sttrans += "&nbsp;" + est.getStateVarName() + "=" + escapeLTGT(est.getOperationOrAssignment()) + "<br>";
-            else
-              sttrans += "&nbsp;" + est.getStateVarName() + "." + escapeLTGT(est.getOperationOrAssignment()) + "<br>";
-          }
-          if (!en.getComments ().isEmpty() ) {
-            String stripBrackets = new String ((String)en.getComments().get(0));
-            tt += "<br><u>description</u><br>" + "&nbsp;" + escapeLTGT(stripBrackets) + "<br>";
+            sttrans.append("&nbsp;");
+            sttrans.append(est.getStateVarName());
+            sttrans.append(!est.isOperation()?"=":".");
+            sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
+            sttrans.append("<br>");
           }
           if (sttrans.length() > 0) {
-            sttrans = sttrans.substring(0, sttrans.length() - 4);
-            tt += "<u>state transitions</u><br>" + sttrans;
+            sb.append("<u>state transitions</u><br>");
+            sb.append(sttrans);
           }
+
           ArrayList argLis = en.getArguments();
-          String args = "";
+          StringBuffer args = new StringBuffer();
           int n = 1;
           for (Iterator itr = argLis.iterator(); itr.hasNext();) {
             EventArgument arg = (EventArgument) itr.next();
             String as = arg.getName() + " (" + arg.getType() + ")";
-            args += "&nbsp;" + n + " " + as + "<br>";
+            args.append("&nbsp;");
+            args.append(n);
+            args.append(" ");
+            args.append(as);
+            args.append("<br>");
           }
           if (args.length() > 0) {
-            args = args.substring(0, args.length() - 4);  // remove last <br>
-            tt += "<br><u>arguments</u><br>" + args;
+            sb.append("<u>arguments</u><br>");
+            sb.append(args);
           }
 
           Vector locVarLis = en.getLocalVariables();
-          String lvs = "";
+          StringBuffer lvs = new StringBuffer();
           for (Iterator itr = locVarLis.iterator(); itr.hasNext();) {
             EventLocalVariable lv = (EventLocalVariable) itr.next();
-            String vs = lv.getName() + " (" + lv.getType() + ") = ";
+            lvs.append("&nbsp;");
+            lvs.append(lv.getName());
+            lvs.append(" (");
+            lvs.append(lv.getType());
+            lvs.append(") = ");
             String val = lv.getValue();
-            vs += (val.length() <= 0 ? "<i><default></i>" : val);
-            lvs += "&nbsp;" + vs + "<br>";
+            lvs.append(val.length() <= 0 ? "<i><default></i>" : val);
+            lvs.append("<br>");
           }
           if (lvs.length() > 0) {
-            lvs = lvs.substring(0, lvs.length() - 4); // remove last <br>
-            tt += "<br><u>local variables</u><br>" + lvs;
+            sb.append("<u>local variables</u><br>");
+            sb.append(lvs);
           }
-          return "<HTML>" + tt + "</HTML>";
+          if(sb.substring(sb.length()-4).equalsIgnoreCase("<br>"))
+            sb.setLength(sb.length()-4);
+          sb.append("</HTML>");
+          return sb.toString();
         }
       }
     }
     return null;
   }
+  private String wrapAtPos(String s, int len)
+  {
+    String[] sa = s.split(" ");
+    StringBuffer sb = new StringBuffer();
+    int idx=0;
+    do {
+      int ll=0;
+      sb.append("&nbsp;");
+      do {
+        ll+= sa[idx].length() + 1;
+        sb.append(sa[idx++]);
+        sb.append(" ");
+      }
+      while(idx < sa.length && ll < len);
+      sb.append("<br>");
+    }
+    while(idx < sa.length);
 
+    String st = sb.toString();
+    if(st.endsWith("<br>"))
+      st = st.substring(0,st.length()-4);
+    return st.trim();
+  }
   public String convertValueToString(Object value)
   {
     CellView view = (value instanceof CellView)
@@ -430,11 +496,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       // If Right Mouse Button
       if (SwingUtilities.isRightMouseButton(e)) {
         // Scale From Screen to Model
-        Point loc = vGraphComponent.this.fromScreen(e.getPoint());
+        //Point loc = vGraphComponent.this.fromScreen(e.getPoint());
         // Find Cell in Model Coordinates
-        Object cell = vGraphComponent.this.getFirstCellForLocation(loc.x, loc.y);
+        //Object cell = vGraphComponent.this.getFirstCellForLocation(loc.x, loc.y);
         // Create PopupMenu for the Cell
-        JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
+        //JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
         // Display PopupMenu
 
         // jmb...not today
@@ -601,9 +667,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener
       // Make Vertex Opaque
       GraphConstants.setOpaque(map, true);
       // Construct a Map from cells to Maps (for insert)
-      Hashtable attributes = new Hashtable();
+      // Hashtable attributes = new Hashtable();
       // Associate the Vertex with its Attributes
-      attributes.put(vertex, map);
+      // attributes.put(vertex, map);
 
       // Insert the Vertex and its Attributes
       //   graphPane.getModel().insert(new Object[]{vertex}, null, null, attributes);
