@@ -1330,6 +1330,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       if(file != null)
         _doOpen(file);
     }
+
+    // v might have been changed
+    setRecentFileList(v);
   }
 
   /**
@@ -1374,6 +1377,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
     historyConfig.getDocument().normalize();
   }
+  
+  private void setRecentFileList(ArrayList lis)
+  {
+    saveHistoryXML(lis);
+  }
+
   private void markConfigOpen(File f)
   {
     int idx = recentFileList.indexOf(f.getAbsolutePath());
