@@ -46,11 +46,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.Collection;
 
 /**
@@ -67,7 +63,7 @@ public class RecentFilesDialog extends JDialog
 {
   private static RecentFilesDialog dialog;
 
-  private final Collection lis;
+  private Collection lis;
   private JList jlist;
   private JButton closeButt;
   private Color defaultColor;
@@ -147,6 +143,7 @@ public class RecentFilesDialog extends JDialog
   }
   public void setParams(Component c, Collection lis)
   {
+    this.lis = lis;
     myClearer.nlis = lis;
 
     fillWidgets();
@@ -162,10 +159,6 @@ public class RecentFilesDialog extends JDialog
     jlist.clearSelection();
     jlist.requestFocus();
     pack();
-  }
-
-  private void unloadWidgets()
-  {
   }
 
   class myMM extends MouseAdapter
