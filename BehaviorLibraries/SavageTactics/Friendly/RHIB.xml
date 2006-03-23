@@ -287,7 +287,7 @@ setDestination(target.getDestination());</Code>
         <Coordinate x="190" y="190"/>
     </Event>
     <Event name="AvoidObstacle">
-        <Comment>Uses diskit.AvoidanceMoverManager to stop the normal MoverManager, perform the avoidance based on the diskit.util.MovementCalculator calculations, and then allows the normal mover manager to take over after the contact is avoided. AvoidanceMoverManager accepts both the avoidance point and the current mover manager as arguments</Comment>
+        <Comment>Uses diskit.AvoidanceMoverManager to stop the normal MoverManager, perform the avoidance based on the diskit.util.MovementCalculator calculations, and then allows the normal mover manager to take over after the contact is avoided. AvoidanceMoverManager  accepts both the avoidance point and the current mover manager as arguments</Comment>
         <Argument name="obstacle" type="diskit.Mover3D">
             <Comment>Obstacle to avoid</Comment>
         </Argument>

@@ -75,7 +75,7 @@
         <Code/>
         <Coordinate x="20" y="30"/>
     </Event>
-    <Event name="Patrol">
+    <Event name="StartMove">
         <Comment/>
         <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(maxSpeed); start()">
             <Comment/>
@@ -86,13 +86,13 @@
         <Code/>
         <Coordinate x="20" y="330"/>
     </Event>
-    <Event name="EndPatrol">
+    <Event name="EndMove">
         <Comment/>
         <Argument name="mover" type="diskit.Mover3D"/>
         <LocalVariable name="m" type="boolean" value="true; setStartPosition(getLocation())">
             <Comment/>
         </LocalVariable>
-        <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="Patrol" priority="0">
+        <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="StartMove" priority="0">
             <Comment/>
         </Schedule>
         <Code/>
@@ -136,7 +136,7 @@
         <StateTransition state="obstacleQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
-        <Cancel event="EndPatrol"/>
+        <Cancel event="EndMove"/>
         <Schedule condition="!obstacleQueue.contains(newTarget)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
@@ -194,7 +194,7 @@ System.out.println("\n");
         <LocalVariable name="amm" type="diskit.AvoidanceMoverManager" value="new diskit.AvoidanceMoverManager(this)">
             <Comment/>
         </LocalVariable>
-        <Schedule event="Patrol"/>
+        <Schedule event="StartMove"/>
         <Code>steer.cross(getVelocity(),obstacle.getVelocity()); /**      * Should be moved to Avoidance Mover Manager at some point     */  if ( steer.length() &lt; getCruisingSpeed() ) {          steer.cross(velocity,up);          veer.set(getLocation());   } else {       steer.cross(up);      veer.set(obstacle.getLocation());  veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0));  veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));      veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) );   }      veer.add(steer); amm.avoidToOffset(veer, getActiveMoverManager());System.out.println(getMoverID() + " Avoiding entity# " + obstacle.getMoverID());</Code>
         <Coordinate x="100" y="440"/>
     </Event>
@@ -221,7 +221,7 @@ System.out.println("\n");
         <StateTransition state="activeMoverManager">
             <Assignment value="patrolManager"/>
         </StateTransition>
-        <Schedule event="Patrol"/>
+        <Schedule event="StartMove"/>
         <Code>for(int i = 0; i&lt;patrolAssignment.length; i++){     if(patrolAssignment[i].getID() == moverID){                       count++;        }  }  duties = new ZoneGeometry[count];  for(int i = 0; i &lt; patrolAssignment.length; i++){   if(patrolAssignment[i].getID() == moverID){      duties[idx] = patrolAssignment[i];      idx++;      }  } setStartPosition(duties[0].getCenter3D());</Code>
         <Coordinate x="20" y="190"/>
     </Event>
@@ -237,7 +237,7 @@ System.out.println("\n");
         <StateTransition state="activeMoverManager">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <Schedule event="Patrol"/>
+        <Schedule event="StartMove"/>
         <Code>setStartPosition(getLocation());System.out.println("Oh, sorry, changing course");</Code>
         <Coordinate x="290" y="220"/>
     </Event>
