@@ -51,6 +51,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Vector;
 
@@ -152,7 +153,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     DoeFileModel dfm = doeFrame.getModel();
     int reti = JOptionPane.YES_OPTION;
     if(dfm != null) {
-      if(((ParamTableModel)dfm.paramTable.getModel()).dirty == true) {
+      if(((ParamTableModel)dfm.paramTable.getModel()).dirty) {
         reti = JOptionPane.showConfirmDialog(doeFrame,"Save changes?");
         if(reti == JOptionPane.YES_OPTION)
           doSave(dfm);
@@ -201,13 +202,15 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
       JOptionPane.showMessageDialog(doeFrame,"Error on file save: "+e.getMessage(),"File save error",JOptionPane.OK_OPTION);
     }
   }
+
+/*
   private void doClose()
   {
     checkDirty();
     doeFrame.setModel(null);
     doeFrame.removeContent();
   }
-
+*/
 
   private void olddoOpen(File f)           // todo remove
   {
@@ -249,7 +252,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
       int n = dfm.paramTable.getModel().getRowCount();
 
       for (int r = 0; r < n; r++) {
-        if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL)).booleanValue() == true) {
+        if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL)).booleanValue()) {
           break check;
         }
       }
@@ -267,10 +270,13 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     // put Event graphs in place (CDATA stuff)
 
     savedEvGraphs = new Vector(OpenAssembly.inst().jaxbRoot.getEventGraph());
-    dfm.saveEventGraphsToJaxb(loadedEventGraphs);
+    // eventgraphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
     return true;
   }
-
+  public Collection getLoadedEventGraphs()
+  {
+    return new Vector(loadedEventGraphs);
+  }
   public void restorePrepRun()
   {
     SimkitAssembly sa = OpenAssembly.inst().jaxbRoot;
