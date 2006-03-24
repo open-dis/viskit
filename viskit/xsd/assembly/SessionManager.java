@@ -20,16 +20,10 @@
 
 package viskit.xsd.assembly;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Iterator;
-import java.net.URLConnection;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
+import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.PasswordFileType;
+import viskit.xsd.bindings.assembly.UserType;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -37,9 +31,12 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import viskit.xsd.bindings.assembly.ObjectFactory;
-import viskit.xsd.bindings.assembly.PasswordFileType;
-import viskit.xsd.bindings.assembly.UserType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -51,7 +48,9 @@ public class SessionManager {
     private static final String WTMP = "/tmp/wtmp.xml";
     private static final String PASSWD = "/tmp/passwd.xml";
     private static final String SALT = "gridkit!";
-    
+
+    public static String LOGIN_ERROR = "LOGIN-ERROR";
+
     /** Creates a new instance of SessionManager */
     public SessionManager() { // public?
         sessions = new Hashtable();
@@ -110,7 +109,7 @@ public class SessionManager {
             }
         } catch (Exception e) {
             log(new java.util.Date().toString()+": Login error "+e.toString());
-            return "LOGIN-ERROR";
+            return LOGIN_ERROR;
         }
         
         log("Unknown user "+username);
