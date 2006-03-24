@@ -108,8 +108,8 @@ public class TextAreaDialog extends JDialog
     cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
     cont.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     commentArea = new JTextArea(10, 40);
-    commentArea.setLineWrap(false); //true);
-    //commentArea.setWrapStyleWord(true);
+    commentArea.setLineWrap(true);           // This needs to be true to ease formatting issues in tooltips
+    commentArea.setWrapStyleWord(true);
 
     JScrollPane jsp = new JScrollPane(commentArea);
     cont.add(jsp);
