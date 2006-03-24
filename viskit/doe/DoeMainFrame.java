@@ -129,7 +129,8 @@ public class DoeMainFrame extends JFrame implements DoeEvents
       sv.setToolTipText("<html><center>Save experiment parameters<br>to assembly file<br>"+
                         "(not required to run job)");
       sv.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0,0,10,10),sv.getBorder()));
-      JPanel moveRight = new JPanel();moveRight.setLayout(new BoxLayout(moveRight,BoxLayout.X_AXIS));
+      JPanel moveRight = new JPanel();
+      moveRight.setLayout(new BoxLayout(moveRight,BoxLayout.X_AXIS));
       moveRight.add(Box.createHorizontalGlue());
       moveRight.add(sv);
       content.add(moveRight);
