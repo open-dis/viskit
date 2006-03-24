@@ -63,6 +63,7 @@ public class FileHandler
 {
   public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
 
+
   public static DoeFileModel openFile(File f) throws Exception
   {
     SAXBuilder builder;
@@ -78,6 +79,8 @@ public class FileHandler
     }
     return _openFile(doc,f);
   }
+
+
 
   public static DoeFileModel _openFile(Document doc, File f) throws Exception
   {
@@ -95,6 +98,7 @@ public class FileHandler
 
     return dfm;
   }
+
 
   // todo replace above
   public static DoeFileModel _openFileJaxb(SimkitAssembly assy, File f)
@@ -152,6 +156,7 @@ public class FileHandler
   {
     jobLauncher.setFile(fil.getAbsolutePath(),title);
   }
+
   private static List getDesignParams(Document doc) throws Exception
   {
     Element elm = doc.getRootElement();
@@ -163,6 +168,7 @@ public class FileHandler
     Element elm = doc.getRootElement();
     return elm.getChildren("SimEntity");
   }
+
 
   public static class FileFilterEx extends FileFilter
   {
@@ -192,7 +198,7 @@ public class FileHandler
     public boolean accept(java.io.File f)
     {
       if (f.isDirectory())
-        return _showDirs == true;
+        return _showDirs;
       for (int i = 0; i < _extensions.length; i++)
         if (f.getName().endsWith(_extensions[i]))
           return true;
