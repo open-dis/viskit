@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -94,6 +95,7 @@ public class ParamTable extends JTable
       setOpaque(true);
       setFont(ParamTable.this.getFont());
       defaultC = ParamTable.this.getBackground();
+      setBorder(new EmptyBorder(0,3,0,0));       // keeps left from being cutoff
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
