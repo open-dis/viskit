@@ -14,6 +14,9 @@ NOTE: Visual perception and communications are behaviors representing the person
     <Parameter name="entityName" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
+    <Parameter name="entityType" type="diskit.EntityType">
+        <Comment>A unique entity type other than the default "Friend"</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
