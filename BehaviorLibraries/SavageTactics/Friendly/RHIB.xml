@@ -274,7 +274,7 @@ System.out.println("All stations, this is " + getEntityName() + " I am able to b
             <Comment/>
             <EdgeParameter value="obstacle"/>
         </Schedule>
-        <Code>System.out.println("Avoiding Obstacle: " + obstacle.getMoverID());</Code>
+        <Code>//System.out.println("Avoiding Obstacle: " + obstacle.getMoverID());</Code>
         <Coordinate x="310" y="190"/>
     </Event>
     <Event name="AvoidObstacle">
@@ -320,7 +320,7 @@ System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
             <EdgeParameter value="idAttempts"/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>System.out.println("RHIB doIntercept");
+        <Code>//System.out.println("RHIB doIntercept");
 setCruisingSpeed(getMaxSpeed());
 setStartPosition(getLocation());
 setDestination(interceptPoint);
@@ -355,7 +355,7 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>System.out.println("RHIB doIDContact");</Code>
+        <Code>//System.out.println("RHIB doIDContact");</Code>
         <Coordinate x="490" y="300"/>
     </Event>
     <Event name="PursueHostile">
