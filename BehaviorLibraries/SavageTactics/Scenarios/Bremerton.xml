@@ -239,7 +239,7 @@
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="600"/>
         <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
+        <TerminalParameter name="blastRadius" type="double" value="30"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
@@ -265,7 +265,7 @@
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="601"/>
         <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 2"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
+        <TerminalParameter name="blastRadius" type="double" value="100"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="601"/>
@@ -291,7 +291,7 @@
         <TerminalParameter name="maxSpeed" type="double" value="20"/>
         <TerminalParameter name="moverID" type="int" value="602"/>
         <TerminalParameter name="entityName" type="java.lang.String" value="Terrorist 3"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
+        <TerminalParameter name="blastRadius" type="double" value="30"/>
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="602"/>
@@ -317,6 +317,7 @@
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="403"/>
         <TerminalParameter type="java.lang.String" value="USS Carl Vinson"/>
+        <TerminalParameter type="diskit.EntityType" value="EntityType.HVU"/>
         <Coordinate x="700" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierBravo" type="diskit.Pier">
@@ -388,6 +389,7 @@
         <TerminalParameter name="cruisingSpeed" type="double" value="0"/>
         <TerminalParameter name="moverID" type="int" value="400"/>
         <TerminalParameter type="java.lang.String" value="USS O'Kane"/>
+        <TerminalParameter type="diskit.EntityType" value="EntityType.HVU"/>
         <Coordinate x="470" y="480"/>
     </SimEntity>
     <SimEntity description="" name="DDG59Russell" type="diskit.HVU">
@@ -399,6 +401,7 @@
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="401"/>
         <TerminalParameter type="java.lang.String" value="USS Russell"/>
+        <TerminalParameter type="diskit.EntityType" value="EntityType.HVU"/>
         <Coordinate x="350" y="480"/>
     </SimEntity>
     <SimEntity description="" name="CG59Princeton" type="diskit.HVU">
@@ -410,6 +413,7 @@
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="402"/>
         <TerminalParameter type="java.lang.String" value="USS Princeton"/>
+        <TerminalParameter type="diskit.EntityType" value="EntityType.HVU"/>
         <Coordinate x="0" y="480"/>
     </SimEntity>
     <SimEntity description="" name="FFG60/R.M.Davis" type="diskit.HVU">
@@ -421,6 +425,7 @@
         <TerminalParameter name="cruisingSpeed" type="double" value="0.0"/>
         <TerminalParameter name="moverID" type="int" value="404"/>
         <TerminalParameter type="java.lang.String" value="USS R.M. Davis"/>
+        <TerminalParameter type="diskit.EntityType" value="EntityType.HVU"/>
         <Coordinate x="120" y="480"/>
     </SimEntity>
     <SimEntity description="" name="DISPinger_0" type="diskit.DISPinger">
