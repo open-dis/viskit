@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -558,6 +559,40 @@ public class GridRunner {
         this.root = null;
         System.gc();
         return new Boolean(true);
+    }
+    
+    public String qstat() {
+        try {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec(new String[]{"qstat","-f"});
+            java.io.InputStream i = p.getInputStream();
+            java.io.StringWriter sw = new java.io.StringWriter();
+            int c;
+            while ( (c=i.read()) > 0 ) {
+                sw.write(c);
+            }
+            return sw.toString();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "QSTAT-ERROR";
+        }
+    }
+    
+    public String qstatXML() {
+        try {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec(new String[]{"qstat","-xml"});
+            java.io.InputStream i = p.getInputStream();
+            java.io.StringWriter sw = new java.io.StringWriter();
+            int c;
+            while ( (c=i.read()) > 0 ) {
+                sw.write(c);
+            }
+            return sw.toString();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "QSTAT-ERROR";
+        }
     }
     
     Boolean run() {

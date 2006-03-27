@@ -234,8 +234,18 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
                 ret = sessionManager.logout(usid);
                 
+            } else if (call.equals("gridkit.qstat")) {
+                
+                ret = gridRunner.qstat();
+                
+            } else if (call.equals("gridkit.qstatXML")) {
+                
+                ret = gridRunner.qstatXML();
+                
             } else {
-               ret = new String("No such method \""+methodName+"\"! ");
+                
+                ret = new String("No such method \""+methodName+"\"! ");
+                
             }
             return ret;
             

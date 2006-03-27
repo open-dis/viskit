@@ -40,6 +40,8 @@
     
     <property description="Generated JAXB bindings for CLI config" location="${dir.src}/viskit/xsd/bindings/cli" name="dir.src.cli"/>
     
+    <property description="Generated JAXB bindings for SGE qstat config" location="${dir.src}/viskit/xsd/bindings/sge/qstat" name="dir.src.sge.qstat"/>
+    
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
     
     <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
@@ -47,6 +49,8 @@
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
     
     <property description="CLI utility" location="${dir.src}/viskit/xsd/cli" name="dir.src.cli.util"/>
+    
+    <property description="SGE utilities" location="${dir.src}/viskit/xsd/sge" name="dir.src.sge.util"/>
     
     <property description="Simevg utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simevg.util"/>
 
@@ -323,6 +327,11 @@
         <xjc extension="true" package="viskit.xsd.bindings.cli" schema="${dir.src.cli.util}/cli.xsd" target="${dir.src}">
             <produces dir="${dir.src.cli}" includes="* impl/* impl/runtime/*" />
         </xjc>
+        <!--
+        <xjc extension="true" package="viskit.xsd.bindings.sge.qstat" schema="${dir.src.sge.util}/qstat/qstat.xsd" target="${dir.src}">
+            <produces dir="${dir.src.sge.qstat}" includes="* impl/* impl/runtime/*" />
+        </xjc>
+        -->
     </target>
     
     <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
@@ -388,6 +397,21 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings/cli" includes="jaxb.properties"/>
             <fileset dir="${dir.src}/viskit/xsd/bindings/cli" includes="bgm.ser"/>
         </copy>
+        <!--
+        <javac destdir="${dir.build.classes}"
+	    debug="on"
+            source="1.4"
+            target="1.4">
+            <classpath>
+                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+            </classpath>
+            <src path="${dir.src.sge.qstat}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
+            <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="jaxb.properties"/>
+            <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="bgm.ser"/>
+        </copy>
+        -->
     </target>
     
     <!-- depend create stage 1 visxml.jar which later includes stuff from this compile to make viskit.jar -->
@@ -501,6 +525,13 @@
     </java>
   </target>
 
+  <target description="Test Gridkit qstat" name="test-gridkit-qstat">
+    <java classname="viskit.test.TestGridkitQstat" classpathref="runtime.classpath" fork="true">
+        <arg value="cluster.moves.nps.navy.mil" />
+        <arg value="4444" />
+    </java>
+  </target>
+  
   <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
     <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
         <arg value="cluster.moves.nps.navy.mil" />
