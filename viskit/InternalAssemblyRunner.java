@@ -860,7 +860,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
                   catch (InterruptedException e) {
                   }
                   simThread = null;
-                  extBackChannel.println(RESP_SIMSTOPPED + "SimStopped");
+                  if ( extBackChannel != null ) {
+                    extBackChannel.println(RESP_SIMSTOPPED + "SimStopped");
+                  }
                   System.err.println("Sim stopped (not error)");
                 }
               }, "simEndWatcher");
