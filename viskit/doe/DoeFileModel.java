@@ -274,7 +274,8 @@ public class DoeFileModel
         String name = (String)rData[ParamTableModel.NAME_COL];
         name = name.replace('.','_');  // periods illegal in java identifiers
         tp.setName(name);
-        
+        tp.setLinkRef(name+"_DP");
+
         // Create a designpoint TP with a name
         TerminalParameter newTP;
         try {
@@ -285,8 +286,8 @@ public class DoeFileModel
           designParms.clear();
           return;
         }
-        newTP.setName(name);
-        newTP.setLink(tp.getName());
+        //newTP.setName(name);
+        newTP.setLink(name+"_DP");
         newTP.setType(tp.getType());
         newTP.setValue(tp.getValue());  //may not be required with below:
 
