@@ -117,6 +117,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   private DoeController cntlr;
   public  JCheckBox doClusterStat;
   public  JCheckBox doGraphOutput;
+  public  JButton doQstatConsole;
   private JButton adminButt;
 
   public JobLauncherTab(DoeController controller, String file, String title, JFrame mainFrame)
@@ -219,13 +220,22 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     runButt = new JButton("Run job");
     doClusterStat = new JCheckBox("Display cluster status in browser",false);
     doGraphOutput = new JCheckBox("Graph job output",false);
+    doQstatConsole = new JButton("Qstat Console");
+    doQstatConsole.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent ev) {
+            if (!QstatConsole.showing) {
+                QstatConsole qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
+                qstatConsole.show();
+            }
+        }
+    });
     botBar.add(doClusterStat);
     botBar.add(Box.createHorizontalStrut(5));
     botBar.add(doGraphOutput);
     botBar.add(Box.createHorizontalGlue());
     botBar.add(canButt);
     botBar.add(runButt);
-
+    botBar.add(doQstatConsole);
     p.add(clusPan);
     //p.add(topPan);
       JPanel saveButtCenterPan = new JPanel();
