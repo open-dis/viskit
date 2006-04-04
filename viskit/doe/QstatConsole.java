@@ -3,8 +3,8 @@
  *
  * Created on April 3, 2006, 11:47 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Poll the SGE Queue at a selectable rate.
+ *
  */
 
 package viskit.doe;
@@ -114,12 +114,9 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             try {
                 usid = (String) xmlrpc.execute("gridkit.login",args);
             } catch (Exception e) {
-                usid = "Bad user or password";
+                usid = "Can't connect to server";
             }
-            
-            String text = textArea.getText();
-            text = text + "\n login session cookie: " + usid + "\n";
-            textArea.setText(text);
+            textArea.setText(textArea.getText()+ "\n login session cookie: " + usid + "\n");
         }
     }
     
@@ -153,9 +150,6 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     }
     
     class FrameRateSliderPanel extends JPanel implements ChangeListener {
-        static final int FPM_MIN = 0;
-        static final int FPM_MAX = 60;
-        static final int FPM_INIT = 0;
         private JSlider slider;
         private JLabel sliderLabel;
         
@@ -163,7 +157,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             super();
             setLayout(new FlowLayout());
             setBorder(new EtchedBorder());
-            slider = new JSlider(JSlider.HORIZONTAL,FPM_MIN, FPM_MAX, FPM_INIT);
+            slider = new JSlider(JSlider.HORIZONTAL, min , max, 0);
             slider.setMajorTickSpacing(10);
             slider.setMinorTickSpacing(1);
             slider.setPaintTicks(true);
@@ -171,12 +165,12 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             slider.addChangeListener(this);
             slider.setToolTipText("Adjust number of queries per minute to qstat at the front end");
             sliderLabel = new JLabel("Queries Per Minute", JLabel.CENTER);
-            sliderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            sliderLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             NumberFormat numberFormat =
                     java.text.NumberFormat.getIntegerInstance();
             NumberFormatter formatter = new NumberFormatter(numberFormat);
-            formatter.setMinimum(new Integer(0));
-            formatter.setMaximum(new Integer(60));
+            formatter.setMinimum(new Integer(min));
+            formatter.setMaximum(new Integer(max));
             framesPerMin = new JFormattedTextField(formatter);
             framesPerMin.setValue(new Integer(0));
             framesPerMin.setColumns(2);
@@ -198,7 +192,6 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             add(sliderLabel);
             add(framesPerMin);
             add(slider);            
-            setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         }
         
