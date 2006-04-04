@@ -35,13 +35,17 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     JPanel sliderPanel;
     JFormattedTextField framesPerMin;
     JTextArea textArea;
+    JScrollPane scrollPane;
     Timer timer;
     XmlRpcClientLite xmlrpc;
     Vector args;
-    
+    static final int MAX_ROWS = 30;
+    static final int MIN_FPM = 0;
+    static final int MAX_FPM = 60;
+    static final int INIT_FPM = 0; // should always start at 0
     /** Creates a new instance of QstatConsole */
     public QstatConsole(String uname, String passwd, String host, String port) {
-        super();
+        super("Viskit Grid Queue Status Console");
         this.uname=uname;
         this.passwd=passwd;
         this.host=host;
@@ -52,24 +56,27 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         } catch (Exception e) {
             xmlrpc = null;
         }
+        
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
-        sliderPanel = new FrameRateSliderPanel(0,60);
-        timer = new Timer(60000,this);
+        sliderPanel = new FrameRateSliderPanel(MIN_FPM,MAX_FPM);
+        timer = new Timer(MAX_FPM*1000,this);
         timer.stop();
-        textArea = new JTextArea(40,80);
+        textArea = new JTextArea(30,80);
         if (xmlrpc != null) {
             textArea.setText("Qstatus for "+host+":"+port);
         } else {
             textArea.setText("Gridkit cluster "+host+" XML-RPC unreachable at port "+port+". \nIt is possible the network is down, you are firewalled, or the service requires a restart (check with cluster admin). Please exit this window and try again.");
         }
+        scrollPane = new JScrollPane(textArea);
         add(sliderPanel);
-        add(textArea);
+        add(scrollPane);
         pack();
         setVisible(true);
     }
 
     public void windowActivated(WindowEvent windowEvent) {
+       showing = true;
     }
 
     public void windowClosed(WindowEvent windowEvent) {
@@ -84,6 +91,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     }
 
     public void windowDeiconified(WindowEvent windowEvent) {
+        
     }
 
     public void windowIconified(WindowEvent windowEvent) {
@@ -142,7 +150,10 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             args.clear();
             args.add(usid);
             try {
-                textArea.setText(textArea.getText()+"\n"+(String)(xmlrpc.execute("gridkit.qstat",args)));
+                String data = (String)(xmlrpc.execute("gridkit.qstat",args));
+                int lines = data.split("\\n").length;
+                textArea.setRows(lines>MAX_ROWS?lines:MAX_ROWS);
+                textArea.setText(textArea.getText()+"\n"+data);
             } catch (Exception e) {
                 textArea.setText("Can't qstat!");
             }
@@ -157,9 +168,11 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             super();
             setLayout(new FlowLayout());
             setBorder(new EtchedBorder());
-            slider = new JSlider(JSlider.HORIZONTAL, min , max, 0);
+            setMaximumSize(new java.awt.Dimension(400,60));
+            setPreferredSize(new java.awt.Dimension(400,60));
+            slider = new JSlider(JSlider.HORIZONTAL, min , max, INIT_FPM);
             slider.setMajorTickSpacing(10);
-            slider.setMinorTickSpacing(1);
+            slider.setMinorTickSpacing(2);
             slider.setPaintTicks(true);
             slider.setPaintLabels(true);
             slider.addChangeListener(this);
@@ -172,7 +185,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             formatter.setMinimum(new Integer(min));
             formatter.setMaximum(new Integer(max));
             framesPerMin = new JFormattedTextField(formatter);
-            framesPerMin.setValue(new Integer(0));
+            framesPerMin.setValue(new Integer(INIT_FPM));
             framesPerMin.setColumns(2);
             framesPerMin.getInputMap().put(KeyStroke.getKeyStroke(
                                         KeyEvent.VK_ENTER, 0),
@@ -200,10 +213,10 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             if (!source.getValueIsAdjusting()) {
                 int fpm = (int)source.getValue();
                 if (fpm == 0) {
-                    timer.setDelay(60000); // just set it big, will be paused anyway
+                    timer.setDelay(MAX_FPM*1000); // just set it big, will be paused anyway
                     pauseQstat();
                 } else {
-                    delay = 60000 / fpm;
+                    delay = MAX_FPM*1000 / fpm;
                     timer.setDelay(delay);
                     if(paused) {
                         unPauseQstat();
