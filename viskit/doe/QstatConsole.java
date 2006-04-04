@@ -30,7 +30,6 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     String port;
     int delay = 0;
     boolean paused = true;
-    public static boolean showing = false; // only want one of these up at a time
     JLabel sliderLabel;
     JPanel sliderPanel;
     JFormattedTextField framesPerMin;
@@ -56,18 +55,13 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         } catch (Exception e) {
             xmlrpc = null;
         }
-        
+        addWindowListener(this);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
         sliderPanel = new FrameRateSliderPanel(MIN_FPM,MAX_FPM);
         timer = new Timer(MAX_FPM*1000,this);
         timer.stop();
-        textArea = new JTextArea(30,80);
-        if (xmlrpc != null) {
-            textArea.setText("Qstatus for "+host+":"+port);
-        } else {
-            textArea.setText("Gridkit cluster "+host+" XML-RPC unreachable at port "+port+". \nIt is possible the network is down, you are firewalled, or the service requires a restart (check with cluster admin). Please exit this window and try again.");
-        }
+        reset(); // also gets new textArea
         scrollPane = new JScrollPane(textArea);
         add(sliderPanel);
         add(scrollPane);
@@ -76,15 +70,16 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     }
 
     public void windowActivated(WindowEvent windowEvent) {
-       showing = true;
+    
     }
 
     public void windowClosed(WindowEvent windowEvent) {
-        showing = false;
+        
     }
 
     public void windowClosing(WindowEvent windowEvent) {
-        logout();
+        pauseQstat();
+        reset();
     }
 
     public void windowDeactivated(WindowEvent windowEvent) {
@@ -98,7 +93,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     }
 
     public void windowOpened(WindowEvent windowEvent) {
-        showing = true;
+        
     }
     
     void pauseQstat() {
@@ -143,6 +138,17 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         
     }
    
+    void reset() {
+        ((FrameRateSliderPanel)sliderPanel).reset();
+        if (textArea == null) {
+            textArea = new JTextArea(30,80);
+        } 
+        if (xmlrpc != null) {
+            textArea.setText("Qstatus for "+host+":"+port);
+        } else {
+            textArea.setText("Gridkit cluster "+host+" XML-RPC unreachable at port "+port+". \nIt is possible the network is down, you are firewalled, or the service requires a restart (check with cluster admin). Please exit this window and try again.");
+        }
+    }
     // Timer event
     public void actionPerformed(ActionEvent actionEvent) {
         textArea.setText((new java.util.Date()).toString()+"\n");
@@ -210,8 +216,8 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         
         public void stateChanged(ChangeEvent changeEvent) {
             JSlider source = (JSlider)changeEvent.getSource();
+            int fpm = (int)source.getValue();
             if (!source.getValueIsAdjusting()) {
-                int fpm = (int)source.getValue();
                 if (fpm == 0) {
                     timer.setDelay(MAX_FPM*1000); // just set it big, will be paused anyway
                     pauseQstat();
@@ -222,9 +228,15 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
                         unPauseQstat();
                     }
                 }          
-                framesPerMin.setValue(new Integer(fpm));
+                
             }
+            framesPerMin.setValue(new Integer(fpm));
 
+        }
+        
+        void reset() {
+            framesPerMin.setValue(new Integer(INIT_FPM));
+            slider.setValue(INIT_FPM);
         }
     
     }

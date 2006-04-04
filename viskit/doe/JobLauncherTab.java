@@ -101,7 +101,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   private JTextField numDPsTF;
   private JTextField tmo;
   private JTextArea statusTextArea;
-
+  private QstatConsole qstatConsole;
   private Thread thread;
   private boolean outputDirty = false;
 
@@ -223,10 +223,10 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     doQstatConsole = new JButton("Qstat Console");
     doQstatConsole.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent ev) {
-            if (!QstatConsole.showing) {
-                QstatConsole qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
-                qstatConsole.show();
+            if (qstatConsole == null) {
+                qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
             }
+            qstatConsole.show();
         }
     });
     botBar.add(doClusterStat);
