@@ -742,54 +742,11 @@ System.out.println(dataS);
       if(doGraphOut)
         chartter = new JobResults(null, title);
 
-/*
-      writeStatus("10 second wait before getting results.");
-      try {
-        Thread.sleep(10000);
-      }
-      catch (InterruptedException e) {
-        break lp3;
-      }
-*/
       writeStatus("Getting results:");
 
-      //20Mar2006
       processResultsNew();
 
- /*     // bogus:
-      Vector parms = new Vector();
-      Object o = null;
-      int i = 0;
-      int n = numDesignPts * numCubes * numReps;
-      lp:
-      {
-        for (int dp = 0; dp < numDesignPts * numCubes; dp++) {
-          for (int nrun = 0; nrun < numReps; nrun++, i++) {
-            try {
-              parms.clear();
-              parms.add(new Integer(dp));
-              parms.add(new Integer(nrun));
-              o = rpc.execute("experiment.getResult", parms);
-              if (thread == null)
-                break lp;
-              kickOffClusterUpdate();
-              writeStatus("gotResult " + dp + "," + nrun + " (" + i + " of " + n + ")");
-              int idx = saveOutput((String) o, dp, nrun);
-              if (idx != -1 && doGraphOut)
-                plotOutput(idx);
-              else
-                System.out.println("Output not saved");
-            }
-            catch (Exception e) {
-              if (thread != null)
-                writeStatus("Error from experiment.getResult(): " + e.getMessage());
-              break lp;
-            }
-          }
-        }
-      } // lp
- */
-    } // lp3
+    }
 
     args.clear();
     args.add(userID);
@@ -822,6 +779,7 @@ System.out.println(dataS);
       args.clear();
       args.add(userID);
       int tasksRemaining = ((Integer)rpc.execute("gridkit.getRemainingTasks",args)).intValue(); //5 * 3;
+      writeStatus("Total tasks: "+tasksRemaining);
       int designPoints = jaxbRoot.getDesignParameters().size();
       while (tasksRemaining > 0) {
         // this will block until a task ends which could be
@@ -848,21 +806,22 @@ System.out.println(dataS);
 
             if (/*verbose*/false) {
               ret = rpc.execute("gridkit.getResult", args);
-              System.out.println("Result returned from task " + (i + 1));
-              System.out.println(ret);
+              writeStatus("Result returned from task " + (i + 1));
+              writeStatus(ret.toString());
             }
-            System.out.println("DesignPointStats from task " + (i + 1));
+            writeStatus("DesignPointStats from task " + (i + 1)+ " is sampleIndex "+sampleIndex+" at designPtIndex "+designPtIndex);
             ret = rpc.execute("gridkit.getDesignPointStats", args);
-            System.out.println(ret);
+            writeStatus(ret.toString());
+            writeStatus("Replications per designPt "+exp.getReplicationsPerDesignPoint());
             for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
-              System.out.println("ReplicationStats from task " + (i + 1) + " replication " + j);
+              writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
               args.clear();
               args.add(userID);
               args.add(new Integer(sampleIndex));
               args.add(new Integer(designPtIndex));
               args.add(new Integer(j));
               ret = rpc.execute("gridkit.getReplicationStats", args);
-              System.out.println(ret);
+              writeStatus(ret.toString());
             }
             --tasksRemaining;
             // could also call to get tasksRemaining:
@@ -874,7 +833,7 @@ System.out.println(dataS);
       }
     }
     catch (Exception e) {
-      System.err.println("Error in cluster execution: " + e.getMessage());
+      writeStatus("Error in cluster execution: " + e.getMessage());
     }
 
   }
