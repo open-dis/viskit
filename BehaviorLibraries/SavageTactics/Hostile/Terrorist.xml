@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="pjsulliv" extend="diskit.HostileForce" name="Terrorist" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Terrorist that starts from a point randomly within ZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
-
 TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Start position for this entity</Comment>
-    </Parameter>
-    <Parameter name="maxSpeed" type="double">
-        <Comment/>
-    </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>Unique DIS entity ID number</Comment>
     </Parameter>
-    <Parameter name="entityName" type="java.lang.String">
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Start position for this entity</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment/>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
     <Parameter name="blastRadius" type="double">
@@ -176,8 +175,9 @@ sensors[2] = collisionAvoidance;
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>
         </Schedule>
-        <Code>System.out.println("Terr Detect: " + contact.getEntityName());
-/*System.out.println("Contact Loc: " + contact.getLocation());
+        <Code>/*System.out.println("Contact ID: " + contact.getMoverID());
+System.out.println("Terr Detect: " + contact.getSMAL().getWidth());
+System.out.println("Contact Loc: " + contact.getLocation());
 System.out.println("My loc:          " + getLocation());
 */</Code>
         <Coordinate x="130" y="340"/>
@@ -190,12 +190,12 @@ System.out.println("My loc:          " + getLocation());
         <LocalVariable name="startHeading" type="diskit.Vec3d" value="harborDirector.createWaypoint()">
             <Comment>Pick a random waypoint in the direction of the harbor</Comment>
         </LocalVariable>
-        <LocalVariable name="approachSpeed" type="double" value="getMaxSpeed()/2">
+        <LocalVariable name="approachSpeed" type="double" value="getMaximumSpeed()/2">
             <Comment>Proceed into the harbor at 1/2 speed</Comment>
         </LocalVariable>
         <Code>setStartPosition(startLocation); 
 setDestination(harborDirector.createWaypoint());
-setCruisingSpeed(approachSpeed);</Code>
+setCruiseSpeed(approachSpeed);</Code>
         <Coordinate x="30" y="320"/>
     </Event>
     <Event name="RegisterSensors">
@@ -216,7 +216,7 @@ setCruisingSpeed(approachSpeed);</Code>
         <Coordinate x="220" y="150"/>
     </Event>
     <Event name="Attack">
-        <Comment>Determines the correct heading for an attack and attacks at max speed</Comment>
+        <Comment>Determines the correct heading for an attack and attacks at Maximum speed</Comment>
         <Argument name="target" type="diskit.Mover3D"/>
         <Argument name="sensor" type="diskit.Sensor"/>
         <LocalVariable name="attackDestination" type="diskit.Vec3d" value="getInterceptPoint()">
@@ -235,9 +235,9 @@ setCruisingSpeed(approachSpeed);</Code>
         </Schedule>
         <Code>setStartPosition(getLocation());
 setDestination(target.getLocation());
-this.setCruisingSpeed(getMaxSpeed());
+this.setCruiseSpeed(getMaximumSpeed());
 System.out.println("Do Attack Called in Terrorist:");
-System.out.println("Target Name: " + target.getEntityName());</Code>
+/*System.out.println("Target Name: " + target.getSMAL().getName());*/</Code>
         <Coordinate x="220" y="340"/>
     </Event>
     <Event name="CreateZones">
@@ -290,7 +290,7 @@ Schedule.stopSimulation();</Code>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
         <StateTransition state="plasticExplosives">
-            <Assignment value="new diskit.Explosive(getLocation(), maxSpeed, getMoverID(), diskit.EntityType.HOSTILE, &quot;Plastic Explosives&quot;, blastRadius)"/>
+            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), getMoverID(), diskit.EntityType.HOSTILE, &quot;Plastic Explosives&quot;, blastRadius)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
             <Comment/>
@@ -317,7 +317,7 @@ Schedule.stopSimulation();</Code>
         <Schedule condition="true" delay="5" event="Stop" priority="0">
             <Comment>After the terrorist blows up, stop the simulation after a delay to allow for animation and data collection</Comment>
         </Schedule>
-        <Code>setCruisingSpeed(0);
+        <Code>setCruiseSpeed(0);
 setStartPosition(getLocation());
 System.out.println("Terrorist doDetonate event");</Code>
         <Coordinate x="380" y="340"/>

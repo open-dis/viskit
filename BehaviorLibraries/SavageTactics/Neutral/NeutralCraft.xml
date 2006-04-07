@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="Patrick Sullivan" extend="diskit.NeutralForce" name="NeutralCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A Neutral Craft which will navigate through it's assigned zones. Most common use for this class is as traffic for a harbor or any other entity type that is neither a defender or an attacker.</Comment>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Start Position - different than first waypoint</Comment>
-    </Parameter>
-    <Parameter name="cruisingSpeed" type="double">
-        <Comment>Speed of this entity</Comment>
-    </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>DIS entity ID</Comment>
     </Parameter>
-    <Parameter name="entityName" type="java.lang.String">
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Start Position - different than first waypoint</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>Speed of this entity</Comment>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
     <StateVariable name="tacticalMode" type="diskit.TacticalMode">
@@ -77,7 +77,7 @@
     </Event>
     <Event name="StartMove">
         <Comment/>
-        <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(maxSpeed); start()">
+        <LocalVariable name="movement" type="boolean" value="true; setCruiseSpeed(maximumSpeed); start()">
             <Comment/>
         </LocalVariable>
         <StateTransition state="tacticalMode">
@@ -147,7 +147,7 @@ System.out.println("----------EVENT------------");
 System.out.println(getMoverID() + " Detected entity# " + newTarget.getMoverID());
 System.out.println("\n");
 */
-//System.out.println("Entity Speed: " + newTarget.getCruisingSpeed());
+//System.out.println("Entity Speed: " + newTarget.getCruiseSpeed());
 //System.out.println("Entity Dest:    " + newTarget.getDestination());</Code>
         <Coordinate x="440" y="440"/>
     </Event>
@@ -163,7 +163,7 @@ System.out.println("\n");
         <LocalVariable name="times" type="double[]" value="diskit.Intersector3D.solve(perception.getLocation(),perception.getVelocity(), avoidanceRange, newTarget.getLocation(), newTarget.getVelocity());">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(newTarget,(diskit.Mover3D)this,getCruisingSpeed())">
+        <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(newTarget,(diskit.Mover3D)this,getCruiseSpeed())">
             <Comment/>
         </LocalVariable>
         <StateTransition state="obstacleQueue">
@@ -195,7 +195,7 @@ System.out.println("\n");
             <Comment/>
         </LocalVariable>
         <Schedule event="StartMove"/>
-        <Code>steer.cross(getVelocity(),obstacle.getVelocity()); /**      * Should be moved to Avoidance Mover Manager at some point     */  if ( steer.length() &lt; getCruisingSpeed() ) {          steer.cross(velocity,up);          veer.set(getLocation());   } else {       steer.cross(up);      veer.set(obstacle.getLocation());  veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0));  veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));      veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) );   }      veer.add(steer); amm.avoidToOffset(veer, getActiveMoverManager());System.out.println(getMoverID() + " Avoiding entity# " + obstacle.getMoverID());</Code>
+        <Code>steer.cross(getVelocity(),obstacle.getVelocity()); /**      * Should be moved to Avoidance Mover Manager at some point     */  if ( steer.length() &lt; getCruiseSpeed() ) {          steer.cross(velocity,up);          veer.set(getLocation());   } else {       steer.cross(up);      veer.set(obstacle.getLocation());  veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0));  veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));      veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) );   }      veer.add(steer); amm.avoidToOffset(veer, getActiveMoverManager());System.out.println(getMoverID() + " Avoiding entity# " + obstacle.getMoverID());</Code>
         <Coordinate x="100" y="440"/>
     </Event>
     <Event name="CreateZones">
@@ -241,5 +241,6 @@ System.out.println("\n");
         <Code>setStartPosition(getLocation());System.out.println("Oh, sorry, changing course");</Code>
         <Coordinate x="290" y="220"/>
     </Event>
+    <Code/>
 </SimEntity>
 

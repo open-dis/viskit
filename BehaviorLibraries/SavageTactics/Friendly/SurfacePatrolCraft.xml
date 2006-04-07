@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="Patrick Sullivan" extend="diskit.FriendlyForce" name="SurfacePatrolCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A SurfacePatrolCraft is a waterborne surface patrol craft. Common examples are RHIB's and unmanned surface vehicles.  Only friendly force entities should be created with this graph as hostile attackers will evaluate these entities as a potential target.  For larger scenarios with multiple military forces it would be wise to create new version of FriendlyForce (i.e. OrangeForce, PurpleForce).  In so doing the various forces will be able to 'recognize' their own force, their allies, and hostiles.</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>DIS entity ID</Comment>
+    </Parameter>    
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Start Position - different than first waypoint</Comment>
     </Parameter>
     <Parameter name="cruisingSpeed" type="double">
         <Comment>Speed of this entity</Comment>
-    </Parameter>
-    <Parameter name="moverID" type="int">
-        <Comment>DIS entity ID</Comment>
     </Parameter>
     <Parameter name="entityName" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>

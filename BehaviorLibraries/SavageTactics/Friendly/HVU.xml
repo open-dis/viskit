@@ -2,20 +2,20 @@
 <SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="HVU" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A US Navy RHIB (Rigid Hull Inflatable Boat) typically found on DDG51, CG47, and FFG7 class US Navy Ships.  RHIB's are manned by ships company with a crew of two to four personnel.  In foreign ports these platforms are a primary resource for harbor patrol.
 NOTE: Visual perception and communications are behaviors representing the personnel onboard the craft and not the craft itself.  As such, this event graph should not be used for Unmanned Surface Vehicles (USVs).</Comment>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Must be different then the first waypoint</Comment>
-    </Parameter>
-    <Parameter name="maxSpeed" type="double">
-        <Comment>Maximum speed of this craft</Comment>
-    </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0 - 999]</Comment>
     </Parameter>
-    <Parameter name="entityName" type="java.lang.String">
-        <Comment>Should match name in Assembly</Comment>
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Must be different then the first waypoint</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>Maximum speed of this craft</Comment>
     </Parameter>
     <Parameter name="entityType" type="diskit.EntityType">
-        <Comment>A unique entity type other than the default "Friend"</Comment>
+        <Comment>Unique entity type for this mover (HVU)</Comment>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
+        <Comment>Name for this entity</Comment>
     </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
@@ -152,7 +152,7 @@ NOTE: Visual perception and communications are behaviors representing the person
         <LocalVariable name="rn" type="java.util.Random" value="new Random()">
             <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
         </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="maxSpeed * rn.nextDouble()">
+        <LocalVariable name="currentSpeed" type="double" value="getMaximumSpeed() * rn.nextDouble()">
             <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
         </LocalVariable>
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
@@ -167,7 +167,7 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruisingSpeed(maxSpeed/2);
+        <Code>setCruiseSpeed(getMaximumSpeed()/2);
 setStartPosition(startPosition);
 setDestination(waypoint);</Code>
         <Coordinate x="330" y="220"/>
@@ -185,9 +185,6 @@ setDestination(waypoint);</Code>
         </LocalVariable>
         <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
             <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
-        </LocalVariable>
-        <LocalVariable name="entityType" type="diskit.EntityType" value="contact.getEntityType()">
-            <Comment>Entity type for this contact</Comment>
         </LocalVariable>
         <Schedule condition="sensor == collisionAvoidance &amp;&amp; !friendlyForces.contains(entityID)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>Should not avoid contacts if you are intercepting them</Comment>
@@ -238,8 +235,7 @@ System.out.println("Name:                " + contact.getEntityName());
         <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
             <Comment/>
         </Schedule>
-        <Code>setStartPosition(getLocation());
-System.out.println(getEntityName() + " is Avoiding Obstacle " + obstacle.getMoverID());</Code>
+        <Code>setStartPosition(getLocation());</Code>
         <Coordinate x="440" y="430"/>
     </Event>
     <Event name="ResumePatrol">

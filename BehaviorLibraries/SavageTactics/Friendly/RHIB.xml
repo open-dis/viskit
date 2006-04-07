@@ -2,17 +2,17 @@
 <SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="RHIB" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A US Navy RHIB (Rigid Hull Inflatable Boat) typically found on DDG51, CG47, and FFG7 class US Navy Ships.  RHIB's are manned by ships company with a crew of two to four personnel.  In foreign ports these platforms are a primary resource for harbor patrol.
 NOTE: Visual perception and communications are behaviors representing the personnel onboard the craft and not the craft itself.  As such, this event graph should not be used for Unmanned Surface Vehicles (USVs).</Comment>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Must be different then the first waypoint</Comment>
-    </Parameter>
-    <Parameter name="maxSpeed" type="double">
-        <Comment>Maximum speed of this craft</Comment>
-    </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0 - 999]</Comment>
     </Parameter>
-    <Parameter name="entityName" type="java.lang.String">
-        <Comment>Descriptive name for this entity, used for displays and reports</Comment>
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Must be different then the first waypoint</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>maximumimum speed of this craft</Comment>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
+        <Comment>This entity's name</Comment>
     </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
@@ -154,12 +154,12 @@ NOTE: Visual perception and communications are behaviors representing the person
         <Coordinate x="200" y="70"/>
     </Event>
     <Event name="Patrol">
-        <Comment>Patrolling behavior for this entity. Speed is random and always less than the max speed</Comment>
+        <Comment>Patrolling behavior for this entity. Speed is random and always less than the maximum speed</Comment>
         <LocalVariable name="rn" type="java.util.Random" value="new Random()">
             <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
         </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="maxSpeed * rn.nextDouble()">
-            <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
+        <LocalVariable name="currentSpeed" type="double" value="maximumSpeed * rn.nextDouble()">
+            <Comment>creates a crusing speed between zero and the maximum speed of this craft</Comment>
         </LocalVariable>
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Provides a waypoint within the geometry specified</Comment>
@@ -173,7 +173,7 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruisingSpeed(maxSpeed/2);
+        <Code>setCruiseSpeed(maximumSpeed/2);
 setStartPosition(startPosition);
 setDestination(waypoint);</Code>
         <Coordinate x="490" y="70"/>
@@ -222,7 +222,7 @@ whether or not it can be intercepted</Comment>
             <Comment>Creates time loop for doing an ID</Comment>
         </Argument>
         <Argument name="target" type="diskit.Mover3D"/>
-        <LocalVariable name="targetSpeed" type="double" value="target.getCruisingSpeed() -.2">
+        <LocalVariable name="targetSpeed" type="double" value="target.getCruiseSpeed() -.2">
             <Comment>Trail slightly behind the contact</Comment>
         </LocalVariable>
         <LocalVariable name="targetDestination" type="diskit.Vec3d" value="target.getDestination()">
@@ -244,7 +244,7 @@ Will be reactionary to behavior in next version</Comment>
             <EdgeParameter value="idAttempts"/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Code>setCruisingSpeed(targetSpeed);
+        <Code>setCruiseSpeed(targetSpeed);
 setStartPosition(getLocation());
 setDestination(targetDestination);</Code>
         <Coordinate x="410" y="300"/>
@@ -255,7 +255,7 @@ setDestination(targetDestination);</Code>
             <Comment>The point at which a successful block could be accomplished</Comment>
         </LocalVariable>
         <Code>setDestination(interdictPoint);
-System.out.println("All stations, this is " + getEntityName() + " I am able to block the threat, enroute...Out");
+/*System.out.println("All stations, this is " + getName() + " I am able to block the threat, enroute...Out");*/
 //setStartPosition(getLocation());</Code>
         <Coordinate x="390" y="580"/>
     </Event>
@@ -299,7 +299,7 @@ System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
         <Coordinate x="490" y="190"/>
     </Event>
     <Event name="Intercept">
-        <Comment>Gets the intercept point and determines if intercept is possible based on speed of contact and max speed of this entity</Comment>
+        <Comment>Gets the intercept point and determines if intercept is possible based on speed of contact and maximum speed of this entity</Comment>
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>Contact being evaluated</Comment>
         </Argument>
@@ -321,7 +321,7 @@ System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>//System.out.println("RHIB doIntercept");
-setCruisingSpeed(getMaxSpeed());
+setCruiseSpeed(getMaximumSpeed());
 setStartPosition(getLocation());
 setDestination(interceptPoint);
 /*
@@ -367,13 +367,13 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
             <Comment>Checks to see if it can intercept and hit the contact for blocking</Comment>
         </LocalVariable>
         <StateTransition state="speed">
-            <Assignment value="maxSpeed"/>
+            <Assignment value="maximumSpeed"/>
         </StateTransition>
         <Schedule condition="canIntercept" delay="0.0" event="Interdict" priority="0">
             <Comment>If the threat can be stopped, interdict and block the contact</Comment>
         </Schedule>
         <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
-            <Comment>Unable to block the contact, follow the contact at max speed</Comment>
+            <Comment>Unable to block the contact, follow the contact at maximum speed</Comment>
             <EdgeParameter value="threat"/>
         </Schedule>
         <Code>setStartPosition(getLocation());</Code>
@@ -396,12 +396,12 @@ sensors[1] = collisionAvoidance;</Code>
         <Coordinate x="10" y="240"/>
     </Event>
     <Event name="StandOff">
-        <Comment>Cannot intercept and block the contact so follow the contact at max speed</Comment>
+        <Comment>Cannot intercept and block the contact so follow the contact at maximum speed</Comment>
         <Argument name="threat" type="diskit.Mover3D">
             <Comment>The threat that cant be intercepted</Comment>
         </Argument>
         <Code>setDestination(threat.getDestination());
-System.out.println("All stations, this is " + getEntityName() + " I cannot block the threat...Out");</Code>
+/*System.out.println("All stations, this is " + getEntityName() + " I cannot block the threat...Out");*/</Code>
         <Coordinate x="570" y="580"/>
     </Event>
     <Event name="Evade">
@@ -410,7 +410,7 @@ System.out.println("All stations, this is " + getEntityName() + " I cannot block
         <Argument name="m2" type="diskit.Mover3D"/>
         <Schedule event="PursueHostile"/>
         <Cancel event="Interdict"/>
-        <Code>System.out.println("Do Evade heard by " + getEntityName());</Code>
+        <Code/>
         <Coordinate x="490" y="580"/>
     </Event>
     <Event name="SecurityAlert">
@@ -422,8 +422,8 @@ System.out.println("All stations, this is " + getEntityName() + " I cannot block
             <Comment/>
             <EdgeParameter value="threat"/>
         </Schedule>
-        <Code>System.out.println("All stations, this is " + getEntityName() + " inbound contact " + threat.getEntityName() + " attempting to intercept..Out");
-setCruisingSpeed(getMaxSpeed());</Code>
+        <Code>/*System.out.println("All stations, this is " + getName() + " inbound contact " + threat.getSMAL().getName() + " attempting to intercept..Out");*/
+setCruiseSpeed(getMaximumSpeed());</Code>
         <Coordinate x="490" y="380"/>
     </Event>
     <Code>

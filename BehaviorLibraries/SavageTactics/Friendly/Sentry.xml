@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="Sentry" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A single human sentry.  This vehicle has the ability to provide sensory data and detect other entities but does not avoid other entities.</Comment>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Must be something other than the first waypoint</Comment>
-    </Parameter>
-    <Parameter name="maxSpeed" type="double">
-        <Comment>Maximum speed for this entity</Comment>
-    </Parameter>
     <Parameter name="moverID" type="int">
         <Comment>ESPDU unique id Number [0-999]</Comment>
     </Parameter>
-    <Parameter name="entityName" type="java.lang.String">
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Must be something other than the first waypoint</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>Maximum speed for this entity</Comment>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
@@ -157,7 +157,7 @@
         <LocalVariable name="rn" type="java.util.Random" value="new Random()">
             <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
         </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="maxSpeed * rn.nextDouble()">
+        <LocalVariable name="currentSpeed" type="double" value="maximumSpeed * rn.nextDouble()">
             <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
         </LocalVariable>
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
@@ -169,7 +169,7 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruisingSpeed(currentSpeed);setDestination(waypoint);
+        <Code>setCruiseSpeed(currentSpeed);setDestination(waypoint);
 System.out.println("doPatrol Event:");
 System.out.println("Heading to: " + waypoint);</Code>
         <Coordinate x="240" y="230"/>
