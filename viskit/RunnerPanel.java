@@ -148,7 +148,9 @@ public class RunnerPanel extends JPanel
 
     vcrToolBar.add(Box.createHorizontalStrut(20));
 
-    JLabel vcrSimTimeLab = new JLabel("Simulation time:");
+    JLabel vcrSimTimeLab = new JLabel("Sim start time:");
+    // TODO:  is this start time or current time of sim?
+    // TODO:  is this used elsewhere, or else can it simply be removed?
     vcrSimTime = new JTextField(10);
     vcrSimTime.setEditable(false);
     Vstatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
@@ -157,7 +159,8 @@ public class RunnerPanel extends JPanel
     vcrToolBar.add(vcrSimTime);
     vcrToolBar.add(Box.createHorizontalStrut(10));
 
-    JLabel vcrStopTimeLabel = new JLabel("Stop time:");
+    JLabel vcrStopTimeLabel = new JLabel("Sim stop time:");
+    vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
     vcrStopTime = new JTextField(10);
     Vstatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
 
