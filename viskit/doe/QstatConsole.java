@@ -38,7 +38,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     Timer timer;
     XmlRpcClientLite xmlrpc;
     Vector args;
-    static final int MAX_ROWS = 30;
+    static final int MIN_ROWS = 30;
     static final int MIN_FPM = 0;
     static final int MAX_FPM = 60;
     static final int INIT_FPM = 0; // should always start at 0
@@ -158,10 +158,10 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             try {
                 String data = (String)(xmlrpc.execute("gridkit.qstat",args));
                 int lines = data.split("\\n").length;
-                textArea.setRows(lines>MAX_ROWS?lines:MAX_ROWS);
+                textArea.setRows(lines>MIN_ROWS?lines:MIN_ROWS);
                 textArea.setText(textArea.getText()+"\n"+data);
             } catch (Exception e) {
-                textArea.setText("Can't qstat!");
+                textArea.setText("Can't qstat! \n"+e.toString());
             }
         }
     }
