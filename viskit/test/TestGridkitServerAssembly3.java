@@ -212,9 +212,9 @@ public class TestGridkitServerAssembly3 extends Thread {
             designParams.add(designParam2);
             
             // quick check dp.getName() returns
-            System.out.println("dp0 name "+designParam0.getName());
-            System.out.println("dp1 name "+designParam1.getName());
-            System.out.println("dp2 name "+designParam2.getName());
+            System.out.println("dp0 name "+designParam0.getLink());
+            System.out.println("dp1 name "+designParam1.getLink());
+            System.out.println("dp2 name "+designParam2.getLink());
             
             
             
