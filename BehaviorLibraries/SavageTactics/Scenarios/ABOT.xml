@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="RHIB1" type="diskit.RHIB">
-        <TerminalParameter name="moverID" type="int" value="101"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] :" type="double" value="-2265"/>
-            <TerminalParameter name="p[1] :" type="double" value="-102.28"/>
-            <TerminalParameter name="p[2] :" type="double" value="0.0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="RHIB1"/>
-        <Coordinate x="190" y="220"/>
-    </SimEntity>
-    <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
-        <TerminalParameter name="p[0] : " type="boolean" value="false"/>
+    <SimEntity description="Central Manager of the scenario, all entities must register with this object in some fashion to participate in the scenario." name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter name="p[0]" type="boolean" value="false"/>
         <TerminalParameter name="p[1] : " type="java.lang.String" value="239.255.5.5"/>
         <TerminalParameter name="p[2] : " type="int" value="62040"/>
         <TerminalParameter name="p[3] : " type="int" value="0"/>
         <TerminalParameter name="p[4] : " type="int" value="1"/>
         <Coordinate x="320" y="280"/>
     </SimEntity>
-    <SimEntity description="" name="USNavyPatrolZones" type="diskit.SceneZoneCreator">
+    <SimEntity description="Creates the patrol zone assignments for all entities listening to this entity with a 'doCreateZones' event." name="USNavyPatrolZones" type="diskit.SceneZoneCreator">
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="" type="int" value="101"/>
@@ -131,39 +120,37 @@
         <TerminalParameter name="name" type="java.lang.String" value="Super Cobra"/>
         <Coordinate x="190" y="400"/>
     </SimEntity>
-    <SimEntity description="" name="DDG77" type="diskit.HVU">
-        <TerminalParameter name="moverID" type="int" value="104"/>
+    <SimEntity description="CG59 ship's RHIB - a US Navy MK6 Rigid-Hull Inflatable boat (RHIB)" name="RHIB2" type="diskit.MilitaryPatrolCraft">
+        <TerminalParameter name="moverID" type="int" value="101"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="0"/>
-            <TerminalParameter name="p[1] : " type="double" value="0.0"/>
+            <TerminalParameter name="p[0] : " type="double" value="-2295"/>
+            <TerminalParameter name="p[1] : " type="double" value="107.08"/>
             <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="15"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="diskit.EntityType.HVU"/>
-        <TerminalParameter name="name" type="java.lang.String" value="USS O'KANE"/>
-        <Coordinate x="190" y="340"/>
-    </SimEntity>
-    <SimEntity description="" name="CG59" type="diskit.HVU">
-        <TerminalParameter name="moverID" type="int" value="105"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="1850"/>
-            <TerminalParameter name="p[1] : " type="double" value="165"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+        <TerminalParameter name="name" type="java.lang.String" value="RHIB East"/>
+        <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+        <TerminalParameter name="length" type="double" value="6.1"/>
+        <TerminalParameter name="width" type="double" value="2.74"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".2"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="15"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="diskit.EntityType.HVU"/>
-        <TerminalParameter name="name" type="java.lang.String" value="USS PRINCETON"/>
-        <Coordinate x="190" y="280"/>
-    </SimEntity>
-    <SimEntity name="RHIB2" type="diskit.RHIB">
-        <TerminalParameter name="moverID" type="int" value="102"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-2259"/>
-            <TerminalParameter name="p[1] : " type="double" value="107.08"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="RHIB2"/>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
         <Coordinate x="190" y="160"/>
     </SimEntity>
     <SimEntity description="" name="CommerShip1" type="diskit.NeutralCraft">
@@ -254,7 +241,7 @@
         <TerminalParameter name="name" type="java.lang.String" value="Dhow6"/>
         <Coordinate x="550" y="380"/>
     </SimEntity>
-    <SimEntity description="" name="PersianGulfTrafficLanes" type="diskit.SceneZoneCreator">
+    <SimEntity description="Sets the traffic areas for civilian boats and ships using ZoneGeometry. The purpose of this object is to create loosely defined areas of shipping traffic in the scenario" name="PersianGulfTrafficLanes" type="diskit.SceneZoneCreator">
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="200"/>
@@ -403,7 +390,7 @@
         <TerminalParameter name="name" type="java.lang.String" value="Oil Tanker 2 (East)"/>
         <Coordinate x="390" y="530"/>
     </SimEntity>
-    <SimEntity description="" name="TerroristCellPlanner" type="diskit.SceneZoneCreator">
+    <SimEntity description="Creates the starting position areas for each terrorist listening to this object" name="TerroristCellPlanner" type="diskit.SceneZoneCreator">
         <MultiParameter type="diskit.ZoneGeometry[]">
             <MultiParameter type="diskit.ZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
@@ -600,7 +587,7 @@
         </MultiParameter>
         <Coordinate x="320" y="0"/>
     </SimEntity>
-    <SimEntity description="" name="Terrorist1" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.Terrorist">
         <TerminalParameter name="moverID" type="int" value="600"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -626,7 +613,7 @@
         </MultiParameter>
         <Coordinate x="260" y="100"/>
     </SimEntity>
-    <SimEntity description="" name="Terrorist2" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.Terrorist">
         <TerminalParameter name="moverID" type="int" value="601"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -652,7 +639,7 @@
         </MultiParameter>
         <Coordinate x="320" y="100"/>
     </SimEntity>
-    <SimEntity description="" name="Terrorist3" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.Terrorist">
         <TerminalParameter name="moverID" type="int" value="602"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -1101,23 +1088,120 @@
         </MultiParameter>
         <Coordinate x="120" y="530"/>
     </SimEntity>
-    <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
+    <SimEntity description="DDG77 ship's RHIB - a US Navy MK6 Rigid-Hull Inflatable boat (RHIB)" name="RHIB1" type="diskit.MilitaryPatrolCraft">
+        <TerminalParameter name="moverID" type="int" value="101"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2265"/>
+            <TerminalParameter name="p[1] : " type="double" value="-102.28"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+        <TerminalParameter name="name" type="java.lang.String" value="RHIB East"/>
+        <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+        <TerminalParameter name="length" type="double" value="6.1"/>
+        <TerminalParameter name="width" type="double" value="2.74"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".2"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
+        <Coordinate x="190" y="220"/>
+    </SimEntity>
+    <SimEntity description="USS O'Kane - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG77" type="diskit.MilitaryShip">
+        <TerminalParameter name="moverID" type="int" value="104"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="30"/>
+        <TerminalParameter name="name" type="java.lang.String" value="USS O'KANE"/>
+        <TerminalParameter name="cruiseSpeed" type="double" value="15"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+        <TerminalParameter name="length" type="double" value="153.92"/>
+        <TerminalParameter name="width" type="double" value="18"/>
+        <TerminalParameter name="height" type="double" value="51"/>
+        <TerminalParameter name="draft" type="double" value="9.45"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".015"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="37040"/>
+        <TerminalParameter name="maximumAirDetectionRange" type="double" value="74080"/>
+        <TerminalParameter name="maximumSubSurfaceDetectionRange" type="double" value="30"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
+        <Coordinate x="190" y="340"/>
+    </SimEntity>
+    <SimEntity description="USS Princeton - a Ticonderoga (CG 47) Class US Navy Cruiser" name="CG59" type="diskit.MilitaryShip">
+        <TerminalParameter name="moverID" type="int" value="105"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="1850"/>
+            <TerminalParameter name="p[1] : " type="double" value="165"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="30"/>
+        <TerminalParameter name="name" type="java.lang.String" value="USS Princeton"/>
+        <TerminalParameter name="cruiseSpeed" type="double" value="15"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+        <TerminalParameter name="length" type="double" value="172.82"/>
+        <TerminalParameter name="width" type="double" value="16.764"/>
+        <TerminalParameter name="height" type="double" value="57.6"/>
+        <TerminalParameter name="draft" type="double" value="10.058"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".015"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="37040"/>
+        <TerminalParameter name="maximumAirDetectionRange" type="double" value="74080"/>
+        <TerminalParameter name="maximumSubSurfaceDetectionRange" type="double" value="30"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
+        <Coordinate x="190" y="280"/>
+    </SimEntity>
+        <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="p[0] : " type="double" value=".2"/>
         <TerminalParameter name="p[1] : " type="long" value="200"/>
         <Coordinate x="330" y="470"/>
     </SimEntity>
-    <SimEventListenerConnection listener="ScenarioManager" source="RHIB1"/>
-    <SimEventListenerConnection listener="RHIB1" source="USNavyPatrolZones"/>
     <SimEventListenerConnection listener="ScenarioManager" source="SuperCobra"/>
     <SimEventListenerConnection listener="SuperCobra" source="USNavyPatrolZones"/>
-    <SimEventListenerConnection listener="DDG77" source="USNavyPatrolZones"/>
-    <SimEventListenerConnection listener="CG59" source="USNavyPatrolZones"/>
     <SimEventListenerConnection listener="RHIB2" source="USNavyPatrolZones"/>
     <SimEventListenerConnection listener="ScenarioManager" source="RHIB2"/>
     <SimEventListenerConnection listener="ScenarioManager" source="CommerShip1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="CommerShip2"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="DDG77"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="CG59"/>
     <SimEventListenerConnection listener="Dhow1" source="PersianGulfTrafficLanes"/>
     <SimEventListenerConnection listener="Dhow2" source="PersianGulfTrafficLanes"/>
     <SimEventListenerConnection listener="Dhow3" source="PersianGulfTrafficLanes"/>
@@ -1140,7 +1224,12 @@
     <SimEventListenerConnection listener="ScenarioManager" source="Terrorist1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="Terrorist2"/>
     <SimEventListenerConnection listener="ScenarioManager" source="Terrorist3"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="RHIB1" source="USNavyPatrolZones"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="RHIB1"/>
+    <SimEventListenerConnection listener="DDG77" source="USNavyPatrolZones"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="DDG77"/>
+    <SimEventListenerConnection listener="CG59" source="USNavyPatrolZones"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CG59"/>
     <Schedule stopTime="10000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
