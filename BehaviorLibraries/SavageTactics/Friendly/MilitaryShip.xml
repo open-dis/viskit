@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="MilitaryShip" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>!!!TODO ADD COMMENTS FOR MILITARY SHIP!!!</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>ESPDU unique id Number [0 - 999]</Comment>
+    </Parameter>
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Must be different then the first waypoint</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>Maximum speed of this craft</Comment>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
+        <Comment>Name for this entity</Comment>
+    </Parameter>
+    <Parameter name="cruiseSpeed" type="double">
+        <Comment>The published cruising speed for this craft</Comment>
+    </Parameter>
+    <Parameter name="level" type="java.lang.String">
+        <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
+    </Parameter>
+    <Parameter name="rationale" type="java.lang.String">
+        <Comment>The specific element which contains the information classifying this document</Comment>
+    </Parameter>
+    <Parameter name="reference" type="java.lang.String">
+        <Comment>The published source of classified information, if any</Comment>
+    </Parameter>
+    <Parameter name="length" type="double">
+        <Comment>The maximum length of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="width" type="double">
+        <Comment>The maximum beam of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="height" type="double">
+        <Comment>The maximum height of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="draft" type="double">
+        <Comment>The maximum draft of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="centerOfGravity" type="double[]">
+        <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
+    </Parameter>
+    <Parameter name="maximumAcceleration" type="double">
+        <Comment>The maximum achievable acceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumDeceleration" type="double">
+        <Comment>The maximum achievable deceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumTurnRate" type="double">
+        <Comment>The maximum turn rate in degrees per second</Comment>
+    </Parameter>
+    <Parameter name="minimumTurnRadius" type="double">
+        <Comment>The minimum turning radius for this vehicle in feet or meters</Comment>
+    </Parameter>
+    <Parameter name="maximumSurfaceDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range surface detection sensor</Comment>
+    </Parameter>
+    <Parameter name="maximumAirDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range air detection sensor</Comment>
+    </Parameter>
+    <Parameter name="maximumSubSurfaceDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range sub-surface detection sensor</Comment>
+    </Parameter>
+    <Parameter name="forceID" type="int">
+        <Comment>The DIS Enumeration for the force id for this entity [0 = Other, 1 = Friend, 2 = Opposing, 3 = Neutral]</Comment>
+    </Parameter>
+    <Parameter name="entityDomain" type="int">
+        <Comment>The DIS Enumeration for the domain for this entity [0 = Other, 1 = Land, 2 = Air, 3 = Surface, 4 = SubSurface]</Comment>
+    </Parameter>
+    <Parameter name="entityKind" type="int">
+        <Comment>The DIS Enumeration for the overall type for this entity [1 = Platform, 3 = Life Form, 7 = Radio]</Comment>
+    </Parameter>
+    <Parameter name="entityCountry" type="int">
+        <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    </Parameter>    
+    <StateVariable name="visualPerception" type="diskit.Sensor">
+        <Comment>Visual sense of RHIB crew</Comment>
+    </StateVariable>
+    <StateVariable name="visualRange" type="double">
+        <Comment>Visual Range for the crew</Comment>
+    </StateVariable>
+    <StateVariable name="collisionAvoidance" type="diskit.Sensor">
+        <Comment>Sensor that is used for collision avoidance</Comment>
+    </StateVariable>
+    <StateVariable name="avoidanceRange" type="double">
+        <Comment>Proximity tolerance for this contact. Will maneuver to avoid objects that will breach this range</Comment>
+    </StateVariable>
+    <StateVariable name="patrolManager" type="diskit.ZoneMoverManager">
+        <Comment>Mover manager that manages entity movement based on diskit.ZoneGeometry patrol zones</Comment>
+    </StateVariable>
+    <StateVariable name="amm" type="diskit.AvoidanceMoverManager">
+        <Comment>MoverManager for avoiding collision</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>Tactical State that the RHIB is in (e.g. Patrolling, Intercepting)</Comment>
+    </StateVariable>
+    <StateVariable name="waypointGenerator" type="diskit.WaypointCreator">
+        <Comment>Generates waypoints based on the diskit.ZoneGeometry for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="calc" type="diskit.util.MovementCalculator">
+        <Comment>Calculates intercept and avoidance</Comment>
+    </StateVariable>
+    <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
+        <Comment>Stores and sorts obstacles based on proximity</Comment>
+    </StateVariable>
+    <StateVariable name="targetQueue" type="diskit.TargetQueue">
+        <Comment>Stores and sorts targets based on proximity</Comment>
+    </StateVariable>
+    <StateVariable name="contactPicture" type="LinkedList">
+        <Comment>List of all contacts in this entities contact picture</Comment>
+    </StateVariable>
+    <StateVariable name="speed" type="double">
+        <Comment>DATA: Average Speed of this entity</Comment>
+    </StateVariable>
+    <StateVariable name="contactIDs" type="int">
+        <Comment>DATA: Total number of contacts ID'd</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>Initializes all state variables for each simulation run.</Comment>
+        <StateTransition state="visualRange">
+            <Assignment value="600"/>
+        </StateTransition>
+        <StateTransition state="avoidanceRange">
+            <Assignment value="10"/>
+        </StateTransition>
+        <StateTransition state="speed">
+            <Assignment value="0.0"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Assignment value="new diskit.TargetQueue(getLocation());"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="10" y="80"/>
+    </Event>
+    <Event name="Init">
+        <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>Entity being initialized</Comment>
+        </Argument>
+        <StateTransition state="visualPerception">
+            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+        </StateTransition>
+        <StateTransition state="calc">
+            <Assignment value="new diskit.util.MovementCalculator(this)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule event="CreateSensors"/>
+        <Code/>
+        <Coordinate x="10" y="150"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Registers this mover with the simulation</Comment>
+        <Argument name="m" type="diskit.Mover3D">
+            <Comment>This mover being registered</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="90" y="150"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers this entity's sensor with the simulation. Also registers a SimEventListener between this mover and its sensor</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]">
+            <Comment>Collection of sensors for this entity</Comment>
+        </Argument>
+        <StateTransition state="visualPerception">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="90" y="240"/>
+    </Event>
+    <Event name="CreateZones">
+        <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
+        <Argument name="zones" type="diskit.ZoneGeometry[]">
+            <Comment>Zones for this simulation</Comment>
+        </Argument>
+        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
+            <Comment>Reads Zones for only those that are for this entity</Comment>
+        </LocalVariable>
+        <LocalVariable name="myPatrol" type="diskit.ZoneGeometry[]" value="zoneReader.getMyPatrol()">
+            <Comment>Returns this entities patrol zones</Comment>
+        </LocalVariable>
+        <StateTransition state="waypointGenerator">
+            <Assignment value="new diskit.WaypointCreator(myPatrol)"/>
+        </StateTransition>
+        <StateTransition state="patrolManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule event="Patrol"/>
+        <Code/>
+        <Coordinate x="200" y="220"/>
+    </Event>
+    <Event name="Patrol">
+        <Comment>Patrolling behavior for this entity. Speed is random and always less than the max speed</Comment>
+        <LocalVariable name="rn" type="java.util.Random" value="new Random()">
+            <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
+        </LocalVariable>
+        <LocalVariable name="currentSpeed" type="double" value="getMaximumSpeed() * rn.nextDouble()">
+            <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
+        </LocalVariable>
+        <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>Provides a waypoint within the geometry specified</Comment>
+        </LocalVariable>
+        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>Start somewhere different each time</Comment>
+        </LocalVariable>
+        <StateTransition state="speed">
+            <Assignment value="currentSpeed"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.PATROLLING"/>
+        </StateTransition>
+        <Code>setCruiseSpeed(getMaximumSpeed()/2);
+setStartPosition(startPosition);
+setDestination(waypoint);</Code>
+        <Coordinate x="330" y="220"/>
+    </Event>
+    <Event name="Detection">
+        <Comment>The Sensor of this entity has detected a contact</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor of the contact detected</Comment>
+        </Argument>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact detected</Comment>
+        </Argument>
+        <LocalVariable name="entityID" type="int" value="contact.getMoverID()">
+            <Comment>Find out the id# of this entity for comparison</Comment>
+        </LocalVariable>
+        <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
+            <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
+        </LocalVariable>
+        <Schedule condition="sensor == collisionAvoidance &amp;&amp; !friendlyForces.contains(entityID)" delay="0.0" event="AssessObstacle" priority="0">
+            <Comment>Should not avoid contacts if you are intercepting them</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>contact.addSimEventListener(this);
+/*
+System.out.println("Cruising Speed: " + contact.getCruisingSpeed());
+System.out.println("Max Speed:       " + contact.getMaxSpeed());
+System.out.println("Destination:       " + contact.getDestination());
+System.out.println("Location:            " + contact.getLocation());
+System.out.println("Name:                " + contact.getEntityName());
+*/</Code>
+        <Coordinate x="440" y="220"/>
+    </Event>
+    <Event name="AssessObstacle">
+        <Comment/>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>Mover that is a potential obstacle</Comment>
+        </Argument>
+        <StateTransition state="calc">
+            <Operation method="checkCollision(obstacle, collisionAvoidance, avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="add(obstacle)"/>
+        </StateTransition>
+        <Schedule condition="calc.willCollide() &amp;&amp; patrolManager !=null" delay="0.0" event="AvoidObstacle" priority="0">
+            <Comment>Check to see if collision will occur and whether or not this entity is moving</Comment>
+            <EdgeParameter value="obstacle"/>
+        </Schedule>
+        <Code>System.out.println("Avoiding Obstacle: " + obstacle.getMoverID());</Code>
+        <Coordinate x="440" y="320"/>
+    </Event>
+    <Event name="AvoidObstacle">
+        <Comment>Uses diskit.AvoidanceMoverManager to stop the normal MoverManager, perform the avoidance based on the diskit.util.MovementCalculator calculations, and then allows the normal mover manager to take over after the contact is avoided. AvoidanceMoverManager accepts both the avoidance point and the current mover manager as arguments</Comment>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>Obstacle to avoid</Comment>
+        </Argument>
+        <LocalVariable name="avoidancePoint" type="diskit.Vec3d" value="calc.getCollisionAvoidance(obstacle)">
+            <Comment>The point this mover should go to to avoid collision</Comment>
+        </LocalVariable>
+        <StateTransition state="amm">
+            <Assignment value="new diskit.AvoidanceMoverManager(this)"/>
+        </StateTransition>
+        <StateTransition state="amm">
+            <Operation method="avoidToOffset(avoidancePoint, patrolManager)"/>
+        </StateTransition>
+        <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
+            <Comment/>
+        </Schedule>
+        <Code>setStartPosition(getLocation());</Code>
+        <Coordinate x="440" y="430"/>
+    </Event>
+    <Event name="ResumePatrol">
+        <Comment/>
+        <Schedule event="Patrol"/>
+        <Code/>
+        <Coordinate x="330" y="430"/>
+    </Event>
+    <Event name="CreateSensors">
+        <Comment/>
+        <LocalVariable name="numOfSensors" type="int" value="2">
+            <Comment>Number of Sensor for this entity</Comment>
+        </LocalVariable>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
+            <Comment>Collection of sensors for this entity</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code>sensors[0] = visualPerception;
+sensors[1] = collisionAvoidance;</Code>
+        <Coordinate x="10" y="240"/>
+    </Event>
+    <Code>
+
+
+</Code>
+</SimEntity>
+
