@@ -13,9 +13,6 @@
     <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in assembly</Comment>
     </Parameter>
-    <Parameter name="cruiseSpeed" type="double">
-        <Comment>The published cruising speed for this craft</Comment>
-    </Parameter>
     <Parameter name="level" type="java.lang.String">
         <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
     </Parameter>
