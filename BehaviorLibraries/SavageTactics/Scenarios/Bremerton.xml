@@ -109,26 +109,68 @@
         <TerminalParameter name="appID" type="int" value="1"/>
         <Coordinate x="370" y="110"/>
     </SimEntity>
-    <SimEntity description="" name="RHIB" type="diskit.RHIB">
+    <SimEntity description="" name="RHIB" type="diskit.MilitaryPatrolCraft">
     <TerminalParameter name="moverID" type="int" value="101"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-1263.441"/>
             <TerminalParameter name="" type="double" value="-871.5"/>
             <TerminalParameter name="" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="19"/>
-        <TerminalParameter type="java.lang.String" value="RHIB"/>
+        <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+        <TerminalParameter name="name" type="java.lang.String" value="RHIB"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+        <TerminalParameter name="length" type="double" value="6.1"/>
+        <TerminalParameter name="width" type="double" value="2.74"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".2"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>        
         <Coordinate x="170" y="130"/>
     </SimEntity>
-    <SimEntity description="A Fishing Trawler" name="Trawler" type="diskit.NeutralCraft">
+    <SimEntity description="A Fishing Trawler" name="Trawler" type="diskit.CivilianMerchantShip">
 <TerminalParameter name="moverID" type="int" value="121"/>        
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="DISXcord" type="double" value="-762.743"/>
             <TerminalParameter name="DISYcord" type="double" value="-251.632"/>
             <TerminalParameter name="DISZcord" type="double" value="0.0"/>
         </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="5"/>
-        <TerminalParameter type="java.lang.String" value="Trawler"/>
+         <TerminalParameter name="maximumSpeed" type="double" value="12.5"/>
+        <TerminalParameter name="name" type="java.lang.String" value="Fishing Trawler"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+        <TerminalParameter name="length" type="double" value="28.6"/>
+        <TerminalParameter name="width" type="double" value="9"/>
+        <TerminalParameter name="height" type="double" value="10"/>
+        <TerminalParameter name="draft" type="double" value="3"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="37040"/>
+        <TerminalParameter name="forceID" type="int" value="3"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
         <Coordinate x="170" y="10"/>
     </SimEntity>
     <SimEntity description="" name="SeaFox" type="diskit.USV">
@@ -138,8 +180,29 @@
             <TerminalParameter name="DISYcord" type="double" value="0"/>
             <TerminalParameter name="DISZcord" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="8"/>
-        <TerminalParameter type="java.lang.String" value="Sea Fox"/>
+        <TerminalParameter name="maximumSpeed" type="double" value="8"/>
+        <TerminalParameter name ="name" type="java.lang.String" value="Sea Fox"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+        <TerminalParameter name="length" type="double" value="2"/>
+        <TerminalParameter name="width" type="double" value=".8"/>
+        <TerminalParameter name="height" type="double" value="1"/>
+        <TerminalParameter name="draft" type="double" value=".1"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
         <Coordinate x="170" y="70"/>
     </SimEntity>
     <SimEntity description="" name="SeaScan" type="diskit.UAV">
@@ -149,8 +212,31 @@
             <TerminalParameter name="" type="double" value="0"/>
             <TerminalParameter name="" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="50"/>
-        <TerminalParameter type="java.lang.String" value="Sea Scan"/>
+        <TerminalParameter name="maximumSpeed" type="double" value="70"/>
+        <TerminalParameter name="name" type="java.lang.String" value="Sea Scan"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="http://www.insitugroup.com/prod_seascan.cfm"/>
+        <TerminalParameter name="length" type="double" value="1.2"/>
+        <TerminalParameter name="width" type="double" value="3.1"/>
+        <TerminalParameter name="height" type="double" value=".2"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="30"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="30"/>
+        <TerminalParameter name="maximumAltitude" type="double" value="5000"/>
+        <TerminalParameter name="cruiseAltitude" type="double" value="3000.0"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".045"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="2"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="40000"/>
+        <TerminalParameter name="maximumAirDetectionRange" type="double" value="30000"/>
+        <TerminalParameter name="forceID" type="int" value="1"/>
+        <TerminalParameter name="entityDomain" type="int" value="2"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="225"/>
         <Coordinate x="170" y="190"/>
     </SimEntity>
     <SimEntity description="" name="TerroristCell" type="diskit.SceneZoneCreator">
