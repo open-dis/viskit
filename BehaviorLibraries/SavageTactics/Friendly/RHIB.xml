@@ -173,9 +173,11 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruiseSpeed(maximumSpeed/2);
+        <Code>System.out.println("Cruise speed before: " + cruiseSpeed);
+setCruiseSpeed(maximumSpeed/2);
 setStartPosition(startPosition);
-setDestination(waypoint);</Code>
+setDestination(waypoint);
+System.out.println("Cruise speed after: " + cruiseSpeed);</Code>
         <Coordinate x="490" y="70"/>
     </Event>
     <Event name="Detection">

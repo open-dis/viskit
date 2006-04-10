@@ -8,13 +8,10 @@
         <Comment>Must be different then the first waypoint</Comment>
     </Parameter>
     <Parameter name="maximumSpeed" type="double">
-        <Comment>maximumimum speed of this craft</Comment>
+        <Comment>maximum speed of this craft</Comment>
     </Parameter>
     <Parameter name="name" type="java.lang.String">
         <Comment>This entity's name</Comment>
-    </Parameter>
-    <Parameter name="cruiseSpeed" type="double">
-        <Comment>The published cruising speed for this craft</Comment>
     </Parameter>
     <Parameter name="level" type="java.lang.String">
         <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
@@ -37,7 +34,7 @@
     <Parameter name="draft" type="double">
         <Comment>The maximum draft of this craft in meters</Comment>
     </Parameter>
-        <Parameter name="centerOfGravity" type="double[]">
+    <Parameter name="centerOfGravity" type="double[]">
         <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
     </Parameter>
     <Parameter name="maximumAcceleration" type="double">
@@ -66,7 +63,7 @@
     </Parameter>
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
-    </Parameter>    
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -138,8 +135,9 @@
         <StateTransition state="contactIDs">
             <Assignment value="0"/>
         </StateTransition>
+        <Schedule event="ScaleSpeedToKnots"/>
         <Code/>
-        <Coordinate x="10" y="70"/>
+        <Coordinate x="10" y="80"/>
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
@@ -226,9 +224,11 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruiseSpeed(maximumSpeed/2);
+        <Code>System.out.println("Cruise speed before: " + cruiseSpeed);
+setCruiseSpeed(maximumSpeed/2);
 setStartPosition(startPosition);
-setDestination(waypoint);</Code>
+setDestination(waypoint);
+System.out.println("Cruise speed after:  " + cruiseSpeed);</Code>
         <Coordinate x="490" y="70"/>
     </Event>
     <Event name="Detection">
@@ -479,9 +479,15 @@ sensors[1] = collisionAvoidance;</Code>
 setCruiseSpeed(getMaximumSpeed());</Code>
         <Coordinate x="490" y="380"/>
     </Event>
+    <Event name="ScaleSpeedToKnots">
+        <Comment>Scales entered speed to knots</Comment>
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+            <Comment/>
+        </LocalVariable>
+        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Coordinate x="90" y="80"/>
+    </Event>
     <Code>
-
-
 </Code>
 </SimEntity>
 

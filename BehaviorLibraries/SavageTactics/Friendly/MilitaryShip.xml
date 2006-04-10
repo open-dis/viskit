@@ -13,9 +13,6 @@
     <Parameter name="name" type="java.lang.String">
         <Comment>Name for this entity</Comment>
     </Parameter>
-    <Parameter name="cruiseSpeed" type="double">
-        <Comment>The published cruising speed for this craft</Comment>
-    </Parameter>
     <Parameter name="level" type="java.lang.String">
         <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
     </Parameter>
@@ -72,7 +69,7 @@
     </Parameter>
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
-    </Parameter>    
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -135,6 +132,7 @@
         <StateTransition state="targetQueue">
             <Operation method="clear()"/>
         </StateTransition>
+        <Schedule event="ScaleSpeedToKnots"/>
         <Code/>
         <Coordinate x="10" y="80"/>
     </Event>
@@ -223,9 +221,9 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruiseSpeed(getMaximumSpeed()/2);
-setStartPosition(startPosition);
-setDestination(waypoint);</Code>
+        <Code>setStartPosition(startPosition);
+setDestination(waypoint);
+setCruiseSpeed(getMaximumSpeed()/2);</Code>
         <Coordinate x="330" y="220"/>
     </Event>
     <Event name="Detection">
@@ -315,6 +313,14 @@ System.out.println("Name:                " + contact.getEntityName());
         <Code>sensors[0] = visualPerception;
 sensors[1] = collisionAvoidance;</Code>
         <Coordinate x="10" y="240"/>
+    </Event>
+    <Event name="ScaleSpeedToKnots">
+        <Comment>Scales maximum speed to knots</Comment>
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+            <Comment/>
+        </LocalVariable>
+        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Coordinate x="90" y="80"/>
     </Event>
     <Code>
 

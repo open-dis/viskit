@@ -13,6 +13,66 @@
     <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in assembly</Comment>
     </Parameter>
+    <Parameter name="cruiseSpeed" type="double">
+        <Comment>The published cruising speed for this craft</Comment>
+    </Parameter>
+    <Parameter name="level" type="java.lang.String">
+        <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
+    </Parameter>
+    <Parameter name="rationale" type="java.lang.String">
+        <Comment>The specific element which contains the information classifying this document</Comment>
+    </Parameter>
+    <Parameter name="reference" type="java.lang.String">
+        <Comment>The published source of classified information, if any</Comment>
+    </Parameter>
+    <Parameter name="length" type="double">
+        <Comment>The maximum length of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="width" type="double">
+        <Comment>The maximum beam of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="height" type="double">
+        <Comment>The maximum height of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="aerodynamicCenter" type="double[]">
+        <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
+    </Parameter>
+    <Parameter name="maximumAcceleration" type="double">
+        <Comment>The maximum achievable acceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumDeceleration" type="double">
+        <Comment>The maximum achievable deceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumAltitude" type="double">
+        <Comment>The absolute ceiling for this aircraft in feet or meters</Comment>
+    </Parameter>
+    <Parameter name="cruiseAltitude" type="double">
+        <Comment>The cruise ceiling for this aircraft in feet or meters</Comment>
+    </Parameter>
+    <Parameter name="maximumTurnRate" type="double">
+        <Comment>The maximum turn rate in degrees per second</Comment>
+    </Parameter>
+    <Parameter name="minimumTurnRadius" type="double">
+        <Comment>The minimum turning radius for this vehicle in feet or meters</Comment>
+    </Parameter>
+    <Parameter name="maximumSurfaceDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range surface detection sensor</Comment>
+    </Parameter>
+    <Parameter name="maximumAirDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range air detection sensor</Comment>
+    </Parameter>
+    <Parameter name="forceID" type="int">
+        <Comment>The DIS Enumeration for the force id for this entity [0 = Other, 1 = Friend, 2 = Opposing, 3 = Neutral]</Comment>
+    </Parameter>
+    <Parameter name="entityDomain" type="int">
+        <Comment>The DIS Enumeration for the domain for this entity [0 = Other, 1 = Land, 2 = Air, 3 = Surface, 4 = SubSurface]</Comment>
+    </Parameter>
+    <Parameter name="entityKind" type="int">
+        <Comment>The DIS Enumeration for the overall type for this entity [1 = Platform, 3 = Life Form, 7 = Radio]</Comment>
+    </Parameter>
+    <Parameter name="entityCountry" type="int">
+        <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -90,6 +150,7 @@
         <StateTransition state="distanceFromMissedAttacker">
             <Assignment value="0"/>
         </StateTransition>
+        <Schedule event="ScaleSpeedToKnots"/>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
@@ -178,6 +239,14 @@ setDestination(waypoint);
 //System.out.println("doPatrol Event:");
 //System.out.println("Heading to: " + waypoint);</Code>
         <Coordinate x="240" y="230"/>
+    </Event>
+    <Event name="ScaleSpeedToKnots">
+        <Comment>Scales max speed to knots</Comment>
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+            <Comment/>
+        </LocalVariable>
+        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Coordinate x="30" y="110"/>
     </Event>
     <Code/>
 </SimEntity>
