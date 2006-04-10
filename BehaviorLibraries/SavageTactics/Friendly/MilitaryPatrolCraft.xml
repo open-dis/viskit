@@ -224,11 +224,9 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>System.out.println("Cruise speed before: " + cruiseSpeed);
-setCruiseSpeed(maximumSpeed/2);
+        <Code>setCruiseSpeed(maximumSpeed/2);
 setStartPosition(startPosition);
-setDestination(waypoint);
-System.out.println("Cruise speed after:  " + cruiseSpeed);</Code>
+setDestination(waypoint);</Code>
         <Coordinate x="490" y="70"/>
     </Event>
     <Event name="Detection">

@@ -233,7 +233,6 @@
         <Code>setStartPosition(startPosition);
 setDestination(waypoint);
 setCruiseSpeed(currentSpeed);
-System.out.println("Helo cruise speed test: " + cruiseSpeed);
 //System.out.println("doPatrol Event:");
 //System.out.println("Heading to: " + waypoint);</Code>
         <Coordinate x="240" y="230"/>
