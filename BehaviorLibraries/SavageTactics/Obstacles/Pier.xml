@@ -10,6 +10,12 @@
     <Parameter name="width" type="double">
         <Comment>width of this pier</Comment>
     </Parameter>
+    <Parameter name="height" type="double">
+        <Comment>Height in meters above the waterline</Comment>
+    </Parameter>
+    <Parameter name="rotation" type="double">
+        <Comment>Orientation in radians about the Y axis (Z for DIS)</Comment>
+    </Parameter>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <Code/>
