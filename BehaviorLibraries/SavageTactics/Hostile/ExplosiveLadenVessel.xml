@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.HostileForce" name="ExplosiveLadenVessel" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Terrorist that starts from a point randomly within ZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
+TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>Unique DIS entity ID number</Comment>
+    </Parameter>
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Start position for this entity</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment/>
+    </Parameter>
+    <Parameter name="name" type="java.lang.String">
+        <Comment>Should match name in Assembly</Comment>
+    </Parameter>
+    <Parameter name="blastRadius" type="double">
+        <Comment>proximity to a target required to effectively destroy it</Comment>
+    </Parameter>
+    <Parameter name="harborLocation" type="diskit.ZoneGeometry[]">
+        <Comment>General area where the harbor is located</Comment>
+    </Parameter>
+    <Parameter name="level" type="java.lang.String">
+        <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
+    </Parameter>
+    <Parameter name="rationale" type="java.lang.String">
+        <Comment>The specific element which contains the information classifying this document</Comment>
+    </Parameter>
+    <Parameter name="reference" type="java.lang.String">
+        <Comment>The published source of classified information, if any</Comment>
+    </Parameter>
+    <Parameter name="length" type="double">
+        <Comment>The maximum length of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="width" type="double">
+        <Comment>The maximum beam of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="height" type="double">
+        <Comment>The maximum height of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="draft" type="double">
+        <Comment>The maximum draft of this craft in meters</Comment>
+    </Parameter>
+    <Parameter name="centerOfGravity" type="double[]">
+        <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
+    </Parameter>
+    <Parameter name="maximumAcceleration" type="double">
+        <Comment>The maximum achievable acceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumDeceleration" type="double">
+        <Comment>The maximum achievable deceleration</Comment>
+    </Parameter>
+    <Parameter name="maximumTurnRate" type="double">
+        <Comment>The maximum turn rate in degrees per second</Comment>
+    </Parameter>
+    <Parameter name="minimumTurnRadius" type="double">
+        <Comment>The minimum turning radius for this vehicle in feet or meters</Comment>
+    </Parameter>
+    <Parameter name="maximumSurfaceDetectionRange" type="double">
+        <Comment>The maximum detection range of the longest range surface detection sensor</Comment>
+    </Parameter>
+    <Parameter name="forceID" type="int">
+        <Comment>The DIS Enumeration for the force id for this entity [0 = Other, 1 = Friend, 2 = Opposing, 3 = Neutral]</Comment>
+    </Parameter>
+    <Parameter name="entityDomain" type="int">
+        <Comment>The DIS Enumeration for the domain for this entity [0 = Other, 1 = Land, 2 = Air, 3 = Surface, 4 = SubSurface]</Comment>
+    </Parameter>
+    <Parameter name="entityKind" type="int">
+        <Comment>The DIS Enumeration for the overall type for this entity [1 = Platform, 3 = Life Form, 7 = Radio]</Comment>
+    </Parameter>
+    <Parameter name="entityCountry" type="int">
+        <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    </Parameter>
+    <StateVariable name="avoidanceRange" type="double">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="visualPerception" type="diskit.Sensor">
+        <Comment>Sensor object that processes all targets in the state space before attacking</Comment>
+    </StateVariable>
+    <StateVariable name="interceptMoverManager" type="diskit.InterceptMoverManager">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="attackCreator" type="diskit.WaypointCreator">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="targetQueue" type="java.util.LinkedList">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="activeMoverManager" type="diskit.MoverManager">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="collisionAvoidance" type="diskit.Sensor">
+        <Comment>Sensor that implements collision avoidance</Comment>
+    </StateVariable>
+    <StateVariable name="lethalRange" type="diskit.Sensor">
+        <Comment>Range at which this terrorist can be lethal (assumes suicide bombing as attack)</Comment>
+    </StateVariable>
+    <StateVariable name="initialMoverManager" type="diskit.PathMoverManager">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="successfulStartPosition" type="diskit.Vec3d">
+        <Comment>TODO: add property stat</Comment>
+    </StateVariable>
+    <StateVariable name="unsuccessfulStartPosit" type="diskit.Vec3d">
+        <Comment>TODO: add property stat</Comment>
+    </StateVariable>
+    <StateVariable name="successfullAttack" type="int">
+        <Comment>TODO: add as property stat</Comment>
+    </StateVariable>
+    <StateVariable name="unsuccessfulAttack" type="int">
+        <Comment>TODO: add as property stat</Comment>
+    </StateVariable>
+    <StateVariable name="lengthOfAttack" type="double">
+        <Comment>TODO: add as property stat</Comment>
+    </StateVariable>
+    <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="calc" type="diskit.util.MovementCalculator">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="harborDirector" type="diskit.WaypointCreator">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="amm" type="diskit.AvoidanceMoverManager">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="detonateProximity" type="diskit.Sensor">
+        <Comment>Sensor that determines if the contact is close enough to kill</Comment>
+    </StateVariable>
+    <StateVariable name="visualRange" type="double">
+        <Comment>Visual range for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="entitySensors" type="diskit.Sensor[0]">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="plasticExplosives" type="diskit.Explosive">
+        <Comment>Explosives that this entity is carrying</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="avoidanceRange">
+            <Assignment value="30"/>
+        </StateTransition>
+        <StateTransition state="interceptMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.TRANSITING"/>
+        </StateTransition>
+        <StateTransition state="visualRange">
+            <Assignment value="1800"/>
+        </StateTransition>
+        <Schedule event="ScaleSpeedToKnots"/>
+        <Code/>
+        <Coordinate x="30" y="10"/>
+    </Event>
+    <Event name="Init">
+        <Comment/>
+        <Argument name="entity" type="diskit.Mover3D"/>
+        <LocalVariable name="numOfSensors" type="int" value="3">
+            <Comment>Number of Sensors this entity has</Comment>
+        </LocalVariable>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="calc">
+            <Assignment value="new diskit.util.MovementCalculator(this)"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Assignment value="new diskit.SphereCutterSensor(this, blastRadius)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="entity == this" delay="0.0" event="CreateSensors" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule event="CreateExplosive"/>
+        <Code>//TODO: Elegant construction of sensors array
+sensors[0] = visualPerception;
+sensors[1] = detonateProximity;
+sensors[2] = collisionAvoidance;
+//Schedule.stopOnEvent("Stop");</Code>
+        <Coordinate x="120" y="70"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment/>
+        <Argument name="target" type="diskit.Mover3D"/>
+        <Code/>
+        <Coordinate x="220" y="70"/>
+    </Event>
+    <Event name="Detection">
+        <Comment>Determines whether or not a detected contact is a high value unit and makes a decision based on the evaluation of the entity</Comment>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <LocalVariable name="id" type="diskit.EntityType" value="contact.getEntityType()">
+            <Comment>Use the type of entity to determine course of action</Comment>
+        </LocalVariable>
+        <LocalVariable name="isHostileForce" type="boolean" value="hostileForces.contains(contact.getMoverID())">
+            <Comment>Check to see if contact is of the same force</Comment>
+        </LocalVariable>
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact)">
+            <Comment>Can I intercept the contact and blow it up</Comment>
+        </LocalVariable>
+        <LocalVariable name="currentTacticalMode" type="diskit.TacticalMode" value="getTacticalMode()">
+            <Comment>The tactical mode of the entity when he detects the contact</Comment>
+        </LocalVariable>
+        <Schedule condition="id.equals(EntityType.HVU) &amp;&amp;  canIntercept " delay="0.0" event="Attack" priority="0">
+            <Comment>If this is an HVU and I can intercept it, and I'm not already attacking</Comment>
+            <EdgeParameter value="contact"/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Code>/*System.out.println("Contact ID: " + contact.getMoverID());
+System.out.println("Terr Detect: " + contact.getSMAL().getWidth());
+System.out.println("Contact Loc: " + contact.getLocation());
+System.out.println("My loc:          " + getLocation());
+*/</Code>
+        <Coordinate x="130" y="340"/>
+    </Event>
+    <Event name="Start">
+        <Comment>TODO: Move Harbor Center to the constructor for this event graph</Comment>
+        <LocalVariable name="startLocation" type="diskit.Vec3d" value="attackCreator.createWaypoint()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="startHeading" type="diskit.Vec3d" value="harborDirector.createWaypoint()">
+            <Comment>Pick a random waypoint in the direction of the harbor</Comment>
+        </LocalVariable>
+        <LocalVariable name="approachSpeed" type="double" value="getMaximumSpeed()/2">
+            <Comment>Proceed into the harbor at 1/2 speed</Comment>
+        </LocalVariable>
+        <Code>setStartPosition(startLocation); 
+setDestination(harborDirector.createWaypoint());
+setCruiseSpeed(approachSpeed);</Code>
+        <Coordinate x="30" y="320"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
+        <Argument name="sensors[]" type="diskit.Sensor[]">
+            <Comment>Sensors for this entity</Comment>
+        </Argument>
+        <StateTransition state="visualPerception">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="220" y="150"/>
+    </Event>
+    <Event name="Attack">
+        <Comment>Determines the correct heading for an attack and attacks at Maximum speed</Comment>
+        <Argument name="target" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <LocalVariable name="attackDestination" type="diskit.Vec3d" value="getInterceptPoint()">
+            <Comment>The location where an attack will succeed</Comment>
+        </LocalVariable>
+        <LocalVariable name="detonateTime" type="double" value="getInterceptTime()">
+            <Comment>Set explosive to explode when you arrive</Comment>
+        </LocalVariable>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.ATTACKING"/>
+        </StateTransition>
+        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code>setStartPosition(getLocation());
+setDestination(target.getLocation());
+this.setCruiseSpeed(getMaximumSpeed());
+System.out.println("Do Attack Called in Terrorist:");
+/*System.out.println("Target Name: " + target.getSMAL().getName());*/</Code>
+        <Coordinate x="220" y="340"/>
+    </Event>
+    <Event name="CreateZones">
+        <Comment/>
+        <Argument name="startZones" type="diskit.ZoneGeometry[]">
+            <Comment>Possible starting locations, only restriction should be physical limitations of attack craft</Comment>
+        </Argument>
+        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, startZones)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="startPositions" type="diskit.ZoneGeometry[]" value="zoneReader.getMyPatrol()">
+            <Comment>Starting position zones assigned to this entity</Comment>
+        </LocalVariable>
+        <StateTransition state="attackCreator">
+            <Assignment value="new diskit.WaypointCreator(startPositions)"/>
+        </StateTransition>
+        <StateTransition state="harborDirector">
+            <Assignment value="new diskit.WaypointCreator(harborLocation)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, harborDirector, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule event="Start"/>
+        <Code/>
+        <Coordinate x="30" y="150"/>
+    </Event>
+    <Event name="CreateSensors">
+        <Comment>Builds array of all sensors to be registered</Comment>
+        <LocalVariable name="numOfSensors" type="int" value="3">
+            <Comment>Number of Sensors for this entity</Comment>
+        </LocalVariable>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
+            <Comment>Array to add all sensors</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code>sensors[0] = visualPerception;
+sensors[1] = detonateProximity;
+sensors[2] = collisionAvoidance;</Code>
+        <Coordinate x="120" y="150"/>
+    </Event>
+    <Event name="Stop">
+        <Comment/>
+        <Code>System.out.println("doStop called in Terrorist");
+Schedule.stopSimulation();</Code>
+        <Coordinate x="380" y="460"/>
+    </Event>
+    <Event name="CreateExplosive">
+        <Comment>Creates the explosive for this entity</Comment>
+        <StateTransition state="plasticExplosives">
+            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), getMoverID(), diskit.EntityType.HOSTILE, &quot;Plastic Explosives&quot;, blastRadius)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
+            <Comment/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="120" y="0"/>
+    </Event>
+    <Event name="RegisterMunition">
+        <Comment>Register the explosive with scenario Manager</Comment>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The explosives just created</Comment>
+        </Argument>
+        <StateTransition state="plasticExplosives">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code>this.addSimEventListener(munition);</Code>
+        <Coordinate x="220" y="0"/>
+    </Event>
+    <Event name="Detonate">
+        <Comment/>
+        <Argument name="shooter" type="diskit.Mover3D"/>
+        <Argument name="munition" type="diskit.Munition"/>
+        <Schedule condition="true" delay="5" event="Stop" priority="0">
+            <Comment>After the terrorist blows up, stop the simulation after a delay to allow for animation and data collection</Comment>
+        </Schedule>
+        <Code>setCruiseSpeed(0);
+setStartPosition(getLocation());
+System.out.println("Terrorist doDetonate event");</Code>
+        <Coordinate x="380" y="340"/>
+    </Event>
+    <Event name="ScaleSpeedToKnots">
+        <Comment>Scales maximum speed to knots</Comment>
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+            <Comment/>
+        </LocalVariable>
+        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Coordinate x="30" y="80"/>
+    </Event>
+</SimEntity>
+
