@@ -380,10 +380,31 @@ public class Vstatics
                   }
               }
           }
-          putParameterList(c.getName(),plist);
-          
+          //putParameterList(c.getName(),plist);
+          putParameterList(type,plist);
+          resolved = plist;
       }
       return resolved;
       
   }
+  
+  // check if primitive type in Viskit format ie not Clazz format
+  public static boolean isPrimitive(String type) {
+      return type.equals("byte") | type.equals("boolean") 
+        | type.equals("char") | type.equals("double") 
+        | type.equals("float") | type.equals("int") 
+        | type.equals("short"); 
+  }
+  
+  // returns number of constructors, checks is [] type
+  public static int numConstructors(String type) {
+      if (type.endsWith("]")) {
+          return 1;
+      } else {
+          Class clz = classForName(type);
+          Constructor[] constrs = clz.getConstructors();
+          return constrs.length;
+      }
+  }
+  
 }

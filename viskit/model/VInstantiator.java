@@ -6,6 +6,7 @@ import viskit.xsd.bindings.eventgraph.ParameterType;
 import viskit.xsd.bindings.assembly.TerminalParameterType;
 import viskit.xsd.bindings.assembly.FactoryParameterType;
 import viskit.xsd.bindings.assembly.MultiParameterType;
+import viskit.xsd.bindings.assembly.ObjectFactory;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -107,11 +108,29 @@ public abstract class VInstantiator
     private List args;
 
     // takes List of Assembly parameters and args for type
-    // note this gets used in recursion, so it may not be top-level
+
     public Constr(List params, String type) {
         super(type);
         
         System.out.println("Building Constr for "+type);
+        System.out.println("Required Parameters:");
+        java.util.ListIterator li = params.listIterator();
+        while(li.hasNext()) {
+            Object o = li.next();
+           
+            String s1="null";
+            if ( o instanceof TerminalParameterType ) { // check if caller is sending assembly param types
+                s1 = ((TerminalParameterType)o).getType();  System.out.print("\tAssembly TerminalParameterType");
+            } else if ( o instanceof MultiParameterType ) {
+                s1 = ((MultiParameterType)o).getType(); System.out.print("\tAssembly MultiParameterType");
+            } else if ( o instanceof FactoryParameterType ) {
+                s1 = ((FactoryParameterType)o).getType();   System.out.print("\tAssembly FactoryParameterType");              
+            } else if (o instanceof ParameterType) { // from InstantiationPanel, this could also be an eventgraph param type?
+                s1 = ((ParameterType)o).getType(); System.out.print("\tEventGraph ParameterType");
+
+            }  
+            System.out.println(" "+s1);
+        }
         // gets lists of EventGraph parameters for type if top-level
         // or null if type is a basic class ie. java.lang.Double
         // todo use same block as LegosTree to resolve any type
@@ -166,6 +185,61 @@ public abstract class VInstantiator
                 instr.add(buildMultiParameter((MultiParameterType)o));
             } else if (o instanceof FactoryParameterType) {
                 instr.add(buildFactoryParameter((FactoryParameterType)o));
+            } else if (o instanceof ParameterType) { // from InstantiationPanel Const getter
+                System.out.println("Conversion from "+((ParameterType)o).getType()); // 
+                
+                List args = new ArrayList();
+                String type = ((ParameterType)o).getType();
+                String name = ((ParameterType)o).getName();
+                ObjectFactory of = new ObjectFactory();
+                
+                // TerminalParameter
+                if ( Vstatics.isPrimitive(type) || type.equals("String") || type.equals("java.lang.String")) {
+                    try {
+                        TerminalParameterType tp = of.createTerminalParameterType();
+                        tp.setType(type);
+                        tp.setName(name);
+                        tp.setValue("");
+                        instr.add(buildTerminalParameter(tp));
+                    } catch (javax.xml.bind.JAXBException jaxbe) {
+                        jaxbe.printStackTrace();
+                    }
+                } else if (Vstatics.numConstructors(type) > 0 ){ // MultiParameter
+                    
+                    try {
+                        MultiParameterType mp = of.createMultiParameterType();
+                        mp.setType(type);
+                        mp.setName(name);
+                        // if  mp is [] then done
+                        if (!type.endsWith("]")) {
+                            // fill with empty parameters?
+                        }
+                        instr.add(buildMultiParameter(mp));
+                    } catch (javax.xml.bind.JAXBException ex) {
+                        ex.printStackTrace();
+                    }
+                    
+                } else { // no constructors, should be a FactoryParameter or array of them
+                    try {
+                        if (type.endsWith("]")) {
+                            MultiParameterType mp = of.createMultiParameterType();
+                            mp.setType(type);
+                            mp.setName(name);
+                            instr.add(buildMultiParameter(mp));
+                        } else {
+                            FactoryParameterType fp = of.createFactoryParameterType();
+                            fp.setName(name);
+                            fp.setFactory(type); // this gets handled later
+                            fp.setType(type); // this should be the type returned by method
+                            fp.setMethod("fill in method for factory");
+                            instr.add(buildFactoryParameter(fp));
+                        }
+                    } catch (javax.xml.bind.JAXBException ex) {
+                        ex.printStackTrace();
+                    }
+                    
+                }
+                
             }
         }
         return instr;
@@ -202,26 +276,33 @@ public abstract class VInstantiator
     
     boolean paramsMatch(List aparams,List eparams) {
         if ( aparams.size() != eparams.size() ) {
+            System.out.println("No match.");
             return false;
         }
         
         for (int i = 0; i < aparams.size(); i++) {
             Object o = aparams.get(i);
-            String s1 = ((ParameterType)(eparams.get(i))).getType();
-            String s2;
-            if ( o instanceof TerminalParameterType ) {
-                s2 = ((TerminalParameterType)o).getType();
+            String s2 = ((ParameterType)(eparams.get(i))).getType();
+            String s1;
+            if ( o instanceof TerminalParameterType ) { // check if caller is sending assembly param types
+                s1 = ((TerminalParameterType)o).getType();
             } else if ( o instanceof MultiParameterType ) {
-                s2 = ((MultiParameterType)o).getType();
+                s1 = ((MultiParameterType)o).getType();
             } else if ( o instanceof FactoryParameterType ) {
-                s2 = ((FactoryParameterType)o).getType();
-            } else return false;
-            System.out.print("Type match "+s1 + " "+ s2);
+                s1 = ((FactoryParameterType)o).getType();
+            } else if (o instanceof ParameterType) { // from InstantiationPanel, this could also be an eventgraph param type
+                s1 = ((ParameterType)o).getType();
+            }   else return false;
+            System.out.print("Type match "+s1 + " to "+ s2);
             s1 = s1.split("\\.")[ s1.split("\\.").length - 1 ];
             s2 = s2.split("\\.")[ s2.split("\\.").length - 1 ];
-            System.out.println(s1 + " " + s2);
-            if (!s1.equals(s2)) return false;
+            System.out.println(" tail "+s1 + " " + s2); // eg. java.lang.String vs. String?
+            if (!s1.equals(s2)) {
+                System.out.println("No match.");
+                return false;
+            }
         }
+        System.out.println("Match.");
         return true;
         
     }

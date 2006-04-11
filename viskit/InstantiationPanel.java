@@ -291,6 +291,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     String typ;
     public void setType(String clName) throws ClassNotFoundException
    {
+        System.out.println("InstantiationPanel: Constructor for class "+clName);
         List[] parameters = Vstatics.resolveParameters(clName);
         typ = clName;
         removeAll();

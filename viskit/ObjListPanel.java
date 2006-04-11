@@ -105,7 +105,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             for (int x = 0; x < typeLab.length; x++) {
                 if (nameLab != null){
                     if(nameLab[x].getText().length() <= 0) {
-                        nameLab[x].setText("flop"); nameLab[x].setBorder(new LineBorder(Color.cyan));}
+                        nameLab[x].setText(":"); nameLab[x].setBorder(new LineBorder(Color.cyan));}
                     add(nameLab[x]);
                 }
                 add(typeLab[x]);
