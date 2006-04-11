@@ -14,12 +14,6 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="name" type="java.lang.String">
         <Comment>Should match name in Assembly</Comment>
     </Parameter>
-    <Parameter name="blastRadius" type="double">
-        <Comment>proximity to a target required to effectively destroy it</Comment>
-    </Parameter>
-    <Parameter name="harborLocation" type="diskit.ZoneGeometry[]">
-        <Comment>General area where the harbor is located</Comment>
-    </Parameter>
     <Parameter name="level" type="java.lang.String">
         <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
     </Parameter>
@@ -140,6 +134,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="plasticExplosives" type="diskit.Explosive">
         <Comment>Explosives that this entity is carrying</Comment>
     </StateVariable>
+    <StateVariable name="blastRadius" type="double">
+        <Comment/>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="avoidanceRange">
@@ -159,6 +156,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         </StateTransition>
         <StateTransition state="visualRange">
             <Assignment value="1800"/>
+        </StateTransition>
+        <StateTransition state="blastRadius">
+            <Assignment value="40"/>
         </StateTransition>
         <Schedule event="ScaleSpeedToKnots"/>
         <Code/>
@@ -248,7 +248,7 @@ System.out.println("My loc:          " + getLocation());
         <Code>setStartPosition(startLocation); 
 setDestination(harborDirector.createWaypoint());
 setCruiseSpeed(approachSpeed);</Code>
-        <Coordinate x="30" y="320"/>
+        <Coordinate x="300" y="230"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
@@ -306,15 +306,8 @@ System.out.println("Do Attack Called in Terrorist:");
         <StateTransition state="attackCreator">
             <Assignment value="new diskit.WaypointCreator(startPositions)"/>
         </StateTransition>
-        <StateTransition state="harborDirector">
-            <Assignment value="new diskit.WaypointCreator(harborLocation)"/>
-        </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, harborDirector, avoidanceRange)"/>
-        </StateTransition>
-        <Schedule event="Start"/>
         <Code/>
-        <Coordinate x="30" y="150"/>
+        <Coordinate x="30" y="230"/>
     </Event>
     <Event name="CreateSensors">
         <Comment>Builds array of all sensors to be registered</Comment>
@@ -381,6 +374,30 @@ System.out.println("Terrorist doDetonate event");</Code>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
         <Coordinate x="30" y="80"/>
+    </Event>
+    <Event name="SetHarborLocation">
+        <Comment/>
+        <Argument name="entityID" type="int"/>
+        <Argument name="harborLocation" type="diskit.ZoneGeometry[]"/>
+        <Schedule condition="entityID == moverID" delay="0.0" event="PrepareForAttack" priority="0">
+            <Comment/>
+            <EdgeParameter value="harborLocation"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="110" y="230"/>
+    </Event>
+    <Event name="PrepareForAttack">
+        <Comment/>
+        <Argument name="destinationChoices" type="diskit.ZoneGeometry[]"/>
+        <StateTransition state="harborDirector">
+            <Assignment value="new diskit.WaypointCreator(destinationChoices)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, harborDirector, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule event="Start"/>
+        <Code/>
+        <Coordinate x="210" y="230"/>
     </Event>
 </SimEntity>
 
