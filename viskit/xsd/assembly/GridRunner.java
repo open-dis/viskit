@@ -198,7 +198,7 @@ public class GridRunner {
             }
             return Integer.valueOf(data.length);
         } catch (Exception e) {
-            return Integer.valueOf(-1);
+            return Integer.valueOf("-1");
         }
     }
 
