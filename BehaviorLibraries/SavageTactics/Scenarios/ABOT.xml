@@ -546,204 +546,7 @@
         <TerminalParameter name="name" type="java.lang.String" value="Oil Tanker 2 (East)"/>
         <Coordinate x="390" y="530"/>
     </SimEntity>
-    <SimEntity description="Creates the starting position areas for each terrorist listening to this object" name="TerroristCellPlanner" type="diskit.SceneZoneCreator">
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="600"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="600"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="600"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="600"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-7500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-7500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="4300"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="10000"/>
-                <TerminalParameter name="p[4] : " type="double" value="500"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="2500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".25"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-7500"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="9000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-3097.249"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-3394.708"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="534.772"/>
-                <TerminalParameter name="p[4] : " type="double" value="53.934"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-418.91"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="2094.154"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="1274.633"/>
-                <TerminalParameter name="p[4] : " type="double" value="100"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-3097.249"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-3394.708"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="534.772"/>
-                <TerminalParameter name="p[4] : " type="double" value="53.934"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-418.91"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="2094.154"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="1274.633"/>
-                <TerminalParameter name="p[4] : " type="double" value="100"/>
-                <TerminalParameter name="p[5] : " type="double" value="0"/>
-            </MultiParameter>
-        </MultiParameter>
-        <Coordinate x="320" y="0"/>
-    </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="600"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -752,24 +555,30 @@
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="20"/>
         <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="600"/>
-                <TerminalParameter name="p[1] : " type="double" value="1"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2600"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="1000"/>
-                <TerminalParameter name="p[4] : " type="double" value="100"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+        <TerminalParameter name="length" type="double" value="18"/>
+        <TerminalParameter name="width" type="double" value="5"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".5"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="2"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="0"/>
         <Coordinate x="260" y="100"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="601"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -777,25 +586,31 @@
             <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 2"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="601"/>
-                <TerminalParameter name="p[1] : " type="double" value="1"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2600"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="1000"/>
-                <TerminalParameter name="p[4] : " type="double" value="100"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
+        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+        <TerminalParameter name="length" type="double" value="18"/>
+        <TerminalParameter name="width" type="double" value="5"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".5"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="2"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="0"/>
         <Coordinate x="320" y="100"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.Terrorist">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="602"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -803,22 +618,28 @@
             <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 3"/>
-        <TerminalParameter name="blastRadius" type="double" value="10"/>
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="602"/>
-                <TerminalParameter name="p[1] : " type="double" value="1"/>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-2600"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="0"/>
-                </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="1000"/>
-                <TerminalParameter name="p[4] : " type="double" value="100"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-            </MultiParameter>
+        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
+        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+        <TerminalParameter name="length" type="double" value="18"/>
+        <TerminalParameter name="width" type="double" value="5"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <TerminalParameter name="draft" type="double" value=".5"/>
+        <MultiParameter type="double[]">
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
+        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+        <TerminalParameter name="forceID" type="int" value="2"/>
+        <TerminalParameter name="entityDomain" type="int" value="3"/>
+        <TerminalParameter name="entityKind" type="int" value="1"/>
+        <TerminalParameter name="entityCountry" type="int" value="0"/>
         <Coordinate x="380" y="100"/>
     </SimEntity>
     <SimEntity name="ABOTObstacles" type="diskit.Obstacles">
@@ -1378,10 +1199,178 @@
         <TerminalParameter name="entityCountry" type="int" value="225"/>
         <Coordinate x="190" y="400"/>
     </SimEntity>
+    <SimEntity description="" name="TerroristCellPlanner" type="diskit.TerroristCellPlanner">
+        <MultiParameter type="int[]">
+            <TerminalParameter name="" type="int" value="600"/>
+            <TerminalParameter name="" type="int" value="601"/>
+            <TerminalParameter name="" type="int" value="602"/>
+        </MultiParameter>
+        <MultiParameter type="diskit.ZoneGeometry[]">
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value="1"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2600"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="1000"/>
+                <TerminalParameter name="p[4] : " type="double" value="100"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ZoneGeometry[]">
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="600"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-7500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="601"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="601"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="601"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="601"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-7500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="602"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="602"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="4300"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="10000"/>
+                <TerminalParameter name="p[4] : " type="double" value="500"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="602"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="2500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.ZoneGeometry">
+                <TerminalParameter name="p[0] : " type="int" value="602"/>
+                <TerminalParameter name="p[1] : " type="double" value=".25"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-7500"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="500"/>
+                <TerminalParameter name="p[4] : " type="double" value="9000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="320" y="10"/>
+    </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="p[0] : " type="double" value=".2"/>
         <TerminalParameter name="p[1] : " type="long" value="200"/>
-        <Coordinate x="320" y="460"/>
+        <Coordinate x="330" y="460"/>
     </SimEntity>
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="SuperCobra"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes zone assignments" listener="SuperCobra" source="USNavyPatrolZones"/>
@@ -1405,9 +1394,9 @@
     <SimEventListenerConnection listener="ScenarioManager" source="OilTankerEast"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes traffic zones" listener="CommerShipGreece" source="PersianGulfTrafficLanes"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes traffic zones" listener="CommerShipPanama" source="PersianGulfTrafficLanes"/>
-    <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist1" source="TerroristCellPlanner"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist2" source="TerroristCellPlanner"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist3" source="TerroristCellPlanner"/>
+    <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist1" source="TerroristCellPlanner"/>
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="Terrorist1"/>
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="Terrorist2"/>
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="Terrorist3"/>
@@ -1417,7 +1406,7 @@
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="DDG77"/>
     <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes zone assignments" listener="CG59" source="USNavyPatrolZones"/>
     <SimEventListenerConnection description="Registers entity with scenario and enables DIS packet construction" listener="ScenarioManager" source="CG59"/>
-    <SimEventListenerConnection description="Transmits the doSendPings event for packet construction and transmittal" listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
     <Schedule stopTime="10000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
