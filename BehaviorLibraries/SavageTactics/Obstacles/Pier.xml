@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="pjsulliv" extend="SimEntityBase" name="Pier" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>A single human sentry.  This vehicle has the ability to provide sensory data and detect other entities but does not avoid other entities.</Comment>
+    <Comment>A Pier</Comment>
     <Parameter name="center" type="diskit.Vec3d">
         <Comment>Center point of the pier</Comment>
     </Parameter>
