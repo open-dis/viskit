@@ -239,7 +239,7 @@ setDestination(waypoint);
     </Event>
     <Event name="ScaleSpeedToKnots">
         <Comment>Scales max speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/2">
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
