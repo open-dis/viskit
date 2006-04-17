@@ -516,6 +516,7 @@
         <Coordinate x="700" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierBravo" type="diskit.Pier">
+       <TerminalParameter name="moverID" type="int" value="800"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-660.574"/>
             <TerminalParameter name="" type="double" value="-772.039"/>
@@ -528,6 +529,7 @@
         <Coordinate x="60" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierCharlie" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="801"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-563.442"/>
             <TerminalParameter name="" type="double" value="-964.239"/>
@@ -540,6 +542,7 @@
         <Coordinate x="240" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierDelta" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="802"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-692.608"/>
             <TerminalParameter name="" type="double" value="-1144.037"/>
@@ -552,6 +555,7 @@
         <Coordinate x="410" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringE" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="802"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-740.141"/>
             <TerminalParameter name="" type="double" value="-1326.936"/>
@@ -564,6 +568,7 @@
         <Coordinate x="640" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringF" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="803"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-776.308"/>
             <TerminalParameter name="" type="double" value="-1466.435"/>
@@ -576,6 +581,7 @@
         <Coordinate x="810" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringG" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="804"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="" type="double" value="-779.408"/>
             <TerminalParameter name="" type="double" value="-1654.50"/>
