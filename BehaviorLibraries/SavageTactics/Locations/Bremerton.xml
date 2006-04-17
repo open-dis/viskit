@@ -8,77 +8,83 @@
         <TerminalParameter name="p[4] : " type="int" value="1"/>
         <Coordinate x="220" y="130"/>
     </SimEntity>
-    <SimEntity description="" name="PierBravo" type="diskit.Pier">
+        <SimEntity description="" name="PierBravo" type="diskit.Pier">
+       <TerminalParameter name="moverID" type="int" value="800"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-660.574"/>
-            <TerminalParameter name="p[1] : " type="double" value="-772.039"/>
-            <TerminalParameter name="p[2] : " type="double" value="0"/>
+            <TerminalParameter name="" type="double" value="-660.574"/>
+            <TerminalParameter name="" type="double" value="-772.039"/>
+            <TerminalParameter name="" type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="360"/>
         <TerminalParameter name="width" type="double" value="20"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="60" y="230"/>
+        <Coordinate x="60" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierCharlie" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="801"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-563.442"/>
-            <TerminalParameter name="p[1] : " type="double" value="-964.239"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="-563.442"/>
+            <TerminalParameter name="" type="double" value="-964.239"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="175.341"/>
         <TerminalParameter name="width" type="double" value="34.276"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="130" y="230"/>
+        <Coordinate x="240" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierDelta" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="802"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-692.608"/>
-            <TerminalParameter name="p[1] : " type="double" value="-1144.037"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="-692.608"/>
+            <TerminalParameter name="" type="double" value="-1144.037"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="437.082"/>
         <TerminalParameter name="width" type="double" value="49.33"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="210" y="230"/>
+        <Coordinate x="410" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringE" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="802"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-740.141"/>
-            <TerminalParameter name="p[1] : " type="double" value="-1326.936"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="-740.141"/>
+            <TerminalParameter name="" type="double" value="-1326.936"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="370.166"/>
         <TerminalParameter name="width" type="double" value="11.898"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="290" y="230"/>
+        <Coordinate x="640" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringF" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="803"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-776.308"/>
-            <TerminalParameter name="p[1] : " type="double" value="-1466.435"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="-776.308"/>
+            <TerminalParameter name="" type="double" value="-1466.435"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="299.833"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="380" y="230"/>
+        <Coordinate x="810" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringG" type="diskit.Pier">
+    <TerminalParameter name="moverID" type="int" value="804"/>
         <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="p[0] : " type="double" value="-779.408"/>
-            <TerminalParameter name="p[1] : " type="double" value="-1654.50"/>
-            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+            <TerminalParameter name="" type="double" value="-779.408"/>
+            <TerminalParameter name="" type="double" value="-1654.50"/>
+            <TerminalParameter name="" type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="length" type="double" value="276.551"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
         <TerminalParameter name="height" type="double" value="3"/>
         <TerminalParameter name="rotation" type="double" value="0"/>
-        <Coordinate x="460" y="230"/>
+        <Coordinate x="910" y="480"/>
     </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="p[0] : " type="double" value=".2"/>

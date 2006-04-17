@@ -9,6 +9,7 @@
         <Coordinate x="220" y="130"/>
     </SimEntity>
     <SimEntity description="Overall Area of ammo pier, includes the three access piers" name="AmmoPier" type="diskit.Pier">
+      <TerminalParameter name="moverID" type="int" value="800"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-343.347"/>
             <TerminalParameter name="p[1] : " type="double" value="-1178.404"/>
@@ -17,7 +18,7 @@
         <TerminalParameter name="length" type="double" value="360"/>
         <TerminalParameter name="width" type="double" value="20"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="-16.5"/>
+        <TerminalParameter name="rotation" type="double" value="-0.0917"/>
         <Coordinate x="220" y="230"/>
     </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
