@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="SimEntityBase" name="Pier" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>A Pier</Comment>
+<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="Pier" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>A Pier without berths specified</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>Unique ID number for this object</Comment>
+    </Parameter>
     <Parameter name="center" type="diskit.Vec3d">
         <Comment>Center point of the pier</Comment>
     </Parameter>
@@ -29,10 +32,6 @@
         <Code/>
         <Coordinate x="130" y="30"/>
     </Event>
-    <Code>/*
-Currently just a place holder event graph.  Scenario Manager will have to be updated to register event graphs 
-that extend diskit.Obstacle (not created as of 2/28). ZoneMoverManagers will need access to these objects to
-do slope intercept calculations when they generate waypoints.  If a pier intersects the path between a startPosition 
-and destination.</Code>
+    <Code/>
 </SimEntity>
 
