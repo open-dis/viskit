@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="PierWithBerths" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>A Pier with berth positions specified. This graph must impelment Mover3D in order to use it's proximity sensor</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>Unique ID number for this object</Comment>
+    </Parameter>
+    <Parameter name="center" type="diskit.Vec3d">
+        <Comment>Center point of the pier</Comment>
+    </Parameter>
+    <Parameter name="length" type="double">
+        <Comment>length of the pier</Comment>
+    </Parameter>
+    <Parameter name="width" type="double">
+        <Comment>width of this pier</Comment>
+    </Parameter>
+    <Parameter name="height" type="double">
+        <Comment>Height in meters above the waterline</Comment>
+    </Parameter>
+    <Parameter name="rotation" type="double">
+        <Comment>Orientation in radians about the Y axis (Z for DIS)</Comment>
+    </Parameter>
+    <Parameter name="berths" type="diskit.Berth[]">
+        <Comment>The individual berths contained on this pier</Comment>
+    </Parameter>
+    <StateVariable name="proximitySensor" type="diskit.Sensor">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>Initializes all state variables for each simulation run.</Comment>
+        <Schedule event="Init"/>
+        <Code/>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="Init">
+        <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>Entity being initialized</Comment>
+        </Argument>
+        <StateTransition state="proximitySensor">
+            <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterSensorByRelay" priority="0">
+            <Comment/>
+            <EdgeParameter value="proximitySensor"/>
+        </Schedule>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTargetByRelay" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="130" y="30"/>
+    </Event>
+    <Event name="RegisterSensorByRelay">
+        <Comment>Passes Sensor to Relay for Registration</Comment>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Code>sensor.addSimEventListener(this);</Code>
+        <Coordinate x="250" y="110"/>
+    </Event>
+    <Event name="RegisterTargetByRelay">
+        <Comment/>
+        <Argument name="target" type="diskit.Mover3D"/>
+        <Code/>
+        <Coordinate x="250" y="30"/>
+    </Event>
+    <Code/>
+</SimEntity>
+
