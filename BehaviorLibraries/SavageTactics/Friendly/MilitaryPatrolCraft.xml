@@ -181,7 +181,7 @@
             <Operation method="addSimEventListener(this)"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="90" y="240"/>
+        <Coordinate x="90" y="300"/>
     </Event>
     <Event name="CreateZones">
         <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
@@ -444,7 +444,7 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         </Schedule>
         <Code>sensors[0] = visualPerception;
 sensors[1] = collisionAvoidance;</Code>
-        <Coordinate x="10" y="240"/>
+        <Coordinate x="10" y="300"/>
     </Event>
     <Event name="StandOff">
         <Comment>Cannot intercept and block the contact so follow the contact at maximum speed</Comment>
