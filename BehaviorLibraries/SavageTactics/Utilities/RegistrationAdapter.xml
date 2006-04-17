@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="RegistrationAdapter" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>This utility class serves as a Adapter between an entity and the scenario manager.  If an entity has a "doRegisterTargetByAdapter" and or a "doRegisterSensorByAdapter" event this entity and this class is listening to it it will pass the information to a RegistrationAdapter.
+
+The most common use of this utility is to group common entities in graphical form in the assembly editor.  See BehaviorLibraries/Locations/PearlHarbor.xml for an exaample implementation</Comment>
+    <Event name="Run">
+        <Code/>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="RegisterTargetWithAdapter">
+        <Comment>Listens to this event in a connected class and passes the argument to a RegistrationAdapter</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target being registered by Adapter</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="100"/>
+    </Event>
+    <Event name="RegisterSensorWithAdapter">
+        <Comment>Listens to this event in a connected class and passes the argument to a RegistrationAdapter</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor being registered using this Adapter</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="170"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Passes target to an adapter</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to Adapter to the adapter</Comment>
+        </Argument>
+        <Code>System.out.println("RegisterTarget reached in Adapter");</Code>
+        <Coordinate x="130" y="100"/>
+    </Event>
+    <Event name="RegisterSensor">
+        <Comment>Passes target to an adapter</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor to pass to the adapter</Comment>
+        </Argument>
+        <Code>System.out.println("RegisterSensor reached in Adapter");</Code>
+        <Coordinate x="130" y="170"/>
+    </Event>
+</SimEntity>
+
