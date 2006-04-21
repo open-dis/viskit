@@ -36,26 +36,26 @@
             <Comment>Entity being initialized</Comment>
         </Argument>
         <StateTransition state="proximitySensor">
-            <Assignment value="new diskit.SphereCutterSensor(this, length/2)"/>
+            <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensorByRelay" priority="0">
             <Comment/>
             <EdgeParameter value="proximitySensor"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTargetByRelay" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
         <Coordinate x="130" y="30"/>
     </Event>
-    <Event name="RegisterSensor">
+    <Event name="RegisterSensorByRelay">
         <Comment>Passes Sensor to Relay for Registration</Comment>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Code>sensor.addSimEventListener(this);</Code>
         <Coordinate x="250" y="110"/>
     </Event>
-    <Event name="RegisterTarget">
+    <Event name="RegisterTargetByRelay">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
         <Code/>
