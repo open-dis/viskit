@@ -193,7 +193,7 @@
     </Event>
     <Event name="CreateZones">
         <Comment>Listens to the Harbor Creator to get Zone Assignment geometry</Comment>
-        <Argument name="patrolAssignment" type="ZoneGeometry[]">
+        <Argument name="patrolAssignment" type="ProbabilityZoneGeometry[]">
             <Comment>Passed by the Harbor Creator - states patrol responsibilities and contains entity ID for assignment</Comment>
         </Argument>
         <LocalVariable name="count" type="int" value="0">
@@ -202,7 +202,7 @@
         <LocalVariable name="idx" type="int" value="0">
             <Comment>Used for patrol zone array construction</Comment>
         </LocalVariable>
-        <LocalVariable name="duties" type="ZoneGeometry[]" value="null">
+        <LocalVariable name="duties" type="ProbabilityZoneGeometry[]" value="null">
             <Comment/>
         </LocalVariable>
         <StateTransition state="waypointCreator">
@@ -215,7 +215,7 @@
             <Assignment value="patrolManager"/>
         </StateTransition>
         <Schedule event="Patrol"/>
-        <Code>for(int i = 0; i&lt;patrolAssignment.length; i++){     if(patrolAssignment[i].getID() == moverID){                       count++;        }  }  duties = new ZoneGeometry[count];  for(int i = 0; i &lt; patrolAssignment.length; i++){   if(patrolAssignment[i].getID() == moverID){      duties[idx] = patrolAssignment[i];      idx++;      }  } setStartPosition(duties[0].getCenter3D());</Code>
+        <Code>for(int i = 0; i&lt;patrolAssignment.length; i++){     if(patrolAssignment[i].getID() == moverID){                       count++;        }  }  duties = new ProbabilityZoneGeometry[count];  for(int i = 0; i &lt; patrolAssignment.length; i++){   if(patrolAssignment[i].getID() == moverID){      duties[idx] = patrolAssignment[i];      idx++;      }  } setStartPosition(duties[0].getCenter3D());</Code>
         <Coordinate x="20" y="190"/>
     </Event>
     <Event name="ClearExclusionZone">

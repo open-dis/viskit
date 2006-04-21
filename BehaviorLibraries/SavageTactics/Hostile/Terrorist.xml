@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="pjsulliv" extend="diskit.HostileForce" name="Terrorist" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Terrorist that starts from a point randomly within ZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
+    <Comment>Terrorist that starts from a point randomly within ProbabilityZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
 TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique DIS entity ID number</Comment>
@@ -17,7 +17,7 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="blastRadius" type="double">
         <Comment>proximity to a target required to effectively destroy it</Comment>
     </Parameter>
-    <Parameter name="harborLocation" type="diskit.ZoneGeometry[]">
+    <Parameter name="harborLocation" type="diskit.ProbabilityZoneGeometry[]">
         <Comment>General area where the harbor is located</Comment>
     </Parameter>
     <StateVariable name="avoidanceRange" type="double">
@@ -242,13 +242,13 @@ System.out.println("Do Attack Called in Terrorist:");
     </Event>
     <Event name="CreateZones">
         <Comment/>
-        <Argument name="startZones" type="diskit.ZoneGeometry[]">
+        <Argument name="startZones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Possible starting locations, only restriction should be physical limitations of attack craft</Comment>
         </Argument>
         <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, startZones)">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="startPositions" type="diskit.ZoneGeometry[]" value="zoneReader.getMyPatrol()">
+        <LocalVariable name="startPositions" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
             <Comment>Starting position zones assigned to this entity</Comment>
         </LocalVariable>
         <StateTransition state="attackCreator">

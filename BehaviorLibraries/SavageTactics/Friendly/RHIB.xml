@@ -27,13 +27,13 @@ NOTE: Visual perception and communications are behaviors representing the person
         <Comment>Proximity tolerance for this contact. Will maneuver to avoid objects that will breach this range</Comment>
     </StateVariable>
     <StateVariable name="patrolManager" type="diskit.ZoneMoverManager">
-        <Comment>Mover manager that manages entity movement based on diskit.ZoneGeometry patrol zones</Comment>
+        <Comment>Mover manager that manages entity movement based on diskit.ProbabilityZoneGeometry patrol zones</Comment>
     </StateVariable>
     <StateVariable name="tacticalMode" type="diskit.TacticalMode">
         <Comment>Tactical State that the RHIB is in (e.g. Patrolling, Intercepting)</Comment>
     </StateVariable>
     <StateVariable name="waypointGenerator" type="diskit.WaypointCreator">
-        <Comment>Generates waypoints based on the diskit.ZoneGeometry for this entity</Comment>
+        <Comment>Generates waypoints based on the diskit.ProbabilityZoneGeometry for this entity</Comment>
     </StateVariable>
     <StateVariable name="calc" type="diskit.util.MovementCalculator">
         <Comment>Calculates intercept and avoidance</Comment>
@@ -134,13 +134,13 @@ NOTE: Visual perception and communications are behaviors representing the person
     </Event>
     <Event name="CreateZones">
         <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
-        <Argument name="zones" type="diskit.ZoneGeometry[]">
+        <Argument name="zones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Zones for this simulation</Comment>
         </Argument>
         <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
             <Comment>Reads Zones for only those that are for this entity</Comment>
         </LocalVariable>
-        <LocalVariable name="myPatrol" type="diskit.ZoneGeometry[]" value="zoneReader.getMyPatrol()">
+        <LocalVariable name="myPatrol" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
             <Comment>Returns this entities patrol zones</Comment>
         </LocalVariable>
         <StateTransition state="waypointGenerator">

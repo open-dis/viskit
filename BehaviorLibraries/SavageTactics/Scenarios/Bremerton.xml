@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="Bremerton" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity description="" name="SceneZoneCreator" type="diskit.SceneZoneCreator">
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="101"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -13,9 +13,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="500"/>
                 <TerminalParameter name="zoneWidth" type="double" value="2000"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+                        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="101"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -26,9 +31,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="518.053"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1766.035"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+                        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="102"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -39,9 +49,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="846.449"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1339.32"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+                        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="102"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -52,9 +67,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="1261.1"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1064.44"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="103"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -65,9 +85,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="846.449"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1339.32"/>
                 <TerminalParameter name="zoneHeight" type="double" value="20"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="103"/>
                 <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
@@ -78,9 +103,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="1261.1"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1064.44"/>
                 <TerminalParameter name="zoneHeight" type="double" value="20"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="121"/>
                 <TerminalParameter name="probability" type="double" value="1"/>
                 <MultiParameter type="double[]">
@@ -91,9 +121,14 @@
                 <TerminalParameter name="zoneLength" type="double" value="500"/>
                 <TerminalParameter name="zoneWidth" type="double" value="2000"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="entityID" type="int" value="121"/>
                 <TerminalParameter name="probability" type="double" value="0"/>
                 <MultiParameter type="double[]">
@@ -104,7 +139,12 @@
                 <TerminalParameter name="zoneLength" type="double" value="518.053"/>
                 <TerminalParameter name="zoneWidth" type="double" value="1766.035"/>
                 <TerminalParameter name="zoneHeight" type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
         </MultiParameter>
         <Coordinate x="30" y="90"/>
@@ -253,8 +293,8 @@
             <TerminalParameter name="" type="int" value="601"/>
             <TerminalParameter name="" type="int" value="602"/>
         </MultiParameter>
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
                 <TerminalParameter name="p[1] : " type="double" value="1"/>
                 <MultiParameter type="double[]">
@@ -265,11 +305,16 @@
                 <TerminalParameter name="p[3] : " type="double" value="1000"/>
                 <TerminalParameter name="p[4] : " type="double" value="100"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+                        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <MultiParameter type="diskit.ZoneGeometry[]">
-            <MultiParameter type="diskit.ZoneGeometry">
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -280,9 +325,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -293,9 +343,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -306,9 +361,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="600"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -319,9 +379,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="601"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -332,9 +397,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="601"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -345,9 +415,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="601"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -358,9 +433,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="601"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -371,9 +451,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="602"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -384,9 +469,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="602"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -397,9 +487,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="10000"/>
                 <TerminalParameter name="p[4] : " type="double" value="500"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="602"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -410,9 +505,14 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0.0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
-            <MultiParameter type="diskit.ZoneGeometry">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
                 <TerminalParameter name="p[0] : " type="int" value="602"/>
                 <TerminalParameter name="p[1] : " type="double" value=".25"/>
                 <MultiParameter type="double[]">
@@ -423,12 +523,17 @@
                 <TerminalParameter name="p[3] : " type="double" value="500"/>
                 <TerminalParameter name="p[4] : " type="double" value="9000"/>
                 <TerminalParameter name="p[5] : " type="double" value="0"/>
-                <TerminalParameter name="" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
             </MultiParameter>
         </MultiParameter>
         <Coordinate x="560" y="110"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVessel">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="600"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -460,7 +565,7 @@
         <TerminalParameter name="entityCountry" type="int" value="0"/>
         <Coordinate x="460" y="50"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVessel">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="601"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -492,7 +597,7 @@
         <TerminalParameter name="entityCountry" type="int" value="0"/>
         <Coordinate x="460" y="110"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVessel">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="602"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
