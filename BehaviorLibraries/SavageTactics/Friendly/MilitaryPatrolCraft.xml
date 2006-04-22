@@ -158,8 +158,7 @@
             <EdgeParameter value="this"/>
         </Schedule>
         <Schedule event="CreateSensors"/>
-        <Code>System.out.println("\n\n**************************");
-System.out.println(entity);</Code>
+        <Code/>
         <Coordinate x="10" y="150"/>
     </Event>
     <Event name="RegisterTarget">
