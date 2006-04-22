@@ -221,7 +221,7 @@
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Provides a waypoint within the geometry specified</Comment>
         </LocalVariable>
-        <LocalVariable  type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+        <LocalVariable name="startPosition" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Pick a random start position</Comment>
         </LocalVariable>
         <StateTransition state="speed">
@@ -247,4 +247,3 @@ setDestination(waypoint);
     </Event>
     <Code/>
 </SimEntity>
-
