@@ -18,7 +18,12 @@
         <TerminalParameter name="length" type="double" value="360"/>
         <TerminalParameter name="width" type="double" value="20"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="-0.0917"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="-0.0917"/>
+        </MultiParameter>
         <Coordinate x="220" y="230"/>
     </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
