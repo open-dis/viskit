@@ -9,7 +9,7 @@
         <Coordinate x="690" y="150"/>
     </SimEntity>
     <SimEntity description="Alpha Piers, berth 1" name="A1" type="diskit.PierWithBerths">
-		<TerminalParameter name="moverID" type="int" value="800"/>
+        <TerminalParameter name="moverID" type="int" value="800"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1255.071"/>
             <TerminalParameter name="p[1] : " type="double" value="2886.506"/>
@@ -18,7 +18,7 @@
         <TerminalParameter name="length" type="double" value="120"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -38,7 +38,7 @@
         <Coordinate x="260" y="800"/>
     </SimEntity>
     <SimEntity description="Alpha Piers, berths 2-3" name="A2-A3" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="801"/>
+        <TerminalParameter name="moverID" type="int" value="801"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1334.225"/>
             <TerminalParameter name="p[1] : " type="double" value="2876.853"/>
@@ -76,7 +76,7 @@
         <Coordinate x="260" y="860"/>
     </SimEntity>
     <SimEntity description="Alpha Piers, berth 4" name="A4" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="802"/>
+        <TerminalParameter name="moverID" type="int" value="802"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1330.364"/>
             <TerminalParameter name="p[1] : " type="double" value="2829.553"/>
@@ -85,7 +85,7 @@
         <TerminalParameter name="length" type="double" value="70"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-      <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -105,7 +105,7 @@
         <Coordinate x="260" y="920"/>
     </SimEntity>
     <SimEntity description="Alpha Piers, berths 5 through 6" name="A5-A6" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="803"/>
+        <TerminalParameter name="moverID" type="int" value="803"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1396.004"/>
             <TerminalParameter name="p[1] : " type="double" value="2850.79"/>
@@ -114,7 +114,7 @@
         <TerminalParameter name="length" type="double" value="91"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -143,7 +143,7 @@
         <Coordinate x="260" y="980"/>
     </SimEntity>
     <SimEntity description="Alpha Piers, berth 7" name="A7" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="804"/>
+        <TerminalParameter name="moverID" type="int" value="804"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1418.206"/>
             <TerminalParameter name="p[1] : " type="double" value="2789.01"/>
@@ -152,7 +152,7 @@
         <TerminalParameter name="length" type="double" value="110"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -172,7 +172,7 @@
         <Coordinate x="260" y="1040"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 1 through 4" name="B1-B4" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="805"/>
+        <TerminalParameter name="moverID" type="int" value="805"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-242.341"/>
             <TerminalParameter name="p[1] : " type="double" value="131.417"/>
@@ -181,7 +181,7 @@
         <TerminalParameter name="length" type="double" value="600"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -228,7 +228,7 @@
         <Coordinate x="370" y="800"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berth 5" name="B5" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="806"/>
+        <TerminalParameter name="moverID" type="int" value="806"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-114.643"/>
             <TerminalParameter name="p[1] : " type="double" value="37.643"/>
@@ -237,7 +237,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -257,7 +257,7 @@
         <Coordinate x="370" y="860"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berth 6" name="B6" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="807"/>
+        <TerminalParameter name="moverID" type="int" value="807"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-31.284"/>
             <TerminalParameter name="p[1] : " type="double" value="-8.615"/>
@@ -266,7 +266,7 @@
         <TerminalParameter name="length" type="double" value="155"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -286,7 +286,7 @@
         <Coordinate x="370" y="920"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 7 through 8" name="B7-B8" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="808"/>
+        <TerminalParameter name="moverID" type="int" value="808"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="7.735"/>
             <TerminalParameter name="p[1] : " type="double" value="-6.921"/>
@@ -295,7 +295,7 @@
         <TerminalParameter name="length" type="double" value="223"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -324,7 +324,7 @@
         <Coordinate x="370" y="980"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berth 9" name="B9" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="809"/>
+        <TerminalParameter name="moverID" type="int" value="809"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0.64"/>
             <TerminalParameter name="p[1] : " type="double" value="104.815"/>
@@ -333,7 +333,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -353,7 +353,7 @@
         <Coordinate x="370" y="1040"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 10 through 13" name="B10-B13" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="810"/>
+        <TerminalParameter name="moverID" type="int" value="810"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="59.167"/>
             <TerminalParameter name="p[1] : " type="double" value="129.649"/>
@@ -362,7 +362,7 @@
         <TerminalParameter name="length" type="double" value="400"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -409,7 +409,7 @@
         <Coordinate x="370" y="1100"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berth 14" name="B14" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="811"/>
+        <TerminalParameter name="moverID" type="int" value="811"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="16.602"/>
             <TerminalParameter name="p[1] : " type="double" value="315.87"/>
@@ -418,7 +418,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -438,7 +438,7 @@
         <Coordinate x="370" y="1160"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 15 through 18" name="B15-B18" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="812"/>
+        <TerminalParameter name="moverID" type="int" value="812"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="161.148"/>
             <TerminalParameter name="p[1] : " type="double" value="197.041"/>
@@ -447,7 +447,7 @@
         <TerminalParameter name="length" type="double" value="350"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -494,7 +494,7 @@
         <Coordinate x="370" y="1220"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berth 19" name="B19" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="813"/>
+        <TerminalParameter name="moverID" type="int" value="813"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="125.678"/>
             <TerminalParameter name="p[1] : " type="double" value="381.493"/>
@@ -503,7 +503,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -523,7 +523,7 @@
         <Coordinate x="370" y="1280"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 20 through 21" name="B20-B21" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="814"/>
+        <TerminalParameter name="moverID" type="int" value="814"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="248.054"/>
             <TerminalParameter name="p[1] : " type="double" value="299.908"/>
@@ -532,7 +532,7 @@
         <TerminalParameter name="length" type="double" value="300"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -561,7 +561,7 @@
         <Coordinate x="370" y="1340"/>
     </SimEntity>
     <SimEntity description="Bravo Piers, berths 22 through 26" name="B22-B26" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="815"/>
+        <TerminalParameter name="moverID" type="int" value="815"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="693.221"/>
             <TerminalParameter name="p[1] : " type="double" value="399.227"/>
@@ -570,7 +570,7 @@
         <TerminalParameter name="length" type="double" value="900"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -617,7 +617,7 @@
         <Coordinate x="370" y="1400"/>
     </SimEntity>
     <SimEntity description="Hickham Wharf by Alpha Piers" name="HickhamWharf" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="816"/>
+        <TerminalParameter name="moverID" type="int" value="816"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1245.901"/>
             <TerminalParameter name="p[1] : " type="double" value="3007.169"/>
@@ -626,7 +626,7 @@
         <TerminalParameter name="length" type="double" value="170"/>
         <TerminalParameter name="width" type="double" value="70"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -635,7 +635,7 @@
         <Coordinate x="1040" y="860"/>
     </SimEntity>
     <SimEntity description="Deperming Pier, at Beckoning Point" name="DepermPier" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="817"/>
+        <TerminalParameter name="moverID" type="int" value="817"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-2194.949"/>
             <TerminalParameter name="p[1] : " type="double" value="-1052.982"/>
@@ -644,7 +644,7 @@
         <TerminalParameter name="length" type="double" value="110"/>
         <TerminalParameter name="width" type="double" value="25"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -664,7 +664,7 @@
         <Coordinate x="1040" y="980"/>
     </SimEntity>
     <SimEntity description="Inactive Ships Pier 1" name="InactiveShipsPier1" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="818"/>
+        <TerminalParameter name="moverID" type="int" value="818"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-3896.386"/>
             <TerminalParameter name="p[1] : " type="double" value="-2709.534"/>
@@ -673,7 +673,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -682,7 +682,7 @@
         <Coordinate x="1040" y="1040"/>
     </SimEntity>
     <SimEntity description="Inactive Ships Pier 2" name="InactiveShipsPier2" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="819"/>
+        <TerminalParameter name="moverID" type="int" value="819"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-3915.018"/>
             <TerminalParameter name="p[1] : " type="double" value="-2658.719"/>
@@ -691,7 +691,7 @@
         <TerminalParameter name="length" type="double" value="70"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -700,7 +700,7 @@
         <Coordinate x="1040" y="1100"/>
     </SimEntity>
     <SimEntity description="Utah Memorial, back side of Ford Island" name="UtahMemorial" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="820"/>
+        <TerminalParameter name="moverID" type="int" value="820"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-907.436"/>
             <TerminalParameter name="p[1] : " type="double" value="-1449.546"/>
@@ -709,7 +709,7 @@
         <TerminalParameter name="length" type="double" value="16"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -718,7 +718,7 @@
         <Coordinate x="1040" y="1160"/>
     </SimEntity>
     <SimEntity description="Torpedo Waterborne Recovery (TWR) Boat House" name="TWRBoatHouse" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="821"/>
+        <TerminalParameter name="moverID" type="int" value="821"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1393.785"/>
             <TerminalParameter name="p[1] : " type="double" value="294.587"/>
@@ -727,7 +727,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -747,7 +747,7 @@
         <Coordinate x="1040" y="800"/>
     </SimEntity>
     <SimEntity description="Landing Bravo, behind Arizona Memorial" name="LandingBravo" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="822"/>
+        <TerminalParameter name="moverID" type="int" value="822"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="315.652"/>
             <TerminalParameter name="p[1] : " type="double" value="1292.548"/>
@@ -756,7 +756,7 @@
         <TerminalParameter name="length" type="double" value="80"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -765,7 +765,7 @@
         <Coordinate x="1040" y="920"/>
     </SimEntity>
     <SimEntity description="Ferry Boat House on Ford Island" name="FerryBoatHouse" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="823"/>
+        <TerminalParameter name="moverID" type="int" value="823"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-305.188"/>
             <TerminalParameter name="p[1] : " type="double" value="-654.966"/>
@@ -774,7 +774,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="15"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -783,7 +783,7 @@
         <Coordinate x="970" y="860"/>
     </SimEntity>
     <SimEntity description="Victor Piers, berth 1" name="V1" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="824"/>
+        <TerminalParameter name="moverID" type="int" value="824"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-2024.72"/>
             <TerminalParameter name="p[1] : " type="double" value="1706.794"/>
@@ -792,7 +792,7 @@
         <TerminalParameter name="length" type="double" value="116"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -812,7 +812,7 @@
         <Coordinate x="830" y="800"/>
     </SimEntity>
     <SimEntity description="Victor Piers, berth 2" name="V2" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="825"/>
+        <TerminalParameter name="moverID" type="int" value="825"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1763.872"/>
             <TerminalParameter name="p[1] : " type="double" value="-1564.514"/>
@@ -821,7 +821,7 @@
         <TerminalParameter name="length" type="double" value="116"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -841,7 +841,7 @@
         <Coordinate x="830" y="860"/>
     </SimEntity>
     <SimEntity description="Victor Piers, berth 3" name="V3" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="826"/>
+        <TerminalParameter name="moverID" type="int" value="826"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1570.778"/>
             <TerminalParameter name="p[1] : " type="double" value="-1601.778"/>
@@ -850,7 +850,7 @@
         <TerminalParameter name="length" type="double" value="130"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -870,7 +870,7 @@
         <Coordinate x="830" y="920"/>
     </SimEntity>
     <SimEntity description="Victor Piers, berth 4" name="V4" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="827"/>
+        <TerminalParameter name="moverID" type="int" value="827"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1428.496"/>
             <TerminalParameter name="p[1] : " type="double" value="-1869.401"/>
@@ -879,7 +879,7 @@
         <TerminalParameter name="length" type="double" value="130"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -899,7 +899,7 @@
         <Coordinate x="830" y="980"/>
     </SimEntity>
     <SimEntity description="Victor Piers, berths 5 through 6" name="V5-V6" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="828"/>
+        <TerminalParameter name="moverID" type="int" value="828"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1345.5"/>
             <TerminalParameter name="p[1] : " type="double" value="-2536.765"/>
@@ -908,7 +908,7 @@
         <TerminalParameter name="length" type="double" value="210"/>
         <TerminalParameter name="width" type="double" value="15"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -937,7 +937,7 @@
         <Coordinate x="830" y="1040"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 1A" name="F1A" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="829"/>
+        <TerminalParameter name="moverID" type="int" value="829"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-766.102"/>
             <TerminalParameter name="p[1] : " type="double" value="-138.953"/>
@@ -946,7 +946,7 @@
         <TerminalParameter name="length" type="double" value="170"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -966,7 +966,7 @@
         <Coordinate x="460" y="800"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 1B" name="F1B" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="830"/>
+        <TerminalParameter name="moverID" type="int" value="830"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-683.889"/>
             <TerminalParameter name="p[1] : " type="double" value="-193.177"/>
@@ -975,7 +975,7 @@
         <TerminalParameter name="length" type="double" value="90"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -995,7 +995,7 @@
         <Coordinate x="460" y="860"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 2" name="F2" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="831"/>
+        <TerminalParameter name="moverID" type="int" value="831"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-585.06"/>
             <TerminalParameter name="p[1] : " type="double" value="-278.014"/>
@@ -1004,7 +1004,7 @@
         <TerminalParameter name="length" type="double" value="23"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1013,7 +1013,7 @@
         <Coordinate x="460" y="920"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 3" name="F3" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="832"/>
+        <TerminalParameter name="moverID" type="int" value="832"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-494.976"/>
             <TerminalParameter name="p[1] : " type="double" value="-438.065"/>
@@ -1022,7 +1022,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1031,7 +1031,7 @@
         <Coordinate x="460" y="980"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 3.5" name="F3.5" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="833"/>
+        <TerminalParameter name="moverID" type="int" value="833"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-522.088"/>
             <TerminalParameter name="p[1] : " type="double" value="-612.985"/>
@@ -1040,7 +1040,7 @@
         <TerminalParameter name="length" type="double" value="140"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1060,7 +1060,7 @@
         <Coordinate x="460" y="1040"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 5" name="F5" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="834"/>
+        <TerminalParameter name="moverID" type="int" value="834"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-11.323"/>
             <TerminalParameter name="p[1] : " type="double" value="-745.924"/>
@@ -1069,7 +1069,7 @@
         <TerminalParameter name="length" type="double" value="300"/>
         <TerminalParameter name="width" type="double" value="30"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1078,7 +1078,7 @@
         <Coordinate x="460" y="1100"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 6" name="F6" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="835"/>
+        <TerminalParameter name="moverID" type="int" value="835"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="144.356"/>
             <TerminalParameter name="p[1] : " type="double" value="-889.358"/>
@@ -1087,7 +1087,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1096,7 +1096,7 @@
         <Coordinate x="460" y="1160"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 7" name="F7" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="836"/>
+        <TerminalParameter name="moverID" type="int" value="836"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="312.279"/>
             <TerminalParameter name="p[1] : " type="double" value="-1029.296"/>
@@ -1105,7 +1105,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1114,7 +1114,7 @@
         <Coordinate x="460" y="1220"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 8" name="F8" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="837"/>
+        <TerminalParameter name="moverID" type="int" value="837"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="480.202"/>
             <TerminalParameter name="p[1] : " type="double" value="-1165.731"/>
@@ -1123,7 +1123,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1132,7 +1132,7 @@
         <Coordinate x="460" y="1280"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 10" name="F10" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="838"/>
+        <TerminalParameter name="moverID" type="int" value="838"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1334.49"/>
             <TerminalParameter name="p[1] : " type="double" value="-1112.265"/>
@@ -1141,7 +1141,7 @@
         <TerminalParameter name="length" type="double" value="113"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1161,7 +1161,7 @@
         <Coordinate x="460" y="1340"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berth 11" name="F11" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="839"/>
+        <TerminalParameter name="moverID" type="int" value="839"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1126.15"/>
             <TerminalParameter name="p[1] : " type="double" value="-1283.34"/>
@@ -1170,7 +1170,7 @@
         <TerminalParameter name="length" type="double" value="113"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1190,7 +1190,7 @@
         <Coordinate x="460" y="1400"/>
     </SimEntity>
     <SimEntity description="Foxtrot Piers, berths 12 through 13" name="F12-F13" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="840"/>
+        <TerminalParameter name="moverID" type="int" value="840"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-702.04"/>
             <TerminalParameter name="p[1] : " type="double" value="-1635.717"/>
@@ -1199,7 +1199,7 @@
         <TerminalParameter name="length" type="double" value="440"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1228,7 +1228,7 @@
         <Coordinate x="460" y="1460"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berth 1" name="S1" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="841"/>
+        <TerminalParameter name="moverID" type="int" value="841"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1232.39"/>
             <TerminalParameter name="p[1] : " type="double" value="221.871"/>
@@ -1237,7 +1237,7 @@
         <TerminalParameter name="length" type="double" value="3500"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1275,7 +1275,7 @@
         <Coordinate x="760" y="800"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berths 8-9" name="S8-S9" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="842"/>
+        <TerminalParameter name="moverID" type="int" value="842"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="927.334"/>
             <TerminalParameter name="p[1] : " type="double" value="143.834"/>
@@ -1284,7 +1284,7 @@
         <TerminalParameter name="length" type="double" value="160"/>
         <TerminalParameter name="width" type="double" value="25"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1313,7 +1313,7 @@
         <Coordinate x="760" y="860"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berths 10-14" name="S10-S14" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="843"/>
+        <TerminalParameter name="moverID" type="int" value="843"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1181.843"/>
             <TerminalParameter name="p[1] : " type="double" value="-178.958"/>
@@ -1322,7 +1322,7 @@
         <TerminalParameter name="length" type="double" value="460"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1378,7 +1378,7 @@
         <Coordinate x="760" y="920"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berths 15 through 16" name="S15-S16" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="844"/>
+        <TerminalParameter name="moverID" type="int" value="844"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1242.144"/>
             <TerminalParameter name="p[1] : " type="double" value="-343.9"/>
@@ -1387,7 +1387,7 @@
         <TerminalParameter name="length" type="double" value="135"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1416,7 +1416,7 @@
         <Coordinate x="760" y="980"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berths 17 through 18" name="S17-S18" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="845"/>
+        <TerminalParameter name="moverID" type="int" value="845"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1196.031"/>
             <TerminalParameter name="p[1] : " type="double" value="-375.825"/>
@@ -1425,7 +1425,7 @@
         <TerminalParameter name="length" type="double" value="139"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1454,7 +1454,7 @@
         <Coordinate x="760" y="1040"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berth 19" name="S19" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="846"/>
+        <TerminalParameter name="moverID" type="int" value="846"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1151.692"/>
             <TerminalParameter name="p[1] : " type="double" value="-418.39"/>
@@ -1463,7 +1463,7 @@
         <TerminalParameter name="length" type="double" value="150"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1483,7 +1483,7 @@
         <Coordinate x="760" y="1100"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berth 20" name="S20" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="847"/>
+        <TerminalParameter name="moverID" type="int" value="847"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1055.919"/>
             <TerminalParameter name="p[1] : " type="double" value="-342.127"/>
@@ -1492,7 +1492,7 @@
         <TerminalParameter name="length" type="double" value="70"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1512,7 +1512,7 @@
         <Coordinate x="760" y="1160"/>
     </SimEntity>
     <SimEntity description="Sierra Piers, berth 21A - 21B" name="S21" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="848"/>
+        <TerminalParameter name="moverID" type="int" value="848"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="903.391"/>
             <TerminalParameter name="p[1] : " type="double" value="-171.864"/>
@@ -1521,7 +1521,7 @@
         <TerminalParameter name="length" type="double" value="280"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1559,7 +1559,7 @@
         <Coordinate x="760" y="1220"/>
     </SimEntity>
     <SimEntity description="Sub Base Ferry Landing" name="SubBaseFerryLanding" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="849"/>
+        <TerminalParameter name="moverID" type="int" value="849"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1007.146"/>
             <TerminalParameter name="p[1] : " type="double" value="44.513"/>
@@ -1568,7 +1568,7 @@
         <TerminalParameter name="length" type="double" value="100"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1577,7 +1577,7 @@
         <Coordinate x="970" y="800"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berth 1" name="K1" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="850"/>
+        <TerminalParameter name="moverID" type="int" value="850"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="515.969"/>
             <TerminalParameter name="p[1] : " type="double" value="-260.692"/>
@@ -1586,7 +1586,7 @@
         <TerminalParameter name="length" type="double" value="140"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1606,7 +1606,7 @@
         <Coordinate x="620" y="800"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berths 3-5" name="K3-K5" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="851"/>
+        <TerminalParameter name="moverID" type="int" value="851"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="690.889"/>
             <TerminalParameter name="p[1] : " type="double" value="-382.316"/>
@@ -1615,7 +1615,7 @@
         <TerminalParameter name="length" type="double" value="315"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1644,7 +1644,7 @@
         <Coordinate x="620" y="860"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berth 6" name="K6" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="852"/>
+        <TerminalParameter name="moverID" type="int" value="852"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="837.112"/>
             <TerminalParameter name="p[1] : " type="double" value="-506.673"/>
@@ -1653,7 +1653,7 @@
         <TerminalParameter name="length" type="double" value="130"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1673,7 +1673,7 @@
         <Coordinate x="620" y="920"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berths 7 through 8" name="K7-K8" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="853"/>
+        <TerminalParameter name="moverID" type="int" value="853"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="748.968"/>
             <TerminalParameter name="p[1] : " type="double" value="-558.603"/>
@@ -1682,7 +1682,7 @@
         <TerminalParameter name="length" type="double" value="210"/>
         <TerminalParameter name="width" type="double" value="45"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1711,7 +1711,7 @@
         <Coordinate x="620" y="980"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berth 9" name="K9" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="854"/>
+        <TerminalParameter name="moverID" type="int" value="854"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="835.746"/>
             <TerminalParameter name="p[1] : " type="double" value="-672.028"/>
@@ -1720,7 +1720,7 @@
         <TerminalParameter name="length" type="double" value="110"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1740,7 +1740,7 @@
         <Coordinate x="620" y="1040"/>
     </SimEntity>
     <SimEntity description="Kilo Piers, berths 10-11" name="K10-K11" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="855"/>
+        <TerminalParameter name="moverID" type="int" value="855"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="975.134"/>
             <TerminalParameter name="p[1] : " type="double" value="-786.819"/>
@@ -1749,7 +1749,7 @@
         <TerminalParameter name="length" type="double" value="310"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1778,7 +1778,7 @@
         <Coordinate x="620" y="1100"/>
     </SimEntity>
     <SimEntity description="Hotel Piers, berths 1 through 4" name="H1-H4" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="856"/>
+        <TerminalParameter name="moverID" type="int" value="856"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1135.023"/>
             <TerminalParameter name="p[1] : " type="double" value="-1001.37"/>
@@ -1787,7 +1787,7 @@
         <TerminalParameter name="length" type="double" value="410"/>
         <TerminalParameter name="width" type="double" value="19"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1834,7 +1834,7 @@
         <Coordinate x="540" y="800"/>
     </SimEntity>
     <SimEntity description="Mike Piers, berths 1 through 2" name="M1-M2" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="857"/>
+        <TerminalParameter name="moverID" type="int" value="857"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1062.124"/>
             <TerminalParameter name="p[1] : " type="double" value="480.812"/>
@@ -1843,7 +1843,7 @@
         <TerminalParameter name="length" type="double" value="250"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1872,7 +1872,7 @@
         <Coordinate x="690" y="800"/>
     </SimEntity>
     <SimEntity description="Mike Piers, berths 3 through 4" name="M3-M4" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="858"/>
+        <TerminalParameter name="moverID" type="int" value="858"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1204.012"/>
             <TerminalParameter name="p[1] : " type="double" value="347.795"/>
@@ -1881,7 +1881,7 @@
         <TerminalParameter name="length" type="double" value="390"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1910,7 +1910,7 @@
         <Coordinate x="690" y="860"/>
     </SimEntity>
     <SimEntity description="Yankee Piers, berth 2" name="Y2" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="859"/>
+        <TerminalParameter name="moverID" type="int" value="859"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="748.285"/>
             <TerminalParameter name="p[1] : " type="double" value="-14.71"/>
@@ -1919,7 +1919,7 @@
         <TerminalParameter name="length" type="double" value="160"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1939,7 +1939,7 @@
         <Coordinate x="900" y="800"/>
     </SimEntity>
     <SimEntity description="Yankee Piers, berth 3" name="Y3" type="diskit.PierWithBerths">
-    <TerminalParameter name="moverID" type="int" value="860"/>
+        <TerminalParameter name="moverID" type="int" value="860"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="589.762"/>
             <TerminalParameter name="p[1] : " type="double" value="-81.673"/>
@@ -1948,7 +1948,7 @@
         <TerminalParameter name="length" type="double" value="330"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -1986,7 +1986,7 @@
         <Coordinate x="900" y="860"/>
     </SimEntity>
     <SimEntity description="Ford Island Ferry Landing" name="FordIslandFerryLanding" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="861"/>
+        <TerminalParameter name="moverID" type="int" value="861"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-641.908"/>
             <TerminalParameter name="p[1] : " type="double" value="-214.168"/>
@@ -1995,7 +1995,7 @@
         <TerminalParameter name="length" type="double" value="23"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2004,7 +2004,7 @@
         <Coordinate x="970" y="920"/>
     </SimEntity>
     <SimEntity description="Merry Point Ferry Landing" name="MerryPointFerryLanding" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="862"/>
+        <TerminalParameter name="moverID" type="int" value="862"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1097.598"/>
             <TerminalParameter name="p[1] : " type="double" value="613.831"/>
@@ -2013,7 +2013,7 @@
         <TerminalParameter name="length" type="double" value="60"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2022,7 +2022,7 @@
         <Coordinate x="970" y="980"/>
     </SimEntity>
     <SimEntity description="Arizona Landing Aiea, the boat landing that loads visitors at the museum" name="ArizonaLandingAiea" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="863"/>
+        <TerminalParameter name="moverID" type="int" value="863"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="1453.747"/>
             <TerminalParameter name="p[1] : " type="double" value="-1175.223"/>
@@ -2031,7 +2031,7 @@
         <TerminalParameter name="length" type="double" value="60"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2040,7 +2040,7 @@
         <Coordinate x="1110" y="920"/>
     </SimEntity>
     <SimEntity description="Arizona Landing Ford Island, the boat landing that loads visitors at the memorial" name="ArizonaLandingFordIsland" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="864"/>
+        <TerminalParameter name="moverID" type="int" value="864"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="374.376"/>
             <TerminalParameter name="p[1] : " type="double" value="-982.065"/>
@@ -2049,7 +2049,7 @@
         <TerminalParameter name="length" type="double" value="30"/>
         <TerminalParameter name="width" type="double" value="5"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2058,7 +2058,7 @@
         <Coordinate x="1110" y="860"/>
     </SimEntity>
     <SimEntity description="Arizona Memorial" name="ArizonaMemorial" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="865"/>
+        <TerminalParameter name="moverID" type="int" value="865"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="352.51"/>
             <TerminalParameter name="p[1] : " type="double" value="-1018.799"/>
@@ -2067,7 +2067,7 @@
         <TerminalParameter name="length" type="double" value="60"/>
         <TerminalParameter name="width" type="double" value="13"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2076,7 +2076,7 @@
         <Coordinate x="1110" y="800"/>
     </SimEntity>
     <SimEntity description="Iroquois Point Ferry Landing" name="IroquoisPointFerryLanding" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="866"/>
+        <TerminalParameter name="moverID" type="int" value="866"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1986.388"/>
             <TerminalParameter name="p[1] : " type="double" value="3121.074"/>
@@ -2085,7 +2085,7 @@
         <TerminalParameter name="length" type="double" value="20"/>
         <TerminalParameter name="width" type="double" value="5"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2094,7 +2094,7 @@
         <Coordinate x="970" y="1040"/>
     </SimEntity>
     <SimEntity description="Charlie Landing" name="CharlieLanding" type="diskit.Pier">
-    <TerminalParameter name="moverID" type="int" value="867"/>
+        <TerminalParameter name="moverID" type="int" value="867"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-1128.949"/>
             <TerminalParameter name="p[1] : " type="double" value="444.982"/>
@@ -2103,7 +2103,7 @@
         <TerminalParameter name="length" type="double" value="25"/>
         <TerminalParameter name="width" type="double" value="10"/>
         <TerminalParameter name="height" type="double" value="2"/>
-                <MultiParameter type="diskit.Vec4d">
+        <MultiParameter type="diskit.Vec4d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
             <TerminalParameter name="p[1] : " type="double" value="0"/>
             <TerminalParameter name="p[2] : " type="double" value="1"/>
@@ -2154,6 +2154,693 @@
     </SimEntity>
     <SimEntity description="The collection of Arizona Piers. Serves as a connection between SimEntities and a Registration Adapter." name="ArizonaPiers" type="diskit.RegistrationRelay">
         <Coordinate x="1110" y="690"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="TripodReef" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="868"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2139.637"/>
+            <TerminalParameter name="p[1] : " type="double" value="4075.544"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1000"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0.753"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="AhuaReef" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="869"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1155.929"/>
+            <TerminalParameter name="p[1] : " type="double" value="4068.199"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1000"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.010"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBeach" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="870"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1737.978"/>
+            <TerminalParameter name="p[1] : " type="double" value="3423.876"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="650"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.507"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBeach2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="871"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1829.618"/>
+            <TerminalParameter name="p[1] : " type="double" value="3055.299"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="200"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.764"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="AhuaReef2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="872"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1271.716"/>
+            <TerminalParameter name="p[1] : " type="double" value="3335.257"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="600"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.256"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBoatLanding" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="873"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1937.162"/>
+            <TerminalParameter name="p[1] : " type="double" value="2580.105"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="800"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.633"/>
+        </MultiParameter>
+        <Coordinate x="1540" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="BishopPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="874"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1486.979"/>
+            <TerminalParameter name="p[1] : " type="double" value="2780.186"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="200"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.638"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="HickhamChannelWaterfront" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="875"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1557.008"/>
+            <TerminalParameter name="p[1] : " type="double" value="2330.001"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="800"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.507"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="OkioKiolepePond" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="876"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2469.034"/>
+            <TerminalParameter name="p[1] : " type="double" value="1493.496"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1800"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.199"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="877"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2455.392"/>
+            <TerminalParameter name="p[1] : " type="double" value="1047.326"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1400"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.199"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="KeKaaPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="878"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3476.904"/>
+            <TerminalParameter name="p[1] : " type="double" value="782.296"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1100"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="BaltmrePoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="879"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3463.601"/>
+            <TerminalParameter name="p[1] : " type="double" value="548.751"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="BaltmrePoint1" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="880"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3031.987"/>
+            <TerminalParameter name="p[1] : " type="double" value="504.407"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="400"/>
+        <TerminalParameter name="width" type="double" value="40"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".251"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="PowderPoint1" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="881"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4078.504"/>
+            <TerminalParameter name="p[1] : " type="double" value="533.969"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.759"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="PowderPoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="882"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4307.614"/>
+            <TerminalParameter name="p[1] : " type="double" value="261.993"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="400"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="3.015"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WestLochWaterFront" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="883"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4730.361"/>
+            <TerminalParameter name="p[1] : " type="double" value="335.9"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".436"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="884"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3883.93"/>
+            <TerminalParameter name="p[1] : " type="double" value="-193.868"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="550"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".251"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint3" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="885"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4029.674"/>
+            <TerminalParameter name="p[1] : " type="double" value="-374.079"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="900"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".251"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint4" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="886"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3613.479"/>
+            <TerminalParameter name="p[1] : " type="double" value="-367.2"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="250"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.507"/>
+        </MultiParameter>
+        <Coordinate x="1480" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="HanaloaPoint1" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="887"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4504.342"/>
+            <TerminalParameter name="p[1] : " type="double" value="-178.021"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="250"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".879"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="HanaloaPoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="888"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-4727.918"/>
+            <TerminalParameter name="p[1] : " type="double" value="-43.874"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="250"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".125"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="NicholsPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="889"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-5140.673"/>
+            <TerminalParameter name="p[1] : " type="double" value="272.571"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="-.753"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="BishopPoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="890"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1327.847"/>
+            <TerminalParameter name="p[1] : " type="double" value="1744.731"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".802"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="HospitalPoint1" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="891"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1369.124"/>
+            <TerminalParameter name="p[1] : " type="double" value="1166.873"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="900"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.094"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="HospitalPoint2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="892"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1320.967"/>
+            <TerminalParameter name="p[1] : " type="double" value="568.379"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="700"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".645"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="NevadaPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="893"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2039.85"/>
+            <TerminalParameter name="p[1] : " type="double" value="-319.045"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1200"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.024"/>
+        </MultiParameter>
+        <Coordinate x="1420" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="LocoPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="894"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3154.289"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1543.552"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1200"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.443"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="BeckoningPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="895"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2493.88"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1165.194"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="400"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.792"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuWaterFront1" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="896"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3880.05"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2836.852"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1200"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.745"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuWaterFront2" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="897"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3646.155"/>
+            <TerminalParameter name="p[1] : " type="double" value="-3490.382"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="700"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".139"/>
+        </MultiParameter>
+        <Coordinate x="1360" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WildLifeRefuge" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="898"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3068.298"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2974.437"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="900"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.181"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="790"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="PearlCityPenisulaWest" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="899"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-2586.75"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2479.131"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="500"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.617"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="850"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="PearlCityPenisulaEast" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="900"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1537.663"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2967.558"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="600"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.094"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="910"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="WaimaluStream" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="901"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-354.432"/>
+            <TerminalParameter name="p[1] : " type="double" value="-3228.97"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="700"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.53"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="970"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="AieaWaterFront" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="902"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="753.128"/>
+            <TerminalParameter name="p[1] : " type="double" value="2719.905"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="800"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.53"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="1030"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="AieaBay" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="903"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="1812.534"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2238.358"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="375"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.53"/>
+        </MultiParameter>
+        <Coordinate x="1300" y="1090"/>
+    </SimEntity>
+    <SimEntity description="A zone representing a large segment of waterfront area" name="AieaShoal" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="904"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="1633.673"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1825.602"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="375"/>
+        <TerminalParameter name="width" type="double" value="30"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".959"/>
+        </MultiParameter>
+        <Coordinate x="1600" y="1150"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront1" type="diskit.RegistrationRelay">
+        <Coordinate x="1300" y="690"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront2" type="diskit.RegistrationRelay">
+        <Coordinate x="1360" y="690"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront3" type="diskit.RegistrationRelay">
+        <Coordinate x="1420" y="690"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront4" type="diskit.RegistrationRelay">
+        <Coordinate x="1480" y="690"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront5" type="diskit.RegistrationRelay">
+        <Coordinate x="1540" y="690"/>
+    </SimEntity>
+    <SimEntity description="A collection of waterfront areas" name="WaterFront6" type="diskit.RegistrationRelay">
+        <Coordinate x="1600" y="690"/>
+    </SimEntity>
+    <SimEntity description="The complete collection of all WaterFront zones" name="WaterFront" type="diskit.RegistrationAdapter">
+        <Coordinate x="1460" y="530"/>
     </SimEntity>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="AlphaPiers" source="A1"/>
@@ -2237,6 +2924,50 @@
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="Piers" source="MiscPiers"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="Piers" source="ArizonaPiers"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="ScenarioManager" source="Piers"/>
+    <SimEventListenerConnection listener="WaterFront1" source="WildLifeRefuge"/>
+    <SimEventListenerConnection listener="WaterFront1" source="PearlCityPenisulaWest"/>
+    <SimEventListenerConnection listener="WaterFront1" source="PearlCityPenisulaEast"/>
+    <SimEventListenerConnection listener="WaterFront1" source="WaimaluStream"/>
+    <SimEventListenerConnection listener="WaterFront1" source="AieaWaterFront"/>
+    <SimEventListenerConnection listener="WaterFront1" source="AieaBay"/>
+    <SimEventListenerConnection listener="WaterFront2" source="HospitalPoint1"/>
+    <SimEventListenerConnection listener="WaterFront2" source="HospitalPoint2"/>
+    <SimEventListenerConnection listener="WaterFront2" source="LocoPoint"/>
+    <SimEventListenerConnection listener="WaterFront2" source="BeckoningPoint"/>
+    <SimEventListenerConnection listener="WaterFront2" source="WaipahuWaterFront1"/>
+    <SimEventListenerConnection listener="WaterFront2" source="WaipahuWaterFront2"/>
+    <SimEventListenerConnection listener="WaterFront3" source="WaipahuPoint"/>
+    <SimEventListenerConnection listener="WaterFront3" source="KeKaaPoint"/>
+    <SimEventListenerConnection listener="WaterFront3" source="HanaloaPoint1"/>
+    <SimEventListenerConnection listener="WaterFront3" source="HanaloaPoint2"/>
+    <SimEventListenerConnection listener="WaterFront3" source="NicholsPoint"/>
+    <SimEventListenerConnection listener="WaterFront3" source="NevadaPoint"/>
+    <SimEventListenerConnection listener="WaterFront4" source="WestLochWaterFront"/>
+    <SimEventListenerConnection listener="WaterFront4" source="IntrepidPoint2"/>
+    <SimEventListenerConnection listener="WaterFront4" source="IntrepidPoint3"/>
+    <SimEventListenerConnection listener="WaterFront4" source="IntrepidPoint4"/>
+    <SimEventListenerConnection listener="WaterFront4" source="PowderPoint1"/>
+    <SimEventListenerConnection listener="WaterFront4" source="PowderPoint2"/>
+    <SimEventListenerConnection listener="WaterFront5" source="TripodReef"/>
+    <SimEventListenerConnection listener="WaterFront5" source="AhuaReef"/>
+    <SimEventListenerConnection listener="WaterFront5" source="AhuaReef2"/>
+    <SimEventListenerConnection listener="WaterFront5" source="IroquoisPointBeach"/>
+    <SimEventListenerConnection listener="WaterFront5" source="IroquoisPointBeach2"/>
+    <SimEventListenerConnection listener="WaterFront5" source="IroquoisPointBoatLanding"/>
+    <SimEventListenerConnection listener="WaterFront6" source="OkioKiolepePond"/>
+    <SimEventListenerConnection listener="WaterFront6" source="HickhamChannelWaterfront"/>
+    <SimEventListenerConnection listener="WaterFront6" source="BaltmrePoint1"/>
+    <SimEventListenerConnection listener="WaterFront6" source="BaltmrePoint2"/>
+    <SimEventListenerConnection listener="WaterFront6" source="BishopPoint"/>
+    <SimEventListenerConnection listener="WaterFront6" source="BishopPoint2"/>
+    <SimEventListenerConnection listener="WaterFront6" source="AieaShoal"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="WaterFront"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront1"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront2"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront3"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront4"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront5"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront6"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
