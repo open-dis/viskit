@@ -651,7 +651,12 @@
         <TerminalParameter name="length" type="double" value="360"/>
         <TerminalParameter name="width" type="double" value="20"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="60" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierCharlie" type="diskit.Pier">
@@ -664,7 +669,12 @@
         <TerminalParameter name="length" type="double" value="175.341"/>
         <TerminalParameter name="width" type="double" value="34.276"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="240" y="480"/>
     </SimEntity>
     <SimEntity description="" name="PierDelta" type="diskit.Pier">
@@ -677,7 +687,12 @@
         <TerminalParameter name="length" type="double" value="437.082"/>
         <TerminalParameter name="width" type="double" value="49.33"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="410" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringE" type="diskit.Pier">
@@ -690,7 +705,12 @@
         <TerminalParameter name="length" type="double" value="370.166"/>
         <TerminalParameter name="width" type="double" value="11.898"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="640" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringF" type="diskit.Pier">
@@ -703,7 +723,12 @@
         <TerminalParameter name="length" type="double" value="299.833"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="810" y="480"/>
     </SimEntity>
     <SimEntity description="" name="MooringG" type="diskit.Pier">
@@ -716,7 +741,12 @@
         <TerminalParameter name="length" type="double" value="276.551"/>
         <TerminalParameter name="width" type="double" value="14.053"/>
         <TerminalParameter name="height" type="double" value="3"/>
-        <TerminalParameter name="rotation" type="double" value="0"/>
+                                <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
         <Coordinate x="910" y="480"/>
     </SimEntity>
     <SimEntity description="" name="DDG77/O'Kane" type="diskit.HVU">
