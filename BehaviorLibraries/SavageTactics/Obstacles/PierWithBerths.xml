@@ -16,8 +16,8 @@
     <Parameter name="height" type="double">
         <Comment>Height in meters above the waterline</Comment>
     </Parameter>
-    <Parameter name="rotation" type="double">
-        <Comment>Orientation in radians about the Y axis (Z for DIS)</Comment>
+    <Parameter name="rotation" type="diskit.Vec4d">
+        <Comment>Orientation in radians about the (Z DIS axis (Y for X3D)) example: 0 0 1 1.57</Comment>
     </Parameter>
     <Parameter name="berths" type="diskit.Berth[]">
         <Comment>The individual berths contained on this pier</Comment>
