@@ -2171,7 +2171,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="0.753"/>
         </MultiParameter>
-        <Coordinate x="1540" y="790"/>
+        <Coordinate x="1480" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="AhuaReef" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="869"/>
@@ -2189,7 +2189,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.010"/>
         </MultiParameter>
-        <Coordinate x="1540" y="850"/>
+        <Coordinate x="1480" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBeach" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="870"/>
@@ -2207,7 +2207,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.507"/>
         </MultiParameter>
-        <Coordinate x="1540" y="970"/>
+        <Coordinate x="1480" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBeach2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="871"/>
@@ -2225,7 +2225,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.764"/>
         </MultiParameter>
-        <Coordinate x="1540" y="1030"/>
+        <Coordinate x="1480" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="AhuaReef2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="872"/>
@@ -2243,7 +2243,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.256"/>
         </MultiParameter>
-        <Coordinate x="1540" y="910"/>
+        <Coordinate x="1480" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IroquoisPointBoatLanding" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="873"/>
@@ -2261,7 +2261,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.633"/>
         </MultiParameter>
-        <Coordinate x="1540" y="1090"/>
+        <Coordinate x="1480" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="BishopPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="874"/>
@@ -2279,7 +2279,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.638"/>
         </MultiParameter>
-        <Coordinate x="1600" y="1030"/>
+        <Coordinate x="1540" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="HickhamChannelWaterfront" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="875"/>
@@ -2297,7 +2297,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.507"/>
         </MultiParameter>
-        <Coordinate x="1600" y="850"/>
+        <Coordinate x="1540" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="OkioKiolepePond" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="876"/>
@@ -2315,7 +2315,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.199"/>
         </MultiParameter>
-        <Coordinate x="1600" y="790"/>
+        <Coordinate x="1540" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="877"/>
@@ -2333,7 +2333,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.199"/>
         </MultiParameter>
-        <Coordinate x="1420" y="790"/>
+        <Coordinate x="1360" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="KeKaaPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="878"/>
@@ -2351,7 +2351,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="0"/>
         </MultiParameter>
-        <Coordinate x="1420" y="850"/>
+        <Coordinate x="1360" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="BaltmrePoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="879"/>
@@ -2369,7 +2369,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="0"/>
         </MultiParameter>
-        <Coordinate x="1600" y="970"/>
+        <Coordinate x="1540" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="BaltmrePoint1" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="880"/>
@@ -2387,7 +2387,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".251"/>
         </MultiParameter>
-        <Coordinate x="1600" y="910"/>
+        <Coordinate x="1540" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="PowderPoint1" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="881"/>
@@ -2405,7 +2405,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.759"/>
         </MultiParameter>
-        <Coordinate x="1480" y="1030"/>
+        <Coordinate x="1420" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="PowderPoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="882"/>
@@ -2423,7 +2423,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="3.015"/>
         </MultiParameter>
-        <Coordinate x="1480" y="1090"/>
+        <Coordinate x="1420" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WestLochWaterFront" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="883"/>
@@ -2441,7 +2441,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".436"/>
         </MultiParameter>
-        <Coordinate x="1480" y="790"/>
+        <Coordinate x="1420" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="884"/>
@@ -2459,7 +2459,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".251"/>
         </MultiParameter>
-        <Coordinate x="1480" y="850"/>
+        <Coordinate x="1420" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint3" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="885"/>
@@ -2477,7 +2477,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".251"/>
         </MultiParameter>
-        <Coordinate x="1480" y="910"/>
+        <Coordinate x="1420" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="IntrepidPoint4" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="886"/>
@@ -2495,7 +2495,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.507"/>
         </MultiParameter>
-        <Coordinate x="1480" y="970"/>
+        <Coordinate x="1420" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="HanaloaPoint1" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="887"/>
@@ -2513,7 +2513,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".879"/>
         </MultiParameter>
-        <Coordinate x="1420" y="910"/>
+        <Coordinate x="1360" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="HanaloaPoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="888"/>
@@ -2531,7 +2531,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".125"/>
         </MultiParameter>
-        <Coordinate x="1420" y="970"/>
+        <Coordinate x="1360" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="NicholsPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="889"/>
@@ -2549,7 +2549,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="-.753"/>
         </MultiParameter>
-        <Coordinate x="1420" y="1030"/>
+        <Coordinate x="1360" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="BishopPoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="890"/>
@@ -2567,7 +2567,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".802"/>
         </MultiParameter>
-        <Coordinate x="1600" y="1090"/>
+        <Coordinate x="1540" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="HospitalPoint1" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="891"/>
@@ -2585,7 +2585,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.094"/>
         </MultiParameter>
-        <Coordinate x="1360" y="790"/>
+        <Coordinate x="1300" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="HospitalPoint2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="892"/>
@@ -2603,7 +2603,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".645"/>
         </MultiParameter>
-        <Coordinate x="1360" y="850"/>
+        <Coordinate x="1300" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="NevadaPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="893"/>
@@ -2621,7 +2621,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.024"/>
         </MultiParameter>
-        <Coordinate x="1420" y="1090"/>
+        <Coordinate x="1360" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="LocoPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="894"/>
@@ -2639,7 +2639,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.443"/>
         </MultiParameter>
-        <Coordinate x="1360" y="910"/>
+        <Coordinate x="1300" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="BeckoningPoint" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="895"/>
@@ -2657,7 +2657,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.792"/>
         </MultiParameter>
-        <Coordinate x="1360" y="970"/>
+        <Coordinate x="1300" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuWaterFront1" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="896"/>
@@ -2675,7 +2675,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="1.745"/>
         </MultiParameter>
-        <Coordinate x="1360" y="1030"/>
+        <Coordinate x="1300" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WaipahuWaterFront2" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="897"/>
@@ -2693,7 +2693,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".139"/>
         </MultiParameter>
-        <Coordinate x="1360" y="1090"/>
+        <Coordinate x="1300" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WildLifeRefuge" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="898"/>
@@ -2711,7 +2711,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.181"/>
         </MultiParameter>
-        <Coordinate x="1300" y="790"/>
+        <Coordinate x="1240" y="780"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="PearlCityPenisulaWest" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="899"/>
@@ -2729,7 +2729,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.617"/>
         </MultiParameter>
-        <Coordinate x="1300" y="850"/>
+        <Coordinate x="1240" y="840"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="PearlCityPenisulaEast" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="900"/>
@@ -2747,7 +2747,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.094"/>
         </MultiParameter>
-        <Coordinate x="1300" y="910"/>
+        <Coordinate x="1240" y="900"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="WaimaluStream" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="901"/>
@@ -2765,7 +2765,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.53"/>
         </MultiParameter>
-        <Coordinate x="1300" y="970"/>
+        <Coordinate x="1240" y="960"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="AieaWaterFront" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="902"/>
@@ -2783,7 +2783,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.53"/>
         </MultiParameter>
-        <Coordinate x="1300" y="1030"/>
+        <Coordinate x="1240" y="1020"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="AieaBay" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="903"/>
@@ -2801,7 +2801,7 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="2.53"/>
         </MultiParameter>
-        <Coordinate x="1300" y="1090"/>
+        <Coordinate x="1240" y="1080"/>
     </SimEntity>
     <SimEntity description="A zone representing a large segment of waterfront area" name="AieaShoal" type="diskit.PerimeterZone">
         <TerminalParameter name="moverID" type="int" value="904"/>
@@ -2819,28 +2819,234 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value=".959"/>
         </MultiParameter>
-        <Coordinate x="1600" y="1150"/>
+        <Coordinate x="1540" y="1140"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront1" type="diskit.RegistrationRelay">
-        <Coordinate x="1300" y="690"/>
+        <Coordinate x="1240" y="690"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront2" type="diskit.RegistrationRelay">
-        <Coordinate x="1360" y="690"/>
+        <Coordinate x="1300" y="690"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront3" type="diskit.RegistrationRelay">
-        <Coordinate x="1420" y="690"/>
+        <Coordinate x="1360" y="690"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront4" type="diskit.RegistrationRelay">
-        <Coordinate x="1480" y="690"/>
+        <Coordinate x="1420" y="690"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront5" type="diskit.RegistrationRelay">
-        <Coordinate x="1540" y="690"/>
+        <Coordinate x="1480" y="690"/>
     </SimEntity>
     <SimEntity description="A collection of waterfront areas" name="WaterFront6" type="diskit.RegistrationRelay">
-        <Coordinate x="1600" y="690"/>
+        <Coordinate x="1540" y="690"/>
     </SimEntity>
     <SimEntity description="The complete collection of all WaterFront zones" name="WaterFront" type="diskit.RegistrationAdapter">
-        <Coordinate x="1460" y="530"/>
+        <Coordinate x="1380" y="490"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy1" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="905"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-340.045"/>
+            <TerminalParameter name="p[1] : " type="double" value="6549.691"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Green"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="4"/>
+        <Coordinate x="70" y="780"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy2" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="906"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-31.279"/>
+            <TerminalParameter name="p[1] : " type="double" value="6369.904"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Red"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="2.5"/>
+        <Coordinate x="70" y="840"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy3" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="907"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-719.162"/>
+            <TerminalParameter name="p[1] : " type="double" value="5775.823"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Green"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <Coordinate x="70" y="900"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy4" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="908"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-406.488"/>
+            <TerminalParameter name="p[1] : " type="double" value="5549.135"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Red"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <Coordinate x="70" y="960"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy5" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="909"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1359.166"/>
+            <TerminalParameter name="p[1] : " type="double" value="4466.501"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Green"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="2.5"/>
+        <Coordinate x="70" y="1020"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="Buoy6" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="910"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-354.701"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1872.963"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Red"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="6"/>
+        <Coordinate x="70" y="1080"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="HarborBuoy8" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="911"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="114.309"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1646.275"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Red"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="2.5"/>
+        <Coordinate x="130" y="960"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="HarborBuoy1" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="912"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1992.331"/>
+            <TerminalParameter name="p[1] : " type="double" value="-200.158"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Green"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="4"/>
+        <Coordinate x="130" y="780"/>
+    </SimEntity>
+    <SimEntity description="A navigation buoy" name="HarborBuoy9" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="913"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="661.489"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1927.681"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1"/>
+        <TerminalParameter name="width" type="double" value="1"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="Green"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <Coordinate x="130" y="840"/>
+    </SimEntity>
+    <SimEntity description="A mooring buoy" name="MooringBuoyX9S" type="diskit.Buoy">
+        <TerminalParameter name="moverID" type="int" value="914"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="677.123"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2076.201"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="2"/>
+        <TerminalParameter name="width" type="double" value="2"/>
+        <TerminalParameter name="height" type="double" value="2.5"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
+        <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <Coordinate x="130" y="900"/>
+    </SimEntity>
+    <SimEntity description="All buoys for channel navigation" name="ChannelBuoys" type="diskit.RegistrationRelay">
+        <Coordinate x="70" y="690"/>
+    </SimEntity>
+    <SimEntity description="Buoys found in the harbor" name="HarborBuoys" type="diskit.RegistrationRelay">
+        <Coordinate x="130" y="690"/>
     </SimEntity>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="AlphaPiers" source="A1"/>
@@ -2968,6 +3174,16 @@
     <SimEventListenerConnection listener="WaterFront" source="WaterFront4"/>
     <SimEventListenerConnection listener="WaterFront" source="WaterFront5"/>
     <SimEventListenerConnection listener="WaterFront" source="WaterFront6"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy1"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy2"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy3"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy4"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy6"/>
+    <SimEventListenerConnection listener="HarborBuoys" source="HarborBuoy1"/>
+    <SimEventListenerConnection listener="HarborBuoys" source="HarborBuoy9"/>
+    <SimEventListenerConnection listener="HarborBuoys" source="MooringBuoyX9S"/>
+    <SimEventListenerConnection listener="HarborBuoys" source="HarborBuoy8"/>
+    <SimEventListenerConnection listener="ChannelBuoys" source="Buoy5"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
