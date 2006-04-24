@@ -127,6 +127,30 @@
         <Code/>
         <Coordinate x="260" y="290"/>
     </Event>
+    <Event name="RegisterTargetByPier">
+        <Comment>Allows Ships berthed at this pier to register with the simulation by using the pier as a relay</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>Mover3D to be registered</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="RegisterTargetByRelay" priority="0">
+            <Comment/>
+            <EdgeParameter value="mover"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="340" y="30"/>
+    </Event>
+    <Event name="RegisterSensorByPier">
+        <Comment>Allows ships berthed at this pier to register their sensors</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor to pass to the scenario manager</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="RegisterSensorByRelay" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="340" y="110"/>
+    </Event>
     <Code/>
 </SimEntity>
 
