@@ -97,11 +97,8 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="collisionAvoidance">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-        </Schedule>
         <Schedule event="CreateSensors"/>
+        <Schedule event="RegisterTarget"/>
         <Code/>
         <Coordinate x="10" y="150"/>
     </Event>
