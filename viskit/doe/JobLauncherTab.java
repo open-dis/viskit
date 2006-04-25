@@ -43,7 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
-import edu.nps.util.CryptoMethods;
+import edu.nps.util.CryptoMethods; 
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
@@ -56,14 +56,18 @@ import viskit.TitleListener;
 import viskit.VGlobals;
 import viskit.xsd.assembly.SessionManager;
 import viskit.xsd.bindings.assembly.Experiment;
+import viskit.xsd.bindings.assembly.SampleStatisticsType;
 import viskit.xsd.bindings.assembly.Schedule;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
-
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -76,7 +80,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 {
   private XmlRpcClientLite rpc;
   private String userID;
-
+  Hashtable statsGraphs;
   String inputFileString;
   File inputFile;
   File filteredFile;
@@ -102,6 +106,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   private JTextField tmo;
   private JTextArea statusTextArea;
   private QstatConsole qstatConsole;
+  private StatsGraph statsGraph;
   private Thread thread;
   private boolean outputDirty = false;
 
@@ -119,9 +124,18 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
   public  JCheckBox doGraphOutput;
   public  JButton doQstatConsole;
   private JButton adminButt;
+  
+  private JAXBContext jaxbCtx;
+  private Unmarshaller unmarshaller;
 
   public JobLauncherTab(DoeController controller, String file, String title, JFrame mainFrame)
   {
+      try {
+    jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+    unmarshaller = jaxbCtx.createUnmarshaller();
+      } catch (JAXBException je) {
+          je.printStackTrace();
+      }
     this.title = title;
     cntlr = controller;
     mom = mainFrame;
@@ -739,8 +753,8 @@ System.out.println(dataS);
       // Bring up the 2 other windows
       if(doClustStat)
         showClusterStatus(clusterWebStatus);
-      if(doGraphOut)
-        chartter = new JobResults(null, title);
+      //if(doGraphOut)
+        //chartter = new JobResults(null, title);
 
       writeStatus("Getting results:");
 
@@ -760,12 +774,14 @@ System.out.println(dataS);
     Vector args = new Vector(5);
     Object ret;
     Experiment exp = (Experiment)jaxbRoot.getExperiment();
-
+    int samples = Integer.parseInt(exp.getTotalSamples());
+    int designPoints = jaxbRoot.getDesignParameters().size();
     // synchronous single threaded results, uses
     // a status buffer that locks until results are
     // in, at which point a select can be performed.
     // this saves server thread resources
-
+    
+    
     Vector lastQueue;
 
     try {
@@ -780,7 +796,7 @@ System.out.println(dataS);
       args.add(userID);
       int tasksRemaining = ((Integer)rpc.execute("gridkit.getRemainingTasks",args)).intValue(); //5 * 3;
       writeStatus("Total tasks: "+tasksRemaining);
-      int designPoints = jaxbRoot.getDesignParameters().size();
+      
       while (tasksRemaining > 0) {
         // this will block until a task ends which could be
         // because it died, or because it completed, either way
@@ -811,7 +827,13 @@ System.out.println(dataS);
             }
             writeStatus("DesignPointStats from task " + (i + 1)+ " is sampleIndex "+sampleIndex+" at designPtIndex "+designPtIndex);
             ret = rpc.execute("gridkit.getDesignPointStats", args);
-            writeStatus(ret.toString());
+            if (statsGraph == null) {
+                final String[] properties = (String[])((Hashtable)ret).keySet().toArray(new String[0]);
+                statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
+                statsGraph.show();
+            }
+            addDesignPointStatsToGraphs((Hashtable)ret,designPtIndex,sampleIndex);
+            //writeStatus(ret.toString());
             writeStatus("Replications per designPt "+exp.getReplicationsPerDesignPoint());
             for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
               writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
@@ -821,7 +843,7 @@ System.out.println(dataS);
               args.add(new Integer(designPtIndex));
               args.add(new Integer(j));
               ret = rpc.execute("gridkit.getReplicationStats", args);
-              writeStatus(ret.toString());
+              //writeStatus(ret.toString());
             }
             --tasksRemaining;
             // could also call to get tasksRemaining:
@@ -831,8 +853,10 @@ System.out.println(dataS);
         lastQueue = queue;
 
       }
+      statsGraph = null; // allow to gc after done
     }
     catch (Exception e) {
+        e.printStackTrace();
       writeStatus("Error in cluster execution: " + e.getMessage());
     }
 
@@ -1212,6 +1236,24 @@ System.out.println(dataS);
     vConfig.setProperty(recentClusterKey+"[@port]",portCfg);
     vConfig.setProperty(recentClusterKey+"[@username]",unameCfg);
     vConfig.setProperty(recentClusterKey+"[@password]",pwordCfg);
+  }
+
+  private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s) {
+      System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint "+d+" sample "+s);
+      System.out.println(ret);
+      java.util.Enumeration stats = ret.elements();
+      while ( stats.hasMoreElements() ) {
+          String data = (String)stats.nextElement();
+          try {
+              System.out.println("\tAdding data "+data);
+              SampleStatisticsType sst = (SampleStatisticsType)unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
+              
+              statsGraph.addSampleStatistic(sst,d,s);
+          } catch (JAXBException ex) {
+              ex.printStackTrace();
+          }
+      }
+      
   }
 
 
