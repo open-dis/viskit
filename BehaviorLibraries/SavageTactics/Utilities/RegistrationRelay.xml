@@ -7,7 +7,7 @@ The most common use of this utility is to group common entities in graphical for
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
-    <Event name="RegisterTargetByRelay">
+    <Event name="RegisterTarget">
         <Comment>Listens to this event in a connected class and passes the argument to a RegistrationAdapter</Comment>
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The target being registered by relay</Comment>
@@ -19,7 +19,7 @@ The most common use of this utility is to group common entities in graphical for
         <Code/>
         <Coordinate x="30" y="100"/>
     </Event>
-    <Event name="RegisterSensorByRelay">
+    <Event name="RegisterSensor">
         <Comment>Listens to this event in a connected class and passes the argument to a RegistrationAdapter</Comment>
         <Argument name="sensor" type="diskit.Sensor">
             <Comment>The sensor being registered using this relay</Comment>
@@ -46,6 +46,22 @@ The most common use of this utility is to group common entities in graphical for
         </Argument>
         <Code/>
         <Coordinate x="130" y="170"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers an array of sensors</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]"/>
+        <Schedule condition="true" delay="0.0" event="RegisterSensorsWithAdapter" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="240"/>
+    </Event>
+    <Event name="RegisterSensorsWithAdapter">
+        <Comment>Passes multiple sensors to an adapter</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]"/>
+        <Code/>
+        <Coordinate x="130" y="240"/>
     </Event>
 </SimEntity>
 

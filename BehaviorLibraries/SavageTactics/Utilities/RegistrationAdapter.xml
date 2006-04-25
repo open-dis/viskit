@@ -47,5 +47,21 @@ The most common use of this utility is to group common entities in graphical for
         <Code/>
         <Coordinate x="130" y="170"/>
     </Event>
+    <Event name="RegisterSensorsWithAdapter">
+        <Comment/>
+        <Argument name="sensors" type="diskit.Sensor[]"/>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="240"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment/>
+        <Argument name="sensors" type="diskit.Sensor[]"/>
+        <Code/>
+        <Coordinate x="130" y="240"/>
+    </Event>
 </SimEntity>
 
