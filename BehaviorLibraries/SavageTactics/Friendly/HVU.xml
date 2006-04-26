@@ -11,9 +11,6 @@ NOTE: Visual perception and communications are behaviors representing the person
     <Parameter name="maximumSpeed" type="double">
         <Comment>Maximum speed of this craft</Comment>
     </Parameter>
-    <Parameter name="entityType" type="diskit.EntityType">
-        <Comment>Unique entity type for this mover (HVU)</Comment>
-    </Parameter>
     <Parameter name="name" type="java.lang.String">
         <Comment>Name for this entity</Comment>
     </Parameter>

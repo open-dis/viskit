@@ -21,6 +21,7 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
         <Comment>Sensor arrays that have been registered through this object</Comment>
     </StateVariable>
     <Event name="Run">
+        <Schedule event="CreateHarborMap"/>
         <Code/>
         <Coordinate x="10" y="300"/>
     </Event>
@@ -29,8 +30,8 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
         <StateTransition state="harborMap">
             <Assignment value="new diskit.AStarZoneMap(navigatableWaterZones)"/>
         </StateTransition>
-        <Code/>
-        <Coordinate x="110" y="300"/>
+        <Code>System.out.println("CreateHarborMap called");</Code>
+        <Coordinate x="210" y="300"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Passes target to an adapter</Comment>

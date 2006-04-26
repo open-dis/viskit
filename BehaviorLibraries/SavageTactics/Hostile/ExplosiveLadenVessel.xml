@@ -210,9 +210,6 @@ sensors[2] = collisionAvoidance;
         <Comment>Determines whether or not a detected contact is a high value unit and makes a decision based on the evaluation of the entity</Comment>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Argument name="contact" type="diskit.Mover3D"/>
-        <LocalVariable name="id" type="diskit.EntityType" value="contact.getEntityType()">
-            <Comment>Use the type of entity to determine course of action</Comment>
-        </LocalVariable>
         <LocalVariable name="isHostileForce" type="boolean" value="hostileForces.contains(contact.getMoverID())">
             <Comment>Check to see if contact is of the same force</Comment>
         </LocalVariable>
@@ -222,7 +219,7 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="currentTacticalMode" type="diskit.TacticalMode" value="getTacticalMode()">
             <Comment>The tactical mode of the entity when he detects the contact</Comment>
         </LocalVariable>
-        <Schedule condition="id.equals(EntityType.HVU) &amp;&amp;  canIntercept " delay="0.0" event="Attack" priority="0">
+        <Schedule condition="canIntercept " delay="0.0" event="Attack" priority="0">
             <Comment>If this is an HVU and I can intercept it, and I'm not already attacking</Comment>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>

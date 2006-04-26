@@ -243,9 +243,6 @@ setDestination(waypoint);</Code>
         <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
             <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
         </LocalVariable>
-        <LocalVariable name="entityType" type="diskit.EntityType" value="contact.getEntityType()">
-            <Comment>Entity type for this contact</Comment>
-        </LocalVariable>
         <LocalVariable name="alreadyIDd" type="boolean" value="contactPicture.contains(contact)">
             <Comment>Check to see if this contact is part of the entity's contact picture</Comment>
         </LocalVariable>
@@ -390,19 +387,16 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>Contact being identified</Comment>
         </Argument>
-        <LocalVariable name="id" type="diskit.EntityType" value="contact.getEntityType()">
-            <Comment>Check the type of the entity</Comment>
-        </LocalVariable>
         <StateTransition state="contactPicture">
             <Operation method="add(contact)"/>
         </StateTransition>
         <StateTransition state="contactIDs">
             <Assignment value="contactIDs + 1"/>
         </StateTransition>
-        <Schedule condition="!id.equals(EntityType.HOSTILE)" delay="0.0" event="ResumePatrol" priority="0">
+        <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
             <Comment>If the contact wasn't hostile, return to patrol</Comment>
         </Schedule>
-        <Schedule condition="id.equals(EntityType.HOSTILE)" delay="0.0" event="SecurityAlert" priority="0">
+        <Schedule condition="3&gt;7" delay="0.0" event="SecurityAlert" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
