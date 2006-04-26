@@ -529,7 +529,6 @@
             <TerminalParameter name="p[2] : " type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="0.0"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="EntityType.HVU"/>
         <TerminalParameter name="name" type="java.lang.String" value="USS Carl Vinson"/>
         <Coordinate x="550" y="810"/>
     </SimEntity>
@@ -649,7 +648,6 @@
             <TerminalParameter name="p[2] : " type="double" value="0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="0"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="EntityType.HVU"/>
         <TerminalParameter name="name" type="java.lang.String" value="USS O'Kane"/>
         <Coordinate x="490" y="870"/>
     </SimEntity>
@@ -661,7 +659,6 @@
             <TerminalParameter name="p[2] : " type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="0.0"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="EntityType.HVU"/>
         <TerminalParameter name="name" type="java.lang.String" value="USS Russell"/>
         <Coordinate x="490" y="810"/>
     </SimEntity>
@@ -673,7 +670,6 @@
             <TerminalParameter name="p[2] : " type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="0.0"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="EntityType.HVU"/>
         <TerminalParameter name="name" type="java.lang.String" value="USS Princeton"/>
         <Coordinate x="370" y="810"/>
     </SimEntity>
@@ -685,7 +681,6 @@
             <TerminalParameter name="p[2] : " type="double" value="0.0"/>
         </MultiParameter>
         <TerminalParameter name="maximumSpeed" type="double" value="0.0"/>
-        <TerminalParameter name="entityType" type="diskit.EntityType" value="EntityType.HVU"/>
         <TerminalParameter name="name" type="java.lang.String" value="USS R.M. Davis"/>
         <Coordinate x="370" y="870"/>
     </SimEntity>
@@ -1222,7 +1217,7 @@
                 <TerminalParameter name="p[0] : " type="java.lang.String" value="PortWashingtonNarrows4"/>
                 <MultiParameter type="java.lang.String[]">
                     <TerminalParameter name="" type="java.lang.String" value="PortWashingtonNarrows3"/>
-                    <TerminalParameter name="" type="java.lang.String" value="PointHeuronArea"/>
+                    <TerminalParameter name="" type="java.lang.String" value="PortHeuronArea"/>
                 </MultiParameter>
                 <MultiParameter type="double[]">
                     <TerminalParameter name="" type="double" value="1998.325"/>
@@ -1282,10 +1277,10 @@
         </MultiParameter>
         <Coordinate x="510" y="240"/>
     </SimEntity>
-    <SimEntity description="Sends packets at the interval specified" name="DISPacketSender" type="diskit.DISPinger">
+    <SimEntity description="" name="DISPacketSender" type="diskit.DISPinger">
         <TerminalParameter name="p[0] : " type="double" value=".2"/>
         <TerminalParameter name="p[1] : " type="long" value="200"/>
-        <Coordinate x="510" y="40"/>
+        <Coordinate x="510" y="60"/>
     </SimEntity>
     <SimEventListenerConnection listener="RHIB" source="SceneZoneCreator"/>
     <SimEventListenerConnection listener="ScenarioManager" source="RHIB"/>
