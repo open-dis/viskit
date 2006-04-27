@@ -14,6 +14,9 @@ NOTE: Visual perception and communications are behaviors representing the person
     <Parameter name="name" type="java.lang.String">
         <Comment>Name for this entity</Comment>
     </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>Zones that this entity has been assigned</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -76,7 +79,10 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="targetQueue">
             <Operation method="clear()"/>
         </StateTransition>
-        <Schedule event="Start"/>
+        <Schedule condition="zones.length != 0" delay="0.0" event="ReviewPatrol" priority="0">
+            <Comment/>
+            <EdgeParameter value="zones"/>
+        </Schedule>
         <Code/>
         <Coordinate x="10" y="80"/>
     </Event>
@@ -121,26 +127,20 @@ NOTE: Visual perception and communications are behaviors representing the person
         <Code/>
         <Coordinate x="90" y="240"/>
     </Event>
-    <Event name="CreateZones">
+    <Event name="ReviewPatrol">
         <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
         <Argument name="zones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Zones for this simulation</Comment>
         </Argument>
-        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
-            <Comment>Reads Zones for only those that are for this entity</Comment>
-        </LocalVariable>
-        <LocalVariable name="myPatrol" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
-            <Comment>Returns this entities patrol zones</Comment>
-        </LocalVariable>
         <StateTransition state="waypointGenerator">
-            <Assignment value="new diskit.WaypointCreator(myPatrol)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
         </StateTransition>
         <Schedule event="Patrol"/>
         <Code/>
-        <Coordinate x="200" y="220"/>
+        <Coordinate x="330" y="80"/>
     </Event>
     <Event name="Patrol">
         <Comment>Patrolling behavior for this entity. Speed is random and always less than the max speed</Comment>
@@ -254,31 +254,6 @@ System.out.println("Name:                " + contact.getEntityName());
         <Code>sensors[0] = visualPerception;
 sensors[1] = collisionAvoidance;</Code>
         <Coordinate x="10" y="240"/>
-    </Event>
-    <Event name="Start">
-        <Comment/>
-        <LocalVariable name="fakeMovementSpeed" type="double" value=".0001">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="baseVector" type="diskit.Vec3d" value="getLocation()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="xVal" type="double" value="baseVector.get(0)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="yVal" type="double" value="baseVector.get(1)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="zVal" type="double" value="baseVector.get(2) + .0001">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="fakeDestination" type="diskit.Vec3d" value="new diskit.Vec3d(xVal, yVal, zVal)">
-            <Comment/>
-        </LocalVariable>
-        <Code>setCruiseSpeed(fakeMovementSpeed);
-setStartPosition(baseVector);
-setDestination(fakeDestination);</Code>
-        <Coordinate x="110" y="80"/>
     </Event>
     <Code>
 

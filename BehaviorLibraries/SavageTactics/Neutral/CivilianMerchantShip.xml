@@ -64,6 +64,9 @@
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
     </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>Areas where this entity can navigate</Comment>
+    </Parameter>
     <StateVariable name="tacticalMode" type="diskit.TacticalMode">
         <Comment>Tactical Mode of this entity</Comment>
     </StateVariable>
@@ -124,30 +127,41 @@
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
         </StateTransition>
         <Schedule event="ScaleSpeedToKnots"/>
+        <Schedule condition="zones.length != 0" delay="0.0" event="ProcessZones" priority="0">
+            <Comment/>
+            <EdgeParameter value="zones"/>
+        </Schedule>
         <Code/>
         <Coordinate x="20" y="30"/>
     </Event>
     <Event name="StartMove">
         <Comment/>
-        <LocalVariable name="movement" type="boolean" value="true; setCruiseSpeed(maximumSpeed); start()">
+        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="destination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
             <Comment/>
         </LocalVariable>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
-        <Code/>
+        <Code>setStartPosition(startPosit);
+setDestination(destination);
+setCruiseSpeed(getMaximumSpeed()/2);
+start();</Code>
         <Coordinate x="20" y="330"/>
     </Event>
     <Event name="EndMove">
         <Comment/>
         <Argument name="mover" type="diskit.Mover3D"/>
-        <LocalVariable name="m" type="boolean" value="true; setStartPosition(getLocation())">
+        <LocalVariable name="destination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
             <Comment/>
         </LocalVariable>
         <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="StartMove" priority="0">
             <Comment/>
         </Schedule>
-        <Code/>
+        <Code>setStartPosition(getLocation());
+setDestination(destination);</Code>
         <Coordinate x="440" y="330"/>
     </Event>
     <Event name="Init">
@@ -250,22 +264,16 @@ System.out.println("\n");
         <Code>steer.cross(getVelocity(),obstacle.getVelocity()); /**      * Should be moved to Avoidance Mover Manager at some point     */  if ( steer.length() &lt; getCruiseSpeed() ) {          steer.cross(velocity,up);          veer.set(getLocation());   } else {       steer.cross(up);      veer.set(obstacle.getLocation());  veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0));  veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));      veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) );   }      veer.add(steer); amm.avoidToOffset(veer, getActiveMoverManager());System.out.println(getMoverID() + " Avoiding entity# " + obstacle.getMoverID());</Code>
         <Coordinate x="100" y="440"/>
     </Event>
-    <Event name="CreateZones">
+    <Event name="ProcessZones">
         <Comment>Listens to the Harbor Creator to get Zone Assignment geometry</Comment>
-        <Argument name="patrolAssignment" type="ProbabilityZoneGeometry[]">
+        <Argument name="zones" type="ProbabilityZoneGeometry[]">
             <Comment>Passed by the Harbor Creator - states patrol responsibilities and contains entity ID for assignment</Comment>
         </Argument>
         <LocalVariable name="count" type="int" value="0">
             <Comment>tracks number of patrol zone assignments</Comment>
         </LocalVariable>
-        <LocalVariable name="idx" type="int" value="0">
-            <Comment>Used for patrol zone array construction</Comment>
-        </LocalVariable>
-        <LocalVariable name="duties" type="ProbabilityZoneGeometry[]" value="null">
-            <Comment/>
-        </LocalVariable>
         <StateTransition state="waypointCreator">
-            <Assignment value="new WaypointCreator(duties)"/>
+            <Assignment value="new WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator,avoidanceRange)"/>
@@ -274,7 +282,7 @@ System.out.println("\n");
             <Assignment value="patrolManager"/>
         </StateTransition>
         <Schedule event="StartMove"/>
-        <Code>for(int i = 0; i&lt;patrolAssignment.length; i++){     if(patrolAssignment[i].getID() == moverID){                       count++;        }  }  duties = new ProbabilityZoneGeometry[count];  for(int i = 0; i &lt; patrolAssignment.length; i++){   if(patrolAssignment[i].getID() == moverID){      duties[idx] = patrolAssignment[i];      idx++;      }  } setStartPosition(duties[0].getCenterDIS());</Code>
+        <Code/>
         <Coordinate x="20" y="190"/>
     </Event>
     <Event name="ClearExclusionZone">
@@ -299,7 +307,7 @@ System.out.println("\n");
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
-        <Coordinate x="20" y="120"/>
+        <Coordinate x="80" y="120"/>
     </Event>
     <Code/>
 </SimEntity>

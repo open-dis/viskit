@@ -64,6 +64,9 @@
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
     </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>The patrol zones for this entity</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -136,8 +139,12 @@
             <Assignment value="0"/>
         </StateTransition>
         <Schedule event="ScaleSpeedToKnots"/>
+        <Schedule condition="zones.length != 0 " delay="0.0" event="ReviewPatrol" priority="0">
+            <Comment/>
+            <EdgeParameter value="zones"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="10" y="80"/>
+        <Coordinate x="20" y="70"/>
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
@@ -183,19 +190,13 @@
         <Code/>
         <Coordinate x="90" y="300"/>
     </Event>
-    <Event name="CreateZones">
+    <Event name="ReviewPatrol">
         <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
         <Argument name="zones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Zones for this simulation</Comment>
         </Argument>
-        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
-            <Comment>Reads Zones for only those that are for this entity</Comment>
-        </LocalVariable>
-        <LocalVariable name="myPatrol" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
-            <Comment>Returns this entities patrol zones</Comment>
-        </LocalVariable>
         <StateTransition state="waypointGenerator">
-            <Assignment value="new diskit.WaypointCreator(myPatrol)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
@@ -477,7 +478,7 @@ setCruiseSpeed(getMaximumSpeed());</Code>
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
-        <Coordinate x="90" y="80"/>
+        <Coordinate x="110" y="10"/>
     </Event>
     <Code>
 </Code>

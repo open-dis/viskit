@@ -70,6 +70,9 @@
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
     </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>The patrol zones for this entity</Comment>
+    </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
     </StateVariable>
@@ -133,6 +136,10 @@
             <Operation method="clear()"/>
         </StateTransition>
         <Schedule event="ScaleSpeedToKnots"/>
+        <Schedule condition="zones.length != 0" delay="0.0" event="CreateZones" priority="0">
+            <Comment/>
+            <EdgeParameter value="zones"/>
+        </Schedule>
         <Code/>
         <Coordinate x="10" y="80"/>
     </Event>
@@ -185,21 +192,15 @@
         <Argument name="zones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Zones for this simulation</Comment>
         </Argument>
-        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
-            <Comment>Reads Zones for only those that are for this entity</Comment>
-        </LocalVariable>
-        <LocalVariable name="myPatrol" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
-            <Comment>Returns this entities patrol zones</Comment>
-        </LocalVariable>
         <StateTransition state="waypointGenerator">
-            <Assignment value="new diskit.WaypointCreator(myPatrol)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
         </StateTransition>
         <Schedule event="Patrol"/>
         <Code/>
-        <Coordinate x="200" y="220"/>
+        <Coordinate x="200" y="80"/>
     </Event>
     <Event name="Patrol">
         <Comment>Patrolling behavior for this entity. Speed is random and always less than the max speed</Comment>
@@ -224,7 +225,7 @@
         <Code>setStartPosition(startPosition);
 setDestination(waypoint);
 setCruiseSpeed(getMaximumSpeed()/2);</Code>
-        <Coordinate x="330" y="220"/>
+        <Coordinate x="330" y="80"/>
     </Event>
     <Event name="Detection">
         <Comment>The Sensor of this entity has detected a contact</Comment>
@@ -320,7 +321,7 @@ sensors[1] = collisionAvoidance;</Code>
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
-        <Coordinate x="90" y="80"/>
+        <Coordinate x="110" y="20"/>
     </Event>
     <Code>
 

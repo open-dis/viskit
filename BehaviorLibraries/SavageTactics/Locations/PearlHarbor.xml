@@ -3048,6 +3048,95 @@
     <SimEntity description="Buoys found in the harbor" name="HarborBuoys" type="diskit.RegistrationRelay">
         <Coordinate x="130" y="690"/>
     </SimEntity>
+    <SimEntity description="An object that manages all of the information that one" name="NauticalChart" type="diskitXML.NauticalChart">
+        <MultiParameter type="diskit.AStarZoneGeometry[]">
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="PapaHotel"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ChannelApproach"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="1638.163"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="9065.331"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="200"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="ChannelApproach"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="PapaHotel"/>
+                     <TerminalParameter name="" type="java.lang.String" value="PearlHarborEntranceChannel"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-827.621"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="5146.567"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="50"/>
+                <TerminalParameter name="p[4] : " type="double" value="50"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+                        <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="PearlHarborEntranceChannel"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ChannelApproach"/>
+                     <TerminalParameter name="" type="java.lang.String" value="WaipahuPoint"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-1566.313"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="3372.142"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="50"/>
+                <TerminalParameter name="p[4] : " type="double" value="50"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+                        <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="WaipahuPoint"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="PearlHarborEntranceChannel"/>
+                     <TerminalParameter name="" type="java.lang.String" value="HospitalPoint"/>
+                     <TerminalParameter name="" type="java.lang.String" value="WestLochEntrance"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-1820.362"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="1808.772"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="200"/>
+                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="150" y="200"/>
+    </SimEntity>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="AlphaPiers" source="A1"/>
     <SimEventListenerConnection description="Passes Registration information to a registration relay" listener="AlphaPiers" source="A2-A3"/>

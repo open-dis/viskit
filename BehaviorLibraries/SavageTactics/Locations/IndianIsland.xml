@@ -9,7 +9,7 @@
         <Coordinate x="220" y="130"/>
     </SimEntity>
     <SimEntity description="Overall Area of ammo pier, includes the three access piers" name="AmmoPier" type="diskit.Pier">
-      <TerminalParameter name="moverID" type="int" value="800"/>
+        <TerminalParameter name="moverID" type="int" value="800"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="-343.347"/>
             <TerminalParameter name="p[1] : " type="double" value="-1178.404"/>
@@ -24,14 +24,492 @@
             <TerminalParameter name="p[2] : " type="double" value="1"/>
             <TerminalParameter name="p[3] : " type="double" value="-0.0917"/>
         </MultiParameter>
-        <Coordinate x="220" y="230"/>
+        <Coordinate x="220" y="340"/>
     </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="p[0] : " type="double" value=".2"/>
         <TerminalParameter name="p[1] : " type="long" value="200"/>
         <Coordinate x="220" y="20"/>
     </SimEntity>
+    <SimEntity description="" name="OakBay" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="801"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="8815.955"/>
+            <TerminalParameter name="p[1] : " type="double" value="6335.941"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="3000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".628"/>
+        </MultiParameter>
+        <Coordinate x="480" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="MutinyBay" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="802"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-10333.633"/>
+            <TerminalParameter name="p[1] : " type="double" value="10164.297"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="2000"/>
+        <TerminalParameter name="width" type="double" value="600"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.89"/>
+        </MultiParameter>
+        <Coordinate x="600" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="PatridgeBank" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="803"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="11612.106"/>
+            <TerminalParameter name="p[1] : " type="double" value="-3246.988"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="2000"/>
+        <TerminalParameter name="width" type="double" value="600"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="2.387"/>
+        </MultiParameter>
+        <Coordinate x="540" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="WhidbeyIsland" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="805"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="4504.087"/>
+            <TerminalParameter name="p[1] : " type="double" value="9200.271"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="6000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <Coordinate x="660" y="160"/>
+    </SimEntity>
+    <SimEntity description="" name="LagoonPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="804"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3181.683"/>
+            <TerminalParameter name="p[1] : " type="double" value="9949.367"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="2000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="0"/>
+        </MultiParameter>
+        <Coordinate x="480" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="MarrowStone" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="806"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-1177.499"/>
+            <TerminalParameter name="p[1] : " type="double" value="3677.609"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="6000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".125"/>
+        </MultiParameter>
+        <Coordinate x="660" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="FortWilson" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="807"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="7500.125"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2673.26"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="2000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.759"/>
+        </MultiParameter>
+        <Coordinate x="480" y="160"/>
+    </SimEntity>
+    <SimEntity description="" name="Haddock" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="808"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-5135.06"/>
+            <TerminalParameter name="p[1] : " type="double" value="-944.04"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="600"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.759"/>
+        </MultiParameter>
+        <Coordinate x="540" y="160"/>
+    </SimEntity>
+    <SimEntity description="" name="KalaPoint" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="809"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-3424.78"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2518.85"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".376"/>
+        </MultiParameter>
+        <Coordinate x="600" y="160"/>
+    </SimEntity>
+    <SimEntity description="" name="QuimperPennisula" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="810"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="106.196"/>
+            <TerminalParameter name="p[1] : " type="double" value="-4105"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="3000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".376"/>
+        </MultiParameter>
+        <Coordinate x="660" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="PortTownsend" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="811"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="3254.626"/>
+            <TerminalParameter name="p[1] : " type="double" value="-2741.58"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="3000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="-1.005"/>
+        </MultiParameter>
+        <Coordinate x="540" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="PointHudson" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="812"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="5201.091"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1736.95"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1500"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value=".628"/>
+        </MultiParameter>
+        <Coordinate x="600" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="KeyStoneHarbor" type="diskit.PerimeterZone">
+        <TerminalParameter name="moverID" type="int" value="813"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="8815.955"/>
+            <TerminalParameter name="p[1] : " type="double" value="6335.941"/>
+            <TerminalParameter name="p[2] : " type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="3000"/>
+        <TerminalParameter name="width" type="double" value="100"/>
+        <TerminalParameter name="height" type="double" value="0.0"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="p[0] : " type="double" value="0"/>
+            <TerminalParameter name="p[1] : " type="double" value="0"/>
+            <TerminalParameter name="p[2] : " type="double" value="1"/>
+            <TerminalParameter name="p[3] : " type="double" value="1.759"/>
+        </MultiParameter>
+        <Coordinate x="720" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="NauticalChart" type="diskitXML.NauticalChart">
+        <MultiParameter type="diskit.AStarZoneGeometry[]">
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="PortTowsend"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="AmmoPierArea"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-3716.891"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-1405.476"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="400"/>
+                <TerminalParameter name="p[4] : " type="double" value="400"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="KilisutHarbor"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ScowBay"/>
+                    <TerminalParameter name="" type="java.lang.String" value="KilisutHarborEntrance"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-2243.681"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="1794.944"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="200"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="ScowBay"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="KilisutHarbor"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-4995.365"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="2133.613"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="100"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="KilisutHarborEntrance"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="WalanPoint"/>
+                    <TerminalParameter name="" type="java.lang.String" value="KilisutHarbor"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="1354.675"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="541.87"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="200"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="WalanPoint"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="KilisutHarborEntrance"/>
+                    <TerminalParameter name="" type="java.lang.String" value="AmmoPierArea"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="643.47"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-300.569"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="50"/>
+                <TerminalParameter name="p[4] : " type="double" value="50"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="AmmoPierArea"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="WalanPoint"/>
+                    <TerminalParameter name="" type="java.lang.String" value="PortTownsend"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-196.852"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="-1697.578"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="200"/>
+                <TerminalParameter name="p[4] : " type="double" value="200"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="AdmiraltyBay"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="PortTownsendApproach"/>
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyInletSouth"/>
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyInletNorth"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="5312.866"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="5152"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="2000"/>
+                <TerminalParameter name="p[4] : " type="double" value="1000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="AdmiraltyInletNorth"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="PortTownsendApproach"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="8564.087"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="681.57"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="1000"/>
+                <TerminalParameter name="p[4] : " type="double" value="1000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="AdmiraltyInletSouth"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyBay"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="-1718.324"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="7044.17"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="1000"/>
+                <TerminalParameter name="p[4] : " type="double" value="1000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="p[0] : " type="java.lang.String" value="PortTownsendApproach"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyBay"/>
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyInletNorth"/>
+                    <TerminalParameter name="" type="java.lang.String" value="AdmiraltyInletSouth"/>
+                </MultiParameter>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="3822.724"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="410.635"/>
+                </MultiParameter>
+                <TerminalParameter name="p[3] : " type="double" value="1000"/>
+                <TerminalParameter name="p[4] : " type="double" value="1000"/>
+                <TerminalParameter name="p[5] : " type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="p[0] : " type="double" value="0"/>
+                    <TerminalParameter name="p[1] : " type="double" value="0"/>
+                    <TerminalParameter name="p[2] : " type="double" value="1"/>
+                    <TerminalParameter name="p[3] : " type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="220" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="WaterFront1" type="diskit.RegistrationRelay">
+        <Coordinate x="410" y="160"/>
+    </SimEntity>
+    <SimEntity description="" name="WaterFront2" type="diskit.RegistrationRelay">
+        <Coordinate x="410" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="WaterFront3" type="diskit.RegistrationRelay">
+        <Coordinate x="410" y="280"/>
+    </SimEntity>
+    <SimEntity description="" name="WaterFront" type="diskit.RegistrationAdapter">
+        <Coordinate x="320" y="220"/>
+    </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="NauticalChart"/>
+    <SimEventListenerConnection listener="NauticalChart" source="AmmoPier"/>
+    <SimEventListenerConnection listener="WaterFront1" source="FortWilson"/>
+    <SimEventListenerConnection listener="WaterFront1" source="Haddock"/>
+    <SimEventListenerConnection listener="WaterFront1" source="KalaPoint"/>
+    <SimEventListenerConnection listener="WaterFront1" source="WhidbeyIsland"/>
+    <SimEventListenerConnection listener="WaterFront2" source="OakBay"/>
+    <SimEventListenerConnection listener="WaterFront2" source="PatridgeBank"/>
+    <SimEventListenerConnection listener="WaterFront2" source="MutinyBay"/>
+    <SimEventListenerConnection listener="WaterFront2" source="QuimperPennisula"/>
+    <SimEventListenerConnection listener="WaterFront3" source="LagoonPoint"/>
+    <SimEventListenerConnection listener="WaterFront3" source="PortTownsend"/>
+    <SimEventListenerConnection listener="WaterFront3" source="PointHudson"/>
+    <SimEventListenerConnection listener="WaterFront3" source="MarrowStone"/>
+    <SimEventListenerConnection listener="WaterFront3" source="KeyStoneHarbor"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront1"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront2"/>
+    <SimEventListenerConnection listener="WaterFront" source="WaterFront3"/>
+    <SimEventListenerConnection listener="NauticalChart" source="WaterFront"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>

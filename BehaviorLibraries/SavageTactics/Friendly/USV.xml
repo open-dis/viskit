@@ -7,7 +7,7 @@
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Must be something other than the first waypoint</Comment>
     </Parameter>
-     <Parameter name="maximumSpeed" type="double">
+    <Parameter name="maximumSpeed" type="double">
         <Comment/>
     </Parameter>
     <Parameter name="name" type="java.lang.String">
@@ -63,6 +63,9 @@
     </Parameter>
     <Parameter name="entityCountry" type="int">
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>The patrol zones for this entity</Comment>
     </Parameter>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Visual sense of RHIB crew</Comment>
@@ -141,8 +144,12 @@
         <StateTransition state="distanceFromMissedAttacker">
             <Assignment value="0"/>
         </StateTransition>
+        <Schedule condition="zones.length != 0" delay="0.0" event="ReviewPatrol" priority="0">
+            <Comment/>
+            <EdgeParameter value="zones"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="30" y="30"/>
+        <Coordinate x="20" y="190"/>
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
@@ -182,26 +189,20 @@
         <Code/>
         <Coordinate x="150" y="110"/>
     </Event>
-    <Event name="CreateZones">
+    <Event name="ReviewPatrol">
         <Comment>Listens to diskit.SceneZoneCreator to get Patrol Zone responsibilities</Comment>
         <Argument name="zones" type="diskit.ProbabilityZoneGeometry[]">
             <Comment>Zones for this simulation</Comment>
         </Argument>
-        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, zones)">
-            <Comment>Reads Zones for only those that are for this entity</Comment>
-        </LocalVariable>
-        <LocalVariable name="myPatrol" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
-            <Comment>Returns this entities patrol zones</Comment>
-        </LocalVariable>
         <StateTransition state="waypointGenerator">
-            <Assignment value="new diskit.WaypointCreator(myPatrol)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
         </StateTransition>
         <Schedule event="Patrol"/>
         <Code/>
-        <Coordinate x="240" y="110"/>
+        <Coordinate x="150" y="190"/>
     </Event>
     <Event name="Patrol">
         <Comment>Patrolling behavior for this entity. Speed is random and always less than the max speed</Comment>
@@ -228,7 +229,7 @@ setStartPosition(startPosition);
 setDestination(waypoint);
 //System.out.println("doPatrol Event:");
 //System.out.println("Heading to: " + waypoint);</Code>
-        <Coordinate x="240" y="230"/>
+        <Coordinate x="150" y="310"/>
     </Event>
     <Code/>
 </SimEntity>
