@@ -1,5 +1,6 @@
 package viskit;
 
+import java.lang.reflect.Field;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
 
@@ -466,45 +467,88 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     jarFileCommon(jarFile);
   }
 
-  private void jarFileCommon(JarFile jarFile)
-  {
-    java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
-    for (int j = 0; j < list.size(); j++) {
-      Class c = (Class) list.get(j);
-      System.out.println("adding " + c.getName());
-      ObjectFactory of = new ObjectFactory();
-      Constructor[] constr = c.getConstructors();
-      ArrayList[] plist = new ArrayList[constr.length];
-      System.out.println("\t # constructors: " + constr.length);
-      for (int i = 0; i < constr.length; i ++) {
-        Class[] ptypes = constr[i].getParameterTypes();
-        plist[i] = new ArrayList();
-        System.out.println("\t # params " + ptypes.length + " in constructor " + i);
-        for (int k = 0; k < ptypes.length; k++) {
+  private void jarFileCommon(JarFile jarFile) {
+      java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
+      for (int j = 0; j < list.size(); j++) {
+          Class c = (Class) list.get(j);
+          Constructor[] constr = c.getConstructors();
+          ArrayList[] plist = new ArrayList[constr.length];
+          ObjectFactory of = new ObjectFactory();
+          Field f = null;
           try {
-            ParameterType p = of.createParameter();
-            String ptname = Vstatics.convertClassName(ptypes[k].getName());
-            if (ptname.indexOf(".class") > 0) { //??
-              ptname = ptname.split("\\.")[0];
-            }
-            p.setName("p[" + k + "] : ");
-            p.setType(ptname);
-            plist[i].add(p);
-            System.out.println("\t " + p.getName() + p.getType());
+              f = c.getField("parameterMap");
+          } catch (SecurityException ex) {
+              ex.printStackTrace();
+          } catch (NoSuchFieldException ex) {
+              ex.printStackTrace();
           }
-          catch (Exception e) {
-            e.printStackTrace();
+          System.out.println("adding " + c.getName());
+          if (f != null) {
+              try {
+                  // parameters are in the following order
+                  // {
+                  //  { "type0","name0","type1","name1",... }
+                  //  { "type0","name0", ... }
+                  //  ...
+                  // }
+                  String[][] parameterMap = (String[][])(f.get(new String[0][0]));
+                  int numConstrs = parameterMap.length;
+                  
+                  for (int n = 0; n < numConstrs; n++) {
+                      String[] params = parameterMap[n];
+                      plist[n] = new ArrayList();
+                      for (int k = 0; k < params.length; k+=2) {
+                          try {
+                              ParameterType p = of.createParameter();
+                              String ptype = params[k];
+                              String pname = params[k+1];
+                              
+                              p.setName(pname);
+                              p.setType(ptype);
+                              plist[n].add(p);
+                              System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                          }
+                      }
+                  }
+              } catch (IllegalArgumentException ex) {
+                  ex.printStackTrace();
+              } catch (IllegalAccessException ex) {
+                  ex.printStackTrace();
+              }
+          } else {
+              
+              System.out.println("\t # constructors: " + constr.length);
+              for (int i = 0; i < constr.length; i ++) {
+                  Class[] ptypes = constr[i].getParameterTypes();
+                  plist[i] = new ArrayList();
+                  System.out.println("\t # params " + ptypes.length + " in constructor " + i);
+                  for (int k = 0; k < ptypes.length; k++) {
+                      try {
+                          ParameterType p = of.createParameter();
+                          String ptname = Vstatics.convertClassName(ptypes[k].getName());
+                          if (ptname.indexOf(".class") > 0) { //??
+                              ptname = ptname.split("\\.")[0];
+                          }
+                          p.setName("p[" + k + "] : ");
+                          p.setType(ptname);
+                          plist[i].add(p);
+                          System.out.println("\t " + p.getName() + p.getType());
+                      } catch (Exception e) {
+                          e.printStackTrace();
+                      }
+                  }
+              }
           }
-        }
+          Vstatics.putParameterList(c.getName(), plist);
+          
       }
-      Vstatics.putParameterList(c.getName(), plist);
-
-    }
-    if (list == null || list.size() <= 0) {
-      JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
-          "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);
-      return;
-    }
+      if (list == null || list.size() <= 0) {
+          JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
+                  "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);
+          return;
+      }
 
     DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
     mod.insertNodeInto(localRoot, root, 0);
@@ -616,8 +660,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           return false;
       }
       else if (f.getName().equals("CVS") ||
-          f.getName().equals("Scenarios") ||
-          f.getName().equals("Locations")) {
+          f.getName().equals("Scenarios")) {
         return false;
       }
       else {
@@ -718,13 +761,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     for (int i = 0; i < fa.length; i++) {
       boolean recurse = true;
       if (fa[i].isDirectory() && !fa[i].getName().equals("CVS")
-          && !fa[i].getName().equals("Scenarios")
-          && !fa[i].getName().equals("Locations")) {
+          && !fa[i].getName().equals("Scenarios")) {
         addContentRoot(fa[i], recurse);
       }
       else if (!fa[i].getName().equals("CVS") &&
-          !fa[i].getName().equals("Scenarios")
-          && !fa[i].getName().equals("Locations")) {
+          !fa[i].getName().equals("Scenarios")) {
         addContentRoot(fa[i]);
       }
     }
