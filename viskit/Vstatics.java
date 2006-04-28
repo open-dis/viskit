@@ -356,19 +356,21 @@ public class Vstatics
                   
                   for (int n = 0; n < numConstrs; n++) {
                       String[] params = parameterMap[n];
-                      plist[n] = new ArrayList();
-                      for (int k = 0; k < params.length; k+=2) {
-                          try {
-                              ParameterType p = of.createParameter();
-                              String ptype = params[k];
-                              String pname = params[k+1];
-                              
-                              p.setName(pname);
-                              p.setType(ptype);
-                              plist[n].add(p);
-                              System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
-                          } catch (Exception e) {
-                              e.printStackTrace();
+                      if (params != null) {
+                          plist[n] = new ArrayList();
+                          for (int k = 0; k < params.length; k+=2) {
+                              try {
+                                  ParameterType p = of.createParameter();
+                                  String ptype = params[k];
+                                  String pname = params[k+1];
+                                  
+                                  p.setName(pname);
+                                  p.setType(ptype);
+                                  plist[n].add(p);
+                                  System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                              } catch (Exception e) {
+                                  e.printStackTrace();
+                              }
                           }
                       }
                   }
