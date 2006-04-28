@@ -660,7 +660,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           return false;
       }
       else if (f.getName().equals("CVS") ||
-          f.getName().equals("Scenarios")) {
+          f.getName().equals("Scenarios") ||
+          f.getName().equals("Locations")){
         return false;
       }
       else {
@@ -761,11 +762,13 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     for (int i = 0; i < fa.length; i++) {
       boolean recurse = true;
       if (fa[i].isDirectory() && !fa[i].getName().equals("CVS")
-          && !fa[i].getName().equals("Scenarios")) {
+          && !fa[i].getName().equals("Scenarios")
+          && !fa[i].getName().equals("Locations")) {
         addContentRoot(fa[i], recurse);
       }
       else if (!fa[i].getName().equals("CVS") &&
-          !fa[i].getName().equals("Scenarios")) {
+          !fa[i].getName().equals("Scenarios")
+          && !fa[i].getName().equals("Locations")) {
         addContentRoot(fa[i]);
       }
     }
