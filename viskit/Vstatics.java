@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
 
@@ -328,55 +329,105 @@ public class Vstatics
           ObjectFactory of = new ObjectFactory();
           Constructor[] constr = c.getConstructors();
           ArrayList[] plist = new ArrayList[constr.length];
-          System.out.println("\t # constructors: "+constr.length);
-          for ( int i = 0; i < constr.length; i ++ ) {
-              Class[] ptypes = constr[i].getParameterTypes();
-              plist[i] = new ArrayList();
-              System.out.println("\t # params "+ptypes.length+" in constructor "+i);
-              for ( int k = 0; k < ptypes.length; k++ ) {
-                  try {
-                      ParameterType p = of.createParameter();
-                      String ptname = ptypes[k].getName();
-                      if ( ptname.indexOf(".class")>0 ) { //??
-                          ptname = ptname.split("\\.")[0]; 
-                      }
-                      // could be from class loader, which would
-                      // prepend [L, etc. to an array, fix it up here
-                      if ( ptname.startsWith("[")) {
-                          System.out.println("[] an array "+ptname);
-                          // java has it if array of some type then [Lclassname, long
-                          // pointer? so for all cases of prims [x except [L
-                          // then just convert to full name, otherwise if begins with [L
-                          // check if length of string is > 2, then it is [classname
-                          // also, note name is followed by ;
-                          if (ptname.length() == 2) { // must be a prim type
-                              if (ptname.equals("[B")) {
-                                  ptname = "byte[]";
-                              } else if (ptname.equals("[C")) {
-                                  ptname = "char[]";
-                              } else if (ptname.equals("[D")) {
-                                  ptname = "double[]";
-                              } else if (ptname.equals("[F")) {
-                                  ptname = "float[]";
-                              } else if (ptname.equals("[I")) {
-                                  ptname = "int[]";
-                              } else if (ptname.equals("[J")) {
-                                  ptname = "long[]";
-                              } else if (ptname.equals("[S")) {
-                                  ptname = "short[]";
-                              } else if (ptname.equals("[Z")) {
-                                  ptname = "boolean[]";
-                              }
-                          } else {
-                              ptname = convertClassName(ptname);
+          
+          // at this point, there should be loaded classes
+          // from LegosTree, however, addJarFileCommon is only
+          // looking for SimEntity types (TBD could refactor this better
+          // as this code block is directly from LegosTree.addJarFileCommon()
+          Field f = null;
+          try {
+              f = c.getField("parameterMap");
+          } catch (SecurityException ex) {
+              ex.printStackTrace();
+          } catch (NoSuchFieldException ex) {
+              ;
+          }
+          if (f != null) { // these would be base classes not arrays
+              System.out.println(f+" is a parameterMap");
+              try {
+                  // parameters are in the following order
+                  // {
+                  //  { "type0","name0","type1","name1",... }
+                  //  { "type0","name0", ... }
+                  //  ...
+                  // }
+                  String[][] parameterMap = (String[][])(f.get(new String[0][0]));
+                  int numConstrs = parameterMap.length;
+                  
+                  for (int n = 0; n < numConstrs; n++) {
+                      String[] params = parameterMap[n];
+                      plist[n] = new ArrayList();
+                      for (int k = 0; k < params.length; k+=2) {
+                          try {
+                              ParameterType p = of.createParameter();
+                              String ptype = params[k];
+                              String pname = params[k+1];
+                              
+                              p.setName(pname);
+                              p.setType(ptype);
+                              plist[n].add(p);
+                              System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                          } catch (Exception e) {
+                              e.printStackTrace();
                           }
                       }
-                      p.setName("p["+k+"] : ");
-                      p.setType(ptname);
-                      plist[i].add(p);
-                      System.out.println("\t "+p.getName()+p.getType());
-                  } catch (Exception e) {
-                      e.printStackTrace();
+                  }
+              } catch (IllegalArgumentException ex) {
+                  ex.printStackTrace();
+              } catch (IllegalAccessException ex) {
+                  ex.printStackTrace();
+              }
+          } else {
+              System.out.println("\t # constructors: "+constr.length);
+              for ( int i = 0; i < constr.length; i ++ ) {
+                  Class[] ptypes = constr[i].getParameterTypes();
+                  plist[i] = new ArrayList();
+                  System.out.println("\t # params "+ptypes.length+" in constructor "+i);
+                  for ( int k = 0; k < ptypes.length; k++ ) {
+                      try {
+                          ParameterType p = of.createParameter();
+                          String ptname = ptypes[k].getName();
+                          if ( ptname.indexOf(".class")>0 ) { //??
+                              ptname = ptname.split("\\.")[0];
+                          }
+                          // could be from class loader, which would
+                          // prepend [L, etc. to an array, fix it up here
+                          if ( ptname.startsWith("[")) {
+                              System.out.println("[] an array "+ptname);
+                              // java has it if array of some type then [Lclassname, long
+                              // pointer? so for all cases of prims [x except [L
+                              // then just convert to full name, otherwise if begins with [L
+                              // check if length of string is > 2, then it is [classname
+                              // also, note name is followed by ;
+                              if (ptname.length() == 2) { // must be a prim type
+                                  if (ptname.equals("[B")) {
+                                      ptname = "byte[]";
+                                  } else if (ptname.equals("[C")) {
+                                      ptname = "char[]";
+                                  } else if (ptname.equals("[D")) {
+                                      ptname = "double[]";
+                                  } else if (ptname.equals("[F")) {
+                                      ptname = "float[]";
+                                  } else if (ptname.equals("[I")) {
+                                      ptname = "int[]";
+                                  } else if (ptname.equals("[J")) {
+                                      ptname = "long[]";
+                                  } else if (ptname.equals("[S")) {
+                                      ptname = "short[]";
+                                  } else if (ptname.equals("[Z")) {
+                                      ptname = "boolean[]";
+                                  }
+                              } else {
+                                  ptname = convertClassName(ptname);
+                              }
+                          }
+                          p.setName("p["+k+"] : ");
+                          p.setType(ptname);
+                          plist[i].add(p);
+                          System.out.println("\t "+p.getName()+p.getType());
+                      } catch (Exception e) {
+                          e.printStackTrace();
+                      }
                   }
               }
           }

@@ -480,10 +480,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           } catch (SecurityException ex) {
               ex.printStackTrace();
           } catch (NoSuchFieldException ex) {
-              ex.printStackTrace();
+              ;
           }
           System.out.println("adding " + c.getName());
           if (f != null) {
+              System.out.println(f+" is a parameterMap");
               try {
                   // parameters are in the following order
                   // {
