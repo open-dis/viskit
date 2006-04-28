@@ -1278,8 +1278,9 @@
         <Coordinate x="510" y="330"/>
     </SimEntity>
     <SimEntity description="" name="DISPacketSender" type="diskit.DISPinger">
-        <TerminalParameter name="p[0] : " type="double" value=".2"/>
-        <TerminalParameter name="p[1] : " type="long" value="200"/>
+        <TerminalParameter name="isActive" type="boolean" value="true"/>
+        <TerminalParameter name="duration" type="double" value=".2"/>
+        <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
         <Coordinate x="510" y="30"/>
     </SimEntity>
     <SimEntity description="" name="WaterFront3" type="diskit.RegistrationRelay">
