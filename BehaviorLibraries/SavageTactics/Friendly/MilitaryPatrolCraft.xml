@@ -160,6 +160,9 @@
         <StateTransition state="collisionAvoidance">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
         </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -201,33 +204,16 @@
         <StateTransition state="patrolManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
         </StateTransition>
-        <Schedule event="Patrol"/>
+        <Schedule event="SetStartingPositions"/>
         <Code/>
         <Coordinate x="200" y="70"/>
     </Event>
     <Event name="Patrol">
         <Comment>Patrolling behavior for this entity. Speed is random and always less than the maximum speed</Comment>
-        <LocalVariable name="rn" type="java.util.Random" value="new Random()">
-            <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
-        </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="maximumSpeed * rn.nextDouble()">
-            <Comment>creates a crusing speed between zero and the maximum speed of this craft</Comment>
-        </LocalVariable>
-        <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
-            <Comment>Provides a waypoint within the geometry specified</Comment>
-        </LocalVariable>
-        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
-            <Comment>Start somewhere different each time</Comment>
-        </LocalVariable>
-        <StateTransition state="speed">
-            <Assignment value="currentSpeed"/>
-        </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruiseSpeed(maximumSpeed/2);
-setStartPosition(startPosition);
-setDestination(waypoint);</Code>
+        <Code/>
         <Coordinate x="490" y="70"/>
     </Event>
     <Event name="Detection">
@@ -253,7 +239,10 @@ setDestination(waypoint);</Code>
         <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
             <Comment>Check to see if this is a contact of like forces</Comment>
         </LocalVariable>
-        <Schedule condition="3&gt;7" delay="0.0" event="AssessObstacle" priority="0">
+        <StateTransition state="contactIDs">
+            <Assignment value="contactIDs + 1"/>
+        </StateTransition>
+        <Schedule condition="alreadyIDd || isFriendlyForce" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>Should not avoid contacts if you are intercepting them</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -303,9 +292,9 @@ setDestination(targetDestination);</Code>
         <LocalVariable name="interdictPoint" type="diskit.Vec3d" value="getInterceptPoint()">
             <Comment>The point at which a successful block could be accomplished</Comment>
         </LocalVariable>
-        <Code>setDestination(interdictPoint);
-/*System.out.println("All stations, this is " + getName() + " I am able to block the threat, enroute...Out");*/
-//setStartPosition(getLocation());</Code>
+        <Code>setStartPosition(getLocation());
+setDestination(interdictPoint);
+/*System.out.println("All stations, this is " + getName() + " I am able to block the threat, enroute...Out");*/</Code>
         <Coordinate x="390" y="580"/>
     </Event>
     <Event name="AssessObstacle">
@@ -334,17 +323,18 @@ setDestination(targetDestination);</Code>
         <LocalVariable name="avoidancePoint" type="diskit.Vec3d" value="calc.getCollisionAvoidance(obstacle)">
             <Comment>The point this mover should go to to avoid collision</Comment>
         </LocalVariable>
-        <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
-            <Comment/>
-        </Schedule>
         <Code>setStartPosition(getLocation());
-System.out.println("Avoiding Obstacle " + obstacle.getMoverID());</Code>
+setDestination(avoidancePoint);
+System.out.println("Avoiding Obstacle " + obstacle.getName());</Code>
         <Coordinate x="410" y="190"/>
     </Event>
     <Event name="ResumePatrol">
         <Comment/>
-        <Schedule event="Patrol"/>
-        <Code/>
+        <LocalVariable name="patrolPoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>A point that is back on the patrol</Comment>
+        </LocalVariable>
+        <Code>//setStartPosition(getLocation());
+//setDestination(patrolPoint);</Code>
         <Coordinate x="490" y="190"/>
     </Event>
     <Event name="Intercept">
@@ -388,20 +378,26 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>Contact being identified</Comment>
         </Argument>
+        <LocalVariable name="eval" type="java.lang.String" value="contact.getEntityType()">
+            <Comment>TODO: Better ID tactics</Comment>
+        </LocalVariable>
         <StateTransition state="contactPicture">
             <Operation method="add(contact)"/>
         </StateTransition>
         <StateTransition state="contactIDs">
             <Assignment value="contactIDs + 1"/>
         </StateTransition>
-        <Schedule condition="3&gt;7" delay="0.0" event="ResumePatrol" priority="0">
-            <Comment>If the contact wasn't hostile, return to patrol</Comment>
+        <StateTransition state="idAttempts">
+            <Assignment value="0"/>
+        </StateTransition>
+        <Schedule condition="!eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="ResumePatrol" priority="0">
+            <Comment>TODO: Add better tactics If the contact wasn't hostile, return to patrol</Comment>
         </Schedule>
-        <Schedule condition="3&gt;7" delay="0.0" event="SecurityAlert" priority="0">
-            <Comment/>
+        <Schedule condition="eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="SecurityAlert" priority="0">
+            <Comment>TODO: Add better tactics</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>//System.out.println("RHIB doIDContact");</Code>
+        <Code>System.out.println("RHIB doIDContact");</Code>
         <Coordinate x="490" y="300"/>
     </Event>
     <Event name="PursueHostile">
@@ -422,7 +418,8 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
             <Comment>Unable to block the contact, follow the contact at maximum speed</Comment>
             <EdgeParameter value="threat"/>
         </Schedule>
-        <Code>setStartPosition(getLocation());</Code>
+        <Code>//setStartPosition(getLocation());
+System.out.println("Pursue Hostile RHIB");</Code>
         <Coordinate x="490" y="460"/>
     </Event>
     <Event name="CreateSensors">
@@ -474,11 +471,21 @@ setCruiseSpeed(getMaximumSpeed());</Code>
     </Event>
     <Event name="ScaleSpeedToKnots">
         <Comment>Scales entered speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
-            <Comment/>
-        </LocalVariable>
-        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Code>setMaximumSpeed(getMaximumSpeed()/2);</Code>
         <Coordinate x="110" y="10"/>
+    </Event>
+    <Event name="SetStartingPositions">
+        <Comment>Starts this entity at a random location within it's patrol area at the start of each simulation run</Comment>
+        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>Random starting position</Comment>
+        </LocalVariable>
+        <LocalVariable name="firstDestination" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
+            <Comment>First destination for this entity</Comment>
+        </LocalVariable>
+        <Schedule event="Patrol"/>
+        <Code>setCruiseSpeed(getMaximumSpeed()/2);
+setStartPosition(startPosit);</Code>
+        <Coordinate x="340" y="70"/>
     </Event>
     <Code>
 </Code>

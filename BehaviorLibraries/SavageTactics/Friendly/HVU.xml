@@ -59,6 +59,15 @@ NOTE: Visual perception and communications are behaviors representing the person
     <StateVariable name="contactIDs" type="int">
         <Comment>DATA: Total number of contacts ID'd</Comment>
     </StateVariable>
+    <StateVariable name="shipAssetsRegistered" type="java.util.LinkedList">
+        <Comment>Used to keep track of entities that have registered through this entity</Comment>
+    </StateVariable>
+    <StateVariable name="shipAssetsSensorRegistered" type="java.util.LinkedList">
+        <Comment>Tracks the sensors that have been registered through this entity</Comment>
+    </StateVariable>
+    <StateVariable name="shipAssetsSensorsRegistered" type="java.util.LinkedList">
+        <Comment>Keeps track of sensor arrays that have been registered through this entity</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <StateTransition state="visualRange">
@@ -77,6 +86,15 @@ NOTE: Visual perception and communications are behaviors representing the person
             <Assignment value="new diskit.TargetQueue(getLocation());"/>
         </StateTransition>
         <StateTransition state="targetQueue">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="shipAssetsRegistered">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="shipAssetsSensorRegistered">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="shipAssetsSensorsRegistered">
             <Operation method="clear()"/>
         </StateTransition>
         <Schedule condition="zones.length != 0" delay="0.0" event="ReviewPatrol" priority="0">
@@ -100,6 +118,9 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="collisionAvoidance">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
         </StateTransition>
+        <StateTransition state="shipAssetsRegistered">
+            <Operation method="add(this)"/>
+        </StateTransition>
         <Schedule event="CreateSensors"/>
         <Schedule event="RegisterTarget"/>
         <Code/>
@@ -107,9 +128,13 @@ NOTE: Visual perception and communications are behaviors representing the person
     </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this mover with the simulation</Comment>
-        <Argument name="m" type="diskit.Mover3D">
+        <Argument name="target" type="diskit.Mover3D">
             <Comment>This mover being registered</Comment>
         </Argument>
+        <Schedule condition="!shipAssetsRegistered.contains(target)" delay="0.0" event="ProcessShipAssetTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
         <Code/>
         <Coordinate x="90" y="150"/>
     </Event>
@@ -124,6 +149,10 @@ NOTE: Visual perception and communications are behaviors representing the person
         <StateTransition state="collisionAvoidance">
             <Operation method="addSimEventListener(this)"/>
         </StateTransition>
+        <Schedule condition="!shipAssetsSensorsRegistered.contains(sensors)	" delay="0.0" event="ProcessShipAssetSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
         <Code/>
         <Coordinate x="90" y="240"/>
     </Event>
@@ -247,6 +276,9 @@ System.out.println("Name:                " + contact.getEntityName());
         <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
             <Comment>Collection of sensors for this entity</Comment>
         </LocalVariable>
+        <StateTransition state="shipAssetsSensorsRegistered">
+            <Operation method="add(sensors)"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
             <Comment/>
             <EdgeParameter value="sensors"/>
@@ -254,6 +286,55 @@ System.out.println("Name:                " + contact.getEntityName());
         <Code>sensors[0] = visualPerception;
 sensors[1] = collisionAvoidance;</Code>
         <Coordinate x="10" y="240"/>
+    </Event>
+    <Event name="ProcessShipAssetTarget">
+        <Comment>Allows ships assets to register through the ship</Comment>
+        <Argument name="target" type="diskit.Mover3D"/>
+        <StateTransition state="shipAssetsRegistered">
+            <Operation method="add(this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="200" y="150"/>
+    </Event>
+    <Event name="ProcessShipAssetSensors">
+        <Comment>Allows sensor arrays of ships assets to register through the ship</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]"/>
+        <StateTransition state="shipAssetsSensorsRegistered">
+            <Operation method="add(sensors)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="200" y="240"/>
+    </Event>
+    <Event name="RegisterSensor">
+        <Comment>Single sensor to be registered by this entity</Comment>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Schedule condition="!shipAssetsSensorRegistered.contains(sensor)		" delay="0.0" event="ProcessShipAssetSensor" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="90" y="320"/>
+    </Event>
+    <Event name="ProcessShipAssetSensor">
+        <Comment>Allows single ship asset sensor to register through this entity</Comment>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <StateTransition state="shipAssetsSensorRegistered">
+            <Operation method="add(sensor)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="200" y="320"/>
     </Event>
     <Code>
 
