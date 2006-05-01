@@ -8,6 +8,18 @@
         <TerminalParameter name="p[4] : " type="int" value="1"/>
         <Coordinate x="220" y="130"/>
     </SimEntity>
+    <SimEntity description="" name="DDG77/O'Kane" type="diskit.HVU">
+        <TerminalParameter name="moverID" type="int" value="400"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="p[0] : " type="double" value="-249.854"/>
+            <TerminalParameter name="p[1] : " type="double" value="-1273.95"/>
+            <TerminalParameter name="p[2] : " type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="0"/>
+        <TerminalParameter name="name" type="java.lang.String" value="USS O'Kane"/>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <Coordinate x="220" y="440"/>
+    </SimEntity>
     <SimEntity description="" name="RHIB" type="diskit.MilitaryPatrolCraft">
         <TerminalParameter name="moverID" type="int" value="101"/>
         <MultiParameter type="diskit.Vec3d">
@@ -76,7 +88,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="80" y="180"/>
+        <Coordinate x="70" y="170"/>
     </SimEntity>
     <SimEntity description="A Fishing Trawler" name="Trawler" type="diskit.CivilianMerchantShip">
         <TerminalParameter name="moverID" type="int" value="121"/>
@@ -146,7 +158,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="80" y="80"/>
+        <Coordinate x="70" y="80"/>
     </SimEntity>
     <SimEntity description="Overall Area of ammo pier, includes the three access piers" name="AmmoPier" type="diskit.Pier">
         <TerminalParameter name="moverID" type="int" value="800"/>
@@ -172,7 +184,7 @@
         <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
         <Coordinate x="220" y="20"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVesselNew">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="600"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -202,9 +214,9 @@
         <TerminalParameter name="entityDomain" type="int" value="3"/>
         <TerminalParameter name="entityKind" type="int" value="1"/>
         <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="350" y="150"/>
+        <Coordinate x="330" y="130"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVesselNew">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="601"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -234,9 +246,9 @@
         <TerminalParameter name="entityDomain" type="int" value="3"/>
         <TerminalParameter name="entityKind" type="int" value="1"/>
         <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="470" y="270"/>
+        <Coordinate x="450" y="250"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVesselNew">
+    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVessel">
         <TerminalParameter name="moverID" type="int" value="602"/>
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter name="p[0] : " type="double" value="0"/>
@@ -266,7 +278,7 @@
         <TerminalParameter name="entityDomain" type="int" value="3"/>
         <TerminalParameter name="entityKind" type="int" value="1"/>
         <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="350" y="380"/>
+        <Coordinate x="330" y="360"/>
     </SimEntity>
     <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="diskitXML.TerroristCellPlanner">
         <MultiParameter type="int[]">
@@ -283,7 +295,7 @@
         <MultiParameter type="diskit.Tactic[]">
             <TerminalParameter name="" type="diskit.Tactic" value="diskit.Tactic.ATTACK"/>
         </MultiParameter>
-        <Coordinate x="350" y="270"/>
+        <Coordinate x="330" y="250"/>
     </SimEntity>
     <SimEntity description="" name="NauticalChart" type="diskitXML.NauticalChart">
         <MultiParameter type="diskit.AStarZoneGeometry[]">
@@ -348,11 +360,7 @@
                 <MultiParameter type="java.lang.String[]">
                     <TerminalParameter name="" type="java.lang.String" value="WalanPoint"/>
                 </MultiParameter>
-                <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="1354.675"/>
-                    <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="541.87"/>
-                </MultiParameter>
+                <MultiParameter type="double[]"/>
                 <TerminalParameter name="length" type="double" value="200"/>
                 <TerminalParameter name="width" type="double" value="200"/>
                 <TerminalParameter name="height" type="double" value="0.0"/>
@@ -746,7 +754,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="220" y="260"/>
+        <Coordinate x="220" y="240"/>
     </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection listener="ScenarioManager" source="NauticalChart"/>
@@ -761,6 +769,7 @@
     <SimEventListenerConnection listener="TerroristCellPlanner" source="Terrorist3"/>
     <SimEventListenerConnection listener="NauticalChart" source="TerroristCellPlanner"/>
     <SimEventListenerConnection listener="TerroristCellPlanner" source="NauticalChart"/>
+    <SimEventListenerConnection listener="AmmoPier" source="DDG77/O'Kane"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
