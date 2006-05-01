@@ -63,5 +63,25 @@ The most common use of this utility is to group common entities in graphical for
         <Code/>
         <Coordinate x="130" y="240"/>
     </Event>
+    <Event name="AddZoneWithAdapter">
+        <Comment>Passes a perimeter zone as an AStarGeometry zone to a Nautical Chart object</Comment>
+        <Argument name="zone" type="diskit.AStarZoneGeometry">
+            <Comment>The perimeter zone to be passed</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="AddZoneToWaterFront" priority="0">
+            <Comment/>
+            <EdgeParameter value="zone"/>
+        </Schedule>
+        <Code>System.out.println("Adapter Got it: " + zone.getName());</Code>
+        <Coordinate x="20" y="310"/>
+    </Event>
+    <Event name="AddZoneToWaterFront">
+        <Comment>The event that a nautical chart object is listening to</Comment>
+        <Argument name="zone" type="diskit.AStarZoneGeometry">
+            <Comment>The zone being passed</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="130" y="310"/>
+    </Event>
 </SimEntity>
 
