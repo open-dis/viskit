@@ -66,22 +66,22 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
     </Parameter>
     <StateVariable name="avoidanceRange" type="double">
-        <Comment/>
+        <Comment>The proximity tollerance for this entity</Comment>
     </StateVariable>
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Sensor object that processes all targets in the state space before attacking</Comment>
     </StateVariable>
     <StateVariable name="interceptMoverManager" type="diskit.InterceptMoverManager">
-        <Comment/>
+        <Comment>The mover manager used when attempting an intercept</Comment>
     </StateVariable>
-    <StateVariable name="attackCreator" type="diskit.WaypointCreator">
-        <Comment/>
+    <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
+        <Comment>The utility that creates waypoints based on the arguments passed</Comment>
     </StateVariable>
     <StateVariable name="targetQueue" type="java.util.LinkedList">
-        <Comment/>
+        <Comment>The queue of active targets for this entity</Comment>
     </StateVariable>
     <StateVariable name="activeMoverManager" type="diskit.MoverManager">
-        <Comment/>
+        <Comment>A place holder mover manager that identifies that active mover manager. Primarily used for swapping active mover manager types</Comment>
     </StateVariable>
     <StateVariable name="collisionAvoidance" type="diskit.Sensor">
         <Comment>Sensor that implements collision avoidance</Comment>
@@ -89,38 +89,17 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="lethalRange" type="diskit.Sensor">
         <Comment>Range at which this terrorist can be lethal (assumes suicide bombing as attack)</Comment>
     </StateVariable>
-    <StateVariable name="initialMoverManager" type="diskit.PathMoverManager">
-        <Comment/>
-    </StateVariable>
-    <StateVariable name="successfulStartPosition" type="diskit.Vec3d">
-        <Comment>TODO: add property stat</Comment>
-    </StateVariable>
-    <StateVariable name="unsuccessfulStartPosit" type="diskit.Vec3d">
-        <Comment>TODO: add property stat</Comment>
-    </StateVariable>
-    <StateVariable name="successfullAttack" type="int">
-        <Comment>TODO: add as property stat</Comment>
-    </StateVariable>
-    <StateVariable name="unsuccessfulAttack" type="int">
-        <Comment>TODO: add as property stat</Comment>
-    </StateVariable>
-    <StateVariable name="lengthOfAttack" type="double">
-        <Comment>TODO: add as property stat</Comment>
-    </StateVariable>
     <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
-        <Comment/>
+        <Comment>The active list of obstacles that this entity is concerned with. Special class that organizes the queue based on the proximity of the obstacles</Comment>
     </StateVariable>
     <StateVariable name="tacticalMode" type="diskit.TacticalMode">
-        <Comment/>
+        <Comment>The current tactical mode of this entity</Comment>
     </StateVariable>
     <StateVariable name="calc" type="diskit.util.MovementCalculator">
-        <Comment/>
+        <Comment>A utility class that performs 3D vector math calculations</Comment>
     </StateVariable>
-    <StateVariable name="harborDirector" type="diskit.WaypointCreator">
-        <Comment/>
-    </StateVariable>
-    <StateVariable name="amm" type="diskit.AvoidanceMoverManager">
-        <Comment/>
+    <StateVariable name="avoidanceMoverManager" type="diskit.AvoidanceMoverManager">
+        <Comment>A mover manager that handles avoidance of objects</Comment>
     </StateVariable>
     <StateVariable name="detonateProximity" type="diskit.Sensor">
         <Comment>Sensor that determines if the contact is close enough to kill</Comment>
@@ -128,17 +107,47 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="visualRange" type="double">
         <Comment>Visual range for this entity</Comment>
     </StateVariable>
-    <StateVariable name="entitySensors" type="diskit.Sensor[0]">
-        <Comment/>
-    </StateVariable>
     <StateVariable name="plasticExplosives" type="diskit.Explosive">
         <Comment>Explosives that this entity is carrying</Comment>
     </StateVariable>
     <StateVariable name="blastRadius" type="double">
-        <Comment/>
+        <Comment>The radius of the explosives</Comment>
+    </StateVariable>
+    <StateVariable name="harborChart" type="diskit.AStarZoneMap">
+        <Comment>A map of the environment that contains the collection of search nodes for path finding</Comment>
+    </StateVariable>
+    <StateVariable name="primaryTarget" type="java.lang.String">
+        <Comment>The primary target for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="aStarSearch" type="diskit.AStarSearch">
+        <Comment>The A* search implementation that is used for path finding</Comment>
+    </StateVariable>
+    <StateVariable name="tactic" type="diskit.Tactic">
+        <Comment>The tactic that has been ordered for this terrorist</Comment>
+    </StateVariable>
+    <StateVariable name="startZone" type="diskit.AStarZoneGeometry">
+        <Comment>The zone from which the terrorist should start</Comment>
+    </StateVariable>
+    <StateVariable name="goalZone" type="diskit.AStarZoneGeometry">
+        <Comment>The area where this terrorist should head towards to execute it's tactics</Comment>
+    </StateVariable>
+    <StateVariable name="attackAuthorized" type="boolean">
+        <Comment>A flag to indicate whether or not the cell planner has authorized the execution of the attack plan</Comment>
+    </StateVariable>
+    <StateVariable name="planFinalized" type="boolean">
+        <Comment>A flag that indicates that this entity has processed it's attack order and is ready to attack</Comment>
+    </StateVariable>
+    <StateVariable name="zoneMoverManager" type="diskit.ZoneMoverManager">
+        <Comment>The primary mover for this entity, moves using A* search zone geometry</Comment>
+    </StateVariable>
+    <StateVariable name="attackStartWaypoint" type="diskit.Vec3d">
+        <Comment>The waypoint selected to start the attack</Comment>
+    </StateVariable>
+    <StateVariable name="chosenToAttack" type="boolean">
+        <Comment>Flag that is set to true when this entity has been selected to attack</Comment>
     </StateVariable>
     <Event name="Run">
-        <Comment/>
+        <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
             <Assignment value="30"/>
         </StateTransition>
@@ -155,12 +164,20 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
         <StateTransition state="visualRange">
-            <Assignment value="1800"/>
+            <Assignment value="600"/>
         </StateTransition>
         <StateTransition state="blastRadius">
             <Assignment value="40"/>
         </StateTransition>
-        <Schedule event="ScaleSpeedToKnots"/>
+        <StateTransition state="attackAuthorized">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="planFinalized">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="chosenToAttack">
+            <Assignment value="false"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="30" y="10"/>
     </Event>
@@ -219,7 +236,10 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="currentTacticalMode" type="diskit.TacticalMode" value="getTacticalMode()">
             <Comment>The tactical mode of the entity when he detects the contact</Comment>
         </LocalVariable>
-        <Schedule condition="canIntercept " delay="0.0" event="Attack" priority="0">
+        <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
+            <Comment>Checks the entity type of the contact</Comment>
+        </LocalVariable>
+        <Schedule condition="canIntercept &amp;&amp; contactType.equals(&quot;HVU&quot;) &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.ATTACKING)" delay="0.0" event="Attack" priority="0">
             <Comment>If this is an HVU and I can intercept it, and I'm not already attacking</Comment>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>
@@ -230,22 +250,6 @@ System.out.println("Contact Loc: " + contact.getLocation());
 System.out.println("My loc:          " + getLocation());
 */</Code>
         <Coordinate x="130" y="340"/>
-    </Event>
-    <Event name="Start">
-        <Comment>TODO: Move Harbor Center to the constructor for this event graph</Comment>
-        <LocalVariable name="startLocation" type="diskit.Vec3d" value="attackCreator.createWaypoint()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="startHeading" type="diskit.Vec3d" value="harborDirector.createWaypoint()">
-            <Comment>Pick a random waypoint in the direction of the harbor</Comment>
-        </LocalVariable>
-        <LocalVariable name="approachSpeed" type="double" value="getMaximumSpeed()/2">
-            <Comment>Proceed into the harbor at 1/2 speed</Comment>
-        </LocalVariable>
-        <Code>setStartPosition(startLocation); 
-setDestination(harborDirector.createWaypoint());
-setCruiseSpeed(approachSpeed);</Code>
-        <Coordinate x="300" y="230"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
@@ -283,28 +287,8 @@ setCruiseSpeed(approachSpeed);</Code>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
         <Code>setStartPosition(getLocation());
-setDestination(target.getLocation());
-this.setCruiseSpeed(getMaximumSpeed());
-System.out.println("Do Attack Called in Terrorist:");
-/*System.out.println("Target Name: " + target.getSMAL().getName());*/</Code>
+setDestination(target.getLocation());</Code>
         <Coordinate x="220" y="340"/>
-    </Event>
-    <Event name="CreateZones">
-        <Comment/>
-        <Argument name="startZones" type="diskit.ProbabilityZoneGeometry[]">
-            <Comment>Possible starting locations, only restriction should be physical limitations of attack craft</Comment>
-        </Argument>
-        <LocalVariable name="zoneReader" type="diskit.ZoneReader" value="new diskit.ZoneReader(moverID, startZones)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="startPositions" type="diskit.ProbabilityZoneGeometry[]" value="zoneReader.getMyPatrol()">
-            <Comment>Starting position zones assigned to this entity</Comment>
-        </LocalVariable>
-        <StateTransition state="attackCreator">
-            <Assignment value="new diskit.WaypointCreator(startPositions)"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="30" y="230"/>
     </Event>
     <Event name="CreateSensors">
         <Comment>Builds array of all sensors to be registered</Comment>
@@ -322,12 +306,6 @@ System.out.println("Do Attack Called in Terrorist:");
 sensors[1] = detonateProximity;
 sensors[2] = collisionAvoidance;</Code>
         <Coordinate x="120" y="150"/>
-    </Event>
-    <Event name="Stop">
-        <Comment/>
-        <Code>System.out.println("doStop called in Terrorist");
-Schedule.stopSimulation();</Code>
-        <Coordinate x="380" y="460"/>
     </Event>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
@@ -356,45 +334,180 @@ Schedule.stopSimulation();</Code>
         <Comment/>
         <Argument name="shooter" type="diskit.Mover3D"/>
         <Argument name="munition" type="diskit.Munition"/>
-        <Schedule condition="true" delay="5" event="Stop" priority="0">
-            <Comment>After the terrorist blows up, stop the simulation after a delay to allow for animation and data collection</Comment>
+        <Schedule condition="shooter == this" delay="0.0" event="AttackComplete" priority="0">
+            <Comment/>
         </Schedule>
-        <Code>setCruiseSpeed(0);
-setStartPosition(getLocation());
-System.out.println("Terrorist doDetonate event");</Code>
+        <Code/>
         <Coordinate x="380" y="340"/>
     </Event>
-    <Event name="ScaleSpeedToKnots">
-        <Comment>Scales maximum speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
-            <Comment/>
-        </LocalVariable>
-        <Code>setMaximumSpeed(newMaxSpeed);</Code>
-        <Coordinate x="30" y="80"/>
+    <Event name="TerroristGivenChart">
+        <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
+        <Argument name="chart" type="diskit.AStarZoneMap">
+            <Comment>The chart that the terrorist sent</Comment>
+        </Argument>
+        <StateTransition state="harborChart">
+            <Assignment value="chart"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="30" y="230"/>
     </Event>
-    <Event name="SetHarborLocation">
-        <Comment/>
-        <Argument name="entityID" type="int"/>
-        <Argument name="harborLocation" type="diskit.ProbabilityZoneGeometry[]"/>
-        <Schedule condition="entityID == moverID" delay="0.0" event="PrepareForAttack" priority="0">
+    <Event name="TargetListSent">
+        <Comment>Receives the target priority list from the terrorist cell planner</Comment>
+        <Argument name="targetList" type="java.lang.String[]">
+            <Comment>The list of target types in order of priority</Comment>
+        </Argument>
+        <StateTransition state="primaryTarget">
+            <Assignment value="targetList[0]"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="100" y="230"/>
+    </Event>
+    <Event name="AttackOrderSent">
+        <Comment>Checks to see if the order is for this entity. If so it begins to process the instructions and form a tactical plan. If not the order is ignored</Comment>
+        <Argument name="terroristID" type="int">
+            <Comment>The moverID number of the terrorist the order is for</Comment>
+        </Argument>
+        <Argument name="attackStart" type="diskit.AStarZoneGeometry">
+            <Comment>The start zone for this order</Comment>
+        </Argument>
+        <Argument name="attackGoal" type="diskit.AStarZoneGeometry">
+            <Comment>The general goal area for this order</Comment>
+        </Argument>
+        <Argument name="tactic" type="diskit.Tactic">
+            <Comment>The tactic for this order</Comment>
+        </Argument>
+        <LocalVariable name="start" type="diskit.AStarZoneGeometry" value="attackStart">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <LocalVariable name="goal" type="diskit.AStarZoneGeometry" value="attackGoal">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <LocalVariable name="tacticCopy" type="diskit.Tactic" value="tactic">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <Schedule condition="terroristID == moverID" delay="0.0" event="BeginAttackPlanning" priority="0">
             <Comment/>
-            <EdgeParameter value="harborLocation"/>
+            <EdgeParameter value="start"/>
+            <EdgeParameter value="goal"/>
+            <EdgeParameter value="tacticCopy"/>
         </Schedule>
         <Code/>
-        <Coordinate x="110" y="230"/>
+        <Coordinate x="190" y="230"/>
     </Event>
-    <Event name="PrepareForAttack">
-        <Comment/>
-        <Argument name="destinationChoices" type="diskit.ProbabilityZoneGeometry[]"/>
-        <StateTransition state="harborDirector">
-            <Assignment value="new diskit.WaypointCreator(destinationChoices)"/>
+    <Event name="BeginAttackPlanning">
+        <Comment>Takes the order information and prepares for its attack. Preparations include: 1) setting the startZone and goalZone state variables 2) Initializing a waypoint creator 3) Initializing an A* search object for path finding 4) Initializing a ZoneMoverManager for movement</Comment>
+        <Argument name="orderedStart" type="diskit.AStarZoneGeometry">
+            <Comment>The starting perimeter zone for this attack</Comment>
+        </Argument>
+        <Argument name="orderedGoal" type="diskit.AStarZoneGeometry">
+            <Comment>The goal zone for this attack</Comment>
+        </Argument>
+        <Argument name="orderedTactic" type="diskit.Tactic">
+            <Comment>The tactic for this attack</Comment>
+        </Argument>
+        <LocalVariable name="tacticToImplement" type="diskit.Tactic" value="orderedTactic">
+            <Comment>Copy of the tactic that has been ordered</Comment>
+        </LocalVariable>
+        <StateTransition state="startZone">
+            <Assignment value="orderedStart"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, harborDirector, avoidanceRange)"/>
+        <StateTransition state="goalZone">
+            <Assignment value="orderedGoal"/>
         </StateTransition>
-        <Schedule event="Start"/>
+        <StateTransition state="aStarSearch">
+            <Assignment value="new diskit.AStarSearch(harborChart)"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator()"/>
+        </StateTransition>
+        <StateTransition state="chosenToAttack">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule event="PickStartPosition"/>
         <Code/>
-        <Coordinate x="210" y="230"/>
+        <Coordinate x="280" y="230"/>
+    </Event>
+    <Event name="PickStartPosition">
+        <Comment>Terrorist uses the start zone to select an exact start position. It then determines which zone on the map is the closest to his starting position and updates it's A* search object with its destination and first zone to visit.   This implementation purposely decouples perimeter zones from the zones of the environment to allow analysts to alter terrorist starting options without effecting the overall structure of the basic environment map (e.g. navigatable water spaces). Futhermore it allows developers to prevent defending forces from knowing exactly where terrorists are going to retreat to (e.g. where they started).</Comment>
+        <LocalVariable name="initialWaypoint" type="diskit.Vec3d" value="waypointCreator.createWaypoint(startZone)">
+            <Comment>Generates a waypoint from the starting perimeter zone</Comment>
+        </LocalVariable>
+        <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(initialWaypoint)">
+            <Comment>Returns the A* zone that is not a perimeter zone and is the closest to the initial waypoint provided</Comment>
+        </LocalVariable>
+        <StateTransition state="aStarSearch">
+            <Operation method="setStartZone(closestZone)"/>
+        </StateTransition>
+        <StateTransition state="aStarSearch">
+            <Operation method="setGoalZone(goalZone)"/>
+        </StateTransition>
+        <StateTransition state="attackStartWaypoint">
+            <Assignment value="initialWaypoint"/>
+        </StateTransition>
+        <Schedule event="FinalizePlan"/>
+        <Code>System.out.println("I should go to " + closestZone.getName() + " first");</Code>
+        <Coordinate x="360" y="230"/>
+    </Event>
+    <Event name="FinalizePlan">
+        <Comment>Uses the closest zone as the first destination and generates a path. Then a path mover manager is created with the attack plan. If the attack has been authorized by the terrorist planner while the terrorist was making its plan, the terrorist will start it's attack immediately after the plan is made. Otherwise it will wait for the 'BeginAttack' order from the terrorist cell planner</Comment>
+        <LocalVariable name="attackPath" type="java.util.LinkedList" value="aStarSearch.createZonePath()">
+            <Comment>Returns the zones that should be used to generate waypoints in the order that they should be used by the waypoint creator</Comment>
+        </LocalVariable>
+        <StateTransition state="planFinalized">
+            <Assignment value="true"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator, avoidanceRange)"/>
+        </StateTransition>
+        <Schedule condition="attackAuthorized" delay="0.0" event="StartMove" priority="0">
+            <Comment/>
+        </Schedule>
+        <Code>waypointCreator.setAStarZones(attackPath);
+//aStarSearch.printPath(attackPath);</Code>
+        <Coordinate x="450" y="230"/>
+    </Event>
+    <Event name="BeginAttack">
+        <Comment>The execution order giving this terrorist permission to start its attack when ready</Comment>
+        <StateTransition state="attackAuthorized">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule condition="planFinalized" delay="0.0" event="StartMove" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule condition="!chosenToAttack" delay="0.0" event="NotAChosenPlatform" priority="0">
+            <Comment>If this entity hasn't been selected for the attack, hide it from view as an inactive platform</Comment>
+        </Schedule>
+        <Code/>
+        <Coordinate x="540" y="150"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <Code>setCruiseSpeed(maximumSpeed);
+setStartPosition(attackStartWaypoint);
+setDestination(waypointCreator.createWaypoint());</Code>
+        <Coordinate x="540" y="230"/>
+    </Event>
+    <Event name="NotAChosenPlatform">
+        <Comment>Hides inactive platforms not chosen for attack</Comment>
+        <LocalVariable name="hiddenPosition" type="diskit.Vec3d" value="new diskit.Vec3d(0, 0, 1000)">
+            <Comment>A position that is removed from the scenario, hides the terrorist from view when not being used</Comment>
+        </LocalVariable>
+        <Code>setStartPosition(hiddenPosition);</Code>
+        <Coordinate x="450" y="150"/>
+    </Event>
+    <Event name="AttackComplete">
+        <Comment>Notifies the terrorist cell planner that the attack has ended. This does not mean that the attack succeeded just that it is over</Comment>
+        <LocalVariable name="posit" type="diskit.Vec3d" value="getLocation()">
+            <Comment/>
+        </LocalVariable>
+        <Code>setCruiseSpeed(40);
+setStartPosition(posit);
+posit.add(new Vec3d(0,0,-50));
+setDestination(posit);
+setCruiseSpeed(5);
+posit.add(new Vec3d(0, 20, 50));
+setDestination(posit);</Code>
+        <Coordinate x="490" y="340"/>
     </Event>
 </SimEntity>
 
