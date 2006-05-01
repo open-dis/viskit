@@ -335,7 +335,7 @@ sensors[2] = collisionAvoidance;</Code>
         <Argument name="shooter" type="diskit.Mover3D"/>
         <Argument name="munition" type="diskit.Munition"/>
         <Schedule condition="shooter == this" delay="0.0" event="AttackComplete" priority="0">
-            <Comment/>
+            <Comment>Conditional edge is to prevent this entity from proceeding when it hears a detonate event from a fellow terrorist</Comment>
         </Schedule>
         <Code/>
         <Coordinate x="380" y="340"/>
