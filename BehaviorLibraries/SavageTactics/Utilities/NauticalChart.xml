@@ -8,6 +8,9 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
     <Parameter name="navigatableWaterZones" type="diskit.AStarZoneGeometry[]">
         <Comment>The collection of zones that represent general areas of navigatable water</Comment>
     </Parameter>
+    <Parameter name="waterFrontAreas" type="diskit.AStarZoneGeometry[]">
+        <Comment>The areas of the waterfront that can be used by crafts for launching or water access</Comment>
+    </Parameter>
     <StateVariable name="harborMap" type="diskit.AStarZoneMap">
         <Comment>The diskit.AStarZoneMap created using the specified zones</Comment>
     </StateVariable>
@@ -20,18 +23,52 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
     <StateVariable name="registeredSensors" type="java.util.LinkedList">
         <Comment>Sensor arrays that have been registered through this object</Comment>
     </StateVariable>
+    <StateVariable name="waterPerimeter" type="java.util.HashMap">
+        <Comment>A collection of perimeter zones</Comment>
+    </StateVariable>
+    <StateVariable name="registeredMunitions" type="java.util.LinkedList">
+        <Comment>Munitions that have been registered through this object</Comment>
+    </StateVariable>
+    <StateVariable name="detonations" type="java.util.LinkedList">
+        <Comment>The detonations that have been processed</Comment>
+    </StateVariable>
     <Event name="Run">
-        <Schedule event="CreateHarborMap"/>
+        <Comment/>
+        <StateTransition state="registeredTargets">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="registeredSensor">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="registeredSensors">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="registeredMunitions">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="detonations">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="CreateHarborMap" priority="0">
+            <Comment/>
+        </Schedule>
         <Code/>
-        <Coordinate x="10" y="300"/>
+        <Coordinate x="340" y="10"/>
     </Event>
     <Event name="CreateHarborMap">
         <Comment>Creates a new instance of diskit.AStarZoneMap with the zones that were passed to the constructor</Comment>
         <StateTransition state="harborMap">
             <Assignment value="new diskit.AStarZoneMap(navigatableWaterZones)"/>
         </StateTransition>
-        <Code>System.out.println("CreateHarborMap called");</Code>
-        <Coordinate x="210" y="300"/>
+        <StateTransition state="harborMap">
+            <Operation method="setPerimeterZones(waterFrontAreas)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="NauticalChartPublished" priority="0">
+            <Comment/>
+            <EdgeParameter value="harborMap"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="340" y="120"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Passes target to an adapter</Comment>
@@ -72,6 +109,9 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
         <Argument name="target" type="diskit.Mover3D">
             <Comment>mover to be registered</Comment>
         </Argument>
+        <LocalVariable name="moverType" type="java.lang.String" value="target.getEntityType()">
+            <Comment>Checks the type of target getting registered so that it can extract perimeter zones</Comment>
+        </LocalVariable>
         <StateTransition state="registeredTargets">
             <Operation method="add(target)"/>
         </StateTransition>
@@ -80,7 +120,7 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
             <EdgeParameter value="target"/>
         </Schedule>
         <Code/>
-        <Coordinate x="170" y="10"/>
+        <Coordinate x="140" y="10"/>
     </Event>
     <Event name="ProcessSensor">
         <Comment>Registers the passed sensor as a relay</Comment>
@@ -95,7 +135,7 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
             <EdgeParameter value="sensor"/>
         </Schedule>
         <Code/>
-        <Coordinate x="170" y="80"/>
+        <Coordinate x="140" y="80"/>
     </Event>
     <Event name="ProcessSensors">
         <Comment>Registers sensor arrays with scenario manager as a relay</Comment>
@@ -110,7 +150,77 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
             <EdgeParameter value="sensors"/>
         </Schedule>
         <Code/>
-        <Coordinate x="170" y="150"/>
+        <Coordinate x="140" y="150"/>
+    </Event>
+    <Event name="NauticalChartPublished">
+        <Comment>The event which publishes all nautical chart information to the listeners of this object</Comment>
+        <Argument name="chart" type="diskit.AStarZoneMap">
+            <Comment>The navigatable water, in AStar search format</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="340" y="210"/>
+    </Event>
+    <Event name="RegisterMunition">
+        <Comment>Allows munitions to be registered through the nautical chart</Comment>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The munition to be registered</Comment>
+        </Argument>
+        <Schedule condition="!registeredMunitions.contains(munition)" delay="0.0" event="ProcessMunition" priority="0">
+            <Comment/>
+            <EdgeParameter value="munition"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="220"/>
+    </Event>
+    <Event name="ProcessMunition">
+        <Comment>Registers the munition and records the fact that it did</Comment>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The munition to be registered</Comment>
+        </Argument>
+        <StateTransition state="registeredMunitions">
+            <Operation method="add(munition)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
+            <Comment/>
+            <EdgeParameter value="munition"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="140" y="220"/>
+    </Event>
+    <Event name="Detonate">
+        <Comment>Passes the doDetonate event to the scenario manager</Comment>
+        <Argument name="shooter" type="diskit.Mover3D">
+            <Comment>The mover that used the munition</Comment>
+        </Argument>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The munition that was used</Comment>
+        </Argument>
+        <Schedule condition="!detonations.contains(munition)" delay="0.0" event="ProcessDetonation" priority="0">
+            <Comment/>
+            <EdgeParameter value="shooter"/>
+            <EdgeParameter value="munition"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="300"/>
+    </Event>
+    <Event name="ProcessDetonation">
+        <Comment>Processes the detonation that is being passed</Comment>
+        <Argument name="shooter" type="diskit.Mover3D">
+            <Comment>The mover that used the munition</Comment>
+        </Argument>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The munition that was used</Comment>
+        </Argument>
+        <StateTransition state="detonations">
+            <Operation method="add(munition)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="0">
+            <Comment/>
+            <EdgeParameter value="shooter"/>
+            <EdgeParameter value="munition"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="140" y="300"/>
     </Event>
 </SimEntity>
 
