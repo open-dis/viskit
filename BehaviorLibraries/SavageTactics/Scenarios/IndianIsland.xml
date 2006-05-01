@@ -360,7 +360,11 @@
                 <MultiParameter type="java.lang.String[]">
                     <TerminalParameter name="" type="java.lang.String" value="WalanPoint"/>
                 </MultiParameter>
-                <MultiParameter type="double[]"/>
+                <MultiParameter type="double[]">
+                    <TerminalParameter name="" type="double" value="1354.675"/>
+                    <TerminalParameter name="" type="double" value="0.0"/>
+                    <TerminalParameter name="" type="double" value="541.87"/>
+                </MultiParameter>
                 <TerminalParameter name="length" type="double" value="200"/>
                 <TerminalParameter name="width" type="double" value="200"/>
                 <TerminalParameter name="height" type="double" value="0.0"/>
