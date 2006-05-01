@@ -39,6 +39,15 @@
         <StateTransition state="closeContactQueue">
             <Operation method="clear()"/>
         </StateTransition>
+        <StateTransition state="registeredContacts">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="registeredSensor">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="registeredSensors">
+            <Operation method="clear()"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
@@ -180,8 +189,27 @@
     <Event name="RegisterSensors">
         <Comment/>
         <Argument name="sensors" type="diskit.Sensor[]"/>
+        <Schedule condition="!registeredSensors.contains(sensors)" delay="0.0" event="RegisterSensorArrays" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
         <Code/>
         <Coordinate x="250" y="180"/>
+    </Event>
+    <Event name="RegisterSensorArrays">
+        <Comment>Processes sensor arrays for pierside entities</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]">
+            <Comment>The array of sensors to register</Comment>
+        </Argument>
+        <StateTransition state="registeredSensors">
+            <Operation method="add(sensors)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="390" y="180"/>
     </Event>
     <Code/>
 </SimEntity>
