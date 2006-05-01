@@ -185,7 +185,7 @@ public class Vstatics
               try {
                   c = Thread.currentThread().getContextClassLoader().loadClass(s);
               } catch (ClassNotFoundException cnfe ) {
-                  ; //System.err.println("Vstatics what to do here... "+s);
+                  System.err.println("Vstatics what to do here... "+s);
               }
           }
       }
@@ -451,12 +451,22 @@ public class Vstatics
   
   // returns number of constructors, checks is [] type
   public static int numConstructors(String type) {
+      // 
+      System.out.println("number of constructors for "+type+":");
       if (type.endsWith("]")) {
           return 1;
       } else {
           Class clz = classForName(type);
-          Constructor[] constrs = clz.getConstructors();
-          return constrs.length;
+          if (clz != null) {
+              Constructor[] constrs = clz.getConstructors();
+              if(constrs == null) {
+                  return 0;
+              } else {
+                  return constrs.length;
+              }
+          } else {
+              return 0;
+          }
       }
   }
   
