@@ -123,7 +123,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
-        <Code>System.out.println("NumOfTerrorists " + terroristSelection);</Code>
+        <Code/>
         <Coordinate x="360" y="140"/>
     </Event>
     <Event name="CreateAttackPlan">

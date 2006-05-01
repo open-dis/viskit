@@ -445,7 +445,7 @@ sensors[2] = collisionAvoidance;</Code>
             <Assignment value="initialWaypoint"/>
         </StateTransition>
         <Schedule event="FinalizePlan"/>
-        <Code>System.out.println("I should go to " + closestZone.getName() + " first");</Code>
+        <Code/>
         <Coordinate x="360" y="230"/>
     </Event>
     <Event name="FinalizePlan">
