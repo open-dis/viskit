@@ -118,9 +118,6 @@
     <StateVariable name="distanceFromMissedAttacker" type="double">
         <Comment>DATA: Distance from attacker at time of successful attack</Comment>
     </StateVariable>
-    <StateVariable name="radioComms" type="diskit.RadioCommunication">
-        <Comment>A radio communication object for this entity to use</Comment>
-    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <StateTransition state="visualRange">
