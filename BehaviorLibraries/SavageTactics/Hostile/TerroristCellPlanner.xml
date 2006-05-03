@@ -385,7 +385,7 @@ System.out.println("**********************************\n");</Code>
         <StateTransition state="completedAttacks">
             <Assignment value="completedAttacks + 1"/>
         </StateTransition>
-        <Schedule condition="completedAttacks == totalPlans" delay="5" event="Stop" priority="0">
+        <Schedule condition="completedAttacks -1 == totalPlans" delay="5" event="Stop" priority="0">
             <Comment>Schedules the simulation to end once all attacks have completed. The index 'total plans' is decremented by one due to the planning processes using arrays which include a zero index position.
 A delay of five seconds is used to allow entity state variable transitions and data collection to occur
 TODO: Test to see if delay is needed</Comment>
