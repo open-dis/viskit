@@ -197,17 +197,17 @@
         <Coordinate x="250" y="180"/>
     </Event>
     <Event name="RegisterSensorArrays">
-        <Comment>Processes sensor arrays for pierside entities</Comment>
+        <Comment>Processes sensor arrays for pierside entities, however, it only registers the visual sensor since other sensors are turned off when pierside (air detection, sonar)</Comment>
         <Argument name="sensors" type="diskit.Sensor[]">
             <Comment>The array of sensors to register</Comment>
         </Argument>
+        <LocalVariable name="visualSensor" type="diskit.Sensor" value="sensors[0]">
+            <Comment>The extracted visual Sensor</Comment>
+        </LocalVariable>
         <StateTransition state="registeredSensors">
             <Operation method="add(sensors)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensors"/>
-        </Schedule>
+        <Schedule event="RegisterSensor"/>
         <Code/>
         <Coordinate x="390" y="180"/>
     </Event>
