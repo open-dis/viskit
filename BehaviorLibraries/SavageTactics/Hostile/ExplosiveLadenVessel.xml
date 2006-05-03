@@ -77,7 +77,7 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
         <Comment>The utility that creates waypoints based on the arguments passed</Comment>
     </StateVariable>
-    <StateVariable name="targetQueue" type="java.util.LinkedList">
+    <StateVariable name="targetQueue" type="diskit.TargetQueue">
         <Comment>The queue of active targets for this entity</Comment>
     </StateVariable>
     <StateVariable name="activeMoverManager" type="diskit.MoverManager">
@@ -146,6 +146,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="chosenToAttack" type="boolean">
         <Comment>Flag that is set to true when this entity has been selected to attack</Comment>
     </StateVariable>
+    <StateVariable name="arrivedAtGoal" type="boolean">
+        <Comment>Flags when the entity has reached it's destination</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
@@ -156,9 +159,6 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         </StateTransition>
         <StateTransition state="activeMoverManager">
             <Assignment value="null"/>
-        </StateTransition>
-        <StateTransition state="targetQueue">
-            <Operation method="clear()"/>
         </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
@@ -176,6 +176,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
             <Assignment value="false"/>
         </StateTransition>
         <StateTransition state="chosenToAttack">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="arrivedAtGoal">
             <Assignment value="false"/>
         </StateTransition>
         <Code/>
@@ -201,6 +204,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         </StateTransition>
         <StateTransition state="collisionAvoidance">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Assignment value="new diskit.TargetQueue(startPosition)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -239,7 +245,7 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="canIntercept &amp;&amp; contactType.equals(&quot;HVU&quot;) &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.ATTACKING)" delay="0.0" event="Attack" priority="0">
+        <Schedule condition="canIntercept &amp;&amp; primaryTarget.equals(contactType) &amp;&amp; !tacticalMode.equals(diskit.TacticalMode.ATTACKING) &amp;&amp; arrivedAtGoal" delay="0.0" event="Attack" priority="0">
             <Comment>If this is an HVU and I can intercept it, and I'm not already attacking</Comment>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>
@@ -287,7 +293,8 @@ System.out.println("My loc:          " + getLocation());
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
         <Code>setStartPosition(getLocation());
-setDestination(target.getLocation());</Code>
+setDestination(target.getLocation());
+System.out.println("I've chosen to attack: " + target.getName());</Code>
         <Coordinate x="220" y="340"/>
     </Event>
     <Event name="CreateSensors">
@@ -335,7 +342,7 @@ sensors[2] = collisionAvoidance;</Code>
         <Argument name="shooter" type="diskit.Mover3D"/>
         <Argument name="munition" type="diskit.Munition"/>
         <Schedule condition="shooter == this" delay="0.0" event="AttackComplete" priority="0">
-            <Comment>Conditional edge is to prevent this entity from proceeding when it hears a detonate event from a fellow terrorist</Comment>
+            <Comment/>
         </Schedule>
         <Code/>
         <Coordinate x="380" y="340"/>
@@ -423,6 +430,9 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="chosenToAttack">
             <Assignment value="true"/>
         </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
         <Schedule event="PickStartPosition"/>
         <Code/>
         <Coordinate x="280" y="230"/>
@@ -508,6 +518,37 @@ setCruiseSpeed(5);
 posit.add(new Vec3d(0, 20, 50));
 setDestination(posit);</Code>
         <Coordinate x="490" y="340"/>
+    </Event>
+    <Event name="DestinationReached">
+        <Comment/>
+        <LocalVariable name="targetChoice" type="diskit.Mover3D" value="targetQueue.closest()">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="arrivedAtGoal">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule condition="targetChoice != null" delay="0.0" event="PickFromTargets" priority="0">
+            <Comment>If there is a target to attack, attack it</Comment>
+            <EdgeParameter value="targetChoice"/>
+        </Schedule>
+        <Code>System.out.println(getName() + ": I have arrived at " + goalZone.getName());</Code>
+        <Coordinate x="220" y="520"/>
+    </Event>
+    <Event name="PickFromTargets">
+        <Comment/>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to attack</Comment>
+        </Argument>
+        <LocalVariable name="contactType" type="java.lang.String" value="target.getEntityType()">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="primaryTarget.equals(contactType)" delay="0.0" event="Attack" priority="0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="visualRange"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="220" y="430"/>
     </Event>
 </SimEntity>
 
