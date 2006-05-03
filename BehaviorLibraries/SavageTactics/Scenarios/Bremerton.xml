@@ -92,16 +92,16 @@
         <TerminalParameter name="entityCountry" type="int" value="225"/>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
             <MultiParameter type="diskit.ProbabilityZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="121"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
+                <TerminalParameter name="entityID" type="int" value="121"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-1263.441"/>
+                    <TerminalParameter name="" type="double" value="-290.371"/>
                     <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-871.545"/>
+                    <TerminalParameter name="" type="double" value="1618.25"/>
                 </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="500"/>
-                <TerminalParameter name="p[4] : " type="double" value="2000"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <TerminalParameter name="length" type="double" value="500"/>
+                <TerminalParameter name="width" type="double" value="2000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
                 <MultiParameter type="diskit.Vec4d">
                     <TerminalParameter name="p[0] : " type="double" value="0"/>
                     <TerminalParameter name="p[1] : " type="double" value="0"/>
@@ -110,16 +110,16 @@
                 </MultiParameter>
             </MultiParameter>
             <MultiParameter type="diskit.ProbabilityZoneGeometry">
-                <TerminalParameter name="p[0] : " type="int" value="121"/>
-                <TerminalParameter name="p[1] : " type="double" value=".5"/>
+                <TerminalParameter name="entityID" type="int" value="121"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
                 <MultiParameter type="double[]">
-                    <TerminalParameter name="" type="double" value="-762.743"/>
+                    <TerminalParameter name="" type="double" value="-1945.474"/>
                     <TerminalParameter name="" type="double" value="0.0"/>
-                    <TerminalParameter name="" type="double" value="-251.632"/>
+                    <TerminalParameter name="" type="double" value="-2291.929"/>
                 </MultiParameter>
-                <TerminalParameter name="p[3] : " type="double" value="518.053"/>
-                <TerminalParameter name="p[4] : " type="double" value="1766.035"/>
-                <TerminalParameter name="p[5] : " type="double" value="0.0"/>
+                <TerminalParameter name="length" type="double" value="518.053"/>
+                <TerminalParameter name="width" type="double" value="1766.035"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
                 <MultiParameter type="diskit.Vec4d">
                     <TerminalParameter name="p[0] : " type="double" value="0"/>
                     <TerminalParameter name="p[1] : " type="double" value="0"/>
