@@ -118,6 +118,9 @@
     <StateVariable name="distanceFromMissedAttacker" type="double">
         <Comment>DATA: Distance from attacker at time of successful attack</Comment>
     </StateVariable>
+    <StateVariable name="radioComms" type="diskit.RadioCommunication">
+        <Comment>A radio communication object for this entity to use</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <StateTransition state="visualRange">
@@ -184,12 +187,6 @@
         <Argument name="sensors" type="diskit.Sensor[]">
             <Comment>Collection of sensors for this entity</Comment>
         </Argument>
-        <StateTransition state="visualPerception">
-            <Operation method="addSimEventListener(this)"/>
-        </StateTransition>
-        <StateTransition state="collisionAvoidance">
-            <Operation method="addSimEventListener(this)"/>
-        </StateTransition>
         <Code/>
         <Coordinate x="90" y="300"/>
     </Event>
@@ -236,22 +233,23 @@
         <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact, avoidanceRange)">
             <Comment>Check to see if intercept is possible</Comment>
         </LocalVariable>
-        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
+        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(entityID)">
             <Comment>Check to see if this is a contact of like forces</Comment>
         </LocalVariable>
-        <StateTransition state="contactIDs">
-            <Assignment value="contactIDs + 1"/>
-        </StateTransition>
-        <Schedule condition="alreadyIDd || isFriendlyForce" delay="0.0" event="AssessObstacle" priority="0">
+        <LocalVariable name="contactSpeed" type="double" value="contact.getMaximumSpeed()">
+            <Comment>TODO: Remove this and add an obstacle check, buoys, barriers, etc, will have slow movement</Comment>
+        </LocalVariable>
+        <Schedule condition="contactSpeed &lt;= 0 &amp;&amp; !obstacleQueue.contains(contact)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>Should not avoid contacts if you are intercepting them</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="!isFriendlyForce &amp;&amp; !alreadyIDd &amp;&amp; canIntercept" delay="0.0" event="Intercept" priority="0">
+        <Schedule condition="!isFriendlyForce &amp;&amp; !alreadyIDd &amp;&amp; contactSpeed &gt; 0" delay="0.0" event="Intercept" priority="0">
             <Comment>Check to see if contact is a friend, if it has been Id'd and
-whether or not it can be intercepted</Comment>
+whether or not it can be intercepted. Finally, check to make sure that it's moving
+If its not then its an obstacle. TODO: Allow obstacles to move</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>contact.addSimEventListener(this);</Code>
+        <Code>//System.out.println("RHIB DETECTED: " + contact.getName());</Code>
         <Coordinate x="200" y="250"/>
     </Event>
     <Event name="EvaluateContact">
@@ -276,13 +274,14 @@ whether or not it can be intercepted</Comment>
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Schedule condition="idAttempts &lt; 2" delay="getDuration()" event="EvaluateContact" priority="0">
+        <Schedule condition="idAttempts &lt; 2" delay="this.getDuration()" event="EvaluateContact" priority="0">
             <Comment>Follow the contact for two legs then break make id.
 Will be reactionary to behavior in next version</Comment>
             <EdgeParameter value="idAttempts"/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Code>setCruiseSpeed(targetSpeed);
+        <Code>System.out.println("EVALUATING CONTACT");
+setCruiseSpeed(targetSpeed);
 setStartPosition(getLocation());
 setDestination(targetDestination);</Code>
         <Coordinate x="410" y="300"/>
@@ -312,7 +311,7 @@ setDestination(interdictPoint);
             <Comment/>
             <EdgeParameter value="obstacle"/>
         </Schedule>
-        <Code>//System.out.println("Avoiding Obstacle: " + obstacle.getMoverID());</Code>
+        <Code>//System.out.println("Avoiding Obstacle: " + obstacle.getName());</Code>
         <Coordinate x="310" y="190"/>
     </Event>
     <Event name="AvoidObstacle">
@@ -325,8 +324,8 @@ setDestination(interdictPoint);
         </LocalVariable>
         <Code>setStartPosition(getLocation());
 setDestination(avoidancePoint);
-System.out.println("Avoiding Obstacle " + obstacle.getName());</Code>
-        <Coordinate x="410" y="190"/>
+//System.out.println("Avoiding Obstacle " + obstacle.getName());</Code>
+        <Coordinate x="420" y="190"/>
     </Event>
     <Event name="ResumePatrol">
         <Comment/>
@@ -354,6 +353,9 @@ System.out.println("Avoiding Obstacle " + obstacle.getName());</Code>
         <StateTransition state="idAttempts">
             <Assignment value="0"/>
         </StateTransition>
+        <StateTransition state="contactPicture">
+            <Operation method="add(contact)"/>
+        </StateTransition>
         <Schedule condition="true" delay="timeToIntercept - .05" event="EvaluateContact" priority="0">
             <Comment/>
             <EdgeParameter value="idAttempts"/>
@@ -370,7 +372,8 @@ System.out.println("----------EVENT------------");
 System.out.println("RHIB Intercepting: " + contact.getMoverID());
 System.out.println("Intercepting to:     " + interceptPoint);
 System.out.println("Time To Intercept: " + timeToIntercept + "\n");
-*/</Code>
+*/
+System.out.println("RHIB intercepting contact: " + contact.getName());</Code>
         <Coordinate x="310" y="300"/>
     </Event>
     <Event name="IDContact">
@@ -393,7 +396,7 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         <Schedule condition="!eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="ResumePatrol" priority="0">
             <Comment>TODO: Add better tactics If the contact wasn't hostile, return to patrol</Comment>
         </Schedule>
-        <Schedule condition="eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="SecurityAlert" priority="0">
+        <Schedule condition="3&gt;7 &amp;&amp;eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="SecurityAlert" priority="0">
             <Comment>TODO: Add better tactics</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
