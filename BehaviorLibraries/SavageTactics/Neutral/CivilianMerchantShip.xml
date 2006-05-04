@@ -73,7 +73,7 @@
     <StateVariable name="assetState" type="diskit.AssetState">
         <Comment>Asset State of this entity</Comment>
     </StateVariable>
-    <StateVariable name="perception" type="diskit.Sensor">
+    <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>Perceptual Range of Entity for Detection and Avoidance</Comment>
     </StateVariable>
     <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
@@ -106,6 +106,9 @@
     <StateVariable name="geomIndex" type="int">
         <Comment>index variable used to count number of zones that are pertainent to this entity</Comment>
     </StateVariable>
+    <StateVariable name="visualRange" type="double">
+        <Comment>The visual range of the bridge crew on this platform</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="tacticalMode">
@@ -125,6 +128,9 @@
         </StateTransition>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="visualRange">
+            <Assignment value="600"/>
         </StateTransition>
         <Schedule event="ScaleSpeedToKnots"/>
         <Schedule condition="zones.length != 0" delay="0.0" event="ProcessZones" priority="0">
@@ -169,6 +175,9 @@ setDestination(destination);</Code>
         <Argument name="entity" type="diskit.Mover3D"/>
         <StateTransition state="reach">
             <Assignment value="new diskit.SphereCutterSensor(this,avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -226,20 +235,17 @@ System.out.println("\n");
         <LocalVariable name="tgetVel" type="diskit.Vec3d" value="new diskit.Vec3d(newTarget.getVelocity())">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="times" type="double[]" value="diskit.Intersector3D.solve(perception.getLocation(),perception.getVelocity(), avoidanceRange, newTarget.getLocation(), newTarget.getVelocity());">
-            <Comment/>
-        </LocalVariable>
         <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(newTarget,(diskit.Mover3D)this,getCruiseSpeed())">
             <Comment/>
         </LocalVariable>
         <StateTransition state="obstacleQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
-        <Schedule condition="( times[0] &gt; 0.0 ) &amp;&amp; (  times[0] &lt; Double.POSITIVE_INFINITY )" delay="0.0" event="AvoidObstacle" priority="0">
+        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
-        <Code>if (tgetVel.length() &lt; .1) {  tgetVel.set(getVelocity());  tgetVel.negate();tgetVel.scale(.1);  }</Code>
+        <Code/>
         <Coordinate x="280" y="440"/>
     </Event>
     <Event name="AvoidObstacle">
@@ -261,7 +267,7 @@ System.out.println("\n");
             <Comment/>
         </LocalVariable>
         <Schedule event="StartMove"/>
-        <Code>steer.cross(getVelocity(),obstacle.getVelocity()); /**      * Should be moved to Avoidance Mover Manager at some point     */  if ( steer.length() &lt; getCruiseSpeed() ) {          steer.cross(velocity,up);          veer.set(getLocation());   } else {       steer.cross(up);      veer.set(obstacle.getLocation());  veer.set(0,(veer.get(0)/2.0) + (loc.get(0)/2.0));  veer.set(1, (veer.get(1)/2.0)+(loc.get(1)/2.0));      veer.set( 2, (veer.get(2)/2.0)+(loc.get(2)/2.0) );   }      veer.add(steer); amm.avoidToOffset(veer, getActiveMoverManager());System.out.println(getMoverID() + " Avoiding entity# " + obstacle.getMoverID());</Code>
+        <Code/>
         <Coordinate x="100" y="440"/>
     </Event>
     <Event name="ProcessZones">
@@ -303,7 +309,7 @@ System.out.println("\n");
     </Event>
     <Event name="ScaleSpeedToKnots">
         <Comment>Scales maximum speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/2">
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>
