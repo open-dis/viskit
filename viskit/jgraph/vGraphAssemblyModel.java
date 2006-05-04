@@ -1,9 +1,11 @@
 package viskit.jgraph;
 
 import org.jgraph.JGraph;
-import org.jgraph.graph.*;
+import org.jgraph.graph.ConnectionSet;
+import org.jgraph.graph.DefaultGraphCell;
+import org.jgraph.graph.DefaultGraphModel;
+import org.jgraph.graph.GraphConstants;
 import viskit.model.*;
-import viskit.model.Edge;
 
 import javax.swing.*;
 import java.awt.*;
@@ -102,6 +104,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     c.removeAllChildren();
     this.remove(new Object[]{c});
   }
+
   public void addEGNode(EvGraphNode egn)
   {
     DefaultGraphCell c = new AssemblyCircleCell(egn.getName());
@@ -111,6 +114,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     attributes.put(c,createBounds(egn.getPosition().x,egn.getPosition().y,Color.black));
     c.add(new vAssemblyPortCell(egn.getName()+"/Center"));
     this.insert(new Object[]{c},attributes,null,null,null);
+    this.toFront(new Object[]{c});
   }
   
   public void changeEGNode(EvGraphNode egn)
@@ -132,8 +136,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     attributes.put(c,createBounds(pcln.getPosition().x,pcln.getPosition().y,Color.black));
     c.add(new vAssemblyPortCell(pcln.getName()+"/Center"));
     this.insert(new Object[]{c},attributes,null,null,null);
-
+    this.toFront(new Object[]{c});
   }
+
   public void deletePCLNode(PropChangeListenerNode pcln)
   {
     DefaultGraphCell c = (DefaultGraphCell)pcln.opaqueViewObject;
@@ -178,7 +183,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     attributes.put(edge,this.viskitAssyAdapterEdgeStyle);
 
     this.insert(new Object[]{edge},attributes,cs,null,null);
-
+    this.toBack(new Object[]{edge});
   }
   public void deleteAdapterEdge(AdapterEdge ae)
   {
@@ -224,6 +229,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     attributes.put(edge,this.viskitAssySimEvLisEdgeStyle);
 
     this.insert(new Object[]{edge},attributes,cs,null,null);
+    this.toBack(new Object[]{edge});
   }
   public void deleteSimEvListEdge(SimEvListenerEdge sele)
   {
@@ -259,6 +265,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     attributes.put(edge,this.viskitAssyPclEdgeStyle);
 
     this.insert(new Object[]{edge},attributes,cs,null,null);
+    this.toBack(new Object[]{edge});
   }
 
   public Map createBounds(int x, int y, Color c) {
