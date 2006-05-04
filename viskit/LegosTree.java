@@ -184,6 +184,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
   // todo if no valid leaves are found, remove the directory...at it is, it is represented in
   // the tree with the node icon.
+  // 4 May 06 JMB The filter down below checks for empty dirs.  If there is a directory
+  // with xml in it, it will show, but if it's children have errors when marshalling,
+  // they will not appear.
 
   public void addContentRoot(File f)
   {
@@ -264,7 +267,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           myNode = (DefaultMutableTreeNode) directoryRoots.get(f.getParent());
           if (myNode != null) {
             DefaultMutableTreeNode parent = myNode;
-            myNode = new DefaultMutableTreeNode(f.getPath());
+            myNode = new DefaultMutableTreeNode(f.getName());
             parent.add(myNode);
             directoryRoots.put(f.getPath(), myNode);
             int idx = parent.getIndex(myNode);
@@ -661,16 +664,22 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       if (f.isDirectory()) {
         if (dirsToo == false)
           return false;
-      }
+        if (f.getName().equals("CVS"))
+          return false;
+        File[] fa = f.listFiles(new MyClassTypeFilter(true));
+        if(fa == null || fa.length <= 0)
+          return false;   // don't include empty dirs.
+/*
       else if (f.getName().equals("CVS") ||
           f.getName().equals("Scenarios") ||
           f.getName().equals("Locations")){
         return false;
       }
-      else {
-        return true;
-
+*/
+        else
+          return true;
       }
+
       if (f.isFile()) {
         if (f.getName().endsWith(".class"))
           return true;
@@ -761,6 +770,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   public void addEventGraphXML(String topLevelDirectory)
   {
     File dir = new File(topLevelDirectory);
+    addContentRoot(dir,true);
+/*
     File[] fa = dir.listFiles();
     for (int i = 0; i < fa.length; i++) {
       boolean recurse = true;
@@ -775,6 +786,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         addContentRoot(fa[i]);
       }
     }
+*/
   }
 }
 
