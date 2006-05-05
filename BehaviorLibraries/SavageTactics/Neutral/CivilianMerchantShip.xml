@@ -137,7 +137,7 @@
             <Comment/>
             <EdgeParameter value="zones"/>
         </Schedule>
-        <Code/>
+        <Code>setCruiseSpeed(0);</Code>
         <Coordinate x="20" y="30"/>
     </Event>
     <Event name="StartMove">

@@ -115,6 +115,9 @@
     <StateVariable name="contactIDs" type="int">
         <Comment>DATA: Total number of contacts ID'd</Comment>
     </StateVariable>
+    <StateVariable name="moving" type="boolean">
+        <Comment/>
+    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <StateTransition state="visualRange">
@@ -140,7 +143,7 @@
             <Comment/>
             <EdgeParameter value="zones"/>
         </Schedule>
-        <Code/>
+        <Code>setCruiseSpeed(0);</Code>
         <Coordinate x="10" y="80"/>
     </Event>
     <Event name="Init">
@@ -199,7 +202,7 @@
             <Assignment value="new diskit.ZoneMoverManager(this, waypointGenerator, avoidanceRange)"/>
         </StateTransition>
         <Schedule event="Patrol"/>
-        <Code/>
+        <Code>System.out.println("CreateZone reached in " + getName());</Code>
         <Coordinate x="200" y="80"/>
     </Event>
     <Event name="Patrol">
@@ -241,7 +244,7 @@ setCruiseSpeed(getMaximumSpeed()/2);</Code>
         <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
             <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == collisionAvoidance &amp;&amp; !friendlyForces.contains(entityID)" delay="0.0" event="AssessObstacle" priority="0">
+        <Schedule condition="moving &amp;&amp; sensor == collisionAvoidance &amp;&amp; !friendlyForces.contains(entityID)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>Should not avoid contacts if you are intercepting them</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
