@@ -95,6 +95,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     runPanel.vcrPlay.setEnabled(false);
     runPanel.vcrRewind.setEnabled(false);
     runPanel.vcrStep.setEnabled(false);
+    
+    //runPanel.numRepsTF.addActionListener(new repsListener()); // this gets directly read at initRun()
 
     twiddleButtons(OFF);
   }
@@ -236,6 +238,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     send(runPanel.printRepReportsCB.isSelected());
     send(ExternalSimRunner.ASSY_PRINT_SUMM_REPORTS);
     send(runPanel.printSummReportsCB.isSelected());
+
   }
 
   private void showLaunchingDialog(int msToShow)
@@ -346,7 +349,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
       }
     }
   }
-
+  
+  /* unused, currenlty this data gets set at initRun()
+   * right when the play button gets toggled
+    class repsListener implements ActionListener
+  {
+      public void actionPerformed(ActionEvent e)
+      {
+          System.out.println(e);
+          int reps = Integer.parseInt(runPanel.numRepsTF.getText());
+          send(ExternalSimRunner.ASSY_NUM_REPS);
+          send(runPanel.numRepsTF.getText().trim());
+        
+         
+      }
+  }
+   */
   /* to handle the saving of the execution parms to the assembly file
   class saveParmListener implements ActionListener
   {
@@ -898,6 +916,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
                 nint = Integer.parseInt(n);
                 if(!(targetAssembly instanceof ViskitAssembly))
                     targetAssembly.setNumberReplications(1); // todo when fixed   nint);
+                else {
+                    ((ViskitAssembly)targetAssembly).setNumberReplications(nint);
+                } 
+                    
               }
               catch (NumberFormatException e) {
                 System.err.println("Error parsing number of reps: "+n);
