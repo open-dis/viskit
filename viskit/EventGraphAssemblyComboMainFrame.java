@@ -74,10 +74,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
   Action myQuitAction;
   private DoeMain doeMain;
+  /** The initial assembly to load. */
+  private String initialFile;
 
-  public EventGraphAssemblyComboMainFrame()
+  public EventGraphAssemblyComboMainFrame(String initialFile)
   {
     super("Viskit");
+
+    this.initialFile = initialFile;
 
     initUI();
 
@@ -140,7 +144,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamSettingsHandler(menuBar);
     asyRunComponent.setTitleListener(myTitleListener,2);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
-    ((AssemblyController)asyFrame.getController()).setAssemblyRunner( new ThisAssemblyRunnerPlug());
+    AssemblyController controller = ((AssemblyController)asyFrame.getController());
+    controller.setInitialFile(initialFile);
+    controller.setAssemblyRunner( new ThisAssemblyRunnerPlug());
 
     // Design of experiments
     doeMain = DoeMain.main2();
@@ -180,7 +186,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyCntlr.addAssemblyFileListener(asyRunComponent);
     asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
     asyCntlr.addAssemblyFileListener(runGridComponent);
-    
+
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
     cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());
@@ -198,6 +204,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   }
   private void runLater(final long ms, final Runnable runr)
   {
+System.out.println("Run later: " + runr);
     Thread t = new Thread(new Runnable()
     {
       public void run()
@@ -314,6 +321,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
             //todo other postQuits here if needed
 
             thisClassCleanup();
+System.out.println("in actionPerformed of exit");
             VGlobals.instance().sysExit(0);  // quit application
           }
         }

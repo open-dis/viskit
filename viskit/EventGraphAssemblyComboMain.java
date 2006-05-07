@@ -48,13 +48,21 @@ import javax.swing.*;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
+import org.apache.commons.configuration.XMLConfiguration;
 
 public class EventGraphAssemblyComboMain
 {
   public static void main(String[] args)
   {
+    String initialFile = null;
+
+    if (args.length > 0) {
+        initialFile = args[0];
+    }
+
+System.out.println("***Inside EventGraphAssembly main: " + args.length);
     setLandFandFonts();
-    JFrame mainFrame = new EventGraphAssemblyComboMainFrame();
+    JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
     VGlobals.instance().setMainAppWindow(mainFrame);
     mainFrame.setVisible(true);
   }
