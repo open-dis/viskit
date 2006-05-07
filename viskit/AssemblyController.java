@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController
 {
   Class simEvSrcClass,simEvLisClass,propChgSrcClass,propChgLisClass;
+  private String initialFile;
 
   public AssemblyController()
   {
@@ -43,13 +44,41 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     initFileWatch();
   }
 
+  public void setInitialFile(String fil)
+  {
+    System.out.println("Initial file set: " + fil);
+    initialFile = fil;
+
+    // Seems this code requires this to be initialed if _doOpen is called
+    recentFileList = new ArrayList(RECENTLISTSIZE+1);
+
+  }
+
+  public void runAssembly(String initialFile) {
+      System.out.println("Running assembly: " + initialFile);
+      _doOpen(new File(initialFile));
+
+      runAssembly();
+  }
+
   public void begin()
   //-----------------
   {
-    ArrayList lis = getOpenFileList(false);
-    if(lis.size() > 0)
-      _doOpen(new File((String)lis.get(0)));     // should only be one
+    if (initialFile != null)
+    {
+      System.out.println("Loading initial file: " + initialFile);
+      _doOpen(new File(initialFile));
 
+      runAssembly();
+    } else
+    {
+
+        ArrayList lis = getOpenFileList(false);
+
+        if(lis.size() > 0) {
+          _doOpen(new File((String)lis.get(0)));     // should only be one
+        }
+    }
     //newEventGraph();
     // The following comments were an attempt to solve classloader issues that needed to be solved
     // a different way
@@ -909,7 +938,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       e.printStackTrace();
       return -1;
     }
-    return com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
+//    return com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
+    return com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), canPath});
   }
 
   private static File makeFile(String src)
@@ -1002,7 +1032,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
          String cp = getCustomClassPath();
 
-         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+//         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
          if(reti == 0 || completeOnBadCompile)
            return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
        }
@@ -1363,6 +1394,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     for (int i = 0; i < valueAr.length; i++) {
       recentFileList.add(valueAr[i]);
       String op = historyConfig.getString(assyHistoryKey + "(" + i + ")[@open]");
+
       if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes")))
         openV.add(valueAr[i]);
     }
@@ -1377,7 +1409,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
     historyConfig.getDocument().normalize();
   }
-  
+
   private void setRecentFileList(ArrayList lis)
   {
     saveHistoryXML(lis);
