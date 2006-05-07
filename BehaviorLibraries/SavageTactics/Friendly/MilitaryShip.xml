@@ -320,7 +320,7 @@ sensors[1] = collisionAvoidance;</Code>
     </Event>
     <Event name="ScaleSpeedToKnots">
         <Comment>Scales maximum speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/3">
+        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed * .6">
             <Comment/>
         </LocalVariable>
         <Code>setMaximumSpeed(newMaxSpeed);</Code>

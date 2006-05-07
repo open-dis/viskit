@@ -309,10 +309,7 @@ System.out.println("\n");
     </Event>
     <Event name="ScaleSpeedToKnots">
         <Comment>Scales maximum speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/2">
-            <Comment/>
-        </LocalVariable>
-        <Code>setMaximumSpeed(newMaxSpeed);</Code>
+        <Code/>
         <Coordinate x="80" y="120"/>
     </Event>
     <Code/>

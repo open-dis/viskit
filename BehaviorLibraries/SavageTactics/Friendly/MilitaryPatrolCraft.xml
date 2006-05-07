@@ -118,6 +118,9 @@
     <StateVariable name="distanceFromMissedAttacker" type="double">
         <Comment>DATA: Distance from attacker at time of successful attack</Comment>
     </StateVariable>
+    <StateVariable name="speedScalar" type="double">
+        <Comment>The factor to scale the speed to</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
         <StateTransition state="visualRange">
@@ -138,12 +141,27 @@
         <StateTransition state="contactIDs">
             <Assignment value="0"/>
         </StateTransition>
-        <Schedule event="ScaleSpeedToKnots"/>
+        <StateTransition state="tacticalMode">
+            <Assignment value="TacticalMode.IDLE"/>
+        </StateTransition>
+        <StateTransition state="patrolManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="distanceFromMissedAttacker">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="speedScalar">
+            <Assignment value="1"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="ScaleSpeed" priority="0">
+            <Comment/>
+            <EdgeParameter value="speedScalar"/>
+        </Schedule>
         <Schedule condition="zones.length != 0 " delay="0.0" event="ReviewPatrol" priority="0">
             <Comment/>
             <EdgeParameter value="zones"/>
         </Schedule>
-        <Code/>
+        <Code>setCruiseSpeed(0);</Code>
         <Coordinate x="20" y="70"/>
     </Event>
     <Event name="Init">
@@ -162,6 +180,12 @@
         </StateTransition>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="contactPicture">
+            <Assignment value="new diskit.ContactPicture()"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Assignment value="new diskit.TargetQueue(getLocation())"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -207,6 +231,9 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
+        <StateTransition state="speed">
+            <Assignment value="getCruiseSpeed()"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="490" y="70"/>
     </Event>
@@ -218,35 +245,31 @@
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>The contact detected</Comment>
         </Argument>
-        <LocalVariable name="entityID" type="int" value="contact.getMoverID()">
-            <Comment>Find out the id# of this entity for comparison</Comment>
-        </LocalVariable>
-        <LocalVariable name="interceptOffset" type="double" value="avoidanceRange * 2">
-            <Comment>Stay outside the contacts avoidance range for routine intercept</Comment>
-        </LocalVariable>
         <LocalVariable name="alreadyIDd" type="boolean" value="contactPicture.contains(contact)">
             <Comment>Check to see if this contact is part of the entity's contact picture</Comment>
         </LocalVariable>
-        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact, avoidanceRange)">
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact, (avoidanceRange + contact.getSMAL().getWidth()))">
             <Comment>Check to see if intercept is possible</Comment>
         </LocalVariable>
-        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(entityID)">
+        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
             <Comment>Check to see if this is a contact of like forces</Comment>
         </LocalVariable>
-        <LocalVariable name="contactSpeed" type="double" value="contact.getMaximumSpeed()">
+        <LocalVariable name="contactSpeed" type="double" value="contact.getSMAL().getMaximumSpeed()">
             <Comment>TODO: Remove this and add an obstacle check, buoys, barriers, etc, will have slow movement</Comment>
         </LocalVariable>
-        <Schedule condition="contactSpeed &lt;= 0 &amp;&amp; !obstacleQueue.contains(contact)" delay="0.0" event="AssessObstacle" priority="0">
-            <Comment>Should not avoid contacts if you are intercepting them</Comment>
+        <Schedule condition="sensor == collisionAvoidance &amp;&amp;  tacticalMode != TacticalMode.INTERDICTING &amp;&amp; contactPicture.contains(contact)" delay="0.0" event="AssessObstacle" priority="0">
+            <Comment>Should not avoid contacts if you are intercepting them. You should
+also only avoid if this is a collision detection and you are close enough to care</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="!isFriendlyForce &amp;&amp; !alreadyIDd &amp;&amp; contactSpeed &gt; 0" delay="0.0" event="Intercept" priority="0">
+        <Schedule condition="!isFriendlyForce &amp;&amp;  !alreadyIDd &amp;&amp;  contactSpeed &gt; 0 &amp;&amp;  tacticalMode == TacticalMode.PATROLLING" delay="0.0" event="Intercept" priority="0">
             <Comment>Check to see if contact is a friend, if it has been Id'd and
 whether or not it can be intercepted. Finally, check to make sure that it's moving
 If its not then its an obstacle. TODO: Allow obstacles to move</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>//System.out.println("RHIB DETECTED: " + contact.getName());</Code>
+        <Code>//System.out.println("RHIB DETECTED: " + contact.getName());
+//System.out.println("Contact Speed:   " + contactSpeed);</Code>
         <Coordinate x="200" y="250"/>
     </Event>
     <Event name="EvaluateContact">
@@ -255,11 +278,14 @@ If its not then its an obstacle. TODO: Allow obstacles to move</Comment>
             <Comment>Creates time loop for doing an ID</Comment>
         </Argument>
         <Argument name="target" type="diskit.Mover3D"/>
-        <LocalVariable name="targetSpeed" type="double" value="target.getCruiseSpeed() -.2">
+        <LocalVariable name="targetSpeed" type="double" value="target.getCruiseSpeed()">
             <Comment>Trail slightly behind the contact</Comment>
         </LocalVariable>
         <LocalVariable name="targetDestination" type="diskit.Vec3d" value="target.getDestination()">
             <Comment>Match the contacts heading</Comment>
+        </LocalVariable>
+        <LocalVariable name="eval" type="java.lang.String" value="target.getEntityType()">
+            <Comment>returns the type of entity</Comment>
         </LocalVariable>
         <StateTransition state="idAttempts">
             <Assignment value="idAttempts + 1"/>
@@ -267,17 +293,17 @@ If its not then its an obstacle. TODO: Allow obstacles to move</Comment>
         <StateTransition state="successfulIntercepts">
             <Assignment value="successfulIntercepts + 1"/>
         </StateTransition>
-        <Schedule condition="idAttempts &gt; 2" delay="0.0" event="IDContact" priority="0">
+        <Schedule condition="idAttempts &gt; 1 || eval.equals(&quot;ExplosiveLadenVessel&quot;)" delay="0.0" event="IDContact" priority="0">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Schedule condition="idAttempts &lt; 2" delay="this.getDuration()" event="EvaluateContact" priority="0">
+        <Schedule condition="idAttempts &lt; 1 &amp;&amp; !eval.equals(&quot;ExplosiveLadenVessel&quot;)" delay="this.getDuration()" event="EvaluateContact" priority="0">
             <Comment>Follow the contact for two legs then break make id.
 Will be reactionary to behavior in next version</Comment>
             <EdgeParameter value="idAttempts"/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Code>System.out.println("EVALUATING CONTACT");
+        <Code>//System.out.println("EVALUATING CONTACT");
 setCruiseSpeed(targetSpeed);
 setStartPosition(getLocation());
 setDestination(targetDestination);</Code>
@@ -285,13 +311,17 @@ setDestination(targetDestination);</Code>
     </Event>
     <Event name="Interdict">
         <Comment>Intercept and block the contact with the RHIB</Comment>
+        <Argument name="threat" type="diskit.Mover3D"/>
         <LocalVariable name="interdictPoint" type="diskit.Vec3d" value="getInterceptPoint()">
             <Comment>The point at which a successful block could be accomplished</Comment>
+        </LocalVariable>
+        <LocalVariable name="timeToIntercept" type="double" value="getInterceptTime()">
+            <Comment/>
         </LocalVariable>
         <Code>setStartPosition(getLocation());
 setDestination(interdictPoint);
 /*System.out.println("All stations, this is " + getName() + " I am able to block the threat, enroute...Out");*/</Code>
-        <Coordinate x="390" y="580"/>
+        <Coordinate x="490" y="580"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment/>
@@ -301,14 +331,11 @@ setDestination(interdictPoint);
         <StateTransition state="calc">
             <Operation method="checkCollision(obstacle, collisionAvoidance, avoidanceRange)"/>
         </StateTransition>
-        <StateTransition state="obstacleQueue">
-            <Operation method="add(obstacle)"/>
-        </StateTransition>
         <Schedule condition="calc.willCollide()" delay="0.0" event="AvoidObstacle" priority="0">
             <Comment/>
             <EdgeParameter value="obstacle"/>
         </Schedule>
-        <Code>//System.out.println("Avoiding Obstacle: " + obstacle.getName());</Code>
+        <Code>System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
         <Coordinate x="310" y="190"/>
     </Event>
     <Event name="AvoidObstacle">
@@ -329,8 +356,11 @@ setDestination(avoidancePoint);
         <LocalVariable name="patrolPoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>A point that is back on the patrol</Comment>
         </LocalVariable>
-        <Code>//setStartPosition(getLocation());
-//setDestination(patrolPoint);</Code>
+        <StateTransition state="tacticalMode">
+            <Assignment value="TacticalMode.PATROLLING"/>
+        </StateTransition>
+        <Code>setStartPosition(getLocation());
+setDestination(patrolPoint);</Code>
         <Coordinate x="490" y="190"/>
     </Event>
     <Event name="Intercept">
@@ -350,10 +380,10 @@ setDestination(avoidancePoint);
         <StateTransition state="idAttempts">
             <Assignment value="0"/>
         </StateTransition>
-        <StateTransition state="contactPicture">
+        <StateTransition state="targetQueue">
             <Operation method="add(contact)"/>
         </StateTransition>
-        <Schedule condition="true" delay="timeToIntercept - .05" event="EvaluateContact" priority="0">
+        <Schedule condition="true" delay="timeToIntercept - .1" event="EvaluateContact" priority="0">
             <Comment/>
             <EdgeParameter value="idAttempts"/>
             <EdgeParameter value="contact"/>
@@ -370,7 +400,7 @@ System.out.println("RHIB Intercepting: " + contact.getMoverID());
 System.out.println("Intercepting to:     " + interceptPoint);
 System.out.println("Time To Intercept: " + timeToIntercept + "\n");
 */
-System.out.println("RHIB intercepting contact: " + contact.getName());</Code>
+/*System.out.println("RHIB intercepting contact: " + contact.getName());*/</Code>
         <Coordinate x="310" y="300"/>
     </Event>
     <Event name="IDContact">
@@ -393,11 +423,11 @@ System.out.println("RHIB intercepting contact: " + contact.getName());</Code>
         <Schedule condition="!eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="ResumePatrol" priority="0">
             <Comment>TODO: Add better tactics If the contact wasn't hostile, return to patrol</Comment>
         </Schedule>
-        <Schedule condition="3&gt;7 &amp;&amp;eval.equals(&quot;ExplosiveLaddenVesselNew&quot;)" delay="0.0" event="SecurityAlert" priority="0">
+        <Schedule condition="eval.equals(&quot;ExplosiveLadenVessel&quot;)" delay="0.0" event="SecurityAlert" priority="0">
             <Comment>TODO: Add better tactics</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>System.out.println("RHIB doIDContact");</Code>
+        <Code>//System.out.println("RHIB doIDContact");</Code>
         <Coordinate x="490" y="300"/>
     </Event>
     <Event name="PursueHostile">
@@ -411,15 +441,20 @@ System.out.println("RHIB intercepting contact: " + contact.getName());</Code>
         <StateTransition state="speed">
             <Assignment value="maximumSpeed"/>
         </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="TacticalMode.INTERDICTING"/>
+        </StateTransition>
         <Schedule condition="canIntercept" delay="0.0" event="Interdict" priority="0">
             <Comment>If the threat can be stopped, interdict and block the contact</Comment>
+            <EdgeParameter value="threat"/>
         </Schedule>
         <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
             <Comment>Unable to block the contact, follow the contact at maximum speed</Comment>
             <EdgeParameter value="threat"/>
         </Schedule>
-        <Code>//setStartPosition(getLocation());
-System.out.println("Pursue Hostile RHIB");</Code>
+        <Code>setStartPosition(getLocation());
+setCruiseSpeed(getMaximumSpeed());
+//System.out.println("Pursue Hostile RHIB");</Code>
         <Coordinate x="490" y="460"/>
     </Event>
     <Event name="CreateSensors">
@@ -443,8 +478,12 @@ sensors[1] = collisionAvoidance;</Code>
         <Argument name="threat" type="diskit.Mover3D">
             <Comment>The threat that cant be intercepted</Comment>
         </Argument>
-        <Code>setDestination(threat.getDestination());
-/*System.out.println("All stations, this is " + getEntityName() + " I cannot block the threat...Out");*/</Code>
+        <StateTransition state="tacticalMode">
+            <Assignment value="TacticalMode.IDLE"/>
+        </StateTransition>
+        <Code>setStartPosition(getLocation());
+setDestination(threat.getDestination());
+/*System.out.println("All stations, this is " + getName() + " I cannot block the threat...Out");*/</Code>
         <Coordinate x="570" y="580"/>
     </Event>
     <Event name="Evade">
@@ -454,7 +493,7 @@ sensors[1] = collisionAvoidance;</Code>
         <Schedule event="PursueHostile"/>
         <Cancel event="Interdict"/>
         <Code/>
-        <Coordinate x="490" y="580"/>
+        <Coordinate x="400" y="580"/>
     </Event>
     <Event name="SecurityAlert">
         <Comment/>
@@ -469,9 +508,12 @@ sensors[1] = collisionAvoidance;</Code>
 setCruiseSpeed(getMaximumSpeed());</Code>
         <Coordinate x="490" y="380"/>
     </Event>
-    <Event name="ScaleSpeedToKnots">
+    <Event name="ScaleSpeed">
         <Comment>Scales entered speed to knots</Comment>
-        <Code>setMaximumSpeed(getMaximumSpeed()/2);</Code>
+        <Argument name="speedScale" type="double">
+            <Comment>Allows scenario manager to adjust the speed of all entities</Comment>
+        </Argument>
+        <Code>setMaximumSpeed(getMaximumSpeed() * speedScalar);</Code>
         <Coordinate x="110" y="10"/>
     </Event>
     <Event name="SetStartingPositions">

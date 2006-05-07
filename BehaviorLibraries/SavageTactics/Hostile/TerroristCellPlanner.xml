@@ -62,6 +62,15 @@ The planner also stops a simulation run when it thinks that a complete attack is
     <StateVariable name="detonations" type="java.util.LinkedList">
         <Comment>The detonations that have passed through this object</Comment>
     </StateVariable>
+    <StateVariable name="summaryWindow" type="diskit.DisplayWindow">
+        <Comment>JFrame object used to display results</Comment>
+    </StateVariable>
+    <StateVariable name="buf" type="java.lang.StringBuffer">
+        <Comment>Buffer used to collect the strings for the result</Comment>
+    </StateVariable>
+    <StateVariable name="replicationNumber" type="int">
+        <Comment/>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="planIndex">
@@ -81,6 +90,12 @@ The planner also stops a simulation run when it thinks that a complete attack is
         </StateTransition>
         <StateTransition state="registeredMunitions">
             <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="buf">
+            <Assignment value="new java.lang.StringBuffer()"/>
+        </StateTransition>
+        <StateTransition state="replicationNumber">
+            <Assignment value="replicationNumber + 1"/>
         </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
@@ -377,20 +392,47 @@ System.out.println("**********************************\n");</Code>
     </Event>
     <Event name="Stop">
         <Comment>Stops this replication if all attacks have finished</Comment>
-        <Code>Schedule.stopSimulation();</Code>
+        <Code>System.out.println(Schedule.getSimTime());
+Schedule.stopSimulation();</Code>
         <Coordinate x="350" y="430"/>
     </Event>
     <Event name="AttackComplete">
         <Comment>Recieves a report from each active terrorist as they complete their attacks. Once all attacks are complete the cell planner stops the simulation. In this case an attack is complete when it has reached its end state (e.g. it suceeded or failed, but it's over).  TODO: Add attack report so that planner can change it's knowledge base</Comment>
+        <Argument name="attackResult" type="java.lang.String">
+            <Comment>True if it was a success, false otherwise</Comment>
+        </Argument>
+        <Argument name="targetDestroyed" type="diskit.Mover3D">
+            <Comment>The target that was destroyed</Comment>
+        </Argument>
+        <Argument name="attackLocation" type="java.lang.String">
+            <Comment>The location of the attack</Comment>
+        </Argument>
+        <Argument name="reportingUnit" type="diskit.Mover3D">
+            <Comment>The terrorist making this report</Comment>
+        </Argument>
         <StateTransition state="completedAttacks">
             <Assignment value="completedAttacks + 1"/>
         </StateTransition>
-        <Schedule condition="completedAttacks -1 == totalPlans" delay="5" event="Stop" priority="0">
+        <Schedule condition="true" delay="5" event="Stop" priority="0">
             <Comment>Schedules the simulation to end once all attacks have completed. The index 'total plans' is decremented by one due to the planning processes using arrays which include a zero index position.
 A delay of five seconds is used to allow entity state variable transitions and data collection to occur
 TODO: Test to see if delay is needed</Comment>
         </Schedule>
-        <Code/>
+        <Schedule condition="summaryWindow == null" delay="0.0" event="CreateWindow" priority="0">
+            <Comment/>
+            <EdgeParameter value="buf"/>
+        </Schedule>
+        <Schedule condition="summaryWindow != null" delay="0.0" event="DisplayResults" priority="0">
+            <Comment/>
+            <EdgeParameter value="buf"/>
+        </Schedule>
+        <Code>buf.append("Simulation Results - Replication #" + replicationNumber + " \n");
+buf.append("-----------------------------------------------\n");
+buf.append("Attack result:     " + attackResult + "\n");
+buf.append("Attacking Unit:   " + reportingUnit.getName() + "\n");
+buf.append("Attack location:  " + attackLocation + "\n");
+buf.append("Blue Force Loss: " + targetDestroyed.getName() + "\n");
+buf.append("-----------------------------------------------\n\n\n");</Code>
         <Coordinate x="260" y="430"/>
     </Event>
     <Event name="Detonate">
@@ -427,6 +469,30 @@ TODO: Test to see if delay is needed</Comment>
         </Schedule>
         <Code/>
         <Coordinate x="140" y="330"/>
+    </Event>
+    <Event name="DisplayResults">
+        <Comment/>
+        <Argument name="simSummary" type="java.lang.StringBuffer"/>
+        <StateTransition state="summaryWindow">
+            <Operation method="addContent(simSummary.toString())"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="260" y="500"/>
+    </Event>
+    <Event name="CreateWindow">
+        <Comment/>
+        <Argument name="firstResults" type="java.lang.StringBuffer"/>
+        <StateTransition state="summaryWindow">
+            <Assignment value="new diskit.DisplayWindow(&quot;Simulation Summary&quot;);"/>
+        </StateTransition>
+        <StateTransition state="summaryWindow">
+            <Operation method="addContent(firstResults.toString())"/>
+        </StateTransition>
+        <StateTransition state="summaryWindow">
+            <Operation method="display()"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="150" y="430"/>
     </Event>
 </SimEntity>
 

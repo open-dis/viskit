@@ -216,22 +216,16 @@
         <LocalVariable name="rn" type="java.util.Random" value="new Random()">
             <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
         </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="getMaximumSpeed() * rn.nextDouble()">
-            <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
-        </LocalVariable>
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Provides a waypoint within the geometry specified</Comment>
         </LocalVariable>
         <LocalVariable name="startPosition" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
             <Comment>Pick a random start position</Comment>
         </LocalVariable>
-        <StateTransition state="speed">
-            <Assignment value="currentSpeed"/>
-        </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
-        <Code>setCruiseSpeed(currentSpeed);
+        <Code>setCruiseSpeed(getMaximumSpeed()/2);
 setStartPosition(startPosition);
 setDestination(waypoint);
 //System.out.println("doPatrol Event:");

@@ -209,7 +209,7 @@
         <LocalVariable name="rn" type="java.util.Random" value="new Random()">
             <Comment>Pseudorandom number generator for fluxuating speeds and times between patrol movements</Comment>
         </LocalVariable>
-        <LocalVariable name="currentSpeed" type="double" value="getMaximumSpeed() * rn.nextDouble()">
+        <LocalVariable name="currentSpeed" type="double" value="getMaximumSpeed() * .6">
             <Comment>creates a crusing speed between zero and the max speed of this craft</Comment>
         </LocalVariable>
         <LocalVariable name="waypoint" type="diskit.Vec3d" value="waypointGenerator.createWaypoint()">
