@@ -8,119 +8,6 @@
         <TerminalParameter name="appID" type="int" value="1"/>
         <Coordinate x="280" y="270"/>
     </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist1" type="diskit.ExplosiveLadenVessel">
-        <TerminalParameter name="moverID" type="int" value="600"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="x" type="double" value="0"/>
-            <TerminalParameter name="y" type="double" value="0"/>
-            <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
-        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
-        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
-        <TerminalParameter name="length" type="double" value="18"/>
-        <TerminalParameter name="width" type="double" value="5"/>
-        <TerminalParameter name="height" type="double" value="2"/>
-        <TerminalParameter name="draft" type="double" value=".5"/>
-        <MultiParameter type="double[]">
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
-        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
-        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
-        <TerminalParameter name="forceID" type="int" value="2"/>
-        <TerminalParameter name="entityDomain" type="int" value="3"/>
-        <TerminalParameter name="entityKind" type="int" value="1"/>
-        <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="170" y="560"/>
-    </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist2" type="diskit.ExplosiveLadenVessel">
-        <TerminalParameter name="moverID" type="int" value="601"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="x" type="double" value="0"/>
-            <TerminalParameter name="y" type="double" value="0"/>
-            <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
-        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
-        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
-        <TerminalParameter name="length" type="double" value="18"/>
-        <TerminalParameter name="width" type="double" value="5"/>
-        <TerminalParameter name="height" type="double" value="2"/>
-        <TerminalParameter name="draft" type="double" value=".5"/>
-        <MultiParameter type="double[]">
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
-        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
-        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
-        <TerminalParameter name="forceID" type="int" value="2"/>
-        <TerminalParameter name="entityDomain" type="int" value="3"/>
-        <TerminalParameter name="entityKind" type="int" value="1"/>
-        <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="290" y="670"/>
-    </SimEntity>
-    <SimEntity description="A suicide bomber with an explosive laden craft that determines start position by using ProbabilityZoneGeometry from the Terrorist Cell Planner. This entity heads to the general area of the target and selects one once it can clearly see it." name="Terrorist3" type="diskit.ExplosiveLadenVessel">
-        <TerminalParameter name="moverID" type="int" value="602"/>
-        <MultiParameter type="diskit.Vec3d">
-            <TerminalParameter name="x" type="double" value="0"/>
-            <TerminalParameter name="y" type="double" value="0"/>
-            <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
-        <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
-        <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
-        <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
-        <TerminalParameter name="reference" type="java.lang.String" value="none"/>
-        <TerminalParameter name="length" type="double" value="18"/>
-        <TerminalParameter name="width" type="double" value="5"/>
-        <TerminalParameter name="height" type="double" value="2"/>
-        <TerminalParameter name="draft" type="double" value=".5"/>
-        <MultiParameter type="double[]">
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-            <TerminalParameter name="" type="double" value="0.0"/>
-        </MultiParameter>
-        <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
-        <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
-        <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
-        <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
-        <TerminalParameter name="forceID" type="int" value="2"/>
-        <TerminalParameter name="entityDomain" type="int" value="3"/>
-        <TerminalParameter name="entityKind" type="int" value="1"/>
-        <TerminalParameter name="entityCountry" type="int" value="0"/>
-        <Coordinate x="390" y="560"/>
-    </SimEntity>
-    <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="diskitXML.TerroristCellPlanner">
-        <MultiParameter type="int[]">
-            <TerminalParameter name="" type="int" value="600"/>
-            <TerminalParameter name="" type="int" value="601"/>
-            <TerminalParameter name="" type="int" value="602"/>
-        </MultiParameter>
-        <MultiParameter type="java.lang.String[]">
-            <TerminalParameter name="" type="java.lang.String" value="CivilianMerchantShip"/>
-        </MultiParameter>
-        <MultiParameter type="java.lang.String[]">
-            <TerminalParameter name="" type="java.lang.String" value="ABOT"/>
-        </MultiParameter>
-        <MultiParameter type="diskit.Tactic[]">
-            <TerminalParameter name="" type="diskit.Tactic" value="diskit.Tactic.ATTACK"/>
-        </MultiParameter>
-        <Coordinate x="280" y="560"/>
-    </SimEntity>
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="isActive" type="boolean" value="true"/>
         <TerminalParameter name="duration" type="double" value=".2"/>
@@ -485,12 +372,6 @@
         </MultiParameter>
         <Coordinate x="280" y="440"/>
     </SimEntity>
-    <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist2" source="TerroristCellPlanner"/>
-    <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist3" source="TerroristCellPlanner"/>
-    <SimEventListenerConnection description="Transmits &quot;doCreateZones&quot; event which distributes starting position zones" listener="Terrorist1" source="TerroristCellPlanner"/>
-    <SimEventListenerConnection listener="TerroristCellPlanner" source="Terrorist1"/>
-    <SimEventListenerConnection listener="TerroristCellPlanner" source="Terrorist2"/>
-    <SimEventListenerConnection listener="TerroristCellPlanner" source="Terrorist3"/>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection listener="ScenarioManager" source="NauticalChart"/>
     <SimEventListenerConnection listener="NauticalChart" source="TerroristCellPlanner"/>
