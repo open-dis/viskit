@@ -2,7 +2,7 @@
 <SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity description="Central Manager of the scenario, all entities must register with this object in some fashion to participate in the scenario." name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter name="clearOnReset" type="boolean" value="false"/>
-        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.5"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.8"/>
         <TerminalParameter name="port" type="int" value="62040"/>
         <TerminalParameter name="siteID" type="int" value="0"/>
         <TerminalParameter name="appID" type="int" value="1"/>
