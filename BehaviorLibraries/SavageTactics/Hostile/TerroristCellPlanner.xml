@@ -220,7 +220,7 @@ System.out.println("**********************************\n");</Code>
         <Argument name="list" type="java.lang.String[]">
             <Comment>The target priority list parameter for this object</Comment>
         </Argument>
-        <Argument name="terroristLeader" type="Hostile.TerroristCellPlanner">
+        <Argument name="terroristLeader" type="simkit.SimEntity">
             <Comment>Planner notifies the terrorists who the leader is so that reports can be received</Comment>
         </Argument>
         <Code>System.out.println("TargetListSent by planner");</Code>

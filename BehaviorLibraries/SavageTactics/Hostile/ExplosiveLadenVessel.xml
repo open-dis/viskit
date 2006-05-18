@@ -89,7 +89,7 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="destroyedTarget" type="diskit.Mover3D">
         <Comment>The mover that was destroyed</Comment>
     </StateVariable>
-    <StateVariable name="terroristLeader" type="Hostile.TerroristCellPlanner">
+    <StateVariable name="terroristLeader" type="simkit.SimEntity">
         <Comment>The entity that is giving the orders to this terrorist</Comment>
     </StateVariable>
     <Event name="Run">
@@ -336,7 +336,7 @@ sensors[2] = collisionAvoidance;</Code>
         <Argument name="targetList" type="java.lang.String[]">
             <Comment>The list of target types in order of priority</Comment>
         </Argument>
-        <Argument name="cellPlanner" type="Hostile.TerroristCellPlanner">
+        <Argument name="cellPlanner" type="simkit.SimEntity">
             <Comment>The entity who is giving the orders</Comment>
         </Argument>
         <StateTransition state="primaryTarget">
