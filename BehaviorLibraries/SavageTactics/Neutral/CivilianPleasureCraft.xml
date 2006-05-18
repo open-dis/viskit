@@ -1,320 +1,258 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Patrick Sullivan" extend="diskit.NeutralForce" name="CivilianPleasureCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>A Civilian vessel considerd to be a pleasure craft</Comment>
+<SimEntity author="pjsulliv" extend="diskit.NeutralForce" name="CivilianPleasureCraft" package="Neutral" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>A civilian merchant ship. This behavior is set up for typical civilian merchant ship traffic. There is currenlty no difference between this graph and civilian merchant ship. It is a place holder for future developments</Comment>
     <Parameter name="moverID" type="int">
         <Comment>DIS entity ID</Comment>
     </Parameter>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Start Position - different than first waypoint</Comment>
-    </Parameter>
-    <Parameter name="maximumSpeed" type="double">
-        <Comment>Speed of this entity</Comment>
-    </Parameter>
-    <Parameter name="name" type="java.lang.String">
-        <Comment>Should match name in Assembly</Comment>
-    </Parameter>
-    <Parameter name="level" type="java.lang.String">
-        <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
-    </Parameter>
-    <Parameter name="rationale" type="java.lang.String">
-        <Comment>The specific element which contains the information classifying this document</Comment>
-    </Parameter>
-    <Parameter name="reference" type="java.lang.String">
-        <Comment>The published source of classified information, if any</Comment>
-    </Parameter>
-    <Parameter name="length" type="double">
-        <Comment>The maximum length of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="width" type="double">
-        <Comment>The maximum beam of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="height" type="double">
-        <Comment>The maximum height of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="draft" type="double">
-        <Comment>The maximum draft of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="centerOfGravity" type="double[]">
-        <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
-    </Parameter>
-    <Parameter name="maximumAcceleration" type="double">
-        <Comment>The maximum achievable acceleration</Comment>
-    </Parameter>
-    <Parameter name="maximumDeceleration" type="double">
-        <Comment>The maximum achievable deceleration</Comment>
-    </Parameter>
-    <Parameter name="maximumTurnRate" type="double">
-        <Comment>The maximum turn rate in degrees per second</Comment>
-    </Parameter>
-    <Parameter name="minimumTurnRadius" type="double">
-        <Comment>The minimum turning radius for this vehicle in feet or meters</Comment>
-    </Parameter>
-    <Parameter name="maximumSurfaceDetectionRange" type="double">
-        <Comment>The maximum detection range of the longest range surface detection sensor</Comment>
-    </Parameter>
-    <Parameter name="forceID" type="int">
-        <Comment>The DIS Enumeration for the force id for this entity [0 = Other, 1 = Friend, 2 = Opposing, 3 = Neutral]</Comment>
-    </Parameter>
-    <Parameter name="entityDomain" type="int">
-        <Comment>The DIS Enumeration for the domain for this entity [0 = Other, 1 = Land, 2 = Air, 3 = Surface, 4 = SubSurface]</Comment>
-    </Parameter>
-    <Parameter name="entityKind" type="int">
-        <Comment>The DIS Enumeration for the overall type for this entity [1 = Platform, 3 = Life Form, 7 = Radio]</Comment>
-    </Parameter>
-    <Parameter name="entityCountry" type="int">
-        <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The Savage Modeling Analysis Language(SMAL) object that contains all specific information about the model being used</Comment>
     </Parameter>
     <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
-        <Comment>Areas where this entity can navigate</Comment>
+        <Comment>General areas from which waypoints should be generated for this entity.</Comment>
     </Parameter>
-    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
-        <Comment>Tactical Mode of this entity</Comment>
+    <StateVariable name="visualRange" type="double">
+        <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
-    <StateVariable name="assetState" type="diskit.AssetState">
-        <Comment>Asset State of this entity</Comment>
+    <StateVariable name="surfaceRadarRange" type="double">
+        <Comment>The maximum range of the surface search radar on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="avoidanceRange" type="double">
+        <Comment>Contact proximity tolerance for this entity, used for collision avoidance</Comment>
     </StateVariable>
     <StateVariable name="visualPerception" type="diskit.Sensor">
-        <Comment>Perceptual Range of Entity for Detection and Avoidance</Comment>
+        <Comment>The visual perception of a human on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="surfaceRadar" type="diskit.Sensor">
+        <Comment>The surface search radar on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="collisionDetection" type="diskit.Sensor">
+        <Comment>A collision avoidance sensor for this platform</Comment>
+    </StateVariable>
+    <StateVariable name="activeMoverManager" type="diskit.MoverManager">
+        <Comment>The mover manager that is currently being used. Primarily used for swapping between mover manager types</Comment>
+    </StateVariable>
+    <StateVariable name="zoneMoverManager" type="diskit.ZoneMoverManager">
+        <Comment>[Primary] mover manager used to transit in designated areas defined by the 'zones' parameter</Comment>
+    </StateVariable>
+    <StateVariable name="avoidanceMoverManager" type="diskit.AvoidanceMoverManager">
+        <Comment>[Secondary] Mover Manager used for avoidance movement</Comment>
+    </StateVariable>
+    <StateVariable name="interceptMoverManager" type="diskit.InterceptMoverManager">
+        <Comment>[Not used] Mover Manager that executes an interception</Comment>
+    </StateVariable>
+    <StateVariable name="pathMoverManager" type="diskit.PathMoverManager">
+        <Comment>[Not used] Mover Manager that moves in a predetermined path</Comment>
+    </StateVariable>
+    <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
+        <Comment>[Mode - Probability] generates waypoints based on 'zones' parameter</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>Tactical Mode of this entity</Comment>
     </StateVariable>
     <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
         <Comment>Collection of obstacles for this entity to negotiate</Comment>
     </StateVariable>
-    <StateVariable name="avoidanceRange" type="double">
-        <Comment>Contact proximity tolerance for this entity</Comment>
+    <StateVariable name="speedScale" type="double">
+        <Comment>A scalar variable which is applied to the speed of this entity. Variation in the speed scale is set for all entities by the diskit.ScenarioManager. This allows for simulation wide speed up /slow down functionality</Comment>
     </StateVariable>
-    <StateVariable name="activeMoverManager" type="diskit.MoverManager">
-        <Comment>Used as a placeholder for managing various mover managers</Comment>
-    </StateVariable>
-    <StateVariable name="patrolManager" type="diskit.ZoneMoverManager">
-        <Comment>Primary mover manager, used for moving entities from waypoint to waypoint</Comment>
-    </StateVariable>
-    <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
-        <Comment>generates waypoints within geometry bounds based on probabilities</Comment>
-    </StateVariable>
-    <StateVariable name="interceptMoverManager" type="diskit.InterceptMoverManager">
-        <Comment>Mover Manager that executes an intercept</Comment>
-    </StateVariable>
-    <StateVariable name="targetQueue" type="java.util.LinkedList">
-        <Comment>Collection of potential targets (NOTE: may not be necessary for a neutral, but left in the graph in case a modified neutral -&gt; hostile agent is desired)</Comment>
-    </StateVariable>
-    <StateVariable name="canIntercept" type="boolean">
-        <Comment>True/false return from intercept mover manager, returns false when an intercept is impossible based of the speed and range of this entity and the target</Comment>
-    </StateVariable>
-    <StateVariable name="reach" type="diskit.Sensor">
-        <Comment>reach is the range of the sensor that is used to determine whether there is going to be an intercept or not.</Comment>
-    </StateVariable>
-    <StateVariable name="geomIndex" type="int">
-        <Comment>index variable used to count number of zones that are pertainent to this entity</Comment>
-    </StateVariable>
-    <StateVariable name="visualRange" type="double">
-        <Comment>The visual range of the bridge crew on this platform</Comment>
+    <StateVariable name="nauticalChart" type="diskit.AStarZoneMap">
+        <Comment>The nautical chart object received from the scenario manager</Comment>
     </StateVariable>
     <Event name="Run">
-        <Comment/>
+        <Comment>The run event sets the parameter values for each simulation run</Comment>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
-        <StateTransition state="avoidanceRange">
-            <Assignment value="30"/>
-        </StateTransition>
-        <StateTransition state="patrolManager">
+        <StateTransition state="zoneMoverManager">
             <Assignment value="null"/>
         </StateTransition>
-        <StateTransition state="interceptMoverManager">
+        <StateTransition state="avoidanceMoverManager">
             <Assignment value="null"/>
-        </StateTransition>
-        <StateTransition state="targetQueue">
-            <Operation method="clear()"/>
         </StateTransition>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
         </StateTransition>
+        <StateTransition state="speedScale">
+            <Assignment value="1.0"/>
+        </StateTransition>
+        <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
+            <Comment>If zones have been specified, schedule movement setup events</Comment>
+        </Schedule>
+        <Code/>
+        <Coordinate x="210" y="10"/>
+    </Event>
+    <Event name="Init">
+        <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
+        </Argument>
+        <StateTransition state="surfaceRadarRange">
+            <Assignment value="getEntityDefinition().getMaximumSurfaceDetectionRange()"/>
+        </StateTransition>
+        <StateTransition state="avoidanceRange">
+            <Assignment value="getEntityDefinition().getLength() * 1.5"/>
+        </StateTransition>
         <StateTransition state="visualRange">
             <Assignment value="600"/>
         </StateTransition>
-        <Schedule event="ScaleSpeedToKnots"/>
-        <Schedule condition="zones.length != 0" delay="0.0" event="ProcessZones" priority="0">
-            <Comment/>
-            <EdgeParameter value="zones"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="20" y="30"/>
-    </Event>
-    <Event name="StartMove">
-        <Comment/>
-        <LocalVariable name="startPosit" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="destination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
-            <Comment/>
-        </LocalVariable>
-        <StateTransition state="tacticalMode">
-            <Assignment value="diskit.TacticalMode.TRANSITING"/>
-        </StateTransition>
-        <Code>setStartPosition(startPosit);
-setDestination(destination);
-setCruiseSpeed(getMaximumSpeed()/2);
-start();</Code>
-        <Coordinate x="20" y="330"/>
-    </Event>
-    <Event name="EndMove">
-        <Comment/>
-        <Argument name="mover" type="diskit.Mover3D"/>
-        <LocalVariable name="destination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
-            <Comment/>
-        </LocalVariable>
-        <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="StartMove" priority="0">
-            <Comment/>
-        </Schedule>
-        <Code>setStartPosition(getLocation());
-setDestination(destination);</Code>
-        <Coordinate x="440" y="330"/>
-    </Event>
-    <Event name="Init">
-        <Comment/>
-        <Argument name="entity" type="diskit.Mover3D"/>
-        <StateTransition state="reach">
-            <Assignment value="new diskit.SphereCutterSensor(this,avoidanceRange)"/>
-        </StateTransition>
         <StateTransition state="visualPerception">
             <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+        </StateTransition>
+        <StateTransition state="surfaceRadar">
+            <Assignment value="new diskit.SphereCutterSensor(this, surfaceRadarRange)"/>
+        </StateTransition>
+        <StateTransition state="collisionDetection">
+            <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="reach"/>
+        <Schedule condition="zones.length == 0" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment>Only register the visualSensor if this entity is not moving</Comment>
+            <EdgeParameter value="visualPerception"/>
+        </Schedule>
+        <Schedule condition="zones.length &gt; 0" delay="0.0" event="BuildSensorArray" priority="0">
+            <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
         <Code/>
-        <Coordinate x="90" y="30"/>
+        <Coordinate x="10" y="10"/>
+    </Event>
+    <Event name="ApplySpeedScale">
+        <Comment>This event is scheduled by the diskit.ScenarioManager. All entities that have this event in their graph will adjust their speed values by the speed scale which will be applied throughout the entire simulation. Scheduling of this event occurs as part of the 'doRegisterTarget' process in diskit.ScenarioManager.</Comment>
+        <Argument name="speedScaleChange" type="double">
+            <Comment>The uniform speed scale change for this simulation</Comment>
+        </Argument>
+        <StateTransition state="speedScale">
+            <Assignment value="speedScaleChange"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="100" y="220"/>
     </Event>
     <Event name="RegisterTarget">
-        <Comment/>
-        <Argument name="target" type="diskit.Mover3D"/>
-        <Coordinate x="200" y="30"/>
+        <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="10"/>
     </Event>
     <Event name="RegisterSensor">
-        <Comment>Registering of Sensor with the Scenario Manager</Comment>
-        <Argument name="newPercept" type="diskit.Sensor"/>
-        <LocalVariable name="sensor" type="diskit.Sensor" value="newPercept">
-            <Comment/>
-        </LocalVariable>
-        <Code>sensor.addSimEventListener(this);</Code>
-        <Coordinate x="200" y="110"/>
-    </Event>
-    <Event name="Detection">
-        <Comment/>
-        <Argument name="sensor" type="diskit.Sensor"/>
-        <Argument name="newTarget" type="diskit.Mover3D"/>
-        <StateTransition state="obstacleQueue">
-            <Operation method="add(newTarget)"/>
-        </StateTransition>
-        <Cancel event="EndMove"/>
-        <Schedule condition="!obstacleQueue.contains(newTarget)" delay="0.0" event="AssessObstacle" priority="0">
-            <Comment/>
-            <EdgeParameter value="newTarget"/>
-        </Schedule>
-        <Code>/*System.out.println("***Simulation Time ***");
-System.out.println(Schedule.getSimTime());
-System.out.println("----------EVENT------------");
-System.out.println(getMoverID() + " Detected entity# " + newTarget.getMoverID());
-System.out.println("\n");
-*/
-//System.out.println("Entity Speed: " + newTarget.getCruiseSpeed());
-//System.out.println("Entity Dest:    " + newTarget.getDestination());</Code>
-        <Coordinate x="440" y="440"/>
-    </Event>
-    <Event name="AssessObstacle">
-        <Comment/>
-        <Argument name="newTarget" type="diskit.Mover3D"/>
-        <LocalVariable name="closest" type="diskit.Mover3D" value="obstacleQueue.closest()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="tgetVel" type="diskit.Vec3d" value="new diskit.Vec3d(newTarget.getVelocity())">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="collidePoint" type="diskit.Vec3d" value="diskit.util.Math3D.findInterceptPoint(newTarget,(diskit.Mover3D)this,getCruiseSpeed())">
-            <Comment/>
-        </LocalVariable>
-        <StateTransition state="obstacleQueue">
-            <Operation method="add(newTarget)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0">
-            <Comment/>
-            <EdgeParameter value="newTarget"/>
-        </Schedule>
+        <Comment>If this entity is not moving (e.g. no probability zones) only the visual sensor is registered with this simulation</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The visual sensor for this entity</Comment>
+        </Argument>
         <Code/>
-        <Coordinate x="280" y="440"/>
+        <Coordinate x="100" y="80"/>
     </Event>
-    <Event name="AvoidObstacle">
-        <Comment/>
-        <Argument name="obstacle" type="diskit.Mover3D"/>
-        <LocalVariable name="loc" type="diskit.Vec3d" value="new diskit.Vec3d(getLocation())">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="up" type="diskit.Vec3d" value="new diskit.Vec3d(0.0,0.0,-1.0)">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="steer" type="diskit.Vec3d" value="new diskit.Vec3d()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="veer" type="diskit.Vec3d" value="new diskit.Vec3d()">
-            <Comment/>
-        </LocalVariable>
-        <LocalVariable name="amm" type="diskit.AvoidanceMoverManager" value="new diskit.AvoidanceMoverManager(this)">
-            <Comment/>
-        </LocalVariable>
-        <Schedule event="StartMove"/>
+    <Event name="RegisterSensors">
+        <Comment>Registers the complete sensor array if and only if this entity has at least one probability zone</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]">
+            <Comment>The complete collection of sensors for this entity</Comment>
+        </Argument>
         <Code/>
-        <Coordinate x="100" y="440"/>
+        <Coordinate x="100" y="150"/>
     </Event>
     <Event name="ProcessZones">
-        <Comment>Listens to the Harbor Creator to get Zone Assignment geometry</Comment>
-        <Argument name="zones" type="ProbabilityZoneGeometry[]">
-            <Comment>Passed by the Harbor Creator - states patrol responsibilities and contains entity ID for assignment</Comment>
-        </Argument>
-        <LocalVariable name="count" type="int" value="0">
-            <Comment>tracks number of patrol zone assignments</Comment>
-        </LocalVariable>
+        <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled.</Comment>
         <StateTransition state="waypointCreator">
-            <Assignment value="new WaypointCreator(zones)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
-        <StateTransition state="patrolManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator,avoidanceRange)"/>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
         </StateTransition>
         <StateTransition state="activeMoverManager">
-            <Assignment value="patrolManager"/>
+            <Assignment value="zoneMoverManager"/>
         </StateTransition>
-        <Schedule event="StartMove"/>
-        <Code/>
-        <Coordinate x="20" y="190"/>
+        <Schedule event="StartMoving"/>
+        <Code>System.out.println("ProcessZones");</Code>
+        <Coordinate x="210" y="160"/>
     </Event>
-    <Event name="ClearExclusionZone">
-        <Comment/>
-        <Argument name="target" type="diskit.Mover3D"/>
-        <StateTransition state="interceptMoverManager">
-            <Operation method="setMover(null)"/>
-        </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Assignment value="patrolManager"/>
-        </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Operation method="setMover(this)"/>
-        </StateTransition>
-        <Schedule event="StartMove"/>
-        <Code>setStartPosition(getLocation());System.out.println("Oh, sorry, changing course");</Code>
-        <Coordinate x="290" y="220"/>
-    </Event>
-    <Event name="ScaleSpeedToKnots">
-        <Comment>Scales maximum speed to knots</Comment>
-        <LocalVariable name="newMaxSpeed" type="double" value="maximumSpeed/2">
-            <Comment/>
+    <Event name="StartMoving">
+        <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
+        <LocalVariable name="initialStartPosition" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment>An initial waypoint in one of the provided zones</Comment>
         </LocalVariable>
-        <Code>setMaximumSpeed(newMaxSpeed);</Code>
-        <Coordinate x="80" y="120"/>
+        <LocalVariable name="initialDestination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment>An initial destination selected from one of the zones</Comment>
+        </LocalVariable>
+        <Code>setMaximumSpeed(getEntityDefinition().getMaximumSpeed() * speedScale);
+setStartPosition(initialStartPosition);
+setDestination(initialDestination);
+System.out.println("SetMoveValues");
+setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
+start();
+System.out.println("StartMoving");</Code>
+        <Coordinate x="210" y="260"/>
     </Event>
-    <Code/>
+    <Event name="Detection">
+        <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor that detected another simEntity</Comment>
+        </Argument>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The mover that was detected</Comment>
+        </Argument>
+        <Schedule condition="sensor == collisionDetection" delay="0.0" event="AssessObstacle" priority="0">
+            <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " Detected: " + contact.getName());</Code>
+        <Coordinate x="300" y="90"/>
+    </Event>
+    <Event name="AssessObstacle">
+        <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>The mover being evaluated as a potential obstacle</Comment>
+        </Argument>
+        <LocalVariable name="obstacleToAvoid" type="boolean" value="willCollide(obstacle, collisionDetection, avoidanceRange)">
+            <Comment>Method call to diskit.SMALMover3D that uses diskit.util.MovementCalculator to determine if there will be a collision</Comment>
+        </LocalVariable>
+        <Schedule condition="obstacleToAvoid " delay="0.0" event="AvoidObstacle" priority="0">
+            <Comment>If I am going to hit this obstacle, and its bigger then I am (give way vessel simulated) or it's not moving then avoid it</Comment>
+            <EdgeParameter value="obstacle"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="300" y="170"/>
+    </Event>
+    <Event name="AvoidObstacle">
+        <Comment>If a collision will occur avoid the obstacle using the avoidance mover manager. The avoidance mover manager will perform the avoidance and then reset the activeMoverManager to its pre-avoidance value after completing the avoidance maneuver.</Comment>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>The obstacle that must be avoided</Comment>
+        </Argument>
+        <LocalVariable name="avoidancePoint" type="diskit.Vec3d" value="getAvoidancePoint(obstacle)">
+            <Comment>Method call to diskit.SMALMover3D to get the exact avoidance point for this obstacle</Comment>
+        </LocalVariable>
+        <StateTransition state="avoidanceMoverManager">
+            <Assignment value="new diskit.AvoidanceMoverManager(this)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="300" y="260"/>
+    </Event>
+    <Event name="BuildSensorArray">
+        <Comment>Combines all sensors in an array</Comment>
+        <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[3]">
+            <Comment>Initialized to the maximum number of sensors possible for this object</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="multipleSensors"/>
+        </Schedule>
+        <Code>multipleSensors[0] = visualPerception;
+multipleSensors[1] = surfaceRadar;
+multipleSensors[2] = collisionDetection;</Code>
+        <Coordinate x="10" y="150"/>
+    </Event>
+    <Event name="NauticalChartReceived">
+        <Comment>Recieves a copy of a Utilities.NauticalChart object from the Scenario Manager. When the NauticalChart registers with this simulation the scenario manager schedules a 'doNauticalChartRecieved' event for all movers registered with the simulation.  Only those entities with this exact event will actually receive the nautical chart object. It will be ignored otherwise.</Comment>
+        <Argument name="nauticalChart" type="diskit.AStarZoneMap">
+            <Comment>An A* zone map that is used as a nautical chart</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="10" y="220"/>
+    </Event>
 </SimEntity>
 
