@@ -1,69 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="diskit.HostileForce" name="ExplosiveLadenVessel" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.HostileForce" name="ExplosiveLadenVessel" package="Hostile" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Terrorist that starts from a point randomly within ProbabilityZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
 TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique DIS entity ID number</Comment>
     </Parameter>
-    <Parameter name="startPosition" type="diskit.Vec3d">
-        <Comment>Start position for this entity</Comment>
-    </Parameter>
-    <Parameter name="maximumSpeed" type="double">
-        <Comment>The maximum speed for this mover</Comment>
-    </Parameter>
-    <Parameter name="name" type="java.lang.String">
-        <Comment>Should match name in Assembly</Comment>
-    </Parameter>
-    <Parameter name="level" type="java.lang.String">
-        <Comment>The classifcation level of this entity (e.g. UNCLASSIFIED)</Comment>
-    </Parameter>
-    <Parameter name="rationale" type="java.lang.String">
-        <Comment>The specific element which contains the information classifying this document</Comment>
-    </Parameter>
-    <Parameter name="reference" type="java.lang.String">
-        <Comment>The published source of classified information, if any</Comment>
-    </Parameter>
-    <Parameter name="length" type="double">
-        <Comment>The maximum length of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="width" type="double">
-        <Comment>The maximum beam of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="height" type="double">
-        <Comment>The maximum height of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="draft" type="double">
-        <Comment>The maximum draft of this craft in meters</Comment>
-    </Parameter>
-    <Parameter name="centerOfGravity" type="double[]">
-        <Comment>Center of Gravity of the object as an (x, y, z) distance in meters from the physical center of the object, which is located at (0, 0, 0)</Comment>
-    </Parameter>
-    <Parameter name="maximumAcceleration" type="double">
-        <Comment>The maximum achievable acceleration</Comment>
-    </Parameter>
-    <Parameter name="maximumDeceleration" type="double">
-        <Comment>The maximum achievable deceleration</Comment>
-    </Parameter>
-    <Parameter name="maximumTurnRate" type="double">
-        <Comment>The maximum turn rate in degrees per second</Comment>
-    </Parameter>
-    <Parameter name="minimumTurnRadius" type="double">
-        <Comment>The minimum turning radius for this vehicle in feet or meters</Comment>
-    </Parameter>
-    <Parameter name="maximumSurfaceDetectionRange" type="double">
-        <Comment>The maximum detection range of the longest range surface detection sensor</Comment>
-    </Parameter>
-    <Parameter name="forceID" type="int">
-        <Comment>The DIS Enumeration for the force id for this entity [0 = Other, 1 = Friend, 2 = Opposing, 3 = Neutral]</Comment>
-    </Parameter>
-    <Parameter name="entityDomain" type="int">
-        <Comment>The DIS Enumeration for the domain for this entity [0 = Other, 1 = Land, 2 = Air, 3 = Surface, 4 = SubSurface]</Comment>
-    </Parameter>
-    <Parameter name="entityKind" type="int">
-        <Comment>The DIS Enumeration for the overall type for this entity [1 = Platform, 3 = Life Form, 7 = Radio]</Comment>
-    </Parameter>
-    <Parameter name="entityCountry" type="int">
-        <Comment>The DIS Enumeration for the country for this entity [225 = United States]</Comment>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The SMAL entity definition for this entity</Comment>
     </Parameter>
     <StateVariable name="avoidanceRange" type="double">
         <Comment>The proximity tollerance for this entity</Comment>
@@ -145,6 +88,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     </StateVariable>
     <StateVariable name="destroyedTarget" type="diskit.Mover3D">
         <Comment>The mover that was destroyed</Comment>
+    </StateVariable>
+    <StateVariable name="terroristLeader" type="Hostile.TerroristCellPlanner">
+        <Comment>The entity that is giving the orders to this terrorist</Comment>
     </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
@@ -246,7 +192,7 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == detonateProximity &amp;&amp;  contactType.equals(&quot;MilitaryPatrolCraft&quot;) &amp;&amp; tacticalMode != TacticalMode.DETONATING" delay="0.0" event="CannotEscape" priority="0">
+        <Schedule condition="sensor == detonateProximity &amp;&amp;  contactType.equals(&quot;MilitaryPatrolCraft&quot;) &amp;&amp; tacticalMode != diskit.TacticalMode.DETONATING" delay="0.0" event="CannotEscape" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -254,11 +200,11 @@ sensors[2] = collisionAvoidance;
             <Comment>TODO: Remove patrol craft hardcoding</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp; contactType.equals(primaryTarget) &amp;&amp;  arrivedAtGoal &amp;&amp;  currentTacticalMode != TacticalMode.ATTACKING" delay="0.0" event="Attack" priority="0">
+        <Schedule condition="sensor == visualPerception &amp;&amp; contactType.equals(primaryTarget) &amp;&amp;  arrivedAtGoal &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="Attack" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp;  contactType.equals(primaryTarget) &amp;&amp;   !arrivedAtGoal &amp;&amp;   currentTacticalMode != TacticalMode.ATTACKING" delay="0.0" event="TargetSpotted" priority="0">
+        <Schedule condition="sensor == visualPerception &amp;&amp;  contactType.equals(primaryTarget) &amp;&amp;   !arrivedAtGoal &amp;&amp;   currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="TargetSpotted" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -310,7 +256,7 @@ contact.waitDelay("Die", 0.0);</Code>
         </Schedule>
         <Code>setStartPosition(getLocation());
 setDestination(attackDestination);
-//System.out.println("I've chosen to attack: " + //target.getName());
+System.out.println("I've chosen to attack: " + target.getName());
 //System.out.println("Attack Position is: " + attackDestination);</Code>
         <Coordinate x="460" y="330"/>
     </Event>
@@ -334,7 +280,7 @@ sensors[2] = collisionAvoidance;</Code>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
         <StateTransition state="plasticExplosives">
-            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), getMoverID(), diskit.EntityType.HOSTILE, &quot;Plastic Explosives&quot;, blastRadius)"/>
+            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), getMoverID(), blastRadius)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
             <Comment/>
@@ -364,14 +310,17 @@ sensors[2] = collisionAvoidance;</Code>
         <LocalVariable name="areaOfAttack" type="java.lang.String" value="closestZone.getName()">
             <Comment>The name of the closest zone for reporting purposes</Comment>
         </LocalVariable>
-        <Schedule condition="shooter == this &amp;&amp; tacticalMode != TacticalMode.DEAD" delay="0.0" event="Die" priority="0">
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <Schedule condition="shooter == this &amp;&amp; tacticalMode != diskit.TacticalMode.DEAD" delay="0.0" event="Die" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code>setCruiseSpeed(0);</Code>
         <Coordinate x="600" y="260"/>
     </Event>
-    <Event name="TerroristGivenChart">
+    <Event name="AStarZoneMapDistributed">
         <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
         <Argument name="chart" type="diskit.AStarZoneMap">
             <Comment>The chart that the terrorist sent</Comment>
@@ -387,8 +336,14 @@ sensors[2] = collisionAvoidance;</Code>
         <Argument name="targetList" type="java.lang.String[]">
             <Comment>The list of target types in order of priority</Comment>
         </Argument>
+        <Argument name="cellPlanner" type="Hostile.TerroristCellPlanner">
+            <Comment>The entity who is giving the orders</Comment>
+        </Argument>
         <StateTransition state="primaryTarget">
             <Assignment value="targetList[0]"/>
+        </StateTransition>
+        <StateTransition state="terroristLeader">
+            <Assignment value="cellPlanner"/>
         </StateTransition>
         <Code/>
         <Coordinate x="430" y="40"/>
@@ -491,7 +446,7 @@ sensors[2] = collisionAvoidance;</Code>
             <Assignment value="true"/>
         </StateTransition>
         <StateTransition state="zoneMoverManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator, avoidanceRange)"/>
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
         </StateTransition>
         <Schedule condition="attackAuthorized" delay="0.0" event="StartMove" priority="0">
             <Comment/>
@@ -517,7 +472,7 @@ sensors[2] = collisionAvoidance;</Code>
     <Event name="StartMove">
         <Comment/>
         <StateTransition state="tacticalMode">
-            <Assignment value="TacticalMode.APPROACHING"/>
+            <Assignment value="diskit.TacticalMode.APPROACHING"/>
         </StateTransition>
         <Code>setCruiseSpeed(maximumSpeed);
 setStartPosition(attackStartWaypoint);
@@ -557,7 +512,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <StateTransition state="arrivedAtGoal">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0">
+        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0">
             <Comment>If there is a target to attack, attack it</Comment>
             <EdgeParameter value="targetChoice"/>
         </Schedule>
@@ -569,7 +524,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The target to attack</Comment>
         </Argument>
-        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getSMAL().getWidth() )">
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getEntityDefinition().getWidth() )">
             <Comment>Determines if this target can be intercepted</Comment>
         </LocalVariable>
         <Schedule condition="canIntercept" delay="0.0" event="Attack" priority="0">
@@ -591,15 +546,15 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <Assignment value="mover"/>
         </StateTransition>
         <StateTransition state="tacticalMode">
-            <Assignment value="TacticalMode.DETONATING"/>
+            <Assignment value="diskit.TacticalMode.DETONATING"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="Detonate" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
-        <Code>//System.out.println("Detonate Proximity sensed");
-//System.out.println("I'm blowing up "+  mover.getName());
+        <Code>System.out.println("Detonate Proximity sensed");
+System.out.println("I'm blowing up "+  mover.getName());
 setCruiseSpeed(0);</Code>
         <Coordinate x="460" y="260"/>
     </Event>
@@ -650,10 +605,13 @@ setDestination(avoidancePoint);</Code>
             <Comment>The name of the general area of the attack</Comment>
         </LocalVariable>
         <StateTransition state="tacticalMode">
-            <Assignment value="TacticalMode.DEAD"/>
+            <Assignment value="diskit.TacticalMode.DEAD"/>
         </StateTransition>
         <StateTransition state="zoneMoverManager">
             <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="terroristLeader">
+            <Operation method="waitDelay(&quot;AttackComplete&quot;,0.0,new Object[]{attackSuccess,destroyedTarget,areaOfAttack,this},0)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="AttackComplete" priority="0">
             <Comment/>

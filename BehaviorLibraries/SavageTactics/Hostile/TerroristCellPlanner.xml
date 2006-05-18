@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="SimEntityBase" name="TerroristCellPlanner" package="diskitXML" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="TerroristCellPlanner" package="Hostile" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This object connects to a nautical chart and uses that information to develop and adjust attack plans.  It passes attack plans to the entities that are listed as potential terrorist platforms. These entities must be listening to this object to get the information.  Starting positions are selected from the perimeter zones of the nautical chart. 
 
 Terrorists report back to this object as to whether or not they were succesfull. Adjustments are made and the cell planner will issue new attack orders based on it's evaluation of the success of the mission.
@@ -44,55 +44,22 @@ The planner also stops a simulation run when it thinks that a complete attack is
     <StateVariable name="totalPlans" type="int">
         <Comment>The total number of plans that are generated for a single simulation run</Comment>
     </StateVariable>
-    <StateVariable name="registeredTerrorist" type="java.util.LinkedList">
-        <Comment>The list of terrorists that have registered through the cell planner</Comment>
-    </StateVariable>
-    <StateVariable name="registeredSensor" type="java.util.LinkedList">
-        <Comment>The list of single sensors that have been registered by the cell planner</Comment>
-    </StateVariable>
-    <StateVariable name="registeredSensorArrays" type="java.util.LinkedList">
-        <Comment>The list of sensor arrays that have registered through the cell planner</Comment>
-    </StateVariable>
-    <StateVariable name="registeredMunitions" type="java.util.LinkedList">
-        <Comment>The list of munitions that was registered through this object</Comment>
-    </StateVariable>
     <StateVariable name="completedAttacks" type="int">
         <Comment>Number of attacks that have been completed</Comment>
     </StateVariable>
-    <StateVariable name="detonations" type="java.util.LinkedList">
-        <Comment>The detonations that have passed through this object</Comment>
-    </StateVariable>
-    <StateVariable name="summaryWindow" type="diskit.DisplayWindow">
-        <Comment>JFrame object used to display results</Comment>
-    </StateVariable>
-    <StateVariable name="buf" type="java.lang.StringBuffer">
-        <Comment>Buffer used to collect the strings for the result</Comment>
-    </StateVariable>
     <StateVariable name="replicationNumber" type="int">
         <Comment/>
+    </StateVariable>
+    <StateVariable name="mapReceived" type="boolean">
+        <Comment>This is a special case filter that prevents multiple scheduling of the 'doAStarZoneMapDistributed' event as a result of the bi-directional listener between this object in terrorists. Without this flag multiple events would be scheduled (one from the scenario manager and one for each connected terrorist)</Comment>
     </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="planIndex">
             <Assignment value="0"/>
         </StateTransition>
-        <StateTransition state="registeredTerrorist">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensor">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensorArrays">
-            <Operation method="clear()"/>
-        </StateTransition>
         <StateTransition state="completedAttacks">
             <Assignment value="0"/>
-        </StateTransition>
-        <StateTransition state="registeredMunitions">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="buf">
-            <Assignment value="new java.lang.StringBuffer()"/>
         </StateTransition>
         <StateTransition state="replicationNumber">
             <Assignment value="replicationNumber + 1"/>
@@ -100,8 +67,8 @@ The planner also stops a simulation run when it thinks that a complete attack is
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
-    <Event name="NauticalChartPublished">
-        <Comment>Allows this agent to obtain information about the harbor by listening to an event with the same name in NauticalChart</Comment>
+    <Event name="AStarZoneMapDistributed">
+        <Comment>Listens to this event from the scenario manager and uses the object 'harborMap' to plan and order attacks. Must have a bi-directional listening connection to the scenario manager.</Comment>
         <Argument name="harborMap" type="diskit.AStarZoneMap">
             <Comment>The map of the harbor</Comment>
         </Argument>
@@ -111,35 +78,34 @@ The planner also stops a simulation run when it thinks that a complete attack is
         <StateTransition state="rn">
             <Assignment value="new java.util.Random()"/>
         </StateTransition>
-        <Schedule event="ChoosePlatformsToDeploy"/>
-        <Schedule condition="true" delay="0.0" event="TerroristGivenChart" priority="0">
+        <Schedule condition="true" delay="0.0" event="ChoosePlatformsToDeploy" priority="0">
             <Comment/>
-            <EdgeParameter value="harborChart"/>
         </Schedule>
         <Schedule condition="true" delay="0.0" event="TargetListSent" priority="0">
             <Comment/>
             <EdgeParameter value="targetPriorityList"/>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
-        <Coordinate x="360" y="40"/>
+        <Coordinate x="130" y="120"/>
     </Event>
     <Event name="ChoosePlatformsToDeploy">
         <Comment>Selects at random a number of units to deploy</Comment>
         <LocalVariable name="totalPossiblePlatforms" type="int" value="terroristIDs.length">
             <Comment>The maximum number of terrorist that this planner can deploy</Comment>
         </LocalVariable>
-        <LocalVariable name="terroristSelection" type="int" value="rn.nextInt(totalPossiblePlatforms-1)">
+        <LocalVariable name="terroristSelection" type="int" value="rn.nextInt(totalPossiblePlatforms)">
             <Comment>Generates a random selection between 1 and the maximum number of platforms</Comment>
         </LocalVariable>
         <StateTransition state="totalPlans">
-            <Assignment value="terroristSelection + 2"/>
+            <Assignment value="terroristSelection"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="CreateAttackPlan" priority="0">
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
         <Code/>
-        <Coordinate x="360" y="140"/>
+        <Coordinate x="130" y="200"/>
     </Event>
     <Event name="CreateAttackPlan">
         <Comment>Creates a unique attack plan for each terrorist selected</Comment>
@@ -151,7 +117,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
             <EdgeParameter value="planIndex"/>
         </Schedule>
         <Code/>
-        <Coordinate x="360" y="220"/>
+        <Coordinate x="130" y="300"/>
     </Event>
     <Event name="SelectTerrorist">
         <Comment>Picks the terrorist platform for the attack plan</Comment>
@@ -163,7 +129,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
         </StateTransition>
         <Schedule event="SelectStartArea"/>
         <Code/>
-        <Coordinate x="260" y="220"/>
+        <Coordinate x="30" y="300"/>
     </Event>
     <Event name="SelectStartArea">
         <Comment>Generates the start position for this attack plan and updates the current plan with that zone</Comment>
@@ -181,7 +147,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
         </StateTransition>
         <Schedule event="SelectGoalArea"/>
         <Code/>
-        <Coordinate x="260" y="320"/>
+        <Coordinate x="30" y="400"/>
     </Event>
     <Event name="SelectGoalArea">
         <Comment>Identifies the area that the terrorist should head towards in executing this plan</Comment>
@@ -196,7 +162,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
         </StateTransition>
         <Schedule event="SelectTactic"/>
         <Code/>
-        <Coordinate x="350" y="320"/>
+        <Coordinate x="120" y="400"/>
     </Event>
     <Event name="SelectTactic">
         <Comment>Chooses a tactic to assign to the terrorist</Comment>
@@ -214,7 +180,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
             <EdgeParameter value="selectedTactic"/>
         </Schedule>
         <Code/>
-        <Coordinate x="450" y="320"/>
+        <Coordinate x="220" y="400"/>
     </Event>
     <Event name="AttackOrderSent">
         <Comment>Transmits the complete attack plan to the listening terrorist with the same moverID as the one passed</Comment>
@@ -247,154 +213,29 @@ System.out.println("\t Start: " + attackStart.getName());
 System.out.println("\t Head to : " + attackGoal.getName());
 System.out.println("\t Tactic: " + selectedTactic);
 System.out.println("**********************************\n");</Code>
-        <Coordinate x="450" y="220"/>
+        <Coordinate x="220" y="300"/>
     </Event>
     <Event name="TargetListSent">
         <Comment>Sends the target priority list to listening terrorists</Comment>
         <Argument name="list" type="java.lang.String[]">
             <Comment>The target priority list parameter for this object</Comment>
         </Argument>
-        <Code/>
-        <Coordinate x="260" y="40"/>
+        <Argument name="terroristLeader" type="Hostile.TerroristCellPlanner">
+            <Comment>Planner notifies the terrorists who the leader is so that reports can be received</Comment>
+        </Argument>
+        <Code>System.out.println("TargetListSent by planner");</Code>
+        <Coordinate x="220" y="120"/>
     </Event>
     <Event name="BeginAttack">
         <Comment>Once all plans have been constructed and distributed the attacks are ordered to begin. Also clears the registration lists. By the time of the attack the sensors, terrorists, and munitions will have been registered</Comment>
-        <StateTransition state="registeredTerrorist">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensor">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensorArrays">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredMunitions">
-            <Operation method="clear()"/>
-        </StateTransition>
         <Code/>
-        <Coordinate x="570" y="220"/>
-    </Event>
-    <Event name="RegisterTarget">
-        <Comment>Allows a terrorist to register through the planner</Comment>
-        <Argument name="terrorist" type="diskit.Mover3D">
-            <Comment>The terrorist trying to register</Comment>
-        </Argument>
-        <Schedule condition="!registeredTerrorist.contains(terrorist)" delay="0.0" event="ProcessTerrorist" priority="0">
-            <Comment/>
-            <EdgeParameter value="terrorist"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="30" y="90"/>
-    </Event>
-    <Event name="ProcessTerrorist">
-        <Comment>Registers the terrorist and records the fact that it has</Comment>
-        <Argument name="terrorist" type="diskit.Mover3D">
-            <Comment>The terrorist to register</Comment>
-        </Argument>
-        <StateTransition state="registeredTerrorist">
-            <Operation method="add(terrorist)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
-            <Comment/>
-            <EdgeParameter value="terrorist"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="140" y="90"/>
-    </Event>
-    <Event name="RegisterSensor">
-        <Comment>Registers a single sensor object for a connected terrorist</Comment>
-        <Argument name="sensor" type="diskit.Sensor">
-            <Comment>The sensor that needs to be registered</Comment>
-        </Argument>
-        <Schedule condition="!registeredSensor.contains(sensor)" delay="0.0" event="ProcessSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensor"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="30" y="150"/>
-    </Event>
-    <Event name="ProcessSensor">
-        <Comment>Registers the sensor and records the fact that it has</Comment>
-        <Argument name="sensor" type="diskit.Sensor">
-            <Comment>The sensor to be registered</Comment>
-        </Argument>
-        <StateTransition state="registeredSensor">
-            <Operation method="add(sensor)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensor"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="140" y="150"/>
-    </Event>
-    <Event name="RegisterSensors">
-        <Comment>Registers a sensor array for a connected terrorist</Comment>
-        <Argument name="sensors" type="diskit.Sensor[]">
-            <Comment>The array of sensors to be processed</Comment>
-        </Argument>
-        <Schedule condition="!registeredSensorArrays.contains(sensors)" delay="0.0" event="ProcessSensorArray" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensors"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="30" y="210"/>
-    </Event>
-    <Event name="ProcessSensorArray">
-        <Comment>Registers an array of sensors and records the fact that it has</Comment>
-        <Argument name="sensors" type="diskit.Sensor[]">
-            <Comment>The array of sensors being registered</Comment>
-        </Argument>
-        <StateTransition state="registeredSensorArrays">
-            <Operation method="add(sensors)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensors"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="140" y="210"/>
-    </Event>
-    <Event name="RegisterMunition">
-        <Comment>Allows terrorist munitions to register through the planner</Comment>
-        <Argument name="munition" type="diskit.Munition">
-            <Comment>The munition being registered by a terrorist</Comment>
-        </Argument>
-        <Schedule condition="!registeredMunitions.contains(munition)" delay="0.0" event="ProcessMunition" priority="0">
-            <Comment/>
-            <EdgeParameter value="munition"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="30" y="270"/>
-    </Event>
-    <Event name="ProcessMunition">
-        <Comment>Registers munition and records the fact that it did</Comment>
-        <Argument name="munition" type="diskit.Munition">
-            <Comment>The munition being registered</Comment>
-        </Argument>
-        <StateTransition state="registeredMunitions">
-            <Operation method="add(munition)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
-            <Comment/>
-            <EdgeParameter value="munition"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="140" y="270"/>
-    </Event>
-    <Event name="TerroristGivenChart">
-        <Comment>Passes the nautical chart to the listening terrorists to increase their knowledge of the environment and allow them to use A* search to navigate through the environment</Comment>
-        <Argument name="chart" type="diskit.AStarZoneMap">
-            <Comment>The copy of the nautical chart that the planner has</Comment>
-        </Argument>
-        <Code/>
-        <Coordinate x="450" y="40"/>
+        <Coordinate x="350" y="300"/>
     </Event>
     <Event name="Stop">
         <Comment>Stops this replication if all attacks have finished</Comment>
-        <Code>System.out.println(Schedule.getSimTime());
+        <Code>System.out.println("SimRunEndTime: " +Schedule.getSimTime());
 Schedule.stopSimulation();</Code>
-        <Coordinate x="350" y="430"/>
+        <Coordinate x="120" y="510"/>
     </Event>
     <Event name="AttackComplete">
         <Comment>Recieves a report from each active terrorist as they complete their attacks. Once all attacks are complete the cell planner stops the simulation. In this case an attack is complete when it has reached its end state (e.g. it suceeded or failed, but it's over).  TODO: Add attack report so that planner can change it's knowledge base</Comment>
@@ -418,81 +259,8 @@ Schedule.stopSimulation();</Code>
 A delay of five seconds is used to allow entity state variable transitions and data collection to occur
 TODO: Test to see if delay is needed</Comment>
         </Schedule>
-        <Schedule condition="summaryWindow == null" delay="0.0" event="CreateWindow" priority="0">
-            <Comment/>
-            <EdgeParameter value="buf"/>
-        </Schedule>
-        <Schedule condition="summaryWindow != null" delay="0.0" event="DisplayResults" priority="0">
-            <Comment/>
-            <EdgeParameter value="buf"/>
-        </Schedule>
-        <Code>buf.append("Simulation Results - Replication #" + replicationNumber + " \n");
-buf.append("-----------------------------------------------\n");
-buf.append("Attack result:     " + attackResult + "\n");
-buf.append("Attacking Unit:   " + reportingUnit.getName() + "\n");
-buf.append("Attack location:  " + attackLocation + "\n");
-buf.append("Blue Force Loss: " + targetDestroyed.getName() + "\n");
-buf.append("-----------------------------------------------\n\n\n");</Code>
-        <Coordinate x="260" y="430"/>
-    </Event>
-    <Event name="Detonate">
-        <Comment>Allows connected terrorists to pass their doDetonate event</Comment>
-        <Argument name="shooter" type="diskit.Mover3D">
-            <Comment>The mover 3d that used the munition</Comment>
-        </Argument>
-        <Argument name="munition" type="diskit.Munition">
-            <Comment>The munition that was used</Comment>
-        </Argument>
-        <Schedule condition="!detonations.contains(munition)" delay="0.0" event="ProcessDetonation" priority="0">
-            <Comment/>
-            <EdgeParameter value="shooter"/>
-            <EdgeParameter value="munition"/>
-        </Schedule>
         <Code/>
-        <Coordinate x="30" y="330"/>
-    </Event>
-    <Event name="ProcessDetonation">
-        <Comment>Processed the detonation and records the fact that it did</Comment>
-        <Argument name="shooter" type="diskit.Mover3D">
-            <Comment>The mover that used the munition</Comment>
-        </Argument>
-        <Argument name="munition" type="diskit.Munition">
-            <Comment>The munition that was used</Comment>
-        </Argument>
-        <StateTransition state="detonations">
-            <Operation method="add(munition)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Detonate" priority="0">
-            <Comment/>
-            <EdgeParameter value="shooter"/>
-            <EdgeParameter value="munition"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="140" y="330"/>
-    </Event>
-    <Event name="DisplayResults">
-        <Comment/>
-        <Argument name="simSummary" type="java.lang.StringBuffer"/>
-        <StateTransition state="summaryWindow">
-            <Operation method="addContent(simSummary.toString())"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="260" y="500"/>
-    </Event>
-    <Event name="CreateWindow">
-        <Comment/>
-        <Argument name="firstResults" type="java.lang.StringBuffer"/>
-        <StateTransition state="summaryWindow">
-            <Assignment value="new diskit.DisplayWindow(&quot;Simulation Summary&quot;);"/>
-        </StateTransition>
-        <StateTransition state="summaryWindow">
-            <Operation method="addContent(firstResults.toString())"/>
-        </StateTransition>
-        <StateTransition state="summaryWindow">
-            <Operation method="display()"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="150" y="430"/>
+        <Coordinate x="30" y="510"/>
     </Event>
 </SimEntity>
 
