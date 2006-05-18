@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="PierWithBerths" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="PierWithBerths" package="Obstacles" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A Pier without berths specified</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique ID number for this object</Comment>
@@ -19,38 +19,11 @@
     <Parameter name="rotation" type="diskit.Vec4d">
         <Comment>Orientation in radians about the (Z DIS axis (Y for X3D)) example: 0 0 1 1.57</Comment>
     </Parameter>
-        <Parameter name="berths" type="diskit.Berth[]">
+    <Parameter name="berths" type="diskit.Berth[]">
         <Comment>The individual berths contained on this pier</Comment>
     </Parameter>
-    <StateVariable name="proximitySensor" type="diskit.Sensor">
-        <Comment>Sensor used to detect when movers are getting close to the pier and should consider it for navigation</Comment>
-    </StateVariable>
-    <StateVariable name="closeContactQueue" type="java.util.LinkedList">
-        <Comment>Collection of contacts that have gotten close to the pier and have not exited</Comment>
-    </StateVariable>
-    <StateVariable name="registeredContacts" type="java.util.LinkedList">
-        <Comment>Contacts that have been registered through this pier</Comment>
-    </StateVariable>
-    <StateVariable name="registeredSensor" type="java.util.LinkedList">
-        <Comment>List of all single sensors registered by this pier</Comment>
-    </StateVariable>
-    <StateVariable name="registeredSensors" type="java.util.LinkedList">
-        <Comment>List of all sensor arrays registered by this pier</Comment>
-    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
-        <StateTransition state="closeContactQueue">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredContacts">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensor">
-            <Operation method="clear()"/>
-        </StateTransition>
-        <StateTransition state="registeredSensors">
-            <Operation method="clear()"/>
-        </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
@@ -59,19 +32,6 @@
         <Argument name="entity" type="simkit.SimEntity">
             <Comment>Entity being initialized</Comment>
         </Argument>
-        <StateTransition state="proximitySensor">
-            <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
-        </StateTransition>
-        <StateTransition state="proximitySensor">
-            <Operation method="addSimEventListener(this)"/>
-        </StateTransition>
-        <StateTransition state="registeredContacts">
-            <Operation method="add(this)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="proximitySensor"/>
-        </Schedule>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -79,140 +39,11 @@
         <Code/>
         <Coordinate x="130" y="30"/>
     </Event>
-    <Event name="RegisterSensor">
-        <Comment>Passes Sensor to Relay for Registration</Comment>
-        <Argument name="sensor" type="diskit.Sensor"/>
-        <Schedule condition="!registeredSensor.contains(sensor)" delay="0.0" event="RegisterPiersideSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensor"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="250" y="110"/>
-    </Event>
     <Event name="RegisterTarget">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
-        <Schedule condition="!registeredContacts.contains(target)" delay="0.0" event="RegisterPiersideMover" priority="0">
-            <Comment/>
-            <EdgeParameter value="target"/>
-        </Schedule>
         <Code/>
         <Coordinate x="250" y="30"/>
-    </Event>
-    <Event name="Detection">
-        <Comment>Detects when a mover is getting close to this object</Comment>
-        <Argument name="sensor" type="diskit.Sensor">
-            <Comment>Sensor that detected the mover</Comment>
-        </Argument>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover that is getting close to obstacle</Comment>
-        </Argument>
-        <Schedule condition="!closeContactQueue.contains(mover)" delay="0.0" event="ObstacleClose" priority="0">
-            <Comment/>
-            <EdgeParameter value="mover"/>
-            <EdgeParameter value="this"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="150" y="260"/>
-    </Event>
-    <Event name="ObstacleClose">
-        <Comment>Notification event that passes obstacle information to the detected mover. Also adds mover to the close contact queue.</Comment>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover who is close to this object</Comment>
-        </Argument>
-        <Argument name="pier" type="diskit.Obstacle">
-            <Comment>Object that may need to be avoided</Comment>
-        </Argument>
-        <StateTransition state="closeContactQueue">
-            <Operation method="add(mover)"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="260" y="260"/>
-    </Event>
-    <Event name="UnDetection">
-        <Comment>Senses when mover has exited the proximity range for this object</Comment>
-        <Argument name="sensor" type="diskit.Sensor">
-            <Comment>Sensor that detected the exit range event</Comment>
-        </Argument>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover that exited the range</Comment>
-        </Argument>
-        <Schedule condition="closeContactQueue.contains(mover)" delay="0.0" event="ObstacleCleared" priority="0">
-            <Comment/>
-            <EdgeParameter value="mover"/>
-            <EdgeParameter value="this"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="150" y="340"/>
-    </Event>
-    <Event name="ObstacleCleared">
-        <Comment>Notification event to mover that the obstacle has been cleared. Also removes the mover from the close contact queue</Comment>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover that has cleared the range</Comment>
-        </Argument>
-        <Argument name="pier" type="diskit.Obstacle">
-            <Comment>Pier that has been cleared and should be removed from the obstacle queue of the mover</Comment>
-        </Argument>
-        <StateTransition state="closeContactQueue">
-            <Operation method="remove(mover)"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="260" y="340"/>
-    </Event>
-    <Event name="RegisterPiersideMover">
-        <Comment/>
-        <Argument name="pierSideMover" type="diskit.Mover3D">
-            <Comment>The mover attempting to register through the pier</Comment>
-        </Argument>
-        <StateTransition state="registeredContacts">
-            <Operation method="add(pierSideMover)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
-            <Comment/>
-            <EdgeParameter value="pierSideMover"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="390" y="30"/>
-    </Event>
-    <Event name="RegisterPiersideSensor">
-        <Comment>Registers a single sensor passed from a mover on the pier</Comment>
-        <Argument name="pierSideSensor" type="diskit.Sensor">
-            <Comment>Single sensor being passed from a pierside mover</Comment>
-        </Argument>
-        <StateTransition state="registeredSensor">
-            <Operation method="add(pierSideSensor)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
-            <Comment/>
-            <EdgeParameter value="pierSideSensor"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="390" y="110"/>
-    </Event>
-    <Event name="RegisterSensors">
-        <Comment/>
-        <Argument name="sensors" type="diskit.Sensor[]"/>
-        <Schedule condition="!registeredSensors.contains(sensors)" delay="0.0" event="RegisterSensorArrays" priority="0">
-            <Comment/>
-            <EdgeParameter value="sensors"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="250" y="180"/>
-    </Event>
-    <Event name="RegisterSensorArrays">
-        <Comment>Processes sensor arrays for pierside entities, however, it only registers the visual sensor since other sensors are turned off when pierside (air detection, sonar)</Comment>
-        <Argument name="sensors" type="diskit.Sensor[]">
-            <Comment>The array of sensors to register</Comment>
-        </Argument>
-        <LocalVariable name="visualSensor" type="diskit.Sensor" value="sensors[0]">
-            <Comment>The extracted visual Sensor</Comment>
-        </LocalVariable>
-        <StateTransition state="registeredSensors">
-            <Operation method="add(sensors)"/>
-        </StateTransition>
-        <Schedule event="RegisterSensor"/>
-        <Code/>
-        <Coordinate x="390" y="180"/>
     </Event>
     <Code/>
 </SimEntity>

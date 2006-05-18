@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="Buoy" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.Obstacle" name="Buoy" package="Obstacles" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A buoy which may be moving and effected by currents, wakes and tides.</Comment>
     <Parameter name="moverID" type="int">
         <Comment>Unique ID number for this object</Comment>
@@ -26,7 +26,7 @@
     <Parameter name="lightFlashInterval" type="double">
         <Comment>Interval between flashing of light (zero if no light) in seconds</Comment>
     </Parameter>
-        <StateVariable name="proximitySensor" type="diskit.Sensor">
+    <StateVariable name="proximitySensor" type="diskit.Sensor">
         <Comment>Sensor used to detect when movers are getting close to the pier and should consider it for navigation</Comment>
     </StateVariable>
     <StateVariable name="closeContactQueue" type="java.util.LinkedList">
@@ -34,7 +34,7 @@
     </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
-                <StateTransition state="closeContactQueue">
+        <StateTransition state="closeContactQueue">
             <Operation method="clear()"/>
         </StateTransition>
         <Code/>
@@ -48,24 +48,24 @@
         <StateTransition state="proximitySensor">
             <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensorByRelay" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
             <Comment/>
             <EdgeParameter value="proximitySensor"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTargetByRelay" priority="0">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
         <Coordinate x="130" y="30"/>
     </Event>
-    <Event name="RegisterSensorByRelay">
+    <Event name="RegisterSensor">
         <Comment>Passes Sensor to Relay for Registration</Comment>
         <Argument name="sensor" type="diskit.Sensor"/>
-        <Code>sensor.addSimEventListener(this);</Code>
+        <Code/>
         <Coordinate x="250" y="110"/>
     </Event>
-    <Event name="RegisterTargetByRelay">
+    <Event name="RegisterTarget">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
         <Code/>
@@ -133,6 +133,4 @@
     </Event>
     <Code/>
 </SimEntity>
-
-
 
