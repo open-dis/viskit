@@ -196,7 +196,7 @@ public class GridRunner {
                     
                 }
             }
-            return Integer.valueOf(data.length);
+            return Integer.valueOf(""+data.length);
         } catch (Exception e) {
             return Integer.valueOf("-1");
         }
@@ -576,6 +576,10 @@ public class GridRunner {
             ex.printStackTrace();
             return "QSTAT-ERROR";
         }
+    }
+    
+    public Integer getDesignPointCount() {
+        return new Integer(designPointCount);
     }
     
     public String qstatXML() {
