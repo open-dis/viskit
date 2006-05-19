@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly name="RandomVariateDistributionExamples" package="ExampleAssemblies" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" name="NormalDistPlot" type="RandomVariateGeneration.RandomVariatePlotter">
+        <MultiParameter type="diskit.random.Histogram">
+            <MultiParameter type="diskit.random.RandomVariateInstantiator">
+                <MultiParameter type="diskit.random.AR1Variate"/>
+                <MultiParameter type="diskit.random.BernoulliVariate"/>
+                <MultiParameter type="diskit.random.BetaVariate"/>
+                <MultiParameter type="diskit.random.BinomialVariate"/>
+                <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+                <MultiParameter type="diskit.random.ExponentialVariate"/>
+                <MultiParameter type="diskit.random.GammaVariate"/>
+                <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+                <MultiParameter type="diskit.random.NormalVariate">
+                    <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="10"/>
+                    <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.random.PoissonVariate"/>
+                <MultiParameter type="diskit.random.UniformVariate"/>
+            </MultiParameter>
+            <TerminalParameter name="number of samples" type="int" value="1000"/>
+            <TerminalParameter name="number of histogram bins" type="int" value="50"/>
+            <TerminalParameter name="lowerBounds" type="double" value="0.0"/>
+            <TerminalParameter name="upperBounds" type="double" value="30"/>
+        </MultiParameter>
+        <Coordinate x="80" y="130"/>
+    </SimEntity>
+    <SimEntity description="Example plot of an exponential Distribution" name="ExponenPlot" type="RandomVariateGeneration.RandomVariatePlotter">
+        <MultiParameter type="diskit.random.Histogram">
+            <MultiParameter type="diskit.random.RandomVariateInstantiator">
+                <MultiParameter type="diskit.random.AR1Variate"/>
+                <MultiParameter type="diskit.random.BernoulliVariate"/>
+                <MultiParameter type="diskit.random.BetaVariate"/>
+                <MultiParameter type="diskit.random.BinomialVariate"/>
+                <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+                <MultiParameter type="diskit.random.ExponentialVariate">
+                    <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="10"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.random.GammaVariate"/>
+                <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+                <MultiParameter type="diskit.random.NormalVariate"/>
+                <MultiParameter type="diskit.random.PoissonVariate"/>
+                <MultiParameter type="diskit.random.UniformVariate"/>
+            </MultiParameter>
+            <TerminalParameter name="number of samples" type="int" value="1000"/>
+            <TerminalParameter name="number of histogram bins" type="int" value="50"/>
+            <TerminalParameter name="lowerBounds" type="double" value="0"/>
+            <TerminalParameter name="upperBounds" type="double" value="30"/>
+        </MultiParameter>
+        <Coordinate x="80" y="70"/>
+    </SimEntity>
+    <SimEntity description="" name="PoissonPlot" type="RandomVariateGeneration.RandomVariatePlotter">
+        <MultiParameter type="diskit.random.Histogram">
+            <MultiParameter type="diskit.random.RandomVariateInstantiator">
+                <MultiParameter type="diskit.random.AR1Variate"/>
+                <MultiParameter type="diskit.random.BernoulliVariate"/>
+                <MultiParameter type="diskit.random.BetaVariate"/>
+                <MultiParameter type="diskit.random.BinomialVariate"/>
+                <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+                <MultiParameter type="diskit.random.ExponentialVariate"/>
+                <MultiParameter type="diskit.random.GammaVariate"/>
+                <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+                <MultiParameter type="diskit.random.NormalVariate"/>
+                <MultiParameter type="diskit.random.PoissonVariate">
+                    <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value="20"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.random.UniformVariate"/>
+            </MultiParameter>
+            <TerminalParameter name="number of samples" type="int" value="1000"/>
+            <TerminalParameter name="number of histogram bins" type="int" value="50"/>
+            <TerminalParameter name="lowerBounds" type="double" value="0"/>
+            <TerminalParameter name="upperBounds" type="double" value="30"/>
+        </MultiParameter>
+        <Coordinate x="80" y="190"/>
+    </SimEntity>
+    <SimEntity description="" name="BernoulliPlot" type="RandomVariateGeneration.RandomVariatePlotter">
+        <MultiParameter type="diskit.random.Histogram">
+            <MultiParameter type="diskit.random.RandomVariateInstantiator">
+                <MultiParameter type="diskit.random.AR1Variate"/>
+                <MultiParameter type="diskit.random.BernoulliVariate">
+                    <TerminalParameter name="P{X=1} (0.0 -&gt; 1.0)" type="double" value=".8"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.random.BetaVariate"/>
+                <MultiParameter type="diskit.random.BinomialVariate"/>
+                <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+                <MultiParameter type="diskit.random.ExponentialVariate"/>
+                <MultiParameter type="diskit.random.GammaVariate"/>
+                <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+                <MultiParameter type="diskit.random.NormalVariate"/>
+                <MultiParameter type="diskit.random.PoissonVariate"/>
+                <MultiParameter type="diskit.random.UniformVariate"/>
+            </MultiParameter>
+            <TerminalParameter name="number of samples" type="int" value="1000"/>
+            <TerminalParameter name="number of histogram bins" type="int" value="50"/>
+            <TerminalParameter name="lowerBounds" type="double" value="0"/>
+            <TerminalParameter name="upperBounds" type="double" value="5"/>
+        </MultiParameter>
+        <Coordinate x="160" y="70"/>
+    </SimEntity>
+    <SimEntity description="" name="GammaPlot" type="RandomVariateGeneration.RandomVariatePlotter">
+        <MultiParameter type="diskit.random.Histogram">
+            <MultiParameter type="diskit.random.RandomVariateInstantiator">
+                <MultiParameter type="diskit.random.AR1Variate"/>
+                <MultiParameter type="diskit.random.BernoulliVariate"/>
+                <MultiParameter type="diskit.random.BetaVariate"/>
+                <MultiParameter type="diskit.random.BinomialVariate"/>
+                <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+                <MultiParameter type="diskit.random.ExponentialVariate"/>
+                <MultiParameter type="diskit.random.GammaVariate">
+                    <TerminalParameter name="alpha (0 -&gt; +Infinity)" type="double" value="2"/>
+                    <TerminalParameter name="beta (0 -&gt; +Infinity)" type="double" value="5"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+                <MultiParameter type="diskit.random.NormalVariate"/>
+                <MultiParameter type="diskit.random.PoissonVariate"/>
+                <MultiParameter type="diskit.random.UniformVariate"/>
+            </MultiParameter>
+            <TerminalParameter name="number of samples" type="int" value="1000"/>
+            <TerminalParameter name="number of histogram bins" type="int" value="50"/>
+            <TerminalParameter name="lowerBounds" type="double" value="0.0"/>
+            <TerminalParameter name="upperBounds" type="double" value="30"/>
+        </MultiParameter>
+        <Coordinate x="160" y="130"/>
+    </SimEntity>
+    <Schedule stopTime="100." verbose="false"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+
