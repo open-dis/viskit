@@ -44,6 +44,8 @@
     
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
     
+    <property description="Behavior Libraries Directory" location="${basedir}/BehaviorLibraries" name="behavior.lib" />
+    
     <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
               
     <property description="Simasm utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
@@ -252,11 +254,17 @@
     <target depends="jar, doc" name="dist">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc"/>
+        <mkdir dir="${dir.dist}/BehaviorLibraries"/>
         <copy todir="${dir.dist}">
             <fileset dir="${dir.build.lib}"/>
         </copy>
         <copy todir="${dir.dist}/doc">
             <fileset dir="${dir.build.doc}"/>
+        </copy>
+        <copy todir="${dir.dist}/BehaviorLibraries">
+            <fileset dir="${behavior.lib}">
+            	<include name="**/*.xml"/>
+            </fileset>
         </copy>
     </target>
 
