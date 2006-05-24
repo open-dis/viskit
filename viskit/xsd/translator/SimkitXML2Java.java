@@ -189,6 +189,10 @@ public class SimkitXML2Java {
                     ;
                 }
 
+                if (!java.lang.reflect.Modifier.isPublic(cst.getModifiers())) {
+                    cst = null;
+                }
+                
 		if ( cst != null ) pw.println(sp4 + "protected" + sp + s.getType() + sp
 			+ s.getName() + sp + eq + sp + "new" + sp
 			+ s.getType() + lp + rp + sc ) ;
