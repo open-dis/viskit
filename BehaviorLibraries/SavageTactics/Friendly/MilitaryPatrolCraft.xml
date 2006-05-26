@@ -12,6 +12,12 @@
     <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
         <Comment>General areas from which waypoints should be generated for this entity.</Comment>
     </Parameter>
+    <Parameter name="driverReactionTime" type="diskit.random.RandomVariateInstantiator">
+        <Comment>The reaction time of the driver to detection events and radio orders</Comment>
+    </Parameter>
+    <Parameter name="communicationsChannel" type="int">
+        <Comment>The communications channel used by this entity</Comment>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -63,9 +69,6 @@
     <StateVariable name="successfulIntercepts" type="int">
         <Comment>[DATA] Total number of successful intercepts</Comment>
     </StateVariable>
-    <StateVariable name="unsuccessfulIntercepts" type="int">
-        <Comment>[DATA] Total number of successful intercepts</Comment>
-    </StateVariable>
     <StateVariable name="speed" type="double">
         <Comment>[DATA] Used to collect speed statistics for this entity</Comment>
     </StateVariable>
@@ -74,6 +77,18 @@
     </StateVariable>
     <StateVariable name="distanceFromMissedAttacker" type="double">
         <Comment>[DATA] Distance from attacker at time of successful attack</Comment>
+    </StateVariable>
+    <StateVariable name="radioCommunication" type="diskit.RadioCommunication">
+        <Comment>A radio communication template used to construct and transmit radio messages through the scenario manager</Comment>
+    </StateVariable>
+    <StateVariable name="responseFromContact" type="boolean">
+        <Comment>Whether or not a contact that has been called on the radio has answered</Comment>
+    </StateVariable>
+    <StateVariable name="timeSpentIntercepting" type="double">
+        <Comment>[DATA] The time it takes to intercept a contact</Comment>
+    </StateVariable>
+    <StateVariable name="driverResponseTime" type="double">
+        <Comment>[DATA] The response time of the driver</Comment>
     </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
@@ -91,6 +106,12 @@
         </StateTransition>
         <StateTransition state="speedScale">
             <Assignment value="1.0"/>
+        </StateTransition>
+        <StateTransition state="responseFromContact">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="timeSpentIntercepting">
+            <Assignment value="0"/>
         </StateTransition>
         <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
             <Comment>If zones have been specified, schedule movement setup events</Comment>
@@ -117,6 +138,12 @@
         </StateTransition>
         <StateTransition state="contactPicture">
             <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication(communicationsChannel, this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(friendlyForceList)"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -208,7 +235,10 @@ start();</Code>
         <LocalVariable name="alreadyIDd" type="boolean" value="contactPicture.contains(contact)">
             <Comment>Check to see if this contact is part of the entity's contact picture</Comment>
         </LocalVariable>
-        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact, (avoidanceRange + contact.getEntityDefinition().getWidth()))">
+        <LocalVariable name="entitySize" type="double" value="contact.getBoundingBox().getArea()">
+            <Comment>TODO: Higher fidelity intercept</Comment>
+        </LocalVariable>
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact, avoidanceRange)">
             <Comment>Check to see if intercept is possible</Comment>
         </LocalVariable>
         <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
@@ -217,15 +247,19 @@ start();</Code>
         <LocalVariable name="contactSpeed" type="double" value="contact.getEntityDefinition().getMaximumSpeed()">
             <Comment>TODO: Remove this and add an obstacle check, buoys, barriers, etc, will have slow movement</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == collisionDetection" delay="0.0" event="AssessObstacle" priority="0">
+        <StateTransition state="driverResponseTime">
+            <Assignment value="driverReactionTime.generate()"/>
+        </StateTransition>
+        <Schedule condition="sensor == collisionDetection &amp;&amp; (alreadyIDd || isFriendlyForce)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp; !alreadyIDd &amp;&amp; canIntercept" delay="0.0" event="Intercept" priority="0">
-            <Comment>If this is the largest sensor, and I haven't IDd the contact, and I can intercept it I will</Comment>
+        <Schedule condition="sensor == visualPerception &amp;&amp;  !isFriendlyForce &amp;&amp; !alreadyIDd &amp;&amp;  contact.getCruiseSpeed() &gt; 0 &amp;&amp;  canIntercept &amp;&amp; tacticalMode != diskit.TacticalMode.INTERCEPTING" delay="0.0" event="Intercept" priority="0">
+            <Comment>Evaluate whether this contact should be intercepted and react to it based on the drivers response time</Comment>
+            <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="360" y="10"/>
+        <Coordinate x="680" y="20"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
@@ -240,7 +274,7 @@ start();</Code>
             <EdgeParameter value="obstacle"/>
         </Schedule>
         <Code/>
-        <Coordinate x="420" y="100"/>
+        <Coordinate x="680" y="140"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>If a collision will occur avoid the obstacle using the avoidance mover manager. The avoidance mover manager will perform the avoidance and then reset the activeMoverManager to its pre-avoidance value after completing the avoidance maneuver.</Comment>
@@ -256,9 +290,8 @@ start();</Code>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
         </StateTransition>
-        <Schedule event="ResumePatrol"/>
         <Code/>
-        <Coordinate x="420" y="200"/>
+        <Coordinate x="680" y="240"/>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
@@ -273,11 +306,14 @@ start();</Code>
 multipleSensors[1] = collisionDetection;</Code>
         <Coordinate x="10" y="150"/>
     </Event>
-    <Event name="NauticalChartReceived">
+    <Event name="AStarZoneMapDistributed">
         <Comment>Recieves a copy of a Utilities.NauticalChart object from the Scenario Manager. When the NauticalChart registers with this simulation the scenario manager schedules a 'doNauticalChartRecieved' event for all movers registered with the simulation.  Only those entities with this exact event will actually receive the nautical chart object. It will be ignored otherwise.</Comment>
-        <Argument name="nauticalChart" type="diskit.AStarZoneMap">
+        <Argument name="harborChart" type="diskit.AStarZoneMap">
             <Comment>An A* zone map that is used as a nautical chart</Comment>
         </Argument>
+        <StateTransition state="nauticalChart">
+            <Assignment value="harborChart"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="10" y="220"/>
     </Event>
@@ -292,47 +328,123 @@ multipleSensors[1] = collisionDetection;</Code>
         <LocalVariable name="timeToIntercept" type="double" value="getInterceptTime()">
             <Comment>Get the amount of time that it will take to intercept this contact</Comment>
         </LocalVariable>
+        <LocalVariable name="contactLocation" type="java.lang.String" value="nauticalChart.findClosestZone(contact.getLocation()).getName()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="report" type="java.lang.String" value="&quot;All stations this is &quot; + getName() + &quot;.  I am enroute to identify an unknown contact in the vicinity of &quot; + contactLocation + &quot;. Over..&quot;">
+            <Comment/>
+        </LocalVariable>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.INTERCEPTING"/>
         </StateTransition>
-        <StateTransition state="targetQueue">
-            <Operation method="add(contact)"/>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(report)"/>
         </StateTransition>
-        <Schedule condition="true" delay="timeToIntercept - .01" event="EvaluateContact" priority="0">
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(contact)"/>
+        </StateTransition>
+        <StateTransition state="responseFromContact">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="timeSpentIntercepting">
+            <Assignment value="timeToIntercept"/>
+        </StateTransition>
+        <Schedule condition="true" delay="timeToIntercept" event="QueryContact" priority="0">
             <Comment/>
+            <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>//System.out.println("RHIB doIntercept");
-setCruiseSpeed(getMaximumSpeed());
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code>setCruiseSpeed(getMaximumSpeed());
 setStartPosition(getLocation());
-setDestination(interceptPoint);
-/*
-System.out.println("***Simulation Time ***");
-System.out.println(Schedule.getSimTime());
-System.out.println("----------EVENT------------");
-System.out.println("RHIB Intercepting: " + contact.getMoverID());
-System.out.println("Intercepting to:     " + interceptPoint);
-System.out.println("Time To Intercept: " + timeToIntercept + "\n");
-*/
-/*System.out.println("RHIB intercepting contact: " + contact.getName());*/</Code>
-        <Coordinate x="300" y="100"/>
+setDestination(interceptPoint);</Code>
+        <Coordinate x="510" y="120"/>
     </Event>
-    <Event name="EvaluateContact">
-        <Comment/>
+    <Event name="QueryContact">
+        <Comment>After completing an intercept this vessel will call the contact on the radio to make an identification and shadow the contacts course and speed</Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact of interest</Comment>
+        </Argument>
+        <LocalVariable name="contactLocation" type="java.lang.String" value="nauticalChart.findClosestZone(contact.getLocation()).getName()">
+            <Comment>The general area of this contact</Comment>
+        </LocalVariable>
+        <LocalVariable name="query" type="java.lang.String" value="&quot;Unidentified contact in the vicinity of &quot; + contactLocation +&quot;. This is &quot; + getName() + &quot;. Request you identify yourself and your intentions...Over&quot;">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipient(contact)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;Query&quot;)"/>
+        </StateTransition>
+        <StateTransition state="successfulIntercepts">
+            <Assignment value="successfulIntercepts + 1"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(query)"/>
+        </StateTransition>
         <Schedule event="IDContact"/>
-        <Code/>
-        <Coordinate x="300" y="200"/>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Schedule condition="!responseFromContact" delay="getDuration()" event="QueryContact" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>setStartPosition(getLocation());
+setCruiseSpeed(contact.getCruiseSpeed());
+setDestination(contact.getDestination());</Code>
+        <Coordinate x="390" y="120"/>
     </Event>
     <Event name="IDContact">
-        <Comment/>
-        <Schedule event="SecurityAlert"/>
+        <Comment>Contact has been identified and is not in any exclusion zone. Add to contact picture and make contact report to other friendly forces</Comment>
+        <Argument name="identifiedContact" type="diskit.Mover3D">
+            <Comment>The contact that was identified</Comment>
+        </Argument>
+        <LocalVariable name="contactReport" type="java.lang.String" value="&quot;All stations, this is &quot; + getName() + &quot; contact has been identified as a &quot; + identifiedContact.getEntityType()">
+            <Comment>Contact report to send to all friendly forces</Comment>
+        </LocalVariable>
+        <StateTransition state="contactPicture">
+            <Operation method="add(identifiedContact)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(friendlyForceList)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(identifiedContact)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;ContactReport&quot;)"/>
+        </StateTransition>
+        <StateTransition state="contactIDs">
+            <Assignment value="contactIDs + 1"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(contactReport)"/>
+        </StateTransition>
         <Schedule event="ResumePatrol"/>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
         <Code/>
         <Coordinate x="300" y="300"/>
     </Event>
     <Event name="ResumePatrol">
         <Comment/>
-        <Code/>
-        <Coordinate x="420" y="300"/>
+        <LocalVariable name="patrolDestination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment>Resuming patrol so pick a waypoint</Comment>
+        </LocalVariable>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.PATROLLING"/>
+        </StateTransition>
+        <Code>setStartPosition(getLocation());
+setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
+setDestination(patrolDestination);</Code>
+        <Coordinate x="200" y="300"/>
     </Event>
     <Event name="PursueHostile">
         <Comment/>
@@ -363,6 +475,68 @@ System.out.println("Time To Intercept: " + timeToIntercept + "\n");
         <Schedule event="PursueHostile"/>
         <Code/>
         <Coordinate x="300" y="380"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment/>
+        <Argument name="message" type="diskit.RadioCommunication"/>
+        <Code/>
+        <Coordinate x="450" y="240"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>A radio message was transmitted by the scenario manager to this entity</Comment>
+        <Argument name="message" type="diskit.RadioCommunication">
+            <Comment>A radio communication object</Comment>
+        </Argument>
+        <LocalVariable name="messageType" type="java.lang.String" value="message.getType()">
+            <Comment>The type of message being received</Comment>
+        </LocalVariable>
+        <LocalVariable name="sender" type="diskit.Mover3D" value="message.getSender()">
+            <Comment>The contact that sent the message</Comment>
+        </LocalVariable>
+        <LocalVariable name="contact" type="diskit.Mover3D" value="message.getContext()">
+            <Comment>The context of this message</Comment>
+        </LocalVariable>
+        <Schedule condition="sender != this &amp;&amp; 
+messageType != null &amp;&amp;
+messageType.equals(&quot;QueryResponse&quot;)" delay="0.0" event="QueryResponseReceived" priority="0">
+            <Comment>Response received process the response</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " received a message");
+System.out.println(contact.getName());</Code>
+        <Coordinate x="590" y="440"/>
+    </Event>
+    <Event name="QueryResponseReceived">
+        <Comment>When the contact makes a response the radio transmission recieved is processed</Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact that made the response</Comment>
+        </Argument>
+        <LocalVariable name="reply" type="java.lang.String" value="contact.getName() + &quot; this is &quot; + getName() + &quot;. Thank you for your cooperation, have a good day. Out&quot;">
+            <Comment>Basic reply</Comment>
+        </LocalVariable>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipient(contact)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;GeneralMessage&quot;)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(reply)"/>
+        </StateTransition>
+        <Cancel condition="true" event="QueryContact">
+            <Comment>The contact responded so stop evaluating it</Comment>
+            <EdgeParameter value="contact"/>
+        </Cancel>
+        <Schedule condition="true" delay="driverReactionTime.generate()" event="IDContact" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="590" y="290"/>
     </Event>
 </SimEntity>
 

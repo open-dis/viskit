@@ -10,6 +10,12 @@
     <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
         <Comment>General areas from which waypoints should be generated for this entity.</Comment>
     </Parameter>
+    <Parameter name="communicationDelay" type="diskit.random.RandomVariateInstantiator">
+        <Comment>The distribution of the delay for a signal to be transmitted from this platform</Comment>
+    </Parameter>
+    <Parameter name="commsChannel" type="int">
+        <Comment>The channel that this entity is communicating on</Comment>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The range of the camera sensor on this platform</Comment>
     </StateVariable>
@@ -58,6 +64,21 @@
     <StateVariable name="altitudeFloor" type="double">
         <Comment>The lowest altitude that this platform should be at during normal operation (e.g. not landing)</Comment>
     </StateVariable>
+    <StateVariable name="radioCommunication" type="diskit.RadioCommunication">
+        <Comment>An object used to transmit radio Communications</Comment>
+    </StateVariable>
+    <StateVariable name="contactPicture" type="diskit.ContactPicture">
+        <Comment>A local list of contacts that have been reported</Comment>
+    </StateVariable>
+    <StateVariable name="transmitDelay" type="double">
+        <Comment>The delay for sending communciation signals</Comment>
+    </StateVariable>
+    <StateVariable name="harborChart" type="diskit.AStarZoneMap">
+        <Comment>A local copy of an AStarZoneMap object,recevied from the ScenarioManager</Comment>
+    </StateVariable>
+    <StateVariable name="reportedContacts" type="int">
+        <Comment>Tally of contacts reported by this entity</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
         <StateTransition state="tacticalMode">
@@ -103,6 +124,24 @@
         </StateTransition>
         <StateTransition state="collisionDetection">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="contactPicture">
+            <Operation method="clear()"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication()"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setSender(this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setChannel(commsChannel)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(friendlyForceList)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;UAV Contact Report&quot;)"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -179,12 +218,25 @@ start();</Code>
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>The mover that was detected</Comment>
         </Argument>
+        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
+            <Comment>Whether or not this contact is a friendly force</Comment>
+        </LocalVariable>
+        <LocalVariable name="alreadyIDd" type="boolean" value="contactPicture.contains(contact)">
+            <Comment>Whether or not the contact has been added to this entity's contact picture</Comment>
+        </LocalVariable>
         <Schedule condition="sensor == collisionDetection" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
+        <Schedule condition="sensor == airSearchRadar &amp;&amp;
+!isFriendlyForce &amp;&amp;
+!alreadyIDd &amp;&amp;
+contact.getCruiseSpeed() &gt; 0" delay="0.0" event="PrepareContactMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="300" y="90"/>
+        <Coordinate x="300" y="10"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
@@ -231,6 +283,61 @@ start();</Code>
 multipleSensors[1] = airSearchRadar;
 multipleSensors[2] = collisionDetection;</Code>
         <Coordinate x="10" y="150"/>
+    </Event>
+    <Event name="PrepareContactMessage">
+        <Comment>Prepares the contact report, calculates the delay, and adds this contact to the contact picture</Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact of interest</Comment>
+        </Argument>
+        <LocalVariable name="contactLocation" type="java.lang.String" value="harborChart.findClosestZone(contact.getLocation()).getName()">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="report" type="java.lang.String" value="&quot;|Contact Report| &quot; + getName() + &quot; detects unidentified contact IVO &quot; + contactLocation + &quot; --|| End Transmission&quot;">
+            <Comment>Contact report template from this object</Comment>
+        </LocalVariable>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(contact)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setTimeStamp(Schedule.getSimTime())"/>
+        </StateTransition>
+        <StateTransition state="transmitDelay">
+            <Assignment value="communicationDelay.generate()"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(report)"/>
+        </StateTransition>
+        <StateTransition state="contactPicture">
+            <Operation method="add(contact)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="transmitDelay" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="400" y="10"/>
+    </Event>
+    <Event name="AStarZoneMapDistributed">
+        <Comment>Receives a copy of a registered AStarZoneMap if one exists</Comment>
+        <Argument name="zoneMap" type="diskit.AStarZoneMap">
+            <Comment>The A* zone map for this simulation</Comment>
+        </Argument>
+        <StateTransition state="harborChart">
+            <Assignment value="zoneMap"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="10" y="240"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits the radio message through the scenario manager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message to be transmitted</Comment>
+        </Argument>
+        <StateTransition state="reportedContacts">
+            <Assignment value="reportedContacts + 1"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="400" y="90"/>
     </Event>
 </SimEntity>
 
