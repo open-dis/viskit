@@ -10,6 +10,12 @@
     <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
         <Comment>General areas from which waypoints should be generated for this entity.</Comment>
     </Parameter>
+    <Parameter name="radioResponseTime" type="diskit.random.RandomVariateInstantiator">
+        <Comment>The amount of time it takes for this entity to respond to radio communications</Comment>
+    </Parameter>
+    <Parameter name="communicationsChannel" type="int">
+        <Comment>The channel that this entity is listening to</Comment>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -58,6 +64,12 @@
     <StateVariable name="nauticalChart" type="diskit.AStarZoneMap">
         <Comment>The nautical chart object received from the scenario manager</Comment>
     </StateVariable>
+    <StateVariable name="radioCommunication" type="diskit.RadioCommunication">
+        <Comment>An object that represents a radio communication</Comment>
+    </StateVariable>
+    <StateVariable name="radioResponseDelay" type="double">
+        <Comment>The individual delay for each radio response</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
         <StateTransition state="tacticalMode">
@@ -103,6 +115,15 @@
         </StateTransition>
         <StateTransition state="collisionDetection">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication()"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setSender(this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setChannel(communicationsChannel)"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -251,6 +272,65 @@ multipleSensors[2] = collisionDetection;</Code>
         </Argument>
         <Code/>
         <Coordinate x="10" y="220"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>A radio message was received by this entity</Comment>
+        <Argument name="message" type="diskit.RadioCommunication">
+            <Comment>The radio communication object received</Comment>
+        </Argument>
+        <LocalVariable name="messageType" type="java.lang.String" value="message.getType()">
+            <Comment>Indicates the type of message sent</Comment>
+        </LocalVariable>
+        <StateTransition state="radioResponseDelay">
+            <Assignment value="radioResponseTime.generate()"/>
+        </StateTransition>
+        <Schedule condition="messageType.equals(&quot;Query&quot;)" delay="radioResponseDelay" event="RespondToQuery" priority="0">
+            <Comment/>
+            <EdgeParameter value="message"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="400" y="170"/>
+    </Event>
+    <Event name="RespondToQuery">
+        <Comment>Responds to a query radio communication</Comment>
+        <Argument name="originalMessage" type="diskit.RadioCommunication">
+            <Comment>The original message received by this entity</Comment>
+        </Argument>
+        <LocalVariable name="recipient" type="diskit.Mover3D" value="originalMessage.getSender()">
+            <Comment>Identifies the original sender as the recipient for the reply</Comment>
+        </LocalVariable>
+        <LocalVariable name="reply" type="java.lang.String" value="recipient.getName() + &quot; this is a &quot; + getName() + &quot;. I'm just conducting normal transit. Over...&quot;">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipient(recipient)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(reply)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;QueryResponse&quot;)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setTimeStamp(Schedule.getSimTime())"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="10" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " RadioDelay " + radioResponseDelay);</Code>
+        <Coordinate x="400" y="270"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits a radio communication object through the scenario manager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message to transmit</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="480" y="270"/>
     </Event>
 </SimEntity>
 

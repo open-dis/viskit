@@ -92,6 +92,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="terroristLeader" type="simkit.SimEntity">
         <Comment>The entity that is giving the orders to this terrorist</Comment>
     </StateVariable>
+    <StateVariable name="attackDelay" type="double">
+        <Comment>The amount of time from when an order is received</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">

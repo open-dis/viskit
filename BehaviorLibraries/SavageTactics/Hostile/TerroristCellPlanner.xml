@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="SimEntityBase" name="TerroristCellPlanner" package="Hostile" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.HostileForce" name="TerroristCellPlanner" package="Hostile" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This object connects to a nautical chart and uses that information to develop and adjust attack plans.  It passes attack plans to the entities that are listed as potential terrorist platforms. These entities must be listening to this object to get the information.  Starting positions are selected from the perimeter zones of the nautical chart. 
 
 Terrorists report back to this object as to whether or not they were succesfull. Adjustments are made and the cell planner will issue new attack orders based on it's evaluation of the success of the mission.
 
-The planner also stops a simulation run when it thinks that a complete attack is over.</Comment>
+The planner also stops a simulation run when it thinks that a complete attack is over.
+
+NOTE: Though this entity is not a mover it is instantiated as one so that it has access to the hostileForceList that is resident in the superclass diskit.HostileForce. It is important to have the starting position of this entity definition so far from the environment (e.g. 10000 meters below where all other entites are) that it will not be detected by any of the movers in a simulation run.</Comment>
+    <Parameter name="entityID" type="int">
+        <Comment>Unique DIS entity ID number</Comment>
+    </Parameter>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The SMAL entity definition for this entity</Comment>
+    </Parameter>
     <Parameter name="terroristIDs" type="int[]">
         <Comment>The moverID numbers for all entities that can be used as a terrorist platform</Comment>
     </Parameter>
@@ -16,6 +24,12 @@ The planner also stops a simulation run when it thinks that a complete attack is
     </Parameter>
     <Parameter name="tacticalOptions" type="diskit.Tactic[]">
         <Comment>A list of the possible tactics that the cell may choose to employ</Comment>
+    </Parameter>
+    <Parameter name="attackStartDelay" type="diskit.random.RandomVariateInstantiator">
+        <Comment>The distribution of delay times for this object to use</Comment>
+    </Parameter>
+    <Parameter name="communicationsChannel" type="int">
+        <Comment>The communication channel for this entity</Comment>
     </Parameter>
     <StateVariable name="harborChart" type="diskit.AStarZoneMap">
         <Comment>A chart of all of the areas where an agent can travel</Comment>
@@ -53,6 +67,12 @@ The planner also stops a simulation run when it thinks that a complete attack is
     <StateVariable name="mapReceived" type="boolean">
         <Comment>This is a special case filter that prevents multiple scheduling of the 'doAStarZoneMapDistributed' event as a result of the bi-directional listener between this object in terrorists. Without this flag multiple events would be scheduled (one from the scenario manager and one for each connected terrorist)</Comment>
     </StateVariable>
+    <StateVariable name="radioCommunication" type="diskit.RadioCommunication">
+        <Comment>The communication object used to send/display messages in this simulation</Comment>
+    </StateVariable>
+    <StateVariable name="attackStartTime" type="double">
+        <Comment>The time chosen for an attack to start</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="planIndex">
@@ -78,15 +98,13 @@ The planner also stops a simulation run when it thinks that a complete attack is
         <StateTransition state="rn">
             <Assignment value="new java.util.Random()"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="ChoosePlatformsToDeploy" priority="0">
-            <Comment/>
-        </Schedule>
+        <Schedule event="ChoosePlatformsToDeploy"/>
         <Schedule condition="true" delay="0.0" event="TargetListSent" priority="0">
             <Comment/>
             <EdgeParameter value="targetPriorityList"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Code/>
+        <Code>System.out.println("AStarZoneMap in TCP");</Code>
         <Coordinate x="130" y="120"/>
     </Event>
     <Event name="ChoosePlatformsToDeploy">
@@ -104,7 +122,7 @@ The planner also stops a simulation run when it thinks that a complete attack is
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
-        <Code/>
+        <Code>System.out.println("Terrorist Selection draw: " + terroristSelection);</Code>
         <Coordinate x="130" y="200"/>
     </Event>
     <Event name="CreateAttackPlan">
@@ -169,11 +187,17 @@ The planner also stops a simulation run when it thinks that a complete attack is
         <LocalVariable name="tacticIdx" type="int" value="rn.nextInt(tacticalOptions.length)">
             <Comment>Picks a tactic index at random bounded by the length of the available options</Comment>
         </LocalVariable>
+        <LocalVariable name="attackStart" type="double" value="attackStartDelay.generate()">
+            <Comment>The time from when the order is sent to when the entity should attack</Comment>
+        </LocalVariable>
         <StateTransition state="selectedTactic">
             <Assignment value="tacticalOptions[tacticIdx]"/>
         </StateTransition>
+        <StateTransition state="attackStartTime">
+            <Assignment value="attackStart"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="AttackOrderSent" priority="0">
-            <Comment>Passes the current state variable values for attack plan components</Comment>
+            <Comment/>
             <EdgeParameter value="terroristID"/>
             <EdgeParameter value="attackPlanStartZone"/>
             <EdgeParameter value="attackPlanGoalZone"/>
@@ -196,15 +220,25 @@ The planner also stops a simulation run when it thinks that a complete attack is
         <Argument name="tactic" type="diskit.Tactic">
             <Comment>The name of the tactical behavior expected from this terrorist</Comment>
         </Argument>
+        <LocalVariable name="attackOrder" type="java.lang.String" value="&quot;Okay, terrorist # &quot; + entityID +&quot;. Start your attack  from &quot; +attackStart.getName() + &quot;.  When you arrive at &quot; + attackGoal.getName() + &quot; you are authorized to attack&quot;">
+            <Comment>The order that is being given for an attack</Comment>
+        </LocalVariable>
         <StateTransition state="planIndex">
             <Assignment value="planIndex + 1"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(attackOrder)"/>
         </StateTransition>
         <Schedule condition="planIndex &lt; totalPlans " delay="0.0" event="CreateAttackPlan" priority="0">
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
-        <Schedule condition="planIndex  == totalPlans" delay="0.0" event="BeginAttack" priority="0">
-            <Comment>Once all plans have been sent to the terrorists an order is transmitted to them to attack when ready</Comment>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Schedule condition="planIndex == totalPlans" delay="0.0" event="BeginAttack" priority="0">
+            <Comment/>
         </Schedule>
         <Code>System.out.println("**********************************");
 System.out.println("Terrorist Attack Order");
@@ -223,7 +257,16 @@ System.out.println("**********************************\n");</Code>
         <Argument name="terroristLeader" type="simkit.SimEntity">
             <Comment>Planner notifies the terrorists who the leader is so that reports can be received</Comment>
         </Argument>
-        <Code>System.out.println("TargetListSent by planner");</Code>
+        <LocalVariable name="targetOrders" type="java.lang.String" value="&quot;Listen up...your primary target is: &quot; + list[0]">
+            <Comment>String representation of the hi priority target for display purposes</Comment>
+        </LocalVariable>
+        <StateTransition state="radioCommunication">
+            <Operation method="setTimeStamp(Schedule.getSimTime())"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(targetOrders)"/>
+        </StateTransition>
+        <Code/>
         <Coordinate x="220" y="120"/>
     </Event>
     <Event name="BeginAttack">
@@ -261,6 +304,34 @@ TODO: Test to see if delay is needed</Comment>
         </Schedule>
         <Code/>
         <Coordinate x="30" y="510"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits diskit.RadioCommunication objects through the ScenarioManager</Comment>
+        <Argument name="message" type="diskit.RadioCommunication">
+            <Comment>The message to transmit</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="340" y="120"/>
+    </Event>
+    <Event name="Init">
+        <Comment>The initialization event for this simulation</Comment>
+        <Argument name="entity" type="simkit.SimEntity"/>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication(communicationsChannel, this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(hostileForceList)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="130" y="30"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Registers this entity with the simulation.</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>The mover to register</Comment>
+        </Argument>
+        <Code>System.out.println("RegisterTarget in TCP");</Code>
+        <Coordinate x="220" y="30"/>
     </Event>
 </SimEntity>
 
