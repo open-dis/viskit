@@ -634,7 +634,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void eventList()
   {
     // not used
-    System.out.println("EventListAction in " + this);
+    if (viskit.Vstatics.debug) System.out.println("EventListAction in " + this);
   }
 
   private int nodeCount = 0;

@@ -189,7 +189,7 @@ public class BooleanExpressionEditor extends JDialog
   {
     public void stateChanged(ChangeEvent event)
     {
-      System.out.println("stateChanged");
+      if (viskit.Vstatics.debug) System.out.println("stateChanged");
       modified = true;
       okButt.setEnabled(true);
       getRootPane().setDefaultButton(okButt);

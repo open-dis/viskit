@@ -291,7 +291,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     String typ;
     public void setType(String clName) throws ClassNotFoundException
    {
-        System.out.println("InstantiationPanel: Constructor for class "+clName);
+        if (viskit.Vstatics.debug) System.out.println("InstantiationPanel: Constructor for class "+clName);
         List[] parameters = Vstatics.resolveParameters(clName);
         typ = clName;
         removeAll();
@@ -354,9 +354,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             return;
         // oddly enough this is exactly what VInstantiator.indexOfArgNames(String type, List args)
         // 
-        System.out.println("setting data for "+vi.getType());
+        if (viskit.Vstatics.debug) System.out.println("setting data for "+vi.getType());
         int indx = vi.indexOfArgNames(vi.getType(),vi.getArgs());
-        System.out.println("found a matching constructor at "+indx);
+        if (viskit.Vstatics.debug) System.out.println("found a matching constructor at "+indx);
         constructorPanels[indx].setData(vi.getArgs());
         tp.setSelectedIndex(indx);
         actionPerformed(null);

@@ -242,6 +242,10 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
                 ret = gridRunner.qstatXML();
                 
+            } else if (call.equals("gridkit.getDesignPointCount")) {
+                
+                ret = gridRunner.getDesignPointCount();
+                
             } else {
                 
                 ret = new String("No such method \""+methodName+"\"! ");

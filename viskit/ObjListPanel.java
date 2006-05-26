@@ -49,7 +49,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         shadow = new VInstantiator[sz];
         JComponent[] contentObj = new JComponent[sz];
         
-        System.out.println("really has "+sz+"parameters");
+        if (viskit.Vstatics.debug) System.out.println("really has "+sz+"parameters");
         int i = 0;
         for (Iterator itr = lis.iterator(); itr.hasNext();i++) {
             VInstantiator inst = (VInstantiator) itr.next();
@@ -62,7 +62,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(0,2,0,2))); // some space at sides
             nameLab[i].setOpaque(true);
             nameLab[i].setBackground(new Color(255,255,255,64));
-            System.out.println("really set label "+nm);
+            if (viskit.Vstatics.debug) System.out.println("really set label "+nm);
             //}
             //else
             //nameLab = null; // if one is bad, disable all

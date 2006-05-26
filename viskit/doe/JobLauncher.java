@@ -316,17 +316,17 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     switch(action)
     {
       case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-        System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: "+
+        if (viskit.Vstatics.debug) System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: "+
                                       " " + file.getAbsolutePath());
         setFile(file.getAbsolutePath(),file.getName());
         break;
       case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-        System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: "+
+        if (viskit.Vstatics.debug) System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: "+
                                       " " + file.getAbsolutePath());
         setFile(null,null);
         break;
       case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-        System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: "+
+        if (viskit.Vstatics.debug) System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: "+
                                       " " + file.getAbsolutePath());
         setFile(file.getAbsolutePath(),file.getName());
         break;
@@ -597,7 +597,7 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
 
     Element propCh = el.getChild("PropertyChange");
     if (propCh == null) {
-      System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
+      if (viskit.Vstatics.debug) System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
       return res;
     }
     String listenerName = attValue(propCh, "listenerName");
@@ -605,7 +605,7 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
     java.util.List content = propCh.getContent();
     Text txt = (Text) content.get(0);
     String cstr = txt.getTextTrim();
-    System.out.println("got back " + cstr);
+    if (viskit.Vstatics.debug) System.out.println("got back " + cstr);
     String[] sa = cstr.split("\n");
     if (sa.length != 2) {
       System.out.println("PropertyChange parse error, design point = " + dp + ", run = " + nrun);

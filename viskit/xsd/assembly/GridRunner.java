@@ -168,7 +168,7 @@ public class GridRunner {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
-                System.out.println("Accepting jar transfer: "+filename+" of "+sequence);
+                if (debug) System.out.println("Accepting jar transfer: "+filename+" of "+sequence);
                 lastSequence = sequence;
                 jarData = new ByteArrayOutputStream();
                 jarData.write(data);
@@ -192,7 +192,7 @@ public class GridRunner {
                     // in no transfer. URL will be retrieved by Gridlets
                     // later.
                     thirdPartyJars.put(filename,u);
-                    System.out.println("Cached jar "+u);
+                    if (debug) System.out.println("Cached jar "+u);
                     
                 }
             }
@@ -691,7 +691,7 @@ public class GridRunner {
         while (it.hasNext()) {
             
             TerminalParameterType t = (TerminalParameterType) (it.next());
-            System.out.println("Batch Mode "+t);
+            if (debug) System.out.println("Batch Mode "+t);
             ValueRangeType range = t.getValueRange();
             Object returns;
             if ( range instanceof DoubleRange ) {

@@ -112,8 +112,8 @@ public abstract class VInstantiator
     public Constr(List params, String type) {
         super(type);
         
-        System.out.println("Building Constr for "+type);
-        System.out.println("Required Parameters:");
+        if (viskit.Vstatics.debug) System.out.println("Building Constr for "+type);
+        if (viskit.Vstatics.debug) System.out.println("Required Parameters:");
         java.util.ListIterator li = params.listIterator();
         while(li.hasNext()) {
             Object o = li.next();
@@ -129,7 +129,7 @@ public abstract class VInstantiator
                 s1 = ((ParameterType)o).getType(); System.out.print("\tEventGraph ParameterType");
 
             }  
-            System.out.println(" "+s1);
+            if (viskit.Vstatics.debug) System.out.println(" "+s1);
         }
         // gets lists of EventGraph parameters for type if top-level
         // or null if type is a basic class ie. java.lang.Double
@@ -146,12 +146,12 @@ public abstract class VInstantiator
                 if (paramsMatch(params,eparams[indx])) break;
                 else indx++;
             }
-            System.out.println("Using constructor #"+indx);
+            if (viskit.Vstatics.debug) System.out.println("Using constructor #"+indx);
             
             if (eparams[indx] != null) { 
                 // now that the values, types, etc set, grab names from eg parameters
                 if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
-                    System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
+                    if (viskit.Vstatics.debug) System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
                     ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
                     
                 }
@@ -186,7 +186,7 @@ public abstract class VInstantiator
             } else if (o instanceof FactoryParameterType) {
                 instr.add(buildFactoryParameter((FactoryParameterType)o));
             } else if (o instanceof ParameterType) { // from InstantiationPanel Const getter
-                System.out.println("Conversion from "+((ParameterType)o).getType()); // 
+                if (viskit.Vstatics.debug) System.out.println("Conversion from "+((ParameterType)o).getType()); // 
                 
                 List args = new ArrayList();
                 String type = ((ParameterType)o).getType();
@@ -276,7 +276,7 @@ public abstract class VInstantiator
     
     boolean paramsMatch(List aparams,List eparams) {
         if ( aparams.size() != eparams.size() ) {
-            System.out.println("No match.");
+            if (viskit.Vstatics.debug) System.out.println("No match.");
             return false;
         }
         
@@ -296,13 +296,13 @@ public abstract class VInstantiator
             System.out.print("Type match "+s1 + " to "+ s2);
             s1 = s1.split("\\.")[ s1.split("\\.").length - 1 ];
             s2 = s2.split("\\.")[ s2.split("\\.").length - 1 ];
-            System.out.println(" tail "+s1 + " " + s2); // eg. java.lang.String vs. String?
+            if (viskit.Vstatics.debug) System.out.println(" tail "+s1 + " " + s2); // eg. java.lang.String vs. String?
             if (!s1.equals(s2)) {
-                System.out.println("No match.");
+                if (viskit.Vstatics.debug) System.out.println("No match.");
                 return false;
             }
         }
-        System.out.println("Match.");
+        if (viskit.Vstatics.debug) System.out.println("Match.");
         return true;
         
     }
@@ -344,7 +344,7 @@ public abstract class VInstantiator
                   ((VInstantiator)(args.get(j))).setName(
                         ((ParameterType)(parameters[i].get(j))).getName()
                   );
-                  System.out.println(" to "+((ParameterType)(parameters[i].get(j))).getName());
+                  if (viskit.Vstatics.debug) System.out.println(" to "+((ParameterType)(parameters[i].get(j))).getName());
                           
               } 
               found = match;
@@ -357,7 +357,7 @@ public abstract class VInstantiator
           
           
       }
-      System.out.println("Resolving "+type+" "+parameters[indx]);
+      if (viskit.Vstatics.debug) System.out.println("Resolving "+type+" "+parameters[indx]);
       // the class manager caches Parameter List jaxb from the SimEntity.
       // if it didn't come from XML, then a null is returned. Probably
       // better to move the findArgNamesFromBeansStuff() to the class manager

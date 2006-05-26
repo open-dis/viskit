@@ -112,7 +112,7 @@ public class FindClassesForInterface
                     found.add(c);
                 }
             } catch (ClassNotFoundException e) {}
-
+              catch (Exception ex) { ex.printStackTrace(); }
         }
         return found;
     }

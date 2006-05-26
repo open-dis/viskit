@@ -63,8 +63,8 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         timer.stop();
         reset(); // also gets new textArea
         scrollPane = new JScrollPane(textArea);
-        add(sliderPanel);
-        add(scrollPane);
+        getContentPane().add(sliderPanel);
+        getContentPane().add(scrollPane);
         pack();
         setVisible(true);
     }

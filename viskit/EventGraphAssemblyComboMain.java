@@ -60,7 +60,7 @@ public class EventGraphAssemblyComboMain
         initialFile = args[0];
     }
 
-System.out.println("***Inside EventGraphAssembly main: " + args.length);
+    if (viskit.Vstatics.debug) System.out.println("***Inside EventGraphAssembly main: " + args.length);
     setLandFandFonts();
     JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
     VGlobals.instance().setMainAppWindow(mainFrame);

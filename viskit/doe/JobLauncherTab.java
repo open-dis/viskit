@@ -711,7 +711,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         //if(sa.length == 2)
         //  dataS = sa[1].trim();
         args.add(dataS);
-System.out.println(dataS);
+        if (viskit.Vstatics.debug) System.out.println(dataS);
         writeStatus("Sending job file to " + clusterDNS);
         Boolean retBool = (Boolean)rpc.execute("gridkit.setAssembly",args);
         writeStatus("gridkit.setAssembly returned " + retBool.booleanValue());
@@ -922,7 +922,7 @@ System.out.println(dataS);
     List content = propCh.getContent();
     Text txt = (Text) content.get(0);
     String cstr = txt.getTextTrim();
-    System.out.println("got back " + cstr);
+    if (viskit.Vstatics.debug) System.out.println("got back " + cstr);
     String[] sa = cstr.split("\n");
     if (sa.length != 2) {
       System.out.println("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
@@ -1239,13 +1239,13 @@ System.out.println(dataS);
   }
 
   private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s) {
-      System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint "+d+" sample "+s);
-      System.out.println(ret);
+      if (viskit.Vstatics.debug) System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint "+d+" sample "+s);
+      if (viskit.Vstatics.debug) System.out.println(ret);
       java.util.Enumeration stats = ret.elements();
       while ( stats.hasMoreElements() ) {
           String data = (String)stats.nextElement();
           try {
-              System.out.println("\tAdding data "+data);
+              if (viskit.Vstatics.debug) System.out.println("\tAdding data "+data);
               SampleStatisticsType sst = (SampleStatisticsType)unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
               
               statsGraph.addSampleStatistic(sst,d,s);

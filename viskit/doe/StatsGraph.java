@@ -66,7 +66,7 @@ public class StatsGraph extends JFrame {
         minMaxs = new Hashtable();
         chartPanels = new Hashtable();
         for (int i = 0; i < properties.length; i++) {
-            System.out.println("StatsGraph: createDataSets for "+properties[i]);
+            if (viskit.Vstatics.debug) System.out.println("StatsGraph: createDataSets for "+properties[i]);
             createDataSets(properties[i]);
             tabbedPane.add(properties[i],(ChartPanel)chartPanels.get(properties[i]));  
         }
@@ -88,7 +88,7 @@ public class StatsGraph extends JFrame {
         String name = sample.getName();
         DefaultStatisticalCategoryDataset statsData = (DefaultStatisticalCategoryDataset)meanAndStandardDeviations.get(name);
         DefaultIntervalCategoryDataset minMax = (DefaultIntervalCategoryDataset)minMaxs.get(name);
-        System.out.println("SampleStatisticType name: "+sample.getName());
+        if (viskit.Vstatics.debug) System.out.println("SampleStatisticType name: "+sample.getName());
         statsData.add(Double.parseDouble(sample.getMean()),Double.parseDouble(sample.getStandardDeviation()),"Design Point "+d,"Sample "+s);
         minMax.setStartValue(d,"Sample "+s,Double.valueOf(sample.getMinObs()));
         minMax.setEndValue(d,"Sample "+s,Double.valueOf(sample.getMaxObs()));
@@ -141,8 +141,8 @@ public class StatsGraph extends JFrame {
         renderer.setShape(new java.awt.geom.RoundRectangle2D.Double());
         plot.setDataset(1,(IntervalCategoryDataset)minMaxs.get(name));
         plot.setRenderer(1,renderer);
-        plot.setRowRenderingOrder(SortOrder.ASCENDING);
-        
+        //plot.setRowRenderingOrder(SortOrder.ASCENDING);
+        plot.setRowRenderingOrder(SortOrder.DESCENDING);
     }
     
     /**

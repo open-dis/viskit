@@ -71,6 +71,10 @@ public class ExternalAssemblyRunner extends JFrame
 
     runPanel.closeButt.addActionListener(closer);
 
+    // need runPanel.numRepsTF.something()
+    
+    runPanel.numRepsTF.addActionListener(new repsListener());
+    
     Class targetClass = null;
     try {
       targetClass = Vstatics.classForName(targetClassName);
@@ -375,11 +379,22 @@ public class ExternalAssemblyRunner extends JFrame
       runPanel.serrTA.setText(null);
     }
   }
+  class repsListener implements ActionListener
+  {
+      public void actionPerformed(ActionEvent e)
+      {
+          if (viskit.Vstatics.debug) System.out.println(e);
+          int reps = Integer.parseInt(runPanel.numRepsTF.getText());
+          ((viskit.xsd.assembly.BasicAssembly)targetObject).setNumberReplications(reps);
+        
+         
+      }
+  }
   class timekeeper extends simkit.SimEntityBase
   {
     public synchronized void doTick()
     {
-      System.out.println("doKeepTime");
+      if (viskit.Vstatics.debug) System.out.println("doKeepTime");
       this.waitDelay("Tick",0.0d);
     }
   }

@@ -131,8 +131,8 @@
       }
        public static void main(String[] args)
       {
-         System.out.println(System.getProperty("user.dir"));
-         System.out.println(System.getProperty("java.class.path"));
+         if (viskit.Vstatics.debug) System.out.println(System.getProperty("user.dir"));
+         if (viskit.Vstatics.debug) System.out.println(System.getProperty("java.class.path"));
          Splash2 spl = new Splash2();
          Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
          spl.setLocation((d.width-spl.getWidth())/2,(d.height-spl.getHeight())/2);

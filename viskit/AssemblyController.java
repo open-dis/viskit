@@ -46,7 +46,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   public void setInitialFile(String fil)
   {
-    System.out.println("Initial file set: " + fil);
+    if (viskit.Vstatics.debug) System.out.println("Initial file set: " + fil);
     initialFile = fil;
 
     // Seems this code requires this to be initialed if _doOpen is called
@@ -55,7 +55,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   }
 
   public void runAssembly(String initialFile) {
-      System.out.println("Running assembly: " + initialFile);
+      if (viskit.Vstatics.debug) System.out.println("Running assembly: " + initialFile);
       _doOpen(new File(initialFile));
 
       runAssembly();
@@ -66,7 +66,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     if (initialFile != null)
     {
-      System.out.println("Loading initial file: " + initialFile);
+      if (viskit.Vstatics.debug) System.out.println("Loading initial file: " + initialFile);
       _doOpen(new File(initialFile));
 
       runAssembly();
@@ -1032,8 +1032,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
          String cp = getCustomClassPath();
 
-//         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
-         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+         
          if(reti == 0 || completeOnBadCompile)
            return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
        }

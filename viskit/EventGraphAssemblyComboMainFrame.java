@@ -204,7 +204,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   }
   private void runLater(final long ms, final Runnable runr)
   {
-System.out.println("Run later: " + runr);
+    if (viskit.Vstatics.debug) System.out.println("Run later: " + runr);
     Thread t = new Thread(new Runnable()
     {
       public void run()
@@ -321,7 +321,7 @@ System.out.println("Run later: " + runr);
             //todo other postQuits here if needed
 
             thisClassCleanup();
-System.out.println("in actionPerformed of exit");
+            if (viskit.Vstatics.debug) System.out.println("in actionPerformed of exit");
             VGlobals.instance().sysExit(0);  // quit application
           }
         }

@@ -34,7 +34,10 @@ import java.util.StringTokenizer;
  */
 
 public class Boot extends URLClassLoader implements Runnable {
-    private static final boolean debug = false;
+    static Boot bootee;
+    static Thread booter;
+    static Thread runner;
+    private static final boolean debug = true;
     String[] args;
 
     public Boot(URL[] urls) {
@@ -46,10 +49,10 @@ public class Boot extends URLClassLoader implements Runnable {
     // TODO: -P ackage up a self contained jar given above args.
     public Boot(String[] args) {
         this(new URL[0]);
-        this.args=args;
+        setArgs(args);
     }
     
-    public void setArgs(String[] args) {
+    public void setArgs(final String[] args) {
         this.args=args;
     }
     
@@ -116,6 +119,7 @@ public class Boot extends URLClassLoader implements Runnable {
         JarEntry je;
         JarFile jf;
         JarInputStream jis;
+        String rev = getJavaRev();
         try {
             urlc = jarURL.openConnection();
             jis = new JarInputStream(urlc.getInputStream());
@@ -132,11 +136,19 @@ public class Boot extends URLClassLoader implements Runnable {
                 // needed to externalize the jars.
                 System.out.println("Help jar url"); 
             } else { // from a file, cache internal jars externally
-                super.addURL(jarURL);
+                //if ( !((jarURL.toString()).indexOf("tools") > 0))
+                //first time through would be the internal url which
+                //should be hopefully invalid
+                    super.addURL(jarURL);
 
                 while ( ( je = jis.getNextJarEntry() ) != null ) {
                     String name = je.getName();
                     
+                    // test for which javac to pack
+                    // note this depends on the builder to rename the tools.jars appropriately!
+                    if ((name.equals("tools14.jar") && rev.equals("java15")) ||  (name.equals("tools15.jar") && rev.equals("java14"))) {
+                        skip:;
+                    }
                     if ( name.endsWith("jar") ) {
                         if (debug) System.out.println("Found internal jar externalizing "+name);
                         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -163,6 +175,8 @@ public class Boot extends URLClassLoader implements Runnable {
                         if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));
                         
                     }
+                    skip:
+                        ;
 
                 }
             }
@@ -180,21 +194,35 @@ public class Boot extends URLClassLoader implements Runnable {
     }
     
     public void run() {
-        //load();
         try {
             Class lclaz = loadClass("viskit.xsd.cli.Launcher");
             Constructor lconstructor = lclaz.getConstructor(new Class[0]);
             Launcher launcher = (Launcher)lconstructor.newInstance(new Object[0]);
-            Thread runner = new Thread(launcher);
+            runner = new Thread(launcher);
             runner.setContextClassLoader(this);
             runner.start();
             runner.join();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    
+    private String getJavaRev() {
+        String rev = "java15";
+        try {
+            ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+            InputStream configIn = cloader.getResourceAsStream("config.properties");
+            Properties p = new Properties();
+            p.load(configIn);
+            if (p.getProperty("java.version").indexOf("1.4") > 0) {
+                rev = new String("java14");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rev;
+    }
     public static void main(String[] args) throws Exception {
         URL u = Boot.class.getClassLoader().getResource("viskit/xsd/cli/Boot.class");
         if (debug) System.out.println(u);
@@ -203,10 +231,9 @@ public class Boot extends URLClassLoader implements Runnable {
             u = ((JarURLConnection)urlc).getJarFileURL();
         }
         if (debug) System.out.println("Booting "+u);
-        Boot b = new Boot(new URL[] { u });
-        b.setArgs(args);
-        Thread boot = new Thread(b);
-        boot.start();
-        boot.join();
+        bootee = new Boot(new URL[] { u });
+        bootee.setArgs(args);
+        booter = new Thread(bootee);
+        booter.start();
     }
 }

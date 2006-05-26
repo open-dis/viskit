@@ -1,5 +1,6 @@
 package viskit.xsd.cli;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -20,12 +21,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 public class Launcher extends Thread implements Runnable {
-    ClassLoader cloader;
+    static ClassLoader cloader;
     Hashtable bytes;
     String assembly = null;
     String assemblyName;
     Hashtable eventGraphs = new Hashtable();
-    private static final boolean debug = false;
+    private static final boolean debug = true;
+    private boolean compiled = true;
     
     /**
      *  args -A ssemblyFile [-E ventGraphFile]
@@ -44,11 +46,13 @@ public class Launcher extends Thread implements Runnable {
             p.load(configIn);
             
             try {
+                compiled = (p.getProperty("Beanshell") == null);
                 if (p.getProperty("Gridkit") != null) {
                     launchGridkit(p.getProperty("Gridkit"));
-                } else if (p.getProperty("Assembly") != null ){
-                    System.out.println("Running Assembly "+p.getProperty("Assembly"));
+                } else if (p.getProperty("Assembly") != null ) {
+                    if ( debug ) System.out.println("Running Assembly "+p.getProperty("Assembly"));
                     u = cloader.getResource(p.getProperty("Assembly"));
+                    if ( debug ) System.out.println("From URL: "+u);
                     setAssembly(u);
                     StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
                     while ( st.hasMoreTokens() ) {
@@ -190,7 +194,73 @@ public class Launcher extends Thread implements Runnable {
         }
     }
     
-    public void exec() throws Exception {
+    public void exec() {
+        try {
+            if  ( this.compiled ) execCompiled(); else execInterpreted();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void execCompiled() throws Exception {
+        Class xml2jz;
+        Class axml2jz;
+        Class javacz;
+        Object out;
+        Method m;
+        Constructor c;
+        ByteArrayInputStream bais;
+        String assemblyJava;
+        
+        xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
+        axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
+        javacz = cloader.loadClass("com.sun.tools.javac.Main");
+        
+        try {
+            Enumeration e = eventGraphs.keys();
+            while ( e.hasMoreElements() ){
+                String eventGraphName = (String) (e.nextElement());
+                String eventGraph = (String)eventGraphs.get(eventGraphName);
+                String eventGraphJava;
+                
+                // unmarshal eventGraph xml
+                bais = new ByteArrayInputStream(eventGraph.getBytes());
+                c = xml2jz.getConstructor(new Class[]{ InputStream.class });
+                out = c.newInstance(new Object[]{ bais });
+                m = out.getClass().getDeclaredMethod("unmarshal", new Class[]{});
+                m.invoke(out, new Object[]{});
+                
+                // translate xml to generate java source
+                m = out.getClass().getDeclaredMethod("translate", new Class[]{});
+                out = m.invoke(out, new Object[]{});
+                eventGraphJava = new String((String)out);
+                if (debug) System.out.println(eventGraphJava);
+                
+                // create a temporary .java file
+                File tmpJava = File.createTempFile(eventGraphName,"java");
+                tmpJava.deleteOnExit();
+                byte[] javab = eventGraphJava.getBytes();
+                FileOutputStream fos = new FileOutputStream(tmpJava);
+                fos.write(javab);
+                fos.close();
+                
+                
+                // bsh eval generated java source
+                // m = bshz.getDeclaredMethod("eval", new Class[]{ String.class });
+                //m.invoke(bsh, new Object[]{ eventGraphJava });
+                
+                // sanity check bsh if eventGraph class exists
+                //m = bshcmz.getDeclaredMethod("classExists",  new Class[]{ String.class });
+                //out = m.invoke(bshcm, new Object[]{eventGraphName});
+                System.out.println("Checking if "+eventGraphName+" exists... "+((Boolean)out).toString());
+                
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void execInterpreted() throws Exception {
         Class xml2jz;
         Class axml2jz;
         Class bshz;
@@ -236,7 +306,7 @@ public class Launcher extends Thread implements Runnable {
                 // translate xml to generate java source
                 m = out.getClass().getDeclaredMethod("translate", new Class[]{});
                 out = m.invoke(out, new Object[]{});
-                eventGraphJava = (String)out;
+                eventGraphJava = new String((String)out);
                 if (debug) System.out.println(eventGraphJava);
                 
                 // bsh eval generated java source
@@ -282,7 +352,7 @@ public class Launcher extends Thread implements Runnable {
             out = c.newInstance(new Object[]{});
             Thread t = new Thread((Runnable)out);
             t.start();
-
+            t.join();
             // another one of many ways to do run the resulting assembly
             //m = bshz.getDeclaredMethod("eval", new Class[]{ String.class });
             //m.invoke(bsh,new Object[]{ "Thread t = new Thread(new "+assemblyName+"());"});

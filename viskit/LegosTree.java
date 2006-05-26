@@ -485,9 +485,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           } catch (NoSuchFieldException ex) {
               ;
           }
-          System.out.println("adding " + c.getName());
+          if (viskit.Vstatics.debug) System.out.println("adding " + c.getName());
           if (f != null) {
-              System.out.println(f+" is a parameterMap");
+              if (viskit.Vstatics.debug) System.out.println(f+" is a parameterMap");
               try {
                   // parameters are in the following order
                   // {
@@ -511,7 +511,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                                   p.setName(pname);
                                   p.setType(ptype);
                                   plist[n].add(p);
-                                  System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                                  if (viskit.Vstatics.debug) System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                               } catch (Exception e) {
                                   e.printStackTrace();
                               }
@@ -525,11 +525,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
               }
           } else {
               
-              System.out.println("\t # constructors: " + constr.length);
+              if (viskit.Vstatics.debug) System.out.println("\t # constructors: " + constr.length);
               for (int i = 0; i < constr.length; i ++) {
                   Class[] ptypes = constr[i].getParameterTypes();
                   plist[i] = new ArrayList();
-                  System.out.println("\t # params " + ptypes.length + " in constructor " + i);
+                  if (viskit.Vstatics.debug) System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                   for (int k = 0; k < ptypes.length; k++) {
                       try {
                           ParameterType p = of.createParameter();
@@ -540,7 +540,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                           p.setName("p[" + k + "] : ");
                           p.setType(ptname);
                           plist[i].add(p);
-                          System.out.println("\t " + p.getName() + p.getType());
+                          if (viskit.Vstatics.debug) System.out.println("\t " + p.getName() + p.getType());
                       } catch (Exception e) {
                           e.printStackTrace();
                       }

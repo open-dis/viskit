@@ -89,7 +89,7 @@ public class FileBasedClassManager implements Runnable
           SimEntityType simEntity =  (SimEntityType) um.unmarshal(f);
           List[] pa = new List[] { simEntity.getParameter() };
           Vstatics.putParameterList(fclass.getName(),pa);
-          System.out.println("Put "+fclass.getName()+simEntity.getParameter());
+          if (viskit.Vstatics.debug) System.out.println("Put "+fclass.getName()+simEntity.getParameter());
       } catch (Exception e) {;}
     }
     else if (f.getName().toLowerCase().endsWith(".class")) {
@@ -108,18 +108,6 @@ public class FileBasedClassManager implements Runnable
     return fban;
   }
 
-  // there are two available generic solutions we can enforce
-  // upon plugin writers, either way going to cause some effort
-  // on the part of the plugin, falling through, this method 
-  // should kick in for the "naked" case. 
-  // the "wetsuit" case would be to either embed or subclass each 
-  // class in the plugin to provide an array of names individually;
-  // the "drysuit" case would be to provide an xml registry file
-  // for the plugin inside its own jar that is simkit.xsd tags
-  // for all the parameters in the package. the nice thing about
-  // that is it requires no recompile of the base package, and
-  // can be customized for end user taste without recompile of
-  // base package.
   protected List[] listOfParamNamesForNakedClass(Class c) {
       // brrr. 
       // lets just take case 0
@@ -138,7 +126,7 @@ public class FileBasedClassManager implements Runnable
                   ParameterType p;
                   p = of.createParameter();
                   p.setName(" ");
-                  System.out.println("setting type "+zName);
+                  if (viskit.Vstatics.debug) System.out.println("setting type "+zName);
                   p.setType(zName);
                   l[j].add(p);
               } catch (javax.xml.bind.JAXBException e) {
