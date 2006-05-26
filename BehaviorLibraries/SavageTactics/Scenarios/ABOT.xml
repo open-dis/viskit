@@ -226,7 +226,7 @@
         </MultiParameter>
         <Coordinate x="190" y="270"/>
     </SimEntity>
-    <SimEntity description="" name="NauticalChart" type="Utilities.NauticalChart">
+    <SimEntity description="A chart object that collects all of the information one could derive from a nautical chart" name="NauticalChart" type="Utilities.NauticalChart">
         <MultiParameter type="diskit.AStarZoneGeometry[]">
             <MultiParameter type="diskit.AStarZoneGeometry">
                 <TerminalParameter name="name" type="java.lang.String" value="ABOTAreaEast"/>
@@ -482,6 +482,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="360" y="240"/>
     </SimEntity>
     <SimEntity description="" name="RHIB2" type="Friendly.MilitaryPatrolCraft">
@@ -593,6 +609,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="420" y="240"/>
     </SimEntity>
     <SimEntity description="USS O'Kane - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG77" type="Friendly.MilitaryShip">
@@ -781,7 +813,77 @@
         </MultiParameter>
         <Coordinate x="360" y="300"/>
     </SimEntity>
-    <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
+   <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
+        <TerminalParameter name="moverID" type="int" value="999"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value=""/>
+                <TerminalParameter name="reference" type="java.lang.String" value=""/>
+                <TerminalParameter name="rationale" type="java.lang.String" value=""/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist Cell Planner"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="0"/>
+                    <TerminalParameter name="width" type="double" value="0"/>
+                    <TerminalParameter name="length" type="double" value="0"/>
+                    <TerminalParameter name="draft" type="double" value="0"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="0"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="0"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="10000"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
         <MultiParameter type="int[]">
             <TerminalParameter name="" type="int" value="600"/>
             <TerminalParameter name="" type="int" value="601"/>
@@ -796,6 +898,22 @@
         <MultiParameter type="diskit.Tactic[]">
             <TerminalParameter name="" type="diskit.Tactic" value="diskit.Tactic.ATTACK"/>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value="30"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="20"/>
         <Coordinate x="280" y="390"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist1" type="Hostile.ExplosiveLadenVessel">
@@ -1126,6 +1244,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="480" y="300"/>
     </SimEntity>
     <SimEntity description="A commercial container ship with an arbitrary neutral country assigned (Panama)" name="CommerShip2" type="Neutral.CivilianMerchantShip">
@@ -1237,6 +1372,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="480" y="240"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow1" type="Neutral.CivilianMerchantShip">
@@ -1330,6 +1482,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="540" y="240"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow2" type="Neutral.CivilianMerchantShip">
@@ -1423,6 +1592,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="600" y="240"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow3" type="Neutral.CivilianMerchantShip">
@@ -1516,6 +1702,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="660" y="240"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow4" type="Neutral.CivilianMerchantShip">
@@ -1609,6 +1812,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="540" y="300"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow5" type="Neutral.CivilianMerchantShip">
@@ -1702,6 +1922,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="600" y="300"/>
     </SimEntity>
     <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow6" type="Neutral.CivilianMerchantShip">
@@ -1795,6 +2032,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="660" y="300"/>
     </SimEntity>
     <SimEntity description="AH-1W Super Cobra US Marine Corps helicopter" name="SuperCobra" type="Friendly.MilitaryHelicopter">
@@ -1980,6 +2234,23 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="130" y="240"/>
     </SimEntity>
     <SimEntity description="An Oil Tanker" name="OilTanker2" type="Neutral.CivilianMerchantShip">
@@ -2054,6 +2325,23 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="130" y="320"/>
     </SimEntity>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>

@@ -4,7 +4,7 @@
         <TerminalParameter name="isActive" type="boolean" value="true"/>
         <TerminalParameter name="duration" type="double" value=".2"/>
         <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
-        <Coordinate x="390" y="110"/>
+        <Coordinate x="290" y="40"/>
     </SimEntity>
     <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter name="speedScale" type="double" value=".5"/>
@@ -232,6 +232,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="560" y="140"/>
     </SimEntity>
     <SimEntity description="A SeaFox unmanned surface vehicle" name="SeaFox" type="Friendly.USV">
@@ -454,6 +471,23 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="5"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="2.8"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter type="int" value="128"/>
         <Coordinate x="560" y="200"/>
     </SimEntity>
     <SimEntity description="" name="RHIB" type="Friendly.MilitaryPatrolCraft">
@@ -547,6 +581,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
         <Coordinate x="560" y="260"/>
     </SimEntity>
     <SimEntity description="A chart object that collects all of the information one could derive from a nautical chart" name="NauticalChart" type="Utilities.NauticalChart">
@@ -1368,6 +1418,76 @@
         <Coordinate x="90" y="190"/>
     </SimEntity>
     <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
+        <TerminalParameter name="moverID" type="int" value="999"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value=""/>
+                <TerminalParameter name="reference" type="java.lang.String" value=""/>
+                <TerminalParameter name="rationale" type="java.lang.String" value=""/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist Cell Planner"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="0"/>
+                    <TerminalParameter name="width" type="double" value="0"/>
+                    <TerminalParameter name="length" type="double" value="0"/>
+                    <TerminalParameter name="draft" type="double" value="0"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="0"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="0"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="10000"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
         <MultiParameter type="int[]">
             <TerminalParameter name="" type="int" value="600"/>
             <TerminalParameter name="" type="int" value="601"/>
@@ -1382,6 +1502,22 @@
         <MultiParameter type="diskit.Tactic[]">
             <TerminalParameter name="" type="diskit.Tactic" value="diskit.Tactic.ATTACK"/>
         </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value="30"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="20"/>
         <Coordinate x="380" y="390"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist1" type="Hostile.ExplosiveLadenVessel">
@@ -1751,6 +1887,50 @@
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
         <Coordinate x="620" y="140"/>
     </SimEntity>
+    <SimEntity description="" name="BridgeToBridgeRadio" type="diskit.util.CommunicationDisplay">
+        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Communication Channel" type="int" value="16"/>
+        <TerminalParameter name="Description" type="java.lang.String" value="Bridge-To-Bridge Radio"/>
+        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
+        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.WHITE"/>
+        <Coordinate x="450" y="50"/>
+    </SimEntity>
+    <SimEntity description="UnmannedVehicleCommunications" name="UVComms" type="diskit.util.CommunicationDisplay">
+        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Communication Channel" type="int" value="128"/>
+        <TerminalParameter name="Description" type="java.lang.String" value="UAV/USV Communications"/>
+        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
+        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+        <Coordinate x="390" y="50"/>
+    </SimEntity>
+    <SimEntity description="Secure radio comms between the terrorists and the cell planner" name="TerroristComms" type="diskit.util.CommunicationDisplay">
+        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Communication Channel" type="int" value="20"/>
+        <TerminalParameter name="Description" type="java.lang.String" value="Terrorist Communications"/>
+        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
+        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.RED"/>
+        <Coordinate x="390" y="110"/>
+    </SimEntity>
+    <PropertyChangeListener description="Statististics on number of reported contacts" mode="replicationStats" name="SeaScanReportedContacts" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="reportedContacts"/>
+        <Coordinate x="560" y="350"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="The delay for each transmission by this entity" mode="replicationStats" name="SeaScanTransmissionDelay" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="transmitDelay"/>
+        <Coordinate x="560" y="410"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="Number of successful intercepts by the RHIB" mode="replicationStats" name="RHIBIntercepts" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="successfulIntercepts"/>
+        <Coordinate x="650" y="390"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="" mode="replicationStats" name="RHIBInterceptTime" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeSpentIntercepting"/>
+        <Coordinate x="680" y="510"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="The amount of time it takes the trawler to respond" mode="replicationStats" name="TrawlerRadioResponseTime" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="radioResponseDelay"/>
+        <Coordinate x="560" y="70"/>
+    </PropertyChangeListener>
     <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
     <SimEventListenerConnection listener="ScenarioManager" source="MooringG"/>
     <SimEventListenerConnection listener="ScenarioManager" source="MooringF"/>
@@ -1783,6 +1963,14 @@
     <SimEventListenerConnection listener="Terrorist2" source="TerroristCellPlanner"/>
     <SimEventListenerConnection listener="ScenarioManager" source="FFG60"/>
     <SimEventListenerConnection listener="ScenarioManager" source="CVN70"/>
+    <SimEventListenerConnection listener="BridgeToBridgeRadio" source="ScenarioManager"/>
+    <SimEventListenerConnection listener="UVComms" source="ScenarioManager"/>
+    <SimEventListenerConnection listener="TerroristComms" source="ScenarioManager"/>
+    <PropertyChangeListenerConnection description="reportedContacts" listener="SeaScanReportedContacts" property="reportedContacts" source="SeaScan"/>
+    <PropertyChangeListenerConnection description="transmitDelay" listener="SeaScanTransmissionDelay" property="transmitDelay" source="SeaScan"/>
+    <PropertyChangeListenerConnection description="successfulIntercepts" listener="RHIBIntercepts" property="successfulIntercepts" source="RHIB"/>
+    <PropertyChangeListenerConnection description="timeSpentIntercepting" listener="RHIBInterceptTime" property="timeSpentIntercepting" source="RHIB"/>
+    <PropertyChangeListenerConnection description="radioResponseDelay" listener="TrawlerRadioResponseTime" property="radioResponseDelay" source="FishingTrawler"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
