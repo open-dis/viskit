@@ -1888,7 +1888,7 @@
         <Coordinate x="620" y="140"/>
     </SimEntity>
     <SimEntity description="" name="BridgeToBridgeRadio" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
         <TerminalParameter name="Communication Channel" type="int" value="16"/>
         <TerminalParameter name="Description" type="java.lang.String" value="Bridge-To-Bridge Radio"/>
         <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
@@ -1896,7 +1896,7 @@
         <Coordinate x="450" y="50"/>
     </SimEntity>
     <SimEntity description="UnmannedVehicleCommunications" name="UVComms" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
         <TerminalParameter name="Communication Channel" type="int" value="128"/>
         <TerminalParameter name="Description" type="java.lang.String" value="UAV/USV Communications"/>
         <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
@@ -1904,7 +1904,7 @@
         <Coordinate x="390" y="50"/>
     </SimEntity>
     <SimEntity description="Secure radio comms between the terrorists and the cell planner" name="TerroristComms" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
         <TerminalParameter name="Communication Channel" type="int" value="20"/>
         <TerminalParameter name="Description" type="java.lang.String" value="Terrorist Communications"/>
         <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
