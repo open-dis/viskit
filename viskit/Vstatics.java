@@ -470,4 +470,6 @@ public class Vstatics
       }
   }
   
+  public static boolean debug = true;
+  
 }
