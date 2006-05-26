@@ -184,13 +184,9 @@ public class SimkitXML2Java {
                 java.lang.reflect.Constructor cst = null;
 
                 try {
-                    cst = c.getDeclaredConstructor(new Class[] {});
+                    cst = c.getConstructor(new Class[] {});
                 } catch (Exception e) { // no null constructors
                     ;
-                }
-
-                if (!java.lang.reflect.Modifier.isPublic(cst.getModifiers())) {
-                    cst = null;
                 }
                 
 		if ( cst != null ) pw.println(sp4 + "protected" + sp + s.getType() + sp
