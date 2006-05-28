@@ -229,7 +229,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="radioCommunication">
             <Operation method="setMessage(attackOrder)"/>
         </StateTransition>
-        <Schedule condition="planIndex &lt; totalPlans " delay="0.0" event="CreateAttackPlan" priority="0">
+        <Schedule condition="planIndex &lt;= totalPlans " delay="0.0" event="CreateAttackPlan" priority="0">
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
