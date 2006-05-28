@@ -202,9 +202,6 @@
         <StateTransition state="zoneMoverManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Assignment value="zoneMoverManager"/>
-        </StateTransition>
         <Schedule event="StartMoving"/>
         <Code/>
         <Coordinate x="210" y="90"/>
@@ -219,8 +216,8 @@
         </LocalVariable>
         <Code>setMaximumSpeed(getEntityDefinition().getMaximumSpeed() * speedScale);
 setStartPosition(initialStartPosition);
-setDestination(initialDestination);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
+setDestination(initialDestination);
 start();</Code>
         <Coordinate x="210" y="180"/>
     </Event>
@@ -259,7 +256,7 @@ start();</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="680" y="20"/>
+        <Coordinate x="680" y="120"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
@@ -274,7 +271,7 @@ start();</Code>
             <EdgeParameter value="obstacle"/>
         </Schedule>
         <Code/>
-        <Coordinate x="680" y="140"/>
+        <Coordinate x="680" y="240"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>If a collision will occur avoid the obstacle using the avoidance mover manager. The avoidance mover manager will perform the avoidance and then reset the activeMoverManager to its pre-avoidance value after completing the avoidance maneuver.</Comment>
@@ -290,8 +287,8 @@ start();</Code>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
         </StateTransition>
-        <Code/>
-        <Coordinate x="680" y="240"/>
+        <Code>setStartPosition(getLocation());</Code>
+        <Coordinate x="680" y="340"/>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
@@ -385,7 +382,6 @@ setDestination(interceptPoint);</Code>
         <StateTransition state="radioCommunication">
             <Operation method="setMessage(query)"/>
         </StateTransition>
-        <Schedule event="IDContact"/>
         <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
             <Comment/>
             <EdgeParameter value="radioCommunication"/>
@@ -496,15 +492,12 @@ setDestination(patrolDestination);</Code>
         <LocalVariable name="contact" type="diskit.Mover3D" value="message.getContext()">
             <Comment>The context of this message</Comment>
         </LocalVariable>
-        <Schedule condition="sender != this &amp;&amp; 
-messageType != null &amp;&amp;
-messageType.equals(&quot;QueryResponse&quot;)" delay="0.0" event="QueryResponseReceived" priority="0">
+        <Schedule condition="sender != this &amp;&amp;  messageType != null &amp;&amp; messageType.equals(&quot;QueryResponse&quot;)" delay="0.0" event="QueryResponseReceived" priority="0">
             <Comment>Response received process the response</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>System.out.println(getName() + " received a message");
-System.out.println(contact.getName());</Code>
-        <Coordinate x="590" y="440"/>
+        <Code/>
+        <Coordinate x="590" y="450"/>
     </Event>
     <Event name="QueryResponseReceived">
         <Comment>When the contact makes a response the radio transmission recieved is processed</Comment>
@@ -536,7 +529,7 @@ System.out.println(contact.getName());</Code>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
         <Code/>
-        <Coordinate x="590" y="290"/>
+        <Coordinate x="590" y="300"/>
     </Event>
 </SimEntity>
 

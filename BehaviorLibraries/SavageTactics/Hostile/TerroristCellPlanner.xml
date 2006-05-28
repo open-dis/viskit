@@ -104,7 +104,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <EdgeParameter value="targetPriorityList"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Code>System.out.println("AStarZoneMap in TCP");</Code>
+        <Code/>
         <Coordinate x="130" y="120"/>
     </Event>
     <Event name="ChoosePlatformsToDeploy">
@@ -122,7 +122,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
-        <Code>System.out.println("Terrorist Selection draw: " + terroristSelection);</Code>
+        <Code/>
         <Coordinate x="130" y="200"/>
     </Event>
     <Event name="CreateAttackPlan">
@@ -237,7 +237,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Comment/>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
-        <Schedule condition="planIndex == totalPlans" delay="0.0" event="BeginAttack" priority="0">
+        <Schedule condition="planIndex &gt; totalPlans" delay="0.0" event="BeginAttack" priority="0">
             <Comment/>
         </Schedule>
         <Code>System.out.println("**********************************");
