@@ -501,7 +501,7 @@
         <Coordinate x="360" y="240"/>
     </SimEntity>
     <SimEntity description="" name="RHIB2" type="Friendly.MilitaryPatrolCraft">
-        <TerminalParameter name="moverID" type="int" value="101"/>
+        <TerminalParameter name="moverID" type="int" value="102"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
             <MultiParameter type="diskit.SMAL.Classification">
                 <TerminalParameter name="level" type="java.lang.String" value="0"/>
@@ -813,7 +813,7 @@
         </MultiParameter>
         <Coordinate x="360" y="300"/>
     </SimEntity>
-   <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
+    <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
         <TerminalParameter name="moverID" type="int" value="999"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
             <MultiParameter type="diskit.SMAL.Classification">
@@ -1244,7 +1244,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1372,7 +1372,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1482,7 +1482,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1592,7 +1592,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1702,7 +1702,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1812,7 +1812,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -1922,7 +1922,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
@@ -2032,7 +2032,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-                <MultiParameter type="diskit.random.RandomVariateInstantiator">
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
             <MultiParameter type="diskit.random.BetaVariate"/>
