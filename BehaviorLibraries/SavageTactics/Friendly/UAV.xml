@@ -162,7 +162,7 @@
             <Assignment value="speedScaleChange"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="220"/>
+        <Coordinate x="100" y="240"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
@@ -188,9 +188,6 @@
         <StateTransition state="zoneMoverManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
         </StateTransition>
-        <StateTransition state="activeMoverManager">
-            <Assignment value="zoneMoverManager"/>
-        </StateTransition>
         <Schedule event="StartMoving"/>
         <Code/>
         <Coordinate x="210" y="160"/>
@@ -205,8 +202,8 @@
         </LocalVariable>
         <Code>setMaximumSpeed(getEntityDefinition().getMaximumSpeed() * speedScale);
 setStartPosition(initialStartPosition);
-setDestination(initialDestination);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
+setDestination(initialDestination);
 start();</Code>
         <Coordinate x="210" y="260"/>
     </Event>
@@ -224,14 +221,11 @@ start();</Code>
         <LocalVariable name="alreadyIDd" type="boolean" value="contactPicture.contains(contact)">
             <Comment>Whether or not the contact has been added to this entity's contact picture</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == collisionDetection" delay="0.0" event="AssessObstacle" priority="0">
+        <Schedule condition="sensor == collisionDetection &amp;&amp; (alreadyIDd || isFriendlyForce)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == airSearchRadar &amp;&amp;
-!isFriendlyForce &amp;&amp;
-!alreadyIDd &amp;&amp;
-contact.getCruiseSpeed() &gt; 0" delay="0.0" event="PrepareContactMessage" priority="0">
+        <Schedule condition="sensor == airSearchRadar &amp;&amp; !isFriendlyForce &amp;&amp; !alreadyIDd &amp;&amp; contact.getCruiseSpeed() &gt; 0" delay="0.0" event="PrepareContactMessage" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>

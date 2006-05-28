@@ -157,7 +157,7 @@
         <Coordinate x="210" y="160"/>
     </Event>
     <Event name="StartMoving">
-        <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
+        <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed.</Comment>
         <LocalVariable name="initialStartPosition" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
             <Comment>An initial waypoint in one of the provided zones</Comment>
         </LocalVariable>
@@ -166,8 +166,8 @@
         </LocalVariable>
         <Code>setMaximumSpeed(getEntityDefinition().getMaximumSpeed() * speedScale);
 setStartPosition(initialStartPosition);
-setDestination(initialDestination);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
+setDestination(initialDestination);
 start();</Code>
         <Coordinate x="210" y="260"/>
     </Event>
