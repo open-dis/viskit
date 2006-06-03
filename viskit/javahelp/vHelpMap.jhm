@@ -10,6 +10,7 @@
   <mapID target="assemblyeditor"   url="Pages/AssemblyEditor.html" />
   <mapID target="tutorial"         url="Pages/Tutorial.html" />
   <mapID target="cluster"          url="Pages/Cluster.html"/>
+  <mapID target="JavaHelp"         url="helpContentReadMe.html"/>
 
   <mapID target="topic"   url="Pages/redcircle.png" />
   <mapID target="chapter" url="Pages/chapTopic.gif" />
