@@ -116,7 +116,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
-    tabbedPane.add("Event Graph Edit",egFrame.getContent());   // 0
+    tabbedPane.add("Event Graph Editor",egFrame.getContent());   // 0
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -127,7 +127,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Assembly editor
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
-    tabbedPane.add("Assembly Edit",asyFrame.getContent());  //1
+    tabbedPane.add("Assembly Editor",asyFrame.getContent());  //1
     menuBar = asyFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
