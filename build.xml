@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="build-run-default" name="Viskit">
     <description>
-         Ant build file for the NPS Viskit and associated libraries. Third
-         party jar files are not compiled from source here, but they are copied as
-         necessary for the Viskit distribution.  This buildfile was created and tested
-         using Ant version 1.5.1
+        Ant build file for the NPS Viskit and associated libraries. Third
+        party jar files are not compiled from source here, but they are copied as
+        necessary for the Viskit distribution.  This buildfile was created and tested
+        using Ant version 1.5.1
     </description>
 
-<!-- magic properties, do not change or delete -->
+    <!-- magic properties, do not change or delete -->
 
     <property name="build.compiler" value="modern"/>
 
-<!-- CVS properties (this file) -->
+    <!-- CVS properties (this file) -->
     <property name="CVSId" value="$Id$"/>
 
-<!-- Project directories -->
+    <!-- Project directories -->
 
     <property description="Root of the Viskit source tree." location="." name="dir.src"/>
 
@@ -72,15 +72,15 @@
     <property environment="env"/>
 
     <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
-      <echo message="warning:  JAVA_HOME not set!"/>
+        <echo message="warning:  JAVA_HOME not set!"/>
     </target>
 
     <path id="runtime.classpath">
     
         <!-- use local JDK for tools.jar -->
-	<!-- remember to override your environment variable for -->
-	<!-- JAVA_HOME to point to the JDK version you are building -->
-	<!-- against. Netbeans sets this in the NETBEANS_HOME/etc/netbeans.conf file -->
+        <!-- remember to override your environment variable for -->
+        <!-- JAVA_HOME to point to the JDK version you are building -->
+        <!-- against. Netbeans sets this in the NETBEANS_HOME/etc/netbeans.conf file -->
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${dir.build}/lib/viskit.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
@@ -107,17 +107,17 @@
         <path refid="runtime.extension.classes"/>
     </path>
 
-<!--  === TARGET: help === -->
-  <target name="help">
-    <echo>
-      This is the Ant build file for the NPS Viskit and associated libraries.
-      Third-party jar files are not compiled from source here, but they are
-      copied as necessary for the simkit distribution.  This buildfile was created
-      and tested using Ant version 1.5.1. Modified from Simkit's build.xml.
-    </echo>
-  </target>
+    <!--  === TARGET: help === -->
+    <target name="help">
+        <echo>
+            This is the Ant build file for the NPS Viskit and associated libraries.
+            Third-party jar files are not compiled from source here, but they are
+            copied as necessary for the simkit distribution.  This buildfile was created
+            and tested using Ant version 1.5.1. Modified from Simkit's build.xml.
+        </echo>
+    </target>
 
-<!--  === TARGET: init === -->
+    <!--  === TARGET: init === -->
     <target description="Preparatory actions required for all targets." name="init">
         <tstamp/>
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
@@ -128,7 +128,7 @@
         <echo message="JAVA_HOME: ${env.JAVA_HOME}"/>
     </target>
 
-<!--  === TARGET: build.init === -->
+    <!--  === TARGET: build.init === -->
     <target depends="init" description="Preparatory actions for compilation and documentation targets" name="build.init">
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
@@ -140,22 +140,22 @@
         <mkdir dir="${dir.lib.ext}"/>
     </target>
 
-  <target depends="init" description="build the help search database" name="javahelp">
-    <java classname="com.sun.java.help.search.Indexer">
-      <arg value="-db"/>
-      <arg value="${build.javahelp}/JavaHelpSearch"/>
-      <arg value="${javahelp}/Pages"/>
-      <classpath>
-        <pathelement location="${dir.lib}/jhall.jar"/>
-      </classpath>
-    </java>
-    <copy todir="${build.javahelp}">
-      <fileset dir="${javahelp}"/>
-    </copy>
+    <target depends="init" description="build the help search database" name="javahelp">
+        <java classname="com.sun.java.help.search.Indexer">
+            <arg value="-db"/>
+            <arg value="${build.javahelp}/JavaHelpSearch"/>
+            <arg value="${javahelp}/Pages"/>
+            <classpath>
+                <pathelement location="${dir.lib}/jhall.jar"/>
+            </classpath>
+        </java>
+        <copy todir="${build.javahelp}">
+            <fileset dir="${javahelp}"/>
+        </copy>
 
-  </target>
+    </target>
 
-<!--  === TARGET: clean === -->
+    <!--  === TARGET: clean === -->
     <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
         <delete dir="${dir.src.simevg}"/>
         <delete dir="${dir.src.simasm}"/>
@@ -164,7 +164,7 @@
         <delete dir="${dir.dist}"/>
     </target>
 
-<!--  === TARGET: compile === -->
+    <!--  === TARGET: compile === -->
     <target depends="init,compile.simxml.util" name="compile">
         <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**"
             debug="on"
@@ -204,24 +204,24 @@
                 <include name="**/*.png"/>
                 <include name="**/*.gif"/>
                 <include name="**/*.jpg"/>
-            <include name="*.txt"/>
-            <exclude name="build/"/>
+                <include name="*.txt"/>
+                <exclude name="build/"/>
             </fileset>
         </copy>
     </target>
-<!--  === TARGET: jar === -->
+    <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
-    <!-- remove for dist 
+        <!-- remove for dist 
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
-    -->
+        -->
         <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar"/>
     
     </target>
 
     <target depends="compile.bindings" name="jar-stage1">
-    <!-- remove for dist
+        <!-- remove for dist
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
-    -->    
+        -->    
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
        
     </target>
@@ -229,11 +229,11 @@
     <target name="splashy">
         <splash imageurl="file:${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
     </target>
-<!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
+    <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target depends="build.init,compile" description="Create the javadoc for Viskit." name="doc">
         <javadoc access="private" author="true" destdir="${dir.build.doc}" excludepackagenames="*.test.*" sourcepath="${dir.src}" version="true">
             <!-- Include all the jar files in the lib directory; this prevents some
-                     javadoc warnings about classes not being found. -->
+            javadoc warnings about classes not being found. -->
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
@@ -250,7 +250,7 @@
         </javadoc>
     </target>
 
-<!-- === TARGET: dist === -->
+    <!-- === TARGET: dist === -->
     <target depends="jar, doc" name="dist">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc"/>
@@ -263,7 +263,7 @@
         </copy>
         <copy todir="${dir.dist}/BehaviorLibraries">
             <fileset dir="${behavior.lib}">
-            	<include name="**/*.xml"/>
+                <include name="**/*.xml"/>
             </fileset>
         </copy>
     </target>
@@ -306,21 +306,21 @@
         </copy>
        
         <jar basedir="${dir.dist}/gridkit-stage" 
-            destfile="${dir.dist}/gridkit.jar"
-            manifest="${dir.src.cli.util}/manif.txt" />
+        destfile="${dir.dist}/gridkit.jar"
+        manifest="${dir.src.cli.util}/manif.txt" />
             
     </target>
     
     <taskdef classname="com.sun.tools.xjc.XJCTask" name="xjc">
-         <classpath>
-             <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-         </classpath>
+        <classpath>
+            <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+        </classpath>
     </taskdef>
     
     <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
-         <classpath>
-             <fileset dir="${dir.lib}" includes="trang*.jar"/>
-         </classpath>
+        <classpath>
+            <fileset dir="${dir.lib}" includes="trang*.jar"/>
+        </classpath>
     </taskdef>   
 
     <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
@@ -338,7 +338,7 @@
         </xjc>
         <!--
         <xjc extension="true" package="viskit.xsd.bindings.sge.qstat" schema="${dir.src.sge.util}/qstat/qstat.xsd" target="${dir.src}">
-            <produces dir="${dir.src.sge.qstat}" includes="* impl/* impl/runtime/*" />
+        <produces dir="${dir.src.sge.qstat}" includes="* impl/* impl/runtime/*" />
         </xjc>
         -->
     </target>
@@ -346,16 +346,16 @@
     <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
         <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
-<!-- useful for autogenerating stats schema and adding type validator
+        <!-- useful for autogenerating stats schema and adding type validator
         <trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd" /> 
--->
+        -->
         <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
         <javac destdir="${dir.build.classes}"
-	    debug="on"
+            debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -368,7 +368,7 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings/eventgraph" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
-	    debug="on"
+            debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -381,7 +381,7 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
-	    debug="on"
+            debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -394,7 +394,7 @@
             <fileset dir="${dir.src}/viskit/xsd/bindings/assembly/stats" includes="bgm.ser"/>
         </copy>
         <javac destdir="${dir.build.classes}"
-	    debug="on"
+            debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -408,17 +408,17 @@
         </copy>
         <!--
         <javac destdir="${dir.build.classes}"
-	    debug="on"
-            source="1.4"
-            target="1.4">
-            <classpath>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-            </classpath>
-            <src path="${dir.src.sge.qstat}"/>
+        debug="on"
+        source="1.4"
+        target="1.4">
+        <classpath>
+        <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+        </classpath>
+        <src path="${dir.src.sge.qstat}"/>
         </javac>
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
-            <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="jaxb.properties"/>
-            <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="bgm.ser"/>
+        <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="jaxb.properties"/>
+        <fileset dir="${dir.src}/viskit/xsd/bindings/sge/qstat" includes="bgm.ser"/>
         </copy>
         -->
     </target>
@@ -427,7 +427,7 @@
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
        
         <javac destdir="${dir.build.classes}"
-	    debug="on"
+            debug="on"
             source="1.4"
             target="1.4">
             <classpath>
@@ -482,73 +482,73 @@
     <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples"/>
     
     <target description="diskit module" name="examples.diskit">
-	<echo message="Building Diskit:"/>
-	<ant dir="${dir.diskit}" target="dist"/>
+        <echo message="Building Diskit:"/>
+        <ant dir="${dir.diskit}" target="dist"/>
         <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
     </target>
     
 
     <!-- TARGET: Run -->
-  <target depends="splashy, jar, examples" description="Run Viskit, include example modules if any" name="build-run">
-    <java classname="viskit.EventGraphAssemblyComboMain" classpathref="runtime.classpath" fork="true"/>
-  </target>
-  <target depends="splashy, jar, examples" description="Run Viskit, include example modules if any" name="build-run-orig">
-    <java classname="viskit.Main" classpathref="runtime.classpath" fork="true"/>
-  </target>
+    <target depends="splashy, jar, examples, checkJAVA_HOME" description="Run Viskit, include example modules if any" name="build-run">
+        <java classname="viskit.EventGraphAssemblyComboMain" classpathref="runtime.classpath" fork="true"/>
+    </target>
+    <target depends="splashy, jar" description="Run Viskit only, no module dependency" name="build-run-orig">
+        <java classname="viskit.Main" classpathref="runtime.classpath" fork="true"/>
+    </target>
 
-  <!-- TARGET: Run - no ant splash -->
-  <target depends="jar, examples, checkJAVA_HOME" description="Run Viskit, include example modules if any" name="build-run-default">
-    <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
-      <arg value="viskit.EventGraphAssemblyComboMain"/>
-    </java>
-  </target>
-  <target depends="jar, examples" description="Run Viskit, include example modules if any" name="build-run-default-orig">
-    <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
-      <arg value="viskit.Main"/>
-    </java>
-  </target>
+    <!-- TARGET: Run - no ant splash -->
+    <target depends="jar, examples, checkJAVA_HOME" description="Run Viskit, include example modules if any" name="build-run-default">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+            <arg value="viskit.EventGraphAssemblyComboMain"/>
+        </java>
+    </target>
+    <target depends="jar" description="Run Viskit only, no module dependency" name="build-run-default-orig">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+            <arg value="viskit.Main"/>
+        </java>
+    </target>
 
-  <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
-  <target description="Run Viskit, don't check dependencies" name="quick-run">
-    <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
-      <arg value="viskit.EventGraphAssemblyComboMain"/>
-    </java>
-  </target>
-  <target description="Run Viskit, don't check dependencies" name="quick-run-orig">
-    <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
-      <arg value="viskit.Main"/>
-    </java>
-  </target>
+    <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
+    <target description="Run Viskit, don't check dependencies" name="quick-run">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+            <arg value="viskit.EventGraphAssemblyComboMain"/>
+        </java>
+    </target>
+    <target description="Run Viskit, don't check dependencies" name="quick-run-orig">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+            <arg value="viskit.Main"/>
+        </java>
+    </target>
   
-  <target description="TestCodeFormat runner" name="test-code-format">
-    <java classname="viskit.test.TestCodeFormat" classpathref="runtime.classpath" fork="true">
-        <arg value="viskit/test/ArrayTester.xml"/>
-    </java>
-  </target>
+    <target description="TestCodeFormat runner" name="test-code-format">
+        <java classname="viskit.test.TestCodeFormat" classpathref="runtime.classpath" fork="true">
+            <arg value="viskit/test/ArrayTester.xml"/>
+        </java>
+    </target>
   
-  <target description="Test Gridkit login" name="test-gridkit-login">
-    <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
-        <arg value="localhost" />
-        <arg value="4444" />
-    </java>
-  </target>
+    <target description="Test Gridkit login" name="test-gridkit-login">
+        <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
+            <arg value="localhost" />
+            <arg value="4444" />
+        </java>
+    </target>
 
-  <target description="Test Gridkit qstat" name="test-gridkit-qstat">
-    <java classname="viskit.test.TestGridkitQstat" classpathref="runtime.classpath" fork="true">
-        <arg value="localhost" />
-        <arg value="4444" />
-    </java>
-  </target>
+    <target description="Test Gridkit qstat" name="test-gridkit-qstat">
+        <java classname="viskit.test.TestGridkitQstat" classpathref="runtime.classpath" fork="true">
+            <arg value="localhost" />
+            <arg value="4444" />
+        </java>
+    </target>
   
-  <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
-    <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
-        <arg value="localhost" />
-        <arg value="4444" />
-    </java>
-  </target>
+    <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
+        <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
+            <arg value="localhost" />
+            <arg value="4444" />
+        </java>
+    </target>
   
-  <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
+    <target depends="jar, examples" description="Run Design-Of-Experiments" name="runDOE">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
     
@@ -556,9 +556,9 @@
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
             <classpath path="runtime.classpath"/>
-    <!-- Optional - If source roots are properly declared in project, should
-                    work without setting source path.     
-        <sourcepath path="debug.sourcepath"/> -->
+            <!-- Optional - If source roots are properly declared in project, should
+            work without setting source path.     
+            <sourcepath path="debug.sourcepath"/> -->
         </nbjpdastart>
         <java classname="viskit.Splash2" fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
@@ -574,9 +574,9 @@
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
             <classpath path="runtime.classpath"/>
-    <!-- Optional - If source roots are properly declared in project, should
-                    work without setting source path.     
-        <sourcepath path="debug.sourcepath"/> -->
+            <!-- Optional - If source roots are properly declared in project, should
+            work without setting source path.     
+            <sourcepath path="debug.sourcepath"/> -->
         </nbjpdastart>
         <java fork="true" classname="viskit.Main">
             <jvmarg value="-Xdebug"/>
@@ -586,12 +586,12 @@
             <classpath refid="runtime.classpath"/>
         </java>
     </target>
-<!--
+    <!--
     <taskdef name="izpack" classpath="installer/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
 
     <izpack input="installer/viskit-install.xml"
-	output="${dir.dist}/Viskit-install-${ver).${rel}.jar"
-	installerType="standard" basedir="installer"
-	izPackDir="${izpack.dir}/"/>
--->
+    output="${dir.dist}/Viskit-install-${ver).${rel}.jar"
+    installerType="standard" basedir="installer"
+    izPackDir="${izpack.dir}/"/>
+    -->
 </project>
