@@ -486,8 +486,7 @@
         <ant dir="${dir.diskit}" target="dist"/>
         <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
-    </target>
-    
+    </target>    
 
     <!-- TARGET: Run -->
     <target depends="splashy, jar, examples, checkJAVA_HOME" description="Run Viskit, include example modules if any" name="build-run">
