@@ -6,11 +6,13 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
 <helpset version="2.0">
 
   <!-- title -->
-  <title>Viskit Event Graph Editor Help</title>
+  <title>VisKit - Help</title>
+    <size width="400" height="600" />
+    <location x="200" y="300" />
 
   <!-- maps -->
   <maps>
-     <homeID></homeID>
+     <homeID>SplashImage</homeID>
      <mapref location="vHelpMap.jhm"/>
   </maps>
 
@@ -20,16 +22,18 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
     <label>Table Of Contents</label>
     <type>javax.help.TOCView</type>
     <data>vHelpTOC.xml</data>
+    <size width="400" height="600" />
   </view>
 
-<!--  <view mergetype="javax.help.SortMerge">
+  <!-- don't include this until we've built VisKitHelpIndex.xml
+  <view mergetype="javax.help.SortMerge">
     <name>Index</name>
     <label>Index</label>
     <type>javax.help.IndexView</type>
-    <data>vHelpIndex.xml</data>
-  </view>
--->
-  <view >
+    <data>StudioHelpIndex.xml</data>
+  </view>  -->
+
+  <view>
     <name>Search</name>
     <label>Search</label>
     <type>javax.help.SearchView</type>
@@ -37,6 +41,29 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
       JavaHelpSearch
     </data>
   </view>
-  
+
+  <!-- presentation addition was taken from JavaHelp User Guide section 4.4.1 Helpset File Format but still not working -->
+  <presentation default=true>
+    <name>main window</name>
+    <size width="400" height="600" />
+    <location x="200" y="300" />
+    <title>VisKit</title>
+    <toolbar>
+        <helpaction>javax.help.BackAction</helpaction>
+        <helpaction>javax.help.ForwardAction</helpaction>
+        <helpaction image="homeicon">javax.help.HomeAction</helpaction>
+    </toolbar>
+  </presentation>
+
+  <!-- This is where we install a filter for html pages so we can check for file/mime types that
+       are not supported in the minimal Swing html renderer.  The PDFInterceptor class looks only
+       for pdfs, and if it finds one, it sends it to an external browser through AUVWorkbenchConfig. -->
+
+  <!-- This is not the right class path, need to fix later
+
+  <impl>
+    <viewerregistry viewertype="text/html" viewerclass="workbench.main.javahelp.PDFInterceptor"/>
+  </impl>
+  -->
 </helpset>
 

@@ -3,15 +3,144 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
          "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0" topicimage="topic">
-  <tocitem text="Viskit" image="empty">
-    <tocitem text="Introduction" target="intro">
-      <tocitem text="Event Graphs" target="eventgraphintro" />
+  <tocitem text="VisKit"> <!-- not supported:  image="empty" image="AUVWorkbench.small.jpg" -->
+      <tocitem text="Big Picture" expand="false">
+      <tocitem text="Introduction"		target="Introduction"/>
+      <tocitem text="Contributors"		target="Contributors" />
+      <tocitem text="Overview"			target="Overview"/>
+      <tocitem text="Terms"			target="NOT"/>
+      <tocitem text="VisKit/SimKit"		target="NOT"/>
+      <tocitem text="Studio"			target="NOT"/>
+      <tocitem text="Other Resources"		target="Resources"/>
     </tocitem>
-    <tocitem text="Event Graph Editor" target="eventgrapheditor"/>
-    <tocitem text="Assembly Editor" target="assemblyeditor"/>
-    <tocitem text="Tutorial" target="tutorial"/>
-    <tocitem text="Cluster" target="cluster" />
-    <tocitem text="JavaHelp" target="JavaHelp" />
+
+    <tocitem text="Operation" expand="true">
+      <tocitem text="Tutorial"			target="Tutorial"/>
+      <tocitem text="Ops1"			target="Ops1"/>
+      <tocitem text="Ops2"			target="Ops2"/>
+      <tocitem text="Ops3"			target="Ops3"/>
+    </tocitem>
+
+    <tocitem text="Tabs" expand="true">
+      <tocitem text="Event Graph Edit"	target="TabEventGraph"/>
+      <tocitem text="Assembly Edit"		target="TabAssemblyEdit"/>
+      <tocitem text="Assembly Run"		target="TabAssemblyRun"/>
+      <tocitem text="Design of Experiemnts"	target="TabDesignExperiment"/>
+      <tocitem text="Launch Cluster Job"	target="TabLaunchJob"/>
+    </tocitem>
+
+    <tocitem text="Menus" expand="true">
+      <tocitem text="Event Graph Edit Tab" expand="false">
+        <tocitem text="File" expand="false">
+          <tocitem text="New Event Graph" target="NewEventGraph" />
+          <tocitem text="Open" target="Open" />
+          <tocitem text="Open Recent" target="OpenRecent" />
+          <tocitem text="Close" target="Close" />
+          <tocitem text="Close All" target="CloseAll" />
+          <tocitem text="Save" target="Save" />
+          <tocitem text="Save as..." target="SaveAs" />
+          <tocitem text="View Saved XML" target="ViewXml" />
+          <tocitem text="Generate Java" target="GenerateJava" />
+          <tocitem text="Save screen image" target="SaveScreen" />
+          <tocitem text="Settings" target="Settings" />
+          <tocitem text="Quit" target="Quit" />
+        </tocitem>
+        <tocitem text="Edit" expand="false">
+          <tocitem text="Cut" target="Cut" />
+          <tocitem text="Copy" target="Copy" />
+          <tocitem text="Paste Events" target="NOT" />
+          <tocitem text="Add Event" target="NOT" />
+          <tocitem text="Add State" target="NOT" />
+          <tocitem text="Variable..." target="Cut" />
+          <tocitem text="Add Simulation Parameter..." target="NOT" />
+          <tocitem text="Add Self-Referential Edge..." target="NOT" />
+          <tocitem text="Edit Graph Properties..." target="NOT" />
+        </tocitem>
+        <tocitem text="Help" expand="false">
+          <tocitem text="Contents" target="NOT" />
+          <tocitem text="Search" target="NOT" />
+          <tocitem text="Tutorial" target="NOT" />
+          <tocitem text="About..." target="NOT" />
+        </tocitem>
+      </tocitem>
+
+      <tocitem text="Assembly Edit Tab" expand="false">
+        <tocitem text="File" expand="false">
+          <tocitem text="New Assembly" target="NewAssembly" />
+          <tocitem text="Open" target="Open" />
+          <tocitem text="Open Recent" target="OpenRecent" />
+          <tocitem text="Save" target="Save" />
+          <tocitem text="Save as..." target="SaveAs" />
+          <tocitem text="View Saved XML" target="ViewXml" />
+          <tocitem text="Generate Java Source" target="GenerateJavaSource" />
+          <tocitem text="Run Assembly" target="RunAssembly" />
+          <tocitem text="Export to Cluster Format" target="ExportCluster" />
+          <tocitem text="Save screen image" target="SaveScreen" />
+          <tocitem text="Settings" target="Settings" />
+          <tocitem text="Quit" target="Quit" />
+        </tocitem>
+        <tocitem text="Edit" expand="false">
+          <tocitem text="Cut" target="Cut" />
+          <tocitem text="Copy" target="Copy" />
+          <tocitem text="Add Event Graph..." target="NOT" />
+          <tocitem text="Add Property Change Listener..." target="NOT" />
+          <tocitem text="Edit Assembly Properties..." target="NOT" />
+        </tocitem>
+        <tocitem text="Help" expand="false">
+          <tocitem text="Contents" target="NOT" />
+          <tocitem text="Search" target="NOT" />
+          <tocitem text="Tutorial" target="NOT" />
+          <tocitem text="About..." target="NOT" />
+        </tocitem>
+      </tocitem>
+
+      <tocitem text="Assembly Run Tab" expand="false">
+        <tocitem text="File" expand="false">
+          <tocitem text="Save Output Streams..." target="NOT" />
+          <tocitem text="Settings" target="Settings" />
+          <tocitem text="Quit" target="Quit" />
+        </tocitem>
+        <tocitem text="Edit" expand="false">
+          <tocitem text="Copy" target="Copy" />
+          <tocitem text="Select all" target="NOT" />
+          <tocitem text="Clear all" target="NOT" />
+        </tocitem>
+        <tocitem text="Help" expand="false">
+          <tocitem text="Contents" target="NOT" />
+          <tocitem text="Search" target="NOT" />
+          <tocitem text="Tutorial" target="NOT" />
+          <tocitem text="About..." target="NOT" />
+        </tocitem>
+      </tocitem>
+
+      <tocitem text="Design Experiments Tab" expand="false">
+        <tocitem text="File" expand="false">
+        <tocitem text="Quit" target="Quit" />
+      </tocitem>
+        <tocitem text="Help" expand="false">
+          <tocitem text="Contents" target="NOT" />
+          <tocitem text="Search" target="NOT" />
+          <tocitem text="Tutorial" target="NOT" />
+          <tocitem text="About..." target="NOT" />
+        </tocitem>
+      </tocitem>
+
+      <tocitem text="Launch Cluster Job Tab" expand="false">
+        <tocitem text="File" expand="false">
+          <tocitem text="Quit" target="Quit" />
+        </tocitem>
+        <tocitem text="Help" expand="false">
+          <tocitem text="Contents" target="NOT" />
+          <tocitem text="Search" target="NOT" />
+          <tocitem text="Tutorial" target="NOT" />
+          <tocitem text="About..." target="NOT" />
+        </tocitem>
+      </tocitem>
+    </tocitem>
+
+    <tocitem text="Adding Help" target="addHelp" />
+
   </tocitem>
 </toc>
+
 

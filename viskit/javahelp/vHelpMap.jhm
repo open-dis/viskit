@@ -4,16 +4,69 @@
          "http://java.sun.com/products/javahelp/map_2_0.dtd">
 
 <map version="2.0">
-	<mapID target="intro"            url="Pages/Intro.html" />
-  <mapID target="eventgraphintro"  url="Pages/Intro.html#eventgraphintro" />
-  <mapID target="eventgrapheditor" url="Pages/EventGraphEditor.html" />
-  <mapID target="assemblyeditor"   url="Pages/AssemblyEditor.html" />
-  <mapID target="tutorial"         url="Pages/Tutorial.html" />
-  <mapID target="cluster"          url="Pages/Cluster.html"/>
-  <mapID target="JavaHelp"         url="helpContentReadMe.html"/>
 
-  <mapID target="topic"   url="Pages/redcircle.png" />
-  <mapID target="chapter" url="Pages/chapTopic.gif" />
-  <mapID target="empty"   url="Pages/empty.gif" />
+  <mapID target="Introduction"		url="VisPages/empty.html"/>
+  <mapID target="Contributors"		url="VisPages/empty.html"/>
+  <mapID target="Overview"		url="VisPages/empty.html"/>
+  <mapID target="Resources"		url="VisPages/empty.html"/>
+  <mapID target="Ops1"			url="VisPages/empty.html"/>
+  <mapID target="Ops2"			url="VisPages/empty.html"/>
+  <mapID target="Ops3"			url="VisPages/empty.html"/>
+
+  <mapID target="addHelp"		url="VisPages/addingHelp.html"/>
+  <mapID target="Tutorial"		url="VisPages/tutorial.html"/>
+
+
+<!-- Tab items -->
+
+  <mapID target="TabEventGraph"		url="VisPages/Tabs/eventGraph.html"/>
+  <mapID target="TabAssemblyEdit"	url="VisPages/Tabs/assemblyEdit.html"/>
+  <mapID target="TabAssemblyRun"	url="VisPages/Tabs/assemblyRun.html"/>
+  <mapID target="TabDesignExperiment"	url="VisPages/Tabs/designExperiment.html"/>
+  <mapID target="TabLaunchJob"		url="VisPages/Tabs/launchJob.html"/>
+
+
+<!-- Menu items -->
+
+  <mapID target="Close"			url="VisPages/Menus/close.html"/>
+  <mapID target="CloseAll"		url="VisPages/Menus/closeAll.html"/>
+  <mapID target="NewEventGraph"		url="VisPages/Menus/newEventGraph.html"/>
+  <mapID target="Open"			url="VisPages/Menus/open.html"/>
+  <mapID target="OpenRecent"		url="VisPages/Menus/openRecent.html"/>
+  <mapID target="Quit"			url="VisPages/Menus/quit.html"/>
+  <mapID target="Save"			url="VisPages/Menus/save.html"/>
+  <mapID target="SaveAs"		url="VisPages/Menus/saveAs.html"/>
+  <mapID target="SaveScreen"		url="VisPages/Menus/saveScreen.html"/>
+  <mapID target="Settings"		url="VisPages/Menus/settings.html"/>
+  <mapID target="ViewXml"		url="VisPages/Menus/viewXml.html"/>
+
+  <mapID target="NewAssembly"		url="VisPages/Menus/empty.html"/>
+  <mapID target="GenerateJava"		url="VisPages/Menus/empty.html"/>
+  <mapID target="GenerateJavaSource"	url="VisPages/Menus/empty.html"/>
+  <mapID target="RunAssembly"		url="VisPages/Menus/empty.html"/>
+  <mapID target="ExportCluster"		url="VisPages/Menus/empty.html"/>
+
+  <mapID target="Cut"			url="VisPages/Menus/empty.html"/>
+  <mapID target="Copy"			url="VisPages/Menus/empty.html"/>
+  <mapID target="NOT"			url="VisPages/Menus/empty.html"/>
+
+
+  <mapID target="OpenEvent"		url="VisPages/Menus/empty.html"/>
+  <mapID target="SplashImage"        url="VisPages/SplashImage.html" />
+  
+  
+  <mapID target="topic"              url="VisPages/images/redcircle.png" />
+  <mapID target="chapter"            url="VisPages/images/chapTopic.gif" />
+  <mapID target="empty"              url="VisPages/images/empty.gif" />
+
+  <!-- javahelp VisPages are no longer moved to the build/ subdirectory. -->
+  <!-- After much experimentation, there does appear to be support for relative URLS, but you
+       have to use the 'file:' protocol indicator.  AND, although I believe having no slash after
+       the colon is not kosher, it's the only way that works here. -->
+  <!-- So the relative path is calculated from the directory where AmvwHelpSet.hs is located. -->
+  
+<!-- EXAMPLE:
+  <mapID target="articles"           url="file:../documentation/articles/articles.html" />
+-->
 
 </map>
