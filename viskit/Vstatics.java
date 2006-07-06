@@ -185,7 +185,7 @@ public class Vstatics
               try {
                   c = Thread.currentThread().getContextClassLoader().loadClass(s);
               } catch (ClassNotFoundException cnfe ) {
-                  System.err.println("Vstatics what to do here... "+s);
+                  if(debug)System.err.println("Vstatics what to do here... "+s); // ? sometimes happens but appears harmless
               }
           }
       }
@@ -315,7 +315,7 @@ public class Vstatics
   
   static HashMap parameterMap = new HashMap();
   static void putParameterList(String type, List[] p) {
-      System.out.println("Vstatics putting "+type+" "+p);
+      if(debug)System.out.println("Vstatics putting "+type+" "+p);
       parameterMap.remove(type);
       parameterMap.put(type,p);
   }
@@ -325,7 +325,7 @@ public class Vstatics
       List[] resolved = (List[])(parameterMap.get(type));
       if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
           Class c = classForName(type);
-          System.out.println("adding "+c.getName());
+          if(debug)System.out.println("adding "+c.getName());
           ObjectFactory of = new ObjectFactory();
           Constructor[] constr = c.getConstructors();
           ArrayList[] plist = new ArrayList[constr.length];
@@ -343,7 +343,7 @@ public class Vstatics
               ;
           }
           if (f != null) { // these would be base classes not arrays
-              System.out.println(f+" is a parameterMap");
+              if(debug)System.out.println(f+" is a parameterMap");
               try {
                   // parameters are in the following order
                   // {
@@ -367,7 +367,7 @@ public class Vstatics
                                   p.setName(pname);
                                   p.setType(ptype);
                                   plist[n].add(p);
-                                  System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                                  if(debug)System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                               } catch (Exception e) {
                                   e.printStackTrace();
                               }
@@ -380,11 +380,11 @@ public class Vstatics
                   ex.printStackTrace();
               }
           } else {
-              System.out.println("\t # constructors: "+constr.length);
+              if(debug)System.out.println("\t # constructors: "+constr.length);
               for ( int i = 0; i < constr.length; i ++ ) {
                   Class[] ptypes = constr[i].getParameterTypes();
                   plist[i] = new ArrayList();
-                  System.out.println("\t # params "+ptypes.length+" in constructor "+i);
+                  if(debug)System.out.println("\t # params "+ptypes.length+" in constructor "+i);
                   for ( int k = 0; k < ptypes.length; k++ ) {
                       try {
                           ParameterType p = of.createParameter();
@@ -395,7 +395,7 @@ public class Vstatics
                           // could be from class loader, which would
                           // prepend [L, etc. to an array, fix it up here
                           if ( ptname.startsWith("[")) {
-                              System.out.println("[] an array "+ptname);
+                              if(debug)System.out.println("[] an array "+ptname);
                               // java has it if array of some type then [Lclassname, long
                               // pointer? so for all cases of prims [x except [L
                               // then just convert to full name, otherwise if begins with [L
@@ -426,7 +426,7 @@ public class Vstatics
                           p.setName("p["+k+"] : ");
                           p.setType(ptname);
                           plist[i].add(p);
-                          System.out.println("\t "+p.getName()+p.getType());
+                          if(debug)System.out.println("\t "+p.getName()+p.getType());
                       } catch (Exception e) {
                           e.printStackTrace();
                       }
@@ -452,8 +452,9 @@ public class Vstatics
   // returns number of constructors, checks is [] type
   public static int numConstructors(String type) {
       // 
-      System.out.println("number of constructors for "+type+":");
+      if (debug) System.out.print("number of constructors for "+type+":");
       if (type.endsWith("]")) {
+          if (debug) System.out.print("1");
           return 1;
       } else {
           Class clz = classForName(type);
@@ -462,6 +463,7 @@ public class Vstatics
               if(constrs == null) {
                   return 0;
               } else {
+                  if (debug) System.out.println(constrs.length);
                   return constrs.length;
               }
           } else {
@@ -470,6 +472,6 @@ public class Vstatics
       }
   }
   
-  public static boolean debug = true;
+  public static boolean debug = false;
   
 }

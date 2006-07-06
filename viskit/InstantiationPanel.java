@@ -183,8 +183,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   VInstantiator myVi;
   public void setData(VInstantiator vi) throws ClassNotFoundException
   {
-    myVi = vi;
-    //myVi = vi.vcopy();
+    //myVi = vi;
+    myVi = vi.vcopy();
     String typ = myVi.getType();
     typeTF.setText(typ);
 

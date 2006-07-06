@@ -120,13 +120,13 @@ public abstract class VInstantiator
            
             String s1="null";
             if ( o instanceof TerminalParameterType ) { // check if caller is sending assembly param types
-                s1 = ((TerminalParameterType)o).getType();  System.out.print("\tAssembly TerminalParameterType");
+                s1 = ((TerminalParameterType)o).getType();  if(viskit.Vstatics.debug)System.out.print("\tAssembly TerminalParameterType");
             } else if ( o instanceof MultiParameterType ) {
-                s1 = ((MultiParameterType)o).getType(); System.out.print("\tAssembly MultiParameterType");
+                s1 = ((MultiParameterType)o).getType(); if(viskit.Vstatics.debug)System.out.print("\tAssembly MultiParameterType");
             } else if ( o instanceof FactoryParameterType ) {
-                s1 = ((FactoryParameterType)o).getType();   System.out.print("\tAssembly FactoryParameterType");              
+                s1 = ((FactoryParameterType)o).getType();   if(viskit.Vstatics.debug)System.out.print("\tAssembly FactoryParameterType");              
             } else if (o instanceof ParameterType) { // from InstantiationPanel, this could also be an eventgraph param type?
-                s1 = ((ParameterType)o).getType(); System.out.print("\tEventGraph ParameterType");
+                s1 = ((ParameterType)o).getType(); if(viskit.Vstatics.debug)System.out.print("\tEventGraph ParameterType");
 
             }  
             if (viskit.Vstatics.debug) System.out.println(" "+s1);
@@ -328,13 +328,20 @@ public abstract class VInstantiator
       if (parameters == null) return -1; 
       int indx = 0;
       boolean found = false;
+      
+      if (viskit.Vstatics.debug) {
+          System.out.println("args length "+args.size());
+          System.out.println("resolveParameters "+type+" list length is "+parameters.length);
+          
+      }
       for (int i = 0; i < parameters.length; i++) {
       //while ( indx <= parameters.length - 1 && !found ) {
+          if (viskit.Vstatics.debug) System.out.println("parameters["+i+"].size() "+parameters[i].size());
           if ( parameters[i].size() == args.size() ) {
               boolean match = true;
               for ( int j = 0; j < args.size(); j++ ) {
                   
-                  System.out.print("touching "+Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType())+" "+((VInstantiator)(args.get(j))).getType());
+                  if (viskit.Vstatics.debug) System.out.print("touching "+Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType())+" "+((VInstantiator)(args.get(j))).getType());
                   String pType = Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType());
                   String vType = ((VInstantiator)(args.get(j))).getType();
                   match &= pType.equals(vType);                
@@ -357,7 +364,7 @@ public abstract class VInstantiator
           
           
       }
-      if (viskit.Vstatics.debug) System.out.println("Resolving "+type+" "+parameters[indx]);
+      if (viskit.Vstatics.debug) System.out.println("Resolving "+type+" "+parameters[indx]+" at index "+indx);
       // the class manager caches Parameter List jaxb from the SimEntity.
       // if it didn't come from XML, then a null is returned. Probably
       // better to move the findArgNamesFromBeansStuff() to the class manager

@@ -145,6 +145,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         
         //VInstantiator vinst = shadow[idx].vcopy();
         VInstantiator vinst = shadow[idx];
+        //List[] params = Vstatics.resolveParameters(vinst.getType()); //
+        //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ??? 
         Class c = Vstatics.classForName(vinst.getType());
         if (c.isArray()) {
             ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
@@ -161,6 +163,18 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         } else {
             ObjectInspector oi = new ObjectInspector(parent, this);     // "this" could be locComp
             oi.setType(vinst.getType());
+            // use default constructor if exists
+            Class clazz = Vstatics.classForName(vinst.getType());
+            if(clazz != null) {
+                List args;
+                java.lang.reflect.Constructor[] construct = clazz.getConstructors();
+                if(construct != null && construct.length > 0) {
+                    args = VInstantiator.buildDummyInstantiators(construct[0]);
+                    if ( vinst instanceof VInstantiator.Constr) ((VInstantiator.Constr)vinst).setArgs(args);
+                    
+                }
+            }
+            
             try {
                 oi.setData(vinst);
             } catch (ClassNotFoundException e1) {
