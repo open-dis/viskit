@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+    <meta name=Generator content="Microsoft FrontPage 5.0">
+    <title>Viskit Tutorial</title>
+    <link rel="stylesheet" type="text/css" href="../basicStyle.css" >
+</head>
+
+
+<body lang="EN-US">
+
+<div class=Section1>
+
+<h1>Viskit Tutorial</h1>
+
+<h2><a name="_Ref86549804">1.&nbsp;Introduction</a></h2>
+
+<p>Before attempting to build simulation components and
+models using Viskit, it is important to have at least an elementary
+understanding of Discrete Event Simulation (DES) Event Graph methodology.  See
+the references for background.  A brief overview of DES and Event Graphs is
+provided in the appendix.</p>
+
+<p>Henceforth it will be assumed that the reader has
+knowledge of the mechanics of the DES, including how state variables change
+value, how events arte scheduled, and how the Event List processes events and
+advances time.</p>
+
+<h2>2.&nbsp; Creating a Simple Event Graph Component</h2>
+
+<p>It is best to start with a very simple example.  One of
+the simplest Event Graphs is the "Arrival Process", a component that has one
+parameter, one state variable, and one event.  This Event Graph may be defined
+in a manner that is independent of the implementing programming language or
+even of its Viskit representation.</p>
+
+<h3>2.1.&nbsp;The Arrival Process Event Graph Component</h3>
+
+<p>The Arrival Process is a generalization of the Poisson
+Process.  The differences is that the times between arrivals are allowed to be
+any arbitrary non-negative values.  </p>
+
+<p>Parameter: {t<sub>A</sub>} = sequence of
+non-negative interarrival times.</p>
+
+<p>State Variable: N = number of arrivals (initially 0)</p>
+
+<p>Event Graph (Figure 1):</p>
+
+<p class=BodyTextCentered><img width='188' height='115' src="tutorial_files/image001.gif"></p>
+
+<div class='caption'><a name="_Ref86547619">Figure </a>1. Arrival Process Event Graph</div>
+
+<p>The state variable N is equivalent to the counting process
+associated with a Poisson Process.  Unlike the Poisson Process, however, the
+interarrival times {t<sub>A</sub>} need not be independent exponential random
+variables, but any sequence of non-negative numbers.  So this component could
+be used to represent a Renewal process (if {t<sub>A</sub>} were to be made an
+iid sequence of non-negative random variables), a periodically recurring
+sequence (making {t<sub>A</sub>} all identical values), or a correlated
+sequence of non-negative random variables.</p>
+
+<p>Before walking through the building of the Arrival Process
+component, let us first see what the finished model looks like in Viskit.</p>
+
+<h2><a name="_Ref86549787">2.2.&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>The Arrival Process Component in Viskit</a></h2>
+
+<p>Start the Viskit Event Graph Editor and dismiss the Event
+Graph Properties panel.  Select File | Open from the menu bar, navigate to
+Viskit’s examples directory, select the file "ArrivalProcess.xml" and click
+"Open."  This will open the Arrival Process component in the Event Graph
+editor, which should look like Figure 2.</p>
+
+<p class=BodyTextCentered><img width='576' height='432' src="tutorial_files/image002.jpg"></p>
+<div class='caption'><a name="_Ref86549199">Figure </a>2. Arrival Process in
+Event Graph Editor</div>
+
+
+
+<p>Note the similarity between the abstract Arrival Process
+Event Graph of Figure 1 and the Event Graph drawing in the left panel of Figure 2.  In general, any Event Graph component can be simply drawn as-is in the Event Graph Editor.</p>
+
+<p>[Walk user through the inspectors for parameters, state variables, events, edges, etc]</p>
+
+
+<h2>2.3.&nbsp; Creating the ArrivalProcess Event Graph in Viskit</h2>
+
+<p>Let us now walk through creating the ArrivalProcess
+component shown in Section 2.2.  Start by clicking File | New Event Graph.  Fill in the Event Graph Properties dialog for the name, package, and (optionally) a comment.  It should look roughly like Figure 3 (you may give your component any name and package you wish).  Click "Apply Changes" to close the dialog.  There should now be an empty Event Graph Editor window.  Verify that the name you have given your component
+is shown on the title bar of the window.  If you ever wish to change the Event
+Graph properties, click Edit | Edit Graph Properties…, which will bring up the
+dialog box of Figure 3 again.</p>
+
+<p class=BodyTextCentered><img width='482' height='333' src="tutorial_files/image003.jpg"> </p>
+<div class='caption'><a name="_Ref86550027"></a><a name="_Ref86550045">Figure </a>3. Properties for New Arrival Process</div>
+
+
+<p>When creating an Event Graph Component initially, it is
+best to start by defining parameters, then state variables, and finally drawing
+the Event Graph.</p>
+
+<p>Define the interarrival time parameter by clicking the ‘+’
+icon below the "State Variables" panel on the lower right (see Figure 4).</p>
+
+<p class=BodyTextCentered><img width='588' height='437' src="tutorial_files/image004.gif"></p>
+<div class='caption'><a name="_Ref86550774">Figure </a>4. Adding a Simulation
+Parameter</div>
+
+
+
+<p>This will bring up a Parameter Inspector (Figure 5) that can be used to define the parameter (later this same dialog can be used to modify the parameter).</p>
+
+<p class=BodyTextCentered><img width='380' height='135' src="tutorial_files/image005.jpg"></p>
+<div class='caption'><a name="_Ref86550868">Figure </a>5. Parameter Inspector</div>
+
+<p>Fill in the name of the parameter, its type, and an
+optional comment.  Since the parameter is a sequence of possibly random values,
+the interarrivalTime parameter should be defined as a
+simkit.random.RandomVariate type (Figure 6).  You should save at this point (File | Save).  Navigate to a directory where you have write privileges and save the file.</p>
+
+<p class=BodyTextCentered><img width='380' height='134' src="tutorial_files/image006.jpg"></p>
+<div class='caption'><a name="_Ref86551175">Figure </a>6. Parameter
+interarrivalTime Entered</div>
+
+
+
+<p>At this point there is not enough of the Event Graph to
+generate the Java code.  However, you can view the XML that has been created so
+for by clicking File | View Saved XML (Figure 7).</p>
+
+<p class=BodyTextCentered><img width='475' height='500' src="tutorial_files/image007.jpg"></p>
+<div class='caption'><a name="_Ref86551356">Figure </a>7. XML from Just Defining
+ a Parameter</div>
+
+
+
+<p>In a more complex model there will be additional
+parameters to be defined.  Before moving on to defining state variables, it is
+best to continue entering parameters by clicking on the ‘+’ icon and filling in
+the Parameter Inspector dialog.  If you change your mind and wish to delete a
+parameter, simply select it in the Parameters panel and click the ‘-‘ icon.  In
+that case, a confirmation dialog will ask whether you really wish to delete the
+parameter.</p>
+
+<p>Next, add the state variable by clicking on the ‘+’ icon
+just below the State Variables panel in the upper right of the Event Graph
+Editor window (Figure 8).</p>
+
+<p class=BodyTextCentered><img width='588' height='437' src="tutorial_files/image008.gif"></p>
+<div class='caption'><a name="_Ref86551652">Figure </a>8. Adding a State
+Variable</div>
+
+
+
+<p>As with adding a parameter, clicking the ‘+’ icon for
+adding a State Variable brings up a State Variable Inspector (Figure 9).</p>
+
+<p class=BodyTextCentered><img width='380' height='156' src="tutorial_files/image009.jpg"></p>
+<div class='caption'><a name="_Ref86551925">Figure </a>9. State Variable
+Inspector</div>
+
+
+
+<p>In this case, the RandomVariate type is "left over" from
+the parameter declaration.  For the Arrival Process model, the state variable
+(numberArrivals)  is of type int. Enter this information (Figure 10).  Click Apply Changes to go back to the Event Graph Editor window.</p>
+
+<p class=BodyTextCentered><img width='380' height='156' src="tutorial_files/image010.jpg"></p>
+<div class='caption'><a name="_Ref86552109">Figure </a>10. Declaring the
+numberArrivals State Variable</div>
+
+
+
+<p>As with parameters, it is best to continue defining all
+the state variables for a more complex Event Graph component.  As with
+parameters, any defined state variable can be deleted by first selecting it in
+the panel and then clicking the ‘-‘ icon.  A confirmation dialog appears for
+all deletions.</p>
+
+<p>The final step in creating the component is to draw the
+Event Graph itself and fill in the information defining the Event nodes and
+Scheduling/Canceling edges.  Start by dragging and releasing an Event node  from
+the toolbar to the Event Graph palette on the left of the window (Figure 11).  Do this again to create a second Event node.  The Events will be given default names that should always be changed.</p>
+
+<p class=BodyTextCentered><img width='588' height='437' src="tutorial_files/image011.gif"></p>
+<div class='caption'><a name="_Ref86552852">Figure </a>11. Dragging Event Nodes  to
+the Palette</div>
+
+
+
+<p>To modify an Event node’s properties, double-click on it
+to bring up the Event Node Inspector .  Double-click the evnt_0 node (Figure 12).</p>
+
+<p><img width=351 height=575 src="tutorial_files/image012.jpg"></p>
+<div class='caption'><a name="_Ref86553099">Figure </a>12. Event Node Inspector
+(Before Changes)</div>
+
+
+
+<p>Change the name of the event to "Run."  Recall that for
+Event Graphs, the Run Event is always scheduled on the Event List at time 0.0. 
+The Run Event is responsible for initializing all state variables of the
+component and scheduling any other non-Run Events at the start of a run, if
+necessary.  The state transition for Run in this case is to set numberArrivals
+to 0.  To add a state transition to an Event, click the ‘+’ icon below the
+State Transitions panel (at the very bottom of the Event Inspector).  This will
+bring up the State Transition dialog (Figure 13).  </p>
+
+<p class=BodyTextCentered><img width='431' height='217' src="tutorial_files/image013.jpg"></p>
+<div class='caption'><a name="_Ref86553387">Figure </a>13. State Transition
+Dialog</div>
+
+
+
+<p>Since state transitions can only be applied to state
+variables, the "state variable" part of the dialog can only be selected from
+previously defined state variables.  However, if it is desired to define a new
+state variable, then the user can click the "new" button in the upper right (Figure
+13) and the State Variable Inspector will appear for a new state variable definition (similar to Figure 8).  Enter "0" for the state transition for numberArrivals (Figure 14) and click "Apply Changes."  </p>
+
+<p class=BodyTextCentered><img width='431' height='217' src="tutorial_files/image014.jpg"></p>
+<div class='caption'><a name="_Ref86553684">Figure </a>14. The State Transition
+in Run</div>
+
+
+
+<p>The Event Inspector for Run should now look like Figure 15.   Click Apply Changes, and edit the other event.  It should be renamed to "Arrival" and its state transition should be to change numberArrivals to "numberArrivals + 1" (as defined in the original Event Graph of Figure
+1).</p>
+
+<p class=MsoBodyText align=center><img width='351' height='580' src="tutorial_files/image015.jpg"></p>
+<div class='caption'><a name="_Ref86553883">Figure </a>15. Event Inspector for
+Run after State Transition Defined</div>
+
+
+
+<p>After filling in the state transition and renaming the
+event, the Event Inspector for the second event should look like Figure 16</p>
+
+<p class=BodyTextCentered><img width='351' height='575' src="tutorial_files/image016.jpg"></p>
+<div class='caption'><a name="_Ref86554117">Figure </a>16. Event Definition for
+Arrival Event</div>
+
+
+
+<p>You should save you model at this point.  You can also
+view the saved XML to see how the model is being stored.  Note that in addition
+to Parameter and StateVariable elements, the XML now includes Event elements (Figure
+17).  Note also that the Event elements contain StateTransition elements that specify that Event’s state transition.  In general, an Event element may have as many StateTransition elements as desired.</p>
+
+<p class=BodyTextCentered><img width='475' height='500' src="tutorial_files/image017.jpg"></p>
+<div class='caption'><a name="_Ref86554280">Figure </a>17. XML After Defining
+Events</div>
+
+
+
+<p>Now that the Events are defined, you can also generate the
+Java code (even though the Event Graph component is not yet complete).  Click
+File | Generate Java to bring up a window with the corresponding Java code (Figure
+18).  At any point the user has the option of generating the Java code, saving it (click on the "Save Sourceand Close" button), and modifying the code.  However, changes produced in this manner cannot be imported back
+to Viskit (at this time), so such an action would be a one-way street.  Staying
+in Viskit, the user can check the model by clicking the "Compile test" button. 
+</p>
+
+<p class=BodyTextCentered><img width='576' height='480' src="tutorial_files/image018.jpg"></p>
+<div class='caption'><a name="_Ref86554506">Figure </a>18. Generated Java</div>
+
+
+
+<p>A successful outcome of "Compile test" is shown in Figure 19.</p>
+
+<p class=BodyTextCentered><img width='576' height='551' src="tutorial_files/image019.jpg"></p>
+<div class='caption'><a name="_Ref86554742">Figure </a>19. Successful Compile
+Test</div>
+
+
+
+<p>Returning to the main Event Graph window, the final step
+is to draw and configure the scheduling edges.  To draw a scheduling edge, fist
+go to "Create Scheduling Edge" mode by clicking on the Scheduling Edge Mode
+icon (<img width=23 height=21 src="tutorial_files/image020.gif">, see Figure 20).  The Event nodes will be surrounded by a dark square, and when the mouse is over an Event, the cursor will become a hand.</p>
+
+<p class=BodyTextCentered><img width='588' height='437' src="tutorial_files/image021.gif"></p>
+<div class='caption'><a name="_Ref86559276">Figure </a>20. Going to &quot;Create
+Scheduling Edge&quot; Mode</div>
+
+
+
+<p>When in this mode, a scheduling edge is created by
+dragging the mouse from one Event node (the scheduling Event) to another Event
+node (the scheduled Event).  Drawing the scheduling edge between the Run Event
+and the Arrival Event results in the window looking like Figure 21.</p>
+
+<p class=BodyTextCentered><img width='576' height='432' src="tutorial_files/image022.jpg"></p>
+<div class='caption'><a name="_Ref86559497">Figure </a>21. After Drawing
+Scheduling Edge</div>
+
+
+
+<p>Self-scheduling edges (one of which is needed for the
+Arrival Event, as shown in Figure 1 and Figure 2) are created by dragging from the Self-scheduling edge icon onto the Event for which the self-scheduling edge is desired (Figure 22).  In this case, drag the self-scheduling edge icon onto the Arrival Event to create the self-scheduling edge from Arrival to itself (Figure 22).</p>
+
+<p class=BodyTextCentered><img width='588' height='437' src="tutorial_files/image023.gif"></p>
+<div class='caption'><a name="_Ref86559823">Figure </a>22. Self-Scheduling Edge</div>
+
+
+
+<p>Each edge usually must be edited to enter the necessary
+information.  Double-click on the Run-Arrival edge to bring up its Inspector (Figure
+23).  The source and target events are determined by the drawing, and so are not editable.   Also, although it appears that whether an edge is Scheduling or Canceling can be modified by the radio buttons, in fact they
+can’t.  If a Canceling edge is desired, then it must be drawn separately.  Canceling
+edges will be covered in a later section.</p>
+
+<p>&nbsp;</p>
+
+<p class=BodyTextCentered><img width='328' height='490' src="tutorial_files/image024.jpg"></p>
+<div class='caption'><a name="_Ref86560103">Figure </a>23. Inspector for
+Run-Arrival Scheduling Edge (before edit)</div>
+
+
+
+<p>For simple models, only the time delay and the edge
+condition are typically modified.  For this model, we need to enter the delay
+of an interarrival time.  The interarrivalTime parameter was defined as a
+RandomVariate, which uses the generate() method to generate pseudo-random
+variates.  Therefore, the time delay for this edge is given by
+interarrivalTime.generate() (Figure 24).  Click "Apply Changes" to return to the main Window.</p>
+
+<p class=BodyTextCentered><img width='328' height='490' src="tutorial_files/image025.jpg"></p>
+<div class='caption'><a name="_Ref86560477">Figure </a>24. Delay entered for
+Run-Arrival Scheduling Edge</div>
+
+
+
+<p>Similarly, edit the Self-Scheduling edge for the Arrival
+Event by double-clicking on it.  Its inspector should appear just like Figure 23 (except that both the Source and Target events are "Arrival").  The delay should be filled in as "interarrivalTime.generate()" just as for the Run-Arrival edge.</p>
+
+<p>The model is complete!  Save the model and, if you wish,
+view the generated XML (File | View Saved XML, Figure 25).  You can also generate the Java code and do a compile test.  </p>
+
+<p><img width='475' height='500' src="tutorial_files/image026.jpg"></p>
+<div class='caption'><a name="_Ref86560849">Figure </a>25. XML for Final model,
+Showing Schedule Element in Run Event</div>
+
+<p>Congratulations!  You have created your first Event Graph
+component.  Although this is about the simplest possible Event Graph Component,
+the Arrival Process is nevertheless a very useful and reusable component.  A
+DES model can be created in the Assembly Editor using only this component, and
+that is what we will do next.</p>
+
+<h3>3.&nbsp; Creating a Simple Assembly</h3>
+
+</div>
+
+</body>
+
+</html>
