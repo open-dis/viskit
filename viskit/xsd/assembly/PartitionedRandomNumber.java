@@ -4,7 +4,9 @@
  * Created on July 10, 2006, 10:54 AM
  *
  * Wraps a RandomNumber to partition the outcome within
- * a partition. This is used for instance in an LHS, where
+ * N equally lengthed intervals.
+ * 
+ * This is used for instance in an LHS, where
  * a distribution is to be sampled within each partition.
  * Setting the partition number in effect scales by
  * 1/N and shifts by n/N the draw() outcome.
