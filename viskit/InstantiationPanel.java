@@ -136,7 +136,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             return;
           }
           ffPan.setData(new VInstantiator.FreeF(newType,""));
-          conPan.setData(new VInstantiator.Constr(newType,new Vector()));
+          //conPan.setData(new VInstantiator.Constr(newType,new Vector()));
+          //conPan.setType(newType);
           factPan.setData(new VInstantiator.Factory(newType,"","",new Vector()));
         }
         int idx = methodCB.getSelectedIndex();
@@ -355,6 +356,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         // oddly enough this is exactly what VInstantiator.indexOfArgNames(String type, List args)
         // 
         if (viskit.Vstatics.debug) System.out.println("setting data for "+vi.getType());
+        
         int indx = vi.indexOfArgNames(vi.getType(),vi.getArgs());
         if (viskit.Vstatics.debug) System.out.println("found a matching constructor at "+indx);
         constructorPanels[indx].setData(vi.getArgs());
