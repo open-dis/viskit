@@ -16,7 +16,7 @@
  *
  * 2. before each series of Replications in a DesignPoint as given by row of LHS, 
  * set the partition for each respective RandomVariate in the row by the row value.
- * ie, for some RV, rv.getRandomNumber().setCurrentPartition(row[i]);
+ * ie, for some RV, rv[i].getRandomNumber().setCurrentPartition(row[i]);
  *
  * repeat for each DesignPoint in the LHS. 
  *
