@@ -59,7 +59,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
   {
     this(ownerDialog,changedListener,onlyConstr,false);
   }
-  public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener, boolean onlyConstr, boolean typeEditable)
+  public InstantiationPanel(final JDialog ownerDialog, ActionListener changedListener, boolean onlyConstr, boolean typeEditable)
   {
     modifiedListener = changedListener;
     packMe = ownerDialog;
@@ -71,6 +71,13 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     typeLab = new JLabel("type",JLabel.TRAILING);
     typeTF = new JTextField();
     typeTF.setEditable(typeEditable);
+    typeTF.addActionListener(new ActionListener() {
+        
+        public void actionPerformed(ActionEvent e) {
+            
+            methodCB.actionPerformed(e);
+        }
+    });
     typeLab.setLabelFor(typeTF);
 
     methodLab = new JLabel("method",JLabel.TRAILING);
