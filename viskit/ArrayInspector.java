@@ -48,7 +48,7 @@ public class ArrayInspector  extends JDialog
     typeTF.setEditable(false);
     Vstatics.clampHeight(typeTF);
     typeLab.setLabelFor(typeTF);
-    JLabel countLab = new JLabel("Array size (1-d)",JLabel.TRAILING);
+    JLabel countLab = new JLabel("Array length",JLabel.TRAILING);
     sizeTF = new JTextField();
     Vstatics.clampHeight(sizeTF);
     countLab.setLabelFor(sizeTF);
