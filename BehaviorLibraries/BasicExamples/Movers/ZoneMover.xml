@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.DISMover3D" name="ZoneMover" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="start" type="diskit.Vec3d">
+        <Comment>The starting position for this entity</Comment>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment>The maximum speed for this entity</Comment>
+    </Parameter>
+    <Parameter name="moverID" type="int">
+        <Comment>The unique DIS entity ID number for this entity</Comment>
+    </Parameter>
+    <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
+        <Comment>The zone geometry objects that will be used to generate waypoints</Comment>
+    </Parameter>
+    <StateVariable name="zoneMoverManager" type="diskit.ZoneMoverManager">
+        <Comment>The mover manager that moves entities by using zone geometry</Comment>
+    </StateVariable>
+    <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
+        <Comment>Generates waypoints based on zones parameter</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>The mode that this mover is currently in</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>Required event that is called at the begining of each simulation run</Comment>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
+            <Comment>Only proceed if this mover has zones to process, otherwise do nothing</Comment>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="150"/>
+    </Event>
+    <Event name="Init">
+        <Comment>Called from super class to initialize movers</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>The entity being called by it's super class</Comment>
+        </Argument>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment>Only register this mover if the super class called this entity</Comment>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="30"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Registers this entity as a mover in the scenario</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>This mover</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="130" y="30"/>
+    </Event>
+    <Event name="ProcessZones">
+        <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled.</Comment>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator(this, zones)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+        </StateTransition>
+        <Schedule event="StartMoving"/>
+        <Code/>
+        <Coordinate x="120" y="150"/>
+    </Event>
+    <Event name="StartMoving">
+        <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
+        <LocalVariable name="initialLocation" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment>An initial waypoint in one of the provided zones</Comment>
+        </LocalVariable>
+        <LocalVariable name="initialDestination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
+            <Comment>An initial destination in one of the zones</Comment>
+        </LocalVariable>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.TRANSITING"/>
+        </StateTransition>
+        <Code>/*REQUIRED CODE BLOCK FOR MOVER TO START MOVING
+Without these method calls, IN THIS ORDER, the mover will do nothing. These method calls set the mover in motion and are invoking methods in the super class*/
+setStartPosition(initialLocation);
+setCruiseSpeed(maximumSpeed/2);
+setDestination(initialDestination);
+start();</Code>
+        <Coordinate x="220" y="150"/>
+    </Event>
+</SimEntity>
+
