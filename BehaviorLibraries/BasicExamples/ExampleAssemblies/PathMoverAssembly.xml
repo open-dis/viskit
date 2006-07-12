@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly name="PathMoverAssembly" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
+        <TerminalParameter name="isActive" type="boolean" value="true"/>
+        <TerminalParameter name="duration" type="double" value=".2"/>
+        <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
+        <Coordinate x="280" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter name="speedScale" type="double" value=".5"/>
+        <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.8"/>
+        <TerminalParameter name="port" type="int" value="62040"/>
+        <TerminalParameter name="siteID" type="int" value="0"/>
+        <TerminalParameter name="appID" type="int" value="1"/>
+        <Coordinate x="390" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="PathMover" type="examples.PathMover">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="x" type="double" value="-1410"/>
+            <TerminalParameter name="y" type="double" value="-746"/>
+            <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+        <TerminalParameter name="moverID" type="int" value="101"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1670.41"/>
+                <TerminalParameter name="y" type="double" value="-1438.68"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1715.83"/>
+                <TerminalParameter name="y" type="double" value="-1170.80"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1614.89"/>
+                <TerminalParameter name="y" type="double" value="-772.124"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1206.12"/>
+                <TerminalParameter name="y" type="double" value="-353.26"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-928.567"/>
+                <TerminalParameter name="y" type="double" value="-338.12"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-746.891"/>
+                <TerminalParameter name="y" type="double" value="-524.843"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1054.73"/>
+                <TerminalParameter name="y" type="double" value="-782.217"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1095.104"/>
+                <TerminalParameter name="y" type="double" value="-1276.78"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1670.41"/>
+                <TerminalParameter name="y" type="double" value="-1438.68"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="440" y="120"/>
+    </SimEntity>
+    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PathMover"/>
+    <Schedule stopTime="1000" verbose="false"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+
