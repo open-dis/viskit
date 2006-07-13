@@ -66,7 +66,9 @@ import java.util.ArrayList;
 
 public class EventGraphAssemblyComboMainFrame extends JFrame
 {
-  JTabbedPane tabbedPane;
+  private JTabbedPane tabbedPane;
+  private JTabbedPane runTabbedPane;
+
   EventGraphViewFrame egFrame;
   AssemblyViewFrame asyFrame;
   InternalAssemblyRunner asyRunComponent;
@@ -76,6 +78,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   private DoeMain doeMain;
   /** The initial assembly to load. */
   private String initialFile;
+
+  private final int TAB0_EGEDITOR_IDX = 0;
+  private final int TAB0_ASSYEDITOR_IDX = 1;
+  private final int TAB0_ASSYRUN_SUBTABS_IDX = 2;
+  private final int TAB1_LOCALRUN_IDX = 0;
+  private final int TAB1_DOE_IDX = 1;
+  private final int TAB1_CLUSTERUN_IDX = 2;
+
 
   public EventGraphAssemblyComboMainFrame(String initialFile)
   {
@@ -112,11 +122,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     JMenuBar menuBar;
 
     tabbedPane = new JTabbedPane();
+    ChangeListener tabChangeListener = new myTabChangeListener();
+
     myQuitAction = new QuitAction("Quit");
 
     // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
-    tabbedPane.add("Event Graph Editor",egFrame.getContent());   // 0
+    tabbedPane.add(egFrame.getContent(),this.TAB0_EGEDITOR_IDX);
+    tabbedPane.setTitleAt(TAB0_EGEDITOR_IDX,"Event Graph Editor");
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -127,7 +140,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Assembly editor
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
-    tabbedPane.add("Assembly Editor",asyFrame.getContent());  //1
+    tabbedPane.add(asyFrame.getContent(),TAB0_ASSYEDITOR_IDX);
+    tabbedPane.setTitleAt(TAB0_ASSYEDITOR_IDX,"Assembly Editor");
     menuBar = asyFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -135,9 +149,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyFrame.setTitleListener(myTitleListener,1);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
+    runTabbedPane = new JTabbedPane();
+    tabbedPane.add(runTabbedPane,TAB0_ASSYRUN_SUBTABS_IDX);
+    tabbedPane.setTitleAt(TAB0_ASSYRUN_SUBTABS_IDX,"Assembly Run");
+
     // Assembly runner
     asyRunComponent = new InternalAssemblyRunner();
-    tabbedPane.add("Assembly Run",asyRunComponent.getContent());   // 2
+    runTabbedPane.add(asyRunComponent.getContent(),TAB1_LOCALRUN_IDX);
+    runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX,"Local Run");
     menuBar = asyRunComponent.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -151,8 +170,11 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     // Design of experiments
     doeMain = DoeMain.main2();
     DoeMainFrame doeFrame = doeMain.getMainFrame();
-    tabbedPane.addTab("Design of Experiments",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
-                      doeFrame.getContent());
+    runTabbedPane.add(doeFrame.getContent(),TAB1_DOE_IDX);
+    runTabbedPane.setTitleAt(TAB1_DOE_IDX,"Design of Experiments");
+    runTabbedPane.setIconAt(TAB1_DOE_IDX,new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+    //runTabbedPane.addTab("Design of Experiments",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
+    //                  doeFrame.getContent());
     //tabbedPane.add("Design of Experiments",doeFrame.getContent());
     menuBar = doeMain.getMenus();
     if(menuBar == null){
@@ -167,16 +189,17 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     // Grid run panel
     runGridComponent = new JobLauncherTab(doeMain.getController(),null,null,this);
     doeFrame.getController().setJobLauncher(runGridComponent);
-    //tabbedPane.add("Launch Cluster Job",runGridComponent.getContent());
-    tabbedPane.addTab("Launch Cluster Job",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
-                      runGridComponent.getContent());
+    runTabbedPane.add(runGridComponent.getContent(),TAB1_CLUSTERUN_IDX);
+    runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX,"LaunchClusterJob");
+    runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX,new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+    //runTabbedPane.addTab("Launch Cluster Job",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
+    //                  runGridComponent.getContent());
     menuBar = new JMenuBar();
     menuBar.add(new JMenu("File"));
     jamQuitHandler(null,myQuitAction,menuBar);
     menus.add(menuBar);
     doCommonHelp(menuBar);
     runGridComponent.setTitleListener(myTitleListener,4);
-
 
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
@@ -200,7 +223,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Swing:
     getContentPane().add(tabbedPane);
-    tabbedPane.addChangeListener(new myTabChangeListener());
+
+    tabbedPane.addChangeListener(tabChangeListener);
+    runTabbedPane.addChangeListener(tabChangeListener);
   }
   private void runLater(final long ms, final Runnable runr)
   {
@@ -221,16 +246,19 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   {
     public void stateChanged(ChangeEvent e)
     {
-      getJMenuBar().remove(hmen);
       int i = tabbedPane.getSelectedIndex();
-      JMenuBar newMb = (JMenuBar)menus.get(i);
-      newMb.add(hmen);
-      setJMenuBar(newMb); //(JMenuBar)menus.get(i));
+      if(i == TAB0_ASSYRUN_SUBTABS_IDX)
+        i += runTabbedPane.getSelectedIndex();
+
+      getJMenuBar().remove(hmen);
+      JMenuBar newMB = (JMenuBar)menus.get(i);
+      newMB.add(hmen);
+      setJMenuBar(newMB);
       setTitle((String)titles[i]);
     }
   }
 
-  private JMenu hmen;
+   private JMenu hmen;
   /**
    * Stick the first Help menu we see into all the following ones.
    * @param mb
@@ -305,11 +333,12 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
       VGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
-      tabbedPane.setSelectedIndex(0); // eg
+      tabbedPane.setSelectedIndex(TAB0_EGEDITOR_IDX);
       if(((Controller)egFrame.getController()).preQuit()) {
-        tabbedPane.setSelectedIndex(1); // assy ed
+        tabbedPane.setSelectedIndex(TAB0_ASSYEDITOR_IDX);
         if(((ViskitAssemblyController)asyFrame.getController()).preQuit()) {
-          tabbedPane.setSelectedIndex(3); //doe
+          tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
+          runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
           if(doeMain.getController().preQuit()) {
             //todo other preQuits here if needed
 
@@ -365,7 +394,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
-      tabbedPane.setSelectedIndex(2);
+      tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
+      runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
       asyRunComponent.initParams(execStrings,runnerClassIndex);
     }
   }
@@ -377,7 +407,11 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     public void setTitle(String title, int key)
     {
       titles[key] = title;
-      if(tabbedPane.getSelectedIndex() == key)
+      int tabIdx = tabbedPane.getSelectedIndex();
+      if(tabIdx == TAB0_ASSYRUN_SUBTABS_IDX)
+        tabIdx += runTabbedPane.getSelectedIndex();
+
+      if(tabIdx == key)
         EventGraphAssemblyComboMainFrame.this.setTitle(title);
     }
   }
