@@ -62,6 +62,11 @@ public class EventGraphAssemblyComboMain
 
     if (viskit.Vstatics.debug) System.out.println("***Inside EventGraphAssembly main: " + args.length);
     setLandFandFonts();
+
+    // Leave tooltips on the screen until mouse movement causes removal
+    ToolTipManager ttm = ToolTipManager.sharedInstance();
+    ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+
     JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
     VGlobals.instance().setMainAppWindow(mainFrame);
     mainFrame.setVisible(true);
