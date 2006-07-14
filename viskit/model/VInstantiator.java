@@ -31,6 +31,8 @@ public abstract class VInstantiator
 {
   private String type;
   private String name = "";
+  private String description ="";
+
   public String getType()
   {
     return type;
@@ -46,6 +48,14 @@ public abstract class VInstantiator
   public String getName()
   {
     return name;
+  }
+  public void setDescription(String desc)
+  {
+    description = desc;
+  }
+  public String getDescription()
+  {
+    return description;
   }
   abstract public VInstantiator vcopy();
   abstract public boolean isValid();
@@ -90,7 +100,8 @@ public abstract class VInstantiator
     public VInstantiator vcopy()
     {
       VInstantiator rv = new VInstantiator.FreeF(getType(),getValue());
-      rv.setName(this.getName());
+      rv.setName(getName());
+      rv.setDescription(getDescription());
       return rv;
     }
 
@@ -141,7 +152,7 @@ public abstract class VInstantiator
         // pick the EventGraph list that matches the
         // Assembly arguments
         if (eparams != null) {
-            while ( indx < eparams.length-1 ) {
+            while ( indx < eparams.length/*-1*/ ) {      // todo mike confirm
                 
                 if (paramsMatch(params,eparams[indx])) break;
                 else indx++;
@@ -153,6 +164,7 @@ public abstract class VInstantiator
                 if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
                     if (viskit.Vstatics.debug) System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
                     ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
+                    ((VInstantiator)args.get(j)).setDescription(listToString(((ParameterType)eparams[indx].get(j)).getComment()));
                     
                 }
             }
@@ -172,7 +184,16 @@ public abstract class VInstantiator
         ((VInstantiator)args.get(i)).setName((String)names.get(i));
       }
     }
-    
+    private String listToString(List lis)
+    {
+      StringBuffer sb = new StringBuffer("");
+      for(Iterator itr=lis.iterator();itr.hasNext();) {
+        String s = (String)itr.next();
+        sb.append(s);
+      }
+      return sb.toString();
+    }
+
     // return a List of VInstantiators given a List of Assembly Parameters
     List buildInstantiators(List assemblyParameters) {
         ArrayList instr = new ArrayList();
@@ -476,6 +497,7 @@ public abstract class VInstantiator
       }
       VInstantiator rv = new VInstantiator.Constr(getType(),lis);
       rv.setName(new String(this.getName()));
+      rv.setDescription(new String(this.getDescription()));
       return rv;
     }
     public boolean isValid()
@@ -508,7 +530,8 @@ public abstract class VInstantiator
         lis.add(vi.vcopy());
       }
       VInstantiator rv = new VInstantiator.Array(getType(),getInstantiators());
-      rv.setName(this.getName());
+      rv.setName(getName());
+      rv.setDescription(getDescription());
       return rv;
     }
 
@@ -582,7 +605,8 @@ public abstract class VInstantiator
         lis.add(vi.vcopy());
       }
       VInstantiator rv = new VInstantiator.Factory(getType(),getFactoryClass(),getMethod(),lis);
-      rv.setName(this.getName());
+      rv.setName(getName());
+      rv.setDescription(getDescription());
       return rv;
     }
     public boolean isValid()

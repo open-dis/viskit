@@ -321,6 +321,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 sign = sign.substring(0,sign.length()-3);
                 
                 constructorPanels[i] = new ConstructorPanel(this,parameters.length != 1,this,packMe);
+                // todo test carefully, following may not be required and might be causing double instantiations:
                 constructorPanels[i].setData(constr.getArgs());
                 
                 tp.addTab("Constructor " + i, null, constructorPanels[i], sign);

@@ -56,17 +56,21 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             //shadow[i] = inst.vcopy();
             shadow[i] = inst; //?
             typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
-            String nm = inst.getName();
-            ///if(nm != null && nm.length()>0 && nameLab != null) {
-            nameLab[i] = new JLabel(nm);
+            String s = inst.getName();
+            ///if(s != null && s.length()>0 && nameLab != null) {
+            nameLab[i] = new JLabel(s);
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(0,2,0,2))); // some space at sides
             nameLab[i].setOpaque(true);
             nameLab[i].setBackground(new Color(255,255,255,64));
-            if (viskit.Vstatics.debug) System.out.println("really set label "+nm);
+            if (viskit.Vstatics.debug) System.out.println("really set label "+s);
             //}
             //else
             //nameLab = null; // if one is bad, disable all
-            
+
+            s = inst.getDescription();
+            if(s != null && s.length()>0)
+              nameLab[i].setToolTipText(s);
+
             entryTF[i] = new JTextField(8);
             Vstatics.clampHeight(entryTF[i]);
             entryTF[i].setText(inst.toString());

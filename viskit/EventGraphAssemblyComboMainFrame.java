@@ -82,6 +82,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   private final int TAB0_EGEDITOR_IDX = 0;
   private final int TAB0_ASSYEDITOR_IDX = 1;
   private final int TAB0_ASSYRUN_SUBTABS_IDX = 2;
+  private final int TAB0_ANAL_REPORT_IDX = 3;
+
+  private final int TAB0_COUNT = TAB0_ANAL_REPORT_IDX +1;
+
   private final int TAB1_LOCALRUN_IDX = 0;
   private final int TAB1_DOE_IDX = 1;
   private final int TAB1_CLUSTERUN_IDX = 2;
@@ -128,13 +132,13 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
-    tabbedPane.add(egFrame.getContent(),this.TAB0_EGEDITOR_IDX);
+    tabbedPane.add(egFrame.getContent(),TAB0_EGEDITOR_IDX);
     tabbedPane.setTitleAt(TAB0_EGEDITOR_IDX,"Event Graph Editor");
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
-    egFrame.setTitleListener(myTitleListener,0);
+    egFrame.setTitleListener(myTitleListener,TAB0_EGEDITOR_IDX);
     setJMenuBar(menuBar);
     jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
 
@@ -146,12 +150,23 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
-    asyFrame.setTitleListener(myTitleListener,1);
+    asyFrame.setTitleListener(myTitleListener,TAB0_ASSYEDITOR_IDX);
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
     runTabbedPane = new JTabbedPane();
     tabbedPane.add(runTabbedPane,TAB0_ASSYRUN_SUBTABS_IDX);
     tabbedPane.setTitleAt(TAB0_ASSYRUN_SUBTABS_IDX,"Assembly Run");
+    menus.add(null); // placeholder
+
+    // Analyst report
+    tabbedPane.add(new JLabel("Analyst report goes here"),TAB0_ANAL_REPORT_IDX);
+    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report");
+    menuBar = new JMenuBar(); //todo implement
+    menus.add(menuBar);
+    doCommonHelp(menuBar);
+    jamSettingsHandler(menuBar);
+    //todo blah.setTitleListener(myTitleListener,TAB0_ANAL_REPORT_IDX);
+    //todo jamQuitHandler....
 
     // Assembly runner
     asyRunComponent = new InternalAssemblyRunner();
@@ -161,7 +176,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
-    asyRunComponent.setTitleListener(myTitleListener,2);
+    asyRunComponent.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_LOCALRUN_IDX);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     AssemblyController controller = ((AssemblyController)asyFrame.getController());
     controller.setInitialFile(initialFile);
@@ -173,9 +188,6 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     runTabbedPane.add(doeFrame.getContent(),TAB1_DOE_IDX);
     runTabbedPane.setTitleAt(TAB1_DOE_IDX,"Design of Experiments");
     runTabbedPane.setIconAt(TAB1_DOE_IDX,new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
-    //runTabbedPane.addTab("Design of Experiments",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
-    //                  doeFrame.getContent());
-    //tabbedPane.add("Design of Experiments",doeFrame.getContent());
     menuBar = doeMain.getMenus();
     if(menuBar == null){
       menuBar = new JMenuBar();
@@ -183,7 +195,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     }
     menus.add(menuBar);
     doCommonHelp(menuBar);
-    doeFrame.setTitleListener(myTitleListener,3);
+    doeFrame.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_DOE_IDX);
     jamQuitHandler(doeMain.getQuitMenuItem(),myQuitAction,menuBar);
 
     // Grid run panel
@@ -192,14 +204,12 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     runTabbedPane.add(runGridComponent.getContent(),TAB1_CLUSTERUN_IDX);
     runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX,"LaunchClusterJob");
     runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX,new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
-    //runTabbedPane.addTab("Launch Cluster Job",new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")),
-    //                  runGridComponent.getContent());
     menuBar = new JMenuBar();
     menuBar.add(new JMenu("File"));
     jamQuitHandler(null,myQuitAction,menuBar);
     menus.add(menuBar);
     doCommonHelp(menuBar);
-    runGridComponent.setTitleListener(myTitleListener,4);
+    runGridComponent.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_CLUSTERUN_IDX);
 
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
@@ -248,7 +258,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     {
       int i = tabbedPane.getSelectedIndex();
       if(i == TAB0_ASSYRUN_SUBTABS_IDX)
-        i += runTabbedPane.getSelectedIndex();
+        i = TAB0_COUNT+runTabbedPane.getSelectedIndex();
 
       getJMenuBar().remove(hmen);
       JMenuBar newMB = (JMenuBar)menus.get(i);
@@ -276,6 +286,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       }
     }
   }
+
   private void jamSettingsHandler(JMenuBar mb)
   {
     for(int i=0;i<mb.getMenuCount();i++) {
@@ -409,7 +420,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       titles[key] = title;
       int tabIdx = tabbedPane.getSelectedIndex();
       if(tabIdx == TAB0_ASSYRUN_SUBTABS_IDX)
-        tabIdx += runTabbedPane.getSelectedIndex();
+        tabIdx = TAB0_COUNT+runTabbedPane.getSelectedIndex();
 
       if(tabIdx == key)
         EventGraphAssemblyComboMainFrame.this.setTitle(title);
