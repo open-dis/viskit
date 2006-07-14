@@ -43,12 +43,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit;
 
-import javax.swing.*;
-
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
-import org.apache.commons.configuration.XMLConfiguration;
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+
+import javax.swing.*;
 
 public class EventGraphAssemblyComboMain
 {
