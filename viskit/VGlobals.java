@@ -850,7 +850,8 @@ public class VGlobals
     if (hConfig == null) {
       try {
         File hf = new File(userConfigPath);
-        if (!hf.exists()) {
+        System.out.println("Loading history configuration from "+hf);
+        if (!hf.exists() || hf.length() < 3) {
           File src = new File("c_history_template.xml");
           hf.createNewFile();
           FileIO.copyFile(src, hf, true);
