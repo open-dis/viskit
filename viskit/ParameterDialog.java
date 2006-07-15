@@ -181,6 +181,10 @@ public class ParameterDialog extends JDialog
     nm = nm.replaceAll("\\s","");
     if(param != null) {
       param.setName(nm);
+      // 
+      if ( ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
+          ty = "java.lang."+ty;
+      }
       param.setType(ty);
       param.setComment(commentField.getText());
     }
