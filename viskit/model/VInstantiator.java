@@ -365,9 +365,19 @@ public abstract class VInstantiator
                   if (viskit.Vstatics.debug) System.out.print("touching "+Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType())+" "+((VInstantiator)(args.get(j))).getType());
                   String pType = Vstatics.convertClassName(((ParameterType)(parameters[i].get(j))).getType());
                   String vType = ((VInstantiator)(args.get(j))).getType();
-                  match &= pType.equals(vType);                
-                  // set the names, the final iteration of while cleans up any
-                  // foo
+                  
+                  // check if vType was assignable from pType.
+                  
+                  Class pClazz = Vstatics.classForName(pType);
+                  Class vClazz = Vstatics.classForName(vType);
+                  Class[] vInterfz = vClazz.getInterfaces();
+                  boolean interfz = false;
+                  for (int k = 0; k < vInterfz.length; k++) {
+                      interfz |= vInterfz[k].isAssignableFrom(pClazz);
+                  }
+                  match &= ( vClazz.isAssignableFrom(pClazz) | interfz );
+                  
+                  // set the names, the final iteration of while cleans up
                   
                   ((VInstantiator)(args.get(j))).setName(
                         ((ParameterType)(parameters[i].get(j))).getName()
