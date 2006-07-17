@@ -326,10 +326,11 @@ public abstract class VInstantiator
             Class[] vInterfz = aClazz.getInterfaces();
             boolean interfz = false;
             for (int k = 0; k < vInterfz.length; k++) {
-                interfz |= vInterfz[k].isAssignableFrom(eClazz);
+                //interfz |= vInterfz[k].isAssignableFrom(eClazz);
+                interfz |= eClazz.isAssignableFrom(vInterfz[k]);
             }
-            boolean match = ( aClazz.isAssignableFrom(eClazz) | interfz );
-                  
+            //boolean match = ( aClazz.isAssignableFrom(eClazz) | interfz );
+            boolean match = ( eClazz.isAssignableFrom(aClazz) | interfz );      
             if (!match) {
                if (viskit.Vstatics.debug) System.out.println("No match.");
                return false;
@@ -385,10 +386,11 @@ public abstract class VInstantiator
                   Class[] vInterfz = vClazz.getInterfaces();
                   boolean interfz = false;
                   for (int k = 0; k < vInterfz.length; k++) {
-                      interfz |= vInterfz[k].isAssignableFrom(pClazz);
+                      //interfz |= vInterfz[k].isAssignableFrom(pClazz);
+                      interfz |= pClazz.isAssignableFrom(vInterfz[k]);
                   }
-                  match &= ( vClazz.isAssignableFrom(pClazz) | interfz );
-                  
+                  //match &= ( vClazz.isAssignableFrom(pClazz) | interfz );
+                  match &= ( pClazz.isAssignableFrom(vClazz) | interfz );
                   // set the names, the final iteration of while cleans up
                   
                   ((VInstantiator)(args.get(j))).setName(
