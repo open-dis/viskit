@@ -152,7 +152,7 @@ public abstract class VInstantiator
         // pick the EventGraph list that matches the
         // Assembly arguments
         if (eparams != null) {
-            while ( indx < eparams.length/*-1*/ ) {      // todo mike confirm
+            while ( indx < eparams.length-1 ) {
                 
                 if (paramsMatch(params,eparams[indx])) break;
                 else indx++;
