@@ -53,8 +53,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         int i = 0;
         for (Iterator itr = lis.iterator(); itr.hasNext();i++) {
             VInstantiator inst = (VInstantiator) itr.next();
-            //shadow[i] = inst.vcopy();
-            shadow[i] = inst; //?
+            shadow[i] = inst.vcopy();
+            //shadow[i] = inst; //?
             typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
             String s = inst.getName();
             ///if(s != null && s.length()>0 && nameLab != null) {
@@ -147,8 +147,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     public void actionPerformed(ActionEvent e) {
         int idx = Integer.parseInt(e.getActionCommand());
         
-        //VInstantiator vinst = shadow[idx].vcopy();
-        VInstantiator vinst = shadow[idx];
+        VInstantiator vinst = shadow[idx].vcopy();
+        //VInstantiator vinst = shadow[idx];
         //List[] params = Vstatics.resolveParameters(vinst.getType()); //
         //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ??? 
         Class c = Vstatics.classForName(vinst.getType());
@@ -173,8 +173,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 List args;
                 java.lang.reflect.Constructor[] construct = clazz.getConstructors();
                 if(construct != null && construct.length > 0) {
-                    args = VInstantiator.buildDummyInstantiators(construct[0]);
-                    if ( vinst instanceof VInstantiator.Constr) ((VInstantiator.Constr)vinst).setArgs(args);
+                    //args = VInstantiator.buildDummyInstantiators(construct[0]);
+                    //if ( vinst instanceof VInstantiator.Constr) ((VInstantiator.Constr)vinst).setArgs(args);
                     
                 }
             }
