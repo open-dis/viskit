@@ -303,24 +303,36 @@ public abstract class VInstantiator
         
         for (int i = 0; i < aparams.size(); i++) {
             Object o = aparams.get(i);
-            String s2 = ((ParameterType)(eparams.get(i))).getType();
-            String s1;
+            String eType = ((ParameterType)(eparams.get(i))).getType();
+            String aType;
             if ( o instanceof TerminalParameterType ) { // check if caller is sending assembly param types
-                s1 = ((TerminalParameterType)o).getType();
+                aType = ((TerminalParameterType)o).getType();
             } else if ( o instanceof MultiParameterType ) {
-                s1 = ((MultiParameterType)o).getType();
+                aType = ((MultiParameterType)o).getType();
             } else if ( o instanceof FactoryParameterType ) {
-                s1 = ((FactoryParameterType)o).getType();
+                aType = ((FactoryParameterType)o).getType();
             } else if (o instanceof ParameterType) { // from InstantiationPanel, this could also be an eventgraph param type
-                s1 = ((ParameterType)o).getType();
+                aType = ((ParameterType)o).getType();
             }   else return false;
-            System.out.print("Type match "+s1 + " to "+ s2);
-            s1 = s1.split("\\.")[ s1.split("\\.").length - 1 ];
-            s2 = s2.split("\\.")[ s2.split("\\.").length - 1 ];
-            if (viskit.Vstatics.debug) System.out.println(" tail "+s1 + " " + s2); // eg. java.lang.String vs. String?
-            if (!s1.equals(s2)) {
-                if (viskit.Vstatics.debug) System.out.println("No match.");
-                return false;
+            if (viskit.Vstatics.debug) System.out.print("Type match "+aType + " to "+ eType);
+            //aType = aType.split("\\.")[ aType.split("\\.").length - 1 ];
+            //eType = eType.split("\\.")[ eType.split("\\.").length - 1 ];
+            //if (viskit.Vstatics.debug) System.out.println(" tail "+aType + " " + eType); // eg. java.lang.String vs. String?
+            
+            // check if vType was assignable from pType.
+                  
+            Class eClazz = Vstatics.classForName(eType);
+            Class aClazz = Vstatics.classForName(aType);
+            Class[] vInterfz = aClazz.getInterfaces();
+            boolean interfz = false;
+            for (int k = 0; k < vInterfz.length; k++) {
+                interfz |= vInterfz[k].isAssignableFrom(eClazz);
+            }
+            boolean match = ( aClazz.isAssignableFrom(eClazz) | interfz );
+                  
+            if (!match) {
+               if (viskit.Vstatics.debug) System.out.println("No match.");
+               return false;
             }
         }
         if (viskit.Vstatics.debug) System.out.println("Match.");
