@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.LinkedList;
 import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;
@@ -12,6 +14,8 @@ import simkit.SimEvent;
 import simkit.stat.SavedStats;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SimpleStatsTally;
+import java.io.File;
+
 /**
  * Base class for creating Simkit scenarios. 
  * Modified to be BeanShellable and Viskit VCR aware - rmgoldbe, jmbailey
@@ -32,18 +36,33 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
     protected boolean stopRun;
     protected int startRepNumber = 0;
     
-    private double stopTime;
+    private double  stopTime;
     private boolean verbose;
     private boolean singleStep;
-    private int numberReplications;
+    private int     numberReplications;
     
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
     
+    
+    /***************************************************
+     *TODO MIKE: Wire boolean filters to AnalystReport GUI
+     ***************************************************/
+    private boolean analystReplicationData = true;
+    private boolean analystSummaryData     = true;
+    private boolean generateAnalystReport  = true;
+    private AnalystReportBuilder reportBuilder;
+    /***************************************************/
+    
+    
+    private ReportStatisticsConfig statsConfig;
+    
     private int designPointID;
     
     private DecimalFormat form;
+    
+    private LinkedList entitiesWithStats;
     
     /**
      * Default constructor sets paameters of BasicAssembly to their
@@ -67,6 +86,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
         propertyChangeListener = new PropertyChangeListener[0];
         setNumberReplications(1);
         hookupsCalled = false;
+        
+        //Creates a report stats config object and names it based on the name of this
+        //Assembly.
+        //TODO MIKE: instead of this.getName() We may not need to worry about the name of 
+        //the stats report file. Should discuss though.
+        statsConfig = new ReportStatisticsConfig(this.getName());
+        
+        
         
         //moved to run() to avoid beanshell upcall error
         //createObjects();
@@ -107,6 +134,32 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
         hookupDesignPointListeners();
         hookupPropertyChangeListeners();
         hookupsCalled = true;
+    }
+    /**
+     * Received the replicationStatistics Linked Hash Map from ViskitAssembly. This
+     * method extracts the key values and passes them to ReportStatisticsConfig. The
+     * key set is in the order of the replication statistics object in this class.
+     * The goal of this and related methods is to aid ReportStatisticsConfig in 
+     * exporting statistical results sorted by SimEntity
+     *
+     * NOTE: Requires that the Listeners in the assembly use the following naming
+     *       convention SimEntityName_PropertyName (e.g. RHIB_reportedContacts). 
+     *       ReportStatistics config uses the underscore to extract the entity name
+     *       from the key values of the LinkedHashMap. 
+     *
+     * TODO: Remove the naming convention requirement and has the SimEntityName be
+     *       an automated key value
+     */
+    protected void setStatisticsKeyValues(LinkedHashMap repStatistics){
+        Iterator itr = repStatistics.entrySet().iterator();
+        entitiesWithStats = new LinkedList();
+        while(itr.hasNext()){
+             Map.Entry entry = (Map.Entry)itr.next();
+             entitiesWithStats.add(entry.getKey().toString());   
+             System.out.println(entry.getKey().toString());                  
+            }
+        statsConfig.setEntityIndex(entitiesWithStats);
+           
     }
    
     protected abstract void createSimEntities();
@@ -288,7 +341,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
      */
     protected String getReplicationReport(int rep) {
         StringBuffer buf = new StringBuffer("Output Report for Replication #");
-        buf.append(rep);
+        buf.append(rep+1);
+        
+        //TODO MIKE: outputs replication data on the fly not best location but it works 
+        if(analystReplicationData)statsConfig.processReplicationReport(rep+1, replicationStats);
+        
         for (int i = 0; i < replicationStats.length; ++i) {
             buf.append(System.getProperty("line.separator"));
             buf.append(replicationStats[i].getName());
@@ -381,6 +438,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
         if (isPrintSummaryReport()) {
             System.out.println(getSummaryReport());
         }
+        
+
+        //TODO MIKE: Wire the following to the analyst report GUI somehow
+        if(analystSummaryData) statsConfig.processSummaryReport(designPointStats);
+        if(generateAnalystReport){ 
+            statsConfig.saveData();
+            reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
+            
+        }
+        
 
 
         //saveState(replication);
