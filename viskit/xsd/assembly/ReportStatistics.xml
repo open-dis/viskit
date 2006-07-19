@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportStatistics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\CVSProjects\Viskit\viskit\xsd\assembly\ReportStatistics.xsd">
+	<SimEntity name="RHIB">
+		<DataPoint property="ReportedContacts">
+			<ReplicationReport>
+				<Replication number="1">
+					<StatisticRecord count="1" minObservation="0" maxObservation="2" mean="1.234" standardDeviation=".23" variance=".1"/>
+				</Replication>
+				<Replication number="2">
+					<StatisticRecord count="1" minObservation="0" maxObservation="2" mean="1.234" standardDeviation=".23" variance=".1"/>
+				</Replication>
+			</ReplicationReport>
+		</DataPoint>
+		<SummaryReport>
+			<SummaryRecord property="reportedContacts" count="1" minObservation="0" maxObservation="2" mean="1.234" standardDeviation=".23" variance=".1"/>
+		</SummaryReport>
+	</SimEntity>
+</ReportStatistics>
