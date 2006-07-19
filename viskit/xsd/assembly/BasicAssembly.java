@@ -444,7 +444,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
         if(analystSummaryData) statsConfig.processSummaryReport(designPointStats);
         if(generateAnalystReport){ 
             statsConfig.saveData();
-            reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
+            //reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
             
         }
         
