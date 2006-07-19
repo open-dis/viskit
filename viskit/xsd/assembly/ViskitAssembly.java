@@ -12,14 +12,13 @@
 package viskit.xsd.assembly;
 
 import simkit.Adapter;
-import simkit.Schedule;
 import simkit.SimEntity;
 import simkit.stat.SampleStatistics;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
+
 
 
 /**
@@ -59,6 +58,14 @@ public class ViskitAssembly extends BasicAssembly {
         createReplicationStats();
         createDesignPointStats();
         createPropertyChangeListeners();
+       
+        
+        /**
+         * After all PCLs have been created pass the LHMap to the super so that the
+         * keys can be extracted for data output indexing. This method is used by 
+         * the ReportStatisticsConfig.
+         */
+        setStatisticsKeyValues(replicationStatistics);
     }
     
     public void performHookups() {
