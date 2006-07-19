@@ -198,7 +198,7 @@ public class ReportStatisticsConfig {
           try {
             XMLOutputter outputter = new XMLOutputter();
             //Create a unique file name for each DTG/Location Pair
-            String outputFile = ("C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Reports/"+author+"_"+assemblyName+".xml");
+            String outputFile = (author+"_"+assemblyName+".xml");
             FileWriter writer = new FileWriter(outputFile);
             outputter.output(report, writer);
             
