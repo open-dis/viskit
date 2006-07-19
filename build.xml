@@ -460,6 +460,8 @@
                 <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
+                <pathelement location="${dir.lib}/jdom.jar"/>
+                <pathelement location="${dir.lib}/xerces.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
@@ -472,6 +474,9 @@
             <include name="AssemblyHandler.java"/>
             <include name="GridRunner.java"/>
             <include name="Gridlet.java"/>
+            <include name="ReportStatisticsConfig.java"/>
+            <include name="ReportStatisticsDOM.java"/>
+            <include name="AnalystReportBuilder.java"/>
         </javac>
         
 
