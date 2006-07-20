@@ -17,11 +17,13 @@ package viskit.xsd.assembly;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.jdom.filter.ElementFilter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 public class AnalystReportBuilder {
@@ -192,14 +194,25 @@ public class AnalystReportBuilder {
     private String behaviorConclusions;
     
     /**
-     *UTH - The file locations of the the event graph files
+     *IPCB - Whether to include behavior descriptions
      */
-    private String[] eventGraphFiles;
+    private boolean printBehaviorDescriptions;
+    
     
     /**
-     *AREND - The file locations of the event graph image files
+     *The file locations of the the event graph files
      */
-    private String[] eventGraphImages;
+    private LinkedList eventGraphFiles;
+    
+    /**
+     *The file locations of the event graph image files
+     */
+    private LinkedList eventGraphImages;
+    
+    /**
+     *The names of the event graphs being saved
+     */
+    private LinkedList eventGraphNames;
     
     //SECTION VI. VALUES
     /**
@@ -277,8 +290,12 @@ public class AnalystReportBuilder {
       createSimulationConfiguration(printSimConfigComments, printAssemblyImage, 
                                     printEntityTable, simConfigComments, simConfigConclusions,
                                     assemblyImageLocation, assemblyFile);
+      createEntityParameters(printParameterComments, printParameterTable, parameterComments, 
+                             parameterConclusions);
+      createBehaviorDefinitions(printBehaviorDefComments, printBehaviorDescriptions, printEventGraphImages, behaviorComments,
+                                behaviorConclusions);
       
-       saveData();
+       saveAnalystReportXML();
       }
     }
     /**
@@ -348,12 +365,152 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("comments", booleanToString(printComments));
         simConfig.setAttribute("image", booleanToString(printImage));
         simConfig.setAttribute("entityTable", booleanToString(printEntityTable));
-        simConfig.addContent(makeComments(comments));
-        simConfig.addContent(makeConclusions(conclusions));
+        if(printComments)simConfig.addContent(makeComments(comments));
+        if(printComments)simConfig.addContent(makeConclusions(conclusions));
         if(printImage)simConfig.addContent(makeImage(assemblyImage));
         if(printEntityTable)simConfig.addContent(makeEntityTable(assemblyFileDirectory));
         rootElement.addContent(simConfig);   
     }
+    /**
+     * Creates the entity parameter section of this analyst report
+     *
+     *@param printComments whether to add comments to this section
+     *@param printTable whether to add a parameter tables to this section
+     *@param comments the comments to include
+     *@param conclusions the conclusions to include
+     */
+    private void createEntityParameters(boolean printComments, boolean printTable,
+                                        String comments, String conclusions){
+        Element entityParameters = new Element("EntityParameters");
+        entityParameters.setAttribute("comments", booleanToString(printComments));
+        entityParameters.setAttribute("parameterTables", booleanToString(printTable));
+        if(printComments)entityParameters.addContent(makeComments(comments));
+        if(printComments)entityParameters.addContent(makeConclusions(conclusions));
+        if(printTable)entityParameters.addContent(makeParameterTables());
+        
+        rootElement.addContent(entityParameters);
+            
+        }
+    
+    /**
+     * Creates the behavior parameters portion of the report
+     *
+     *@param printComments whether to print comments
+     *@param printDescriptions whether to print descriptions
+     *@param printImages whether to print the images
+     */
+    private void createBehaviorDefinitions(boolean printComments, boolean printDescriptions,
+                                           boolean printImages, String comments, String conclusions){
+        Element behaviorDefinitions = new Element("BehaviorDefinitions");
+        behaviorDefinitions.setAttribute("comments", booleanToString(printComments));
+        behaviorDefinitions.setAttribute("descriptions", booleanToString(printDescriptions));
+        behaviorDefinitions.setAttribute("image", booleanToString(printImages));
+        if(printComments)behaviorDefinitions.addContent(makeComments(comments));
+        if(printComments)behaviorDefinitions.addContent(makeConclusions(conclusions));
+        behaviorDefinitions.addContent(processBehaviors(printDescriptions, printImages));
+        
+        rootElement.addContent(behaviorDefinitions);
+    }
+    
+    /**
+     *Creates Behavior definition references in the analyst report template
+     */
+    private Element processBehaviors(boolean descript, boolean image){
+        Element behaviorList = new Element("BehaviorList");
+        for(int i = 0; i<eventGraphNames.size(); i++){
+            Element behavior = new Element("Behavior");
+            behavior.setAttribute("name", (String)eventGraphNames.get(i));
+            if(descript){
+                Element description = new Element("description");
+                description.setAttribute("text", "TODO: Need to resolve directory issues");
+                behavior.addContent(description);
+            }
+            if(image){
+                Element evtGraphImage = new Element("EventGraphImage");
+                evtGraphImage.setAttribute("dir",(String)eventGraphImages.get(i));
+                behavior.addContent(evtGraphImage);
+            }
+            behaviorList.addContent(behavior);
+        }
+        return behaviorList;
+    }
+    /**
+     *Creates parameter tables for all files in the assembly that have SMAL definitions.
+     *TODO: extract all parameters?  How to format in the report?
+     *
+     */
+     private Element makeParameterTables(){
+         Element parameterTables = new Element("ParameterTables");
+         Element rootElement = assemblyDocument.getRootElement();
+         List simEntityList  = rootElement.getChildren("SimEntity");
+         Iterator itr = simEntityList.iterator();
+         Element temp;
+         String entityName;
+         while(itr.hasNext()){
+             temp = (Element)itr.next();
+             entityName = temp.getAttributeValue("name");
+             List entityParams = temp.getChildren("MultiParameter");
+             Iterator itr2 = entityParams.iterator();
+             while(itr2.hasNext()){
+                 Element param = (Element)itr2.next();
+                 if(param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")){
+                 parameterTables.addContent(extractSMAL(entityName, param));
+                 }
+             }
+         }
+         return parameterTables;
+     }
+     /**
+      * Takes viskit.Assembly formatted SMAL.EntityDefinition data and formats it for the
+      * analyst report
+      *
+      *@param entityName the name of the entity
+      *@param entityDef the entityDefinition for this file
+      *@return table the properly formatted table entries
+      */
+     private Element extractSMAL(String entityName, Element entityDef){
+        Element table     = new Element("EntityParameterTable");
+        ElementFilter  multiParam = new ElementFilter("MultiParameter");
+        Iterator itr = entityDef.getDescendants(multiParam);
+        table.setAttribute("name", entityName);
+        while(itr.hasNext()){
+            System.out.println(itr.toString());
+            Element temp = (Element)itr.next();
+            String category = temp.getAttributeValue("type");
+            if(category.equals("diskit.SMAL.Classification"))table.addContent(makeTableEntry("Classification", temp));
+            if(category.equals("diskit.SMAL.IdentificationParameters"))table.addContent(makeTableEntry("Identification", temp));
+            if(category.equals("diskit.SMAL.PhysicalConstraints"))table.addContent(makeTableEntry("PhysicalConstraints",temp));
+            if(category.equals("diskit.SMAL.DynamicResponseConstraints"))table.addContent(makeTableEntry("DynamicResponseConstraints", temp));
+            if(category.equals("diskit.SMAL.TacticalConstraints"))table.addContent(makeTableEntry("TacticalConstraints",temp));
+        }
+        
+        return table;
+     }
+     /**
+      * Processes parameters
+      *
+      *@param category the category for this table entry
+      *@param data the element that corresponds to the category
+      *@return tableEntry the parameter in table format
+      */
+      private Element makeTableEntry(String category, Element data){
+        Element tableEntry = new Element(category);
+       
+        List dataList = data.getChildren("TerminalParameter");
+        Iterator itr = dataList.iterator();
+        
+        while(itr.hasNext()){
+            Element temp = (Element)itr.next();
+            if(!temp.getAttributeValue("value").equals("0")){
+                Element param = new Element("parameter");
+                param.setAttribute("name", temp.getAttributeValue("name"));
+                param.setAttribute("value", temp.getAttributeValue("value"));
+        
+                tableEntry.addContent(param);
+            }
+        }
+        return tableEntry;
+      }
     /**
      * Creates the entity table for this analyst xml object
      *
@@ -371,17 +528,55 @@ public class AnalystReportBuilder {
         Element  rootElement = assemblyDocument.getRootElement();
         List     simEntityList = rootElement.getChildren("SimEntity");
         Iterator itr = simEntityList.iterator();
+        
+        //Extract XML based simEntities for entityParameters and event graph image
+        eventGraphFiles = new LinkedList();
+        eventGraphImages = new LinkedList();
+        eventGraphNames  = new LinkedList();
+        String isJAVAfile = "diskit";//if a file is in the diskit package it is native java
+        
         while(itr.hasNext()){
             Element temp = (Element)itr.next();
+            String javaTest = (temp.getAttributeValue("type").substring(0,6));
+            //If its not a java file process it
+           
+            if(!javaTest.equals(isJAVAfile)){
             Element tableEntry = new Element("SimEntity");
             tableEntry.setAttribute("name", temp.getAttributeValue("name"));
             tableEntry.setAttribute("behaviorDefinition", temp.getAttributeValue("type"));
+            saveEventGraphReferences(temp.getAttributeValue("type"));
             entityTable.addContent(tableEntry);
+            }
         }
         
         
         return entityTable;
     }
+    /**
+     * Processes the 'type' value from a Viskit assembly, if it is an xml file, and
+     * adds it to the list of event graphs with the proper formatting of the file's
+     * path
+     *
+     *@param fileType the type of XML file being used
+     */
+    private void saveEventGraphReferences(String fileType){
+        
+         char letter;
+         int  idx = 0; 
+         for(int i = 0; i< fileType.length(); i++){
+            letter = fileType.charAt(i);
+            if(letter == '.')idx = i;
+            
+         }
+         String dir = "../../BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx);
+         String file = fileType.substring(idx+1, fileType.length());
+         String eventGraphDirectory = (dir + file +".xml");
+         String imgDirectory = "../../images/BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/"+ file +".png";
+         eventGraphFiles.add(eventGraphDirectory);
+         eventGraphImages.add(imgDirectory);
+         eventGraphNames.add(fileType.substring(idx+1,fileType.length()));
+        }
+    
     /**
      * Loads an XML document file for processing
      *
@@ -452,13 +647,14 @@ public class AnalystReportBuilder {
      /**
      * File I/O that saves the report in XML format
      */
-    public void saveData(){
+    public void saveAnalystReportXML(){
         
           
           try {
             XMLOutputter outputter = new XMLOutputter();
             //Create a unique file name for each DTG/Location Pair
-            String outputFile = ("../../../../Whereisit.xml");
+            String usr = System.getProperty("user.name");
+            String outputFile = ("../../../../" + usr + "AnalystReport.xml");
             FileWriter writer = new FileWriter(outputFile);
             outputter.output(reportXML, writer);
             writer.close();
@@ -508,7 +704,7 @@ public class AnalystReportBuilder {
                                          "for watching post-experiment replay.  Adding  a simple model of a mooring buoy would be a good addition " +
                                          "to this model.";
         assemblyImageLocation           ="C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.png";
-        //PAT TODO: FILE IO to read in assembly file for Entity Table
+        
         
         //Entity Parameters values
         printParameterComments      = true;
@@ -523,6 +719,7 @@ public class AnalystReportBuilder {
         //BehaviorParameter values
         printBehaviorDefComments   = true;
         printEventGraphImages      = true;
+        printBehaviorDescriptions  = true;
         behaviorComments           ="The agent behaviors used for this simulation were taken from the Behavior Libraries directory. No changes to these behaviors were made.";
         behaviorConclusions        ="The behaviors used in this experiment were sufficient given the overall objective.  However, it would be worthwhile to consider incorporating " +
                                     "classified procedures and doctrine for a more realistic harbor representation.";
