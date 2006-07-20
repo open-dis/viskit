@@ -15,10 +15,18 @@
 package viskit.xsd.assembly;
 
 import org.jdom.*;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
+import java.util.Iterator;
 
 
 public class AnalystReportBuilder {
     
+    private boolean debug = true;
     //MIKE: IPTF = input that should be received from the GUI - text field likely
     //MIKE: IPCB = input that should be received from the GUI - Check box likely
     //MIKE: IPFC = input that should be received from the GUI - FileChooser likely
@@ -234,16 +242,232 @@ public class AnalystReportBuilder {
      */
     private String recommendations;
     
+    /************************************************************
+     * Local NON-GUI variables for building/exporting the report
+     ************************************************************/
+    
+    /**
+     * The jdom.Document object that is used to build the report
+     */
+    private Document reportXML;
+    
+    /**
+     * The file name selected by the user from "SAVE AS" menu option
+     */
+    private String fileName;
+    
+    /**
+     * The root element of the report xml
+     */
+    private Element rootElement;
     
     /** Creates a new instance of AnalystReportBuilder */
     public AnalystReportBuilder(Document statisticsReport) {
-     /***********************************************************************************
-      *TODO: MIKE - remove after all of the wiring up is done this just tests dummy values
-      ***********************************************************************************/
-      setTestValues();
      
+      reportXML   = new Document();
+      rootElement = new Element("AnalystReport");
       this.statsReport = statisticsReport;
+      
+      if(debug){
+      setTestValues();
+      createHeader(reportName, classification, author, dateOfReport);
+      createExecutiveSummary(executiveSummaryComments, executiveSummary);
+      createSimulationLocation(printSimLocationComments, printSimLocationImage, 
+                               simLocComments, simLocConclusions,locationImage);
+      createSimulationConfiguration(printSimConfigComments, printAssemblyImage, 
+                                    printEntityTable, simConfigComments, simConfigConclusions,
+                                    assemblyImageLocation, assemblyFile);
+      
+       saveData();
+      }
     }
+    /**
+     * Creates the root element for the analyst report
+     */
+    public void createHeader(String reportName, String classification, String author, String dateOfReport){
+        reportXML.setRootElement(rootElement);
+        rootElement.setAttribute("name", reportName);
+        rootElement.setAttribute("classification", classification);
+        rootElement.setAttribute("author", author);
+        rootElement.setAttribute("date", dateOfReport);
+    }
+    /**
+     * Populates the executive summary portion of the AnalystReport XML
+     *
+     *@param printComments whether or not to print comments
+     *@param comments the text for the comments portions of this sections
+     */
+    public void createExecutiveSummary(boolean printComments, String comments){
+        Element executiveSummary = new Element("ExecutiveCommentary");
+        executiveSummary.setAttribute("comments", booleanToString(printComments));
+        if(printComments){
+            executiveSummary.addContent(makeComments(comments));
+        }
+        rootElement.addContent(executiveSummary);
+    }
+    /**
+     * Creates the SimulationLocation portion of the analyst report XML
+     *
+     *@param printComments whether or not to print comments
+     *@param printImages whether or not to print images
+     *@param comments the comments text for this report
+     *@param conclusions the conclusions text for this report
+     *@param locImageDirectory the full path name of the image file
+     */
+    public void createSimulationLocation(boolean printComments, boolean printImage, 
+                                         String comments, String conclusions,
+                                         String locImageDirectory){
+        Element simulationLocation = new Element("SimulationLocation");
+        simulationLocation.setAttribute("comments", booleanToString(printComments));
+        simulationLocation.setAttribute("images", booleanToString(printImage));
+        if(printComments){
+            simulationLocation.addContent(makeComments(comments));
+            simulationLocation.addContent(makeConclusions(conclusions));
+        }
+        if(printImage)simulationLocation.addContent(makeImage(locImageDirectory));
+        
+        rootElement.addContent(simulationLocation);
+    }
+    
+    /**
+     * Creates the simulation configuration portion of the Analyst report XML
+     *
+     *@param printComments whether to print comments
+     *@param printImage whether to print the assembly image
+     *@param printEntityTable whether to print the entity table
+     *@param comments the comments text
+     *@param conclusions the conclusions text
+     *@param assemblyImage the assemblyImage directory
+     *@param assemblyFile directory
+     */
+    private void createSimulationConfiguration(boolean printComments, boolean printImage,
+                                               boolean printEntityTable, String comments,
+                                               String conclusions, String assemblyImage,
+                                               String assemblyFileDirectory){
+        Element simConfig = new Element("SimulationConfiguration");
+        simConfig.setAttribute("comments", booleanToString(printComments));
+        simConfig.setAttribute("image", booleanToString(printImage));
+        simConfig.setAttribute("entityTable", booleanToString(printEntityTable));
+        simConfig.addContent(makeComments(comments));
+        simConfig.addContent(makeConclusions(conclusions));
+        if(printImage)simConfig.addContent(makeImage(assemblyImage));
+        if(printEntityTable)simConfig.addContent(makeEntityTable(assemblyFileDirectory));
+        rootElement.addContent(simConfig);   
+    }
+    /**
+     * Creates the entity table for this analyst xml object
+     *
+     *@param fileDirectory the location of the assembly file
+     *@return table the entityTable for the simConfig portion of the analyst report
+     */
+    public Element makeEntityTable(String fileDirectory){
+        try{
+        assemblyDocument = loadXML(fileDirectory);
+        }catch(IOException e){
+            System.out.println("Unable to load: " + fileDirectory);
+        }
+        
+        Element  entityTable = new Element("EntityTable");
+        Element  rootElement = assemblyDocument.getRootElement();
+        List     simEntityList = rootElement.getChildren("SimEntity");
+        Iterator itr = simEntityList.iterator();
+        while(itr.hasNext()){
+            Element temp = (Element)itr.next();
+            Element tableEntry = new Element("SimEntity");
+            tableEntry.setAttribute("name", temp.getAttributeValue("name"));
+            tableEntry.setAttribute("behaviorDefinition", temp.getAttributeValue("type"));
+            entityTable.addContent(tableEntry);
+        }
+        
+        
+        return entityTable;
+    }
+    /**
+     * Loads an XML document file for processing
+     *
+     * @param fileDir the location of the file
+     * @return doc the document object of the loaded XML
+     */
+    private Document loadXML(String fileDir)throws IOException{
+        
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(new File(fileDir));
+            return doc;
+        } catch(JDOMException e) {
+            e.printStackTrace();
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
+     *Converts boolean input into a 'true'/'false' string representation for use as
+     *an attribute value in the Analyst report XML.
+     *
+     *@param booleanFlag the boolean variable to convert
+     *@return str the string representation of the boolean variable
+     */
+    private String booleanToString(boolean booleanFlag){
+        String str = "";
+        if(booleanFlag)str = "true";
+        if(!booleanFlag)str = "false";
+        return str;
+    }
+    /**
+     * Creates a stand 'Image' element used by all sections of the report
+     *
+     *@param dir the directory of the image
+     *@return image the Image url embedded in well formed XML
+     */
+    private Element makeImage(String dir){
+        Element image = new Element("Image");
+        image.setAttribute("dir", dir);
+        return image;
+    }
+    /**
+     * Creates a standard 'Comments' element used by all sections of the report
+     * to add comments
+     *
+     *@param commentText the text comments
+     *@return comments the Comments embedded in well formed XML
+     */          
+    public Element makeComments(String commentText){
+        Element comments = new Element("Comments");
+        comments.setAttribute("text", commentText);
+        return comments;
+    }
+    /**
+     * Creates a standard 'Conclusions' element used by all sections of the report
+     * to add conclusions
+     *
+     *@param conclusionText the text comments
+     *@return conclusions the Comments embedded in well formed XML
+     */ 
+    public Element makeConclusions(String conclusionText){
+        Element conclusions = new Element("Conclusions");
+        conclusions.setAttribute("text", conclusionText);
+        return conclusions;
+    }
+     /**
+     * File I/O that saves the report in XML format
+     */
+    public void saveData(){
+        
+          
+          try {
+            XMLOutputter outputter = new XMLOutputter();
+            //Create a unique file name for each DTG/Location Pair
+            String outputFile = ("../../../../Whereisit.xml");
+            FileWriter writer = new FileWriter(outputFile);
+            outputter.output(reportXML, writer);
+            writer.close();
+            
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+     }
+    
     /**
      * TODO: Remove this method and all values. This was just setup to test XML and html output
      */
