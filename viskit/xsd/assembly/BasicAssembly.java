@@ -443,8 +443,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable{
         //TODO MIKE: Wire the following to the analyst report GUI somehow
         if(analystSummaryData) statsConfig.processSummaryReport(designPointStats);
         if(generateAnalystReport){ 
-            statsConfig.saveData();
-            //reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
+            //statsConfig.saveData();
+            reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
             
         }
         
