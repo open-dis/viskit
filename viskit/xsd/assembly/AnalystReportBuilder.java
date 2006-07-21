@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Date;
+import java.util.Formatter;
+import java.text.SimpleDateFormat;
 
 
 public class AnalystReportBuilder {
@@ -49,96 +52,96 @@ public class AnalystReportBuilder {
     /**
      * IPTF - User defined name for this analyst report
      */
-    private String reportName;
+    private String reportName="";
     
     /**
      *IPTF - Classification - the classfication for this entire report
      */
-    private String classification;
+    private String classification="";
     
     /**
      *IPTF -  Author - the name of the author as it should appear on the report
      */
-    private String author;
+    private String author="";
     
     /**
      *SYSPROP - Date - The date of the report (auto but modifiable)
      */
-    private String dateOfReport;
+    private String dateOfReport="";
     
     /**
      *IPCB - Whether or not to include comments in the executive summary - default to true
      */
-    private boolean executiveSummaryComments;
+    private boolean executiveSummaryComments=true;
     
     /**
      *IPTF - Comments (wrapped of the executive summary) from input field
      */
-    private String executiveSummary;
+    private String executiveSummary="";
     
     
     //SECTION II. VARIABLES
     /**
      *IPCB - Whether or not to include comments in SimulationLocation 
      */
-    private boolean printSimLocationComments;
+    private boolean printSimLocationComments=true;
     
     /**
      *IPCB - Whether or not to include an image in the SimulationLocation section
      */
-    private boolean printSimLocationImage;
+    private boolean printSimLocationImage=true;
     
     /**
      *IPTF - SimulationLocation comments 
      */
-    private String simLocComments;
+    private String simLocComments="";
     
     /**
      *IPTF - SimulationLocation conclusions
      */
-    private String simLocConclusions;
+    private String simLocConclusions="";
     
     /**
      *IPFC - Location X3D screenshot 
      */
-    private String locationImage;
+    private String locationImage="";
     
 
     //SECTION III. VARIABLES
     /**
      *IPTF - Simulation configuration comments
      */
-    private boolean printSimConfigComments;
+    private boolean printSimConfigComments=true;
     
     /**
      *IPCB - Whether to show assembly image
      */
-    private boolean printAssemblyImage;
+    private boolean printAssemblyImage=true;
     
     /**
      *IPCB - Whether to show entityTable
      */
-    private boolean printEntityTable;
+    private boolean printEntityTable=true;
     
     /**
      *UTH - Assembly file
      */
-    private String assemblyFile;
+    private String assemblyFile="";
     
     /**
      *IPTF - Simulation configuration comments
      */
-    private String simConfigComments;
+    private String simConfigComments="";
     
     /**
      *IPTF - Simulation configuration conclusions
      */
-    private String simConfigConclusions;
+    private String simConfigConclusions="";
     
     /**
      *AREND - Location of the assembly image
      */
-    private String assemblyImageLocation;
+    private String assemblyImageLocation="";
     
     /**
      *The jdom.Document object of the assembly file
@@ -150,22 +153,22 @@ public class AnalystReportBuilder {
     /**
      *IPCB - Whether to print parameter comments
      */
-    private boolean printParameterComments;
+    private boolean printParameterComments=true;
     
     /**
      *IPCB - Whether to print the parameterTable;
      */
-    private boolean printParameterTable;
+    private boolean printParameterTable=true;
     
     /**
      *IPTF - Parameter comments
      */
-    private String parameterComments;
+    private String parameterComments="";
     
     /**
      *IPTF - Parameter conclusions
      */
-    private String parameterConclusions;
+    private String parameterConclusions="";
     
     /**
      *The viskit.xsd.assembly.ReportStatisticsDOM object for this report
@@ -176,27 +179,27 @@ public class AnalystReportBuilder {
     /**
      *IPCB - Whether to print behavior definition comments
      */
-    private boolean printBehaviorDefComments;
+    private boolean printBehaviorDefComments=true;
     
     /**
      *IPCB - Whether to print event graph images
      */
-    private boolean printEventGraphImages;
+    private boolean printEventGraphImages=true;
     
     /**
      *IPTF - Behavior Definition comments
      */
-    private String behaviorComments;
+    private String behaviorComments="";
     
     /**
      *IPTF - Behavior Definition conclusions
      */
-    private String behaviorConclusions;
+    private String behaviorConclusions="";
     
     /**
      *IPCB - Whether to include behavior descriptions
      */
-    private boolean printBehaviorDescriptions;
+    private boolean printBehaviorDescriptions=true;
     
     
     /**
@@ -218,46 +221,42 @@ public class AnalystReportBuilder {
     /**
      *IPCB - Whether to include stats results comments
      */
-    private boolean printStatsComments;
+    private boolean printStatsComments=true;
     
     /**
      *IPCB - Whether to include replication stats
      */
-    private boolean printReplicationStats;
+    private boolean printReplicationStats=true;
     
     /**
      *IPCB - Whether to include summary stats
      */
-    private boolean printSummaryStats;
+    private boolean printSummaryStats=true;
     
     /**
      *IPTF - The comments for the stats results setting
      */
-    private String statsComments;
+    private String statsComments="";
     
     /**
      *IPTF - The conclusion for the stats results setting
      */
-    private String statsConclusions;
+    private String statsConclusions="";
     
     /**
      *IPCB - Whether to include Conclusions/Recommendations comments
      */
-    private boolean printRecommendationsConclusions;
+    private boolean printRecommendationsConclusions=true;
     
     /**
      *IPTF - The conclusions for this simulation
      */
-    private String conclusions;
+    private String conclusions="";
     
     /**
      *IPTF - The recommendations for future work
      */
-    private String recommendations;
-    
-    /************************************************************
-     * Local NON-GUI variables for building/exporting the report
-     ************************************************************/
+    private String recommendations="";
     
     /**
      * The jdom.Document object that is used to build the report
@@ -282,136 +281,137 @@ public class AnalystReportBuilder {
       this.statsReport = statisticsReport;
       
       if(debug){
-      setTestValues();
-      createHeader(reportName, classification, author, dateOfReport);
-      createExecutiveSummary(executiveSummaryComments, executiveSummary);
-      createSimulationLocation(printSimLocationComments, printSimLocationImage, 
-                               simLocComments, simLocConclusions,locationImage);
-      createSimulationConfiguration(printSimConfigComments, printAssemblyImage, 
-                                    printEntityTable, simConfigComments, simConfigConclusions,
-                                    assemblyImageLocation, assemblyFile);
-      createEntityParameters(printParameterComments, printParameterTable, parameterComments, 
-                             parameterConclusions);
-      createBehaviorDefinitions(printBehaviorDefComments, printBehaviorDescriptions, printEventGraphImages, behaviorComments,
-                                behaviorConclusions);
+      setTestValues();//TODO: Remove after GUI is fully wired or while testing GUI
+      }
+      createReportXML();
+          
+    }  
+      /**
+       *Creates the report XML and saves it in report format
+       */
+      public void createReportXML(){
+      createHeader();
+      createExecutiveSummary();
+      createSimulationLocation();
+      createSimulationConfiguration();
+      createEntityParameters();
+      createBehaviorDefinitions();
+      createStatisticalResults();
+      createConclusionsRecommendations();
       
        saveAnalystReportXML();
-      }
+      
     }
     /**
      * Creates the root element for the analyst report
      */
-    public void createHeader(String reportName, String classification, String author, String dateOfReport){
+    public void createHeader(){
         reportXML.setRootElement(rootElement);
         rootElement.setAttribute("name", reportName);
         rootElement.setAttribute("classification", classification);
         rootElement.setAttribute("author", author);
         rootElement.setAttribute("date", dateOfReport);
+        
     }
     /**
      * Populates the executive summary portion of the AnalystReport XML
-     *
-     *@param printComments whether or not to print comments
-     *@param comments the text for the comments portions of this sections
      */
-    public void createExecutiveSummary(boolean printComments, String comments){
-        Element executiveSummary = new Element("ExecutiveCommentary");
-        executiveSummary.setAttribute("comments", booleanToString(printComments));
-        if(printComments){
-            executiveSummary.addContent(makeComments(comments));
+    public void createExecutiveSummary(){
+        Element execSummary = new Element("ExecutiveSummary");
+        execSummary.setAttribute("comments", booleanToString(executiveSummaryComments));
+        if(executiveSummaryComments){
+            execSummary.addContent(makeComments(executiveSummary));
         }
-        rootElement.addContent(executiveSummary);
+        rootElement.addContent(execSummary);
     }
+          
     /**
      * Creates the SimulationLocation portion of the analyst report XML
-     *
-     *@param printComments whether or not to print comments
-     *@param printImages whether or not to print images
-     *@param comments the comments text for this report
-     *@param conclusions the conclusions text for this report
-     *@param locImageDirectory the full path name of the image file
      */
-    public void createSimulationLocation(boolean printComments, boolean printImage, 
-                                         String comments, String conclusions,
-                                         String locImageDirectory){
+    public void createSimulationLocation(){
         Element simulationLocation = new Element("SimulationLocation");
-        simulationLocation.setAttribute("comments", booleanToString(printComments));
-        simulationLocation.setAttribute("images", booleanToString(printImage));
-        if(printComments){
-            simulationLocation.addContent(makeComments(comments));
-            simulationLocation.addContent(makeConclusions(conclusions));
+        simulationLocation.setAttribute("comments", booleanToString(printSimLocationComments));
+        simulationLocation.setAttribute("images", booleanToString(printSimLocationImage));
+        if(printSimLocationComments){
+            simulationLocation.addContent(makeComments(simLocComments));
+            simulationLocation.addContent(makeConclusions(simLocConclusions));
         }
-        if(printImage)simulationLocation.addContent(makeImage(locImageDirectory));
+        if(printSimLocationImage)simulationLocation.addContent(makeImage(locationImage));
         
         rootElement.addContent(simulationLocation);
     }
+          
     
     /**
      * Creates the simulation configuration portion of the Analyst report XML
-     *
-     *@param printComments whether to print comments
-     *@param printImage whether to print the assembly image
-     *@param printEntityTable whether to print the entity table
-     *@param comments the comments text
-     *@param conclusions the conclusions text
-     *@param assemblyImage the assemblyImage directory
-     *@param assemblyFile directory
      */
-    private void createSimulationConfiguration(boolean printComments, boolean printImage,
-                                               boolean printEntityTable, String comments,
-                                               String conclusions, String assemblyImage,
-                                               String assemblyFileDirectory){
+    private void createSimulationConfiguration(){
         Element simConfig = new Element("SimulationConfiguration");
-        simConfig.setAttribute("comments", booleanToString(printComments));
-        simConfig.setAttribute("image", booleanToString(printImage));
+        simConfig.setAttribute("comments", booleanToString(printSimConfigComments));
+        simConfig.setAttribute("image", booleanToString(printAssemblyImage));
         simConfig.setAttribute("entityTable", booleanToString(printEntityTable));
-        if(printComments)simConfig.addContent(makeComments(comments));
-        if(printComments)simConfig.addContent(makeConclusions(conclusions));
-        if(printImage)simConfig.addContent(makeImage(assemblyImage));
-        if(printEntityTable)simConfig.addContent(makeEntityTable(assemblyFileDirectory));
+        if(printSimConfigComments)simConfig.addContent(makeComments(simConfigComments));
+        if(printSimConfigComments)simConfig.addContent(makeConclusions(simConfigConclusions));
+        if(printAssemblyImage)simConfig.addContent(makeImage(assemblyImageLocation));
+        if(printEntityTable)simConfig.addContent(makeEntityTable(assemblyFile));
         rootElement.addContent(simConfig);   
     }
+        
     /**
      * Creates the entity parameter section of this analyst report
-     *
-     *@param printComments whether to add comments to this section
-     *@param printTable whether to add a parameter tables to this section
-     *@param comments the comments to include
-     *@param conclusions the conclusions to include
      */
-    private void createEntityParameters(boolean printComments, boolean printTable,
-                                        String comments, String conclusions){
+    private void createEntityParameters(){
         Element entityParameters = new Element("EntityParameters");
-        entityParameters.setAttribute("comments", booleanToString(printComments));
-        entityParameters.setAttribute("parameterTables", booleanToString(printTable));
-        if(printComments)entityParameters.addContent(makeComments(comments));
-        if(printComments)entityParameters.addContent(makeConclusions(conclusions));
-        if(printTable)entityParameters.addContent(makeParameterTables());
+        entityParameters.setAttribute("comments", booleanToString(printParameterComments));
+        entityParameters.setAttribute("parameterTables", booleanToString(printParameterTable));
+        if(printParameterComments)entityParameters.addContent(makeComments(parameterComments));
+        if(printParameterComments)entityParameters.addContent(makeConclusions(parameterConclusions));
+        if(printParameterTable)entityParameters.addContent(makeParameterTables());
         
         rootElement.addContent(entityParameters);
             
         }
+          
     
     /**
      * Creates the behavior parameters portion of the report
-     *
-     *@param printComments whether to print comments
-     *@param printDescriptions whether to print descriptions
-     *@param printImages whether to print the images
      */
-    private void createBehaviorDefinitions(boolean printComments, boolean printDescriptions,
-                                           boolean printImages, String comments, String conclusions){
+    private void createBehaviorDefinitions(){
         Element behaviorDefinitions = new Element("BehaviorDefinitions");
-        behaviorDefinitions.setAttribute("comments", booleanToString(printComments));
-        behaviorDefinitions.setAttribute("descriptions", booleanToString(printDescriptions));
-        behaviorDefinitions.setAttribute("image", booleanToString(printImages));
-        if(printComments)behaviorDefinitions.addContent(makeComments(comments));
-        if(printComments)behaviorDefinitions.addContent(makeConclusions(conclusions));
-        behaviorDefinitions.addContent(processBehaviors(printDescriptions, printImages));
+        behaviorDefinitions.setAttribute("comments", booleanToString(printBehaviorDefComments));
+        behaviorDefinitions.setAttribute("descriptions", booleanToString(printBehaviorDescriptions));
+        behaviorDefinitions.setAttribute("image", booleanToString(printEventGraphImages));
+        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeComments(behaviorComments));
+        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeConclusions(behaviorConclusions));
+        behaviorDefinitions.addContent(processBehaviors(printBehaviorDescriptions, printEventGraphImages));
         
         rootElement.addContent(behaviorDefinitions);
     }
+     
+    private void createStatisticalResults(){
+        Element statisticalResults = new Element("StatisticalResults");
+        statisticalResults.setAttribute("comments",booleanToString(printStatsComments));
+        statisticalResults.setAttribute("replicationStats", booleanToString(printReplicationStats));
+        statisticalResults.setAttribute("summaryStats", booleanToString(printSummaryStats));
+        Element statsFile = new Element("ReportStatistics");
+        statsFile.setAttribute("file","TODO need to get file name of statsReport file");
+        statisticalResults.addContent(statsFile);
+        rootElement.addContent(statisticalResults);
+        //TODO: need to get file location/path from the local copy of stats report
+    }
     
+    /**
+     * Creates the conclusions/Recommendations portion of the analyst report template
+     */
+    private void createConclusionsRecommendations(){
+        Element concRec = new Element("ConclusionsRecommendations");
+        concRec.setAttribute("comments", booleanToString(printRecommendationsConclusions));
+        if(printRecommendationsConclusions){
+            concRec.addContent(makeComments(conclusions));
+            concRec.addContent(makeConclusions(recommendations));
+        }
+        rootElement.addContent(concRec);
+    }
     /**
      *Creates Behavior definition references in the analyst report template
      */
@@ -419,10 +419,18 @@ public class AnalystReportBuilder {
         Element behaviorList = new Element("BehaviorList");
         for(int i = 0; i<eventGraphNames.size(); i++){
             Element behavior = new Element("Behavior");
+            String descriptText="";
             behavior.setAttribute("name", (String)eventGraphNames.get(i));
+           
             if(descript){
+                  try{
+                    Document temp = loadXML((String)eventGraphFiles.get(i)); 
+                    descriptText = temp.getRootElement().getChild("Comment").getText();
+                }catch(IOException e){
+                    System.out.println("Unable to load event graph file");
+                }
                 Element description = new Element("description");
-                description.setAttribute("text", "TODO: Need to resolve directory issues");
+                description.setAttribute("text", descriptText);
                 behavior.addContent(description);
             }
             if(image){
@@ -474,7 +482,6 @@ public class AnalystReportBuilder {
         Iterator itr = entityDef.getDescendants(multiParam);
         table.setAttribute("name", entityName);
         while(itr.hasNext()){
-            System.out.println(itr.toString());
             Element temp = (Element)itr.next();
             String category = temp.getAttributeValue("type");
             if(category.equals("diskit.SMAL.Classification"))table.addContent(makeTableEntry("Classification", temp));
@@ -568,13 +575,15 @@ public class AnalystReportBuilder {
             if(letter == '.')idx = i;
             
          }
-         String dir = "../../BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx);
+         String dir = "./BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/";
          String file = fileType.substring(idx+1, fileType.length());
          String eventGraphDirectory = (dir + file +".xml");
-         String imgDirectory = "../../images/BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/"+ file +".png";
-         eventGraphFiles.add(eventGraphDirectory);
-         eventGraphImages.add(imgDirectory);
-         eventGraphNames.add(fileType.substring(idx+1,fileType.length()));
+         String imgDirectory = "./images/BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/"+ file +".png";
+         if(!eventGraphFiles.contains(eventGraphDirectory)){
+             eventGraphFiles.add(eventGraphDirectory);
+             eventGraphImages.add(imgDirectory);
+             eventGraphNames.add(fileType.substring(idx+1,fileType.length()));
+         }
         }
     
     /**
@@ -648,13 +657,20 @@ public class AnalystReportBuilder {
      * File I/O that saves the report in XML format
      */
     public void saveAnalystReportXML(){
+        Date today;
+        String output;
+        SimpleDateFormat formatter;
         
+        formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+        today = new Date();
+        output = formatter.format(today);
           
           try {
             XMLOutputter outputter = new XMLOutputter();
             //Create a unique file name for each DTG/Location Pair
             String usr = System.getProperty("user.name");
-            String outputFile = ("../../../../" + usr + "AnalystReport.xml");
+           
+            String outputFile = ("./AnalystReports/" + usr + "AnalystReport_"+output+".xml");
             FileWriter writer = new FileWriter(outputFile);
             outputter.output(reportXML, writer);
             writer.close();
@@ -694,7 +710,7 @@ public class AnalystReportBuilder {
         printSimConfigComments          = true;
         printAssemblyImage              = true;
         printEntityTable                = true;
-        assemblyFile                    ="C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Scenarios/BremertonNoPing.xml";       
+        assemblyFile                    ="./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml";       
         simConfigComments               ="The simulation created for this reports included multiple entities as well as the well " +
                                          "known harbor obstructions (e.g. Mooring buoys).  A nautical chart object was included which " +
                                          "provided the simulation agents with an understanding of the waterfront environment by charting " +
