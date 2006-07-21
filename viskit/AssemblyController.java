@@ -1301,7 +1301,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void actionPerformed(ActionEvent ev)
     {
       // create and save the image
-      Component component = (Component) getView();
+      //Component component = (Component) getView();
+
+      // Similarly to Controller.java (EG editor controller), putting the views into tabs requires the following two
+      // to replace the one above.
+      AssemblyViewFrame avf = (AssemblyViewFrame)getView();
+      Component component = avf.getContent();
+
       Point p = new Point(0, 0);
       SwingUtilities.convertPointToScreen(p, component);
       Rectangle region = component.getBounds();

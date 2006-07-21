@@ -759,7 +759,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     public void actionPerformed(ActionEvent ev)
     {
       // create and save the image
-      Component component = (Component) getView();
+      //Component component = (Component) getView();
+
+      // The next two sub for the above, which worked until we did the tabbed display.
+      EventGraphViewFrame egvf = (EventGraphViewFrame)getView();
+      Component component = egvf.getContent();
+
       Point p = new Point(0, 0);
       SwingUtilities.convertPointToScreen(p, component);
       Rectangle region = component.getBounds();
