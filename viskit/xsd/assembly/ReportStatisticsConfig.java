@@ -37,6 +37,10 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 import java.io.*;
 import java.util.*;
+import java.util.Date;
+import java.util.Formatter;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class ReportStatisticsConfig {
     
@@ -187,18 +191,27 @@ public class ReportStatisticsConfig {
      *Returns stats report in jdom.Document format
      */
     public Document getReport(){
-        return reportStats.getReport();
+        Document report = reportStats.getReport();
+        saveData(report);
+        return report;
     }
     /**
      * File I/O that saves the report in XML format
      */
-    public void saveData(){
-        Document report = reportStats.getReport();
-          
+    public void saveData(Document report){
+        
+        Date today;
+        String output;
+        SimpleDateFormat formatter;
+        
+        formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+        today = new Date();
+        output = formatter.format(today);
+        
           try {
             XMLOutputter outputter = new XMLOutputter();
             //Create a unique file name for each DTG/Location Pair
-            String outputFile = (author+"_"+assemblyName+".xml");
+            String outputFile = ("./AnalystReports/statistics/" +author+assemblyName+"_"+ output+".xml");
             FileWriter writer = new FileWriter(outputFile);
             outputter.output(report, writer);
             
