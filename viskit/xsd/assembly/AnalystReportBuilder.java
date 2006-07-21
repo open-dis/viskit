@@ -276,9 +276,9 @@ public class AnalystReportBuilder {
     /** Creates a new instance of AnalystReportBuilder */
     public AnalystReportBuilder(Document statisticsReport) {
      
-      reportXML   = new Document();
-      rootElement = new Element("AnalystReport");
-      this.statsReport = statisticsReport;
+      setReportXML(new Document());
+      setRootElement(new Element("AnalystReport"));
+      this.setStatsReport(statisticsReport);
       
       if(debug){
       setTestValues();//TODO: Remove after GUI is fully wired or while testing GUI
@@ -526,7 +526,7 @@ public class AnalystReportBuilder {
      */
     public Element makeEntityTable(String fileDirectory){
         try{
-        assemblyDocument = loadXML(fileDirectory);
+        setAssemblyDocument(loadXML(fileDirectory));
         }catch(IOException e){
             System.out.println("Unable to load: " + fileDirectory);
         }
@@ -537,9 +537,9 @@ public class AnalystReportBuilder {
         Iterator itr = simEntityList.iterator();
         
         //Extract XML based simEntities for entityParameters and event graph image
-        eventGraphFiles = new LinkedList();
-        eventGraphImages = new LinkedList();
-        eventGraphNames  = new LinkedList();
+        setEventGraphFiles(new LinkedList());
+        setEventGraphImages(new LinkedList());
+        setEventGraphNames(new LinkedList());
         String isJAVAfile = "diskit";//if a file is in the diskit package it is native java
         
         while(itr.hasNext()){
@@ -685,74 +685,250 @@ public class AnalystReportBuilder {
      */
     private void setTestValues(){
         //Header values
-        reportName               = "AnalystReportTest";
-        classification           = "UNCLASSIFIED";
-        author                   = "Patrick Sullivan";
-        dateOfReport             = "July 19, 2006";
+        setReportName("AnalystReportTest");
+        setClassification("UNCLASSIFIED");
+        setAuthor("Patrick Sullivan");
+        setDateOfReport("July 19, 2006");
         
         //Executive Summary values
-        executiveSummaryComments = true;
-        executiveSummary         ="The purpose of this report is to test various force protection alternatives " +
+        setExecutiveSummaryComments(true);
+        setExecutiveSummary("The purpose of this report is to test various force protection alternatives " +
                                   "for Naval Station Bremerton Washington. The initial motivation for this report is to provide an exemplar template of what the end product of the ATFP tool could be to allow for discussion and " +
-                                  "suggestions among participating developers and sponsors";
+                                  "suggestions among participating developers and sponsors");
         
         //SimulationLocation Values
-        printSimLocationComments = true;
-        printSimLocationImage    = true;
-        simLocComments           ="This simulation was designed to reflect real world conditions in Bremerton harbor and to evaluate the effectiveness of a ship's patrol craft at defending against a waterborne terrorist threat. " +
+        setPrintSimLocationComments(true);
+        setPrintSimLocationImage(true);
+        setSimLocComments("This simulation was designed to reflect real world conditions in Bremerton harbor and to evaluate the effectiveness of a ship's patrol craft at defending against a waterborne terrorist threat. " +
                                      "This experiment tests the ability of one patrol boat against up to three terrorist threats. The use of ship's self defense forces (SSDF) was not included in this initial experiment. Bremerton harbor" +
-                                     "is accessible from public waterways though a floating barrier system is in place to protect the units that are docked at it's piers.  This initial simulation test does not incorporate the floating barrier system.";
-        simLocConclusions        ="While this simulation was able to demonstrate that the tool could setup a simple experiment and run the exclusion of the barrier system probably renders the results useless.  This installation relies heavily on " +
-                                     "the barrier system which it has installed. Excluding it from the simulation gives an unrealistic and unrepresentative advantage to waterborne terrorist platforms.";
-        locationImage            ="C:/www.web3D.org/x3d/content/examples/SavageDefense/Locations/Naval-Station-Bremerton-WA/X3D.bmp";
+                                     "is accessible from public waterways though a floating barrier system is in place to protect the units that are docked at it's piers.  This initial simulation test does not incorporate the floating barrier system.");
+        setSimLocConclusions("While this simulation was able to demonstrate that the tool could setup a simple experiment and run the exclusion of the barrier system probably renders the results useless.  This installation relies heavily on " +
+                                     "the barrier system which it has installed. Excluding it from the simulation gives an unrealistic and unrepresentative advantage to waterborne terrorist platforms.");
+        setLocationImage("C:/www.web3D.org/x3d/content/examples/SavageDefense/Locations/Naval-Station-Bremerton-WA/X3D.bmp");
         
         //Simulation Configuration Values
-        printSimConfigComments          = true;
-        printAssemblyImage              = true;
-        printEntityTable                = true;
-        assemblyFile                    ="./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml";       
-        simConfigComments               ="The simulation created for this reports included multiple entities as well as the well " +
+        setPrintSimConfigComments(true);
+        setPrintAssemblyImage(true);
+        setPrintEntityTable(true);
+        setAssemblyFile("./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml");       
+        setSimConfigComments("The simulation created for this reports included multiple entities as well as the well " +
                                          "known harbor obstructions (e.g. Mooring buoys).  A nautical chart object was included which " +
                                          "provided the simulation agents with an understanding of the waterfront environment by charting " +
                                          "both the water perimeter and waterways that could be navigated by waterborne terrorist assets. " +
-                                         "Further discussion about agent behavior implementation is provided in the next section of this report.";
-        simConfigConclusions            ="While the mooring buoys were represented in the simulation they did not have a 3D representation " +
+                                         "Further discussion about agent behavior implementation is provided in the next section of this report.");
+        setSimConfigConclusions("While the mooring buoys were represented in the simulation they did not have a 3D representation " +
                                          "for watching post-experiment replay.  Adding  a simple model of a mooring buoy would be a good addition " +
-                                         "to this model.";
-        assemblyImageLocation           ="C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.png";
+                                         "to this model.");
+        setAssemblyImageLocation("C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.png");
         
         
         //Entity Parameters values
-        printParameterComments      = true;
-        printParameterTable         = true;
-        parameterComments           ="Parameters for the entities in this simulation were derived from online, unclassified sources. In the cases " +
+        setPrintParameterComments(true);
+        setPrintParameterTable(true);
+        setParameterComments("Parameters for the entities in this simulation were derived from online, unclassified sources. In the cases " +
                                      "where such sources were not available generic estimations were used for the parameter values. The units of measure " +
-                                     "for the parameters listed was meters.";
-        parameterConclusions        ="The parameters given to the models for this simulation generated realistic enough results. It is recommended that " +
-                                     "detailed, and perhaps classified values be incorporated for future studies.";
+                                     "for the parameters listed was meters.");
+        setParameterConclusions("The parameters given to the models for this simulation generated realistic enough results. It is recommended that " +
+                                     "detailed, and perhaps classified values be incorporated for future studies.");
         //PAT TODO: BUILD PARAMETER TABLE
         
         //BehaviorParameter values
-        printBehaviorDefComments   = true;
-        printEventGraphImages      = true;
-        printBehaviorDescriptions  = true;
-        behaviorComments           ="The agent behaviors used for this simulation were taken from the Behavior Libraries directory. No changes to these behaviors were made.";
-        behaviorConclusions        ="The behaviors used in this experiment were sufficient given the overall objective.  However, it would be worthwhile to consider incorporating " +
-                                    "classified procedures and doctrine for a more realistic harbor representation.";
+        setPrintBehaviorDefComments(true);
+        setPrintEventGraphImages(true);
+        setPrintBehaviorDescriptions(true);
+        setBehaviorComments("The agent behaviors used for this simulation were taken from the Behavior Libraries directory. No changes to these behaviors were made.");
+        setBehaviorConclusions("The behaviors used in this experiment were sufficient given the overall objective.  However, it would be worthwhile to consider incorporating " +
+                                    "classified procedures and doctrine for a more realistic harbor representation.");
         
         //StatisticalResults values
-        printStatsComments         = true;
-        printReplicationStats      = true;
-        printSummaryStats          = true;
-        statsComments              ="Given that only two replications were conducted the results derived from this simulation are not statistically significant.  They do however " +
-                                    "demonstrate the tools ability to generate a report.";
-        statsConclusions           ="Increased replications are required for any additional analysis";
+        setPrintStatsComments(true);
+        setPrintReplicationStats(true);
+        setPrintSummaryStats(true);
+        setStatsComments("Given that only two replications were conducted the results derived from this simulation are not statistically significant.  They do however " +
+                                    "demonstrate the tools ability to generate a report.");
+        setStatsConclusions("Increased replications are required for any additional analysis");
         
         //Recommendations/Conclusions
-        printRecommendationsConclusions = true;
-        conclusions                ="This simulation was a good initial test of the functionality of this application.  The statistics derived from the simulation runs should not be " +
-                                    "used for any purpose other than to show that the tool could generate results.";
-        recommendations            ="The next step in the project is to set up an experiment with greater level of fidelity, improved agent behaviors and the inclusion of the barrier system.";
+        setPrintRecommendationsConclusions(true);
+        setConclusions("This simulation was a good initial test of the functionality of this application.  The statistics derived from the simulation runs should not be " +
+                                    "used for any purpose other than to show that the tool could generate results.");
+        setRecommendations("The next step in the project is to set up an experiment with greater level of fidelity, improved agent behaviors and the inclusion of the barrier system.");
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public void setReportName(String reportName) {
+        this.reportName = reportName;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setDateOfReport(String dateOfReport) {
+        this.dateOfReport = dateOfReport;
+    }
+
+    public void setExecutiveSummaryComments(boolean executiveSummaryComments) {
+        this.executiveSummaryComments = executiveSummaryComments;
+    }
+
+    public void setExecutiveSummary(String executiveSummary) {
+        this.executiveSummary = executiveSummary;
+    }
+
+    public void setPrintSimLocationComments(boolean printSimLocationComments) {
+        this.printSimLocationComments = printSimLocationComments;
+    }
+
+    public void setPrintSimLocationImage(boolean printSimLocationImage) {
+        this.printSimLocationImage = printSimLocationImage;
+    }
+
+    public void setSimLocComments(String simLocComments) {
+        this.simLocComments = simLocComments;
+    }
+
+    public void setSimLocConclusions(String simLocConclusions) {
+        this.simLocConclusions = simLocConclusions;
+    }
+
+    public void setLocationImage(String locationImage) {
+        this.locationImage = locationImage;
+    }
+
+    public void setPrintSimConfigComments(boolean printSimConfigComments) {
+        this.printSimConfigComments = printSimConfigComments;
+    }
+
+    public void setPrintAssemblyImage(boolean printAssemblyImage) {
+        this.printAssemblyImage = printAssemblyImage;
+    }
+
+    public void setPrintEntityTable(boolean printEntityTable) {
+        this.printEntityTable = printEntityTable;
+    }
+
+    public void setAssemblyFile(String assemblyFile) {
+        this.assemblyFile = assemblyFile;
+    }
+
+    public void setSimConfigComments(String simConfigComments) {
+        this.simConfigComments = simConfigComments;
+    }
+
+    public void setSimConfigConclusions(String simConfigConclusions) {
+        this.simConfigConclusions = simConfigConclusions;
+    }
+
+    public void setAssemblyImageLocation(String assemblyImageLocation) {
+        this.assemblyImageLocation = assemblyImageLocation;
+    }
+
+    public void setAssemblyDocument(Document assemblyDocument) {
+        this.assemblyDocument = assemblyDocument;
+    }
+
+    public void setPrintParameterComments(boolean printParameterComments) {
+        this.printParameterComments = printParameterComments;
+    }
+
+    public void setPrintParameterTable(boolean printParameterTable) {
+        this.printParameterTable = printParameterTable;
+    }
+
+    public void setParameterComments(String parameterComments) {
+        this.parameterComments = parameterComments;
+    }
+
+    public void setParameterConclusions(String parameterConclusions) {
+        this.parameterConclusions = parameterConclusions;
+    }
+
+    public void setStatsReport(Document statsReport) {
+        this.statsReport = statsReport;
+    }
+
+    public void setPrintBehaviorDefComments(boolean printBehaviorDefComments) {
+        this.printBehaviorDefComments = printBehaviorDefComments;
+    }
+
+    public void setPrintEventGraphImages(boolean printEventGraphImages) {
+        this.printEventGraphImages = printEventGraphImages;
+    }
+
+    public void setBehaviorComments(String behaviorComments) {
+        this.behaviorComments = behaviorComments;
+    }
+
+    public void setBehaviorConclusions(String behaviorConclusions) {
+        this.behaviorConclusions = behaviorConclusions;
+    }
+
+    public void setPrintBehaviorDescriptions(boolean printBehaviorDescriptions) {
+        this.printBehaviorDescriptions = printBehaviorDescriptions;
+    }
+
+    public void setEventGraphFiles(LinkedList eventGraphFiles) {
+        this.eventGraphFiles = eventGraphFiles;
+    }
+
+    public void setEventGraphImages(LinkedList eventGraphImages) {
+        this.eventGraphImages = eventGraphImages;
+    }
+
+    public void setEventGraphNames(LinkedList eventGraphNames) {
+        this.eventGraphNames = eventGraphNames;
+    }
+
+    public void setPrintStatsComments(boolean printStatsComments) {
+        this.printStatsComments = printStatsComments;
+    }
+
+    public void setPrintReplicationStats(boolean printReplicationStats) {
+        this.printReplicationStats = printReplicationStats;
+    }
+
+    public void setPrintSummaryStats(boolean printSummaryStats) {
+        this.printSummaryStats = printSummaryStats;
+    }
+
+    public void setStatsComments(String statsComments) {
+        this.statsComments = statsComments;
+    }
+
+    public void setStatsConclusions(String statsConclusions) {
+        this.statsConclusions = statsConclusions;
+    }
+
+    public void setPrintRecommendationsConclusions(boolean printRecommendationsConclusions) {
+        this.printRecommendationsConclusions = printRecommendationsConclusions;
+    }
+
+    public void setConclusions(String conclusions) {
+        this.conclusions = conclusions;
+    }
+
+    public void setRecommendations(String recommendations) {
+        this.recommendations = recommendations;
+    }
+
+    public void setReportXML(Document reportXML) {
+        this.reportXML = reportXML;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setRootElement(Element rootElement) {
+        this.rootElement = rootElement;
     }
 }
 
