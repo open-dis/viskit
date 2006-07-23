@@ -27,6 +27,10 @@ import java.util.LinkedList;
 import java.util.Date;
 import java.util.Formatter;
 import java.text.SimpleDateFormat;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.xml.sax.SAXException;
 
 
 public class AnalystReportBuilder {
@@ -106,6 +110,10 @@ public class AnalystReportBuilder {
      */
     private String locationImage="";
     
+    /**
+     *IPFC - Location of chart image (or secondary image if no chart)
+     */
+     private String chartImage="";
 
     //SECTION III. VARIABLES
     /**
@@ -185,6 +193,11 @@ public class AnalystReportBuilder {
      *IPCB - Whether to print event graph images
      */
     private boolean printEventGraphImages=true;
+    
+    /**
+     *IPCB - Wheter to print parameter and state variable informatin for each event graph
+     */
+    private boolean printEventGraphDetails=true;
     
     /**
      *IPTF - Behavior Definition comments
@@ -320,7 +333,7 @@ public class AnalystReportBuilder {
         Element execSummary = new Element("ExecutiveSummary");
         execSummary.setAttribute("comments", booleanToString(executiveSummaryComments));
         if(executiveSummaryComments){
-            execSummary.addContent(makeComments(executiveSummary));
+            execSummary.addContent(makeComments("ES",executiveSummary));
         }
         rootElement.addContent(execSummary);
     }
@@ -333,11 +346,12 @@ public class AnalystReportBuilder {
         simulationLocation.setAttribute("comments", booleanToString(printSimLocationComments));
         simulationLocation.setAttribute("images", booleanToString(printSimLocationImage));
         if(printSimLocationComments){
-            simulationLocation.addContent(makeComments(simLocComments));
-            simulationLocation.addContent(makeConclusions(simLocConclusions));
+            simulationLocation.addContent(makeComments("SL",simLocComments));
+            simulationLocation.addContent(makeConclusions("SL",simLocConclusions));
         }
-        if(printSimLocationImage)simulationLocation.addContent(makeImage(locationImage));
-        
+        if(printSimLocationImage)simulationLocation.addContent(makeImage("Location", chartImage));
+        if(printSimLocationImage)simulationLocation.addContent(makeImage("Location",locationImage));
+      
         rootElement.addContent(simulationLocation);
     }
           
@@ -350,9 +364,9 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("comments", booleanToString(printSimConfigComments));
         simConfig.setAttribute("image", booleanToString(printAssemblyImage));
         simConfig.setAttribute("entityTable", booleanToString(printEntityTable));
-        if(printSimConfigComments)simConfig.addContent(makeComments(simConfigComments));
-        if(printSimConfigComments)simConfig.addContent(makeConclusions(simConfigConclusions));
-        if(printAssemblyImage)simConfig.addContent(makeImage(assemblyImageLocation));
+        if(printSimConfigComments)simConfig.addContent(makeComments("SC", simConfigComments));
+        if(printSimConfigComments)simConfig.addContent(makeConclusions("SC", simConfigConclusions));
+        if(printAssemblyImage)simConfig.addContent(makeImage("Assembly", assemblyImageLocation));
         if(printEntityTable)simConfig.addContent(makeEntityTable(assemblyFile));
         rootElement.addContent(simConfig);   
     }
@@ -364,8 +378,8 @@ public class AnalystReportBuilder {
         Element entityParameters = new Element("EntityParameters");
         entityParameters.setAttribute("comments", booleanToString(printParameterComments));
         entityParameters.setAttribute("parameterTables", booleanToString(printParameterTable));
-        if(printParameterComments)entityParameters.addContent(makeComments(parameterComments));
-        if(printParameterComments)entityParameters.addContent(makeConclusions(parameterConclusions));
+        if(printParameterComments)entityParameters.addContent(makeComments("PC", parameterComments));
+        if(printParameterComments)entityParameters.addContent(makeConclusions("PC",parameterConclusions));
         if(printParameterTable)entityParameters.addContent(makeParameterTables());
         
         rootElement.addContent(entityParameters);
@@ -381,9 +395,14 @@ public class AnalystReportBuilder {
         behaviorDefinitions.setAttribute("comments", booleanToString(printBehaviorDefComments));
         behaviorDefinitions.setAttribute("descriptions", booleanToString(printBehaviorDescriptions));
         behaviorDefinitions.setAttribute("image", booleanToString(printEventGraphImages));
-        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeComments(behaviorComments));
-        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeConclusions(behaviorConclusions));
-        behaviorDefinitions.addContent(processBehaviors(printBehaviorDescriptions, printEventGraphImages));
+        behaviorDefinitions.setAttribute("details",booleanToString(printEventGraphDetails));
+        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeComments("BC",behaviorComments));
+        if(printBehaviorDefComments)behaviorDefinitions.addContent(makeConclusions("BC", behaviorConclusions));
+        if(printBehaviorDescriptions ||
+           printEventGraphImages ||
+           printEventGraphDetails){
+            behaviorDefinitions.addContent(processBehaviors(printBehaviorDescriptions, printEventGraphImages, printEventGraphDetails));
+        }
         
         rootElement.addContent(behaviorDefinitions);
     }
@@ -393,9 +412,41 @@ public class AnalystReportBuilder {
         statisticalResults.setAttribute("comments",booleanToString(printStatsComments));
         statisticalResults.setAttribute("replicationStats", booleanToString(printReplicationStats));
         statisticalResults.setAttribute("summaryStats", booleanToString(printSummaryStats));
-        Element statsFile = new Element("ReportStatistics");
-        statsFile.setAttribute("file","TODO need to get file name of statsReport file");
-        statisticalResults.addContent(statsFile);
+        if(printStatsComments)statisticalResults.addContent(makeComments("SR",statsComments));
+        if(printStatsComments)statisticalResults.addContent(makeConclusions("SR",statsConclusions));
+        Element sumReport  = new Element("SummaryReport");
+        statisticalResults.setAttribute("file",statsReport.toString());
+       // Element entity;
+        
+        if(printReplicationStats || printSummaryStats){
+            
+            Iterator itr = statsReport.getRootElement().getChildren("SimEntity").iterator();   
+            while(itr.hasNext()){
+             Element entity = (Element)itr.next();
+             Element temp   = (Element)entity.clone();
+             temp.removeChildren("SummaryReport");
+             if(printSummaryStats){
+                 Element summStats = entity.getChild("SummaryReport");
+                 Iterator summItr = summStats.getChildren("Summary").iterator();
+                 while(summItr.hasNext()){
+                     Element temp2 = (Element)summItr.next();
+                     Element summaryRecord = new Element("SummaryRecord");
+                     summaryRecord.setAttribute("entity", entity.getAttributeValue("name"));
+                     summaryRecord.setAttribute("property", temp2.getAttributeValue("property"));
+                     summaryRecord.setAttribute("count", temp2.getAttributeValue("count"));
+                     summaryRecord.setAttribute("minObs", temp2.getAttributeValue("minObs"));
+                     summaryRecord.setAttribute("maxObs", temp2.getAttributeValue("maxObs"));
+                     summaryRecord.setAttribute("mean", temp2.getAttributeValue("mean"));
+                     summaryRecord.setAttribute("stdDeviation", temp2.getAttributeValue("stdDeviation"));
+                     summaryRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
+                     sumReport.addContent(summaryRecord);
+                 }
+             }
+            }
+        }
+        if(printReplicationStats)statisticalResults.addContent(makeReplicationReport());
+        if(printSummaryStats)statisticalResults.addContent(sumReport);
+        
         rootElement.addContent(statisticalResults);
         //TODO: need to get file location/path from the local copy of stats report
     }
@@ -407,24 +458,28 @@ public class AnalystReportBuilder {
         Element concRec = new Element("ConclusionsRecommendations");
         concRec.setAttribute("comments", booleanToString(printRecommendationsConclusions));
         if(printRecommendationsConclusions){
-            concRec.addContent(makeComments(conclusions));
-            concRec.addContent(makeConclusions(recommendations));
+            concRec.addContent(makeComments("CR",conclusions));
+            concRec.addContent(makeConclusions("CR",recommendations));
         }
         rootElement.addContent(concRec);
     }
     /**
      *Creates Behavior definition references in the analyst report template
      */
-    private Element processBehaviors(boolean descript, boolean image){
+    private Element processBehaviors(boolean descript, boolean image, boolean details){
         Element behaviorList = new Element("BehaviorList");
+        
+        if(eventGraphNames != null){
         for(int i = 0; i<eventGraphNames.size(); i++){
             Element behavior = new Element("Behavior");
+            Element rootElement = null;
             String descriptText="";
             behavior.setAttribute("name", (String)eventGraphNames.get(i));
            
             if(descript){
                   try{
                     Document temp = loadXML((String)eventGraphFiles.get(i)); 
+                    rootElement = temp.getRootElement();
                     descriptText = temp.getRootElement().getChild("Comment").getText();
                 }catch(IOException e){
                     System.out.println("Unable to load event graph file");
@@ -432,6 +487,28 @@ public class AnalystReportBuilder {
                 Element description = new Element("description");
                 description.setAttribute("text", descriptText);
                 behavior.addContent(description);
+            
+            if(details){
+                Iterator itr = rootElement.getChildren("Parameter").iterator();
+                while(itr.hasNext()){
+                    Element temp = (Element)itr.next();
+                    Element param = new Element("parameter");
+                    param.setAttribute("name",temp.getAttributeValue("name"));
+                    param.setAttribute("type", temp.getAttributeValue("type"));
+                    param.setAttribute("description",temp.getChildText("Comment"));
+                    behavior.addContent(param);
+                    
+                }
+                Iterator itr2 = rootElement.getChildren("StateVariable").iterator();
+                while(itr2.hasNext()){
+                    Element temp = (Element)itr2.next();
+                    Element stvar = new Element("stateVariable");
+                    stvar.setAttribute("name",temp.getAttributeValue("name"));
+                    stvar.setAttribute("type", temp.getAttributeValue("type"));
+                    stvar.setAttribute("description",temp.getChildText("Comment"));
+                    behavior.addContent(stvar);
+                }
+            }
             }
             if(image){
                 Element evtGraphImage = new Element("EventGraphImage");
@@ -439,6 +516,7 @@ public class AnalystReportBuilder {
                 behavior.addContent(evtGraphImage);
             }
             behaviorList.addContent(behavior);
+        }
         }
         return behaviorList;
     }
@@ -560,6 +638,48 @@ public class AnalystReportBuilder {
         return entityTable;
     }
     /**
+     * This method re-shuffles the statistics report to a format that is handled
+     * by the xslt for the analyst report.  The mis-match of formatting was discovered
+     * after all classes were written. This should be cleaned up or the XML formatted
+     * more uniformly.
+     *
+     */
+    private Element makeReplicationReport(){
+       Element repReports = new Element("ReplicationReports");
+       Iterator mainItr = statsReport.getRootElement().getChildren("SimEntity").iterator();
+       while(mainItr.hasNext()){
+            Element tempEntity = (Element) mainItr.next();    
+            Iterator itr = tempEntity.getChildren("DataPoint").iterator();
+       while(itr.hasNext()){
+          Element temp = (Element)itr.next();
+          Element entity = new Element("SimEntity");
+          entity.setAttribute("name", tempEntity.getAttributeValue("name"));
+          entity.setAttribute("property", temp.getAttributeValue("property"));
+          Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
+          while(itr2.hasNext()){
+             Element temp3 = (Element)itr2.next();
+             Iterator itr3 = temp3.getChildren("Replication").iterator();
+             while(itr3.hasNext()){
+             Element temp2 = (Element)itr3.next();
+             Element repRecord = new Element("Replication");
+             repRecord.setAttribute("number", temp2.getAttributeValue("number"));
+             repRecord.setAttribute("count", temp2.getAttributeValue("count"));
+             repRecord.setAttribute("minObs", temp2.getAttributeValue("minObs"));
+             repRecord.setAttribute("maxObs", temp2.getAttributeValue("maxObs"));
+             repRecord.setAttribute("mean", temp2.getAttributeValue("mean"));
+             repRecord.setAttribute("stdDeviation", temp2.getAttributeValue("stdDeviation"));
+             repRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
+             entity.addContent(repRecord);
+             }
+          repReports.addContent(entity);
+          }
+          
+       }
+       }
+       return repReports;
+       
+    }
+    /**
      * Processes the 'type' value from a Viskit assembly, if it is an xml file, and
      * adds it to the list of event graphs with the proper formatting of the file's
      * path
@@ -578,7 +698,7 @@ public class AnalystReportBuilder {
          String dir = "./BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/";
          String file = fileType.substring(idx+1, fileType.length());
          String eventGraphDirectory = (dir + file +".xml");
-         String imgDirectory = "./images/BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/"+ file +".png";
+         String imgDirectory = "C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/"+fileType.substring(0,idx)+"/"+ file +".xml.png";
          if(!eventGraphFiles.contains(eventGraphDirectory)){
              eventGraphFiles.add(eventGraphDirectory);
              eventGraphImages.add(imgDirectory);
@@ -621,11 +741,12 @@ public class AnalystReportBuilder {
     /**
      * Creates a stand 'Image' element used by all sections of the report
      *
+     *@param imageId a unique identifier for this XML Element
      *@param dir the directory of the image
      *@return image the Image url embedded in well formed XML
      */
-    private Element makeImage(String dir){
-        Element image = new Element("Image");
+    private Element makeImage(String imageID, String dir){
+        Element image = new Element(imageID + "Image");
         image.setAttribute("dir", dir);
         return image;
     }
@@ -633,11 +754,12 @@ public class AnalystReportBuilder {
      * Creates a standard 'Comments' element used by all sections of the report
      * to add comments
      *
+     *@param commentTag the tag used to identify unique Comments (used by XSLT)
      *@param commentText the text comments
      *@return comments the Comments embedded in well formed XML
      */          
-    public Element makeComments(String commentText){
-        Element comments = new Element("Comments");
+    public Element makeComments(String commentTag, String commentText){
+        Element comments = new Element((commentTag +"Comments"));
         comments.setAttribute("text", commentText);
         return comments;
     }
@@ -645,11 +767,12 @@ public class AnalystReportBuilder {
      * Creates a standard 'Conclusions' element used by all sections of the report
      * to add conclusions
      *
+     *@param commentTag the tag used to identify unique Comments (used by XSLT)
      *@param conclusionText the text comments
      *@return conclusions the Comments embedded in well formed XML
      */ 
-    public Element makeConclusions(String conclusionText){
-        Element conclusions = new Element("Conclusions");
+    public Element makeConclusions(String commentTag, String conclusionText){
+        Element conclusions = new Element((commentTag + "Conclusions"));
         conclusions.setAttribute("text", conclusionText);
         return conclusions;
     }
@@ -704,8 +827,8 @@ public class AnalystReportBuilder {
                                      "is accessible from public waterways though a floating barrier system is in place to protect the units that are docked at it's piers.  This initial simulation test does not incorporate the floating barrier system.");
         setSimLocConclusions("While this simulation was able to demonstrate that the tool could setup a simple experiment and run the exclusion of the barrier system probably renders the results useless.  This installation relies heavily on " +
                                      "the barrier system which it has installed. Excluding it from the simulation gives an unrealistic and unrepresentative advantage to waterborne terrorist platforms.");
-        setLocationImage("C:/www.web3D.org/x3d/content/examples/SavageDefense/Locations/Naval-Station-Bremerton-WA/X3D.bmp");
-        
+        setLocationImage("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Locations/BremertonAerial.bmp");
+        setChartImage("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Locations/BremertonChart.bmp");
         //Simulation Configuration Values
         setPrintSimConfigComments(true);
         setPrintAssemblyImage(true);
@@ -719,7 +842,7 @@ public class AnalystReportBuilder {
         setSimConfigConclusions("While the mooring buoys were represented in the simulation they did not have a 3D representation " +
                                          "for watching post-experiment replay.  Adding  a simple model of a mooring buoy would be a good addition " +
                                          "to this model.");
-        setAssemblyImageLocation("C:/CVSProjects/Viskit/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.png");
+        setAssemblyImageLocation("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml.png");
         
         
         //Entity Parameters values
@@ -736,6 +859,7 @@ public class AnalystReportBuilder {
         setPrintBehaviorDefComments(true);
         setPrintEventGraphImages(true);
         setPrintBehaviorDescriptions(true);
+        setPrintEventGraphDetails(true);
         setBehaviorComments("The agent behaviors used for this simulation were taken from the Behavior Libraries directory. No changes to these behaviors were made.");
         setBehaviorConclusions("The behaviors used in this experiment were sufficient given the overall objective.  However, it would be worthwhile to consider incorporating " +
                                     "classified procedures and doctrine for a more realistic harbor representation.");
@@ -929,6 +1053,14 @@ public class AnalystReportBuilder {
 
     public void setRootElement(Element rootElement) {
         this.rootElement = rootElement;
+    }
+
+    public void setPrintEventGraphDetails(boolean printEventGraphDetails) {
+        this.printEventGraphDetails = printEventGraphDetails;
+    }
+
+    public void setChartImage(String chartImage) {
+        this.chartImage = chartImage;
     }
 }
 
