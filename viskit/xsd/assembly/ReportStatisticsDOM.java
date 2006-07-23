@@ -140,7 +140,6 @@ public class ReportStatisticsDOM {
         
         SimEntityRecord(String entityName) {
             //Initialize the default layout
-            System.out.println("SimEntityRecordConstructor for: " + entityName);
             simEntity = new Element("SimEntity");
             simEntity.setAttribute("name", entityName);
             sumReport = new Element("SummaryReport");
