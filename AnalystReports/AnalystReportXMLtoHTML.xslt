@@ -52,7 +52,7 @@
 	    <p/>
 	    <xsl:apply-templates select="/AnalystReport/BehaviorDefinitions/BehaviorList"/>
 	    <p/>
-	    <hr/>
+	    
 	    
 	 <!--Statistical Reports-->
 
@@ -238,6 +238,7 @@
 
 <!--Behavior Definition templates-->
 <xsl:template match="BCComments" mode="BehaviorHeader">
+<hr/>
 <p align="left"><b>Behavior Definitions</b></p>
 <p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
 </xsl:template>
