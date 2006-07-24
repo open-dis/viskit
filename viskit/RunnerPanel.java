@@ -5,6 +5,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
+import javax.swing.text.PlainDocument;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -37,6 +38,8 @@ public class RunnerPanel extends JPanel
   public JCheckBox printRepReportsCB;
   public JCheckBox printSummReportsCB;
   public JTextField numRepsTF;
+  
+  public static int MAX_LINES = 2048;
 
   public RunnerPanel(boolean verbose, boolean skipCloseButt)
   {
@@ -55,11 +58,14 @@ public class RunnerPanel extends JPanel
       titl.setHorizontalAlignment(JLabel.CENTER);
       add(titl); //,BorderLayout.NORTH);
     }
-    soutTA = new JTextArea("Assembly output stream:" + lineEnd +
-        "----------------------" + lineEnd);
-    soutTA.setEditable(true); //false);
+    soutTA = new JTextArea();
+    soutTA.setDocument(new PlainDocument());
+    
+    soutTA.setEditable(false); //false);
     soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
     soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
+    soutTA.append("Assembly output stream:" + lineEnd +
+        "----------------------" + lineEnd);
     JScrollPane jsp = new JScrollPane(soutTA);
     jsp.setPreferredSize(new Dimension(10,350));   // give it some height for the initial split
 
@@ -247,7 +253,7 @@ public class RunnerPanel extends JPanel
 
     public void run()
     {
-      final byte[] buf = new byte[20*1024];
+      final byte[] buf = new byte[256];
       PipedInputStream pis = new PipedInputStream();
       PipedOutputStream pos = null;
       try {
@@ -281,12 +287,7 @@ public class RunnerPanel extends JPanel
 
         // Write to the swing widget
         new inSwingThread(myTa, new String(buf, 0, len), pos);
-        try {
-          pis.read(ba);
-        }
-        catch (Exception e) {
-          e.printStackTrace();
-        }
+        
       }
     }
 
@@ -313,26 +314,20 @@ public class RunnerPanel extends JPanel
 
     public void run()
     {
-      if(clampSize) {
-        stsb.append(s);
-        if(stsb.length() > 0x100000) {
-          stsb.delete(0,stsb.length()-0x100000-1);
-        }
-        ta.setText(stsb.toString());
+
+      ta.append(s);
+      // tbd, these have to be backed by file storage
+      // somehow. save every MAX_LINES
+      // set up a scroll listener, if scroll tab
+      // goes to 0, load previous lines in text-area
+      // if goes to max-scroll, load next availble
+      // block of lines.
+      if (ta.getLineCount() > MAX_LINES) {
+          ta.setText("");
       }
-      else
-        ta.append(s);
 
       ta.setCaretPosition(doc.getLength());
 
-      if(pos != null)
-        try {
-          pos.write(1);
-          pos.flush();
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
     }
   }
   }
