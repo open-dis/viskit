@@ -130,11 +130,12 @@ public class AssemblyRunner
       //System.out.println("into myProcOutReader");
       InputStreamReader isr = new InputStreamReader(proc.getInputStream());
       try {
+        char[] buf = new char[512];
         while(true) {
-          int rd = isr.read();
+          int rd = isr.read(buf);
           if(rd == -1)
             break;
-          myOutPipe.write(rd);
+          myOutPipe.write(buf);
         }
       }
       catch (IOException e) {}
@@ -153,11 +154,12 @@ public class AssemblyRunner
       //System.out.println("into myProcErrReader");
       InputStreamReader isr = new InputStreamReader(proc.getInputStream());
       try {
+        char[] buf = new char[512];
         while(true) {
-          int rd = isr.read();
+          int rd = isr.read(buf);
           if(rd == -1)
             break;
-          myErrPipe.write(rd);
+          myErrPipe.write(buf);
         }
       }
       catch (IOException e) {}
@@ -176,11 +178,12 @@ public class AssemblyRunner
       //System.out.println("into myProcInpWriter");
       OutputStreamWriter osr = new OutputStreamWriter(proc.getOutputStream());
       try {
+        char[] buf = new char[512];
         while(true) {
-          int rd = myInpPipe.read();
+          int rd = myInpPipe.read(buf);
           if(rd == -1)
             break;
-          inpPipe.write(rd);
+          inpPipe.write(buf);
         }
       }
       catch (IOException e) {}
