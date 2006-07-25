@@ -145,10 +145,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   private static final int RUNNER_ARG_STOPTIME = 2;
   private static final int RUNNER_ARG_OUTPUTS = 3;
 
-
-  public void initParams(String[]parms, int runnerClassIndex)
+  private static final int _JAVACMD = 0;
+  private static final int _JVMARGS = 1; // jvmArgCount starts here, rest are offsets
+  private static final int _CLASSPATH_OFFSET = 1;
+  private static final int _RUNNER_CLASS_OFFSET = 2; 
+  private static final int _TARGET_CLASS_OFFSET = 3;
+  private static final int _VERBOSE_OFFSET = 4;
+  private static final int _STOPTIME_OFFSET = 5;
+  
+  // jvmArgCount should always have at least 1 for "-cp"
+  // "-cp" should always be last of any jvm args
+  public void initParams(String[]parms, int jvmArgCount)
   {
-    /*
+    /* eg:
     0 javacmd
     1 "-cp"
     2 classPath
@@ -159,15 +168,15 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     7+ outputentitites
     */
 
-    parms[runnerClassIndex] = "viskit.InternalAssemblyRunner$ExternalSimRunner";
+    parms[jvmArgCount+_RUNNER_CLASS_OFFSET] = "viskit.InternalAssemblyRunner$ExternalSimRunner";
     myCmdLine = parms;
 
-    targetClassName = parms[4];
+    targetClassName = parms[jvmArgCount+_TARGET_CLASS_OFFSET];
     doTitle(parms[4]);
 
-    targetClassPath = parms[2];
-    boolean defaultVerbose = Boolean.valueOf(parms[5]).booleanValue();
-    double defaultStopTime = Double.parseDouble(parms[6]);
+    targetClassPath = parms[jvmArgCount+_CLASSPATH_OFFSET];
+    boolean defaultVerbose = Boolean.valueOf(parms[jvmArgCount+_VERBOSE_OFFSET]).booleanValue();
+    double defaultStopTime = Double.parseDouble(parms[jvmArgCount+_STOPTIME_OFFSET]);
 
     runPanel.vcrStopTime.setText(""+defaultStopTime);
     runPanel.vcrSimTime.setText("0"); //Schedule.getSimTimeStr());

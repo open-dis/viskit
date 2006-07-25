@@ -400,14 +400,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
   class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug
   {
-    public void exec(String[] execStrings, int runnerClassIndex)
+    public void exec(String[] execStrings, int jvmArgCount)
     {
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
       tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
       runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
-      asyRunComponent.initParams(execStrings,runnerClassIndex);
+      asyRunComponent.initParams(execStrings,jvmArgCount);
     }
   }
 

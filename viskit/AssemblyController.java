@@ -1171,8 +1171,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
     }
     else {
-      /** call the potentially overridden exec'er */
-      runner.exec(execStrings,3);   // see buildExecStrings for the 3
+        int jvmArgCount = 1;
+        // "-cp" better be somewhere in execStrings and after rest of jvm args!
+        while (!execStrings[jvmArgCount].equals("-cp")) {
+            jvmArgCount++;
+        }
+        runner.exec(execStrings,jvmArgCount);
     }
   }
 
@@ -1252,11 +1256,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      sb.append("bin");
      sb.append(fsep);
      sb.append("java");
-    v.add(sb.toString());   //0
-
-    v.add("-cp");         //1
-    v.add(classPath);     //2
-    v.add("viskit.ExternalAssemblyRunner"); //3
+    v.add(sb.toString());   
+   // any jvm args go here, followed by "-cp"
+    v.add("-Xss5M");
+    v.add("-Xincgc");
+    v.add("-Xmx512M");
+    v.add("-cp");         
+    v.add(classPath);     
+    v.add("viskit.InternalAssemblyRunner$ExternalSimRunner"); 
     v.add(className);
 
     v.add(""+((ViskitAssemblyModel) getModel()).getMetaData().verbose);
@@ -1337,7 +1344,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   /** The default version of this.  Run assembly in external VM. */
   AssemblyRunnerPlug runner = new AssemblyRunnerPlug()
   {
-    public void exec(String[] execStrings, int runnerClassIndex)
+    public void exec(String[] execStrings, int jvmArgCount)
     {
       try {
         Runtime.getRuntime().exec(execStrings);
@@ -1475,5 +1482,5 @@ class PkgAndFile
 }
 interface AssemblyRunnerPlug
 {
-  public void exec(String[] execStrings, int runnerClassIndex);
+  public void exec(String[] execStrings, int jvmArgCount);
 }
