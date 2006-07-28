@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="SurfaceSearchRadar" package="Neutral" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>A civilian merchant ship. This behavior is set up for typical civilian merchant ship traffic. There is currenlty no difference between this graph and civilian merchant ship. It is a place holder for future developments</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>DIS entity ID</Comment>
+    </Parameter>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The Savage Modeling Analysis Language(SMAL) object that contains all specific information about the model being used</Comment>
+    </Parameter>
+    <StateVariable name="surfaceRadarRange" type="double">
+        <Comment>The maximum range of the surface search radar on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="surfaceRadar" type="diskit.Sensor">
+        <Comment>The surface search radar on this platform</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>The run event sets the parameter values for each simulation run</Comment>
+        <Code/>
+        <Coordinate x="210" y="10"/>
+    </Event>
+    <Event name="Init">
+        <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
+        </Argument>
+        <StateTransition state="surfaceRadarRange">
+            <Assignment value="getEntityDefinition().getMaximumSurfaceDetectionRange()"/>
+        </StateTransition>
+        <StateTransition state="surfaceRadar">
+            <Assignment value="new diskit.SphereCutterSensor(this, surfaceRadarRange)"/>
+        </StateTransition>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment>Only register the visualSensor if this entity is not moving</Comment>
+            <EdgeParameter value="surfaceRadar"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="10" y="10"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="10"/>
+    </Event>
+    <Event name="RegisterSensor">
+        <Comment>If this entity is not moving (e.g. no probability zones) only the visual sensor is registered with this simulation</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The visual sensor for this entity</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="80"/>
+    </Event>
+    <Event name="Detection">
+        <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor that detected another simEntity</Comment>
+        </Argument>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The mover that was detected</Comment>
+        </Argument>
+        <Code>System.out.println(getName() + " Detected: " + contact.getName());</Code>
+        <Coordinate x="210" y="90"/>
+    </Event>
+</SimEntity>
+
