@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="SurfaceSearchRadar" package="Neutral" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="SurfaceSearchRadar" package="FriendlyForce" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A civilian merchant ship. This behavior is set up for typical civilian merchant ship traffic. There is currenlty no difference between this graph and civilian merchant ship. It is a place holder for future developments</Comment>
     <Parameter name="moverID" type="int">
         <Comment>DIS entity ID</Comment>
