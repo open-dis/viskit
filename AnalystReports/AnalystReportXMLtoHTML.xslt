@@ -28,22 +28,28 @@
 	<!--Executive Summary : NOTE: ommitted if analyst did not include comments  -->	
     <xsl:apply-templates select="/AnalystReport/ExecutiveSummary"/>
     <p/>
-
+    <p/>
+    <hr />
+    
     <!--Simulation Location-->
     <xsl:apply-templates select="/AnalystReport/SimulationLocation"/>    
-     <hr />     
+          
+     <p/>
+     <p/>
+     <hr/>
      
 	<!--Simulation Configuration-->
 	<xsl:apply-templates select="/AnalystReport/SimulationConfiguration" mode="ConfigHeader"/>
 
-	    
+	    <p/>
+	    <p/>
 	    <hr/>
 	    
 	    <!--Entity Parameters -->
 	    <xsl:apply-templates select="/AnalystReport/EntityParameters" mode="ParamHeader"/>
 	    <p/>
 	    <xsl:apply-templates select="/AnalystReport/EntityParameters/ParameterTables/EntityParameterTable"/>
-	    
+	    <p/>
         <p/>
         <hr/>	
 	
@@ -52,6 +58,10 @@
 	    <p/>
 	    <xsl:apply-templates select="/AnalystReport/BehaviorDefinitions/BehaviorList"/>
 	    <p/>
+	    <p/>
+	    <p/>
+	    <p/>
+	    <hr/>
 	    
 	    
 	 <!--Statistical Reports-->
@@ -59,6 +69,7 @@
 	 	<xsl:apply-templates select="/AnalystReport/StatisticalResults" mode="StatsHeader"/>
 		<xsl:apply-templates select="/AnalystReport/StatisticalResults/ReplicationReports/SimEntity" mode="RepStats"/>
 		<xsl:apply-templates select="/AnalystReport/StatisticalResults/SummaryReport" mode="SumStats"/>
+	    <p/>
 	    <p/>
 	    <hr/>
 	    
@@ -109,6 +120,9 @@
 <xsl:template match="SCComments" mode="ConfigHeader">
 <p align="left"><b>Simulation Configuration</b></p>
 <p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
+</xsl:template>
+<xsl:template match="SCConclusions" mode="ConfigHeader">
+<p align="left"><i><u>Post-Experiment Comments:</u></i><font color="#000099"><xsl:value-of select="@text"/></font></p> 
 <p align="center"><b>Simulation Entities</b></p>
 		<div align="center">
 		<table border="1"><tr><td bgcolor="#FFFFCC">Entity Name</td><td bgcolor="#FFFFCC">Behavior Definition</td></tr>
@@ -116,9 +130,7 @@
 	    </table>
 	    </div>
 </xsl:template>
-<xsl:template match="SCConclusions" mode="ConfigHeader">
-<p align="left"><i><u>Post-Experiment Comments:</u></i><font color="#000099"><xsl:value-of select="@text"/></font></p> 
-</xsl:template>
+
 <xsl:template match="AssemblyImage" mode="ConfigHeader">
 <p align="center">
 <xsl:element name="img">
@@ -140,10 +152,10 @@
 <!--EntityParameter templates-->
 <xsl:template match="EPComments" mode="ParamHeader">
 <p align="left"><b>Entity Parameters</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="EPConclusions" mode="ParamHeader">
-<p align="left"><i><u>Post-Experiment Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Post-Experiment Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 
 <!--Entity Parameter Tables-->
@@ -266,10 +278,10 @@
 <xsl:template match="BCComments" mode="BehaviorHeader">
 <hr/>
 <p align="left"><b>Behavior Definitions</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="BCConclusions" mode="BehaviorHeader">
-<p align="left"><i><u>Post-Experiment Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Post-Experiment Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 
 <!--Event Graph image and details -->
@@ -323,10 +335,10 @@
 <!--Statistical Results -->
 <xsl:template match="SRComments" mode="StatsHeader">
 <p align="left"><b>Statistical Results</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="SRConclusions" mode="StatsHeader">
-<p align="left"><i><u>Post-Experiment Comments</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Post-Experiment Comments</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 
 <xsl:template match="SimEntity" mode="RepStats">
@@ -346,25 +358,25 @@
 	</xsl:for-each>
 	<p align="center">
 	<table border="1" width="60%">
-			<tr><td bgcolor="#FFFFFF">
+			<tr><td bgcolor="#FFFFCC">
 					<b>Run#</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Count</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Min</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Max</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Mean</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>StdDev</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Variance</b>
 				</td>
 			</tr>
@@ -387,28 +399,28 @@
     <p/>
 	<p align="left"><u><b>Summary Report</b></u>:</p>
 	<table border="1" width="80%">
-			<tr><td bgcolor="#FFFFFF">
+			<tr><td bgcolor="#FFFFCC">
 					<b>Entity</b>
 				</td>
-			     <td bgcolor="#FFFFFF">
+			     <td bgcolor="#FFFFCC">
 					<b>Property</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Count</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Min</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Max</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Mean</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>StdDev</b>
 				</td>
-				<td bgcolor="#FFFFFF">
+				<td bgcolor="#FFFFCC">
 					<b>Variance</b>
 				</td>
 			</tr>
@@ -430,10 +442,10 @@
 <!--Conclusions Recommendations -->
 <xsl:template match="CRComments">
 <p align="left"><b>Conclusions and Recommendations</b></p>
-<p align="left"><i><u>Conclusions</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Conclusions</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="CRConclusions">
-<p align="left"><u><i>Recommendations for future work</i></u>:<xsl:value-of select="@text"/></p>
+<p align="left"><u><i>Recommendations for future work</i></u>:<font color="#00006C"><xsl:value-of select="@text"/></font></p>
 </xsl:template>
 
 		
