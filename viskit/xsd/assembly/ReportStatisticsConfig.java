@@ -24,23 +24,19 @@
 
 package viskit.xsd.assembly;
 
-import java.util.LinkedList;
-import java.util.Iterator;
-import simkit.stat.SampleStatistics;
-import java.text.DecimalFormat;
-import org.jdom.*;
-import org.jdom.*;
-import org.jdom.input.SAXBuilder;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import java.io.*;
-import java.util.*;
-import java.util.Date;
-import java.util.Formatter;
+import simkit.stat.SampleStatistics;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class ReportStatisticsConfig {
     
@@ -80,7 +76,9 @@ public class ReportStatisticsConfig {
     /** Creates a new instance of ReportStatisticsConfig */
     public ReportStatisticsConfig(String assemblyName) {
          this.assemblyName = assemblyName;
-         form = new DecimalFormat("0.000");
+         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+         dfs.setInfinity("inf");  // xml chokes on default
+         form = new DecimalFormat("0.000",dfs);
          reportStats = new ReportStatisticsDOM();
     }
     
@@ -101,7 +99,7 @@ public class ReportStatisticsConfig {
             String key = (String)itr.next();
             seperator  = findUnderscore(key);
             entityIndex[idx]   = key.substring(0, seperator);
-            propertyIndex[idx] = key.substring(seperator+1, key.length());
+            propertyIndex[idx] = key.substring(seperator, key.length());
             System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
             idx++;
         }
@@ -136,9 +134,8 @@ public class ReportStatisticsConfig {
         for(int i = 0; i < rep.length; i++){
            
             Element replication = new Element("Replication");
-            
-            
-            replication.setAttribute("number", Integer.toString(repNumber));            
+
+            replication.setAttribute("number", Integer.toString(repNumber));
             replication.setAttribute("count",form.format(rep[i].getCount()));
             replication.setAttribute("minObs",form.format(rep[i].getMinObs()));
             replication.setAttribute("maxObs",form.format(rep[i].getMaxObs()));
@@ -169,8 +166,7 @@ public class ReportStatisticsConfig {
         for(int i = 0; i < sum.length; i++){
             
             Element summary = new Element("Summary");
-            
-            
+
             summary.setAttribute("property", propertyIndex[i]);            
             summary.setAttribute("count",form.format(sum[i].getCount()));
             summary.setAttribute("minObs",form.format(sum[i].getMinObs()));
