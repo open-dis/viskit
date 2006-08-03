@@ -334,6 +334,17 @@
 	<p align="left"><u><b>Replication Report</b></u>:</p>
 	<p align="left">Entity: <b><xsl:value-of select="@name"/></b>
 	<p align="left">Property: <b><xsl:value-of select="@property"/></b></p>
+	<xsl:for-each select="chartURL">
+	<p align="center">
+	<xsl:element name="img">
+		<xsl:attribute name="border"><xsl:text>1</xsl:text></xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>	
+		<xsl:attribute name="width"><xsl:text>640</xsl:text></xsl:attribute>
+		<xsl:attribute name="height"><xsl:text>480</xsl:text></xsl:attribute>
+	</xsl:element>
+	</p>
+	</xsl:for-each>
+	<p align="center">
 	<table border="1" width="60%">
 			<tr><td bgcolor="#FFFFFF">
 					<b>Run#</b>
@@ -368,7 +379,7 @@
 				<td><xsl:value-of select="@variance"/></td>
 			</tr>
 </xsl:for-each>
-</table></p>
+</table></p></p>
 
 </xsl:template>
 
