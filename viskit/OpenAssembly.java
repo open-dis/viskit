@@ -98,7 +98,7 @@ public class OpenAssembly
       throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
     }
 
-    doSendNewAssy();
+    doSendNewAssy(f);
   }
 
   private HashSet listeners = new HashSet();
@@ -123,7 +123,7 @@ public class OpenAssembly
 
   public void doParamLocallyEditted( AssyChangeListener source )
   {
-    fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED,source);
+    fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED,source,null);
   }
 /*
   public void doSendAssyJdomChanged(AssyChangeListener source)
@@ -133,23 +133,23 @@ public class OpenAssembly
 */
   public void doSendAssyJaxbChanged(AssyChangeListener source)
   {
-    fireAction(AssyChangeListener.JAXB_CHANGED,source);
+    fireAction(AssyChangeListener.JAXB_CHANGED,source,null);
   }
 
-  public void doSendNewAssy()
+  public void doSendNewAssy(File f)
   {
-    fireAction(AssyChangeListener.NEW_ASSY,null);
+    fireAction(AssyChangeListener.NEW_ASSY,null,f);
   }
   public void doSendCloseAssy()
   {
-    fireAction(AssyChangeListener.CLOSE_ASSY,null);
+    fireAction(AssyChangeListener.CLOSE_ASSY,null,null);
   }
-  private void fireAction(int action, AssyChangeListener source)
+  private void fireAction(int action, AssyChangeListener source, Object param)
   {
     for(Iterator itr = listeners.iterator(); itr.hasNext();) {
       AssyChangeListener lis = (AssyChangeListener)itr.next();
       if(lis != source)
-        lis.assyChanged(action,source);
+        lis.assyChanged(action,source,param);
     }
   }
 
@@ -161,7 +161,7 @@ public class OpenAssembly
     public final static int CLOSE_ASSY = 3;
     public final static int PARAM_LOCALLY_EDITTED = 4;
 
-    public void assyChanged(int action, AssyChangeListener source);
+    public void assyChanged(int action, AssyChangeListener source, Object param);
     public String getHandle();
   }
 

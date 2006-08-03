@@ -218,7 +218,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener()
   {
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
     {
       switch(action) {
         case JAXB_CHANGED:

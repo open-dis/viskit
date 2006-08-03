@@ -47,10 +47,7 @@ import edu.nps.util.SysExitHandler;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import viskit.doe.DoeMain;
-import viskit.doe.DoeMainFrame;
-import viskit.doe.FileHandler;
-import viskit.doe.JobLauncherTab;
+import viskit.doe.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -72,7 +69,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   EventGraphViewFrame egFrame;
   AssemblyViewFrame asyFrame;
   InternalAssemblyRunner asyRunComponent;
-  JobLauncherTab runGridComponent;
+  JobLauncherTab2 runGridComponent;
+  AnalystReportPanel reportPanel;
 
   Action myQuitAction;
   private DoeMain doeMain;
@@ -126,6 +124,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     JMenuBar menuBar;
 
     tabbedPane = new JTabbedPane();
+    tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
     ChangeListener tabChangeListener = new myTabChangeListener();
 
     myQuitAction = new QuitAction("Quit");
@@ -154,19 +153,23 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
 
     runTabbedPane = new JTabbedPane();
-    tabbedPane.add(runTabbedPane,TAB0_ASSYRUN_SUBTABS_IDX);
+    //tabbedPane.add(runTabbedPane,TAB0_ASSYRUN_SUBTABS_IDX);
+      JPanel p = new JPanel(new BorderLayout());
+      p.setBackground(new Color(206,206,255)); // light blue
+      p.add(runTabbedPane,BorderLayout.CENTER);
+    tabbedPane.add(p,TAB0_ASSYRUN_SUBTABS_IDX);
     tabbedPane.setTitleAt(TAB0_ASSYRUN_SUBTABS_IDX,"Assembly Run");
     menus.add(null); // placeholder
 
     // Analyst report
-    tabbedPane.add(new JLabel("Analyst report goes here"),TAB0_ANAL_REPORT_IDX);
-    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report");
-    menuBar = new JMenuBar(); //todo implement
+    tabbedPane.add(reportPanel=new AnalystReportPanel(),TAB0_ANAL_REPORT_IDX);
+    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report (in progress)");
+    menuBar = reportPanel.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
     //todo blah.setTitleListener(myTitleListener,TAB0_ANAL_REPORT_IDX);
-    //todo jamQuitHandler....
+    jamQuitHandler(null,myQuitAction,reportPanel.getMenus());
 
     // Assembly runner
     asyRunComponent = new InternalAssemblyRunner();
@@ -181,7 +184,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     AssemblyController controller = ((AssemblyController)asyFrame.getController());
     controller.setInitialFile(initialFile);
     controller.setAssemblyRunner( new ThisAssemblyRunnerPlug());
-
+    asyRunComponent.setAnalystReportGUI(reportPanel);
+    
     // Design of experiments
     doeMain = DoeMain.main2();
     DoeMainFrame doeFrame = doeMain.getMainFrame();
@@ -199,7 +203,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamQuitHandler(doeMain.getQuitMenuItem(),myQuitAction,menuBar);
 
     // Grid run panel
-    runGridComponent = new JobLauncherTab(doeMain.getController(),null,null,this);
+    runGridComponent = new JobLauncherTab2(doeMain.getController(),null,null,this);
     doeFrame.getController().setJobLauncher(runGridComponent);
     runTabbedPane.add(runGridComponent.getContent(),TAB1_CLUSTERUN_IDX);
     runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX,"LaunchClusterJob");
@@ -219,7 +223,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyCntlr.addAssemblyFileListener(asyRunComponent);
     asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
     asyCntlr.addAssemblyFileListener(runGridComponent);
-
+    asyCntlr.addAssemblyFileListener(reportPanel);
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
     cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());

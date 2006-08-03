@@ -152,7 +152,7 @@ public class FileHandler
       e.printStackTrace();
     }
   }
-  public static void runFile(File fil, String title, JobLauncherTab jobLauncher)
+  public static void runFile(File fil, String title, JobLauncherTab2 jobLauncher)
   {
     jobLauncher.setFile(fil.getAbsolutePath(),title);
   }

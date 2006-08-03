@@ -382,7 +382,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     }
   }
 
-  public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
   {
   }
 

@@ -188,17 +188,16 @@ public class ReportStatisticsConfig {
          reportStats.storeSummaryData(summaryUpdate);
     }
     /**
-     *Returns stats report in jdom.Document format
+     *Returns stats report in jdom.Document format; Naw...filename
      */
-    public Document getReport(){
+    public String getReport(){
         Document report = reportStats.getReport();
-        saveData(report);
-        return report;
+        return saveData(report);
     }
     /**
      * File I/O that saves the report in XML format
      */
-    public void saveData(Document report){
+    public String saveData(Document report){
         
         Date today;
         String output;
@@ -211,15 +210,23 @@ public class ReportStatisticsConfig {
           try {
             XMLOutputter outputter = new XMLOutputter();
             //Create a unique file name for each DTG/Location Pair
-            String outputFile = ("./AnalystReports/statistics/" +author+assemblyName+"_"+ output+".xml");
-            FileWriter writer = new FileWriter(outputFile);
+            File anStatDir = new File("./AnalystReports/statistics");
+            anStatDir.mkdirs();
+
+            String outputFile = (author+assemblyName+"_"+ output+".xml");
+            File f = new File(anStatDir,outputFile);
+            FileWriter writer = new FileWriter(f);
+            
             outputter.output(report, writer);
             
             writer.close();
+            return f.getAbsolutePath();
             
         } catch (java.io.IOException e) {
             e.printStackTrace();
+            return null;
         }
+
      }
     }
 

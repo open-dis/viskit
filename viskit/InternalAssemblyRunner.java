@@ -62,6 +62,7 @@ import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.EventListener;
 
 /** Analogous to ExternalAssemblyRunner, but puts gui in calling thread and runs
  * sim in external VM.
@@ -71,18 +72,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   String targetClassName;
   String targetClassPath;
   List outputs;
-  RunnerPanel runPanel;
+  RunnerPanel2 runPanel;
   ActionListener closer,saver;
   static String lineSep = System.getProperty("line.separator");
   JMenuBar myMenuBar;
   BufferedReader backChan;
 
   private Process externalSimRunner;
+  private String analystReportTempFile; // external runner saves a file
 
   public InternalAssemblyRunner()
   {
     saver = new saveListener();
-    runPanel = new RunnerPanel(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
+    runPanel = new RunnerPanel2(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
     doMenus();
     runPanel.vcrStop.addActionListener(new stopListener());
     runPanel.vcrPlay.addActionListener(new startResumeListener());
@@ -95,7 +97,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     runPanel.vcrPlay.setEnabled(false);
     runPanel.vcrRewind.setEnabled(false);
     runPanel.vcrStep.setEnabled(false);
-    
+
     //runPanel.numRepsTF.addActionListener(new repsListener()); // this gets directly read at initRun()
 
     twiddleButtons(OFF);
@@ -119,7 +121,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     return "";
   }
 
-  public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+  AnalystReportPanel reportPanel;
+  public void setAnalystReportGUI(AnalystReportPanel pan)
+  {
+    reportPanel = pan;
+  }
+
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
   {
     switch (action) {
       case JAXB_CHANGED:
@@ -222,6 +230,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   PrintWriter pWriter;
   private void initRun()
   {
+    analystReportTempFile = null;
     if(externalSimRunner == null) {
       // disable this...it's not showing up because of the .exec below which
       // is also being done in the Swing thread...redesign
@@ -287,6 +296,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     timr.setRepeats(false);
     timr.start();
   }
+  
   class startResumeListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
@@ -358,22 +368,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
       }
     }
   }
-  
+
   /* unused, currenlty this data gets set at initRun()
-   * right when the play button gets toggled
-    class repsListener implements ActionListener
-  {
-      public void actionPerformed(ActionEvent e)
-      {
-          System.out.println(e);
-          int reps = Integer.parseInt(runPanel.numRepsTF.getText());
-          send(ExternalSimRunner.ASSY_NUM_REPS);
-          send(runPanel.numRepsTF.getText().trim());
+  * right when the play button gets toggled
+   class repsListener implements ActionListener
+ {
+     public void actionPerformed(ActionEvent e)
+     {
+         System.out.println(e);
+         int reps = Integer.parseInt(runPanel.numRepsTF.getText());
+         send(ExternalSimRunner.ASSY_NUM_REPS);
+         send(runPanel.numRepsTF.getText().trim());
         
          
-      }
-  }
-   */
+     }
+ }
+  */
   /* to handle the saving of the execution parms to the assembly file
   class saveParmListener implements ActionListener
   {
@@ -532,8 +542,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
               public void run()
               {
                 twiddleButtons(InternalAssemblyRunner.STOP);
+                if(InternalAssemblyRunner.this.analystReportTempFile != null &&
+                   InternalAssemblyRunner.this.reportPanel != null)
+                  signalReportReady();
               }
             });
+          }
+          else if (line.startsWith(ExternalSimRunner.RESP_ANALYSTREPORTFILE)) {
+            analystReportTempFile = line.substring(ExternalSimRunner.RESP_ANALYSTREPORTFILE.length());
           }
         }
       }
@@ -541,6 +557,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
         System.out.println("Back channel reader dead");
       }
     }
+  }
+
+  private void signalReportReady()
+  {
+    reportPanel.setReportXML(analystReportTempFile); 
   }
 
   double getStopTime()
@@ -771,9 +792,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
                                        "DumpOutputs","OpenBackchannel","Quit",
                                        "SetNumReps","SaveRepData","PrintRepReports","PrintSummReports"};
 
-    public static final String RESP_TIMESTR     = "R1/";
-    public static final String RESP_SIMSTOPPED  = "R2/";
-    public static final String RESP_BACKCHANNEL = "R3/";
+    public static final String RESP_TIMESTR           = "R1/";
+    public static final String RESP_SIMSTOPPED        = "R2/";
+    public static final String RESP_BACKCHANNEL       = "R3/";
+    public static final String RESP_ANALYSTREPORTFILE = "R4/";
 
     private Vector outputs = new Vector();
     private PrintStream extBackChannel;
@@ -822,6 +844,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
         for (int i = RUNNER_ARG_OUTPUTS; i < args.length; i++)
           outputs.add(args[i]);
       }
+
+      sendAnalystReportPath();  // if backchannel open at this point, else when it is
+
       Schedule.reset();
 
       execLoop();
@@ -845,8 +870,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
             case OPEN_BACKCHANNEL:
               String port = in.readLine();
               openChannel(port);
-              if(extBackChannel != null)
+              if(extBackChannel != null) {
                 extBackChannel.println(RESP_BACKCHANNEL+"BackChannelOK");
+                sendAnalystReportPath();
+              }
               break;
             case SCHEDULE_RESET:
               System.err.println("Got reset (not error)");
@@ -927,8 +954,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
                     targetAssembly.setNumberReplications(1); // todo when fixed   nint);
                 else {
                     ((ViskitAssembly)targetAssembly).setNumberReplications(nint);
-                } 
-                    
+                }
+
               }
               catch (NumberFormatException e) {
                 System.err.println("Error parsing number of reps: "+n);
@@ -992,6 +1019,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
         e.printStackTrace();
       }
     }
+
+    private void sendAnalystReportPath()
+    {
+      String analystReportPath = targetAssembly.getAnalystReportPath();
+      if (analystReportPath != null && extBackChannel != null)
+        extBackChannel.println(RESP_ANALYSTREPORTFILE + analystReportPath);
+    }
+
     private String borderString = "******************************";
 
     private void dumpOutputs()

@@ -233,8 +233,8 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     doeFrame.setTitle(doeFrame.titleString+" -- "+dfm.userFile.getName());
   }
 
-  private JobLauncherTab jobLauncher;
-  public void setJobLauncher(JobLauncherTab jobL)
+  private JobLauncherTab2 jobLauncher;
+  public void setJobLauncher(JobLauncherTab2 jobL)
   {
     jobLauncher = jobL;
   }
@@ -369,7 +369,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     return "";
   }
 
-  public void assyChanged(int action, OpenAssembly.AssyChangeListener source)
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
   {
     switch(action) {
       case JAXB_CHANGED:

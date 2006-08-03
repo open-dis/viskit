@@ -113,7 +113,11 @@ public class JobResults extends JFrame
   }
   public void addPoint(JobLauncherTab.Gresults res)
   {
-
+    //todo should these be null methods?
+  }
+  public void addPoint(JobLauncherTab2.Gresults res)
+  {
+    //todo should these be null methods?
   }
   JFreeChart chart;
   private JFreeChart createChart(XYDataset dset)
