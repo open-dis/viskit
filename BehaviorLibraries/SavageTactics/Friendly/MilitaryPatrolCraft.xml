@@ -256,7 +256,7 @@ start();</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="680" y="120"/>
+        <Coordinate x="660" y="110"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
@@ -271,7 +271,7 @@ start();</Code>
             <EdgeParameter value="obstacle"/>
         </Schedule>
         <Code/>
-        <Coordinate x="680" y="240"/>
+        <Coordinate x="650" y="240"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>If a collision will occur avoid the obstacle using the avoidance mover manager. The avoidance mover manager will perform the avoidance and then reset the activeMoverManager to its pre-avoidance value after completing the avoidance maneuver.</Comment>
@@ -288,7 +288,7 @@ start();</Code>
             <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
         </StateTransition>
         <Code>setStartPosition(getLocation());</Code>
-        <Coordinate x="680" y="340"/>
+        <Coordinate x="650" y="340"/>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
@@ -357,7 +357,7 @@ multipleSensors[1] = collisionDetection;</Code>
         <Code>setCruiseSpeed(getMaximumSpeed());
 setStartPosition(getLocation());
 setDestination(interceptPoint);</Code>
-        <Coordinate x="510" y="120"/>
+        <Coordinate x="480" y="110"/>
     </Event>
     <Event name="QueryContact">
         <Comment>After completing an intercept this vessel will call the contact on the radio to make an identification and shadow the contacts course and speed</Comment>
@@ -393,7 +393,7 @@ setDestination(interceptPoint);</Code>
         <Code>setStartPosition(getLocation());
 setCruiseSpeed(contact.getCruiseSpeed());
 setDestination(contact.getDestination());</Code>
-        <Coordinate x="390" y="120"/>
+        <Coordinate x="370" y="110"/>
     </Event>
     <Event name="IDContact">
         <Comment>Contact has been identified and is not in any exclusion zone. Add to contact picture and make contact report to other friendly forces</Comment>
@@ -476,7 +476,7 @@ setDestination(patrolDestination);</Code>
         <Comment/>
         <Argument name="message" type="diskit.RadioCommunication"/>
         <Code/>
-        <Coordinate x="450" y="240"/>
+        <Coordinate x="420" y="240"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was transmitted by the scenario manager to this entity</Comment>
@@ -497,7 +497,7 @@ setDestination(patrolDestination);</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code/>
-        <Coordinate x="590" y="450"/>
+        <Coordinate x="560" y="450"/>
     </Event>
     <Event name="QueryResponseReceived">
         <Comment>When the contact makes a response the radio transmission recieved is processed</Comment>
@@ -529,7 +529,7 @@ setDestination(patrolDestination);</Code>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
         <Code/>
-        <Coordinate x="590" y="300"/>
+        <Coordinate x="550" y="300"/>
     </Event>
 </SimEntity>
 
