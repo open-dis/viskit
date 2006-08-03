@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.FriendlyForce" name="MilitaryShipPierside" package="Friendly" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>A military ship.  When moving this entity has four active sensors (surface, subsurface, air, and the visual perception of humans
+    on the ship). When not moving the ship has only one sensor, the human. Currently this graph does not take into account the difference in line of
+    sight of a human on watch in port and a human on watch on the bridge.</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>DIS entity ID</Comment>
+    </Parameter>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The Savage Modeling Analysis Language(SMAL) object that contains all specific information about the model being used</Comment>
+    </Parameter>
+    <StateVariable name="visualRange" type="double">
+        <Comment>The visual range of a human on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="visualPerception" type="diskit.Sensor">
+        <Comment>The digital camera on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>Tactical Mode of this entity</Comment>
+    </StateVariable>
+    <StateVariable name="killZone" type="diskit.Sensor">
+        <Comment>If this zone is penetrated by a suspect contact the ship will orders it weapons to fire</Comment>
+    </StateVariable>
+    <StateVariable name="killZoneRange" type="double">
+        <Comment>The range for the kill zone</Comment>
+    </StateVariable>
+    <StateVariable name="shipLayout" type="diskit.AStarZoneMap">
+        <Comment>An A* zone map that specifies the layout of the ship for Friendly.ShipSelfDefenseForce agents</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>The run event sets the parameter values for each simulation run</Comment>
+        <Code/>
+        <Coordinate x="0" y="290"/>
+    </Event>
+    <Event name="Init">
+        <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
+        <Argument name="entity" type="simkit.SimEntity">
+            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
+        </Argument>
+        <StateTransition state="visualRange">
+            <Assignment value="600"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+        </StateTransition>
+        <StateTransition state="killZoneRange">
+            <Assignment value="100"/>
+        </StateTransition>
+        <StateTransition state="killZone">
+            <Assignment value="new diskit.SphereCutterSensor(this, killZoneRange)"/>
+        </StateTransition>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="BuildSensorArray" priority="0">
+            <Comment>If this zone is moving register all sensors</Comment>
+        </Schedule>
+        <Code/>
+        <Coordinate x="10" y="10"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="10"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers the complete sensor array if and only if this entity has at least one probability zone</Comment>
+        <Argument name="sensors" type="diskit.Sensor[]">
+            <Comment>The complete collection of sensors for this entity</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="150"/>
+    </Event>
+    <Event name="Detection">
+        <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
+        <Argument name="sensor" type="diskit.Sensor">
+            <Comment>The sensor that detected another simEntity</Comment>
+        </Argument>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The mover that was detected</Comment>
+        </Argument>
+        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
+            <Comment>Determines whether the contact detected is part of the same force</Comment>
+        </LocalVariable>
+        <Schedule condition="sensor == killZone &amp;&amp; !isFriendlyForce" delay="0.0" event="BatteriesReleased" priority="0">
+            <Comment>If the sensor is the kill zone then go authorize shooting</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="sensor == visualPerception &amp;&amp; !isFriendlyForce" delay="0.0" event="GoToSecurityAlert" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " Detected: " + contact.getName());</Code>
+        <Coordinate x="200" y="100"/>
+    </Event>
+    <Event name="BuildSensorArray">
+        <Comment>Combines all sensors in an array</Comment>
+        <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[2]">
+            <Comment>Initialized to the maximum number of sensors possible for this object</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="multipleSensors"/>
+        </Schedule>
+        <Code>multipleSensors[0] = visualPerception;
+multipleSensors[1] = killZone;</Code>
+        <Coordinate x="10" y="150"/>
+    </Event>
+    <Event name="GoToSecurityAlert">
+        <Comment>Indicates that this unit needs to go to Security Alert</Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact of interest that prompted the security alert</Comment>
+        </Argument>
+        <Schedule condition="true" delay="0.0" event="SecurityAlert" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " ordered Security alert");</Code>
+        <Coordinate x="320" y="100"/>
+    </Event>
+    <Event name="SecurityAlert">
+        <Comment>Passes the security alert event to its weapons personel</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The contact that is the cause of concern</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="320" y="180"/>
+    </Event>
+    <Event name="BatteriesReleased">
+        <Comment>Sends the order of batteries released when a contact of interest breaches the kill zone. This entity has sole authority to make that determination</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to shoot at</Comment>
+        </Argument>
+        <Code>System.out.println(getName() + " ordered BatteriesReleased");</Code>
+        <Coordinate x="200" y="190"/>
+    </Event>
+</SimEntity>
+
