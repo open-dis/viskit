@@ -623,6 +623,60 @@ public class AnalystReportBuilder
       statisticalResults.addContent(sumReport);
     }
   }
+  public List  unMakeReplicationList(Element statisticalResults)
+  {
+    Vector v = new Vector();
+
+    Element repReports = statisticalResults.getChild("ReplicationReports");
+    List simEnts = repReports.getChildren("SimEntity");
+    for (Iterator itr = simEnts.iterator(); itr.hasNext();) {
+      Vector se = new Vector(3);
+      Element sEnt = (Element)itr.next();
+      se.add(sEnt.getAttributeValue("name"));
+      se.add(sEnt.getAttributeValue("property"));
+      Vector r = new Vector();
+      List repLis = sEnt.getChildren("Replication");
+      for(Iterator i2 = repLis.iterator(); i2.hasNext();) {
+        Element rep = (Element)i2.next();
+        String[] sa = new String[7];
+        sa[0] = rep.getAttributeValue("number");
+        sa[1] = rep.getAttributeValue("count");
+        sa[2] = rep.getAttributeValue("minObs");
+        sa[3] = rep.getAttributeValue("maxObs");
+        sa[4] = rep.getAttributeValue("mean");
+        sa[5] = rep.getAttributeValue("stdDeviation");
+        sa[6] = rep.getAttributeValue("variance");
+        r.add(sa);
+      }
+      se.add(r);
+      v.add(se);
+    }
+
+    return v;
+  }
+
+  public List unMakeStatsSummList(Element statisticalResults)
+  {
+    Vector v = new Vector();
+
+    Element sumReports = statisticalResults.getChild("SummaryReport");
+    List recs = sumReports.getChildren("SummaryRecord");
+    for (Iterator itr = recs.iterator(); itr.hasNext();) {
+      Element rec = (Element) itr.next();
+      String[] sa = new String[8];
+      sa[0] = rec.getAttributeValue("entity");
+      sa[1] = rec.getAttributeValue("property");
+      sa[2] = rec.getAttributeValue("count");
+      sa[3] = rec.getAttributeValue("minObs");
+      sa[4] = rec.getAttributeValue("maxObs");
+      sa[5] = rec.getAttributeValue("mean");
+      sa[6] = rec.getAttributeValue("stdDeviation");
+      sa[7] = rec.getAttributeValue("variance");
+
+      v.add(sa);
+    }
+    return v;
+  }
 
   /**
    * Creates the conclusions/Recommendations portion of the analyst report template
@@ -928,12 +982,12 @@ public class AnalystReportBuilder
   {
     Element repReports = new Element("ReplicationReports");
     Iterator mainItr = statsReport.getRootElement().getChildren("SimEntity").iterator();
-    
+
     //variables for JFreeChart construction
     ChartDrawer chart = new ChartDrawer();
     String chartTitle = "";
     String axisLabel  = "";
-    
+
     while (mainItr.hasNext()) {
       Element tempEntity = (Element) mainItr.next();
       Iterator itr = tempEntity.getChildren("DataPoint").iterator();
@@ -943,15 +997,15 @@ public class AnalystReportBuilder
         entity.setAttribute("name", tempEntity.getAttributeValue("name"));
         entity.setAttribute("property", temp.getAttributeValue("property"));
         Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
-        
+
         //Chart title and label
         chartTitle = ("Entity Name: " + tempEntity.getAttributeValue("name"));
         axisLabel  = (temp.getAttributeValue("property")) ;
-        
+
         while (itr2.hasNext()) {
           Element temp3 = (Element) itr2.next();
           Iterator itr3 = temp3.getChildren("Replication").iterator();
-          
+
          //Create a data set instance and chart for each replication report
           double[] data = new double[temp3.getChildren().size()];
           int idx = 0;
@@ -966,11 +1020,11 @@ public class AnalystReportBuilder
             repRecord.setAttribute("stdDeviation", temp2.getAttributeValue("stdDeviation"));
             repRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
             entity.addContent(repRecord);
-            
+
             //Add the mean of this replication to the chart
             data[idx] = Double.parseDouble(temp2.getAttributeValue("mean"));
             idx++;
-            
+
           }
           Element chartDir = new Element("chartURL");
           String filename = axisLabel;
@@ -1416,18 +1470,20 @@ public class AnalystReportBuilder
   public boolean isPrintStatsComments()    { return stringToBoolean(statisticalResults.getAttributeValue("comments")); }
   public boolean isPrintSummaryStats()     { return stringToBoolean(statisticalResults.getAttributeValue("summaryStats")); }
   public boolean isPrintStatsCharts()      { return stringToBoolean(statisticalResults.getAttributeValue("charts")); }
-  public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
+  //todo later public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
   public void setPrintReplicationStats   (boolean bool) { statisticalResults.setAttribute("replicationStats", booleanToString(bool)); }
   public void setPrintStatsComments      (boolean bool) { statisticalResults.setAttribute("comments", booleanToString(bool)); }
   public void setPrintSummaryStats       (boolean bool) { statisticalResults.setAttribute("summaryStats", booleanToString(bool)); }
   public void setPrintStatsCharts        (boolean bool) { statisticalResults.setAttribute("charts", booleanToString(bool)); }
-  public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
+  //todo later public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
 
   public String  getStatsComments()        { return unMakeComments(statisticalResults);}
   public String  getStatsConclusions()     { return unMakeConclusions(statisticalResults);}
   public void setStatsComments           (String s) { makeComments(statisticalResults,"SR", s); }
   public void setStatsConclusions        (String s) { makeConclusions(statisticalResults,"SR", s); }
-
+  public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
+  public List   getStatsReplicationsList() { return unMakeReplicationList(statisticalResults);}
+  public List   getStastSummaryList()      { return unMakeStatsSummList(statisticalResults); }
 
   // misc:
   public void setEventGraphFiles(LinkedList eventGraphFiles) { this.eventGraphFiles = eventGraphFiles; }
