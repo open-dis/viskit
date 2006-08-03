@@ -462,6 +462,7 @@
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
                 <pathelement location="${dir.lib}/xerces.jar"/>
+                <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
             </classpath>
             <src path="${dir.src.simasm.util}"/>
             <include name="SimkitAssemblyXML2Java.java"/>
@@ -481,6 +482,7 @@
             <include name="TempDir.java"/>
             <include name="DirDeleter.java"/>
             <include name="BshGridlet.java"/>
+             <include name="ChartDrawer.java"/>
         </javac>
         
 
