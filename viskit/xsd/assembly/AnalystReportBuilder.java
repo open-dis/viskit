@@ -29,7 +29,7 @@ import java.text.DateFormat;
 
 public class AnalystReportBuilder
 {
-  private boolean debug = true;
+  private boolean debug = false;
   //MIKE: IPTF = input that should be received from the GUI - text field likely
   //MIKE: IPCB = input that should be received from the GUI - Check box likely
   //MIKE: IPFC = input that should be received from the GUI - FileChooser likely
@@ -592,7 +592,7 @@ public class AnalystReportBuilder
     makeComments(statisticalResults,"SR", "");
     makeConclusions(statisticalResults,"SR", "");
 
-    if (statsReportPath != null && statsReportPath.length() > 0) {
+   if (statsReportPath != null && statsReportPath.length() > 0) {
       statisticalResults.setAttribute("file", statsReportPath);
 
       Element sumReport = new Element("SummaryReport");
@@ -928,6 +928,12 @@ public class AnalystReportBuilder
   {
     Element repReports = new Element("ReplicationReports");
     Iterator mainItr = statsReport.getRootElement().getChildren("SimEntity").iterator();
+    
+    //variables for JFreeChart construction
+    ChartDrawer chart = new ChartDrawer();
+    String chartTitle = "";
+    String axisLabel  = "";
+    
     while (mainItr.hasNext()) {
       Element tempEntity = (Element) mainItr.next();
       Iterator itr = tempEntity.getChildren("DataPoint").iterator();
@@ -937,9 +943,18 @@ public class AnalystReportBuilder
         entity.setAttribute("name", tempEntity.getAttributeValue("name"));
         entity.setAttribute("property", temp.getAttributeValue("property"));
         Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
+        
+        //Chart title and label
+        chartTitle = ("Entity Name: " + tempEntity.getAttributeValue("name"));
+        axisLabel  = (temp.getAttributeValue("property")) ;
+        
         while (itr2.hasNext()) {
           Element temp3 = (Element) itr2.next();
           Iterator itr3 = temp3.getChildren("Replication").iterator();
+          
+         //Create a data set instance and chart for each replication report
+          double[] data = new double[temp3.getChildren().size()];
+          int idx = 0;
           while (itr3.hasNext()) {
             Element temp2 = (Element) itr3.next();
             Element repRecord = new Element("Replication");
@@ -951,7 +966,16 @@ public class AnalystReportBuilder
             repRecord.setAttribute("stdDeviation", temp2.getAttributeValue("stdDeviation"));
             repRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
             entity.addContent(repRecord);
+            
+            //Add the mean of this replication to the chart
+            data[idx] = Double.parseDouble(temp2.getAttributeValue("mean"));
+            idx++;
+            
           }
+          Element chartDir = new Element("chartURL");
+          String filename = axisLabel;
+          chartDir.setAttribute("dir",chart.createHistogram(chartTitle, axisLabel, data, filename));
+          entity.addContent(chartDir);
           repReports.addContent(entity);
         }
 
@@ -1300,7 +1324,7 @@ public class AnalystReportBuilder
   //public void setReportJdomDocument(Document doc)              { this.reportJdomDocument = doc; }
   //public void setRootElement       (Element el)                { this.rootElement = el; }
   public void setStatsReport       (Document statsReport)      { this.statsReport = statsReport; }
-  public void setStatsReportPath   (String filename)           { this.statsReportPath = statsReportPath; }
+  public void setStatsReportPath   (String filename)           { this.statsReportPath = filename; }
   public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
   public void setClassification           (String s) { rootElement.setAttribute("classification", s);}
   public void setDateOfReport             (String s) { rootElement.setAttribute("date", s);}
