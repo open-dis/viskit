@@ -477,6 +477,7 @@
             <include name="ReportStatisticsConfig.java"/>
             <include name="ReportStatisticsDOM.java"/>
             <include name="AnalystReportBuilder.java"/>
+            <include name="XsltUtility.java"/>
         </javac>
         
 
