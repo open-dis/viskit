@@ -45,6 +45,7 @@ package viskit;
 
 import edu.nps.util.FileIO;
 import viskit.xsd.assembly.AnalystReportBuilder;
+import viskit.xsd.assembly.XsltUtility;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -59,8 +60,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.List;
+import java.util.Vector;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener
 {
@@ -70,11 +71,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private boolean dirty=false;
   private JMenuBar myMenuBar;
 
+  private JFileChooser imageFileChooser;
+
   public AnalystReportPanel()
   {
     setLayout();
     setBackground(new Color(251,251,229)); // yellow
     doMenus();
+
+    imageFileChooser = new JFileChooser("./images/BehaviorLibraries/SavageTactics");
   }
 
   JTextField titleTF = new JTextField();
@@ -303,7 +308,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JCheckBox wantLocImages;
   JTextArea locCommentsTA;
   JTextArea locConclusionsTA;
-  JList     locImages;
+  JTextField simLocImgTF;
+  JButton    simLocImgButt;
+  JTextField simChartImgTF;
+  JButton    simChartImgButt;
 
   private JPanel makeSimLocPan()
   {
@@ -320,9 +328,33 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     jsp.setBorder(new TitledBorder("Post Experiment Comments"));
     p.add(wantLocImages = new JCheckBox("Want location image(s)"));
     wantLocImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(locImages = new JList(new String[]{"image1","image2"}));
-    locImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+    JPanel imp = new JPanel();
+    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
+    imp.add(new JLabel("Location image: "));
+    imp.add(simLocImgTF=new JTextField(20));
+    imp.add(simLocImgButt=new JButton("..."));
+    simLocImgButt.addActionListener(new fileChoiceListener(simLocImgTF));
+    Dimension ps = simLocImgTF.getPreferredSize();
+    simLocImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
+    simLocImgTF.setEditable(false);
+    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(imp);
+
+    imp = new JPanel();
+    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
+    imp.add(new JLabel("    Chart image: "));
+    imp.add(simChartImgTF=new JTextField(20));
+    imp.add(simChartImgButt=new JButton("..."));
+    simChartImgButt.addActionListener(new fileChoiceListener(simChartImgTF));
+    ps = simChartImgTF.getPreferredSize();
+    simChartImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
+    simChartImgTF.setEditable(false);
+    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(imp);
+
     p.setBorder(new EmptyBorder(10,10,10,10));
+
     return p;
   }
 
@@ -334,8 +366,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     locConclusionsTA.setText(arb.getSimLocConclusions());
     locConclusionsTA.setEnabled(wantLocCommentsAndConclusions.isSelected());
     wantLocImages.setSelected(arb.isPrintSimLocationImage());
-    locImages.setEnabled(wantLocImages.isSelected());
-    // todo fill out list
+    simLocImgTF.setEnabled(wantLocImages.isSelected());
+    simLocImgButt.setEnabled(wantLocImages.isSelected());
+    simChartImgTF.setEnabled(wantLocImages.isSelected());
+    simChartImgButt.setEnabled(wantLocImages.isSelected());
+    simLocImgTF.setText(arb.getLocationImage());
+    simChartImgTF.setText(arb.getChartImage());
   }
   private void unFillSimLoc()
   {
@@ -343,8 +379,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimLocComments(locCommentsTA.getText());
     arb.setSimLocConclusions(locConclusionsTA.getText());
     arb.setPrintSimLocationImage(wantLocImages.isSelected());
- //   arb.setLocationImage("blah"); //todo
- //   arb.setChartImage("blah"); //todo
+    arb.setLocationImage(simLocImgTF.getText());
+    arb.setChartImage(simChartImgTF.getText());
   }
 
   /************************/
@@ -353,9 +389,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JTextArea simConfigComments;
   JTextArea simConfigConclusions;
   JCheckBox wantSimConfigImages;
-  JList     simConfigImages;
   JCheckBox wantEntityTable;
   JTable    entityTable;
+  JTextField configImgPathTF;
+  JButton   configImgButt;
 
   private JPanel makeSimConfigPan()
   {
@@ -382,28 +419,20 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     jsp.setBorder(new TitledBorder("Post Experiment Comments"));
-    p.add(wantSimConfigImages = new JCheckBox("Want simulation configuration images"));
+    p.add(wantSimConfigImages = new JCheckBox("Want simulation configuration image"));
     wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp=new JScrollPane(simConfigImages = new JList(new String[]{"image1","image2"})));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    /*
-  public boolean isPrintSimConfigComments() { return stringToBoolean(simConfig.getAttributeValue("comments"));}
-  public boolean isPrintEntityTable()       { return stringToBoolean(simConfig.getAttributeValue("entityTable"));}
-  public boolean isPrintAssemblyImage()     { return stringToBoolean(simConfig.getAttributeValue("image"));}
-  public void    setPrintSimConfigComments  (boolean bool) { simConfig.setAttribute("comments", booleanToString(bool));}
-  public void    setPrintEntityTable        (boolean bool) { simConfig.setAttribute("entityTable", booleanToString(bool)); }
-  public void    setPrintAssemblyImage      (boolean bool) { simConfig.setAttribute("image", booleanToString(bool)); }
+    JPanel imp = new JPanel();
+    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
+    imp.add(new JLabel("Configuration image: "));
+    imp.add(configImgPathTF=new JTextField(20));
+    imp.add(configImgButt=new JButton("..."));
+    configImgButt.addActionListener(new fileChoiceListener(configImgPathTF));
+    Dimension ps = configImgPathTF.getPreferredSize();
+    configImgPathTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
+    configImgPathTF.setEditable(false);
+    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(imp);
 
-  public String  getSimConfigComments()     { return unMakeComments(simConfig);}
-  public String  getSimConfigEntityTable()  { return  "todo..."; }    //todo
-  public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
-  public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly");}
-  public void    setSimConfigComments       (String s) { simConfig.addContent(makeComments("SC", s)); }
-  public void    setSimConfigEntityTable    (String s) { }; //todo
-  public void    setSimConfigConclusions    (String s) { simConfig.addContent(makeConclusions("SC", s)); }
-  public void    setAssemblyImageLocation   (String s) { simConfig.addContent(makeImage("Assembly", s)); }
-
-    */
     p.setBorder(new EmptyBorder(10,10,10,10));
     return p;
   }
@@ -425,8 +454,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     simConfigConclusions.setEnabled(arb.isPrintSimConfigComments());
 
     wantSimConfigImages.setSelected(arb.isPrintAssemblyImage());
-    simConfigImages.setListData(new String[]{"blahhh","blahhh"});
-    simConfigImages.setEnabled(wantSimConfigImages.isSelected());
+    configImgButt.setEnabled(wantSimConfigImages.isSelected());
+    configImgPathTF.setEnabled(wantSimConfigImages.isSelected());
+    configImgPathTF.setText(arb.getAssemblyImageLocation());
   }
 
   private void unFillSimConfig()
@@ -436,6 +466,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimConfigConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
+    arb.setAssemblyImageLocation(configImgPathTF.getText());
   }
 
   /***********/
@@ -526,6 +557,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   JCheckBox doBehaviorComments;
   JCheckBox doBehaviorDescriptions;
+  JCheckBox doBehaviorImages;
   JTextArea behaviorCommentsTA;
   JTextArea behaviorConclusionsTA;
   JTabbedPane behaviorTabs;
@@ -548,6 +580,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(doBehaviorDescriptions = new JCheckBox("Want behavior descriptions"));
     doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
+    p.add(doBehaviorImages = new JCheckBox("Want behavior images"));
+    doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
     behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
     behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(behaviorTabs);
@@ -561,6 +596,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setBehaviorComments(behaviorCommentsTA.getText());
     arb.setBehaviorConclusions(behaviorConclusionsTA.getText());
     arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
+    arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
 
     // tables are uneditable
   }
@@ -571,6 +607,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     behaviorCommentsTA.setEnabled(doBehaviorComments.isSelected());
     behaviorConclusionsTA.setText(arb.getBehaviorConclusions());
     behaviorConclusionsTA.setEnabled(doBehaviorComments.isSelected());
+    doBehaviorImages.setEnabled(arb.isPrintEventGraphImages());
     doBehaviorDescriptions.setSelected(arb.isPrintBehaviorDescriptions());
     behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
 
@@ -650,6 +687,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JCheckBox wantStatsSummary;
   JTextArea statsComments;
   JTextArea statsConclusions;
+  JPanel    statsSummaryPanel;
+  JPanel    statsRepPanel;
+  JScrollPane repsJsp;
+  JScrollPane summJsp;
 
   private JPanel makeStatsPan()
   {
@@ -668,15 +709,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(wantStatsReplications=new JCheckBox("Want replication statistics"));
     wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-    JLabel lab;
-    p.add(lab=new JLabel("rep table here"));
-    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(repsJsp = new JScrollPane(statsRepPanel = new JPanel()));
+    repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    statsRepPanel.setLayout(new BoxLayout(statsRepPanel,BoxLayout.Y_AXIS));
 
     p.add(wantStatsSummary = new JCheckBox("Want summary statistics"));
     wantStatsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-    p.add(lab=new JLabel("summ table here"));
-    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(summJsp = new JScrollPane(statsSummaryPanel = new JPanel()));
+    summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel,BoxLayout.Y_AXIS));
 
     p.setBorder(new EmptyBorder(10,10,10,10));
     return p;
@@ -693,10 +735,63 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     bool = arb.isPrintReplicationStats();
     wantStatsReplications.setSelected(bool);
-                   //todo more
     bool = arb.isPrintSummaryStats();
     wantStatsSummary.setSelected(bool);
-          // todo more
+
+    List reps = arb.getStatsReplicationsList();
+    statsRepPanel.removeAll();
+    JLabel lab;
+    JScrollPane jsp;
+    JTable tab;
+
+    statsRepPanel.add(lab=new JLabel("Replication Reports"));
+    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    statsRepPanel.add(Box.createVerticalStrut(10));
+    String[] colNames = new String[]{"Run #","Count","Min","Max","Mean","Std Deviation","Variance"};
+
+    for(Iterator repItr = reps.iterator(); repItr.hasNext();) {
+      List r = (List)repItr.next();
+      String nm = (String)r.get(0);
+      String prop = (String)r.get(1);
+      statsRepPanel.add(lab=new JLabel("Entity: "+nm));
+      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      statsRepPanel.add(lab=new JLabel("Property: "+prop));
+      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+      List vals = (List)r.get(2);
+      String[][] saa = new String[vals.size()][];
+      int i=0;
+      for(Iterator r2=vals.iterator();r2.hasNext();) {
+        saa[i++]= (String[])r2.next();
+      }
+      statsRepPanel.add(jsp=new JScrollPane(tab=new ROTable(saa,colNames)));
+      tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
+      jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+      jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+      statsRepPanel.add(Box.createVerticalStrut(20));
+    }
+    List summs= arb.getStastSummaryList();
+
+    colNames = new String[]{"Entity","Property","Count","Min","Max","Mean","Std Deviation","Variance"};
+    String[][] saa = new String[summs.size()][];
+    int i=0;
+    for(Iterator sumItr = summs.iterator();sumItr.hasNext();) {
+      saa[i++] = (String[])sumItr.next();
+    }
+
+    statsSummaryPanel.removeAll();
+    statsSummaryPanel.add(lab = new JLabel("Summary Report"));
+    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    statsSummaryPanel.add(Box.createVerticalStrut(10));
+
+    statsSummaryPanel.add(jsp = new JScrollPane(tab=new ROTable(saa,colNames)));
+    tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
+    jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+    repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
+    summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
 
   }
 
@@ -813,7 +908,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
               break;
           }
         }
-        
+
         JFileChooser openChooser = new JFileChooser("./AnalystReports");
         int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
         if (resp != JFileChooser.APPROVE_OPTION)
@@ -836,11 +931,34 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         unFillLayout();
         saveReport(reportFile);
+        String outFile = reportFile.getAbsolutePath();
+        int idx = outFile.lastIndexOf(".");
+
+        outFile = outFile.substring(0,idx) + ".html";
+        XsltUtility.runXslt(reportFile.getAbsolutePath(),
+            outFile, "./AnalystReports/AnalystReportXMLtoHTML.xslt");
       }
     };
 
     saveAs.addActionListener(saveAsLis);
     save.addActionListener(saveAsLis);      //todo implement properly
+  }
+
+  class fileChoiceListener implements ActionListener
+  {
+    JTextField tf;
+    fileChoiceListener(JTextField tf)
+    {
+      this.tf = tf;
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+      int resp = imageFileChooser.showOpenDialog(AnalystReportPanel.this);
+      if(resp == JFileChooser.APPROVE_OPTION) {
+         tf.setText(imageFileChooser.getSelectedFile().getAbsolutePath());
+      }
+    }
   }
 }
 
@@ -860,9 +978,13 @@ class ROTable extends JTable
   {
     super(v,c);
   }
-
+  ROTable(Object[][]oa, Object[]cols)
+  {
+    super(oa,cols);
+  }
   public boolean isCellEditable(int row, int column)
   {
     return false;
   }
 }
+
