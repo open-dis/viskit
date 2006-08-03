@@ -1126,9 +1126,11 @@ public class AnalystReportBuilder
     return image;
   }
 
-  private String unMakeImage(Element e, String imageID)
+  private String unMakeImage(Element e, String imageID, Integer I)
   {
-    return _unMakeContent(e,imageID+"Image");
+    if(I==null)
+      return _unMakeContent(e,imageID+"Image");
+    return _unMakeContent(e,imageID+"Image",I);
   }
   /**
    * Creates a standard 'Comments' element used by all sections of the report
@@ -1193,7 +1195,26 @@ public class AnalystReportBuilder
     for(Iterator itr=content.iterator(); itr.hasNext();) {
       Element celem = (Element)itr.next();
       if(celem.getName().endsWith(suffix))
-        return celem.getAttributeValue("text");
+          return celem.getAttributeValue("text");
+    }
+    return "";
+  }
+                                                            // hack alert:
+  private String _unMakeContent(Element e, String suffix, Integer wh)
+  {
+    int i=-1;
+    if(wh != null)
+      i=wh.intValue();
+
+    List content = e.getContent();
+    int count=0;
+    for(Iterator itr=content.iterator(); itr.hasNext();) {
+      Element celem = (Element)itr.next();
+      if(celem.getName().endsWith(suffix)) {
+        if(wh==null || count == i)
+          return celem.getAttributeValue("text");
+        count++;
+      }
     }
     return "";
   }
@@ -1407,14 +1428,14 @@ public class AnalystReportBuilder
   public void    setPrintSimLocationImage   (boolean bool){ simulationLocation.setAttribute("images", booleanToString(bool)) ;}
 
   public String  getSimLocComments()          { return unMakeComments(simulationLocation);}
-  public String  getSimLocConclusions()       { return unMakeConclusions(simulationLocation);}
-  public String  getLocationImage()           { return unMakeImage(simulationLocation,"LocationA");}
-  public String  getChartImage()              { return unMakeImage(simulationLocation,"LocationB"); }
+  public String  getSimLocConclusions()       { return unMakeConclusions(simulationLocation);}       // hack:
+  public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location",new Integer(0));}
+  public String  getChartImage()              { return unMakeImage(simulationLocation,"Location",new Integer(1)); }
 
   public void setSimLocComments          (String s)    { makeComments(simulationLocation,"SL", s);}
   public void setSimLocConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
-  public void setLocationImage           (String s)    { simulationLocation.addContent(makeImage("LocationA", s)); }
-  public void setChartImage              (String s)    { simulationLocation.addContent(makeImage("LocationB", s)); }
+  public void setLocationImage           (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
+  public void setChartImage              (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
 
   // entity-parameters
   //good
@@ -1458,7 +1479,7 @@ public class AnalystReportBuilder
   public String  getSimConfigComments()     { return unMakeComments(simConfig);}
   public String[][]  getSimConfigEntityTable()  { return unMakeEntityTable();}
   public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
-  public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly");}
+  public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly",null);}
   public void    setSimConfigComments       (String s) { makeComments(simConfig,"SC", s); }
   public void    setSimConfigEntityTable    (String s) { }; //todo
   public void    setSimConfigConclusions    (String s) { makeConclusions(simConfig,"SC", s); }
