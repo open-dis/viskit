@@ -82,17 +82,15 @@ public class SimkitXML2Java {
 	fileInputStream = new FileInputStream(f);
     }
 
-  public void unmarshal()
-  {
-    Unmarshaller u;
-    try {
-      u = jaxbCtx.createUnmarshaller();
-      this.root = (SimEntity) u.unmarshal(fileInputStream);
+    public void unmarshal() {
+        Unmarshaller u;
+        try {
+            u = jaxbCtx.createUnmarshaller();
+            this.root = (SimEntity) u.unmarshal(fileInputStream);
+        } catch (Exception e) {
+            System.err.println("Error unmarshalling "+fileBaseName+": "+e.getMessage());
+        }
     }
-    catch (Exception e) {
-      System.err.println("Error unmarshalling "+fileBaseName+": "+e.getMessage());
-    }
-  }
 
   public String translate() {
 
@@ -999,6 +997,10 @@ public class SimkitXML2Java {
 
 	System.err.println(sw.toString());
 	System.exit(1);
+    }
+    
+    public SimEntity getRoot() {
+        return root;
     }
 
     /**
