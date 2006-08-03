@@ -66,6 +66,7 @@ public class GridRunner {
     static final boolean debug = true;
     Vector eventGraphs;
     Hashtable thirdPartyJars;
+    File experimentFile;
     // This SimkitAssemblyType is used to set up 
     // the experiment. Read in by the setAssembly()
     // method, subsequently augmented by addEventGraph().
@@ -600,6 +601,7 @@ public class GridRunner {
     }
     
     Boolean run() {
+        File userDir;
         try { // install the eventgraphs in the assembly
             List eventGraphList = root.getEventGraph();
             Enumeration e = eventGraphs.elements();
@@ -609,6 +611,11 @@ public class GridRunner {
                 egt.getContent().add(eg);
                 eventGraphList.add(egt);
             }
+            userDir = new File(System.getProperty("user.dir"));
+            // create experimentFile, an assembly tree with decorations
+            // give it unique name
+            experimentFile = File.createTempFile(root.getName()+"Exp","xml",userDir);
+        
         } catch (Exception e) {
             return Boolean.FALSE;
         }
@@ -617,11 +624,12 @@ public class GridRunner {
         
         if ( calculateDesignPoints() == Boolean.FALSE ) return Boolean.FALSE;
         
+        
         // deposit the Experiment file
-        String experimentFileName = root.getName() + "Exp.xml";
+       
         try {
             (new SimkitAssemblyXML2Java()).marshal((javax.xml.bind.Element)root,
-                    (OutputStream)new FileOutputStream(new File(experimentFileName)));
+                    (OutputStream)new FileOutputStream(experimentFile));
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;
@@ -630,7 +638,7 @@ public class GridRunner {
         // spawn Gridlets
         int totalTasks = designPointCount*totalSamples;
         try {
-            Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFileName,"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
+            Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
             return Boolean.FALSE;

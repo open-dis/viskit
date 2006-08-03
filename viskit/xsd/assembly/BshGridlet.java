@@ -26,13 +26,9 @@ package viskit.xsd.assembly;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -47,29 +43,14 @@ import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.cli.Boot;
 import javax.xml.bind.Element;
 import simkit.stat.SampleStatistics;
-import com.sun.tools.javac.Main;
 
 
 /**
  *
  * @author Rick Goldberg
- *
- * This is the compiled version of the Gridlet, formerly interpereted,
- * which is now in BshGridlet.
- *
- * Main difference aside from using javac to compile, is attention
- * to separation of class paths by various Gridlets which may be 
- * running on the same host. Each Gridlet runs a particular DesignPoint,
- * which in java is represented by a single .class for the ViskitAssembly.
- * Also generated are any event-graph .classes, which also go there.
- *
- * Get 'em while there hot, these Gridlets should outperform the interpereted
- * mode, but most importantly enable entities with a large number of
- * parameters.
- *
  */
 
-public class Gridlet extends Thread {
+public class BshGridlet extends Thread {
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
     int taskID;
@@ -81,7 +62,7 @@ public class Gridlet extends Thread {
     String filename;
     String pwd;
     
-    public Gridlet() {
+    public BshGridlet() {
        
         try {
            
@@ -202,16 +183,10 @@ public class Gridlet extends Thread {
                 System.setOut(log);
             }
             
-            File workDir = new File(System.getProperty("user.dir"));
-            File tempDir = TempDir.createGeneratedName("gridkit",workDir);
-            // setting a classpath this way, we don't need to keep track of the
-            // actual files, ie "javac -d tempDir" will create subdirs 
-            String systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath());
+            bsh.Interpreter bsh = new bsh.Interpreter();
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
-            ArrayList eventGraphJavaFiles = new ArrayList();
             
             // submit all EventGraphs to the beanshell context
             while ( di.hasNext() ) {
@@ -239,71 +214,33 @@ public class Gridlet extends Thread {
                     System.out.println("Evaluating generated java Event Graph:");
                     System.out.println(sx2j.translate());
                 }
-                // pass the source for this SimEntity in for compile
-                String eventGraphJava = sx2j.translate();
-                File eventGraphJavaFile = new File(tempDir,sx2j.getRoot().getName()+".java");
-                FileWriter writer = new FileWriter(eventGraphJavaFile);
-                writer.write(eventGraphJava);
-                writer.flush();
-                writer.close();
-                // since there may be some kind of event-graph interdependency, compile
-                // all .java's "at once"; javac should be able to resolve these if given
-                // on the command line all at once.
-                eventGraphJavaFiles.add(eventGraphJavaFile);
-                
+                // pass the source for this SimEntity in for "compile"
+                bsh.eval(sx2j.translate());
             }
-            
-            // compile eventGraphJavaFiles and deposit the .classes in the appropriate
-            // direcory under tempDir
-            
-            String sources = "";
-            Iterator it = eventGraphJavaFiles.iterator();
-            while (it.hasNext()) {
-                File java = (File)(it.next());
-                sources += java.getCanonicalPath()+ " ";
-            }
-            
-            int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",System.getProperty("java.class.path"),"-d", tempDir.getCanonicalPath(), sources });
             
             if (debug_io) {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
                 System.out.println(sax2j.translate());
-                if (reti != 0) {
-                    System.out.println("\tCompile Failed");
-                }
             }
-             
+            // 
             // Now do the Assembly
-            
-            String assemblyJava = sax2j.translate();
-            File assemblyJavaFile = new File(tempDir,sax2j.getRoot().getName());
-            FileWriter writer = new FileWriter(assemblyJavaFile);
-            writer.write(assemblyJava);
-            writer.flush();
-            writer.close();
-            
-            reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",System.getProperty("java.class.path"),"-d", tempDir.getCanonicalPath(), assemblyJavaFile.getCanonicalPath() });
-            
-            if (debug_io) {
-                if (reti != 0) {
-                    System.out.println("\tCompile Failed");
-                }
-            }
-            
-            ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-            Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
-            Constructor asmc = asmz.getConstructors()[0];
-            ViskitAssembly sim = (ViskitAssembly)(asmc.newInstance(new Object[] {} ));
+            //
+            // first beanshell "compile" and instance
+            //
+            bsh.eval(sax2j.translate());
+            bsh.eval("sim = new "+ root.getName() +"();");
+            ViskitAssembly sim = (ViskitAssembly) bsh.get("sim");
+            //
+            // thread obtained ViskitAssembly and run it
+            //
             Thread runner = new Thread(sim);
-           
-            // trumpets...
-            
             runner.start();
             try {
                 runner.join();
             } catch (InterruptedException ie) {;} // done
             
             // finished running, collect some statistics
+            // from the beanshell context to java
             
             simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
             simkit.stat.SampleStatistics replicationStat;
@@ -458,7 +395,7 @@ public class Gridlet extends Thread {
                 }
                 out.println("<Log>");
                 out.println("<![CDATA[");
-                it = logs.iterator();
+                Iterator it = logs.iterator();
                 while (it.hasNext()) {
                     out.println((String)(it.next()));
                 }
@@ -504,9 +441,9 @@ public class Gridlet extends Thread {
                 e.printStackTrace();
             }
             
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
+        } catch (bsh.EvalError ee) {
+            ee.printStackTrace();
+        }
     }
     
     private viskit.xsd.bindings.assembly.SampleStatistics statForStat(simkit.stat.SampleStatistics stat) throws Exception {
@@ -523,6 +460,4 @@ public class Gridlet extends Thread {
         return sampleStat;
     }
     
-
-
 }
