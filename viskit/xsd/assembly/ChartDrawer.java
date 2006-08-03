@@ -86,6 +86,7 @@ public class ChartDrawer {
         
         
         File outFile = new File(path);
+        outFile.getParentFile().mkdirs();
         String absolutePath = outFile.getAbsolutePath();
         this.url = absolutePath;
         FileOutputStream  fos = new FileOutputStream(outFile);
