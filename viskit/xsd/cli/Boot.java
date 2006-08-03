@@ -39,10 +39,12 @@ public class Boot extends URLClassLoader implements Runnable {
     static Thread runner;
     private static final boolean debug = true;
     String[] args;
+    public URL baseJarURL;
 
     public Boot(URL[] urls) {
         super(urls,Thread.currentThread().getContextClassLoader());
         addURL(urls[0]);
+        baseJarURL = urls[0];
     }
     
     
@@ -174,7 +176,7 @@ public class Boot extends URLClassLoader implements Runnable {
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
                         if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));
                         
-                    }
+                    } 
                     skip:
                         ;
 
