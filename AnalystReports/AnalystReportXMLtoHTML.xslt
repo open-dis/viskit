@@ -83,16 +83,16 @@
 <!--Executive Summary template -->
 <xsl:template match="ESComments">
 <p align="left"><b>Executive Summary</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p>
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p>
 </xsl:template>
 
 <!--Simulation Location templates -->
 <xsl:template match="SLComments">
 <p align="left"><b>Simulation Location</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="SLConclusions">
-<p align="left"><u><i>Post-Experiment Comments</i></u>:<xsl:value-of select="@text"/></p>
+<p align="left"><u><i>Post-Experiment Comments</i></u>:<font color="#00006C"><xsl:value-of select="@text"/></font></p>
 </xsl:template>
 <xsl:template match="LocationImage">
 <p align="center">
@@ -108,7 +108,7 @@
 <!--SimulationConfiguration templates-->
 <xsl:template match="SCComments" mode="ConfigHeader">
 <p align="left"><b>Simulation Configuration</b></p>
-<p align="left"><i><u>Analyst Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Analyst Comments:</u></i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 <p align="center"><b>Simulation Entities</b></p>
 		<div align="center">
 		<table border="1"><tr><td bgcolor="#FFFFCC">Entity Name</td><td bgcolor="#FFFFCC">Behavior Definition</td></tr>
@@ -117,7 +117,7 @@
 	    </div>
 </xsl:template>
 <xsl:template match="SCConclusions" mode="ConfigHeader">
-<p align="left"><i><u>Post-Experiment Comments:</u></i><xsl:value-of select="@text"/></p> 
+<p align="left"><i><u>Post-Experiment Comments:</u></i><font color="#000099"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="AssemblyImage" mode="ConfigHeader">
 <p align="center">
@@ -158,12 +158,17 @@
 <xsl:for-each select="Classification">
 <tr>
 	<td width="132" bgcolor="#CCCCCC">Classification</td>
+	<td width="132"></td>
+	<td width="190"></td>
+<!--   
     <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
     <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+-->
 </tr>
 <xsl:for-each select="parameter">
 					<tr>
-						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+						<td width="132"></td>
+					<!--	<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
 						<td width="190"><xsl:value-of select="@name"/></td>
 						<td><xsl:value-of select="@value"/></td>
 				</tr>
@@ -174,12 +179,17 @@
 <xsl:for-each select="Identification">
 <tr>
 	<td width="132" bgcolor="#CCCCCC">Identification</td>
+	<td width="132"></td>
+	<td width="190"></td>
+<!--  
     <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
     <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+-->
 </tr>
 <xsl:for-each select="parameter">
 					<tr>
-						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+					<td width="132"></td>
+						<!--<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
 						<td width="190"><xsl:value-of select="@name"/></td>
 						<td><xsl:value-of select="@value"/></td>
 				</tr>
@@ -190,12 +200,17 @@
 <xsl:for-each select="PhysicalConstraints">
 <tr>
 	<td width="132" bgcolor="#CCCCCC">Physical Constraints</td>
+	<td width="132"></td>
+	<td width="190"></td>
+	<!--
     <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
     <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+-->
 </tr>
 <xsl:for-each select="parameter">
 					<tr>
-						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+					<td width="132"></td>
+					<!--	<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
 						<td width="190"><xsl:value-of select="@name"/></td>
 						<td><xsl:value-of select="@value"/></td>
 				</tr>
@@ -206,12 +221,17 @@
 <xsl:for-each select="DynamicResponseConstraints">
 <tr>
 	<td width="132" bgcolor="#CCCCCC">Dynamic Response Constraints</td>
+	<td width="132"></td>
+	<td width="190"></td>
+	<!--
     <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
     <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+-->
 </tr>
 <xsl:for-each select="parameter">
 					<tr>
-						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+					<td width="132"></td>
+<!--						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
 						<td width="190"><xsl:value-of select="@name"/></td>
 						<td><xsl:value-of select="@value"/></td>
 				</tr>
@@ -222,12 +242,18 @@
 <xsl:for-each select="TacticalConstraints">
 <tr>
 	<td width="132" bgcolor="#CCCCCC">Tactical Constraints</td>
+	<td width="132"></td>
+	<td width="190"></td>
+	<!--
     <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
     <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+-->
 </tr>
 <xsl:for-each select="parameter">
 					<tr>
-						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
+					<td width="132"></td>
+	
+	<!--					<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
 						<td width="190"><xsl:value-of select="@name"/></td>
 						<td><xsl:value-of select="@value"/></td>
 				</tr>
