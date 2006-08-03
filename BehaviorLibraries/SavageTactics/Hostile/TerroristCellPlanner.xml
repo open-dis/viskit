@@ -73,6 +73,12 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     <StateVariable name="attackStartTime" type="double">
         <Comment>The time chosen for an attack to start</Comment>
     </StateVariable>
+    <StateVariable name="successfullAttacks" type="int">
+        <Comment>Number of successfull attacks for this run</Comment>
+    </StateVariable>
+    <StateVariable name="timeToExecuteAttack" type="double">
+        <Comment>The amount of time that it took to execute the attack</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment/>
         <StateTransition state="planIndex">
@@ -240,13 +246,13 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <Schedule condition="planIndex &gt; totalPlans" delay="0.0" event="BeginAttack" priority="0">
             <Comment/>
         </Schedule>
-        <Code>System.out.println("**********************************");
+        <Code>/*System.out.println("**********************************");
 System.out.println("Terrorist Attack Order");
 System.out.println("\t Terrorist: " + entityID);
 System.out.println("\t Start: " + attackStart.getName());
 System.out.println("\t Head to : " + attackGoal.getName());
 System.out.println("\t Tactic: " + selectedTactic);
-System.out.println("**********************************\n");</Code>
+System.out.println("**********************************\n");*/</Code>
         <Coordinate x="220" y="300"/>
     </Event>
     <Event name="TargetListSent">
@@ -276,9 +282,9 @@ System.out.println("**********************************\n");</Code>
     </Event>
     <Event name="Stop">
         <Comment>Stops this replication if all attacks have finished</Comment>
-        <Code>System.out.println("SimRunEndTime: " +Schedule.getSimTime());
+        <Code>/*System.out.println("SimRunEndTime: " +Schedule.getSimTime());*/
 Schedule.stopSimulation();</Code>
-        <Coordinate x="120" y="510"/>
+        <Coordinate x="120" y="550"/>
     </Event>
     <Event name="AttackComplete">
         <Comment>Recieves a report from each active terrorist as they complete their attacks. Once all attacks are complete the cell planner stops the simulation. In this case an attack is complete when it has reached its end state (e.g. it suceeded or failed, but it's over).  TODO: Add attack report so that planner can change it's knowledge base</Comment>
@@ -297,10 +303,14 @@ Schedule.stopSimulation();</Code>
         <StateTransition state="completedAttacks">
             <Assignment value="completedAttacks + 1"/>
         </StateTransition>
+        <StateTransition state="timeToExecuteAttack">
+            <Assignment value="Schedule.getSimTime()"/>
+        </StateTransition>
+        <Schedule condition="attackResult.equals(&quot;Succeeded&quot;)" delay="0.0" event="RecordAttackResults" priority="0">
+            <Comment/>
+        </Schedule>
         <Schedule condition="true" delay="5" event="Stop" priority="0">
-            <Comment>Schedules the simulation to end once all attacks have completed. The index 'total plans' is decremented by one due to the planning processes using arrays which include a zero index position.
-A delay of five seconds is used to allow entity state variable transitions and data collection to occur
-TODO: Test to see if delay is needed</Comment>
+            <Comment/>
         </Schedule>
         <Code/>
         <Coordinate x="30" y="510"/>
@@ -330,8 +340,16 @@ TODO: Test to see if delay is needed</Comment>
         <Argument name="mover" type="diskit.Mover3D">
             <Comment>The mover to register</Comment>
         </Argument>
-        <Code>System.out.println("RegisterTarget in TCP");</Code>
+        <Code/>
         <Coordinate x="220" y="30"/>
+    </Event>
+    <Event name="RecordAttackResults">
+        <Comment>Records the result of the attack as the reports are received</Comment>
+        <StateTransition state="successfullAttacks">
+            <Assignment value="successfullAttacks + 1"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="120" y="490"/>
     </Event>
 </SimEntity>
 
