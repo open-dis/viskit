@@ -30,6 +30,9 @@ Additionally, buoys, perimeter zones, piers, etc, should all pass through this c
         <StateTransition state="harborMap">
             <Operation method="setPerimeterZones(waterFrontAreas)"/>
         </StateTransition>
+        <StateTransition state="harborMap">
+            <Operation method="setNavigatableZones(navigatableWaterZones)"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterAStarZoneMap" priority="0">
             <Comment/>
             <EdgeParameter value="harborMap"/>
