@@ -117,7 +117,7 @@ public class RunnerPanel2 extends JPanel
     leftRightSplit.setLeftComponent(leftSplit);
     leftRightSplit.setRightComponent(rightSplit);
     leftRightSplit.setDividerLocation(240);
-    leftSplit.setDividerLocation(180);
+    leftSplit.setDividerLocation(200);
     rightSplit.setDividerLocation(350);
 
     add(leftRightSplit,BorderLayout.CENTER);
@@ -133,8 +133,6 @@ public class RunnerPanel2 extends JPanel
   private JPanel makeVCRPanel(boolean skipCloseButt)
   {
     JPanel flowPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-
 
     JLabel vcrSimTimeLab = new JLabel("Sim start time:");
     // TODO:  is this start time or current time of sim?
@@ -160,6 +158,16 @@ public class RunnerPanel2 extends JPanel
     labTF.add(Box.createHorizontalStrut(10));
     flowPan.add(labTF);
 
+    numRepsTF = new JTextField(10);
+    Vstatics.clampSize(numRepsTF,numRepsTF,numRepsTF);
+    JLabel numRepsLab = new JLabel("# replications:");
+    labTF = new JPanel();
+    labTF.setLayout(new BoxLayout(labTF,BoxLayout.X_AXIS));
+    labTF.add(numRepsLab);
+    labTF.add(numRepsTF);
+    labTF.add(Box.createHorizontalStrut(10));
+    flowPan.add(labTF);
+
     vcrVerbose = new JCheckBox("Verbose output", false);
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     flowPan.add(vcrVerbose);
@@ -170,15 +178,6 @@ public class RunnerPanel2 extends JPanel
       flowPan.add(closeButt);
     }
 
-
-    numRepsTF = new JTextField(8);
-    Vstatics.clampSize(numRepsTF,numRepsTF,numRepsTF);
-    JLabel numRepsLab = new JLabel("Number of replications");
-    labTF = new JPanel();
-    labTF.setLayout(new BoxLayout(labTF,BoxLayout.X_AXIS));
-    labTF.add(numRepsLab);
-    labTF.add(numRepsTF);
-    labTF.add(Box.createHorizontalStrut(10));
 
     saveRepDataCB = new JCheckBox("Save rep data");
     flowPan.add(saveRepDataCB);
