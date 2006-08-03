@@ -478,6 +478,9 @@
             <include name="ReportStatisticsDOM.java"/>
             <include name="AnalystReportBuilder.java"/>
             <include name="XsltUtility.java"/>
+            <include name="TempDir.java"/>
+            <include name="DirDeleter.java"/>
+            <include name="BshGridlet.java"/>
         </javac>
         
 
