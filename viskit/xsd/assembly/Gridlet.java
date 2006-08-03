@@ -256,14 +256,25 @@ public class Gridlet extends Thread {
             // compile eventGraphJavaFiles and deposit the .classes in the appropriate
             // direcory under tempDir
             
-            String sources = "";
+            String[] cmd;
             Iterator it = eventGraphJavaFiles.iterator();
+            ArrayList cmdLine = new ArrayList();
+            cmdLine.add("-verbose");
+            cmdLine.add("-classpath");
+            cmdLine.add(System.getProperty("java.class.path"));
+            cmdLine.add("-d");
+            cmdLine.add(tempDir.getCanonicalPath());
+            
+            // allow javac to resolve interdependencies by
+            // providing all .java's at once
             while (it.hasNext()) {
                 File java = (File)(it.next());
-                sources += java.getCanonicalPath()+ " ";
+                cmdLine.add(java.getCanonicalPath());
             }
             
-            int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",System.getProperty("java.class.path"),"-d", tempDir.getCanonicalPath(), sources });
+            cmd = (String[])cmdLine.toArray(new String[]{});
+            
+            int reti =  com.sun.tools.javac.Main.compile(cmd);
             
             if (debug_io) {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
