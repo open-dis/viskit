@@ -109,7 +109,7 @@
 <p align="center">
 <xsl:element name="img">
 <xsl:attribute name="border"><xsl:text>1</xsl:text></xsl:attribute>
-<xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
+<xsl:attribute name="src">file:///<xsl:value-of select="@dir"/></xsl:attribute>
 <xsl:attribute name="width"><xsl:text>640</xsl:text></xsl:attribute>
 <xsl:attribute name="height"><xsl:text>480</xsl:text></xsl:attribute>
 </xsl:element>
@@ -135,7 +135,7 @@
 <p align="center">
 <xsl:element name="img">
 <xsl:attribute name="border"><xsl:text>1</xsl:text></xsl:attribute>
-<xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
+<xsl:attribute name="src">file:///<xsl:value-of select="@dir"/></xsl:attribute>
 <xsl:attribute name="width"><xsl:text>640</xsl:text></xsl:attribute>
 <xsl:attribute name="height"><xsl:text>480</xsl:text></xsl:attribute>
 </xsl:element>
