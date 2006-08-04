@@ -71,15 +71,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private boolean dirty=false;
   private JMenuBar myMenuBar;
 
-  private JFileChooser imageFileChooser;
-
+  private JFileChooser locationImageFileChooser;
   public AnalystReportPanel()
   {
     setLayout();
     setBackground(new Color(251,251,229)); // yellow
     doMenus();
 
-    imageFileChooser = new JFileChooser("./images/BehaviorLibraries/SavageTactics");
+    locationImageFileChooser = new JFileChooser("./images/BehaviorLibraries/SavageTactics/");
+    
   }
 
   JTextField titleTF = new JTextField();
@@ -331,7 +331,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     JPanel imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("Location image: "));
+    imp.add(new JLabel("Chart image: "));
     imp.add(simLocImgTF=new JTextField(20));
     imp.add(simLocImgButt=new JButton("..."));
     simLocImgButt.addActionListener(new fileChoiceListener(simLocImgTF));
@@ -340,10 +340,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     simLocImgTF.setEditable(false);
     imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(imp);
-
+    
     imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("    Chart image: "));
+    imp.add(new JLabel("    Location image: "));
     imp.add(simChartImgTF=new JTextField(20));
     imp.add(simChartImgButt=new JButton("..."));
     simChartImgButt.addActionListener(new fileChoiceListener(simChartImgTF));
@@ -954,9 +954,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     public void actionPerformed(ActionEvent e)
     {
-      int resp = imageFileChooser.showOpenDialog(AnalystReportPanel.this);
+      int resp = locationImageFileChooser.showOpenDialog(AnalystReportPanel.this);
       if(resp == JFileChooser.APPROVE_OPTION) {
-         tf.setText(imageFileChooser.getSelectedFile().getAbsolutePath());
+         tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
       }
     }
   }
