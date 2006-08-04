@@ -45,8 +45,8 @@ import java.util.List;
 public class SessionManager {
     private Hashtable sessions;
     private JAXBContext jaxbCtx;
-    private static final String WTMP = "/tmp/wtmp.xml";
-    private static final String PASSWD = "/tmp/passwd.xml";
+    private static final String WTMP = "/var/gridkit/wtmp.xml";
+    private static final String PASSWD = "/var/gridkit/passwd.xml";
     private static final String SALT = "gridkit!";
 
     public static String LOGIN_ERROR = "LOGIN-ERROR";
