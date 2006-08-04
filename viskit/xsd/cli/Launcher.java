@@ -49,9 +49,10 @@ public class Launcher extends Thread implements Runnable {
             
             try {
                 // first load any of the event-graphs in the BehaviorLibraries
-                // while this could be handled by EventGraphs property, this is
-                // more automated
-                
+                // while this could be handled by EventGraphs property, getting 
+                // a specific directory is more automated
+                String eventGraphDir = p.getProperty("EventGraphDir");
+                eventGraphDir = (eventGraphs==null)?"?":eventGraphDir;
                 if ( Thread.currentThread().getContextClassLoader() instanceof Boot ) {
                     Boot b = (Boot) Thread.currentThread().getContextClassLoader();
                     u = b.baseJarURL;
@@ -62,20 +63,22 @@ public class Launcher extends Thread implements Runnable {
                         String name = je.getName();
                         // nb: BehaviorLibraries is sort of hard coded here,
                         // better to have a property tbd
-                        if (name.indexOf("BehaviorLibraries") >= 0 && name.endsWith("xml")) {
+                        if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml")) {
                             addEventGraph(jis);
                         }
                     }
                 }
                 
                 compiled = (p.getProperty("Beanshell") == null);
-                if (p.getProperty("Gridkit") != null) {
-                    launchGridkit(p.getProperty("Gridkit"));
+                if (p.getProperty("Port") != null) {
+                    launchGridkit(p.getProperty("Port"));
                 } else if (p.getProperty("Assembly") != null ) {
                     if ( debug ) System.out.println("Running Assembly "+p.getProperty("Assembly"));
                     u = cloader.getResource(p.getProperty("Assembly"));
                     if ( debug ) System.out.println("From URL: "+u);
                     setAssembly(u);
+                    // EventGraphs can also be dropped onto the top-level dir
+                    // as long as they are enumerated
                     StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
                     while ( st.hasMoreTokens() ) {
                         u = cloader.getResource( st.nextToken() );
@@ -256,8 +259,11 @@ public class Launcher extends Thread implements Runnable {
         try {
             m = tempDirz.getDeclaredMethod("createGeneratedName",new Class[] { String.class, File.class } );
             tempDir = (File) ( m.invoke(null, new Object[] { "gridkit", new File(System.getProperty("user.dir")) } ));
+            
+            // jam the classpath with the new directory
             String systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath()); // hopefully don't have to addUrl
+            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath()); 
+            // hopefully don't have to addURL, but here just in case
             URL url = new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath());
             
             
@@ -282,7 +288,9 @@ public class Launcher extends Thread implements Runnable {
                 
                 // these could be handled by viskit.AssemblyController.createJavaClassFromString()
                 // since it is not likely to be run in Grid mode here, if at all, so no worries
-                // about shared disk context. A Gridlet on the other hand will require a separate
+                // about shared storage. 
+                
+                // A Gridlet on the other hand will require a separate
                 // path since it could be shared with another Gridlet, especially in a multiprocessor
                 // configuration.
                 
@@ -290,6 +298,7 @@ public class Launcher extends Thread implements Runnable {
                 // Gridlet will handle any event-graphs that were sent from the Viskit
                 // editor that aren't already in the BehaviorLibraries, so here we need
                 // to boot up the BehaviorLibraries.
+                
                 String eventGraphFileName = eventGraphName.substring(eventGraphName.lastIndexOf(".")+1);
                 File eventGraphJavaFile = new File(tempDir,eventGraphFileName+".java");
                 FileWriter writer = new FileWriter(eventGraphJavaFile);
@@ -298,7 +307,27 @@ public class Launcher extends Thread implements Runnable {
                 writer.close();
                 eventGraphJavaFiles.add(eventGraphJavaFile);
             }
-  
+            
+            // unmarshal eventGraph xml
+            bais = new ByteArrayInputStream(assembly.getBytes());
+            c = axml2jz.getConstructor(new Class[]{ InputStream.class });
+            out = c.newInstance(new Object[]{ bais });
+            m = out.getClass().getDeclaredMethod("unmarshal", new Class[]{});
+            m.invoke(out, new Object[]{});
+            
+            // translate xml to generate java source
+            m = out.getClass().getDeclaredMethod("translate", new Class[]{});
+            out = m.invoke(out, new Object[]{});
+            assemblyJava = new String((String)out);
+            if (debug) System.out.println(assemblyJava);
+            
+            String assemblyFileName = assemblyName.substring(assemblyName.lastIndexOf(".")+1);
+            File assemblyJavaFile = new File(tempDir,assemblyFileName+".java");
+            FileWriter writer = new FileWriter(assemblyJavaFile);
+            writer.write(assemblyJava);
+            writer.flush();
+            writer.close();
+            
             String[] cmd;
             Iterator it = eventGraphJavaFiles.iterator();
             ArrayList cmdLine = new ArrayList();
@@ -314,7 +343,7 @@ public class Launcher extends Thread implements Runnable {
                 File java = (File)(it.next());
                 cmdLine.add(java.getCanonicalPath());
             }
-            
+            cmdLine.add(assemblyJavaFile.getCanonicalPath());
             cmd = (String[])cmdLine.toArray(new String[]{});
             
             m = javacz.getMethod("compile", new Class[] { String[].class } );
