@@ -288,6 +288,9 @@
                 <include name="commons-lang-2.0.jar"/>
                 <include name="commons-logging-1.0.4.jar"/>
             </fileset>
+            <fileset dir="${dir.lib.ext}">
+                <include name="diskit.jar"/>
+            </fileset>
             <fileset dir="${dir.lib}/jwsdp-1.5">
                 <include name="jaxb-api.jar"/>
                 <include name="jaxb-impl.jar"/>
@@ -542,7 +545,7 @@
   
     <target description="Test Gridkit login" name="test-gridkit-login">
         <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
-            <arg value="localhost" />
+            <arg value="192.168.1.47" />
             <arg value="4444" />
         </java>
     </target>
