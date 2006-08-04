@@ -63,6 +63,12 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
     <StateVariable name="rn" type="java.util.Random">
         <Comment>A random number object for randomly selecting new places to travel in the harbor</Comment>
     </StateVariable>
+    <StateVariable name="workingChart" type="diskit.AStarZoneMap">
+        <Comment>This is a local copy of the nautical chart object being used. This copy is re-created after each use to ensure that the master chart is not getting altered</Comment>
+    </StateVariable>
+    <StateVariable name="patrolAreas" type="java.lang.String[0]">
+        <Comment>The areas where this entity may travel to</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
@@ -213,6 +219,9 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="harborChart">
             <Assignment value="chart"/>
         </StateTransition>
+        <StateTransition state="workingChart">
+            <Assignment value="chart"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="PlanPatrolMove" priority="0">
             <Comment/>
             <EdgeParameter value="selectedStart"/>
@@ -236,7 +245,7 @@ sensors[2] = collisionAvoidance;</Code>
             <Assignment value="destinationZone"/>
         </StateTransition>
         <StateTransition state="aStarSearch">
-            <Assignment value="new diskit.AStarSearch(harborChart)"/>
+            <Assignment value="new diskit.AStarSearch(workingChart)"/>
         </StateTransition>
         <StateTransition state="waypointCreator">
             <Assignment value="new diskit.WaypointCreator()"/>
@@ -296,6 +305,12 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <LocalVariable name="nextZone" type="diskit.AStarZoneGeometry" value="harborChart.getZone(potentialZones[nextIdx])">
             <Comment>The zone that is selected to be the next zone</Comment>
         </LocalVariable>
+        <StateTransition state="workingChart">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="workingChart">
+            <Assignment value="harborChart"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="PlanPatrolMove" priority="0">
             <Comment>Passes the goal zone as the starting zone because it reached it's destination</Comment>
             <EdgeParameter value="goalZone"/>
