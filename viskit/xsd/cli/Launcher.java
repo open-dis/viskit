@@ -1,10 +1,12 @@
 package viskit.xsd.cli;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -550,12 +552,33 @@ public class Launcher extends Thread implements Runnable {
     
     void launchGridkit(String port) {
         try {
+            /* This may break on Microsoft Windows
+             * due to illegal chars in the system env
             Process pr = Runtime.getRuntime().exec("env");
             InputStream is = pr.getInputStream();
             Properties p = System.getProperties();
             p.load(is);
             
             if (p.getProperty("SGE_TASK_ID") != null) {
+                launchGridlet();
+            } else {
+                launchAssemblyServer(Integer.parseInt(port));
+            }
+             */
+            Process pr = Runtime.getRuntime().exec("env");
+            InputStream is = pr.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String SGE = null;
+            String line;
+            while ( (line = br.readLine()) != null ) {
+                if(debug)System.out.println(line);
+                if (line.indexOf("SGE_TASK_ID")>-1) {
+                    SGE = line;
+                    break;
+                }
+            }
+            if (SGE!=null) {
                 launchGridlet();
             } else {
                 launchAssemblyServer(Integer.parseInt(port));
