@@ -217,7 +217,8 @@ public class Boot extends URLClassLoader implements Runnable {
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);
-            if (p.getProperty("java.version").indexOf("1.4") > 0) {
+            String javaVersion = p.getProperty("JavaVersion") == null? "unk":p.getProperty("JavaVersion");
+            if (javaVersion.indexOf("1.4") > 0) {
                 rev = new String("java14");
             }
         } catch (Exception e) {
@@ -225,6 +226,7 @@ public class Boot extends URLClassLoader implements Runnable {
         }
         return rev;
     }
+    
     public static void main(String[] args) throws Exception {
         URL u = Boot.class.getClassLoader().getResource("viskit/xsd/cli/Boot.class");
         if (debug) System.out.println(u);
