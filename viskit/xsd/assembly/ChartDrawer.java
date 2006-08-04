@@ -40,6 +40,7 @@ public class ChartDrawer {
      */
     public String createHistogram(String title, String label, double[] data, String fileName){
         String fileLocation = "./AnalystReports/charts/"+fileName+".png";
+        String url = "./charts/"+fileName+".png";
         IntervalXYDataset dataset = createIntervalXYDataset(label, data);
         try{
         saveChart(createChart(dataset, title, label), fileLocation);
@@ -86,9 +87,9 @@ public class ChartDrawer {
         
         
         File outFile = new File(path);
-        outFile.getParentFile().mkdirs();
+        /*outFile.getParentFile().mkdirs();
         String absolutePath = outFile.getAbsolutePath();
-        this.url = absolutePath;
+        this.url = absolutePath;*/
         FileOutputStream  fos = new FileOutputStream(outFile);
         ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
         fos.close();

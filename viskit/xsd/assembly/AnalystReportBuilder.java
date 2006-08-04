@@ -1058,7 +1058,10 @@ public class AnalystReportBuilder
     String dir = "./BehaviorLibraries/SavageTactics/" + fileType.substring(0, idx) + "/";
     String file = fileType.substring(idx + 1, fileType.length());
     String eventGraphDirectory = (dir + file + ".xml");
-    String imgDirectory = "./images/BehaviorLibraries/SavageTactics/" + fileType.substring(0, idx) + "/" + file + ".xml.png";
+    String imgDirectory = "../images/BehaviorLibraries/SavageTactics/" + fileType.substring(0, idx) + "/" + file + ".xml.png";
+    
+    //Get the absolute path to resolve the broken url problem
+    
     if (!eventGraphFiles.contains(eventGraphDirectory)) {
       eventGraphFiles.add(eventGraphDirectory);
       eventGraphImages.add(imgDirectory);
@@ -1126,11 +1129,9 @@ public class AnalystReportBuilder
     return image;
   }
 
-  private String unMakeImage(Element e, String imageID, Integer I)
+  private String unMakeImage(Element e, String imageID)
   {
-    if(I==null)
-      return _unMakeContent(e,imageID+"Image");
-    return _unMakeContent(e,imageID+"Image",I);
+    return _unMakeContent(e,imageID+"Image");
   }
   /**
    * Creates a standard 'Comments' element used by all sections of the report
@@ -1195,26 +1196,7 @@ public class AnalystReportBuilder
     for(Iterator itr=content.iterator(); itr.hasNext();) {
       Element celem = (Element)itr.next();
       if(celem.getName().endsWith(suffix))
-          return celem.getAttributeValue("text");
-    }
-    return "";
-  }
-                                                            // hack alert:
-  private String _unMakeContent(Element e, String suffix, Integer wh)
-  {
-    int i=-1;
-    if(wh != null)
-      i=wh.intValue();
-
-    List content = e.getContent();
-    int count=0;
-    for(Iterator itr=content.iterator(); itr.hasNext();) {
-      Element celem = (Element)itr.next();
-      if(celem.getName().endsWith(suffix)) {
-        if(wh==null || count == i)
-          return celem.getAttributeValue("text");
-        count++;
-      }
+        return celem.getAttributeValue("text");
     }
     return "";
   }
@@ -1225,76 +1207,59 @@ public class AnalystReportBuilder
   private void setDefaultValues()
   {
     //Header values
-    setReportName("AnalystReportTest");
-    setClassification("UNCLASSIFIED");
-    //setAuthor("Patrick Sullivan");
+    setReportName("***ENTER REPORT TITLE HERE***");
+    setClassification("***ENTER CLASSIFICATION HERE***");
+    setAuthor("***ENTER THE NAME OF THE AUTHOR HERE***");
     setDateOfReport(DateFormat.getInstance().format(new Date()));
 
     //Executive Summary values
     setExecutiveSummaryComments(true);
-    setExecutiveSummary("The purpose of this report is to test various force protection alternatives " +
-        "for Naval Station Bremerton Washington. The initial motivation for this report is to provide an exemplar template of what the end product of the ATFP tool could be to allow for discussion and " +
-        "suggestions among participating developers and sponsors");
+    setExecutiveSummary("***ENTER EXECUTIVE SUMMARY COMMENTS HERE***");
 
     //SimulationLocation Values
     setPrintSimLocationComments(true);
     setPrintSimLocationImage(true);
-    setSimLocComments("This simulation was designed to reflect real world conditions in Bremerton harbor and to evaluate the effectiveness of a ship's patrol craft at defending against a waterborne terrorist threat. " +
-        "This experiment tests the ability of one patrol boat against up to three terrorist threats. The use of ship's self defense forces (SSDF) was not included in this initial experiment. Bremerton harbor" +
-        "is accessible from public waterways though a floating barrier system is in place to protect the units that are docked at it's piers.  This initial simulation test does not incorporate the floating barrier system.");
-    setSimLocConclusions("While this simulation was able to demonstrate that the tool could setup a simple experiment and run the exclusion of the barrier system probably renders the results useless.  This installation relies heavily on " +
-        "the barrier system which it has installed. Excluding it from the simulation gives an unrealistic and unrepresentative advantage to waterborne terrorist platforms.");
-    setLocationImage("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Locations/BremertonAerial.bmp");
-    setChartImage("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Locations/BremertonChart.bmp");
+    setSimLocComments("***ENTER SIMULATION ENVIRONMENT COMMENTS HERE***");
+    setSimLocConclusions("***ENTER SIMULATION ENVIRONMENT CONCLUSIONS HERE***");
+    //setLocationImage("");
+    //setChartImage("");
 
     //Simulation Configuration Values
     setPrintSimConfigComments(true);
     setPrintAssemblyImage(true);
     setPrintEntityTable(true);
     setAssemblyFile("./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml");
-    setSimConfigComments("The simulation created for this reports included multiple entities as well as the well " +
-        "known harbor obstructions (e.g. Mooring buoys).  A nautical chart object was included which " +
-        "provided the simulation agents with an understanding of the waterfront environment by charting " +
-        "both the water perimeter and waterways that could be navigated by waterborne terrorist assets. " +
-        "Further discussion about agent behavior implementation is provided in the next section of this report.");
-    setSimConfigConclusions("While the mooring buoys were represented in the simulation they did not have a 3D representation " +
-        "for watching post-experiment replay.  Adding  a simple model of a mooring buoy would be a good addition " +
-        "to this model.");
+    setSimConfigComments("***ENTER SIMULATION CONFIGURATION COMMENTS HERE***");
+    setSimConfigConclusions("***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***");
 
-    setAssemblyImageLocation("C:/CVSProjects/Viskit/images/BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml.png");
+    //setAssemblyImageLocation("");
 
     //Entity Parameters values
     setPrintParameterComments(true);
     setPrintParameterTable(true);
-    setParameterComments("Parameters for the entities in this simulation were derived from online, unclassified sources. In the cases " +
-        "where such sources were not available generic estimations were used for the parameter values. The units of measure " +
-        "for the parameters listed was meters.");
-    setParameterConclusions("The parameters given to the models for this simulation generated realistic enough results. It is recommended that " +
-        "detailed, and perhaps classified values be incorporated for future studies.");
-    //PAT TODO: BUILD PARAMETER TABLE
+    setParameterComments("***ENTER ENTITY PARAMETER COMMENTS HERE***");
+    setParameterConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
+    
 
     //BehaviorParameter values
     setPrintBehaviorDefComments(true);
     setPrintEventGraphImages(true);
     setPrintBehaviorDescriptions(true);
     setPrintEventGraphDetails(true);
-    setBehaviorComments("The agent behaviors used for this simulation were taken from the Behavior Libraries directory. No changes to these behaviors were made.");
-    setBehaviorConclusions("The behaviors used in this experiment were sufficient given the overall objective.  However, it would be worthwhile to consider incorporating " +
-        "classified procedures and doctrine for a more realistic harbor representation.");
+    setBehaviorComments("***ENTER ENTITY BEHAVIOR COMMENTS HERE***");
+    setBehaviorConclusions("***ENTER BEHVIOR CONCLUSIONS HERE***");
 
     //StatisticalResults values
     setPrintStatsComments(true);
     setPrintReplicationStats(true);
     setPrintSummaryStats(true);
-    setStatsComments("Given that only two replications were conducted the results derived from this simulation are not statistically significant.  They do however " +
-        "demonstrate the tools ability to generate a report.");
-    setStatsConclusions("Increased replications are required for any additional analysis");
+    setStatsComments("***ENTER STATISTICAL RESULTS COMMENTS HERE***");
+    setStatsConclusions("***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***");
 
     //Recommendations/Conclusions
     setPrintRecommendationsConclusions(true);
-    setConclusions("This simulation was a good initial test of the functionality of this application.  The statistics derived from the simulation runs should not be " +
-        "used for any purpose other than to show that the tool could generate results.");
-    setRecommendations("The next step in the project is to set up an experiment with greater level of fidelity, improved agent behaviors and the inclusion of the barrier system.");
+    setConclusions("***ENTER CONCLUSIONS COMMENTS HERE***");
+    setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
   //public boolean isExecutiveSummaryComments()        { return executiveSummaryComments; }
@@ -1428,9 +1393,9 @@ public class AnalystReportBuilder
   public void    setPrintSimLocationImage   (boolean bool){ simulationLocation.setAttribute("images", booleanToString(bool)) ;}
 
   public String  getSimLocComments()          { return unMakeComments(simulationLocation);}
-  public String  getSimLocConclusions()       { return unMakeConclusions(simulationLocation);}       // hack:
-  public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location",new Integer(0));}
-  public String  getChartImage()              { return unMakeImage(simulationLocation,"Location",new Integer(1)); }
+  public String  getSimLocConclusions()       { return unMakeConclusions(simulationLocation);}
+  public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location");}
+  public String  getChartImage()              { return unMakeImage(simulationLocation,"Location"); }
 
   public void setSimLocComments          (String s)    { makeComments(simulationLocation,"SL", s);}
   public void setSimLocConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
@@ -1479,7 +1444,7 @@ public class AnalystReportBuilder
   public String  getSimConfigComments()     { return unMakeComments(simConfig);}
   public String[][]  getSimConfigEntityTable()  { return unMakeEntityTable();}
   public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
-  public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly",null);}
+  public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly");}
   public void    setSimConfigComments       (String s) { makeComments(simConfig,"SC", s); }
   public void    setSimConfigEntityTable    (String s) { }; //todo
   public void    setSimConfigConclusions    (String s) { makeConclusions(simConfig,"SC", s); }

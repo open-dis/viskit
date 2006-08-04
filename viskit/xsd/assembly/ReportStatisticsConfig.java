@@ -99,7 +99,7 @@ public class ReportStatisticsConfig {
             String key = (String)itr.next();
             seperator  = findUnderscore(key);
             entityIndex[idx]   = key.substring(0, seperator);
-            propertyIndex[idx] = key.substring(seperator, key.length());
+            propertyIndex[idx] = key.substring(seperator+1, key.length());
             System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
             idx++;
         }
