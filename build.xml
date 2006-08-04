@@ -293,6 +293,9 @@
                 <include name="jaxb-impl.jar"/>
                 <include name="jaxb-libs.jar"/>
             </fileset>
+            <fileset dir="${env.JAVA_HOME}/lib">
+                <include name="tools.jar"/>
+            </fileset>
             <fileset dir="${dir.src.cli.util}">
                 <include name="config.properties"/>
             </fileset>
@@ -482,7 +485,7 @@
             <include name="TempDir.java"/>
             <include name="DirDeleter.java"/>
             <include name="BshGridlet.java"/>
-             <include name="ChartDrawer.java"/>
+            <include name="ChartDrawer.java"/>
         </javac>
         
 
