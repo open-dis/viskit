@@ -115,7 +115,7 @@ public class Boot extends URLClassLoader implements Runnable {
         addURL(jarURL);
     }
 
-    protected void addURL(URL jarURL) {
+    public void addURL(URL jarURL) {
         URLConnection urlc;
         URL u;
         JarEntry je;
@@ -148,9 +148,7 @@ public class Boot extends URLClassLoader implements Runnable {
                     
                     // test for which javac to pack
                     // note this depends on the builder to rename the tools.jars appropriately!
-                    if ((name.equals("tools14.jar") && rev.equals("java15")) ||  (name.equals("tools15.jar") && rev.equals("java14"))) {
-                        skip:;
-                    }
+                    
                     if ( name.endsWith("jar") ) {
                         if (debug) System.out.println("Found internal jar externalizing "+name);
                         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -176,9 +174,8 @@ public class Boot extends URLClassLoader implements Runnable {
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
                         if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));
                         
-                    } 
-                    skip:
-                        ;
+                    }
+                    
 
                 }
             }
