@@ -41,7 +41,6 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
-import bsh.Interpreter;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.cli.Boot;
@@ -173,7 +172,7 @@ public class Gridlet extends Thread {
         
         
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
-        
+        debug_io = true;
         if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
         
         //pass design args into design params
@@ -272,6 +271,16 @@ public class Gridlet extends Thread {
                 cmdLine.add(java.getCanonicalPath());
             }
             
+            // Now do the Assembly
+            
+            String assemblyJava = sax2j.translate();
+            File assemblyJavaFile = new File(tempDir,sax2j.getRoot().getName()+".java");
+            FileWriter writer = new FileWriter(assemblyJavaFile);
+            writer.write(assemblyJava);
+            writer.flush();
+            writer.close();
+            cmdLine.add(assemblyJavaFile.getCanonicalPath());
+            
             cmd = (String[])cmdLine.toArray(new String[]{});
             
             int reti =  com.sun.tools.javac.Main.compile(cmd);
@@ -280,28 +289,14 @@ public class Gridlet extends Thread {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
                 System.out.println(sax2j.translate());
                 if (reti != 0) {
-                    System.out.println("\tCompile Failed");
+                    //System.out.println("\tCompile Failed");
                 }
             }
              
-            // Now do the Assembly
-            
-            String assemblyJava = sax2j.translate();
-            File assemblyJavaFile = new File(tempDir,sax2j.getRoot().getName());
-            FileWriter writer = new FileWriter(assemblyJavaFile);
-            writer.write(assemblyJava);
-            writer.flush();
-            writer.close();
-            
-            reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",System.getProperty("java.class.path"),"-d", tempDir.getCanonicalPath(), assemblyJavaFile.getCanonicalPath() });
-            
-            if (debug_io) {
-                if (reti != 0) {
-                    System.out.println("\tCompile Failed");
-                }
-            }
-            
             ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+            System.out.println("Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
+
+            ((Boot)cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
             Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
             Constructor asmc = asmz.getConstructors()[0];
             ViskitAssembly sim = (ViskitAssembly)(asmc.newInstance(new Object[] {} ));

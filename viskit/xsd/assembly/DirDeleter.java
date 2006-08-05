@@ -39,13 +39,13 @@ public class DirDeleter extends Thread {
         
         if (fileArray != null) {
             for (int i = 0; i < fileArray.length; i++) {
-                if (fileArray[i].isDirectory())
-                    deleteDirectory(fileArray[i]);
-                else
-                    fileArray[i].delete();
+                //if (fileArray[i].isDirectory())
+                  //deleteDirectory(fileArray[i]);
+                //else
+                   //fileArray[i].delete();
             }
         }
-        dir.delete();
+        //dir.delete();
     }
 }
 

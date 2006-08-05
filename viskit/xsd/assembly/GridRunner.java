@@ -614,7 +614,7 @@ public class GridRunner {
             userDir = new File(System.getProperty("user.dir"));
             // create experimentFile, an assembly tree with decorations
             // give it unique name
-            experimentFile = File.createTempFile(root.getName()+"Exp","xml",userDir);
+            experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
         
         } catch (Exception e) {
             return Boolean.FALSE;
