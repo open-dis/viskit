@@ -133,6 +133,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
     tabbedPane.add(egFrame.getContent(),TAB0_EGEDITOR_IDX);
     tabbedPane.setTitleAt(TAB0_EGEDITOR_IDX,"Event Graph Editor");
+    tabbedPane.setToolTipTextAt(TAB0_EGEDITOR_IDX,"Visual editor for object class definitions");
     menuBar = egFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -145,6 +146,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
     tabbedPane.add(asyFrame.getContent(),TAB0_ASSYEDITOR_IDX);
     tabbedPane.setTitleAt(TAB0_ASSYEDITOR_IDX,"Assembly Editor");
+    tabbedPane.setToolTipTextAt(TAB0_ASSYEDITOR_IDX,"Visual editor for simulation defined by assembly");
     menuBar = asyFrame.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -159,11 +161,13 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       p.add(runTabbedPane,BorderLayout.CENTER);
     tabbedPane.add(p,TAB0_ASSYRUN_SUBTABS_IDX);
     tabbedPane.setTitleAt(TAB0_ASSYRUN_SUBTABS_IDX,"Assembly Run");
+    tabbedPane.setToolTipTextAt(TAB0_ASSYRUN_SUBTABS_IDX,"Run simulation defined by assembly");
     menus.add(null); // placeholder
 
     // Analyst report
     tabbedPane.add(reportPanel=new AnalystReportPanel(),TAB0_ANAL_REPORT_IDX);
-    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report (in progress)");
+    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report");
+    tabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX,"Support analyst assessment and produce report");
     menuBar = reportPanel.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
@@ -175,6 +179,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyRunComponent = new InternalAssemblyRunner();
     runTabbedPane.add(asyRunComponent.getContent(),TAB1_LOCALRUN_IDX);
     runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX,"Local Run");
+    runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX,"Run replications on local host");
     menuBar = asyRunComponent.getMenus();
     menus.add(menuBar);
     doCommonHelp(menuBar);
