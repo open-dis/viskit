@@ -179,9 +179,9 @@ public class RunnerPanel2 extends JPanel
     }
 
 
-    saveRepDataCB = new JCheckBox("Save rep data");
+    saveRepDataCB = new JCheckBox("Save replication data");
     flowPan.add(saveRepDataCB);
-    printRepReportsCB = new JCheckBox("Print rep reports");
+    printRepReportsCB = new JCheckBox("Print replication reports");
     flowPan.add(printRepReportsCB);
     printSummReportsCB = new JCheckBox("Print summary reports       ");
     flowPan.add(printSummReportsCB);
@@ -248,7 +248,7 @@ public class RunnerPanel2 extends JPanel
         new ReaderThread(piErr, serrTA, false).start();
       }
       catch (IOException e) {
-        JOptionPane.showMessageDialog(null, "exep in setupPipes " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "IOException in setupPipes() " + e.getMessage());
       }
     }
   }

@@ -193,8 +193,8 @@ public class RunnerPanel extends JPanel
     numRepsTF = new JTextField(8);
     Vstatics.clampSize(numRepsTF,numRepsTF,numRepsTF);
     JLabel numRepsLab = new JLabel("Number of replications");
-    saveRepDataCB = new JCheckBox("Save rep data");
-    printRepReportsCB = new JCheckBox("Print rep reports");
+    saveRepDataCB = new JCheckBox("Save replication data");
+    printRepReportsCB = new JCheckBox("Print replication reports");
     printSummReportsCB = new JCheckBox("Print summary reports");
     lowerToolBar.add(Box.createHorizontalGlue());
     lowerToolBar.add(numRepsLab);
