@@ -1,7 +1,9 @@
 package viskit.xsd.cli;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.jar.JarOutputStream;
 
 public class Launcher extends Thread implements Runnable {
     static ClassLoader cloader;
@@ -32,6 +35,7 @@ public class Launcher extends Thread implements Runnable {
     Hashtable eventGraphs = new Hashtable();
     private static final boolean debug = true;
     private boolean compiled = true;
+    private boolean inGridlet = false;
     
     /**
      *  args -A ssemblyFile [-E ventGraphFile]
@@ -54,7 +58,7 @@ public class Launcher extends Thread implements Runnable {
                 // while this could be handled by EventGraphs property, getting 
                 // a specific directory is more automated
                 String eventGraphDir = p.getProperty("EventGraphDir");
-                eventGraphDir = (eventGraphs==null)?"?":eventGraphDir;
+                eventGraphDir = (eventGraphDir==null)?"?":eventGraphDir;
                 if ( Thread.currentThread().getContextClassLoader() instanceof Boot ) {
                     Boot b = (Boot) Thread.currentThread().getContextClassLoader();
                     u = b.baseJarURL;
@@ -63,6 +67,7 @@ public class Launcher extends Thread implements Runnable {
                     JarEntry je;
                     while ( ( je = jis.getNextJarEntry() ) != null ) {
                         String name = je.getName();
+                        System.out.println("Loading EventGraph from BehaviorLibraries: "+name);
                         // nb: BehaviorLibraries is sort of hard coded here,
                         // better to have a property tbd
                         if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml")) {
@@ -72,6 +77,47 @@ public class Launcher extends Thread implements Runnable {
                 }
                 
                 compiled = (p.getProperty("Beanshell") == null);
+                // check that were not starting in SGE mode to boot up a gridlet
+                // in this case we don't want to have to recompile any of the BehaviorLibraries
+                // all over again each time. 
+                // if were not in a Gridlet booter, then either we're booting the AssemblyServer
+                // or running local mode, and the execCompiled actually happens, as it gets
+                // side stepped during setup to launchGridkit otherwise.
+                
+                /* This may break on Microsoft Windows
+                 * due to illegal chars in the system env
+                 * at this stage could be an instance of local run on windows
+                 * so, do something else.
+                    Process pr = Runtime.getRuntime().exec("env");
+                    InputStream is = pr.getInputStream();
+                    Properties p = System.getProperties();
+                    p.load(is);
+                 */
+                Process pr = Runtime.getRuntime().exec("env");
+                InputStream is = pr.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                String SGE = null;
+                String line;
+                while ( (line = br.readLine()) != null ) {
+                    if(debug)System.out.println(line);
+                    if (line.indexOf("SGE_TASK_ID")>-1) {
+                        SGE = line;
+                        break;
+                    }
+                }
+                inGridlet = (SGE!=null);
+                
+                
+                if ( compiled && !inGridlet ) {
+                    // only case where BehaviorLibraries should get compiled 
+                    compile();
+                    //eventGraphs.clear();
+                } else {
+                    eventGraphs.clear();
+                }
+                
+                
                 if (p.getProperty("Port") != null) {
                     launchGridkit(p.getProperty("Port"));
                 } else if (p.getProperty("Assembly") != null ) {
@@ -161,14 +207,14 @@ public class Launcher extends Thread implements Runnable {
         // unmarshal the xml to java bindings
         jclz = cloader.loadClass("javax.xml.bind.Unmarshaller");
         m = jclz.getDeclaredMethod("unmarshal",  new Class[] { InputStream.class });
-        Object assembly = m.invoke( umo, new Object[]{ bais });
+        Object assemblyJaxb = m.invoke( umo, new Object[]{ bais });
         
         // get the root node of the assembly and obtain name of assembly
         jclz = cloader.loadClass("viskit.xsd.bindings.assembly.SimkitAssemblyType");
         m = jclz.getDeclaredMethod("getPackage", new Class[]{});
-        assemblyName = (String)m.invoke(assembly, new Object[]{});
+        assemblyName = (String)m.invoke(assemblyJaxb, new Object[]{});
         m = jclz.getDeclaredMethod("getName", new Class[]{});
-        assemblyName += "."+(String)m.invoke(assembly, new Object[]{});
+        assemblyName += "."+(String)m.invoke(assemblyJaxb, new Object[]{});
         
     }
     
@@ -208,7 +254,7 @@ public class Launcher extends Thread implements Runnable {
             
             eventGraphs.put(eventGraphName,xml.toString());
             if (debug) {
-                System.out.println("EventGraph XML");
+                System.out.println(eventGraphName+"EventGraph XML");
                 System.out.println(xml.toString());
             }
         } catch (Exception e) {;} // silent this may not be an event-graph xml
@@ -239,7 +285,25 @@ public class Launcher extends Thread implements Runnable {
         }
     }
     
-    public void execCompiled() throws Exception {
+    public void execCompiled() {
+        try {
+            compile();
+            if ( assemblyName != null ) {
+                // run it
+                Class asmz = Thread.currentThread().getContextClassLoader().loadClass(assemblyName);
+                Constructor c = asmz.getConstructor(new Class[]{});
+                Object out = c.newInstance(new Object[]{});
+                Thread t = new Thread((Runnable)out);
+                t.start();
+                t.join();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // make java source from xml and add to classpath
+    public void compile() throws Exception {
         Class xml2jz;
         Class axml2jz;
         Class javacz;
@@ -250,7 +314,7 @@ public class Launcher extends Thread implements Runnable {
         Constructor c;
         ByteArrayInputStream bais;
         String assemblyJava;
-        File tempDir;
+        File tempDir, assemblyJavaFile = null;
         ArrayList eventGraphJavaFiles = new ArrayList();
         
         xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
@@ -264,9 +328,8 @@ public class Launcher extends Thread implements Runnable {
             
             // jam the classpath with the new directory
             String systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath()); 
+            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath());
             // hopefully don't have to addURL, but here just in case
-            URL url = new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath());
             
             
             Enumeration e = eventGraphs.keys();
@@ -275,9 +338,58 @@ public class Launcher extends Thread implements Runnable {
                 String eventGraph = (String)eventGraphs.get(eventGraphName);
                 String eventGraphJava;
                 
-                // unmarshal eventGraph xml
-                bais = new ByteArrayInputStream(eventGraph.getBytes());
-                c = xml2jz.getConstructor(new Class[]{ InputStream.class });
+                try {
+                    // unmarshal eventGraph xml
+                    bais = new ByteArrayInputStream(eventGraph.getBytes());
+                    c = xml2jz.getConstructor(new Class[]{ InputStream.class });
+                    out = c.newInstance(new Object[]{ bais });
+                    m = out.getClass().getDeclaredMethod("unmarshal", new Class[]{});
+                    m.invoke(out, new Object[]{});
+                    
+                    // translate xml to generate java source
+                    m = out.getClass().getDeclaredMethod("translate", new Class[]{});
+                    out = m.invoke(out, new Object[]{});
+                    eventGraphJava = new String((String)out);
+                    if (debug) System.out.println(eventGraphJava);
+                    
+                    // these could be handled by viskit.AssemblyController.createJavaClassFromString()
+                    // since it is not likely to be run in Grid mode here, if at all, so no worries
+                    // about shared storage.
+                    
+                    // A Gridlet on the other hand will require a separate
+                    // path since it could be shared with another Gridlet, especially in a multiprocessor
+                    // configuration.
+                    
+                    // see steps from Gridlet, except go through introspection for javac
+                    // Gridlet will handle any event-graphs that were sent from the Viskit
+                    // editor that aren't already in the BehaviorLibraries, so here we need
+                    // to boot up the BehaviorLibraries.
+                    
+                    String eventGraphFileName = eventGraphName.substring(eventGraphName.lastIndexOf(".")+1);
+                    File eventGraphJavaFile = new File(tempDir,eventGraphFileName+".java");
+                    FileWriter writer = new FileWriter(eventGraphJavaFile);
+                    writer.write(eventGraphJava);
+                    writer.flush();
+                    writer.close();
+                    eventGraphJavaFiles.add(eventGraphJavaFile);
+                    
+                   
+                    
+                    
+                } catch (Exception f) {
+                    //normal to have exception as eventGraphs
+                    //may have been blindly loaded with all .xml
+                    //under BehaviorLibraries which could also
+                    //include assemblies. must be caught though
+                    //and ingored
+                    //f.printStackTrace();
+                }
+            }
+            
+            if (assembly != null) {
+                // unmarshal Assembly xml
+                bais = new ByteArrayInputStream(assembly.getBytes());
+                c = axml2jz.getConstructor(new Class[]{ InputStream.class });
                 out = c.newInstance(new Object[]{ bais });
                 m = out.getClass().getDeclaredMethod("unmarshal", new Class[]{});
                 m.invoke(out, new Object[]{});
@@ -285,74 +397,72 @@ public class Launcher extends Thread implements Runnable {
                 // translate xml to generate java source
                 m = out.getClass().getDeclaredMethod("translate", new Class[]{});
                 out = m.invoke(out, new Object[]{});
-                eventGraphJava = new String((String)out);
-                if (debug) System.out.println(eventGraphJava);
+                assemblyJava = new String((String)out);
+                if (debug) System.out.println(assemblyJava);
                 
-                // these could be handled by viskit.AssemblyController.createJavaClassFromString()
-                // since it is not likely to be run in Grid mode here, if at all, so no worries
-                // about shared storage. 
-                
-                // A Gridlet on the other hand will require a separate
-                // path since it could be shared with another Gridlet, especially in a multiprocessor
-                // configuration.
-                
-                // see steps from Gridlet, except go through introspection for javac
-                // Gridlet will handle any event-graphs that were sent from the Viskit
-                // editor that aren't already in the BehaviorLibraries, so here we need
-                // to boot up the BehaviorLibraries.
-                
-                String eventGraphFileName = eventGraphName.substring(eventGraphName.lastIndexOf(".")+1);
-                File eventGraphJavaFile = new File(tempDir,eventGraphFileName+".java");
-                FileWriter writer = new FileWriter(eventGraphJavaFile);
-                writer.write(eventGraphJava);
+                String assemblyFileName = assemblyName.substring(assemblyName.lastIndexOf(".")+1);
+                assemblyJavaFile = new File(tempDir,assemblyFileName+".java");
+                FileWriter writer = new FileWriter(assemblyJavaFile);
+                writer.write(assemblyJava);
                 writer.flush();
                 writer.close();
-                eventGraphJavaFiles.add(eventGraphJavaFile);
             }
-            
-            // unmarshal eventGraph xml
-            bais = new ByteArrayInputStream(assembly.getBytes());
-            c = axml2jz.getConstructor(new Class[]{ InputStream.class });
-            out = c.newInstance(new Object[]{ bais });
-            m = out.getClass().getDeclaredMethod("unmarshal", new Class[]{});
-            m.invoke(out, new Object[]{});
-            
-            // translate xml to generate java source
-            m = out.getClass().getDeclaredMethod("translate", new Class[]{});
-            out = m.invoke(out, new Object[]{});
-            assemblyJava = new String((String)out);
-            if (debug) System.out.println(assemblyJava);
-            
-            String assemblyFileName = assemblyName.substring(assemblyName.lastIndexOf(".")+1);
-            File assemblyJavaFile = new File(tempDir,assemblyFileName+".java");
-            FileWriter writer = new FileWriter(assemblyJavaFile);
-            writer.write(assemblyJava);
-            writer.flush();
-            writer.close();
-            
             String[] cmd;
-            Iterator it = eventGraphJavaFiles.iterator();
+            
             ArrayList cmdLine = new ArrayList();
+            cmdLine.add("-sourcepath");
+            cmdLine.add(tempDir.getCanonicalPath());
             cmdLine.add("-verbose");
             cmdLine.add("-classpath");
             cmdLine.add(System.getProperty("java.class.path"));
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());
             
-            // allow javac to resolve interdependencies by
+            File argsFile = new File(tempDir,"args");
+            FileWriter argsWriter = new FileWriter(argsFile);
+            Iterator cmdIt = cmdLine.iterator();
+            while ( cmdIt.hasNext() ) {
+                argsWriter.write((String)cmdIt.next() + "\n");
+            }
+            argsWriter.flush();
+            argsWriter.close();
+            ArrayList sourcePaths = new ArrayList();
+            // wish: allow javac to resolve potential interdependencies by
             // providing all .java's at once
+            Iterator it = eventGraphJavaFiles.iterator();
             while (it.hasNext()) {
                 File java = (File)(it.next());
-                cmdLine.add(java.getCanonicalPath());
+                sourcePaths.add(java.getCanonicalPath());
+                
             }
-            cmdLine.add(assemblyJavaFile.getCanonicalPath());
-            cmd = (String[])cmdLine.toArray(new String[]{});
+            // we could be in the bootstrap case, no assembly
+            if ( assemblyJavaFile != null ) {
+                sourcePaths.add(assemblyJavaFile.getCanonicalPath());
+                
+            }
             
-            m = javacz.getMethod("compile", new Class[] { String[].class } );
-            m.invoke(null,new Object[] { cmd });
+            cmd = new String[2];
+            cmd[0] = "@"+argsFile.getCanonicalPath();
+            
+            for ( int count = 0; count < sourcePaths.size(); count++) {
+                cmd[1] = (String) sourcePaths.get(count);
+                // unfortunately these have to be done one at a time, if javac
+                // fails on just one it may fail on all
+                m = javacz.getMethod("compile", new Class[] { String[].class } );
+                m.invoke(null,new Object[] { cmd });
+                
+            }
+            
+            // finally jar up the classes and add them to the Boot ClassLoader
+            
+            File jarFromDir = makeJarFileFromDir(tempDir);
+            URL url = new URL("file:"+File.separator+File.separator+jarFromDir.getCanonicalPath()+File.separator);
             // if these path-jammers don't work, then will need to define classes directly in the classloader
             // via bytes. url here is the file:\/\/+ canonical path from above to tempDir
             ((Boot)(Thread.currentThread().getContextClassLoader())).addURL(url);
+            // jam the classpath with the new directory
+            systemClassPath = System.getProperty("java.class.path");
+            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+jarFromDir.getCanonicalPath());
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -552,33 +662,8 @@ public class Launcher extends Thread implements Runnable {
     
     void launchGridkit(String port) {
         try {
-            /* This may break on Microsoft Windows
-             * due to illegal chars in the system env
-            Process pr = Runtime.getRuntime().exec("env");
-            InputStream is = pr.getInputStream();
-            Properties p = System.getProperties();
-            p.load(is);
-            
-            if (p.getProperty("SGE_TASK_ID") != null) {
-                launchGridlet();
-            } else {
-                launchAssemblyServer(Integer.parseInt(port));
-            }
-             */
-            Process pr = Runtime.getRuntime().exec("env");
-            InputStream is = pr.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String SGE = null;
-            String line;
-            while ( (line = br.readLine()) != null ) {
-                if(debug)System.out.println(line);
-                if (line.indexOf("SGE_TASK_ID")>-1) {
-                    SGE = line;
-                    break;
-                }
-            }
-            if (SGE!=null) {
+
+            if (inGridlet) {
                 launchGridlet();
             } else {
                 launchAssemblyServer(Integer.parseInt(port));
@@ -613,4 +698,49 @@ public class Launcher extends Thread implements Runnable {
             System.exit(1);
         }
     }
+
+    private File makeJarFileFromDir(File dir2jar) {
+        File jarOut = dir2jar;
+        try {
+            jarOut = File.createTempFile("bhvr",".jar",new File(System.getProperty("user.dir")));
+            FileOutputStream fos = new FileOutputStream(jarOut);
+            JarOutputStream jos = new JarOutputStream(fos);
+            if ( dir2jar.isDirectory() ) {
+                makeJarFileFromDir(dir2jar,dir2jar,jos);
+            }
+            jos.close();
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return jarOut;
+    }
+    
+    private void makeJarFileFromDir(File baseDir, File newDir, JarOutputStream jos) {
+        File[] dirList = newDir.listFiles();
+        FileInputStream fis;
+        JarEntry je;
+        for ( int i = 0; i < dirList.length; i++ ) {
+            if ( dirList[i].isDirectory() ) {
+                makeJarFileFromDir(baseDir, dirList[i], jos);
+            } else {
+                try {
+                    je = new JarEntry(dirList[i].getCanonicalPath().substring(baseDir.getCanonicalPath().length() + 1));
+                    jos.putNextEntry(je);
+                    fis = new FileInputStream(dirList[i]);
+                    byte[] buf = new byte[256];
+                    int c;
+                    while ( (c = fis.read(buf)) > 0) {
+                        jos.write(buf,0,c);
+                    }
+                    jos.closeEntry();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        
+        
+    }
+    
 }
