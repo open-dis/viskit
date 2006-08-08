@@ -671,7 +671,7 @@
        public void fileName(String s)    // informative, tells view what we're working on
       {
          this.filename = s;
-         String ttl = "Viskit Assembly: "+s;
+         String ttl = "Viskit Assembly Editor: "+s;
          setTitle(ttl);
          if(titlList != null)
             titlList.setTitle(ttl,titlkey);

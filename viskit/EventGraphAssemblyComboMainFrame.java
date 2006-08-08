@@ -172,7 +172,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
-    //todo blah.setTitleListener(myTitleListener,TAB0_ANAL_REPORT_IDX);
+    reportPanel.setTitleListener(myTitleListener,TAB0_ANAL_REPORT_IDX);
     jamQuitHandler(null,myQuitAction,reportPanel.getMenus());
 
     // Assembly runner
@@ -409,14 +409,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
   class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug
   {
-    public void exec(String[] execStrings, int jvmArgCount)
+    public void exec(String[] execStrings)
     {
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
       tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
       runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
-      asyRunComponent.initParams(execStrings,jvmArgCount);
+      asyRunComponent.initParams(execStrings);
     }
   }
 

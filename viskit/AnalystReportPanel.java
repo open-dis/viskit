@@ -51,6 +51,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -142,6 +145,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       System.err.println("Exception copying Analyst Report File: "+e.getMessage());
     }
 
+    doTitle(targetFile.getName());
     buildArb(targetFile);
   }
   private void buildArb(File targetFile)
@@ -531,7 +535,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
       }
 
-      entityParamTabs.add(nm,new JScrollPane(new ROTable(tableVector,colNames)));
+      entityParamTabs.add(nm,new JScrollPane(new EntityParamTable(tableVector,colNames)));
     }
   }
 
@@ -540,20 +544,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setPrintParameterComments(wantEntityParamComments.isSelected());
     arb.setPrintParameterTable(wantEntityParamTables.isSelected());
   }
-
-  /*
-  public boolean isPrintParameterComments() { return stringToBoolean(entityParameters.getAttributeValue("comments"));}
-  public boolean isPrintParameterTable()    { return stringToBoolean(entityParameters.getAttributeValue("parameterTables")); }
-  public void setPrintParameterComments   (boolean bool) { entityParameters.setAttribute("comments", booleanToString(bool)); }
-  public void setPrintParameterTable      (boolean bool) { entityParameters.setAttribute("parameterTables", booleanToString(bool)); }
-
-  public String  getParameterComments()    { return unMakeComments(entityParameters);}
-  public String  getParameterConclusions() { return unMakeConclusions(entityParameters);}
-  public void setParameterComments         (String s){ entityParameters.addContent(makeComments("PC", s)); }
-  public void setParameterConclusions      (String s){ entityParameters.addContent(makeConclusions("PC", s)); }
-
-  */
-
 
   JCheckBox doBehaviorComments;
   JCheckBox doBehaviorDescriptions;
@@ -663,24 +653,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
 
   }
-
-  /*
-  public boolean isPrintBehaviorDefComments()  { return stringToBoolean(behaviorDefinitions.getAttributeValue("comments"));}
-  public void setPrintBehaviorDefComments (boolean bool) { behaviorDefinitions.setAttribute("comments", booleanToString(bool)); }
-
-  public boolean isPrintBehaviorDescriptions() { return stringToBoolean(behaviorDefinitions.getAttributeValue("descriptions"));}
-  public boolean isPrintEventGraphDetails()    { return stringToBoolean(behaviorDefinitions.getAttributeValue("details"));}
-  public boolean isPrintEventGraphImages()     { return stringToBoolean(behaviorDefinitions.getAttributeValue("image"));}
-  public void setPrintBehaviorDescriptions (boolean bool) { behaviorDefinitions.setAttribute("descriptions", booleanToString(bool)); }
-  public void setPrintEventGraphDetails    (boolean bool) { behaviorDefinitions.setAttribute("details", booleanToString(bool)); }
-  public void setPrintEventGraphImages     (boolean bool) { behaviorDefinitions.setAttribute("image", booleanToString(bool)); }
-
-  public String  getBehaviorComments()         { return unMakeComments(behaviorDefinitions); }
-  public String  getBehaviorConclusions()      { return unMakeConclusions(behaviorDefinitions); }
-  public void setBehaviorComments         (String s) { behaviorDefinitions.addContent(makeComments("BC", s)); }
-  public void setBehaviorConclusions      (String s) { behaviorDefinitions.addContent(makeConclusions("BC", s)); }
-
-  */
 
   JCheckBox wantStatsComments;
   JCheckBox wantStatsReplications;
@@ -803,26 +775,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setPrintReplicationStats(wantStatsReplications.isSelected());
     arb.setPrintSummaryStats(wantStatsSummary.isSelected());
   }
-
-  /*
- public boolean isPrintReplicationStats() { return stringToBoolean(statisticalResults.getAttributeValue("replicationStats")); }
-  public boolean isPrintStatsComments()    { return stringToBoolean(statisticalResults.getAttributeValue("comments")); }
-  public boolean isPrintSummaryStats()     { return stringToBoolean(statisticalResults.getAttributeValue("summaryStats")); }
-  public boolean isPrintStatsCharts()      { return stringToBoolean(statisticalResults.getAttributeValue("charts")); }
-  public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
-  public void setPrintReplicationStats   (boolean bool) { statisticalResults.setAttribute("replicationStats", booleanToString(bool)); }
-  public void setPrintStatsComments      (boolean bool) { statisticalResults.setAttribute("comments", booleanToString(bool)); }
-  public void setPrintSummaryStats       (boolean bool) { statisticalResults.setAttribute("summaryStats", booleanToString(bool)); }
-  public void setPrintStatsCharts        (boolean bool) { statisticalResults.setAttribute("charts", booleanToString(bool)); }
-  public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
-
-  public String  getStatsComments()        { return unMakeComments(statisticalResults);}
-  public String  getStatsConclusions()     { return unMakeConclusions(statisticalResults);}
-  public void setStatsComments           (String s) { statisticalResults.addContent(makeComments("SR", s)); }
-  public void setStatsConclusions        (String s) { statisticalResults.addContent(makeConclusions("SR", s)); }
-
-
-  */
 
   JCheckBox wantTotalConRec;
   JTextArea conRecConclusionsTA;
@@ -960,6 +912,27 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       }
     }
   }
+
+  private TitleListener titlList;
+  private int titlkey;
+  public void setTitleListener(TitleListener lis, int key)
+  {
+    titlList = lis;
+    titlkey = key;
+    doTitle(null);
+  }
+
+  private String namePrefix = "Viskit Analyst Report Editor";
+  private String currentTitle = namePrefix;
+  private void doTitle(String nm)
+  {
+    if(nm != null && nm.length()>0)
+      currentTitle = namePrefix +": "+nm;
+
+    if(titlList != null)
+      titlList.setTitle(currentTitle,titlkey);
+  }
+
 }
 
 class WrappingTextArea extends JTextArea
@@ -986,5 +959,37 @@ class ROTable extends JTable
   {
     return false;
   }
+}
+
+class EntityParamTable extends ROTable implements TableCellRenderer
+{
+  TableCellRenderer defRenderer;
+  EntityParamTable(Vector v, Vector c)
+  {
+    super(v,c);
+    defRenderer = new DefaultTableCellRenderer();
+
+    TableColumn tc = getColumnModel().getColumn(0);
+    tc.setCellRenderer(this);
+  }
+
+  Color grey = new Color(204,204,204);
+  Color origBkgd;
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+  {
+    Component c = defRenderer.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
+    if(origBkgd == null)
+      origBkgd = c.getBackground();
+    Object o0 = getValueAt(row,0);
+    Object o1 = getValueAt(row,1);
+    Object o2 = getValueAt(row,2);
+
+    if(o0 != null && (o1==null || ((String)o1).length()<=0) && ((o2 == null || ((String)o2).length()<=0)))
+      c.setBackground(grey);
+    else
+      c.setBackground(origBkgd);
+    return c;
+  }
+
 }
 

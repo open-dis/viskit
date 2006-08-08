@@ -1171,12 +1171,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       JOptionPane.showMessageDialog(null,"Error on compile");         //todo, more information
     }
     else {
-        int jvmArgCount = 1;
-        // "-cp" better be somewhere in execStrings and after rest of jvm args!
-        while (!execStrings[jvmArgCount].equals("-cp")) {
-            jvmArgCount++;
-        }
-        runner.exec(execStrings,jvmArgCount);
+      runner.exec(execStrings);
     }
   }
 
@@ -1245,6 +1240,32 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   }
 
+  public static final int EXEC_JAVACMD = 0;
+  public static final int EXEC_VMARG0  = 1;
+  public static final int EXEC_VMARG1  = 2;
+  public static final int EXEC_VMARG3  = 3;
+  public static final int EXEC_DASH_CP = 4;
+  public static final int EXEC_CLASSPATH = 5;
+  public static final int EXEC_RUNNER_CLASS_NAME = 6;
+
+  public static final int EXEC_TARGET_CLASS_NAME = 7;
+  public static final int EXEC_VERBOSE_SWITCH = 8;
+  public static final int EXEC_STOPTIME_SWITCH = 9;
+  public static final int EXEC_FIRST_ENTITY_NAME = 10;
+
+  // The following four match the previous four, but represent indices as seen by the main()
+  // method in the launched class:
+  public static final int APP_TARGET_CLASS_NAME = 0;
+  public static final int APP_VERBOSE_SWITCH = 1;
+  public static final int APP_STOPTIME_SWITCH = 2;
+  public static final int APP_FIRST_ENTITY_NAME = 3;
+
+  /**
+   * Maintain the above statics to match the order below.
+   * @param className
+   * @param classPath
+   * @return os exec array
+   */
   private String[] buildExecStrings(String className, String classPath)
   {
     Vector v = new Vector();
@@ -1256,22 +1277,22 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      sb.append("bin");
      sb.append(fsep);
      sb.append("java");
-    v.add(sb.toString());   
-   // any jvm args go here, followed by "-cp"
-    v.add("-Xss5M");
-    v.add("-Xincgc");
-    v.add("-Xmx512M");
-    v.add("-cp");         
-    v.add(classPath);     
-    v.add("viskit.InternalAssemblyRunner$ExternalSimRunner"); 
-    v.add(className);
+    v.add(sb.toString());        // 0
 
-    v.add(""+((ViskitAssemblyModel) getModel()).getMetaData().verbose);
-    v.add(((ViskitAssemblyModel) getModel()).getMetaData().stopTime);
+    v.add("-Xss5M");             // 1
+    v.add("-Xincgc");            // 2
+    v.add("-Xmx512M");           // 3
+    v.add("-cp");                // 4
+    v.add(classPath);            // 5
+    v.add("viskit.InternalAssemblyRunner$ExternalSimRunner");  // 6
+    v.add(className);            // 7
+
+    v.add(""+((ViskitAssemblyModel) getModel()).getMetaData().verbose);    // 8
+    v.add(((ViskitAssemblyModel) getModel()).getMetaData().stopTime);      // 9
 
     Vector vec = ((ViskitAssemblyModel)getModel()).getVerboseEntityNames();
     for (Iterator itr = vec.iterator(); itr.hasNext();) {
-      v.add(itr.next());
+      v.add(itr.next());                                                  // 10+
     }
 
     String[] ra = new String[v.size()];
@@ -1344,7 +1365,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   /** The default version of this.  Run assembly in external VM. */
   AssemblyRunnerPlug runner = new AssemblyRunnerPlug()
   {
-    public void exec(String[] execStrings, int jvmArgCount)
+    public void exec(String[] execStrings)
     {
       try {
         Runtime.getRuntime().exec(execStrings);
@@ -1482,5 +1503,5 @@ class PkgAndFile
 }
 interface AssemblyRunnerPlug
 {
-  public void exec(String[] execStrings, int jvmArgCount);
+  public void exec(String[] execStrings);
 }

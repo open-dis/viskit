@@ -148,43 +148,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   }
 
   private String[] myCmdLine;
-  private static final int RUNNER_ARG_CLASSNAME = 0; //  when it gets to the external vm
-  private static final int RUNNER_ARG_VERBOSE = 1;
-  private static final int RUNNER_ARG_STOPTIME = 2;
-  private static final int RUNNER_ARG_OUTPUTS = 3;
 
-  private static final int _JAVACMD = 0;
-  private static final int _JVMARGS = 1; // jvmArgCount starts here, rest are offsets
-  private static final int _CLASSPATH_OFFSET = 1;
-  private static final int _RUNNER_CLASS_OFFSET = 2; 
-  private static final int _TARGET_CLASS_OFFSET = 3;
-  private static final int _VERBOSE_OFFSET = 4;
-  private static final int _STOPTIME_OFFSET = 5;
-  
-  // jvmArgCount should always have at least 1 for "-cp"
-  // "-cp" should always be last of any jvm args
-  public void initParams(String[]parms, int jvmArgCount)
+  /**
+   * Get param indices from AssemblyController statics
+   * @param parms
+   */
+  public void initParams(String[]parms)
   {
-    /* eg:
-    0 javacmd
-    1 "-cp"
-    2 classPath
-    3 "viskit.ExternalAssemblyRunner" main class
-    4 className to run (first program argument)
-    5 verbose
-    6 stoptime
-    7+ outputentitites
-    */
-
-    parms[jvmArgCount+_RUNNER_CLASS_OFFSET] = "viskit.InternalAssemblyRunner$ExternalSimRunner";
+    parms[AssemblyController.EXEC_RUNNER_CLASS_NAME] = "viskit.InternalAssemblyRunner$ExternalSimRunner";
     myCmdLine = parms;
 
-    targetClassName = parms[jvmArgCount+_TARGET_CLASS_OFFSET];
-    doTitle(parms[4]);
+    targetClassName = parms[AssemblyController.EXEC_TARGET_CLASS_NAME];
+    doTitle(targetClassName);
 
-    targetClassPath = parms[jvmArgCount+_CLASSPATH_OFFSET];
-    boolean defaultVerbose = Boolean.valueOf(parms[jvmArgCount+_VERBOSE_OFFSET]).booleanValue();
-    double defaultStopTime = Double.parseDouble(parms[jvmArgCount+_STOPTIME_OFFSET]);
+    targetClassPath = parms[AssemblyController.EXEC_CLASSPATH];
+    boolean defaultVerbose = Boolean.valueOf(parms[AssemblyController.EXEC_VERBOSE_SWITCH]).booleanValue();
+    double defaultStopTime = Double.parseDouble(parms[AssemblyController.EXEC_STOPTIME_SWITCH]);
 
     runPanel.vcrStopTime.setText(""+defaultStopTime);
     runPanel.vcrSimTime.setText("0"); //Schedule.getSimTimeStr());
@@ -810,7 +789,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     private ExternalSimRunner(String[] args)
     {
       Class targetClass = null;
-      String targetClassName = args[RUNNER_ARG_CLASSNAME];
+      String targetClassName = args[AssemblyController.APP_TARGET_CLASS_NAME];
       String errMsg = null;
       try {
         targetClass = Vstatics.classForName(targetClassName);
@@ -837,11 +816,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
         System.exit(-1);
       }
       targetAssembly = (BasicAssembly)targetObject;
-      targetAssembly.setVerbose(Boolean.valueOf(args[RUNNER_ARG_VERBOSE]).booleanValue());
-      targetAssembly.setStopTime(Double.parseDouble(args[RUNNER_ARG_STOPTIME]));
+      targetAssembly.setVerbose(Boolean.valueOf(args[AssemblyController.APP_VERBOSE_SWITCH]).booleanValue());
+      targetAssembly.setStopTime(Double.parseDouble(args[AssemblyController.APP_STOPTIME_SWITCH]));
       outputs.clear();
       if (args != null && args.length > 0) {
-        for (int i = RUNNER_ARG_OUTPUTS; i < args.length; i++)
+        for (int i = AssemblyController.APP_FIRST_ENTITY_NAME; i < args.length; i++)
           outputs.add(args[i]);
       }
 

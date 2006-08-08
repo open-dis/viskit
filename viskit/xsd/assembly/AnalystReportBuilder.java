@@ -23,107 +23,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 
 
 public class AnalystReportBuilder
 {
   private boolean debug = false;
-  //MIKE: IPTF = input that should be received from the GUI - text field likely
-  //MIKE: IPCB = input that should be received from the GUI - Check box likely
-  //MIKE: IPFC = input that should be received from the GUI - FileChooser likely
-  //MIKE: SYSPROP = value from system, some overwritable (i.e. date of report)
-  //MIKE: UTH = under the hood, get it without user involvement
-  //MIKE: AREND = auto render and assign absolute path for assembly and event graph images
-  //              see NOTE 1.
-
-  /**
-   *NOTE 1: For assembly and event graph images it would be better if they were auto
-   *        generated and dropped into the report. They would probably not get included
-   *        if the user had to hand generate them everytime
-   *
-   *NOTE 2: Variables that do not have a key are local variables that I have taken care of (e.g. statsReport)
-   */
-
-  //SECTION I. VARIABLES
-  /**
-   * IPTF - User defined name for this analyst report
-   */
-  //private String xreportName = "";
-
-  /**
-   * IPTF - Classification - the classfication for this entire report
-   */
-  //private String xclassification = "";
-
-
-  /**
-   * IPTF -  Author - the name of the author as it should appear on the report
-   */
-  //private String xauthor = "";
-
-  /**
-   * SYSPROP - Date - The date of the report (auto but modifiable)
-   */
-  //private String xdateOfReport = "";
-
-  /**
-   * IPCB - Whether or not to include comments in the executive summary - default to true
-   */
-  //private boolean xexecutiveSummaryComments = true;
-
-  /**
-   * IPTF - Comments (wrapped of the executive summary) from input field
-   */
-  //private String xexecutiveSummary = "";
-
-  //SECTION II. VARIABLES
-  /**
-   * IPCB - Whether or not to include comments in SimulationLocation
-   */
-  //private boolean xprintSimLocationComments = true;
-
-  /**
-   * IPCB - Whether or not to include an image in the SimulationLocation section
-   */
-  //private boolean xprintSimLocationImage = true;
-
-  /**
-   * IPTF - SimulationLocation comments
-   */
-  //private String xsimLocComments = "";
-
-  /**
-   * IPTF - SimulationLocation conclusions
-   */
-  //private String xsimLocConclusions = "";
-
-  /**
-   * IPFC - Location X3D screenshot
-   */
-  //private String xlocationImage = "";
-
-  /**
-   * IPFC - Location of chart image (or secondary image if no chart)
-   */
-  //private String xchartImage = "";
-
-  //SECTION III. VARIABLES
-  /**
-   * IPTF - Simulation configuration comments
-   */
-  //private boolean xprintSimConfigComments = true;
-
-  /**
-   * IPCB - Whether to show assembly image
-   */
-  //private boolean xprintAssemblyImage = true;
-
-  /**
-   * IPCB - Whether to show entityTable
-   */
-  //private boolean xprintEntityTable = true;
 
   /**
    * UTH - Assembly file
@@ -131,45 +36,9 @@ public class AnalystReportBuilder
   private String assemblyFile;
 
   /**
-   * IPTF - Simulation configuration comments
-   */
-  //private String xsimConfigComments = "";
-
-  /**
-   * IPTF - Simulation configuration conclusions
-   */
-  //private String xsimConfigConclusions = "";
-
-  /**
-   * AREND - Location of the assembly image
-   */
-  //private String xassemblyImageLocation = "";
-
-  /**
    * The jdom.Document object of the assembly file
    */
   private Document assemblyDocument;
-
-  //SECTION IV. VARIABLES
-  /**
-   * IPCB - Whether to print parameter comments
-   */
-  //private boolean xprintParameterComments = true;
-
-  /**
-   * IPCB - Whether to print the parameterTable;
-   */
-  //private boolean xprintParameterTable = true;
-
-  /**
-   * IPTF - Parameter comments
-   */
-  //private String xparameterComments = "";
-
-  /**
-   * IPTF - Parameter conclusions
-   */
-  //private String xparameterConclusions = "";
 
   /**
    * The viskit.xsd.assembly.ReportStatisticsDOM object for this report
@@ -177,93 +46,12 @@ public class AnalystReportBuilder
   private Document statsReport;
   private String   statsReportPath;
 
-  //SECTION V. VALUES
   /**
-   * IPCB - Whether to print behavior definition comments
+   * The names and file locations of the the event graph files and image files being linked
    */
-  //private boolean xprintBehaviorDefComments = true;
-
-  /**
-   * IPCB - Whether to print event graph images
-   */
-  //private boolean xprintEventGraphImages = true;
-
-  /**
-   * IPCB - Wheter to print parameter and state variable information for each event graph
-   */
-  //private boolean xprintEventGraphDetails = true;
-
-  /**
-   * IPTF - Behavior Definition comments
-   */
-  //private String xbehaviorComments = "";
-
-  /**
-   * IPTF - Behavior Definition conclusions
-   */
-  //private String xbehaviorConclusions = "";
-
-  /**
-   * IPCB - Whether to include behavior descriptions
-   */
-  //private boolean xprintBehaviorDescriptions = true;
-
-
-  /**
-   * The file locations of the the event graph files
-   */
-  private LinkedList eventGraphFiles = new LinkedList();
-
-  /**
-   * The file locations of the event graph image files
-   */
+  private LinkedList eventGraphNames  = new LinkedList();
+  private LinkedList eventGraphFiles  = new LinkedList();
   private LinkedList eventGraphImages = new LinkedList();
-
-  /**
-   * The names of the event graphs being saved
-   */
-  private LinkedList eventGraphNames = new LinkedList();
-
-  //SECTION VI. VALUES
-  /**
-   * IPCB - Whether to include stats results comments
-   */
-  //private boolean xprintStatsComments = true;
-
-  /**
-   * IPCB - Whether to include replication stats
-   */
-  //private boolean xprintReplicationStats = true;
-
-  /**
-   * IPCB - Whether to include summary stats
-   */
-  //private boolean xprintSummaryStats = true;
-
-  /**
-   * IPTF - The comments for the stats results setting
-   */
-  //private String xstatsComments = "";
-
-  /**
-   * IPTF - The conclusion for the stats results setting
-   */
-  //private String xstatsConclusions = "";
-
-  /**
-   * IPCB - Whether to include Conclusions/Recommendations comments
-   */
-  //private boolean xprintRecommendationsConclusions = true;
-
-  /**
-   * IPTF - The conclusions for this simulation
-   */
-  //private String xconclusions = "";
-
-  /**
-   * IPTF - The recommendations for future work
-   */
-  //private String xrecommendations = "";
 
   /**
    * The jdom.Document object that is used to build the report
@@ -286,8 +74,6 @@ public class AnalystReportBuilder
   private Element behaviorDefinitions;
   private Element statisticalResults;
   private Element concRec;
-
-  private File xoutputXMLFile;
 
   public static void main(String[] args)
   {
@@ -330,38 +116,6 @@ public class AnalystReportBuilder
     initDocument();
     setDefaultValues();
   }
-/*
-  public AnalystReport(Document statisticsReport)
-  {
-    this(statisticsReport, null);
-  }
-
-  public AnalystReport(Document statisticsReport, File outFile)
-  {
-    this();
-    if (outFile != null)
-      outputXMLFile = outFile;
-    else {
-      try {
-        outputXMLFile = File.createTempFile("ViskitAnalystReport", ".xml");
-      }
-      catch (IOException e) {
-        System.err.println("Error creating output file: " + e.getMessage());
-        outputXMLFile = null;
-      }
-    }
-
-    setReportJdomDocument(new Document());
-    setRootElement(new Element("AnalystReport"));
-    this.setStatsReport(statisticsReport);
-
-    if (debug) {
-      setDefaultValues();//TODO: Remove after GUI is fully wired or while testing GUI
-    }
-    createReportXML();
-
-  }
-*/
 
   private void initDocument()
   {
@@ -383,6 +137,10 @@ public class AnalystReportBuilder
     createStatisticalResults();
     createConclusionsRecommendations();
   }
+
+  /**
+    * File I/O that saves the report in XML format
+    */
 
   public File writeToXMLFile(File fil) throws Exception
   {
@@ -408,53 +166,6 @@ public class AnalystReportBuilder
     return;
   }
 
-  /**
-   * File I/O that saves the report in XML format
-   */
-  public void xsaveAnalystReportXML()
-  {
-    if (xoutputXMLFile == null) {
-      System.err.println("Report not saved");
-      return;
-    }
-    File file = xoutputXMLFile;
-
-    Date today;
-    String output;
-    SimpleDateFormat formatter;
-
-    formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-    today = new Date();
-    output = formatter.format(today);
-
-    try {
-      XMLOutputter outputter = new XMLOutputter();
-      //Create a unique file name for each DTG/Location Pair
-
-      //todo GUI is better place for this:
-
-/*
-            File anDir = new File("./AnalystReports");
-            anDir.mkdirs();
-
-            String usr = System.getProperty("user.name");
-            String outputFile = (usr + "AnalystReport_"+output+".xml");
-
-            File file = new File(anDir,outputFile);
-*/
-      FileWriter writer = new FileWriter(file);
-      outputter.output(reportJdomDocument, writer);
-      writer.close();
-      return;
-
-    }
-    catch (java.io.IOException e) {
-      System.err.println("Error writing Report XML: " + e.getMessage());
-      e.printStackTrace();
-    }
-    return;
-  }
-
   private void parseXML(File fil) throws Exception
   {
     SAXBuilder builder = new SAXBuilder();
@@ -467,24 +178,6 @@ public class AnalystReportBuilder
     behaviorDefinitions = rootElement.getChild("BehaviorDefinitions");
     statisticalResults = rootElement.getChild("StatisticalResults");
     concRec = rootElement.getChild("ConclusionsRecommendations");
-  }
-
-  /**
-   * Creates the report XML and saves it in report format
-   */
-  public void xcreateReportXML()
-  {
-    createHeader();
-    createExecutiveSummary();
-    createSimulationLocation();
-    createSimulationConfiguration();
-    createEntityParameters();
-    createBehaviorDefinitions();
-    createStatisticalResults();
-    createConclusionsRecommendations();
-
-    xsaveAnalystReportXML();
-
   }
 
   /**
@@ -948,11 +641,11 @@ public class AnalystReportBuilder
     Iterator itr = simEntityList.iterator();
 
     //Extract XML based simEntities for entityParameters and event graph image
-/*
+
     setEventGraphFiles(new LinkedList());
     setEventGraphImages(new LinkedList());
     setEventGraphNames(new LinkedList());
-*/
+
     String isJAVAfile = "diskit";//if a file is in the diskit package it is native java
     while (itr.hasNext()) {
       Element temp = (Element) itr.next();
@@ -1262,43 +955,8 @@ public class AnalystReportBuilder
     setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
-  //public boolean isExecutiveSummaryComments()        { return executiveSummaryComments; }
-  //public boolean isPrintAssemblyImage()              { return printAssemblyImage; }
-  //public boolean isPrintBehaviorDefComments()        { return printBehaviorDefComments; }
-  //public boolean isPrintBehaviorDescriptions()       { return printBehaviorDescriptions; }
-  //public boolean isPrintEntityTable()                { return printEntityTable; }
-  //public boolean isPrintEventGraphImages()           { return printEventGraphImages; }
-  //public boolean isPrintParameterComments()          { return printParameterComments; }
-  //public boolean isPrintParameterTable()             { return printParameterTable; }
-  //public boolean isPrintRecommendationsConclusions() { return printRecommendationsConclusions; }
-  //public boolean isPrintReplicationStats()           { return printReplicationStats; }
-  //public boolean isPrintSimConfigComments()          { return printSimConfigComments; }
-  //public boolean isPrintSimLocationComments()        { return printSimLocationComments; }
-  //public boolean isPrintSimLocationImage()           { return printSimLocationImage; }
-  //public boolean isPrintStatsComments()              { return printStatsComments; }
-  //public boolean isPrintSummaryStats()               { return printSummaryStats; }
 
   public boolean isDebug()                           { return debug; }
-
-  //public String     getAssemblyImageLocation() { return assemblyImageLocation; }
-  //public String     getAuthor()                { return author; }
-  //public String     getBehaviorComments()      { return behaviorComments; }
-  //public String     getBehaviorConclusions()   { return behaviorConclusions; }
-  //public String     getChartImage              { return chartImage; }
-  //public String     getClassification()        { return classification; }
-  //public String     getConclusions()           { return conclusions; }
-  //public String     getDateOfReport()          { return dateOfReport; }
-  //public String     getExecutiveSummary()      { return executiveSummary; }
-  //public String     getParameterComments()     { return parameterComments; }
-  //public String     getParameterConclusions()  { return parameterConclusions; }
-  //public String     getRecommendations()       { return recommendations; }
-  //public String     getReportName()            { return reportName; }
-  //public String     getSimConfigComments()     { return simConfigComments; }
-  //public String     getSimConfigConclusions()  { return simConfigConclusions; }
-  //public String     getSimLocComments()        { return simLocComments; }
-  //public String     getSimLocConclusions()     { return simLocConclusions; }
-  //public String     getStatsComments()         { return statsComments; }
-  //public String     getStatsConclusions()      { return statsConclusions; }
 
   public Document   getAssemblyDocument()      { return assemblyDocument; }
   public Document   getReportJdomDocument()    { return reportJdomDocument; }
@@ -1315,48 +973,11 @@ public class AnalystReportBuilder
   public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
   public String     getReportName()            { return rootElement.getAttributeValue("name"); }
 
-
-
-
-
-  // public void setPrintSimConfigComments(boolean printSimConfigComments) { this.printSimConfigComments = printSimConfigComments; }
-  //public void setAssemblyImageLocation(String assemblyImageLocation) { this.assemblyImageLocation = assemblyImageLocation; }
-  //public void setAuthor(String author) { this.author = author; }
-  //public void setBehaviorComments(String behaviorComments) { this.behaviorComments = behaviorComments; }
-  //public void setBehaviorConclusions(String behaviorConclusions) { this.behaviorConclusions = behaviorConclusions; }
-  //public void setClassification(String classification) { this.classification = classification; }
-  //public void setConclusions(String conclusions) { this.conclusions = conclusions; }
-  //public void setExecutiveSummary(String executiveSummary) { this.executiveSummary = executiveSummary; }
-  //public void setExecutiveSummaryComments(boolean executiveSummaryComments) { this.executiveSummaryComments = executiveSummaryComments; }
-  //public void setLocationImage(String locationImage) { this.locationImage = locationImage; }
-  //public void setParameterComments(String parameterComments) { this.parameterComments = parameterComments; }
-  //public void setParameterConclusions(String parameterConclusions) { this.parameterConclusions = parameterConclusions; }
-  //public void setPrintBehaviorDefComments(boolean printBehaviorDefComments) { this.printBehaviorDefComments = printBehaviorDefComments; }
-  //public void setPrintBehaviorDescriptions(boolean printBehaviorDescriptions) { this.printBehaviorDescriptions = printBehaviorDescriptions; }
-  //public void setPrintEntityTable(boolean printEntityTable) { this.printEntityTable = printEntityTable; }
-  //public void setPrintEventGraphDetails(boolean printEventGraphDetails) { this.printEventGraphDetails = printEventGraphDetails; }
-  //public void setPrintEventGraphImages(boolean printEventGraphImages) { this.printEventGraphImages = printEventGraphImages; }
-  //public void setPrintParameterComments(boolean printParameterComments) { this.printParameterComments = printParameterComments; }
-  //public void setPrintParameterTable(boolean printParameterTable) { this.printParameterTable = printParameterTable; }
-  //public void setPrintRecommendationsConclusions(boolean printRecommendationsConclusions) { this.printRecommendationsConclusions = printRecommendationsConclusions; }
-  //public void setPrintReplicationStats(boolean printReplicationStats) { this.printReplicationStats = printReplicationStats; }
-  //public void setPrintSimLocationComments(boolean printSimLocationComments) { this.printSimLocationComments = printSimLocationComments; }
-  //public void setPrintSimLocationImage(boolean printSimLocationImage) { this.printSimLocationImage = printSimLocationImage; }
-  //public void setPrintStatsComments(boolean printStatsComments) { this.printStatsComments = printStatsComments; }
-  //public void setPrintSummaryStats(boolean printSummaryStats) { this.printSummaryStats = printSummaryStats; }
-  //public void setRecommendations(String recommendations) { this.recommendations = recommendations; }
-  //public void setReportName(String reportName) { this.reportName = reportName; }
-  //public void setSimConfigComments(String simConfigComments) { this.simConfigComments = simConfigComments; }
-  //public void setSimConfigConclusions(String simConfigConclusions) { this.simConfigConclusions = simConfigConclusions; }
-  //public void setSimLocConclusions(String simLocConclusions) { this.simLocConclusions = simLocConclusions; }
-  //public void setStatsComments(String statsComments) { this.statsComments = statsComments; }
-  //public void setStatsConclusions(String statsConclusions) { this.statsConclusions = statsConclusions; }
-
   public void setAssemblyDocument  (Document assemblyDocument) { this.assemblyDocument = assemblyDocument; }
-  public void setAssemblyFile      (String assemblyFile)
+  public void setAssemblyFile      (String assyFile)
   {
-    this.assemblyFile = assemblyFile;
-    simConfig.addContent(makeEntityTable(assemblyFile));
+    assemblyFile = assyFile;
+    simConfig.addContent(makeEntityTable(assyFile));
     entityParameters.addContent(makeParameterTables());
     createBehaviorDefinitions();
   }
