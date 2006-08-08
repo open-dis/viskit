@@ -109,6 +109,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Comment/>
             <EdgeParameter value="targetPriorityList"/>
             <EdgeParameter value="this"/>
+            <EdgeParameter value="communicationsChannel"/>
         </Schedule>
         <Code/>
         <Coordinate x="130" y="120"/>
@@ -235,6 +236,12 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="radioCommunication">
             <Operation method="setMessage(attackOrder)"/>
         </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;AttackOrder&quot;)"/>
+        </StateTransition>
         <Schedule condition="planIndex &lt;= totalPlans " delay="0.0" event="CreateAttackPlan" priority="0">
             <Comment/>
             <EdgeParameter value="totalPlans"/>
@@ -260,15 +267,15 @@ System.out.println("**********************************\n");*/</Code>
         <Argument name="list" type="java.lang.String[]">
             <Comment>The target priority list parameter for this object</Comment>
         </Argument>
-        <Argument name="terroristLeader" type="simkit.SimEntity">
+        <Argument name="terroristLeader" type="diskit.Mover3D">
             <Comment>Planner notifies the terrorists who the leader is so that reports can be received</Comment>
+        </Argument>
+        <Argument name="commsChannel" type="java.lang.Integer">
+            <Comment>The channel to use for radio communications</Comment>
         </Argument>
         <LocalVariable name="targetOrders" type="java.lang.String" value="&quot;Listen up...your primary target is: &quot; + list[0]">
             <Comment>String representation of the hi priority target for display purposes</Comment>
         </LocalVariable>
-        <StateTransition state="radioCommunication">
-            <Operation method="setTimeStamp(Schedule.getSimTime())"/>
-        </StateTransition>
         <StateTransition state="radioCommunication">
             <Operation method="setMessage(targetOrders)"/>
         </StateTransition>
@@ -309,7 +316,7 @@ Schedule.stopSimulation();</Code>
         <Schedule condition="attackResult.equals(&quot;Succeeded&quot;)" delay="0.0" event="RecordAttackResults" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="true" delay="5" event="Stop" priority="0">
+        <Schedule condition="true" delay=".1" event="Stop" priority="0">
             <Comment/>
         </Schedule>
         <Code/>
@@ -350,6 +357,14 @@ Schedule.stopSimulation();</Code>
         </StateTransition>
         <Code/>
         <Coordinate x="120" y="490"/>
+    </Event>
+    <Event name="RadioMessageRecieved">
+        <Comment>Received a radio message from a terrorist</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The radio message that was received</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="220" y="500"/>
     </Event>
 </SimEntity>
 
