@@ -254,7 +254,9 @@ sensors[2] = collisionAvoidance;</Code>
             <Operation method="setMover(this)"/>
         </StateTransition>
         <Schedule event="PickStartPosition"/>
-        <Code/>
+        <Code>System.out.println("InPlanPatrolMove");
+System.out.println("StartZone: " + startingZone.getName());
+System.out.println("EndZone:  " + destinationZone.getName());</Code>
         <Coordinate x="270" y="140"/>
     </Event>
     <Event name="PickStartPosition">
@@ -311,12 +313,17 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <StateTransition state="workingChart">
             <Assignment value="harborChart"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="PlanPatrolMove" priority="0">
+        <Schedule condition="!goalZone.getName().equals(nextZone.getName())" delay="0.0" event="PlanPatrolMove" priority="0">
             <Comment>Passes the goal zone as the starting zone because it reached it's destination</Comment>
             <EdgeParameter value="goalZone"/>
             <EdgeParameter value="nextZone"/>
         </Schedule>
-        <Code/>
+        <Schedule condition="goalZone.getName().equals(nextZone.getName())" delay="0.0" event="DestinationReached" priority="0">
+            <Comment/>
+        </Schedule>
+        <Code>System.out.println("InDestinationReachedPHSB");
+System.out.println("NextSelectedZone: " + nextZone.getName());
+System.out.println("LastGoalZone: " + goalZone.getName());</Code>
         <Coordinate x="270" y="220"/>
     </Event>
     <Event name="ScaleSpeed">
@@ -353,6 +360,39 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <Code>setStartPosition(getLocation());
 setDestination(avoidancePoint);</Code>
         <Coordinate x="30" y="260"/>
+    </Event>
+    <Event name="PursueHostile">
+        <Comment/>
+        <Schedule event="Interdict"/>
+        <Schedule event="StandOff"/>
+        <Code/>
+        <Coordinate x="300" y="460"/>
+    </Event>
+    <Event name="StandOff">
+        <Comment/>
+        <Code/>
+        <Coordinate x="380" y="550"/>
+    </Event>
+    <Event name="Evading">
+        <Comment/>
+        <Schedule event="PursueHostile"/>
+        <Cancel event="Interdict"/>
+        <Code/>
+        <Coordinate x="300" y="550"/>
+    </Event>
+    <Event name="Interdict">
+        <Comment/>
+        <Code/>
+        <Coordinate x="220" y="550"/>
+    </Event>
+    <Event name="SecurityAlert">
+        <Comment>Marks when this unit should go to security alert and the contact of interest that caused the alert</Comment>
+        <Argument name="contactOfInterest" type="diskit.Mover3D">
+            <Comment>The contact that caused the security alert</Comment>
+        </Argument>
+        <Schedule event="PursueHostile"/>
+        <Code/>
+        <Coordinate x="300" y="350"/>
     </Event>
 </SimEntity>
 

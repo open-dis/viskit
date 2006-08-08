@@ -9,6 +9,12 @@
     <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
         <Comment>The Savage Modeling Analysis Language(SMAL) object that contains all specific information about the model being used</Comment>
     </Parameter>
+    <Parameter name="shipBoardCommsChannel" type="int">
+        <Comment>The communications channel shared between this entity and it's watch standers</Comment>
+    </Parameter>
+    <Parameter name="navalStationCommsChannel" type="int">
+        <Comment>The comms channel used to communicate with the naval station security organization</Comment>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -27,10 +33,46 @@
     <StateVariable name="shipLayout" type="diskit.AStarZoneMap">
         <Comment>An A* zone map that specifies the layout of the ship for Friendly.ShipSelfDefenseForce agents</Comment>
     </StateVariable>
+    <StateVariable name="shipBoardTransmission" type="diskit.RadioCommunication">
+        <Comment>The object this entity uses to create detailed radio communications</Comment>
+    </StateVariable>
+    <StateVariable name="harborTransmission" type="diskit.RadioCommunication">
+        <Comment>The object this entity uses to communicate with the harbor</Comment>
+    </StateVariable>
+    <StateVariable name="selfDefenseForce" type="java.util.LinkedList">
+        <Comment>The entities that are watchstanders for this unit. Used to send directed communications</Comment>
+    </StateVariable>
+    <StateVariable name="radioMessage" type="java.lang.String">
+        <Comment>A string object used as the text of a radio communicaton</Comment>
+    </StateVariable>
+    <StateVariable name="radioTransmission" type="diskit.RadioCommunication">
+        <Comment>This is an extra radio communication object that is only used by entities that are communicating on more than one channel.  In that case they need to make a copy of their message during the PrepareMessage event</Comment>
+    </StateVariable>
+    <StateVariable name="securityAlertTime" type="double">
+        <Comment>The simulation time at which security alert was called away</Comment>
+    </StateVariable>
+    <StateVariable name="timeToManWeapon" type="double">
+        <Comment>The time it takes for watchstanders to man their weapons</Comment>
+    </StateVariable>
+    <StateVariable name="weaponsManned" type="int">
+        <Comment>The total number of weapons that were manned after security alert was called away</Comment>
+    </StateVariable>
+    <StateVariable name="securityAlertCalled" type="boolean">
+        <Comment>whether or not security alert was called away</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
+        <StateTransition state="weaponsManned">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="securityAlertTime">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="timeToManWeapon">
+            <Assignment value="0"/>
+        </StateTransition>
         <Code/>
-        <Coordinate x="0" y="290"/>
+        <Coordinate x="10" y="250"/>
     </Event>
     <Event name="Init">
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
@@ -49,12 +91,29 @@
         <StateTransition state="killZone">
             <Assignment value="new diskit.SphereCutterSensor(this, killZoneRange)"/>
         </StateTransition>
+        <StateTransition state="shipBoardTransmission">
+            <Assignment value="new diskit.RadioCommunication(shipBoardCommsChannel, this)"/>
+        </StateTransition>
+        <StateTransition state="selfDefenseForce">
+            <Assignment value="new java.util.LinkedList()"/>
+        </StateTransition>
+        <StateTransition state="shipBoardTransmission">
+            <Operation method="setRecipients(selfDefenseForce)"/>
+        </StateTransition>
+        <StateTransition state="securityAlertCalled">
+            <Assignment value="false"/>
+        </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
         <Schedule condition="true" delay="0.0" event="BuildSensorArray" priority="0">
             <Comment>If this zone is moving register all sensors</Comment>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="WatchPositionAssigned" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="shipBoardCommsChannel"/>
         </Schedule>
         <Code/>
         <Coordinate x="10" y="10"/>
@@ -90,12 +149,12 @@
             <Comment>If the sensor is the kill zone then go authorize shooting</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp; !isFriendlyForce" delay="0.0" event="GoToSecurityAlert" priority="0">
+        <Schedule condition="sensor == visualPerception &amp;&amp; !isFriendlyForce &amp;&amp; !securityAlertCalled" delay="0.0" event="SecurityAlert" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Code>System.out.println(getName() + " Detected: " + contact.getName());</Code>
-        <Coordinate x="200" y="100"/>
+        <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
+        <Coordinate x="110" y="320"/>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
@@ -110,33 +169,151 @@
 multipleSensors[1] = killZone;</Code>
         <Coordinate x="10" y="150"/>
     </Event>
-    <Event name="GoToSecurityAlert">
-        <Comment>Indicates that this unit needs to go to Security Alert</Comment>
-        <Argument name="contact" type="diskit.Mover3D">
-            <Comment>The contact of interest that prompted the security alert</Comment>
-        </Argument>
-        <Schedule condition="true" delay="0.0" event="SecurityAlert" priority="0">
-            <Comment/>
-            <EdgeParameter value="contact"/>
-        </Schedule>
-        <Code>System.out.println(getName() + " ordered Security alert");</Code>
-        <Coordinate x="320" y="100"/>
-    </Event>
     <Event name="SecurityAlert">
         <Comment>Passes the security alert event to its weapons personel</Comment>
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The contact that is the cause of concern</Comment>
         </Argument>
-        <Code/>
-        <Coordinate x="320" y="180"/>
+        <LocalVariable name="securityAlertOrder" type="java.lang.String" value="&quot;Security Alert, Security Alert, all hands not involved stand fast. Reason for security alert is inbound unknown boat&quot;">
+            <Comment>The text of the message</Comment>
+        </LocalVariable>
+        <StateTransition state="securityAlertTime">
+            <Assignment value="Schedule.getSimTime()"/>
+        </StateTransition>
+        <StateTransition state="securityAlertCalled">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="PrepareMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="securityAlertOrder"/>
+            <EdgeParameter value="shipBoardTransmission"/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="&quot;SecurityAlert&quot;"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " is going to SA b/c of " + target.getName());</Code>
+        <Coordinate x="220" y="260"/>
     </Event>
     <Event name="BatteriesReleased">
         <Comment>Sends the order of batteries released when a contact of interest breaches the kill zone. This entity has sole authority to make that determination</Comment>
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The target to shoot at</Comment>
         </Argument>
-        <Code>System.out.println(getName() + " ordered BatteriesReleased");</Code>
-        <Coordinate x="200" y="190"/>
+        <LocalVariable name="msgText" type="java.lang.String" value="&quot;BATTERIES RELEASE on: &quot; + target.getName()">
+            <Comment>The order to shoot</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="PrepareMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="msgText"/>
+            <EdgeParameter value="shipBoardTransmission"/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="&quot;BatteriesRelease&quot;"/>
+        </Schedule>
+        <Code>//System.out.println(getName() + " ordered BatteriesReleased");</Code>
+        <Coordinate x="210" y="370"/>
+    </Event>
+    <Event name="WatchPositionAssigned">
+        <Comment>Used to inform listening watchstanders of their parent unit and the radio circuit that they should use.  Without this event Friendly.ShipSelfDefenseForce(SSDF) entities will not create a radio object and cannot participate in the simulation.    This design is on purpose to ensure that SSDF entities have a unit in charge of their command and control and batteries release authority</Comment>
+        <Argument name="parentUnit" type="diskit.Mover3D">
+            <Comment>Passes itself as the parent unit for the watchstanders</Comment>
+        </Argument>
+        <Argument name="commsChannel" type="java.lang.Integer">
+            <Comment>The channel that shipboard entities should use to communicate with this parent object</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="100" y="80"/>
+    </Event>
+    <Event name="WatchPositionAccepted">
+        <Comment>Scheduled by subortinate units indicating that they have received their assignment and created a communications object</Comment>
+        <Argument name="watchStander" type="diskit.Mover3D">
+            <Comment>The watchstander that has accepted it's watch position</Comment>
+        </Argument>
+        <StateTransition state="selfDefenseForce">
+            <Operation method="add(watchStander)"/>
+        </StateTransition>
+        <StateTransition state="shipBoardTransmission">
+            <Operation method="addRecipient(watchStander)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="10" y="410"/>
+    </Event>
+    <Event name="PrepareMessage">
+        <Comment>Central event used to create and send radio messages</Comment>
+        <Argument name="messageText" type="java.lang.String">
+            <Comment>The text of the message</Comment>
+        </Argument>
+        <Argument name="circuit" type="diskit.RadioCommunication">
+            <Comment>The radio communication object to use for this message</Comment>
+        </Argument>
+        <Argument name="context" type="diskit.Mover3D">
+            <Comment>The context of the radio message</Comment>
+        </Argument>
+        <Argument name="messageType" type="java.lang.String">
+            <Comment>The type of message to send</Comment>
+        </Argument>
+        <StateTransition state="radioTransmission">
+            <Assignment value="circuit"/>
+        </StateTransition>
+        <StateTransition state="radioTransmission">
+            <Operation method="setMessage(messageText)"/>
+        </StateTransition>
+        <StateTransition state="radioTransmission">
+            <Operation method="setContext(context)"/>
+        </StateTransition>
+        <StateTransition state="radioTransmission">
+            <Operation method="setType(messageType)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioTransmission"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="360" y="320"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits the radio message via the Scenario Manager</Comment>
+        <Argument name="message" type="diskit.RadioCommunication">
+            <Comment>The message to send</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="470" y="320"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>A radio message was transmitted to this entity from the scenario manager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message that was received</Comment>
+        </Argument>
+        <LocalVariable name="msgType" type="java.lang.String" value="msg.getType()">
+            <Comment>The type of message received</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgContext" type="diskit.Mover3D" value="msg.getContext()">
+            <Comment>The context of the message</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgSender" type="diskit.Mover3D" value="msg.getSender()">
+            <Comment>The sender of this message</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgRecipient" type="diskit.Mover3D" value="msg.getRecipient()">
+            <Comment>The recipient of the message</Comment>
+        </LocalVariable>
+        <Schedule condition="msgType.equals(&quot;MannedAndReady&quot;)" delay="0.0" event="WeaponMannedAndReady" priority="0">
+            <Comment/>
+        </Schedule>
+        <Schedule condition="msgType.equals(&quot;WarningReport&quot;) &amp;&amp; !securityAlertCalled&amp;&amp; msgRecipient == this" delay="0.0" event="SecurityAlert" priority="0">
+            <Comment/>
+            <EdgeParameter value="msgContext"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="180" y="160"/>
+    </Event>
+    <Event name="WeaponMannedAndReady">
+        <Comment>This entity received a manned and ready report. Upon receipt this entity logs how long it took for a watchstander to man it's weapon</Comment>
+        <StateTransition state="weaponsManned">
+            <Assignment value="weaponsManned + 1"/>
+        </StateTransition>
+        <StateTransition state="timeToManWeapon">
+            <Assignment value="Schedule.getSimTime() - securityAlertTime"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="260" y="100"/>
     </Event>
 </SimEntity>
 

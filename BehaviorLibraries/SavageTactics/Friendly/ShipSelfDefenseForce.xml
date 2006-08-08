@@ -68,6 +68,18 @@ Once manned they will not fire until they receive the order from their ship.  Th
     <StateVariable name="hostile" type="diskit.Mover3D">
         <Comment>The target that this entity should shoot at</Comment>
     </StateVariable>
+    <StateVariable name="shipBoardRadio" type="diskit.RadioCommunication">
+        <Comment>The radio circuit used by this entity</Comment>
+    </StateVariable>
+    <StateVariable name="shipBoardRadioChannel" type="int">
+        <Comment>The radio channel that this entity should use to communicate with its parent, value is received from the parent unit</Comment>
+    </StateVariable>
+    <StateVariable name="parentUnit" type="diskit.Mover3D">
+        <Comment>The unit that has tactical control over this entity</Comment>
+    </StateVariable>
+    <StateVariable name="atSecurityAlert" type="boolean">
+        <Comment>Whether or not this person is at security alert</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="visualRange">
@@ -87,6 +99,9 @@ Once manned they will not fire until they receive the order from their ship.  Th
         </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
+        </StateTransition>
+        <StateTransition state="atSecurityAlert">
+            <Assignment value="false"/>
         </StateTransition>
         <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
@@ -122,11 +137,14 @@ Once manned they will not fire until they receive the order from their ship.  Th
         <StateTransition state="hostile">
             <Assignment value="contact"/>
         </StateTransition>
+        <StateTransition state="atSecurityAlert">
+            <Assignment value="true"/>
+        </StateTransition>
         <Schedule condition="true" delay="timeToManWeapon" event="MannedAndReady" priority="0">
             <Comment/>
         </Schedule>
-        <Code>System.out.println("Security alert heard in SSDF");</Code>
-        <Coordinate x="150" y="200"/>
+        <Code/>
+        <Coordinate x="180" y="200"/>
     </Event>
     <Event name="Fire">
         <Comment>Marks when this entity starts shooting at the contact</Comment>
@@ -136,7 +154,7 @@ Once manned they will not fire until they receive the order from their ship.  Th
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The mover that this entity is shooting at</Comment>
         </Argument>
-        <Code>System.out.println("I'm firing");</Code>
+        <Code/>
         <Coordinate x="330" y="200"/>
     </Event>
     <Event name="BatteriesReleased">
@@ -146,6 +164,9 @@ Once manned they will not fire until they receive the order from their ship.  Th
         </Argument>
         <LocalVariable name="haveTargetVisual" type="boolean" value="targetQueue.contains(contact)">
             <Comment>Whether or not this target is in visual range</Comment>
+        </LocalVariable>
+        <LocalVariable name="fireReport" type="java.lang.String" value="weaponAssignment + &quot; Firing&quot;">
+            <Comment>reports that they are firing as ordered</Comment>
         </LocalVariable>
         <StateTransition state="batteriesReleased">
             <Assignment value="true"/>
@@ -158,18 +179,128 @@ Once manned they will not fire until they receive the order from their ship.  Th
             <EdgeParameter value="this"/>
             <EdgeParameter value="hostile"/>
         </Schedule>
-        <Code>System.out.println("Batteries Released heard in SSDF");</Code>
-        <Coordinate x="330" y="80"/>
+        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="&quot;FireReport&quot;"/>
+            <EdgeParameter value="hostile"/>
+            <EdgeParameter value="fireReport"/>
+        </Schedule>
+        <Code>//System.out.println("Batteries Released heard in SSDF");</Code>
+        <Coordinate x="440" y="200"/>
     </Event>
     <Event name="MannedAndReady">
         <Comment/>
+        <LocalVariable name="msgText" type="java.lang.String" value="(weaponAssignment + &quot; is manned and ready!&quot;)">
+            <Comment>manned and ready report once they have arrived and are ready</Comment>
+        </LocalVariable>
         <Schedule condition="batteriesReleased" delay="0.0" event="Fire" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="hostile"/>
         </Schedule>
+        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="&quot;MannedAndReady&quot;"/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="msgText"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="240" y="200"/>
+        <Coordinate x="250" y="200"/>
+    </Event>
+    <Event name="WatchPositionAssigned">
+        <Comment>Scheduled by the parent unit to establish who this entity belongs to and used by this entity to inform its parent of who this entity is.  This event and the one it schedules are used to create a specific list of radio message recipients for each unit.  Without this event the ship would have to communicate with all friendly forces which is not representative of real world operations.  This entity uses the information received to create a radio communication object and perform a radio check</Comment>
+        <Argument name="ship" type="diskit.Mover3D">
+            <Comment>The parent unit in charge of this entity</Comment>
+        </Argument>
+        <Argument name="radioCircuit" type="int">
+            <Comment>The radio channel that this entity should use to communicate with its parent</Comment>
+        </Argument>
+        <StateTransition state="shipBoardRadio">
+            <Assignment value="new diskit.RadioCommunication(shipBoardRadioChannel, this)"/>
+        </StateTransition>
+        <StateTransition state="shipBoardRadio">
+            <Operation method="setRecipient(ship)"/>
+        </StateTransition>
+        <StateTransition state="parentUnit">
+            <Assignment value="ship"/>
+        </StateTransition>
+        <StateTransition state="shipBoardRadio">
+            <Operation method="setChannel(radioCircuit)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="WatchPositionAccepted" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="180" y="10"/>
+    </Event>
+    <Event name="WatchPositionAccepted">
+        <Comment>Used to advise the parent unit that this entity has received it's assignment, has established a radio communications circuit and is ready to respond to future communications</Comment>
+        <Argument name="watchStander" type="diskit.Mover3D">
+            <Comment>Passes itself as the watch stander who is ready to respond</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="270" y="10"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>A radio communication was transmitted to this entity via the ScenarioManager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message that was received</Comment>
+        </Argument>
+        <LocalVariable name="msgType" type="java.lang.String" value="msg.getType()">
+            <Comment>The type of message sent</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgContext" type="diskit.Mover3D" value="msg.getContext()">
+            <Comment>The context of the message</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgRecipient" type="diskit.Mover3D" value="msg.getRecipient()">
+            <Comment>The recipient of the message</Comment>
+        </LocalVariable>
+        <Schedule condition="msgType.equals(&quot;SecurityAlert&quot;) &amp;&amp; !atSecurityAlert &amp;&amp; msgRecipient == this" delay="0.0" event="SecurityAlert" priority="0">
+            <Comment/>
+            <EdgeParameter value="msgContext"/>
+        </Schedule>
+        <Schedule condition="msgType.equals(&quot;BatteriesRelease&quot;) &amp;&amp; msgRecipient == this" delay="0.0" event="BatteriesReleased" priority="0">
+            <Comment/>
+            <EdgeParameter value="msgContext"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="310" y="70"/>
+    </Event>
+    <Event name="PrepareRadioMessage">
+        <Comment>Prepares a radio message to send</Comment>
+        <Argument name="msgType" type="java.lang.String">
+            <Comment>The type of message being sent</Comment>
+        </Argument>
+        <Argument name="msgContext" type="diskit.Mover3D">
+            <Comment>The context of the message</Comment>
+        </Argument>
+        <Argument name="msgText" type="java.lang.String">
+            <Comment>The text of the message</Comment>
+        </Argument>
+        <StateTransition state="shipBoardRadio">
+            <Operation method="setType(msgType)"/>
+        </StateTransition>
+        <StateTransition state="shipBoardRadio">
+            <Operation method="setContext(msgContext)"/>
+        </StateTransition>
+        <StateTransition state="shipBoardRadio">
+            <Operation method="setMessage(msgText)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="shipBoardRadio"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="330" y="310"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits a radio message via the ScenarioManager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The radio message to send</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="330" y="420"/>
     </Event>
 </SimEntity>
 
