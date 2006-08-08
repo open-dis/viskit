@@ -69,6 +69,12 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
     <StateVariable name="patrolAreas" type="java.lang.String[0]">
         <Comment>The areas where this entity may travel to</Comment>
     </StateVariable>
+    <StateVariable name="atSecurityAlert" type="boolean">
+        <Comment>Whether or not this entity is at security alert</Comment>
+    </StateVariable>
+    <StateVariable name="hostileID" type="int">
+        <Comment>The mover ID of a target that has been identified as hostile</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
@@ -78,7 +84,7 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
             <Assignment value="diskit.TacticalMode.PATROLLING"/>
         </StateTransition>
         <StateTransition state="visualRange">
-            <Assignment value="600"/>
+            <Assignment value="300"/>
         </StateTransition>
         <StateTransition state="speedScalar">
             <Assignment value="1"/>
@@ -120,6 +126,9 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
         <StateTransition state="rn">
             <Assignment value="new java.util.Random()"/>
         </StateTransition>
+        <StateTransition state="atSecurityAlert">
+            <Assignment value="false"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -155,8 +164,18 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
+        <LocalVariable name="contactMoverID" type="int" value="contact.getMoverID()">
+            <Comment>The mover ID of this contact</Comment>
+        </LocalVariable>
+        <LocalVariable name="locvar_1" type="int" value="0">
+            <Comment/>
+        </LocalVariable>
         <Schedule condition="sensor == collisionAvoidance " delay="0.0" event="AssessObstacle" priority="0">
             <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="atSecurityAlert &amp;&amp; contactMoverID == hostileID" delay="0.0" event="PursueHostile" priority="0">
+            <Comment>If I'm at security alert and this contact is my contact of interest. Pursue it</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " detected: " + contact.getName());*/</Code>
@@ -294,7 +313,7 @@ System.out.println("EndZone:  " + destinationZone.getName());</Code>
         <Code>setCruiseSpeed(maximumSpeed);
 setStartPosition(startZone.getLocation());
 setDestination(waypointCreator.createWaypoint());</Code>
-        <Coordinate x="510" y="140"/>
+        <Coordinate x="520" y="140"/>
     </Event>
     <Event name="DestinationReached">
         <Comment>This entity has reached its destination for this leg of the patrol and is ready to patrol another area.</Comment>
@@ -365,37 +384,103 @@ setDestination(avoidancePoint);</Code>
         <Coordinate x="30" y="260"/>
     </Event>
     <Event name="PursueHostile">
-        <Comment/>
-        <Schedule event="Interdict"/>
-        <Schedule event="StandOff"/>
+        <Comment>Checks whether or not this entity can successfully pursue a contact</Comment>
+        <Argument name="hostile" type="diskit.Mover3D">
+            <Comment>The contact that has been identified as hostile</Comment>
+        </Argument>
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(hostile, avoidanceRange)">
+            <Comment>Checks to see if an intercept is possible, offset by avoidance range</Comment>
+        </LocalVariable>
+        <Schedule condition="canIntercept" delay="5" event="Interdict" priority="0">
+            <Comment/>
+            <EdgeParameter value="hostile"/>
+        </Schedule>
+        <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
+            <Comment/>
+        </Schedule>
         <Code/>
-        <Coordinate x="300" y="460"/>
+        <Coordinate x="210" y="380"/>
     </Event>
     <Event name="StandOff">
-        <Comment/>
-        <Code/>
-        <Coordinate x="380" y="550"/>
+        <Comment>Intercept was not possible, stand off and allow interior defenses to pursue the contact</Comment>
+        <Code>stop();</Code>
+        <Coordinate x="290" y="480"/>
     </Event>
     <Event name="Evading">
-        <Comment/>
-        <Schedule event="PursueHostile"/>
+        <Comment>Scheduled by the scenario manager when a hostile contact performs an Evading event. The reaction event is scheduled only in the mover that the hostile is trying to evade</Comment>
+        <Argument name="hostile" type="diskit.Mover3D">
+            <Comment>The mover that is hostile</Comment>
+        </Argument>
+        <Schedule condition="true" delay="15" event="PursueHostile" priority="0">
+            <Comment>TODO: Add random variate for reaction time</Comment>
+            <EdgeParameter value="hostile"/>
+        </Schedule>
         <Cancel event="Interdict"/>
         <Code/>
-        <Coordinate x="300" y="550"/>
+        <Coordinate x="210" y="480"/>
     </Event>
     <Event name="Interdict">
-        <Comment/>
-        <Code/>
-        <Coordinate x="220" y="550"/>
+        <Comment>If and intercept is possible I will proceed to interdict the contact</Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The contact I am pursuing</Comment>
+        </Argument>
+        <LocalVariable name="interceptPoint" type="diskit.Vec3d" value="getInterceptPoint()">
+            <Comment>Returns the intercept point that was calculated when 'canIntercept()' was called</Comment>
+        </LocalVariable>
+        <Code>setStartPosition(getLocation());
+setCruiseSpeed(getMaximumSpeed());
+setDestination(interceptPoint);</Code>
+        <Coordinate x="130" y="480"/>
     </Event>
     <Event name="SecurityAlert">
         <Comment>Marks when this unit should go to security alert and the contact of interest that caused the alert</Comment>
         <Argument name="contactOfInterest" type="diskit.Mover3D">
             <Comment>The contact that caused the security alert</Comment>
         </Argument>
-        <Schedule event="PursueHostile"/>
+        <LocalVariable name="contactLocation" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(contactOfInterest.getLocation())">
+            <Comment>Finds the closest zone on the map to where the contact is</Comment>
+        </LocalVariable>
+        <LocalVariable name="myStartingZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
+            <Comment>Finds the closest zone to where this entity is currently located</Comment>
+        </LocalVariable>
+        <StateTransition state="atSecurityAlert">
+            <Assignment value="true"/>
+        </StateTransition>
+        <StateTransition state="hostileID">
+            <Assignment value="contactOfInterest.getMoverID()"/>
+        </StateTransition>
+        <Schedule condition="myStartingZone != contactLocation" delay="0.0" event="PlanPatrolMove" priority="0">
+            <Comment/>
+            <EdgeParameter value="myStartingZone"/>
+            <EdgeParameter value="contactLocation"/>
+        </Schedule>
+        <Schedule condition="myStartingZone == contactLocation" delay="0.0" event="PursueHostile" priority="0">
+            <Comment/>
+            <EdgeParameter value="contactOfInterest"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="300" y="350"/>
+        <Coordinate x="390" y="320"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>Receives a radio message that is transmitted via the scenario manager</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>A radio message that was received</Comment>
+        </Argument>
+        <LocalVariable name="msgType" type="java.lang.String" value="msg.getType()">
+            <Comment>The type of message received</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgContext" type="diskit.Mover3D" value="msg.getContext()">
+            <Comment>The context of the message</Comment>
+        </LocalVariable>
+        <Schedule condition="msgType.equals(&quot;WarningReport&quot;) &amp;&amp; !atSecurityAlert" delay="0.0" event="SecurityAlert" priority="0">
+            <Comment/>
+            <EdgeParameter value="msgContext"/>
+        </Schedule>
+        <Cancel condition="msgType.equals(&quot;WarningReport&quot;)" event="DestinationReached">
+            <Comment/>
+        </Cancel>
+        <Code/>
+        <Coordinate x="390" y="220"/>
     </Event>
 </SimEntity>
 

@@ -256,7 +256,7 @@ start();</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="660" y="110"/>
+        <Coordinate x="650" y="110"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
