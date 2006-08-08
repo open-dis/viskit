@@ -4,11 +4,11 @@
     <Parameter name="moverID" type="int">
         <Comment>Unique ID number for this object</Comment>
     </Parameter>
-    <Parameter name="center" type="diskit.Vec3d">
-        <Comment>Center point of the pier</Comment>
+    <Parameter name="startPosition" type="diskit.Vec3d">
+        <Comment>Center point of the barrier</Comment>
     </Parameter>
     <Parameter name="length" type="double">
-        <Comment>length of the pier</Comment>
+        <Comment>length of the barrier</Comment>
     </Parameter>
     <Parameter name="width" type="double">
         <Comment>width of this pier</Comment>
@@ -22,14 +22,8 @@
     <StateVariable name="proximitySensor" type="diskit.Sensor">
         <Comment>Sensor used to detect when movers are getting close to the pier and should consider it for navigation</Comment>
     </StateVariable>
-    <StateVariable name="closeContactQueue" type="java.util.LinkedList">
-        <Comment>Collection of contacts that have gotten close to the pier and have not exited</Comment>
-    </StateVariable>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
-        <StateTransition state="closeContactQueue">
-            <Operation method="clear()"/>
-        </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
@@ -72,7 +66,7 @@
         <Argument name="mover" type="diskit.Mover3D">
             <Comment>Mover that is getting close to obstacle</Comment>
         </Argument>
-        <Schedule condition="!closeContactQueue.contains(mover)" delay="0.0" event="ObstacleClose" priority="0">
+        <Schedule condition="true" delay="0.0" event="ObstacleClose" priority="0">
             <Comment/>
             <EdgeParameter value="mover"/>
             <EdgeParameter value="this"/>
@@ -88,41 +82,22 @@
         <Argument name="buoy" type="diskit.Obstacle">
             <Comment>Object that may need to be avoided</Comment>
         </Argument>
-        <StateTransition state="closeContactQueue">
-            <Operation method="add(mover)"/>
-        </StateTransition>
         <Code/>
         <Coordinate x="260" y="210"/>
     </Event>
-    <Event name="UnDetection">
-        <Comment>Senses when mover has exited the proximity range for this object</Comment>
-        <Argument name="sensor" type="diskit.Sensor">
-            <Comment>Sensor that detected the exit range event</Comment>
-        </Argument>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover that exited the range</Comment>
-        </Argument>
-        <Schedule condition="closeContactQueue.contains(mover)" delay="0.0" event="ObstacleCleared" priority="0">
-            <Comment/>
-            <EdgeParameter value="mover"/>
-            <EdgeParameter value="this"/>
-        </Schedule>
+    <Event name="BarrierAttacked">
+        <Comment>Scheduled by an entity who attempts to explode this object</Comment>
+        <Schedule event="BarrierDestroyed"/>
         <Code/>
-        <Coordinate x="150" y="290"/>
+        <Coordinate x="150" y="320"/>
     </Event>
-    <Event name="ObstacleCleared">
-        <Comment>Notification event to mover that the obstacle has been cleared. Also removes the mover from the close contact queue</Comment>
-        <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Mover that has cleared the range</Comment>
-        </Argument>
-        <Argument name="buoy" type="diskit.Obstacle">
-            <Comment>Navigational aid that has been cleared and should be removed from the obstacle queue of the mover</Comment>
-        </Argument>
-        <StateTransition state="closeContactQueue">
-            <Operation method="remove(mover)"/>
-        </StateTransition>
-        <Code/>
-        <Coordinate x="260" y="290"/>
+    <Event name="BarrierDestroyed">
+        <Comment>Occurs when the barrier is attacked</Comment>
+        <LocalVariable name="hiddenLocation" type="diskit.Vec3d" value="new diskit.Vec3d(0, 1000, 0)">
+            <Comment>If the barrier is destroyed move it below the sea level</Comment>
+        </LocalVariable>
+        <Code>setStartPosition(hiddenLocation);</Code>
+        <Coordinate x="250" y="320"/>
     </Event>
     <Code/>
 </SimEntity>
