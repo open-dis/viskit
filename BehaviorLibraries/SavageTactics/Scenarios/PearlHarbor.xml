@@ -80,9 +80,11 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="1"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="630"/>
     </SimEntity>
-    <SimEntity description="USS Hopper - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG70" type="Friendly.MilitaryShip">
+    <SimEntity description="USS Hopper - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG70" type="Friendly.MilitaryShipPierside">
         <TerminalParameter name="moverID" type="int" value="2"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
             <MultiParameter type="diskit.SMAL.Classification">
@@ -153,10 +155,11 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="2"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="390"/>
     </SimEntity>
-    <SimEntity description="USS Paul Hamilton - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG60" type="Friendly.MilitaryShip">
+    <SimEntity description="USS Paul Hamilton - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG60" type="Friendly.MilitaryShipPierside">
         <TerminalParameter name="moverID" type="int" value="5"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
             <MultiParameter type="diskit.SMAL.Classification">
@@ -227,10 +230,11 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="3"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="570"/>
     </SimEntity>
-    <SimEntity description="An Oliver Perry Class Frigate" name="FFG37" type="Friendly.MilitaryShip">
+    <SimEntity description="An Oliver Perry Class Frigate" name="FFG37" type="Friendly.MilitaryShipPierside">
         <TerminalParameter name="moverID" type="int" value="3"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
             <MultiParameter type="diskit.SMAL.Classification">
@@ -301,7 +305,8 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="4"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="510"/>
     </SimEntity>
     <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
@@ -381,7 +386,7 @@
             <TerminalParameter name="" type="int" value="602"/>
         </MultiParameter>
         <MultiParameter type="java.lang.String[]">
-            <TerminalParameter name="" type="java.lang.String" value="MilitaryShip"/>
+            <TerminalParameter name="" type="java.lang.String" value="MilitaryShipPierside"/>
         </MultiParameter>
         <MultiParameter type="java.lang.String[]">
             <TerminalParameter name="" type="java.lang.String" value="MerryLoch"/>
@@ -2589,7 +2594,7 @@
         <TerminalParameter name="isActive" type="boolean" value="true"/>
         <TerminalParameter name="duration" type="double" value=".2"/>
         <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
-        <Coordinate x="820" y="520"/>
+        <Coordinate x="880" y="520"/>
     </SimEntity>
     <SimEntity description="A navigation buoy" name="Buoy1" type="Obstacles.Buoy">
         <TerminalParameter name="moverID" type="int" value="905"/>
@@ -3554,7 +3559,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="880" y="520"/>
+        <Coordinate x="940" y="520"/>
     </SimEntity>
     <SimEntity description="A pier sentry" name="PierSentry__DDG77" type="Friendly.Sentry">
         <TerminalParameter name="moverID" type="int" value="11"/>
@@ -3646,6 +3651,22 @@
                     <TerminalParameter name="radianRotation" type="double" value="-1.099"/>
                 </MultiParameter>
             </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <Coordinate x="350" y="630"/>
     </SimEntity>
@@ -3740,6 +3761,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
         <Coordinate x="350" y="510"/>
     </SimEntity>
     <SimEntity description="A pier sentry" name="PierSentry_SSN773" type="Friendly.Sentry">
@@ -3832,6 +3869,22 @@
                     <TerminalParameter name="radianRotation" type="double" value=".753"/>
                 </MultiParameter>
             </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <Coordinate x="350" y="270"/>
     </SimEntity>
@@ -3926,6 +3979,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
         <Coordinate x="350" y="210"/>
     </SimEntity>
     <SimEntity description="A pier sentry" name="PierSentry_CG65" type="Friendly.Sentry">
@@ -4018,6 +4087,22 @@
                     <TerminalParameter name="radianRotation" type="double" value="-.541"/>
                 </MultiParameter>
             </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <Coordinate x="350" y="330"/>
     </SimEntity>
@@ -4112,6 +4197,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
         <Coordinate x="350" y="450"/>
     </SimEntity>
     <SimEntity description="A pier sentry" name="PierSentry_DDG70" type="Friendly.Sentry">
@@ -4204,6 +4305,22 @@
                     <TerminalParameter name="radianRotation" type="double" value="-2.136"/>
                 </MultiParameter>
             </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <Coordinate x="350" y="390"/>
     </SimEntity>
@@ -4298,6 +4415,22 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="weaponAssignment" type="java.lang.String" value="M14"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
         <Coordinate x="350" y="570"/>
     </SimEntity>
     <SimEntity description="Ferry boat used to transfer people to and from the USS Arizona memorial" name="ArizonaFerry1" type="diskit.HarborFerry">
@@ -4306,7 +4439,7 @@
             <TerminalParameter name="y" type="double" value="-327.46"/>
             <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="2"/>
+        <TerminalParameter name="maxSpeed" type="double" value="12"/>
         <TerminalParameter name="moverID" type="int" value="6"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
@@ -4370,7 +4503,7 @@
                 <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="820" y="380"/>
+        <Coordinate x="880" y="380"/>
     </SimEntity>
     <SimEntity description="Ferry boat used to transfer people to and from the USS Arizona memorial" name="ArizonaFerry2" type="diskit.HarborFerry">
         <MultiParameter type="diskit.Vec3d">
@@ -4378,7 +4511,7 @@
             <TerminalParameter name="y" type="double" value="-137.812"/>
             <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="2"/>
+        <TerminalParameter name="maxSpeed" type="double" value="12"/>
         <TerminalParameter name="moverID" type="int" value="7"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
@@ -4442,7 +4575,7 @@
                 <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="820" y="440"/>
+        <Coordinate x="880" y="440"/>
     </SimEntity>
     <SimEntity description="Ferry boat used to transfer people to various landings at Pearl Harbor" name="PearlHarborFerry1" type="diskit.HarborFerry">
         <MultiParameter type="diskit.Vec3d">
@@ -4450,7 +4583,7 @@
             <TerminalParameter name="y" type="double" value="3807.62"/>
             <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="2"/>
+        <TerminalParameter name="maxSpeed" type="double" value="12"/>
         <TerminalParameter name="moverID" type="int" value="8"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
@@ -4604,7 +4737,7 @@
                 <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="880" y="380"/>
+        <Coordinate x="940" y="380"/>
     </SimEntity>
     <SimEntity description="Ferry boat used to transfer people to various landings at Pearl Harbor" name="PearlHarborFerry2" type="diskit.HarborFerry">
         <MultiParameter type="diskit.Vec3d">
@@ -4612,7 +4745,7 @@
             <TerminalParameter name="y" type="double" value="1402.692"/>
             <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
         </MultiParameter>
-        <TerminalParameter name="maxSpeed" type="double" value="2"/>
+        <TerminalParameter name="maxSpeed" type="double" value="12"/>
         <TerminalParameter name="moverID" type="int" value="9"/>
         <MultiParameter type="diskit.Vec3d[]">
             <MultiParameter type="diskit.Vec3d">
@@ -4766,7 +4899,7 @@
                 <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="880" y="440"/>
+        <Coordinate x="940" y="440"/>
     </SimEntity>
     <SimEntity description="The Pearl Harbor Security Boat" name="SecurityBoat" type="Friendly.SecurityBoat">
         <TerminalParameter name="moverID" type="int" value="10"/>
@@ -4839,7 +4972,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="820" y="320"/>
+        <Coordinate x="880" y="320"/>
     </SimEntity>
     <SimEntity description="A Ship's Self Defense Force member designed to man a weapon at security alert" name="SSDF1_DDG77" type="Friendly.ShipSelfDefenseForce">
         <TerminalParameter name="moverID" type="int" value="12"/>
@@ -4919,13 +5052,13 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="10"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
-            <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
-            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <Coordinate x="260" y="630"/>
@@ -5008,12 +5141,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -5097,12 +5232,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="15"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -5186,12 +5323,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -6781,6 +6920,8 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="5"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="330"/>
     </SimEntity>
     <SimEntity description="USS Lake Erie - a Ticonderoga (CG 47) Class US Navy Cruiser" name="CG70" type="Friendly.MilitaryShipPierside">
@@ -6854,6 +6995,8 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="6"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="450"/>
     </SimEntity>
     <SimEntity description="USS Columbus - a Los Angeles Class US Navy Submarine" name="SSN762" type="Friendly.MilitaryShipPierside">
@@ -6927,6 +7070,8 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="7"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="210"/>
     </SimEntity>
     <SimEntity description="USS Cheyene - a Los Angeles Class US Navy Submarine" name="SSN773" type="Friendly.MilitaryShipPierside">
@@ -7000,27 +7145,100 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter name="shipBoardCommsChannel" type="int" value="8"/>
+        <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="270"/>
     </SimEntity>
-    <PropertyChangeListener description="The time required to man a weapon" mode="replicationStats" name="DDG77SSDF1_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
-        <Coordinate x="260" y="690"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="The time required to man a weapon" mode="replicationStats" name="DDG77SSDF2_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
-        <Coordinate x="200" y="690"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="The time required to man a weapon" mode="replicationStats" name="DDG77SSDF3_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
-        <Coordinate x="140" y="690"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="The time required to man a weapon" mode="replicationStats" name="DDG77SSDF4_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
-        <Coordinate x="80" y="690"/>
-    </PropertyChangeListener>
+    <SimEntity description="The harbor control tower that oversees all moving traffic in the harbor" name="PearlHarborControl" type="Friendly.HarborControlTower">
+        <TerminalParameter name="moverID" type="int" value="300"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values for this model are generic estimations"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Pearl Harbor Control"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="0"/>
+                    <TerminalParameter name="width" type="double" value="0"/>
+                    <TerminalParameter name="length" type="double" value="0"/>
+                    <TerminalParameter name="draft" type="double" value="0"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="0"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="0"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="225"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="24.729"/>
+                    <TerminalParameter name="y" type="double" value="1357.026"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="radioCommunicationsChannel" type="int" value="9"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infinity -&gt; +Infinity)" type="double" value="65"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="10"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="publicHarborControlChannel" type="int" value="69"/>
+        <Coordinate x="880" y="250"/>
+    </SimEntity>
     <PropertyChangeListener description="The amount of time that passed before this entity was detected" mode="replicationStats" name="Terrorist1_ElapsedTimeBeforeDetection" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="timeUndetected"/>
-        <Coordinate x="460" y="100"/>
+        <Coordinate x="460" y="90"/>
     </PropertyChangeListener>
     <PropertyChangeListener description="Number of successfull attacks" mode="replicationStats" name="TerroristCellPlanner_SuccessfullAttacks" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="successfullAttacks"/>
@@ -7029,6 +7247,18 @@
     <PropertyChangeListener description="The amount of time required to execute an attack" mode="replicationStats" name="TerroristCellPlanner_TimeToExecuteAttack" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToExecuteAttack"/>
         <Coordinate x="870" y="100"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="Time required to man a weapon" mode="replicationStats" name="DDG77_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
+        <Coordinate x="390" y="770"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="" name="SimplePropertyDumper_1" type="simkit.util.SimplePropertyDumper">
+        <TerminalParameter name="p[0] : " type="boolean" value="true"/>
+        <Coordinate x="270" y="750"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener description="" mode="replicationStats" name="SimpleStatsTally_2" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="weaponsManned"/>
+        <Coordinate x="180" y="780"/>
     </PropertyChangeListener>
     <SimEventListenerConnection listener="ScenarioManager" source="Buoy1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="HarborBuoy1"/>
@@ -7174,13 +7404,24 @@
     <SimEventListenerConnection listener="SSDF3_CG70" source="CG70"/>
     <SimEventListenerConnection listener="ScenarioManager" source="SSN762"/>
     <SimEventListenerConnection listener="ScenarioManager" source="SSN773"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77SSDF1_TimeToManWeapon" property="timeToManWeapon" source="SSDF1_DDG77"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77SSDF2_TimeToManWeapon" property="timeToManWeapon" source="SSDF2_DDG77"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77SSDF3_TimeToManWeapon" property="timeToManWeapon" source="SSDF3_DDG77"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77SSDF4_TimeToManWeapon" property="timeToManWeapon" source="SSDF4_DDG77"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CG70"/>
+    <SimEventListenerConnection listener="PierSentry_SSN762" source="SSN762"/>
+    <SimEventListenerConnection listener="PierSentry_SSN773" source="SSN773"/>
+    <SimEventListenerConnection listener="PierSentry_CG65" source="CG65"/>
+    <SimEventListenerConnection listener="PierSentry_DDG70" source="DDG70"/>
+    <SimEventListenerConnection listener="PierSentry_CG70" source="CG70"/>
+    <SimEventListenerConnection listener="PierSentry_FFG37" source="FFG37"/>
+    <SimEventListenerConnection listener="PierSentry_DDG60" source="DDG60"/>
+    <SimEventListenerConnection listener="PierSentry__DDG77" source="DDG77"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CG70"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CG65"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PearlHarborControl"/>
     <PropertyChangeListenerConnection description="timeUndetected" listener="Terrorist1_ElapsedTimeBeforeDetection" property="timeUndetected" source="Terrorist1"/>
     <PropertyChangeListenerConnection description="successfullAttacks" listener="TerroristCellPlanner_SuccessfullAttacks" property="successfullAttacks" source="TerroristCellPlanner"/>
     <PropertyChangeListenerConnection description="timeToExecuteAttack" listener="TerroristCellPlanner_TimeToExecuteAttack" property="timeToExecuteAttack" source="TerroristCellPlanner"/>
+    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77_TimeToManWeapon" property="timeToManWeapon" source="DDG77"/>
+    <PropertyChangeListenerConnection description="timeToManWeapon" listener="SimplePropertyDumper_1" property="timeToManWeapon" source="DDG77"/>
+    <PropertyChangeListenerConnection description="weaponsManned" listener="SimpleStatsTally_2" property="weaponsManned" source="DDG77"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
