@@ -141,7 +141,10 @@
         <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
             <Comment>Returns true if this contact is a friendly force</Comment>
         </LocalVariable>
-        <Schedule condition="!isFriendlyForce &amp;&amp; !contactPicture.contains(contact)" delay="0.0" event="UnknownContact" priority="0">
+        <LocalVariable name="entityType" type="java.lang.String" value="contact.getEntityType()">
+            <Comment>Returns this entities type</Comment>
+        </LocalVariable>
+        <Schedule condition="!isFriendlyForce &amp;&amp; !contactPicture.contains(contact) &amp;&amp; !entityType.equals(&quot;HarborFerry&quot;)" delay="0.0" event="UnknownContact" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -179,7 +182,8 @@
             <EdgeParameter value="contact"/>
             <EdgeParameter value="query"/>
         </Schedule>
-        <Code/>
+        <Code>
+System.out.println(contact.getEntityType());</Code>
         <Coordinate x="90" y="460"/>
     </Event>
     <Event name="AStarZoneMapDistributed">

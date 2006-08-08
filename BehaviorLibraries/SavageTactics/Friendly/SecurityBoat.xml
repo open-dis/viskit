@@ -313,6 +313,9 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <StateTransition state="workingChart">
             <Assignment value="harborChart"/>
         </StateTransition>
+        <StateTransition state="aStarSearch">
+            <Assignment value="null"/>
+        </StateTransition>
         <Schedule condition="!goalZone.getName().equals(nextZone.getName())" delay="0.0" event="PlanPatrolMove" priority="0">
             <Comment>Passes the goal zone as the starting zone because it reached it's destination</Comment>
             <EdgeParameter value="goalZone"/>
@@ -321,9 +324,9 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <Schedule condition="goalZone.getName().equals(nextZone.getName())" delay="0.0" event="DestinationReached" priority="0">
             <Comment/>
         </Schedule>
-        <Code>System.out.println("InDestinationReachedPHSB");
+        <Code>/*System.out.println("InDestinationReachedPHSB");
 System.out.println("NextSelectedZone: " + nextZone.getName());
-System.out.println("LastGoalZone: " + goalZone.getName());</Code>
+System.out.println("LastGoalZone: " + goalZone.getName());*/</Code>
         <Coordinate x="270" y="220"/>
     </Event>
     <Event name="ScaleSpeed">

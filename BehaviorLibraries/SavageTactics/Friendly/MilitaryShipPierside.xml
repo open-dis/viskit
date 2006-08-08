@@ -145,11 +145,14 @@
         <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
             <Comment>Determines whether the contact detected is part of the same force</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == killZone &amp;&amp; !isFriendlyForce" delay="0.0" event="BatteriesReleased" priority="0">
+        <LocalVariable name="entityType" type="java.lang.String" value="contact.getEntityType()">
+            <Comment>Returns the type for this contact</Comment>
+        </LocalVariable>
+        <Schedule condition="sensor == killZone &amp;&amp; !isFriendlyForce &amp;&amp; !entityType.equals(&quot;HarborFerry&quot;)" delay="0.0" event="BatteriesReleased" priority="0">
             <Comment>If the sensor is the kill zone then go authorize shooting</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp; !isFriendlyForce &amp;&amp; !securityAlertCalled" delay="0.0" event="SecurityAlert" priority="0">
+        <Schedule condition="sensor == visualPerception &amp;&amp; !isFriendlyForce &amp;&amp; !securityAlertCalled &amp;&amp; !entityType.equals(&quot;HarborFerry&quot;)" delay="0.0" event="SecurityAlert" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
