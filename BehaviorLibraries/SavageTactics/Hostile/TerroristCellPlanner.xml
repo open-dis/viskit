@@ -290,7 +290,7 @@ System.out.println("**********************************\n");*/</Code>
     <Event name="Stop">
         <Comment>Stops this replication if all attacks have finished</Comment>
         <Code>/*System.out.println("SimRunEndTime: " +Schedule.getSimTime());*/
-Schedule.stopSimulation();</Code>
+System.out.println("doStop in TCP");</Code>
         <Coordinate x="120" y="550"/>
     </Event>
     <Event name="AttackComplete">
@@ -316,10 +316,10 @@ Schedule.stopSimulation();</Code>
         <Schedule condition="attackResult.equals(&quot;Succeeded&quot;)" delay="0.0" event="RecordAttackResults" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="true" delay=".1" event="Stop" priority="0">
+        <Schedule condition="true" delay="2" event="Stop" priority="0">
             <Comment/>
         </Schedule>
-        <Code/>
+        <Code>System.out.println("Attack Complete in TCP");</Code>
         <Coordinate x="30" y="510"/>
     </Event>
     <Event name="SendRadioMessage">

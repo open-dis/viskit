@@ -104,6 +104,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="radioMsg" type="diskit.RadioCommunication">
         <Comment>The communication object that this entity uses to send messages</Comment>
     </StateVariable>
+    <StateVariable name="evasiveManuever" type="boolean">
+        <Comment>Whether this entity is performing evasive manuevers</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
@@ -167,6 +170,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="targetQueue">
             <Assignment value="new diskit.TargetQueue(startPosition)"/>
         </StateTransition>
+        <StateTransition state="evasiveManuever">
+            <Assignment value="false"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -204,13 +210,12 @@ sensors[2] = collisionAvoidance;
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp;
-(contactType.equals(&quot;MilitaryPatrolCraft&quot;) || contactType.equals(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0">
+        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp; (contactType.equals(&quot;MilitaryPatrolCraft&quot;) || contactType.equals(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="3&gt;7 &amp;&amp; sensor == collisionAvoidance &amp;&amp; !contactType.equals(primaryTarget)" delay="0.0" event="AssessObstacle" priority="0">
-            <Comment>TODO: Remove patrol craft hardcoding</Comment>
+        <Schedule condition="3&gt;7 &amp;&amp; !contactType.equals(primaryTarget)" delay="0.0" event="AssessObstacle" priority="0">
+            <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Schedule condition="sensor == visualPerception &amp;&amp; contactType.equals(primaryTarget) &amp;&amp;  arrivedAtGoal &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="Attack" priority="0">
@@ -226,7 +231,7 @@ sensors[2] = collisionAvoidance;
         </Schedule>
         <Code>/*System.out.println(getName() + " detected: " + contact.getName());*/
 contact.waitDelay("Die", 0.0);</Code>
-        <Coordinate x="220" y="270"/>
+        <Coordinate x="230" y="370"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
@@ -284,7 +289,7 @@ contact.waitDelay("Die", 0.0);</Code>
 setDestination(attackDestination);
 System.out.println("I've chosen to attack: " + target.getName());
 //System.out.println("Attack Position is: " + attackDestination);</Code>
-        <Coordinate x="330" y="330"/>
+        <Coordinate x="340" y="440"/>
     </Event>
     <Event name="CreateSensors">
         <Comment>Builds array of all sensors to be registered</Comment>
@@ -345,7 +350,7 @@ sensors[2] = collisionAvoidance;</Code>
         </Schedule>
         <Code>setCruiseSpeed(0);
 stop();</Code>
-        <Coordinate x="470" y="260"/>
+        <Coordinate x="540" y="370"/>
     </Event>
     <Event name="AStarZoneMapDistributed">
         <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
@@ -541,7 +546,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <Comment>Identify this entity as the reporting unit</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="570" y="390"/>
+        <Coordinate x="640" y="500"/>
     </Event>
     <Event name="DestinationReached">
         <Comment/>
@@ -556,7 +561,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <EdgeParameter value="targetChoice"/>
         </Schedule>
         <Code>//System.out.println(getName() + ": I have arrived at " + //goalZone.getName());</Code>
-        <Coordinate x="330" y="530"/>
+        <Coordinate x="340" y="640"/>
     </Event>
     <Event name="PickFromTargets">
         <Comment/>
@@ -571,7 +576,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <EdgeParameter value="target"/>
         </Schedule>
         <Code/>
-        <Coordinate x="330" y="420"/>
+        <Coordinate x="340" y="530"/>
     </Event>
     <Event name="CannotEscape">
         <Comment>If the terrorist has been intercepted he will detonate</Comment>
@@ -580,6 +585,9 @@ setDestination(waypointCreator.createWaypoint());</Code>
         </Argument>
         <LocalVariable name="failedReport" type="java.lang.String" value="&quot;Leader I have failed. I cannot achieve my objective.  I will sacrifice myself for our cause!!!!  I am destroying &quot; + mover.getName()">
             <Comment>A report of a failed attack</Comment>
+        </LocalVariable>
+        <LocalVariable name="entityType" type="java.lang.String" value="mover.getEntityType()">
+            <Comment>The type of entity encountered</Comment>
         </LocalVariable>
         <StateTransition state="attackSuccess">
             <Assignment value="&quot;Failed&quot;"/>
@@ -602,10 +610,14 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <EdgeParameter value="failedReport"/>
             <EdgeParameter value="this"/>
         </Schedule>
+        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BlewUpBarrier" priority="0">
+            <Comment/>
+            <EdgeParameter value="mover"/>
+        </Schedule>
         <Code>/*System.out.println("Detonate Proximity sensed");
 System.out.println("I'm blowing up "+  mover.getName());*/
 setCruiseSpeed(0);</Code>
-        <Coordinate x="330" y="260"/>
+        <Coordinate x="340" y="370"/>
     </Event>
     <Event name="ScaleSpeed">
         <Comment>Allows the scenario manager to add a cross the board speed scale to all entities</Comment>
@@ -628,7 +640,7 @@ setCruiseSpeed(0);</Code>
             <EdgeParameter value="obstacle"/>
         </Schedule>
         <Code>//System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
-        <Coordinate x="120" y="260"/>
+        <Coordinate x="130" y="370"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>Avoids an obstacle if a collision is going to happen</Comment>
@@ -640,7 +652,7 @@ setCruiseSpeed(0);</Code>
         </LocalVariable>
         <Code>setStartPosition(getLocation());
 setDestination(avoidancePoint);</Code>
-        <Coordinate x="30" y="260"/>
+        <Coordinate x="40" y="370"/>
     </Event>
     <Event name="Die">
         <Comment>Stops this entity</Comment>
@@ -670,7 +682,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
-        <Coordinate x="570" y="260"/>
+        <Coordinate x="640" y="370"/>
     </Event>
     <Event name="TargetSpotted">
         <Comment>Adds spotted targets to queue in the event that the this entity has not reached it's ordered destination</Comment>
@@ -681,7 +693,7 @@ setDestination(avoidancePoint);</Code>
             <Operation method="add(target)"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="220" y="350"/>
+        <Coordinate x="230" y="460"/>
     </Event>
     <Event name="SpottedByEnemy">
         <Comment>Marks when this entity was spotted by any Friendly force</Comment>
@@ -689,7 +701,7 @@ setDestination(avoidancePoint);</Code>
             <Assignment value="Schedule.getSimTime()"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="90" y="350"/>
+        <Coordinate x="100" y="460"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was transmitted to this entity</Comment>
@@ -710,7 +722,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="msgContext"/>
         </Schedule>
         <Code/>
-        <Coordinate x="440" y="520"/>
+        <Coordinate x="510" y="630"/>
     </Event>
     <Event name="UpdateTargetQueue">
         <Comment>This entity changes updates it's targets if a destroyed target report comes across the radio</Comment>
@@ -734,7 +746,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code>System.out.println(getName() + " Received DestroyedTarget");</Code>
-        <Coordinate x="440" y="420"/>
+        <Coordinate x="510" y="530"/>
     </Event>
     <Event name="PrepareRadioMessage">
         <Comment>Prepares the radio communication object for transmission</Comment>
@@ -759,12 +771,12 @@ setDestination(avoidancePoint);</Code>
         <StateTransition state="radioMsg">
             <Operation method="setMessage(msgText)"/>
         </StateTransition>
-        <Schedule condition="msgSender == this" delay="0" event="SendRadioMessage" priority="0">
+        <Schedule condition="true" delay="0" event="SendRadioMessage" priority="0">
             <Comment/>
             <EdgeParameter value="radioMsg"/>
         </Schedule>
         <Code/>
-        <Coordinate x="470" y="330"/>
+        <Coordinate x="540" y="440"/>
     </Event>
     <Event name="SendRadioMessage">
         <Comment>Transmits a radio message through the scenario manager</Comment>
@@ -772,7 +784,15 @@ setDestination(avoidancePoint);</Code>
             <Comment>The message to transmit</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="510" y="410"/>
+        <Coordinate x="580" y="530"/>
+    </Event>
+    <Event name="BlewUpBarrier">
+        <Comment>This entity blew up an existing barrier</Comment>
+        <Argument name="barrier" type="diskit.Mover3D">
+            <Comment>The barrier segment that was targeted</Comment>
+        </Argument>
+        <Code>barrier.waitDelay("BarrierAttacked", 0.0);</Code>
+        <Coordinate x="480" y="260"/>
     </Event>
 </SimEntity>
 
