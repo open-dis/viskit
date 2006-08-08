@@ -6037,12 +6037,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="24"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -6126,12 +6128,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="15"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -6215,12 +6219,14 @@
             <MultiParameter type="diskit.random.BetaVariate"/>
             <MultiParameter type="diskit.random.BinomialVariate"/>
             <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
             <MultiParameter type="diskit.random.GammaVariate"/>
             <MultiParameter type="diskit.random.InverseGaussianVariate"/>
             <MultiParameter type="diskit.random.NormalVariate"/>
             <MultiParameter type="diskit.random.PoissonVariate">
-                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=".2"/>
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value=""/>
             </MultiParameter>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
@@ -7149,6 +7155,88 @@
         <TerminalParameter name="navalStationCommsChannel" type="int" value="9"/>
         <Coordinate x="410" y="270"/>
     </SimEntity>
+    <SimEntity description="Display device for all communication display objects added to the constructor (NOTE: This is not required for communication functionality)" name="CommsDisplay" type="diskit.util.MultipleCommsDisplay">
+        <MultiParameter type="diskit.util.CommunicationDisplay[]">
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="1"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="DDG77 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="2"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="DDG70 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="3"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="DDG60 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="5"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="DDG70 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="5"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="CG65 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="6"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="CG70 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="7"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="SSN762 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="8"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="SSN773 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="20"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="CG65 Comms"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.RED"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="9"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="Harbor Security"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.util.CommunicationDisplay">
+                <TerminalParameter name="Display Window?" type="boolean" value="true"/>
+                <TerminalParameter name="Communication Channel" type="int" value="69"/>
+                <TerminalParameter name="Description" type="java.lang.String" value="Bridge-To-Bridge Radio"/>
+                <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.WHITE"/>
+                <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLACK"/>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="210" y="110"/>
+    </SimEntity>
     <SimEntity description="The harbor control tower that oversees all moving traffic in the harbor" name="PearlHarborControl" type="Friendly.HarborControlTower">
         <TerminalParameter name="moverID" type="int" value="300"/>
         <MultiParameter type="diskit.SMAL.EntityDefinition">
@@ -7247,18 +7335,6 @@
     <PropertyChangeListener description="The amount of time required to execute an attack" mode="replicationStats" name="TerroristCellPlanner_TimeToExecuteAttack" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToExecuteAttack"/>
         <Coordinate x="870" y="100"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="Time required to man a weapon" mode="replicationStats" name="DDG77_TimeToManWeapon" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="timeToManWeapon"/>
-        <Coordinate x="390" y="770"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="" name="SimplePropertyDumper_1" type="simkit.util.SimplePropertyDumper">
-        <TerminalParameter name="p[0] : " type="boolean" value="true"/>
-        <Coordinate x="270" y="750"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener description="" mode="replicationStats" name="SimpleStatsTally_2" type="simkit.stat.SimpleStatsTally">
-        <TerminalParameter name="p[0] : " type="java.lang.String" value="weaponsManned"/>
-        <Coordinate x="180" y="780"/>
     </PropertyChangeListener>
     <SimEventListenerConnection listener="ScenarioManager" source="Buoy1"/>
     <SimEventListenerConnection listener="ScenarioManager" source="HarborBuoy1"/>
@@ -7404,6 +7480,7 @@
     <SimEventListenerConnection listener="SSDF3_CG70" source="CG70"/>
     <SimEventListenerConnection listener="ScenarioManager" source="SSN762"/>
     <SimEventListenerConnection listener="ScenarioManager" source="SSN773"/>
+    <SimEventListenerConnection listener="CommsDisplay" source="ScenarioManager"/>
     <SimEventListenerConnection listener="ScenarioManager" source="CG70"/>
     <SimEventListenerConnection listener="PierSentry_SSN762" source="SSN762"/>
     <SimEventListenerConnection listener="PierSentry_SSN773" source="SSN773"/>
@@ -7419,9 +7496,6 @@
     <PropertyChangeListenerConnection description="timeUndetected" listener="Terrorist1_ElapsedTimeBeforeDetection" property="timeUndetected" source="Terrorist1"/>
     <PropertyChangeListenerConnection description="successfullAttacks" listener="TerroristCellPlanner_SuccessfullAttacks" property="successfullAttacks" source="TerroristCellPlanner"/>
     <PropertyChangeListenerConnection description="timeToExecuteAttack" listener="TerroristCellPlanner_TimeToExecuteAttack" property="timeToExecuteAttack" source="TerroristCellPlanner"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="DDG77_TimeToManWeapon" property="timeToManWeapon" source="DDG77"/>
-    <PropertyChangeListenerConnection description="timeToManWeapon" listener="SimplePropertyDumper_1" property="timeToManWeapon" source="DDG77"/>
-    <PropertyChangeListenerConnection description="weaponsManned" listener="SimpleStatsTally_2" property="weaponsManned" source="DDG77"/>
     <Schedule stopTime="1000" verbose="false"/>
     <Experiment timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
