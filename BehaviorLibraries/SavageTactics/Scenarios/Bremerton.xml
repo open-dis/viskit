@@ -9,7 +9,7 @@
     <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter name="speedScale" type="double" value=".5"/>
         <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
-        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.8"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.10"/>
         <TerminalParameter name="port" type="int" value="62040"/>
         <TerminalParameter name="siteID" type="int" value="0"/>
         <TerminalParameter name="appID" type="int" value="1"/>
@@ -1887,30 +1887,6 @@
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
         <Coordinate x="620" y="140"/>
     </SimEntity>
-    <SimEntity description="" name="BridgeToBridgeRadio" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
-        <TerminalParameter name="Communication Channel" type="int" value="16"/>
-        <TerminalParameter name="Description" type="java.lang.String" value="Bridge-To-Bridge Radio"/>
-        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
-        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.WHITE"/>
-        <Coordinate x="450" y="50"/>
-    </SimEntity>
-    <SimEntity description="UnmannedVehicleCommunications" name="UVComms" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
-        <TerminalParameter name="Communication Channel" type="int" value="128"/>
-        <TerminalParameter name="Description" type="java.lang.String" value="UAV/USV Communications"/>
-        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
-        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.BLUE"/>
-        <Coordinate x="390" y="50"/>
-    </SimEntity>
-    <SimEntity description="Secure radio comms between the terrorists and the cell planner" name="TerroristComms" type="diskit.util.CommunicationDisplay">
-        <TerminalParameter name="Display Window?" type="boolean" value="false"/>
-        <TerminalParameter name="Communication Channel" type="int" value="20"/>
-        <TerminalParameter name="Description" type="java.lang.String" value="Terrorist Communications"/>
-        <TerminalParameter name="Background Color" type="java.awt.Color" value="Color.BLACK"/>
-        <TerminalParameter name="Font Color" type="java.awt.Color" value="Color.RED"/>
-        <Coordinate x="390" y="110"/>
-    </SimEntity>
     <PropertyChangeListener description="Statististics on number of reported contacts" mode="replicationStats" name="SeaScanReportedContacts" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="reportedContacts"/>
         <Coordinate x="560" y="350"/>
@@ -1963,9 +1939,6 @@
     <SimEventListenerConnection listener="Terrorist2" source="TerroristCellPlanner"/>
     <SimEventListenerConnection listener="ScenarioManager" source="FFG60"/>
     <SimEventListenerConnection listener="ScenarioManager" source="CVN70"/>
-    <SimEventListenerConnection listener="BridgeToBridgeRadio" source="ScenarioManager"/>
-    <SimEventListenerConnection listener="UVComms" source="ScenarioManager"/>
-    <SimEventListenerConnection listener="TerroristComms" source="ScenarioManager"/>
     <PropertyChangeListenerConnection description="reportedContacts" listener="SeaScanReportedContacts" property="reportedContacts" source="SeaScan"/>
     <PropertyChangeListenerConnection description="transmitDelay" listener="SeaScanTransmissionDelay" property="transmitDelay" source="SeaScan"/>
     <PropertyChangeListenerConnection description="successfulIntercepts" listener="RHIBIntercepts" property="successfulIntercepts" source="RHIB"/>
