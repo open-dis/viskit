@@ -5,87 +5,75 @@
 
 <map version="2.0">
 
-  <mapID target="Introduction"		url="VisPages/intro.html"/>
-  <mapID target="Contributors"		url="VisPages/contributors.html"/>
-  <mapID target="Overview"		url="VisPages/empty.html"/>
-  <mapID target="Terms"			url="VisPages/terms.html"/>
-
-  <mapID target="Tutorial"		url="VisPages/tutorial.html"/>
-  <mapID target="Ops1"			url="VisPages/empty.html"/>
-  <mapID target="Ops2"			url="VisPages/empty.html"/>
-  <mapID target="Ops3"			url="VisPages/empty.html"/>
-
-  <mapID target="addHelp"		url="VisPages/addingHelp.html"/>
-
+  <mapID target="Introduction"		url="Pages/Intro.html"/>
+  <mapID target="Contributors"		url="Pages/Contributors.html"/>
+  <mapID target="Overview"		    url="Pages/empty.html"/>
+  <mapID target="Terms"			      url="Pages/Terms.html"/>
+  <mapID target="Tutorial"		    url="Pages/Tutorial.html"/>
+  <mapID target="Ops1"			      url="Pages/empty.html"/>
+  <mapID target="Ops2"			      url="Pages/empty.html"/>
+  <mapID target="Ops3"			      url="Pages/empty.html"/>
+  <mapID target="addHelp"		      url="Pages/AddingHelp.html"/>
 
 <!-- Tab items -->
-
-  <mapID target="TabEventGraph"		url="VisPages/Tabs/eventGraph.html"/>
-  <mapID target="TabAssemblyEdit"	url="VisPages/Tabs/assemblyEdit.html"/>
-  <mapID target="TabAssemblyRun"	url="VisPages/Tabs/assemblyRun.html"/>
-  <mapID target="TabAnalystReport"	url="VisPages/Tabs/analystReport.html"/>
-
+  
+  <mapID target="TabAnalystReport"	  url="Pages/Tabs/analystReport.html"/>	
+  <mapID target="TabAssemblyEdit"	    url="Pages/Tabs/assemblyEdit.html"/>
+  <mapID target="TabAssemblyRun"	    url="Pages/Tabs/assemblyRun.html"/>
+	<mapID target="TabDesignExperiment"	url="Pages/Tabs/designExperiment.html"/>	
+	<mapID target="TabEventGraph"		    url="Pages/Tabs/eventGraph.html"/>
+	<mapID target="TabLaunchJob"    	  url="Pages/Tabs/launchJob.html"/>
 
 <!-- Menu items -->
 
-  <mapID target="Close"			url="VisPages/Menus/fileClose.html"/>
-  <mapID target="CloseAll"		url="VisPages/Menus/fileCloseAll.html"/>
-  <mapID target="NewEventGraph"		url="VisPages/Menus/fileNewEventGraph.html"/>
-  <mapID target="Open"			url="VisPages/Menus/fileOpen.html"/>
-  <mapID target="OpenRecent"		url="VisPages/Menus/fileOpenRecent.html"/>
-  <mapID target="Quit"			url="VisPages/Menus/fileQuit.html"/>
-  <mapID target="Save"			url="VisPages/Menus/fileSave.html"/>
-  <mapID target="SaveAs"		url="VisPages/Menus/fileSaveAs.html"/>
-  <mapID target="SaveScreen"		url="VisPages/Menus/fileSaveScreen.html"/>
-  <mapID target="Settings"		url="VisPages/Menus/fileSettings.html"/>
-  <mapID target="ViewXml"		url="VisPages/Menus/fileViewXml.html"/>
-  <mapID target="GenerateJava"		url="VisPages/Menus/fileGenerateJava.html"/>
-
-  <mapID target="NewAssembly"		url="VisPages/Menus/fileNewAssembly.html"/>
-  <mapID target="GenerateJavaSource"	url="VisPages/Menus/fileGenerateJavaSource.html"/>
-  <mapID target="RunAssembly"		url="VisPages/Menus/fileRunAssembly.html"/>
-  <mapID target="ExportCluster"		url="VisPages/Menus/fileExportCluster.html"/>
-
-  <mapID target="SaveOutputStreams"	url="VisPages/Menus/fileSaveOutputStreams.html"/>
-
-
-  <mapID target="Cut"			url="VisPages/Menus/editCut.html"/>
-  <mapID target="Copy"			url="VisPages/Menus/editCopy.html"/>
-  <mapID target="PasteEvents"		url="VisPages/Menus/editPasteEvents.html"/>
-  <mapID target="AddEvent"		url="VisPages/Menus/editAddEvent.html"/>
-  <mapID target="AddState"		url="VisPages/Menus/editAddState.html"/>
-  <mapID target="AddSimulation"		url="VisPages/Menus/editAddSimulation.html"/>
-  <mapID target="AddSelfEdge"		url="VisPages/Menus/editAddSelfEdge.html"/>
-  <mapID target="EditGraph"		url="VisPages/Menus/editEditGraph.html"/>
-
-  <mapID target="AddEventGraph"		url="VisPages/Menus/editAddEventGraph.html"/>
-  <mapID target="AddPropertyChange"	url="VisPages/Menus/editAddPropertyChange.html"/>
-  <mapID target="EditAssemblyProperties"	url="VisPages/Menus/editEditAssemblyProperties.html"/>
-
-  <mapID target="SelectAll"		url="VisPages/Menus/editSelectAll.html"/>
-  <mapID target="ClearAll"		url="VisPages/Menus/editClearAll.html"/>
-
-  <mapID target="NOT"			url="VisPages/Menus/empty.html"/>
-
-
-  <mapID target="OpenEvent"		url="VisPages/Menus/empty.html"/>
-  <mapID target="SplashImage"		url="VisPages/SplashImage.html" />
+  <mapID target="Close"			              url="Pages/Menus/fileClose.html"/>
+  <mapID target="CloseAll"		            url="Pages/Menus/fileCloseAll.html"/>
+  <mapID target="AddEvent"		            url="Pages/Menus/editAddEvent.html"/>
+  <mapID target="AddEventGraph"		        url="Pages/Menus/editAddEventGraph.html"/>
+  <mapID target="AddPropertyChange"	      url="Pages/Menus/editAddPropertyChange.html"/>
+	<mapID target="AddState"		            url="Pages/Menus/editAddState.html"/>
+  <mapID target="AddSimulation"		        url="Pages/Menus/editAddSimulation.html"/>
+  <mapID target="AddSelfEdge"		          url="Pages/Menus/editAddSelfEdge.html"/>
+	<mapID target="ClearAll"		            url="Pages/Menus/editClearAll.html"/>	
+  <mapID target="Copy"			              url="Pages/Menus/editCopy.html"/>
+	<mapID target="Cut"			                url="Pages/Menus/editCut.html"/>
+	<mapID target="EditAssemblyProperties"	url="Pages/Menus/editEditAssemblyProperties.html"/>
+	<mapID target="EditGraph"		            url="Pages/Menus/editEditGraph.html"/>
+	<mapID target="ExportCluster"		        url="Pages/Menus/fileExportCluster.html"/>
+	<mapID target="GenerateJavaSource"	    url="Pages/Menus/fileGenerateJavaSource.html"/>
+	<mapID target="hAbout"		              url="Pages/Menus/helpAbout.html" />
+	<mapID target="hContents"		            url="Pages/Menus/helpContents.html" />
+  <mapID target="hSearch"		              url="Pages/Menus/helpSearch.html" />
+  <mapID target="hTutorial"		            url="Pages/Menus/helpTutorial.html" />
+	<mapID target="NewAssembly"		          url="Pages/Menus/fileNewAssembly.html"/>
+	<mapID target="NewEventGraph"		        url="Pages/Menus/fileNewEventGraph.html"/>
+  <mapID target="NOT"			                url="Pages/Menus/empty.html"/>
+	<mapID target="Open"			              url="Pages/Menus/fileOpen.html"/>
+  <mapID target="OpenEvent"		            url="Pages/Menus/empty.html"/>
+	<mapID target="OpenRecent"		          url="Pages/Menus/fileOpenRecent.html"/>
+  <mapID target="PasteEvents"		          url="Pages/Menus/editPasteEvents.html"/>
+	<mapID target="Quit"			              url="Pages/Menus/fileQuit.html"/>
+  <mapID target="RunAssembly"		          url="Pages/Menus/fileRunAssembly.html"/>
+	<mapID target="Save"			              url="Pages/Menus/fileSave.html"/>
+  <mapID target="SaveAs"		              url="Pages/Menus/fileSaveAs.html"/>
+  <mapID target="SaveOutputStreams"	      url="Pages/Menus/fileSaveOutputStreams.html"/>
+	<mapID target="SaveScreen"		          url="Pages/Menus/fileSaveScreen.html"/>
+  <mapID target="SelectAll"		            url="Pages/Menus/editSelectAll.html"/>
+	<mapID target="Settings"		            url="Pages/Menus/fileSettings.html"/>
+  <mapID target="SplashImage"		          url="Pages/Menus/splashImage.html" />
+	<mapID target="ViewXml"		              url="Pages/Menus/fileViewXml.html"/>
+  <mapID target="GenerateJava"		        url="Pages/Menus/fileGenerateJava.html"/>
   
+<!-- Image items -->
   
-  <mapID target="topic"			url="VisPages/images/redcircle.png" />
-  <mapID target="chapter"		url="VisPages/images/chapTopic.gif" />
-  <mapID target="empty"			url="VisPages/images/empty.gif" />
-
-  <mapID target="hContents"		url="VisPages/Menus/helpContents.html" />
-  <mapID target="hSearch"		url="VisPages/Menus/helpSearch.html" />
-  <mapID target="hTutorial"		url="VisPages/Menus/helpTutorial.html" />
-  <mapID target="hAbout"		url="VisPages/Menus/helpAbout.html" />
-
-  <!-- javahelp VisPages are no longer moved to the build/ subdirectory. -->
+  <mapID target="topic"			url="Pages/images/redcircle.png" />
+  <mapID target="chapter"		url="Pages/images/chapTopic.gif" />
+  <mapID target="empty"			url="Pages/images/empty.gif" />
+  
   <!-- After much experimentation, there does appear to be support for relative URLS, but you
        have to use the 'file:' protocol indicator.  AND, although I believe having no slash after
        the colon is not kosher, it's the only way that works here. -->
-  <!-- So the relative path is calculated from the directory where AmvwHelpSet.hs is located. -->
+  <!-- So the relative path is calculated from the directory where vHelpSet.hs is located. -->
   
 <!-- EXAMPLE:
   <mapID target="articles"           url="file:../documentation/articles/articles.html" />
