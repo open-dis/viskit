@@ -11,12 +11,20 @@
       <tocitem text="Terms"			target="Terms"/>
     </tocitem>
 
-    <tocitem text="Operation" expand="true">
-      <tocitem text="Tutorial"			target="Tutorial"/>
-      <tocitem text="Ops1"			target="Ops1"/>
-      <tocitem text="Ops2"			target="Ops2"/>
-      <tocitem text="Ops3"			target="Ops3"/>
+    <tocitem text="Tutorial"				expand="true">
+      <tocitem text="Contents"		target="TutorialContents"/>
+      <tocitem text="Introduction"		target="TutorialIntro"/>
+      <tocitem text="Creating Event Graph"	target="TutorialEvent"/>
+      <tocitem text="Event Components"		expand="true">
+        <tocitem text="Arrival Process"	target="TutorialEventArrival"/>
+        <tocitem text="Event Parameters"	target="TutorialEventEvntParameters"/>
+        <tocitem text="State Parameters"	target="TutorialEventStParmaeters"/>
+        <tocitem text="Event Nodes"		target="TutorialEventNodes"/>
+        <tocitem text="Event Schedules"	target="TutorialEventSchedules"/>
+      </tocitem>
+      <tocitem text="Creating Assembly"	target="TutorialAssembly"/>
     </tocitem>
+
 
     <tocitem text="Tabs" expand="true">
       <tocitem text="Event Graph Editor"	target="TabEventGraph"/>

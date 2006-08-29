@@ -28,3 +28,19 @@ p {
 	font-weight: bold;
 	font-style: italic;
 }
+
+.menu {
+	font-family: times new roman, serif;
+	font-weight: bold;
+	color: #009900;
+}
+
+.caption {
+	font-style: italic;
+	margin-bottom: 2em;
+}
+
+.note {
+	font-weight: bold;
+	color: red;
+}
