@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : launch4jConfig.xml
+    Created on : September 3, 2006, 2:34 PM
+    Author     : rmgold
+    Description:
+        Purpose of the document follows.
+-->
+
+<launch4jConfig>
+    <!-- Header types: 0-GUI, 1-console -->
+    <headerType>0</headerType>
+    <outfile>build/Install.exe</outfile>
+    <jar>build/Install.jar</jar>
+    <dontWrapJar>false</dontWrapJar>
+    <errTitle>Viskit Install Error</errTitle>
+    <jarArgs></jarArgs>
+    <chdir>.</chdir>
+    <customProcName>true</customProcName>
+    <stayAlive>true</stayAlive>
+    <icon>images/ViskitIcon.ico</icon>
+    <jre>
+      <minVersion>1.5.0</minVersion>
+      <!-- Heap sizes in MB, 0-use default -->
+      <initialHeapSize>30</initialHeapSize>
+      <maxHeapSize>256</maxHeapSize>
+      <args>-client</args>
+    </jre>
+    <splash>
+      <file>images/ViskitSplash2.png</file>
+      <waitForWindow>true</waitForWindow>
+      <timeout>60</timeout>
+      <timeoutErr>true</timeoutErr>
+    </splash>
+    <versionInfo>
+      <fileVersion>0.4.1.0</fileVersion>
+      <txtFileVersion>0.4.1.0</txtFileVersion>
+      <fileDescription>Viskit, Windows installer</fileDescription>
+      <copyright>Copyright Naval Postgraduate School 2006</copyright>
+      <productVersion>0.4.1.0</productVersion>
+      <txtProductVersion>0.4.1.0</txtProductVersion>
+      <productName>Viskit, Windows Installer</productName>
+      <companyName>Naval Postgraduate School</companyName>
+      <internalName>install.jar</internalName>
+      <originalFilename>Install.exe</originalFilename>
+    </versionInfo>
+  </launch4jConfig>
