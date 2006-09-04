@@ -649,14 +649,14 @@
     </condition>
     
     <property name="installer" value="${basedir}/installer" />
-    <property name="izpack" value="${env.HOME}/IzPack" />
-    <property name="launch4j" value="${env.HOME}/launch4j" />
-    <property name="orangevolt" value="${env.HOME}/orangevolt"/>
+    <property name="izpack" value="${user.home}/IzPack" />
+    <property name="launch4j" value="${user.home}/launch4j" />
+    <property name="orangevolt" value="${user.home}/orangevolt"/>
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
     <!-- it should be named manually though for what version has been tested -->
     <property name="winJreExe" value="jre-1_5_0_06-windows-i586-p.exe"/>
-    <property name="winJre" value="${env.HOME}/${winJreExe}" />
+    <property name="winJre" value="${user.home}/${winJreExe}" />
     <target name="checkJre" >
         <available file="${winJre}" property="winJre.exists" />
     </target>
@@ -664,13 +664,19 @@
         <get src="http://jdl.sun.com/webapps/download/AutoDL?BundleId=10433" dest="${winJre}" />
     </target>
         
-    <target name="checkIzPack" >
-        <available file="${env.HOME}/IzPack/lib/compiler.jar" property="izPack.exists" />
+    <target name="moveIzPack" if="build.host.windows">
+        <copy todir="${user.home}\IzPack">
+            <fileset dir="C:\Program Files\IzPack"/>
+        </copy>
+    </target>
+    <target name="checkIzPack">
+        <available file="${izpack}/lib/compiler.jar" property="izPack.exists" />
     </target>
     <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
-        <get src="http://download.berlios.de/izpack/IzPack-install-reg-3.8.1.jar" dest="${env.HOME}/izpack-install.jar" />
-        <echo>Installing IzPack from web, please just use default install path to your home directory when prompted.</echo>
-        <java jar="${env.HOME}/izpack-install.jar" />
+        <get src="http://download.berlios.de/izpack/IzPack-install-reg-3.8.1.jar" dest="${user.home}/izpack-install.jar" />
+        <echo>Installing IzPack from web, please just use default install path when prompted.</echo>
+        <java fork="true" jar="${user.home}/izpack-install.jar" />
+        <ant target="moveIzPack"/>
     </target>
     
     <target name="checkLaunch4j">
@@ -684,34 +690,34 @@
     </target>
     
     <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-win32.zip" dest="${env.HOME}/launch4j.zip" />
-        <unzip src="${env.HOME}/launch4j.zip" dest="${env.HOME}/launch4j"/>
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-win32.zip" dest="${user.home}/launch4j.zip" />
+        <unzip src="${user.home}/launch4j.zip" dest="${user.home}/launch4j"/>
     </target>
     
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-linux.tgz" dest="${env.HOME}/launch4j.tgz" />
-        <untar src="${env.HOME}/launch4j.tgz" dest="${env.HOME}/launch4j" compression="gzip"/>
-        <chmod file="${env.HOME}/launch4j/launch4j/bin/windres" perm="a+x"/>
-        <chmod file="${env.HOME}/launch4j/launch4j/bin/ld" perm="a+x"/>
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-linux.tgz" dest="${user.home}/launch4j.tgz" />
+        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
+        <chmod file="${user.home}/launch4j/launch4j/bin/windres" perm="a+x"/>
+        <chmod file="${user.home}/launch4j/launch4j/bin/ld" perm="a+x"/>
     </target>
     
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-macosx.tgz" dest="${env.HOME}/launch4j.tgz" />
-        <untar src="${env.HOME}/launch4j.tgz" dest="${env.HOME}/launch4j" compression="gzip"/>
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-macosx.tgz" dest="${user.home}/launch4j.tgz" />
+        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
     </target>
     
     <target name="checkOrangevolt">
-        <available file="${env.HOME}/orangevolt.jar" property="orangevolt.exists" />
+        <available file="${user.home}/orangevolt.jar" property="orangevolt.exists" />
     </target>
     <target name="getOrangevolt" depends="checkOrangevolt" unless="orangevolt.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${env.HOME}/orangevolt.jar" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${user.home}/orangevolt.jar" />
     </target>
     
     <target name="checkRoxes" >
-        <available file="${env.HOME}/roxes.jar" property="roxes.exists" />
+        <available file="${user.home}/roxes.jar" property="roxes.exists" />
     </target>
     <target name="getRoxes" depends="checkRoxes" unless="roxes.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/roxes-win32forjava-1.0.4.jar" dest="${env.HOME}/roxes.jar" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/roxes-win32forjava-1.0.4.jar" dest="${user.home}/roxes.jar" />
     </target>
     
     <target name="checkViskit" >
@@ -759,7 +765,7 @@
         classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
         
         <taskdef
-        classpath="${env.HOME}/orangevolt.jar:${env.HOME}/roxes.jar"
+        classpath="${user.home}/orangevolt.jar:${user.home}/roxes.jar"
         resource="com/orangevolt/tools/ant/taskdefs.properties"/>
         
         <izpack input="${installer}/izpack.xml"
@@ -797,7 +803,7 @@
         
         <delete file="${installer}/build/install.zip"/>
         <delete file="${installer}/build/both.bat"/>
-        <delete file="${env.HOME}/izpack-installer.jar"/>
+        <delete file="${user.home}/izpack-installer.jar"/>
         <delete file="${installer}/build/${winJre}"/>
     
     </target>
