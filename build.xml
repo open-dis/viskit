@@ -656,11 +656,11 @@
     <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
     <!-- it should be named manually though for what version has been tested -->
     <property name="winJreExe" value="jre-1_5_0_06-windows-i586-p.exe"/>
-    <property name="winJre" value="${user.home}/${winJreExe}" />
+    <property name="winJre" value="${user.home}${file.separator}${winJreExe}" />
     <target name="checkJre" >
         <available file="${winJre}" property="winJre.exists" />
     </target>
-    <target name="getJre" depends="checkJre" unless="winJre.exists" >
+    <target name="getJre" depends="checkJre" unless="winJre.exists"  >
         <get src="http://jdl.sun.com/webapps/download/AutoDL?BundleId=10433" dest="${winJre}" />
     </target>
         
@@ -752,7 +752,7 @@
         <copy todir="${installer}/images">
             <fileset dir="${dir.src}/viskit/images">
                 <include name="ViskitLogo.png"/>
-                <include name="ViskitSplash2.png"/>
+                <include name="ViskitSplash2.bmp"/>
                 <include name="ViskitIcon.ico"/>
             </fileset>
         </copy>
@@ -776,10 +776,12 @@
         
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
         
+        <!-- this doesn't seem to work, and DOS gets upset if you try to
+              make anything but a DOS style path. Should still prompt to download jre though -->
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
-            rem ${winJre} /S /v/qn 
-            ${winJre}
+            rem ${winJreExe} /S /v/qn 
+            ${winJreExe}
             Install.exe
         </echo>
         
@@ -802,7 +804,7 @@
         output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
         
         <delete file="${installer}/build/install.zip"/>
-        <delete file="${installer}/build/both.bat"/>
+       <!-- <delete file="${installer}/build/both.bat"/>-->
         <delete file="${user.home}/izpack-installer.jar"/>
         <delete file="${installer}/build/${winJre}"/>
     
