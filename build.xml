@@ -60,12 +60,12 @@
     
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
     
-    <path id="runtime.extension.classes">
-        <fileset dir="${dir.lib.ext}" includes="*.jar"/>
+    <path id="runtime.extension.classes.path">
+        <fileset dir="${dir.lib.ext}" includes="*.jar" id="runtime.extension.classes" />
     </path>
     
-    <path id="jaxb.classes">
-        <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+    <path id="jaxb.classes.path">
+        <fileset dir="${dir.lib.xml}" includes="*.jar" id="jaxb.classes" />
     </path>
 
     <!-- access to local environment variables -->
@@ -75,6 +75,32 @@
         <echo message="warning:  JAVA_HOME not set!"/>
     </target>
 
+    <!-- antism, path refid can be used in classpath, but not copy -->
+    <fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
+        <include name="${env.JAVA_HOME}/lib/tools.jar"/>
+    </fileset>
+    <fileset dir="${dir.build}" id="runtime.viskit">
+        <include name="viskit.jar"/>
+    </fileset>
+    <fileset dir="${dir.lib}" id="runtime.lib" >
+        <!-- could use restrictions in current runtime.classpath -->
+        <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${dir.lib}/ext" id="runtime.lib.ext" >
+        
+        <include name="**/*.jar"/>
+    </fileset>
+    
+    <!-- so following could replace the next path after the following -->
+    
+    <path id="runtime.classpath.paths">
+        <fileset refid="runtime.javac"/>
+        <fileset refid="runtime.viskit"/>
+        <fileset refid="runtime.lib"/>
+        <fileset refid="runtime.lib.ext"/>
+        <fileset refid="jaxb.classes"/>
+    </path>
+    
     <path id="runtime.classpath">
     
         <!-- use local JDK for tools.jar -->
@@ -84,7 +110,7 @@
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${dir.build}/lib/viskit.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
-        <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+        <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
         <pathelement location="${dir.lib}/jgraph.jar"/>
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/jhall.jar"/>
@@ -103,8 +129,8 @@
         <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
         <pathelement location="${dir.lib}/xerces.jar"/>
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
-        <path refid="jaxb.classes"/>
-        <path refid="runtime.extension.classes"/>
+        <path refid="jaxb.classes.path"/>
+        <path refid="runtime.extension.classes.path"/>
     </path>
 
     <!--  === TARGET: help === -->
@@ -171,7 +197,7 @@
             source="1.4"
             target="1.4">
             <classpath>
-                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
                 <pathelement location="${dir.lib}/jgraph.jar"/>
                 <pathelement location="${dir.lib}/actions.jar"/>
@@ -280,7 +306,7 @@
             <fileset dir="${dir.lib}">
                 <include name="simkit.jar"/>
                 <include name="xmlrpc-2.0.jar"/>
-                <include name="bsh-2.0b1.jar"/>
+                <include name="bsh-2.0b4.jar"/>
                 <include name="commons-configuration-1.1.jar"/>
                 <include name="commons-beanutils-1.7.0.jar"/>
                 <include name="commons-codec-1.3.jar"/>
@@ -457,7 +483,7 @@
             target="1.4">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
-                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
             </classpath>
             <src path="${dir.src.cli.util}"/>
             <include name="Launcher.java"/>
@@ -471,7 +497,7 @@
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>
-                <pathelement location="${dir.lib}/bsh-2.0b1.jar"/>
+                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -611,21 +637,33 @@
         </java>
     </target>
     
-    <!-- adapted from izpack wiki -->
+    <!-- get all izpack related packages -->
+    <condition property="build.host.linux">
+        <os family="unix"/>
+    </condition>
+    <condition property="build.host.windows">
+        <os family="windows"/>
+    </condition>
+    <condition property="build.host.mac">
+        <os family="mac"/>
+    </condition>
+    
     <property name="installer" value="${basedir}/installer" />
     <property name="izpack" value="${env.HOME}/IzPack" />
     <property name="launch4j" value="${env.HOME}/launch4j" />
     <property name="orangevolt" value="${env.HOME}/orangevolt"/>
+    <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
     <!-- it should be named manually though for what version has been tested -->
-    <property name="winJre" value="${env.HOME}/jre-1_5_0_06-windows-i586-p.exe" />
+    <property name="winJreExe" value="jre-1_5_0_06-windows-i586-p.exe"/>
+    <property name="winJre" value="${env.HOME}/${winJreExe}" />
     <target name="checkJre" >
         <available file="${winJre}" property="winJre.exists" />
     </target>
     <target name="getJre" depends="checkJre" unless="winJre.exists" >
         <get src="http://jdl.sun.com/webapps/download/AutoDL?BundleId=10433" dest="${winJre}" />
     </target>
-    
+        
     <target name="checkIzPack" >
         <available file="${env.HOME}/IzPack/lib/compiler.jar" property="izPack.exists" />
     </target>
@@ -639,8 +677,27 @@
         <available file="${launch4j}/launch4j/launch4j.jar" property="launch4j.exists" />
     </target>
     <target name="getLaunch4j" depends="checkLaunch4j" unless="launch4j.exists" >
+        <!-- only one of these should pass -->
+        <ant target="getLaunch4jWin32"/>
+        <ant target="getLaunch4jLinux"/>     
+        <ant target="getLaunch4jMac"/>
+    </target>
+    
+    <target name="getLaunch4jWin32" if="build.host.windows">
         <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-win32.zip" dest="${env.HOME}/launch4j.zip" />
         <unzip src="${env.HOME}/launch4j.zip" dest="${env.HOME}/launch4j"/>
+    </target>
+    
+    <target name="getLaunch4jLinux" if="build.host.linux">
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-linux.tgz" dest="${env.HOME}/launch4j.tgz" />
+        <untar src="${env.HOME}/launch4j.tgz" dest="${env.HOME}/launch4j" compression="gzip"/>
+        <chmod file="${env.HOME}/launch4j/launch4j/bin/windres" perm="a+x"/>
+        <chmod file="${env.HOME}/launch4j/launch4j/bin/ld" perm="a+x"/>
+    </target>
+    
+    <target name="getLaunch4jMac" if="build.host.mac">
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-macosx.tgz" dest="${env.HOME}/launch4j.tgz" />
+        <untar src="${env.HOME}/launch4j.tgz" dest="${env.HOME}/launch4j" compression="gzip"/>
     </target>
     
     <target name="checkOrangevolt">
@@ -656,11 +713,43 @@
     <target name="getRoxes" depends="checkRoxes" unless="roxes.exists" >
         <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/roxes-win32forjava-1.0.4.jar" dest="${env.HOME}/roxes.jar" />
     </target>
-
-    <target name="build.installers" depends="getJre,getIzPack,getLaunch4j,getOrangevolt,getRoxes">
+    
+    <target name="checkViskit" >
+        <available file="${dir.build.lib}/viskit.jar" property="viskit.built" />
+    </target>
+    
+    <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
+        <ant target="dist"/>
+    </target>
+    
+    <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
+    <target name="build.installers" depends="buildViskit,getJre,getIzPack,getLaunch4j,getOrangevolt,getRoxes">
         <delete dir="${installer}/build"/>
         <mkdir dir="${installer}/build" />
-        
+        <delete dir="${installer}/stage"/>
+        <mkdir dir="${installer}/stage/lib"/>
+        <delete dir="${installer}/images"/>
+        <mkdir dir="${installer}/images"/>
+        <copy todir="${installer}/stage/lib" >
+            <fileset refid="runtime.javac"/>
+            <fileset refid="runtime.viskit"/>
+            <fileset refid="runtime.lib"/>
+            <fileset refid="runtime.lib.ext"/> 
+            <fileset refid="jaxb.classes"/>
+        </copy>
+        <copy todir="${installer}/stage/BehaviorLibraries">
+            <fileset dir="${behavior.lib}"/>
+        </copy>
+        <copy todir="${installer}/stage/license">
+            <fileset dir="${dir.src}/license"/>
+        </copy>
+        <copy todir="${installer}/images">
+            <fileset dir="${dir.src}/viskit/images">
+                <include name="ViskitLogo.png"/>
+                <include name="ViskitSplash2.png"/>
+                <include name="ViskitIcon.ico"/>
+            </fileset>
+        </copy>
         <taskdef name="izpack"
         classpath="${izpack}/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
@@ -674,9 +763,9 @@
         resource="com/orangevolt/tools/ant/taskdefs.properties"/>
         
         <izpack input="${installer}/izpack.xml"
-        output="installer/build/Install.jar"
+        output="${installer}/build/Install.jar"
         installerType="standard"
-        basedir="."
+        basedir="${installer}"
         izPackDir="${izpack}" />
         
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
@@ -694,7 +783,7 @@
         plus the file is 16M, do we need that in CVS?
         -->
         <copy file="${winJre}" todir="${installer}/build" />
-        
+     
         <zip destfile="${installer}/build/install.zip"
         basedir="${installer}/build/."
         includes="both.bat,Install.exe,${winJre}" />
@@ -703,8 +792,8 @@
         archive="${installer}/build/install.zip"
         mode="win32"
         execute="both.bat"
-        icon="${installer}/install.ico"
-        output="${installer}/build/Install-Viskit-with-JRE.exe"/>
+        icon="${installer}/images/ViskitIcon.ico"
+        output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
         
         <delete file="${installer}/build/install.zip"/>
         <delete file="${installer}/build/both.bat"/>
