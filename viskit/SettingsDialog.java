@@ -160,7 +160,7 @@ public class SettingsDialog extends JDialog
     bPan.add(Box.createHorizontalGlue());
     classpathP.add(bPan);
 
-    tabbedPane.addTab("Additional classpaths",classpathP);
+    tabbedPane.addTab("Additional classpath entries",classpathP);
 
     JPanel recentP = new JPanel();
     recentP.setLayout(new BoxLayout(recentP,BoxLayout.Y_AXIS));
