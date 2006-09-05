@@ -11,7 +11,7 @@
 <launch4jConfig>
     <!-- Header types: 0-GUI, 1-console -->
     <headerType>0</headerType>
-    <outfile>Viskit.exe</outfile>
+    <outfile>stage/Viskit.exe</outfile>
     <jar>stage/viskit.jar</jar>
     <dontWrapJar>false</dontWrapJar>
     <errTitle>Viskit Install Error</errTitle>
