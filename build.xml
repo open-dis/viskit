@@ -679,6 +679,7 @@
     <!-- it should be named manually though for what version has been tested -->
     <property name="winJreExe" value="jre-1_5_0_06-windows-i586-p.exe"/>
     <property name="winJre" value="${user.home}${file.separator}${winJreExe}" />
+    
     <target name="checkJre" >
         <available file="${winJre}" property="winJre.exists" />
     </target>
@@ -745,7 +746,6 @@
     <target name="checkViskit" >
         <available file="${dir.build.lib}/viskit.jar" property="viskit.built" />
     </target>
-    
     <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
         <ant target="dist"/>
         <ant target="examples.diskit"/>
@@ -784,6 +784,7 @@
                 <include name="ViskitIcon.ico"/>
             </fileset>
         </copy>
+        
         <taskdef name="izpack"
         classpath="${izpack}/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
@@ -798,12 +799,15 @@
         
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
         
+        <!-- create executable jar file that installs Viskit and related files, assumes java exists, 
+            however once Viskit.exe is actually runs it should check and download latest 1.5.0 -->
         <izpack input="${installer}/izpack.xml"
         output="${installer}/build/ViskitInstall.jar"
         installerType="standard"
         basedir="${installer}"
         izPackDir="${izpack}" />
         
+        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap Viskitinstall.jar as .exe --> 
         <launch4j>
             <config 
                 chdir="." 
@@ -816,6 +820,10 @@
             </config>
         </launch4j>
         
+        <!-- since above should have already made something that checks and installs JRE, the following
+            should not be needed... in which case ViskitInstall.exe is already the deployable -->
+            
+        <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
         
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
