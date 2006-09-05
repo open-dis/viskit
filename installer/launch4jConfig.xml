@@ -11,8 +11,8 @@
 <launch4jConfig>
     <!-- Header types: 0-GUI, 1-console -->
     <headerType>0</headerType>
-    <outfile>build/Install.exe</outfile>
-    <jar>build/Install.jar</jar>
+    <outfile>Viskit.exe</outfile>
+    <jar>stage/viskit.jar</jar>
     <dontWrapJar>false</dontWrapJar>
     <errTitle>Viskit Install Error</errTitle>
     <jarArgs></jarArgs>
@@ -42,7 +42,7 @@
       <txtProductVersion>0.4.1.0</txtProductVersion>
       <productName>Viskit, Windows Installer</productName>
       <companyName>Naval Postgraduate School</companyName>
-      <internalName>install.jar</internalName>
-      <originalFilename>Install.exe</originalFilename>
+      <internalName>viskit.jar</internalName>
+      <originalFilename>Viskit.exe</originalFilename>
     </versionInfo>
   </launch4jConfig>

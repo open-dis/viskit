@@ -75,11 +75,11 @@
         <echo message="warning:  JAVA_HOME not set!"/>
     </target>
 
-    <!-- antism, path refid can be used in classpath, but not copy -->
+    <!-- pathconvert?, path refid can be used in classpath, but not copy -->
     <fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
         <include name="${env.JAVA_HOME}/lib/tools.jar"/>
     </fileset>
-    <fileset dir="${dir.build}" id="runtime.viskit">
+    <fileset dir="${dir.build}/lib" id="runtime.viskit">
         <include name="viskit.jar"/>
     </fileset>
     <fileset dir="${dir.lib}" id="runtime.lib" >
@@ -96,6 +96,14 @@
     <path id="runtime.classpath.paths">
         <fileset refid="runtime.javac"/>
         <fileset refid="runtime.viskit"/>
+        <fileset refid="runtime.lib"/>
+        <fileset refid="runtime.lib.ext"/>
+        <fileset refid="jaxb.classes"/>
+    </path>
+    
+    <!-- this path gets pathconverted for the native launcher in the jar target, see launch4j -->
+    <path id="launcher.classpath">
+        <fileset refid="runtime.javac"/>
         <fileset refid="runtime.lib"/>
         <fileset refid="runtime.lib.ext"/>
         <fileset refid="jaxb.classes"/>
@@ -237,10 +245,18 @@
     </target>
     <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
-        <!-- remove for dist 
-        <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/viskit.jar"/>
-        -->
-        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar"/>
+       
+        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
+            <map from="${lib}" to=".\lib" />
+        </pathconvert>
+
+        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar">
+            <manifest>viskit.EventGraphAssemblyComboMain
+                <!-- used by native launcher, see launch4j -->
+                <attribute name="Main-Class" value="viskit.Splash2.DefaultEntry" />
+                <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
+            </manifest>
+        </jar>
     
     </target>
 
@@ -637,6 +653,12 @@
         </java>
     </target>
     
+    
+    <!-- The Installer contains the JRE, a native wrapper around viskit.jar and its jars, 
+        and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
+        maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
+        To save time, all slow steps are checked if needed, including the build. -->
+        
     <!-- get all izpack related packages -->
     <condition property="build.host.linux">
         <os family="unix"/>
@@ -663,7 +685,7 @@
     <target name="getJre" depends="checkJre" unless="winJre.exists"  >
         <get src="http://jdl.sun.com/webapps/download/AutoDL?BundleId=10433" dest="${winJre}" />
     </target>
-        
+     
     <target name="moveIzPack" if="build.host.windows">
         <copy todir="${user.home}\IzPack">
             <fileset dir="C:\Program Files\IzPack"/>
@@ -690,19 +712,19 @@
     </target>
     
     <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-win32.zip" dest="${user.home}/launch4j.zip" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-win32.zip" dest="${user.home}/launch4j.zip" />
         <unzip src="${user.home}/launch4j.zip" dest="${user.home}/launch4j"/>
     </target>
     
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-linux.tgz" dest="${user.home}/launch4j.tgz" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-linux.tgz" dest="${user.home}/launch4j.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
         <chmod file="${user.home}/launch4j/launch4j/bin/windres" perm="a+x"/>
         <chmod file="${user.home}/launch4j/launch4j/bin/ld" perm="a+x"/>
     </target>
     
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-macosx.tgz" dest="${user.home}/launch4j.tgz" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-macosx.tgz" dest="${user.home}/launch4j.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
     </target>
     
@@ -726,6 +748,7 @@
     
     <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
         <ant target="dist"/>
+        <ant target="examples.diskit"/>
     </target>
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
@@ -738,13 +761,18 @@
         <mkdir dir="${installer}/images"/>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.javac"/>
-            <fileset refid="runtime.viskit"/>
             <fileset refid="runtime.lib"/>
             <fileset refid="runtime.lib.ext"/> 
             <fileset refid="jaxb.classes"/>
         </copy>
+        <copy todir="${installer}/stage">
+            <fileset refid="runtime.viskit"/>
+        </copy>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
+        </copy>
+        <copy todir="${installer}/stage/examples">
+            <fileset dir="${basedir}/examples"/>
         </copy>
         <copy todir="${installer}/stage/license">
             <fileset dir="${dir.src}/license"/>
@@ -768,21 +796,32 @@
         classpath="${user.home}/orangevolt.jar:${user.home}/roxes.jar"
         resource="com/orangevolt/tools/ant/taskdefs.properties"/>
         
+        <launch4j configFile="${installer}/launch4jConfig.xml"/>
+        
         <izpack input="${installer}/izpack.xml"
-        output="${installer}/build/Install.jar"
+        output="${installer}/build/ViskitInstall.jar"
         installerType="standard"
         basedir="${installer}"
         izPackDir="${izpack}" />
         
-        <launch4j configFile="${installer}/launch4jConfig.xml"/>
+        <launch4j>
+            <config 
+                chdir="." 
+                dontwrapjar="false" 
+                jar="${installer}/build/ViskitInstall.jar" 
+                outfile="${installer}/build/ViskitInstall.exe" 
+                headertype="gui" 
+                icon="${installer}/images/ViskitIcon.ico" >
+                <jre minVersion="1.5.0"/>
+            </config>
+        </launch4j>
         
-        <!-- this doesn't seem to work, and DOS gets upset if you try to
-              make anything but a DOS style path. Should still prompt to download jre though -->
+        
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
             rem ${winJreExe} /S /v/qn 
             ${winJreExe}
-            Install.exe
+            ViskitInstall.exe
         </echo>
         
         <chmod perm="+x" file="${installer}/build/both.bat" />
@@ -794,7 +833,7 @@
      
         <zip destfile="${installer}/build/install.zip"
         basedir="${installer}/build/."
-        includes="both.bat,Install.exe,${winJre}" />
+        includes="both.bat,ViskitInstall.exe,${winJreExe}" />
         
         <sfx
         archive="${installer}/build/install.zip"
@@ -802,12 +841,17 @@
         execute="both.bat"
         icon="${installer}/images/ViskitIcon.ico"
         output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
+       
+        <!--<ant target="clean.installers"/>
+        -->
+    </target> 
         
+    <target name="clean.installers">
         <delete file="${installer}/build/install.zip"/>
-       <!-- <delete file="${installer}/build/both.bat"/>-->
+        <!-- <delete file="${installer}/build/both.bat"/>-->
         <delete file="${user.home}/izpack-installer.jar"/>
+        <delete file="${user.home}/launch4j.*"/>
         <delete file="${installer}/build/${winJre}"/>
-    
     </target>
     
 </project>
