@@ -41,7 +41,7 @@
     </locale>
     
     <resources>
-        <res src="stage/license/lgpl.txt" id="LicensePanel.license"/>
+        <res src="stage/license/lgpl.txt" id="LicencePanel.license"/>
     </resources>
     
     <panels>
@@ -64,6 +64,9 @@
         </pack>
         <pack name="Examples" required="yes">
             <description>Viskit Examples</description>
+            <fileset dir="stage" targetdir="$INSTALL_PATH">
+                <include name="examples"/>
+            </fileset>
         </pack>
         <pack name="BehaviorLibraries" required="no">
             <description>SavageDefenseTactics, SavageTactics</description>
