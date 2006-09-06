@@ -708,8 +708,8 @@
 		<include name="american-flag.gif"/>
 	    </fileset>
         </copy>
-	<rename src="${izpack}/bin/langpacks/flags/eng.gif" dest="${izpack}/bin/langpacks/flags/eng-uk.gif"/>
-	<rename src="${izpack}/bin/langpacks/flags/american-flag.gif" dest="${izpack}/bin/langpacks/flags/eng.gif"/>
+	<move file="${izpack}/bin/langpacks/flags/eng.gif" tofile="${izpack}/bin/langpacks/flags/eng-uk.gif"/>
+	<move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/eng.gif"/>
     </target>
     
     <target name="checkLaunch4j">
@@ -784,6 +784,11 @@
         </copy>
         <copy todir="${installer}/stage/license">
             <fileset dir="${dir.src}/license"/>
+        </copy>
+        <copy todir="${installer}/stage/">
+            <fileset dir="${dir.src}/javaHelp/VisPages">
+		<include name="intro.html"/>
+	    </fileset>
         </copy>
         
         <taskdef name="izpack"
