@@ -64,18 +64,19 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <include name="lib/**/*" />
                 <include name="Viskit.exe"/>
+		<include name="viskit.jar"/>
             </fileset>
         </pack>
         <pack name="Examples" required="yes">
             <description>Viskit Examples</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="examples"/>
+                <include name="examples/**/*"/>
             </fileset>
         </pack>
         <pack name="BehaviorLibraries" required="no">
             <description>SavageDefenseTactics, SavageTactics</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="BehaviorLibraries"/>
+                <include name="BehaviorLibraries/**/*"/>
             </fileset>
         </pack> 
     </packs>
