@@ -703,6 +703,13 @@
         <echo>Installing IzPack from web, please just use default install path when prompted.</echo>
         <java fork="true" jar="${user.home}/izpack-install.jar" />
         <ant target="moveIzPack"/>
+        <copy todir="${izpack}/bin/langpacks/flags">
+            <fileset dir="${installer}/images">
+		<include name="american-flag.gif"/>
+	    </fileset>
+        </copy>
+	<rename src="${izpack}/bin/langpacks/flags/eng.gif" dest="${izpack}/bin/langpacks/flags/eng-uk.gif"/>
+	<rename src="${izpack}/bin/langpacks/flags/american-flag.gif" dest="${izpack}/bin/langpacks/flags/eng.gif"/>
     </target>
     
     <target name="checkLaunch4j">
@@ -760,8 +767,6 @@
         <mkdir dir="${installer}/build" />
         <delete dir="${installer}/stage"/>
         <mkdir dir="${installer}/stage/lib"/>
-        <delete dir="${installer}/images"/>
-        <mkdir dir="${installer}/images"/>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.javac"/>
             <fileset refid="runtime.lib"/>
@@ -779,13 +784,6 @@
         </copy>
         <copy todir="${installer}/stage/license">
             <fileset dir="${dir.src}/license"/>
-        </copy>
-        <copy todir="${installer}/images">
-            <fileset dir="${dir.src}/viskit/images">
-                <include name="ViskitLogo.png"/>
-                <include name="ViskitSplash2.bmp"/>
-                <include name="ViskitIcon.ico"/>
-            </fileset>
         </copy>
         
         <taskdef name="izpack"
