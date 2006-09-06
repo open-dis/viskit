@@ -44,7 +44,8 @@
     </locale>
     
     <resources>
-        <res src="stage/license/lgpl.txt" id="LicencePanel.license"/>
+        <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
+	<res src="stage/intro.html" id="HTMLInfoPanel.info"/>
     </resources>
     
     <panels>
