@@ -249,8 +249,8 @@
     </target>
     
     <target depends="compile" name="jar-executable">
-        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
-            <map from="${lib}" to=".\lib" />
+        <pathconvert targetos="windows" pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
+            <map from="${dir.lib}" to=".\lib" />
         </pathconvert>
 
         <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar">
