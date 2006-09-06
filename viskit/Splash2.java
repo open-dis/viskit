@@ -138,6 +138,9 @@
          spl.setLocation((d.width-spl.getWidth())/2,(d.height-spl.getHeight())/2);
          spl.setVisible(true);
       
+	 if ( args.length == 0 ) {
+	    args = new String[] { "viskit.EventGraphAssemblyComboMain" };
+	 }
          
       
       // First argument is main class

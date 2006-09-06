@@ -251,7 +251,7 @@
         </pathconvert>
 
         <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar">
-            <manifest>viskit.EventGraphAssemblyComboMain
+            <manifest>
                 <!-- used by native launcher, see launch4j -->
                 <attribute name="Main-Class" value="viskit.Splash2.DefaultEntry" />
                 <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
