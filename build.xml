@@ -245,7 +245,10 @@
     </target>
     <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
-       
+        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar"/>
+    </target>
+    
+    <target depends="compile" name="jar-executable">
         <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
             <map from="${lib}" to=".\lib" />
         </pathconvert>
@@ -253,7 +256,7 @@
         <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar">
             <manifest>
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2.DefaultEntry" />
+                <attribute name="Main-Class" value="viskit.Splash2" />
                 <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
             </manifest>
         </jar>
@@ -747,7 +750,7 @@
         <available file="${dir.build.lib}/viskit.jar" property="viskit.built" />
     </target>
     <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
-        <ant target="dist"/>
+        <ant target="jar-executable"/>
         <ant target="examples.diskit"/>
     </target>
     
