@@ -15,11 +15,14 @@
         <appversion>"0.4.1"</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
+            <author name="Curt Blaise" email="cblaise@nps.edu"/>
             <author name="Don Brutzman" email="brutzman@nps.edu"/>
             <author name="Arnie Buss" email="abuss@nps.edu"/>
+            <author name="Len Daly" email="leonard.daly@realism.com"/>
             <author name="Rick Goldberg" email="rick@aniviza.com"/>
             <author name="Don McGregor" email="mcgredo@nps.edu"/>
-            <author name="Pat Sullivan (Lt.)" email="pjsulliv@nps.edu"/>
+            <author name="Terry Norbraten" email="tnorbra@nps.edu"/>
+            <author name="Pat Sullivan" email="pjsulliv@nps.edu"/>
         </authors>
         <url>http://diana.gl.nps.navy.mil/Viskit</url>
         <javaversion>1.5</javaversion>
