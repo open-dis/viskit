@@ -803,7 +803,7 @@
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
         
         <!-- create executable jar file that installs Viskit and related files, assumes java exists, 
-            however once Viskit.exe is actually runs it should check and download latest 1.5.0 -->
+            however once Viskit.exe actually runs it should check and download latest 1.5.0 -->
         <izpack input="${installer}/izpack.xml"
         output="${installer}/build/ViskitInstall.jar"
         installerType="standard"
