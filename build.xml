@@ -771,8 +771,10 @@
             <fileset refid="runtime.javac"/>
             <fileset refid="runtime.lib"/>
             <fileset refid="runtime.lib.ext"/> 
-            <fileset refid="jaxb.classes"/>
         </copy>
+	<copy todir="${installer}/stage/lib/jwsdp-1.5">
+            <fileset refid="jaxb.classes"/>
+	</copy>
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit"/>
         </copy>
