@@ -285,7 +285,7 @@ start();</Code>
             <Assignment value="new diskit.AvoidanceMoverManager(this)"/>
         </StateTransition>
         <StateTransition state="avoidanceMoverManager">
-            <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
+            <Operation method="avoidToOffset(avoidancePoint, zoneMoverManager)"/>
         </StateTransition>
         <Code>setStartPosition(getLocation());</Code>
         <Coordinate x="650" y="340"/>
