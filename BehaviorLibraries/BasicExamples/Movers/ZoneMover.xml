@@ -55,7 +55,7 @@
     <Event name="ProcessZones">
         <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled.</Comment>
         <StateTransition state="waypointCreator">
-            <Assignment value="new diskit.WaypointCreator(this, zones)"/>
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
         </StateTransition>
         <StateTransition state="zoneMoverManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
