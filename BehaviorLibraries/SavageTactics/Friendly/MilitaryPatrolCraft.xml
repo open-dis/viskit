@@ -202,6 +202,9 @@
         <StateTransition state="zoneMoverManager">
             <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
         </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
         <Schedule event="StartMoving"/>
         <Code/>
         <Coordinate x="210" y="90"/>
@@ -285,7 +288,7 @@ start();</Code>
             <Assignment value="new diskit.AvoidanceMoverManager(this)"/>
         </StateTransition>
         <StateTransition state="avoidanceMoverManager">
-            <Operation method="avoidToOffset(avoidancePoint, zoneMoverManager)"/>
+            <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
         </StateTransition>
         <Code>setStartPosition(getLocation());</Code>
         <Coordinate x="650" y="340"/>
