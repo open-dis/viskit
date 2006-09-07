@@ -708,8 +708,8 @@
 		<include name="american-flag.gif"/>
 	    </fileset>
         </copy>
-	<move file="${izpack}/bin/langpacks/flags/eng.gif" tofile="${izpack}/bin/langpacks/flags/eng-uk.gif"/>
-	<move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/eng.gif"/>
+        <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
+	<move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
     </target>
     
     <target name="checkLaunch4j">

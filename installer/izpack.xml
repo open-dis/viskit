@@ -35,6 +35,7 @@
     </guiprefs>
     
     <locale>
+        <langpack iso3="usa"/>
         <langpack iso3="eng"/>
         <langpack iso3="fra"/>
         <langpack iso3="deu"/>
@@ -65,6 +66,7 @@
                 <include name="lib/**/*" />
                 <include name="Viskit.exe"/>
 		<include name="viskit.jar"/>
+                <include name="javaHelp/**/*"/>
             </fileset>
         </pack>
         <pack name="Examples" required="yes">
@@ -73,10 +75,12 @@
                 <include name="examples/**/*"/>
             </fileset>
         </pack>
-        <pack name="BehaviorLibraries" required="no">
+        <pack name="BehaviorLibraries" required="yes">
             <description>SavageDefenseTactics, SavageTactics</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <include name="BehaviorLibraries/**/*"/>
+                <include name="images/**/*"/>
+                <include name="AnalystReports/**/*"/>
             </fileset>
         </pack> 
     </packs>
