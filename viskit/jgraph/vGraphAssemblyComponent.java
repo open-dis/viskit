@@ -272,9 +272,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
           }
           else if(se instanceof SimEvListenerEdge) {
             sb.append("<center>SimEvent Listener<br><u>");
-            sb.append(from);
-            sb.append("</u> listening to <u>");
             sb.append(to);
+            sb.append("</u> listening to <u>");
+            sb.append(from);
             sb.append("</center>");
           }
           else /*if(vc.getUserObject() instanceof PropChangeEdge)*/ {
