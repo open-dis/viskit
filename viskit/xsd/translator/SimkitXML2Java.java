@@ -660,6 +660,7 @@ public class SimkitXML2Java {
 	pw.print(s.getDelay() + cm + "new Object[]" + ob);
 
 	while ( ei.hasNext() ) {
+            boolean prim = false;
 	    EdgeParameterType ep = (EdgeParameterType) ei.next();
             ArgumentType arg = (ArgumentType) eventArgsi.next();
 	    try {
@@ -685,10 +686,12 @@ public class SimkitXML2Java {
 		} else { // see #93
                     constructor = "";
                     pw.print(ep.getValue());
-                } if ( !constructor.equals("") )
+                } if ( !constructor.equals("") ) {
 		    pw.print(constructor + lp + ep.getValue() + rp);
+                    prim = true;
+                }
 	    }
-	    if (c != null) {
+	    if (c != null && !prim) {
 		pw.print(ep.getValue());
 	    }
 
