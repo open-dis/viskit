@@ -14,11 +14,19 @@
 	<xsl:output encoding="UTF-8" media-type="text/html" indent="yes" cdata-section-elements="Script" omit-xml-declaration="no" method="xml"/>
 
 <xsl:template match="/">
+    <!-- TODO:  fix
+<xsl:text>
+<![CDATA[
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+]]>
+</xsl:text>
+-->
+
 <html>
 	<head>
 		<meta http-equiv="Content-Language" content="en-us" />
 		<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
-		<title>Viskit Analyst Report</title>
+		<title>Viskit Simulation Analysis Report</title>
 	</head>
 	<body>
 	<!--Title information-->
@@ -26,37 +34,37 @@
 		<hr/>
 		
 	<!--Executive Summary : NOTE: omitted if analyst did not include comments  -->	
-    <xsl:apply-templates select="/AnalystReport/ExecutiveSummary"/>
+    <xsl:apply-templates select="//ExecutiveSummary"/>
     <p/>
     <p/>
     <hr />
     
     <!--Simulation Location-->
-    <xsl:apply-templates select="/AnalystReport/SimulationLocation"/>    
+    <xsl:apply-templates select="//SimulationLocation"/>    
           
      <p/>
      <p/>
      <hr/>
      
 	<!--Simulation Configuration-->
-	<xsl:apply-templates select="/AnalystReport/SimulationConfiguration" mode="ConfigHeader"/>
+	<xsl:apply-templates select="//SimulationConfiguration" mode="ConfigHeader"/>
 
 	    <p/>
 	    <p/>
 	    <hr/>
 	    
 	    <!--Entity Parameters -->
-	    <xsl:apply-templates select="/AnalystReport/EntityParameters" mode="ParamHeader"/>
+	    <xsl:apply-templates select="//EntityParameters" mode="ParamHeader"/>
 	    <p/>
-	    <xsl:apply-templates select="/AnalystReport/EntityParameters/ParameterTables/EntityParameterTable"/>
+	    <xsl:apply-templates select="//EntityParameters/ParameterTables/EntityParameterTable"/>
 	    <p/>
         <p/>
         <hr/>	
 	
 	<!--Behavior Definitions -->
-	<xsl:apply-templates select="/AnalystReport/BehaviorDefinitions" mode="BehaviorHeader"/>
+	<xsl:apply-templates select="//BehaviorDefinitions" mode="BehaviorHeader"/>
 	    <p/>
-	    <xsl:apply-templates select="/AnalystReport/BehaviorDefinitions/BehaviorList"/>
+	    <xsl:apply-templates select="//BehaviorDefinitions/BehaviorList"/>
 	    <p/>
 	    <p/>
 	    <p/>
@@ -66,15 +74,15 @@
 	    
 	 <!--Statistical Reports-->
 
-	 	<xsl:apply-templates select="/AnalystReport/StatisticalResults" mode="StatsHeader"/>
-		<xsl:apply-templates select="/AnalystReport/StatisticalResults/ReplicationReports/SimEntity" mode="RepStats"/>
-		<xsl:apply-templates select="/AnalystReport/StatisticalResults/SummaryReport" mode="SumStats"/>
+	 	<xsl:apply-templates select="//StatisticalResults" mode="StatsHeader"/>
+		<xsl:apply-templates select="//StatisticalResults/ReplicationReports/SimEntity" mode="RepStats"/>
+		<xsl:apply-templates select="//StatisticalResults/SummaryReport" mode="SumStats"/>
 	    <p/>
 	    <p/>
 	    <hr/>
 	    
 	    <!--Conclusions Recommendations -->
-		<xsl:apply-templates select="/AnalystReport/ConclusionsRecommendations"/>
+		<xsl:apply-templates select="//ConclusionsRecommendations"/>
 	    
 	</body>
 </html>
@@ -87,8 +95,8 @@
 <xsl:template match="AnalystReport">
 <p align="center"><font size="2"><b>***</b>THIS REPORT IS: <b><b><xsl:value-of select="@classification"/>***</b></b></font></p>
  <p align="center"><font size="6"><xsl:value-of select="@name"/></font></p>
- <p align="center">Prepared by: <b><xsl:value-of select="@author"/></b></p>
- <p align="center">Date: <b><xsl:value-of select="@date"/></b></p>
+ <p align="center">Analyst: <b><xsl:value-of select="@author"/></b></p>
+ <p align="center">Analysis date: <b><xsl:value-of select="@date"/></b></p>
 </xsl:template>
 
 <!--Executive Summary template -->
@@ -118,15 +126,15 @@
 
 <!--SimulationConfiguration templates-->
 <xsl:template match="SCComments" mode="ConfigHeader">
-<p align="left"><b>Simulation Configuration</b></p>
-<p align="left"><i><u>Analyst Discussion</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
+<p align="left"><b>Viskit Assembly Simulation Configuration</b></p>
+<p align="left"><i><u>Analyst Description</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="SCConclusions" mode="ConfigHeader">
 <p align="left"><i><u>Post-Experiment Analysis</u>:</i><font color="#000099"><xsl:value-of select="@text"/></font></p> 
-<p align="center"><b>Simulation Entities</b></p>
+<p align="center"><b>Summary of Simulation Entities</b></p>
 		<div align="center">
 		<table border="1"><tr><td bgcolor="#FFFFCC">Entity Name</td><td bgcolor="#FFFFCC">Behavior Definition</td></tr>
-			<xsl:apply-templates select="/AnalystReport/SimulationConfiguration/EntityTable/SimEntity" mode="EntitiesTable"/>
+			<xsl:apply-templates select="//SimulationConfiguration/EntityTable/SimEntity" mode="EntitiesTable"/>
 	    </table>
 	    </div>
 </xsl:template>
@@ -152,7 +160,7 @@
 <!--EntityParameter templates-->
 <xsl:template match="EPComments" mode="ParamHeader">
 <p align="left"><b>Entity Parameters</b></p>
-<p align="left"><i><u>Analyst Discussion</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
+<p align="left"><i><u>Analyst Description</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="EPConclusions" mode="ParamHeader">
 <p align="left"><i><u>Post-Experiment Analysis</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
@@ -278,7 +286,7 @@
 <xsl:template match="BCComments" mode="BehaviorHeader">
 <hr/>
 <p align="left"><b>Behavior Definitions</b></p>
-<p align="left"><i><u>Analyst Discussion</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
+<p align="left"><i><u>Analyst Description</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="BCConclusions" mode="BehaviorHeader">
 <p align="left"><i><u>Post-Experiment Analysis</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
@@ -335,7 +343,7 @@
 <!--Statistical Results -->
 <xsl:template match="SRComments" mode="StatsHeader">
 <p align="left"><b>Statistical Results</b></p>
-<p align="left"><i><u>Analyst Discussion</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
+<p align="left"><i><u>Analyst Description</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
 </xsl:template>
 <xsl:template match="SRConclusions" mode="StatsHeader">
 <p align="left"><i><u>Post-Experiment Analysis</u>:</i><font color="#00006C"><xsl:value-of select="@text"/></font></p> 
