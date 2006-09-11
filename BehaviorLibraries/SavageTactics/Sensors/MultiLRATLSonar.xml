@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="Rick Goldberg" extend="diskit.SphereCutterSensor" name="MultiLRATLSonar" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Basic: has a single capture wedge
+LogRangeTL: transmission loss estimated to be 20log range
+Sonar: clipped to z+, uses Sonalyst's Sonar eqn's (a) and (b)
+
+SL - 2TL + TS - (NL - DI) - DT = 0; units in dB related to uPa
+
+SL = Signal strength of ping
+TL = Transmission loss approx 10log r
+TS = Target strength
+NL = Ambient noise
+DI = noise filter capability of sonar
+RD = detection differential, can be operator skill level or aka  DT as Detection Threshold
+AT = Attenuation in dB/km given by 12.0/11.0 * (.003 + .1f^2/(1+f^2) + 40.0f^2/(4100+f^2) + .000275f^2)</Comment>
+    <Parameter name="mover" type="diskit.Mover3D">
+        <Comment>Underlying Mover</Comment>
+    </Parameter>
+    <Parameter name="maxRange" type="double">
+        <Comment>Maximum possible range ( and then some )</Comment>
+    </Parameter>
+    <Parameter name="SL" type="double">
+        <Comment>Source level, or how loud our ping is.</Comment>
+    </Parameter>
+    <Parameter name="DI" type="double">
+        <Comment>Directivity Index, ability of Sonar to filter out noise</Comment>
+    </Parameter>
+    <Parameter name="RD" type="simkit.random.RandomVariate">
+        <Comment>Recognition Differential</Comment>
+    </Parameter>
+    <Parameter name="scans" type="diskit.SonarScan">
+        <Comment>Capture volumes extending out from center of sensor</Comment>
+    </Parameter>
+    <Parameter name="pingInterval" type="double">
+        <Comment>Time in seconds between pings</Comment>
+    </Parameter>
+    <Parameter name="noise" type="simkit.random.RandomVariate">
+        <Comment>Noise Level generator</Comment>
+    </Parameter>
+    <Parameter name="frequency" type="double">
+        <Comment>Sonar Frequency</Comment>
+    </Parameter>
+    <StateVariable name="TL" type="double">
+        <Comment>Transmission Loss</Comment>
+    </StateVariable>
+    <StateVariable name="TS" type="double">
+        <Comment>Target Strength of currently sampled target in contacts list</Comment>
+    </StateVariable>
+    <StateVariable name="DT" type="double">
+        <Comment>Detection Threshold as determined by RD</Comment>
+    </StateVariable>
+    <StateVariable name="NL" type="double">
+        <Comment>Noise Level</Comment>
+    </StateVariable>
+    <StateVariable name="AT" type="double">
+        <Comment>Attenuation</Comment>
+    </StateVariable>
+    <StateVariable name="detections" type="java.util.Hashtable">
+        <Comment>keyed by contacts to booleans</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="DT">
+            <Assignment value="RD.generate()"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="200"/>
+    </Event>
+    <Event name="CheckDetection">
+        <Comment>Sensor's location is the location of the underlyinig mover. All calculations are done in relative coordinates, with sensor at origin.</Comment>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <LocalVariable name="relativeLocation" type="diskit.Vec3d" value="new diskit.Vec3d(contact.getLocation()); relativeLocation.sub(getMover().getLocation())">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="relativeVelocity" type="diskit.Vec3d" value="new diskit.Vec3d(contact.getVelocity()); relativeVelocity.sub(getMover().getVelocity())">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="intercepts" type="java.util.Vector" value="scans.intercept(relativeLocation,relativeVelocity)">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="detections">
+            <Operation method="put(contact, new Boolean(false))"/>
+        </StateTransition>
+        <Schedule condition="intercepts.size() &gt; 0" delay="0.0" event="ProcessIntercepts" priority="0">
+            <Comment/>
+            <EdgeParameter value="intercepts"/>
+            <EdgeParameter value="0"/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;Checking detection of "+contact);
+System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercepts at "+intercepts+" length "+intercepts.size());</Code>
+        <Coordinate x="350" y="210"/>
+    </Event>
+    <Event name="StartPings">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Argument name="enterPoint" type="diskit.Vec4d"/>
+        <Argument name="exitPoint" type="diskit.Vec4d"/>
+        <Schedule condition="true" delay="0.0" event="Ping" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;Starting pings...");</Code>
+        <Coordinate x="20" y="440"/>
+    </Event>
+    <Event name="Ping">
+        <Comment>Target Strength here is place holder for SMAL lookup</Comment>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <LocalVariable name="range" type="double" value="Vec3d.distance(getMover().getLocation(),contact.getLocation())">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="fSq" type="double" value="frequency*frequency">
+            <Comment>frequency^2</Comment>
+        </LocalVariable>
+        <StateTransition state="TL">
+            <Assignment value="10 * Math.log(range)"/>
+        </StateTransition>
+        <StateTransition state="DT">
+            <Assignment value="getRD().generate()"/>
+        </StateTransition>
+        <StateTransition state="TS">
+            <Assignment value="10.0"/>
+        </StateTransition>
+        <StateTransition state="NL">
+            <Assignment value="noise.generate()"/>
+        </StateTransition>
+        <StateTransition state="AT">
+            <Assignment value="(range/1000.0) * (.003 + (.1*fSq/(1+fSq)) + (40.0*fSq/(4100.0 + fSq)) + .000275*fSq) * 12.0/11.0"/>
+        </StateTransition>
+        <Schedule condition="true" delay="getPingInterval()" event="Ping" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="((SL - (2 * TL) + TS - ( NL - DI ) - DT - AT) &gt; 0.0) &amp;&amp; (! ( ((Boolean)(detections.get(contact)) ).booleanValue()))" delay="0.0" event="Detection" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="((SL - (2 * TL) + TS - ( NL - DI ) - DT - AT) &lt;= 0.0) &amp;&amp; (( ((Boolean)(detections.get(contact)) ).booleanValue()))" delay="0.0" event="UnDetection" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;Ping to range "+range);</Code>
+        <Coordinate x="20" y="610"/>
+    </Event>
+    <Event name="StopPings">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Cancel condition="true" event="Ping">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Cancel>
+        <Schedule event="UnDetection"/>
+        <Code/>
+        <Coordinate x="350" y="440"/>
+    </Event>
+    <Event name="Detection">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <StateTransition state="detections">
+            <Operation method="put(contact,new Boolean(true))"/>
+        </StateTransition>
+        <Code>System.out.println("MultiLRATLSonar "+this+" Detected "+contact);</Code>
+        <Coordinate x="350" y="670"/>
+    </Event>
+    <Event name="UnDetection">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <StateTransition state="detections">
+            <Operation method="put(contact,new Boolean(false))"/>
+        </StateTransition>
+        <Code>System.out.println("UnDetection "+contact);</Code>
+        <Coordinate x="350" y="550"/>
+    </Event>
+    <Event name="ProcessIntercepts">
+        <Comment/>
+        <Argument name="intercepts" type="java.util.Vector"/>
+        <Argument name="count" type="int"/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <LocalVariable name="intercept" type="diskit.Vec4d[]" value="(diskit.Vec4d[]) (intercepts.get(count))">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="count &lt; intercepts.size() - 1" delay="0.0" event="ProcessIntercepts" priority="0">
+            <Comment/>
+            <EdgeParameter value="intercepts"/>
+            <EdgeParameter value="count+1"/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="intercept[1].get(3) &gt; 0.0" delay="intercept[1].get(3)" event="StopPings" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="intercept[0].get(3) &gt; 0.0" delay="intercept[0].get(3)" event="StartPings" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+            <EdgeParameter value="intercept[0]"/>
+            <EdgeParameter value="intercept[1]"/>
+        </Schedule>
+        <Code>System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercept 0 "+intercept[0]);
+System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercept 1 "+intercept[1]);</Code>
+        <Coordinate x="20" y="310"/>
+    </Event>
+    <Event name="RegisterSensor">
+        <Comment/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Code/>
+        <Coordinate x="160" y="200"/>
+    </Event>
+    <Code>/* 
+Some Frequencies of interest
+3.5 kHz   :   .22 db/kyd (.24 db/km)
+10 kHz    :   1.08 db/kyd (1.19 db/km)
+30 kHz    :   7.55 db/kyd (8.31 db/km)
+60 kHz    :   19.79 db/kyd (21.77 db/km)
+100 kHz  :   31.22 db/kyd (34.34 db/km)
+*/
+
+public static double FREQ_3_5_Khz = 3500.0;
+public static double FREQ_10_Khz = 10000.0;
+public static double FREQ_30_Khz = 30000.0;
+public static double FREQ_60_Khz = 60000.0;
+public static double FREQ_100_Khz = 100000.0;</Code>
+</SimEntity>
+
