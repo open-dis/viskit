@@ -325,6 +325,10 @@ public class Vstatics
       List[] resolved = (List[])(parameterMap.get(type));
       if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
           Class c = classForName(type);
+          if(c == null) {
+            System.err.println("Can't resolve type: "+type);
+            return resolved;
+          }
           if(debug)System.out.println("adding "+c.getName());
           ObjectFactory of = new ObjectFactory();
           Constructor[] constr = c.getConstructors();
