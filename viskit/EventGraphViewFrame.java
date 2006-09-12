@@ -198,6 +198,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     return(VgraphComponentWrapper)jsp.getViewport().getComponent(0);
   }
 
+  public Component getCurrentJgraphComponent()
+  {
+    VgraphComponentWrapper vcw = getCurrentVgcw();
+    return vcw.drawingSplitPane.getLeftComponent();
+  }
   class TabSelectionHandler implements ChangeListener
   {
    /*

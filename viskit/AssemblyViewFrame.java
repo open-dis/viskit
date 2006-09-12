@@ -103,6 +103,11 @@
          return assemblyEditorContent;
       }
    
+   public Component getCurrentJgraphComponent()
+   {
+     return graphPane;
+
+   }
        public JMenuBar getMenus()
       {
          return myMenuBar;

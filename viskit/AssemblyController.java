@@ -1334,8 +1334,26 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       // Similarly to Controller.java (EG editor controller), putting the views into tabs requires the following two
       // to replace the one above.
       AssemblyViewFrame avf = (AssemblyViewFrame)getView();
-      Component component = avf.getContent();
+      //Component component = avf.getContent();
 
+      // Get only the jgraph part
+      Component component = avf.getCurrentJgraphComponent();
+      if(component instanceof JScrollPane) {
+        component = ((JScrollPane)component).getViewport().getView();
+      }
+      Rectangle reg = component.getBounds();
+      BufferedImage image = new BufferedImage(reg.width,reg.height,BufferedImage.TYPE_3BYTE_BGR);
+      // Tell the jgraph component to draw into our memory
+      component.paint(image.getGraphics());
+      try {
+        ImageIO.write(image,"png",fil);
+      }
+      catch (IOException e) {
+        System.out.println("AssemblyController Exception in capturing screen: "+e.getMessage());
+        return;
+      }
+
+/*
       Point p = new Point(0, 0);
       SwingUtilities.convertPointToScreen(p, component);
       Rectangle region = component.getBounds();
@@ -1349,10 +1367,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       catch (Exception e) {
         e.printStackTrace();
       }
+*/
 
       // display a scaled version
       JFrame frame = new JFrame("Saved as " + fil.getName());
-      ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
+      //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
+      // Nah...
+      ImageIcon ii = new ImageIcon(image);
       JLabel lab = new JLabel(ii);
       frame.getContentPane().setLayout(new BorderLayout());
       frame.getContentPane().add(lab, BorderLayout.CENTER);
