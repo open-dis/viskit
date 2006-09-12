@@ -1171,7 +1171,7 @@
                 <TerminalParameter name="" type="java.lang.Object" value="new Double(10.0)"/>
             </MultiParameter>
         </FactoryParameter>
-        <TerminalParameter name="frequency" type="double" value="20000"/>
+        <TerminalParameter name="frequency" type="double" value="10"/>
         <Coordinate x="110" y="200"/>
     </SimEntity>
     <SimEntity description="" name="SonarMediator_0" type="diskit.SonarMediator">
