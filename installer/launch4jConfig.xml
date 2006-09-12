@@ -12,7 +12,7 @@
     <!-- Header types: 0-GUI, 1-console -->
     <headerType>0</headerType>
     <outfile>stage/Viskit.exe</outfile>
-    <jar>stage/viskit.jar</jar>
+    <jar>stage/viskit-exe.jar</jar>
     <dontWrapJar>false</dontWrapJar>
     <errTitle>Viskit Install Error</errTitle>
     <jarArgs></jarArgs>
@@ -27,12 +27,16 @@
       <maxHeapSize>256</maxHeapSize>
       <args>-client</args>
     </jre>
+    
     <splash>
       <file>images/ViskitSplash2.bmp</file>
+      
       <waitForWindow>true</waitForWindow>
-      <timeout>60</timeout>
-      <timeoutErr>true</timeoutErr>
+      
+      <timeout>600</timeout>
+      <timeoutErr>false</timeoutErr>-->
     </splash>
+   <!--
     <versionInfo>
       <fileVersion>0.4.1.0</fileVersion>
       <txtFileVersion>0.4.1.0</txtFileVersion>
@@ -44,5 +48,5 @@
       <companyName>Naval Postgraduate School</companyName>
       <internalName>viskit.jar</internalName>
       <originalFilename>Viskit.exe</originalFilename>
-    </versionInfo>
+    </versionInfo>-->
   </launch4jConfig>

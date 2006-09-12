@@ -65,8 +65,9 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <include name="lib/**/*" />
                 <include name="Viskit.exe"/>
-		<include name="viskit.jar"/>
+		<include name="viskit-exe.jar"/>
                 <include name="javaHelp/**/*"/>
+                <include name="viskit/javahelp/**/*"/>
             </fileset>
         </pack>
         <pack name="Examples" required="yes">
