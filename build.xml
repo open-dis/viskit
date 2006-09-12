@@ -82,6 +82,9 @@
     <fileset dir="${dir.build}/lib" id="runtime.viskit">
         <include name="viskit.jar"/>
     </fileset>
+    <fileset dir="${dir.build}/lib" id="runtime.viskit.exe">
+        <include name="viskit-exe.jar"/>
+    </fileset>
     <fileset dir="${dir.lib}" id="runtime.lib" >
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
@@ -253,10 +256,10 @@
             <map from="${dir.lib}" to=".\lib" />
         </pathconvert>
 
-        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar">
+        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit-exe.jar">
             <manifest>
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2" />
+                <attribute name="Main-Class" value="viskit.Splash2$DefaultEntry" />
                 <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
             </manifest>
         </jar>
@@ -723,19 +726,19 @@
     </target>
     
     <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-win32.zip" dest="${user.home}/launch4j.zip" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-win32.zip" dest="${user.home}/launch4j.zip" />
         <unzip src="${user.home}/launch4j.zip" dest="${user.home}/launch4j"/>
     </target>
     
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-linux.tgz" dest="${user.home}/launch4j.tgz" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-linux.tgz" dest="${user.home}/launch4j.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
         <chmod file="${user.home}/launch4j/launch4j/bin/windres" perm="a+x"/>
         <chmod file="${user.home}/launch4j/launch4j/bin/ld" perm="a+x"/>
     </target>
     
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-macosx.tgz" dest="${user.home}/launch4j.tgz" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-2.1.5-macosx.tgz" dest="${user.home}/launch4j.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
     </target>
     
@@ -754,7 +757,7 @@
     </target>
     
     <target name="checkViskit" >
-        <available file="${dir.build.lib}/viskit.jar" property="viskit.built" />
+        <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built" />
     </target>
     <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
         <ant target="jar-executable"/>
@@ -770,13 +773,15 @@
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.javac"/>
             <fileset refid="runtime.lib"/>
-            <fileset refid="runtime.lib.ext"/> 
+        </copy>
+        <copy todir="${installer}/stage/lib/ext">
+            <fileset refid="runtime.lib.ext"/>
         </copy>
 	<copy todir="${installer}/stage/lib/jwsdp-1.5">
             <fileset refid="jaxb.classes"/>
 	</copy>
         <copy todir="${installer}/stage">
-            <fileset refid="runtime.viskit"/>
+            <fileset refid="runtime.viskit.exe"/>
         </copy>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
@@ -799,7 +804,16 @@
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
-        <taskdef name="izpack"
+	<!-- do this again just in case IzPack was installed previously -->
+        <copy todir="${izpack}/bin/langpacks/flags">
+            <fileset dir="${installer}/images">
+		<include name="american-flag.gif"/>
+	    </fileset>
+        </copy>
+        <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
+	<move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
+        
+	<taskdef name="izpack"
         classpath="${izpack}/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
         
@@ -821,21 +835,21 @@
         basedir="${installer}"
         izPackDir="${izpack}" />
         
-        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap Viskitinstall.jar as .exe --> 
+        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe --> 
         <launch4j>
             <config 
                 chdir="." 
                 dontwrapjar="false" 
                 jar="${installer}/build/ViskitInstall.jar" 
                 outfile="${installer}/build/ViskitInstall.exe" 
-                headertype="gui" 
+                headertype="0" 
                 icon="${installer}/images/ViskitIcon.ico" >
                 <jre minVersion="1.5.0"/>
             </config>
         </launch4j>
         
         <!-- since above should have already made something that checks and installs JRE, the following
-            should not be needed... in which case ViskitInstall.exe is already the deployable -->
+            should not be needed... in which case ViskitInstall.exe is already the deployable, unless CD only -->
             
         <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
         
