@@ -1149,7 +1149,7 @@
     </SimEntity>
     <SimEntity description="" name="MultiLRATLSonar" type="diskit.MultiLRATLSonar">
         <TerminalParameter name="mover" type="diskit.Mover3D" value="getSimEntityByName(&quot;AmmoPier&quot;)"/>
-        <TerminalParameter name="maxRange" type="double" value="5000"/>
+        <TerminalParameter name="maxRange" type="double" value="6000"/>
         <TerminalParameter name="SL" type="double" value="226"/>
         <TerminalParameter name="DI" type="double" value="15"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
@@ -1161,9 +1161,9 @@
         </FactoryParameter>
         <MultiParameter type="diskit.SonarScan">
             <MultiParameter type="diskit.util.Transform"/>
-            <TerminalParameter name="p[1] : " type="double" value="5000"/>
+            <TerminalParameter name="p[1] : " type="double" value="6000"/>
         </MultiParameter>
-        <TerminalParameter name="pingInterval" type="double" value="1.0"/>
+        <TerminalParameter name="pingInterval" type="double" value="2.0"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" type="java.lang.String" value="simkit.random.NormalVariate"/>
             <MultiParameter type="java.lang.Object[]">
@@ -1171,7 +1171,7 @@
                 <TerminalParameter name="" type="java.lang.Object" value="new Double(10.0)"/>
             </MultiParameter>
         </FactoryParameter>
-        <TerminalParameter name="frequency" type="double" value="10"/>
+        <TerminalParameter name="frequency" type="double" value="30"/>
         <Coordinate x="110" y="200"/>
     </SimEntity>
     <SimEntity description="" name="SonarMediator_0" type="diskit.SonarMediator">
