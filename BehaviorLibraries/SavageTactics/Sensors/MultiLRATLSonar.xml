@@ -123,7 +123,7 @@ System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercepts at "+intercepts+" len
             <Assignment value="getRD().generate()"/>
         </StateTransition>
         <StateTransition state="TS">
-            <Assignment value="10.0"/>
+            <Assignment value="-15.0"/>
         </StateTransition>
         <StateTransition state="NL">
             <Assignment value="noise.generate()"/>
