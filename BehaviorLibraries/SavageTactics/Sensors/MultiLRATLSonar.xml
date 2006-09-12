@@ -129,7 +129,7 @@ System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercepts at "+intercepts+" len
             <Assignment value="noise.generate()"/>
         </StateTransition>
         <StateTransition state="AT">
-            <Assignment value="(range/1000.0) * (.003 + (.1*fSq/(1+fSq)) + (40.0*fSq/(4100.0 + fSq)) + .000275*fSq) * 12.0/11.0"/>
+            <Assignment value="(range/1000.0) * (.003 + (.1*fSq/(1+fSq)) + (40.0*fSq/(4100.0 + fSq)) + .000275*fSq) * 12.0/11.0; System.out.println(&quot;SL: &quot;+SL+&quot; TL: &quot;+TL+&quot; TS: &quot;+TS+&quot; NL: &quot;+NL+&quot; DI &quot;+DI+&quot; DT: &quot;+DT+&quot; AT: &quot;+AT+&quot;\nSL-(2*TL)+TS-(NL-DI)-DT-AT = &quot;+(SL-(2*TL) +TS-(NL-DI)-DT-AT));"/>
         </StateTransition>
         <Schedule condition="true" delay="getPingInterval()" event="Ping" priority="0">
             <Comment/>
@@ -193,7 +193,8 @@ System.out.println("&gt;&gt;&gt;&gt;&gt;&gt;&gt;Intercepts at "+intercepts+" len
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="intercept[0].get(3) &gt; 0.0" delay="intercept[0].get(3)" event="StartPings" priority="0">
+        <Schedule condition="intercept[1].get(3) &gt; 0.0
+" delay="intercept[0].get(3)&gt;0.0?intercept[0].get(3):0.0" event="StartPings" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="intercept[0]"/>
