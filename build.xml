@@ -792,7 +792,13 @@
 		<include name="intro.html"/>
 	    </fileset>
         </copy>
-        
+        <!-- which one ?-->
+        <copy todir="${installer}/stage/javaHelp">
+            <fileset dir="${dir.src}/javaHelp"/>
+        </copy>
+        <copy todir="${installer}/stage/viskit/javahelp">
+            <fileset dir="${dir.src}/viskit/javahelp"/>
+        </copy>
         <taskdef name="izpack"
         classpath="${izpack}/lib/compiler.jar"
         classname="com.izforge.izpack.ant.IzPackTask"/>
