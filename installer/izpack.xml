@@ -68,6 +68,7 @@
 		<include name="viskit-exe.jar"/>
                 <include name="javaHelp/**/*"/>
                 <include name="viskit/javahelp/**/*"/>
+                <include name="*.xml"/>
             </fileset>
         </pack>
         <pack name="Examples" required="yes">
