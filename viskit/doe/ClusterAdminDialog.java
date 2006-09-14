@@ -84,12 +84,26 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     new ClusterAdminDialog(cluster, port, parent, locComp).setVisible(true);
   }
 
+  public static void showDialog(String cluster, int port, JDialog parent, Component locComp)
+  {
+    new ClusterAdminDialog(cluster, port, parent, locComp).setVisible(true);
+  }
+
+  private ClusterAdminDialog(String cluster, int port, JDialog parent, Component locComp)
+  {
+    super(parent,cluster+":"+port,true);
+    commonConstructor(cluster,port,locComp);
+  }
   private ClusterAdminDialog(String cluster, int port, JFrame parent, Component locComp)
   {
     super(parent,cluster+":"+port,true);
+    commonConstructor(cluster,port,locComp);
+  }
+
+  private void commonConstructor(String cluster, int port, Component locComp)
+  {
     clusterName = cluster;
     this.port = port;
-    setLocationRelativeTo(locComp);
 
     JPanel c = new JPanel();
     c.setLayout(new BoxLayout(c,BoxLayout.Y_AXIS));
@@ -178,6 +192,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     setContentPane(c);
 
     pack();
+    setLocationRelativeTo(locComp);
+    
     addHandlers();
     enableActions(false);
   }
