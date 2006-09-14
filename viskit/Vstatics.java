@@ -76,7 +76,15 @@ public class Vstatics
     c.setMaximumSize(d);
     c.setMinimumSize(d);
   }
-
+  public static void clampMaxSize(JComponent c)
+  {
+    Dimension d = new Dimension(c.getPreferredSize());
+    c.setMaximumSize(d);
+  }
+  public static void clampSize(JComponent c)
+  {
+    clampSize(c,c,c);
+  }
   /**
    * Set the size(s) of c to be exactly those of src
    * @param c
@@ -99,6 +107,7 @@ public class Vstatics
     comp.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
     comp.setMinimumSize(new Dimension(Integer.MIN_VALUE,d.height));
   }
+  
   /**
    * Clamp the height of a component to another's height
    * @param c
