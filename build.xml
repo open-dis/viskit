@@ -794,7 +794,7 @@
             <fileset dir="${dir.src}/license"/>
         </copy>
         <copy todir="${installer}/stage/">
-            <fileset dir="${dir.src}/javaHelp/VisPages">
+            <fileset dir="${dir.src}/viskit/javahelp/VisPages">
 		<include name="intro.html"/>
 	    </fileset>
         </copy>
@@ -804,10 +804,6 @@
 	    </fileset>
         </copy>
 	<delete file="${installer}/stage/build.xml"/>
-        <!-- which one ?-->
-        <copy todir="${installer}/stage/javaHelp">
-            <fileset dir="${dir.src}/javaHelp"/>
-        </copy>
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
