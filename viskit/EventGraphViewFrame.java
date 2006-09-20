@@ -73,7 +73,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private JToggleButton arcMode;
   private JToggleButton cancelArcMode;
 
-  private Help help;
+  Help help;
   private JTabbedPane tabbedPane;
   private JPanel eventGraphViewerContent;
   private JMenuBar myMenuBar;
