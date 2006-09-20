@@ -994,7 +994,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (statsGraph == null) {
               final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
               statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);
-              statsGraph.show();
+              statsGraph.setVisible(true);
             }
             addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
             //writeStatus(ret.toString());

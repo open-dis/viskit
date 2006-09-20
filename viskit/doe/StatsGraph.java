@@ -72,7 +72,7 @@ public class StatsGraph extends JFrame {
         }
         setContentPane(tabbedPane);
         pack();
-        show();
+        setVisible(true);
     }
     /**
      *

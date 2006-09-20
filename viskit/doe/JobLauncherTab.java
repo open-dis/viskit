@@ -240,7 +240,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             if (qstatConsole == null) {
                 qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
             }
-            qstatConsole.show();
+            qstatConsole.setVisible(true);
         }
     });
     botBar.add(doClusterStat);
@@ -830,7 +830,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             if (statsGraph == null) {
                 final String[] properties = (String[])((Hashtable)ret).keySet().toArray(new String[0]);
                 statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
-                statsGraph.show();
+                statsGraph.setVisible(true);
             }
             addDesignPointStatsToGraphs((Hashtable)ret,designPtIndex,sampleIndex);
             //writeStatus(ret.toString());
