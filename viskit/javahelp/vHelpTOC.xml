@@ -3,26 +3,30 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
          "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0" topicimage="topic">
-  <tocitem text="VisKit"> <!-- not supported:  image="empty" image="AUVWorkbench.small.jpg" -->
-      <tocitem text="Big Picture" expand="false">
-      <tocitem text="Introduction"		target="Introduction"/>
-      <tocitem text="Contributors"		target="Contributors" />
+  <tocitem text="VisKit">
+    <tocitem text="Big Picture" expand="false">
+      <tocitem text="Introduction"  target="Introduction"/>
+      <tocitem text="Contributors"  target="Contributors"/>
       <tocitem text="Overview"			target="Overview"/>
-      <tocitem text="Terms"			target="Terms"/>
+      <tocitem text="Terms"			    target="Terms"/>
     </tocitem>
 
     <tocitem text="Tutorial"				expand="true">
-      <tocitem text="Contents"		target="TutorialContents"/>
-      <tocitem text="Introduction"		target="TutorialIntro"/>
-      <tocitem text="Creating Event Graph"	target="TutorialEvent"/>
-      <tocitem text="Event Components"		expand="true">
-        <tocitem text="Arrival Process"	target="TutorialEventArrival"/>
-        <tocitem text="Event Parameters"	target="TutorialEventEvntParameters"/>
-        <tocitem text="State Parameters"	target="TutorialEventStParmaeters"/>
-        <tocitem text="Event Nodes"		target="TutorialEventNodes"/>
-        <tocitem text="Event Schedules"	target="TutorialEventSchedules"/>
+      <tocitem text="Event Graph"			expand="true">
+        <tocitem text="Contents"		target="TutorialEventContents"/>
+        <tocitem text="Introduction"		target="TutorialEventIntro"/>
+        <tocitem text="Creating Event Graph"	target="TutorialEvent"/>
+        <tocitem text="Event Components"		expand="true">
+          <tocitem text="Arrival Process"	target="TutorialEventArrival"/>
+          <tocitem text="Event Parameters"	target="TutorialEventEvntParameters"/>
+          <tocitem text="State Parameters"	target="TutorialEventStParmaeters"/>
+          <tocitem text="Event Nodes"		target="TutorialEventNodes"/>
+          <tocitem text="Event Schedules"	target="TutorialEventSchedules"/>
+        </tocitem>
       </tocitem>
-      <tocitem text="Creating Assembly"	target="TutorialAssembly"/>
+      <tocitem text="Creating Assembly"			expand="true">
+        <tocitem text="Contents"		target="TutorialAssemblyContents"/>
+      </tocitem>
     </tocitem>
 
 
@@ -128,8 +132,5 @@
     </tocitem>
 
     <tocitem text="Adding Help" target="addHelp" />
-
   </tocitem>
 </toc>
-
-

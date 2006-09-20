@@ -4,93 +4,87 @@
          "http://java.sun.com/products/javahelp/map_2_0.dtd">
 
 <map version="2.0">
+  <mapID target="Introduction"  url="Pages/Intro.html"/>
+  <mapID target="Contributors"  url="Pages/Contributors.html"/>
+  <mapID target="Overview"      url="Pages/empty.html"/>
+  <mapID target="Terms"         url="Pages/Terms.html"/>
 
-  <mapID target="Introduction"		url="Pages/intro.html"/>
-  <mapID target="Contributors"		url="Pages/contributors.html"/>
-  <mapID target="Overview"		url="Pages/empty.html"/>
-  <mapID target="Terms"			url="Pages/terms.html"/>
-
-  <mapID target="addHelp"		url="Pages/addingHelp.html"/>
-
+  <mapID target="addHelp"       url="Pages/AddingHelp.html"/>
 
 <!-- Tutorial items -->
 
-  <mapID target="Tutorial"		url="Pages/tutorial.html"/>
-  <mapID target="TutorialContents"	url="Pages/tutorial.html#Contents"/>
-  <mapID target="TutorialIntro"		url="Pages/tutorial.html#Intro"/>
-  <mapID target="TutorialEvent"		url="Pages/tutorial.html#Event"/>
-  <mapID target="TutorialEventArrival"	url="Pages/tutorial.html#EventArrival"/>
-  <mapID target="TutorialEventEvntParameters"	url="Pages/tutorial.html#EventEvntParameters"/>
-  <mapID target="TutorialEventStParmaeters"	url="Pages/tutorial.html#EventStParameters"/>
-  <mapID target="TutorialEventNodes"	url="Pages/tutorial.html#EventNodes"/>
-  <mapID target="TutorialEventSchedules"	url="Pages/tutorial.html#EventSchedules"/>
-  <mapID target="TutorialAssembly"	url="Pages/tutorial.html#Assembly"/>
+  <mapID target="TutorialEventContents"       url="Pages/tutorialEvent.html#Contents"/>
+  <mapID target="TutorialEventIntro"          url="Pages/tutorialEvent.html#Intro"/>
+  <mapID target="TutorialEvent"               url="Pages/tutorialEvent.html#Event"/>
+  <mapID target="TutorialEventArrival"        url="Pages/tutorialEvent.html#EventArrival"/>
+  <mapID target="TutorialEventEvntParameters" url="Pages/tutorialEvent.html#EventEvntParameters"/>
+  <mapID target="TutorialEventStParmaeters"   url="Pages/tutorialEvent.html#EventStParameters"/>
+  <mapID target="TutorialEventNodes"          url="Pages/tutorialEvent.html#EventNodes"/>
+  <mapID target="TutorialEventSchedules"      url="Pages/tutorialEvent.html#EventSchedules"/>
+  <mapID target="TutorialAssembly"            url="Pages/tutorialEvent.html#Assembly"/>
 
+  <mapID target="TutorialAssemblyContents"    url="Pages/tutorialAssembly.html#Contents"/>
 
 <!-- Tab items -->
 
-  <mapID target="TabEventGraph"		url="Pages/Tabs/eventGraph.html"/>
-  <mapID target="TabAssemblyEdit"	url="Pages/Tabs/assemblyEdit.html"/>
-  <mapID target="TabAssemblyRun"	url="Pages/Tabs/assemblyRun.html"/>
-  <mapID target="TabAnalystReport"	url="Pages/Tabs/analystReport.html"/>
-
+  <mapID target="TabEventGraph"     url="Pages/Tabs/eventGraph.html"/>
+  <mapID target="TabAssemblyEdit"   url="Pages/Tabs/assemblyEdit.html"/>
+  <mapID target="TabAssemblyRun"    url="Pages/Tabs/assemblyRun.html"/>
+  <mapID target="TabAnalystReport"  url="Pages/Tabs/analystReport.html"/>
 
 <!-- Menu items -->
 
-  <mapID target="Close"			url="Pages/Menus/fileClose.html"/>
-  <mapID target="CloseAll"		url="Pages/Menus/fileCloseAll.html"/>
-  <mapID target="NewEventGraph"		url="Pages/Menus/fileNewEventGraph.html"/>
-  <mapID target="Open"			url="Pages/Menus/fileOpen.html"/>
-  <mapID target="OpenRecent"		url="Pages/Menus/fileOpenRecent.html"/>
-  <mapID target="Quit"			url="Pages/Menus/fileQuit.html"/>
-  <mapID target="Save"			url="Pages/Menus/fileSave.html"/>
-  <mapID target="SaveAs"		url="Pages/Menus/fileSaveAs.html"/>
-  <mapID target="SaveScreen"		url="Pages/Menus/fileSaveScreen.html"/>
-  <mapID target="Settings"		url="Pages/Menus/fileSettings.html"/>
-  <mapID target="ViewXml"		url="Pages/Menus/fileViewXml.html"/>
-  <mapID target="GenerateJava"		url="Pages/Menus/fileGenerateJava.html"/>
+  <mapID target="Close"         url="Pages/Menus/fileClose.html"/>
+  <mapID target="CloseAll"      url="Pages/Menus/fileCloseAll.html"/>
+  <mapID target="NewEventGraph" url="Pages/Menus/fileNewEventGraph.html"/>
+  <mapID target="Open"          url="Pages/Menus/fileOpen.html"/>
+  <mapID target="OpenRecent"    url="Pages/Menus/fileOpenRecent.html"/>
+  <mapID target="Quit"          url="Pages/Menus/fileQuit.html"/>
+  <mapID target="Save"          url="Pages/Menus/fileSave.html"/>
+  <mapID target="SaveAs"        url="Pages/Menus/fileSaveAs.html"/>
+  <mapID target="SaveScreen"    url="Pages/Menus/fileSaveScreen.html"/>
+  <mapID target="Settings"      url="Pages/Menus/fileSettings.html"/>
+  <mapID target="ViewXml"       url="Pages/Menus/fileViewXml.html"/>
+  <mapID target="GenerateJava"  url="Pages/Menus/fileGenerateJava.html"/>
 
-  <mapID target="NewAssembly"		url="Pages/Menus/fileNewAssembly.html"/>
-  <mapID target="GenerateJavaSource"	url="Pages/Menus/fileGenerateJavaSource.html"/>
-  <mapID target="RunAssembly"		url="Pages/Menus/fileRunAssembly.html"/>
-  <mapID target="ExportCluster"		url="Pages/Menus/fileExportCluster.html"/>
+  <mapID target="NewAssembly"         url="Pages/Menus/fileNewAssembly.html"/>
+  <mapID target="GenerateJavaSource"  url="Pages/Menus/fileGenerateJavaSource.html"/>
+  <mapID target="RunAssembly"         url="Pages/Menus/fileRunAssembly.html"/>
+  <mapID target="ExportCluster"       url="Pages/Menus/fileExportCluster.html"/>
 
-  <mapID target="SaveOutputStreams"	url="Pages/Menus/fileSaveOutputStreams.html"/>
+  <mapID target="SaveOutputStreams"  url="Pages/Menus/fileSaveOutputStreams.html"/>
+
+  <mapID target="Cut"           url="Pages/Menus/editCut.html"/>
+  <mapID target="Copy"          url="Pages/Menus/editCopy.html"/>
+  <mapID target="PasteEvents"   url="Pages/Menus/editPasteEvents.html"/>
+  <mapID target="AddEvent"      url="Pages/Menus/editAddEvent.html"/>
+  <mapID target="AddState"      url="Pages/Menus/editAddState.html"/>
+  <mapID target="AddSimulation" url="Pages/Menus/editAddSimulation.html"/>
+  <mapID target="AddSelfEdge"   url="Pages/Menus/editAddSelfEdge.html"/>
+  <mapID target="EditGraph"     url="Pages/Menus/editEditGraph.html"/>
+
+  <mapID target="AddEventGraph"           url="Pages/Menus/editAddEventGraph.html"/>
+  <mapID target="AddPropertyChange"       url="Pages/Menus/editAddPropertyChange.html"/>
+  <mapID target="EditAssemblyProperties"  url="Pages/Menus/editEditAssemblyProperties.html"/>
+
+  <mapID target="SelectAll"    url="Pages/Menus/editSelectAll.html"/>
+  <mapID target="ClearAll"     url="Pages/Menus/editClearAll.html"/>
+
+  <mapID target="NOT"          url="Pages/Menus/empty.html"/>
+
+  <mapID target="OpenEvent"    url="Pages/Menus/empty.html"/>
+  <mapID target="SplashImage"  url="Pages/SplashImage.html" />
+
+  <mapID target="topic"        url="Pages/images/redcircle.png" />
+  <mapID target="chapter"      url="Pages/images/chapTopic.gif" />
+  <mapID target="empty"        url="Pages/images/empty.gif" />
+
+  <mapID target="hContents"    url="Pages/Menus/helpContents.html" />
+  <mapID target="hSearch"      url="Pages/Menus/helpSearch.html" />
+  <mapID target="hTutorial"    url="Pages/Menus/helpTutorial.html" />
+  <mapID target="hAbout"       url="Pages/Menus/helpAbout.html" />
 
 
-  <mapID target="Cut"			url="Pages/Menus/editCut.html"/>
-  <mapID target="Copy"			url="Pages/Menus/editCopy.html"/>
-  <mapID target="PasteEvents"		url="Pages/Menus/editPasteEvents.html"/>
-  <mapID target="AddEvent"		url="Pages/Menus/editAddEvent.html"/>
-  <mapID target="AddState"		url="Pages/Menus/editAddState.html"/>
-  <mapID target="AddSimulation"		url="Pages/Menus/editAddSimulation.html"/>
-  <mapID target="AddSelfEdge"		url="Pages/Menus/editAddSelfEdge.html"/>
-  <mapID target="EditGraph"		url="Pages/Menus/editEditGraph.html"/>
-
-  <mapID target="AddEventGraph"		url="Pages/Menus/editAddEventGraph.html"/>
-  <mapID target="AddPropertyChange"	url="Pages/Menus/editAddPropertyChange.html"/>
-  <mapID target="EditAssemblyProperties"	url="Pages/Menus/editEditAssemblyProperties.html"/>
-
-  <mapID target="SelectAll"		url="Pages/Menus/editSelectAll.html"/>
-  <mapID target="ClearAll"		url="Pages/Menus/editClearAll.html"/>
-
-  <mapID target="NOT"			url="Pages/Menus/empty.html"/>
-
-
-  <mapID target="OpenEvent"		url="Pages/Menus/empty.html"/>
-  <mapID target="SplashImage"		url="Pages/SplashImage.html" />
-  
-  
-  <mapID target="topic"			url="Pages/images/redcircle.png" />
-  <mapID target="chapter"		url="Pages/images/chapTopic.gif" />
-  <mapID target="empty"			url="Pages/images/empty.gif" />
-
-  <mapID target="hContents"		url="Pages/Menus/helpContents.html" />
-  <mapID target="hSearch"		url="Pages/Menus/helpSearch.html" />
-  <mapID target="hTutorial"		url="Pages/Menus/helpTutorial.html" />
-  <mapID target="hAbout"		url="Pages/Menus/helpAbout.html" />
-
-  <!-- javahelp Pages are no longer moved to the build/ subdirectory. -->
   <!-- After much experimentation, there does appear to be support for relative URLS, but you
        have to use the 'file:' protocol indicator.  AND, although I believe having no slash after
        the colon is not kosher, it's the only way that works here. -->

@@ -12,7 +12,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
 
   <!-- maps -->
   <maps>
-     <homeID>SplashImage</homeID>
+     <homeID></homeID>
      <mapref location="vHelpMap.jhm"/>
   </maps>
 
@@ -43,7 +43,8 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
   </view>
 
   <!-- presentation addition was taken from JavaHelp User Guide section 4.4.1 Helpset File Format but still not working -->
-  <presentation default=true>
+
+  <presentation default="true">
     <name>main window</name>
     <size width="400" height="600" />
     <location x="200" y="300" />
