@@ -59,6 +59,7 @@ public class Help {
       catch (HelpSetException e) {
         e.printStackTrace();
       }
+
       // Here we're setting up the action event peripherals for the tutorial menu selection
       tutorialComponent = new Button();
       tutListenerLauncher = new CSH.DisplayHelpFromSource(hb);
@@ -113,8 +114,9 @@ public class Help {
   {
     Point p = new Point(bounds.x, bounds.y);
     Dimension d = new Dimension(bounds.width,bounds.height);
-    Dimension hd = hb.getSize();
-    hd.width+=100;
+    //Dimension hd = hb.getSize();
+    //hd.width+=100;
+    Dimension hd = new Dimension(1200,700);
     hb.setSize(hd);
     p.x = p.x + d.width / 2 - hd.width / 2;
     p.y = p.y + d.height / 2 - hd.height / 2;
