@@ -296,6 +296,13 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     }
   }
 
+  public void setVisible(boolean b)
+  {
+    super.setVisible(b);
+    // tell the help screen where we are so he can center himself
+    egFrame.help.mainFrameLocated(this.getBounds());
+  }
+
   private void jamSettingsHandler(JMenuBar mb)
   {
     for(int i=0;i<mb.getMenuCount();i++) {
