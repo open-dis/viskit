@@ -339,7 +339,6 @@
             <fileset dir="${dir.lib.ext}">
                 <include name="diskit.jar"/>
                 <include name="dis.jar"/>
-                <include name="bhvr.jar"/>
             </fileset>
             <fileset dir="${dir.lib}/jwsdp-1.5">
                 <include name="jaxb-api.jar"/>
