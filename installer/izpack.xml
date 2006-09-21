@@ -46,7 +46,7 @@
     
     <resources>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
-	<res src="stage/intro.html" id="HTMLInfoPanel.info"/>
+	<res src="stage/Intro.html" id="HTMLInfoPanel.info"/>
     </resources>
     
     <panels>
