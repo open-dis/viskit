@@ -794,7 +794,7 @@
         </copy>
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-		<include name="Intro.html"/>
+		<include name="intro.html"/>
 	    </fileset>
         </copy>
         <copy todir="${installer}/stage">
