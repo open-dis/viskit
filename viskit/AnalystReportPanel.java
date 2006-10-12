@@ -836,7 +836,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JMenu file = new JMenu("File");
     JMenuItem open  = new JMenuItem("Open analyst report");
     JMenuItem save  = new JMenuItem("Save analyst report");
-    JMenuItem saveAs= new JMenuItem("Save analyst report as...");
+    JMenuItem saveAs= new JMenuItem("Save analyst report as HTML...");
 
     file.add(open);
     file.add(save);
