@@ -326,10 +326,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JScrollPane jsp;
     p.add(jsp=new JScrollPane(locCommentsTA = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Comments"));
+    jsp.setBorder(new TitledBorder("Description"));
     p.add(jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post Experiment Comments"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
     p.add(wantLocImages = new JCheckBox("Want location image(s)", true));
     wantLocImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
@@ -365,9 +365,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void fillSimLoc()
   {
     wantLocCommentsAndConclusions.setSelected(arb.isPrintSimLocationComments());
-    locCommentsTA.setText(arb.getSimLocComments());
+    locCommentsTA.setText(arb.getSimLocationComments());
     locCommentsTA.setEnabled(wantLocCommentsAndConclusions.isSelected());
-    locConclusionsTA.setText(arb.getSimLocConclusions());
+    locConclusionsTA.setText(arb.getSimLocationConclusions());
     locConclusionsTA.setEnabled(wantLocCommentsAndConclusions.isSelected());
     wantLocImages.setSelected(arb.isPrintSimLocationImage());
     simLocImgTF.setEnabled(wantLocImages.isSelected());
@@ -380,8 +380,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void unFillSimLoc()
   {
     arb.setPrintSimLocationComments(wantLocCommentsAndConclusions.isSelected());
-    arb.setSimLocComments(locCommentsTA.getText());
-    arb.setSimLocConclusions(locConclusionsTA.getText());
+    arb.setSimLocationDescription(locCommentsTA.getText());
+    arb.setSimLocationConclusions(locConclusionsTA.getText());
     arb.setPrintSimLocationImage(wantLocImages.isSelected());
     arb.setLocationImage(simLocImgTF.getText());
     arb.setChartImage(simChartImgTF.getText());
@@ -407,7 +407,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JScrollPane jsp;
     p.add(jsp = new JScrollPane(simConfigComments = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Comments"));
+    jsp.setBorder(new TitledBorder("Description"));
 
     p.add(wantEntityTable = new JCheckBox("Want entity table", true));
     wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -422,7 +422,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
     p.add(jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post Experiment Comments"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
     p.add(wantSimConfigImages = new JCheckBox("Want simulation configuration image", true));
     wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JPanel imp = new JPanel();
@@ -466,8 +466,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void unFillSimConfig()
   {
     arb.setPrintSimConfigComments(wantSimConfigCommentsAndConclusions.isSelected());
-    arb.setSimConfigComments(simConfigComments.getText());
-    arb.setSimConfigConclusions(simConfigConclusions.getText());
+    arb.setSimConfigurationDescription(simConfigComments.getText());
+    arb.setSimConfigurationConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
     arb.setAssemblyImageLocation(configImgPathTF.getText());
@@ -559,11 +559,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(doBehaviorComments = new JCheckBox("Want behavior comments", true));
     doBehaviorComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp = new JScrollPane(behaviorCommentsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Comments"));
+    jsp.setBorder(new TitledBorder("Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
     jsp = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Post Experiment Comments"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
 
@@ -583,7 +583,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void unFillBehaviors()
   {
     arb.setPrintBehaviorDefComments(doBehaviorComments.isSelected());
-    arb.setBehaviorComments(behaviorCommentsTA.getText());
+    arb.setBehaviorDescription(behaviorCommentsTA.getText());
     arb.setBehaviorConclusions(behaviorConclusionsTA.getText());
     arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
     arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
@@ -672,10 +672,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       wantStatsComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp = new JScrollPane(statsComments=new WrappingTextArea()));
-    jsp.setBorder(new TitledBorder("Comments"));
+    jsp.setBorder(new TitledBorder("Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp = new JScrollPane(statsConclusions= new WrappingTextArea()));
-    jsp.setBorder(new TitledBorder("Post-Experiment Comments"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     p.add(wantStatsReplications=new JCheckBox("Want replication statistics", true));
@@ -770,7 +770,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void unFillStatsPan()
   {
     arb.setPrintStatsComments(wantStatsComments.isSelected());
-    arb.setStatsComments(statsComments.getText());
+    arb.setStatsDescription(statsComments.getText());
     arb.setStatsConclusions(statsConclusions.getText());
     arb.setPrintReplicationStats(wantStatsReplications.isSelected());
     arb.setPrintSummaryStats(wantStatsSummary.isSelected());

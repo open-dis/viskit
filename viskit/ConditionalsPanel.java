@@ -64,7 +64,7 @@ public class ConditionalsPanel extends JPanel
 
      jtaComments = new JTextArea(2,25);
      jsp = new JScrollPane(jtaComments);
-     jsp.setBorder(BorderFactory.createTitledBorder("Comments"));
+     jsp.setBorder(BorderFactory.createTitledBorder("Description"));
     add(jsp);
      d = jsp.getPreferredSize();
      jsp.setMinimumSize(d);
