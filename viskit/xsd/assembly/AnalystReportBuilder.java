@@ -907,13 +907,13 @@ public class AnalystReportBuilder
 
     //Executive Summary values
     setExecutiveSummaryComments(true);
-    setExecutiveSummary("***ENTER EXECUTIVE SUMMARY COMMENTS HERE***");
+    setExecutiveSummary("***ENTER EXECUTIVE SUMMARY DESCRIPTION HERE***");
 
     //SimulationLocation Values
     setPrintSimLocationComments(true);
     setPrintSimLocationImage(true);
-    setSimLocComments("***ENTER SIMULATION ENVIRONMENT COMMENTS HERE***");
-    setSimLocConclusions("***ENTER SIMULATION ENVIRONMENT CONCLUSIONS HERE***");
+    setSimLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
+    setSimLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
     //setLocationImage("");
     //setChartImage("");
 
@@ -922,15 +922,15 @@ public class AnalystReportBuilder
     setPrintAssemblyImage(true);
     setPrintEntityTable(true);
     setAssemblyFile("./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml");
-    setSimConfigComments("***ENTER SIMULATION CONFIGURATION COMMENTS HERE***");
-    setSimConfigConclusions("***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***");
+    setSimConfigurationDescription("***ENTER SIMULATION CONFIGURATION DESCRIPTION HERE***");
+    setSimConfigurationConclusions("***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***");
 
     //setAssemblyImageLocation("");
 
     //Entity Parameters values
     setPrintParameterComments(true);
     setPrintParameterTable(true);
-    setParameterComments("***ENTER ENTITY PARAMETER COMMENTS HERE***");
+    setParameterDescription("***ENTER ENTITY PARAMETER DESCRIPTION HERE***");
     setParameterConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
     
 
@@ -939,19 +939,19 @@ public class AnalystReportBuilder
     setPrintEventGraphImages(true);
     setPrintBehaviorDescriptions(true);
     setPrintEventGraphDetails(true);
-    setBehaviorComments("***ENTER ENTITY BEHAVIOR COMMENTS HERE***");
+    setBehaviorDescription("***ENTER ENTITY BEHAVIOR DESCRIPTION HERE***");
     setBehaviorConclusions("***ENTER BEHVIOR CONCLUSIONS HERE***");
 
     //StatisticalResults values
     setPrintStatsComments(true);
     setPrintReplicationStats(true);
     setPrintSummaryStats(true);
-    setStatsComments("***ENTER STATISTICAL RESULTS COMMENTS HERE***");
+    setStatsDescription("***ENTER STATISTICAL RESULTS DESCRIPTION HERE***");
     setStatsConclusions("***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***");
 
     //Recommendations/Conclusions
     setPrintRecommendationsConclusions(true);
-    setConclusions("***ENTER CONCLUSIONS COMMENTS HERE***");
+    setConclusions("***ENTER CONCLUSIONS DESCRIPTION HERE***");
     setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
@@ -1013,13 +1013,13 @@ public class AnalystReportBuilder
   public boolean isPrintSimLocationImage()    { return stringToBoolean(simulationLocation.getAttributeValue("images"));}
   public void    setPrintSimLocationImage   (boolean bool){ simulationLocation.setAttribute("images", booleanToString(bool)) ;}
 
-  public String  getSimLocComments()          { return unMakeComments(simulationLocation);}
-  public String  getSimLocConclusions()       { return unMakeConclusions(simulationLocation);}
+  public String  getSimLocationComments()          { return unMakeComments(simulationLocation);}
+  public String  getSimLocationConclusions()       { return unMakeConclusions(simulationLocation);}
   public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location");}
   public String  getChartImage()              { return unMakeImage(simulationLocation,"Location"); }
 
-  public void setSimLocComments          (String s)    { makeComments(simulationLocation,"SL", s);}
-  public void setSimLocConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
+  public void setSimLocationDescription          (String s)    { makeComments(simulationLocation,"SL", s);}
+  public void setSimLocationConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
   public void setLocationImage           (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
   public void setChartImage              (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
 
@@ -1033,7 +1033,7 @@ public class AnalystReportBuilder
   public String  getParameterComments()    { return unMakeComments(entityParameters);}
   public String  getParameterConclusions() { return unMakeConclusions(entityParameters);}
   public Vector  getParameterTables()      { return unMakeParameterTables(entityParameters);}
-  public void setParameterComments         (String s){ makeComments(entityParameters,"PC", s); }
+  public void setParameterDescription         (String s){ makeComments(entityParameters,"PC", s); }
   public void setParameterConclusions      (String s){ makeConclusions(entityParameters,"PC", s); }
 
   // behavior definitions:
@@ -1050,7 +1050,7 @@ public class AnalystReportBuilder
 
   public String  getBehaviorComments()         { return unMakeComments(behaviorDefinitions); }
   public String  getBehaviorConclusions()      { return unMakeConclusions(behaviorDefinitions); }
-  public void setBehaviorComments         (String s) { makeComments(behaviorDefinitions,"BC", s); }
+  public void setBehaviorDescription         (String s) { makeComments(behaviorDefinitions,"BC", s); }
   public void setBehaviorConclusions      (String s) { makeConclusions(behaviorDefinitions,"BC", s); }
   public List getBehaviorList()          { return unMakeBehaviorList(behaviorDefinitions); }
   // sim-config:
@@ -1066,9 +1066,9 @@ public class AnalystReportBuilder
   public String[][]  getSimConfigEntityTable()  { return unMakeEntityTable();}
   public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
   public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly");}
-  public void    setSimConfigComments       (String s) { makeComments(simConfig,"SC", s); }
+  public void    setSimConfigurationDescription       (String s) { makeComments(simConfig,"SC", s); }
   public void    setSimConfigEntityTable    (String s) { }; //todo
-  public void    setSimConfigConclusions    (String s) { makeConclusions(simConfig,"SC", s); }
+  public void    setSimConfigurationConclusions    (String s) { makeConclusions(simConfig,"SC", s); }
   public void    setAssemblyImageLocation   (String s) { simConfig.addContent(makeImage("Assembly", s)); }
 
   // stat results:
@@ -1086,7 +1086,7 @@ public class AnalystReportBuilder
 
   public String  getStatsComments()        { return unMakeComments(statisticalResults);}
   public String  getStatsConclusions()     { return unMakeConclusions(statisticalResults);}
-  public void setStatsComments           (String s) { makeComments(statisticalResults,"SR", s); }
+  public void setStatsDescription           (String s) { makeComments(statisticalResults,"SR", s); }
   public void setStatsConclusions        (String s) { makeConclusions(statisticalResults,"SR", s); }
   public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
   public List   getStatsReplicationsList() { return unMakeReplicationList(statisticalResults);}
