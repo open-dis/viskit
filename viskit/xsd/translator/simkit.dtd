@@ -15,6 +15,7 @@
         author          CDATA   #IMPLIED
         extend          CDATA   "SimEntityBase"
         implement       CDATA   #IMPLIED
+        description     CDATA   #IMPLIED
 >
 
 <!ELEMENT Comment ( #PCDATA ) >
@@ -23,18 +24,21 @@
 <!ATTLIST StateVariable
 	type        CDATA	#REQUIRED
 	name        ID  	#REQUIRED
+        description CDATA       #IMPLIED
 >
 
 <!ELEMENT Argument ( Comment )* >
 <!ATTLIST Argument
 	type	    CDATA	#REQUIRED
         name        ID          #REQUIRED
+        description CDATA       #IMPLIED
 >
 
 <!ELEMENT Parameter ( Comment )* >
 <!ATTLIST Parameter
 	type        CDATA	#REQUIRED
 	name        ID  	#REQUIRED
+        description CDATA       #IMPLIED
 >
 
 <!ELEMENT LocalVariable ( Comment*, Code* ) >
@@ -42,12 +46,14 @@
         type        CDATA       #REQUIRED
         name        ID          #REQUIRED
         value       CDATA       #IMPLIED
+        description CDATA       #IMPLIED
 >
 
 
 <!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) > 
 <!ATTLIST Event
 	name		ID	#REQUIRED
+        description     CDATA   #IMPLIED
 >
 
 <!ELEMENT Code (#PCDATA) >
@@ -60,23 +66,27 @@
 
 <!ELEMENT Operation EMPTY >
 <!ATTLIST Operation
-        method  CDATA   #REQUIRED   
+        method  CDATA   #REQUIRED
+        description CDATA   #IMPLIED   
 >
 
 <!ELEMENT Assignment EMPTY >
 <!ATTLIST Assignment
         value   CDATA   #REQUIRED
+        description CDATA   #IMPLIED
 >
 
 <!ELEMENT StateTransition (( Assignment|Operation ),Code*) >
 <!ATTLIST StateTransition
         state           IDREF   #REQUIRED
 	index		IDREF	#IMPLIED
+        description CDATA   #IMPLIED
 >
   
 <!ELEMENT EdgeParameter EMPTY >
 <!ATTLIST EdgeParameter
         value   CDATA	#REQUIRED
+        description CDATA   #IMPLIED
 >
 
 <!ELEMENT Schedule (Code*,Comment*,EdgeParameter*) >
@@ -85,10 +95,12 @@
 	event	IDREF	#REQUIRED
 	condition CDATA	#IMPLIED 
         priority  CDATA  "0.0"	
+        description CDATA   #IMPLIED
 >
 
 <!ELEMENT Cancel (Code*,Comment*,EdgeParameter*) >
 <!ATTLIST Cancel
 	event	IDREF	#REQUIRED
-	condition CDATA	#IMPLIED 	
+	condition CDATA	#IMPLIED 
+        description CDATA   #IMPLIED	
 >
