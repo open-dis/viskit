@@ -88,8 +88,9 @@ public class ReportStatisticsConfig {
      */
     public void setEntityIndex(LinkedList keyValues){
         System.out.println("\n\nAnalyst Report Selected for the following:");
-        System.out.printf("%-20s %s",new Object[]{"Entity Name", "Data Point\n"});
-        System.out.println("-----------------------------------------");    
+        System.out.println("         Entity Name Data Point");
+        //System.out.printf("%-20s %s",new Object[]{"Entity Name", "Data Point\n"});
+        System.out.println("-----------------------------------------");
         Iterator itr  = keyValues.iterator();
         entityIndex   = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
@@ -100,7 +101,8 @@ public class ReportStatisticsConfig {
             seperator  = findUnderscore(key);
             entityIndex[idx]   = key.substring(0, seperator);
             propertyIndex[idx] = key.substring(seperator+1, key.length());
-            System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
+            //System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
+            System.out.println(entityIndex[idx]+" "+propertyIndex[idx]);
             idx++;
         }
         reportStats.initializeEntities(entityIndex,propertyIndex);
