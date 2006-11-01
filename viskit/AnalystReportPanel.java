@@ -336,7 +336,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     JPanel imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("Chart image: "));
+    imp.add(new JLabel("Location image "));
     imp.add(simLocImgTF=new JTextField(20));
     imp.add(simLocImgButt=new JButton("..."));
     simLocImgButt.addActionListener(new fileChoiceListener(simLocImgTF));
@@ -348,7 +348,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("    Location image: "));
+    imp.add(new JLabel("Chart image "));
     imp.add(simChartImgTF=new JTextField(20));
     imp.add(simChartImgButt=new JButton("..."));
     simChartImgButt.addActionListener(new fileChoiceListener(simChartImgTF));
