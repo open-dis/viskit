@@ -17,6 +17,7 @@ package viskit.xsd.assembly;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 
 import java.io.File;
@@ -160,6 +161,9 @@ public class AnalystReportBuilder
   private void _writeCommon(File fil) throws Exception
   {
     XMLOutputter outputter = new XMLOutputter();
+    Format form = Format.getPrettyFormat();
+    outputter.setFormat(form);
+
     FileWriter writer = new FileWriter(fil);
     outputter.output(reportJdomDocument, writer);
     writer.close();
@@ -233,7 +237,12 @@ public class AnalystReportBuilder
     makeConclusions(simConfig,"SC", "");
     //simConfig.addContent(makeImage("Assembly", xassemblyImageLocation));
     if(assemblyFile != null)
-      simConfig.addContent(makeEntityTable(assemblyFile));
+      try {
+        simConfig.addContent(makeEntityTable(assemblyFile));
+      }
+      catch (Exception e) {
+        System.err.println("Error reading assembly file: "+e.getMessage());
+      }
 
     rootElement.addContent(simConfig);
   }
@@ -246,8 +255,8 @@ public class AnalystReportBuilder
     entityParameters = new Element("EntityParameters");
     entityParameters.setAttribute("comments", "true");
     entityParameters.setAttribute("parameterTables", "true");
-    makeComments(entityParameters,"PC", "");
-    makeConclusions(entityParameters,"PC", "");
+    makeComments(entityParameters,"EP", "");
+    makeConclusions(entityParameters,"EP", "");
     if(assemblyFile != null)
       entityParameters.addContent(makeParameterTables());
 
@@ -268,7 +277,12 @@ public class AnalystReportBuilder
     makeComments(behaviorDefinitions,"BC", "");
     makeConclusions(behaviorDefinitions,"BC", "");
 
-    behaviorDefinitions.addContent(processBehaviors(true,true,true));
+    try {
+      behaviorDefinitions.addContent(processBehaviors(true,true,true));
+    }
+    catch (Exception e) {
+      System.err.println("Error processing assembly file: "+e.getMessage());
+    }
 
     rootElement.removeChild("BehaviorDefinitions");
     rootElement.addContent(behaviorDefinitions);
@@ -386,7 +400,7 @@ public class AnalystReportBuilder
   /**
    * Creates Behavior definition references in the analyst report template
    */
-  private Element processBehaviors(boolean descript, boolean image, boolean details)
+  private Element processBehaviors(boolean descript, boolean image, boolean details) throws Exception
   {
     Element behaviorList = new Element("BehaviorList");
     if (eventGraphNames != null) {
@@ -397,15 +411,10 @@ public class AnalystReportBuilder
         behavior.setAttribute("name", (String) eventGraphNames.get(i));
 
         if (descript) {
-          try {
+          Document tmp = loadXML((String) eventGraphFiles.get(i));
+          rootElement = tmp.getRootElement();
+          descriptText = tmp.getRootElement().getChild("Comment").getText();
 
-            Document temp = loadXML((String) eventGraphFiles.get(i));
-            rootElement = temp.getRootElement();
-            descriptText = temp.getRootElement().getChild("Comment").getText();
-          }
-          catch (IOException e) {
-            System.out.println("Unable to load event graph file");
-          }
           Element description = new Element("description");
           description.setAttribute("text", descriptText);
           behavior.addContent(description);
@@ -448,46 +457,48 @@ public class AnalystReportBuilder
     Vector v = new Vector();
 
     Element listEl = localRoot.getChild("BehaviorList");
-    List behElms = listEl.getChildren("Behavior");
-    for (Iterator itr = behElms.iterator(); itr.hasNext();) {
-      Vector b = new Vector();
+    if (listEl != null) {
+      List behElms = listEl.getChildren("Behavior");
+      for (Iterator itr = behElms.iterator(); itr.hasNext();) {
+        Vector b = new Vector();
 
-      Element behavior = (Element) itr.next();
-      String nm = behavior.getAttributeValue("name");
-      b.add(nm);
+        Element behavior = (Element) itr.next();
+        String nm = behavior.getAttributeValue("name");
+        b.add(nm);
 
-      Element desc = behavior.getChild("description");
-      String desctxt = desc.getAttributeValue("text");
-      b.add(desctxt);
+        Element desc = behavior.getChild("description");
+        String desctxt = desc.getAttributeValue("text");
+        b.add(desctxt);
 
-      List parms = behavior.getChildren("parameter");
-      Vector p = new Vector();
-      for (Iterator pitr = parms.iterator(); pitr.hasNext();) {
-        Element param = (Element) pitr.next();
-        String pnm = param.getAttributeValue("name");
-        String pty = param.getAttributeValue("type");
-        String pdsc = param.getAttributeValue("description");
-        String[] pa = new String[]{pnm, pty, pdsc};
-        p.add(pa);
+        List parms = behavior.getChildren("parameter");
+        Vector p = new Vector();
+        for (Iterator pitr = parms.iterator(); pitr.hasNext();) {
+          Element param = (Element) pitr.next();
+          String pnm = param.getAttributeValue("name");
+          String pty = param.getAttributeValue("type");
+          String pdsc = param.getAttributeValue("description");
+          String[] pa = new String[]{pnm, pty, pdsc};
+          p.add(pa);
+        }
+        b.add(p);
+
+        List stvars = behavior.getChildren("stateVariable");
+        Vector s = new Vector();
+        for (Iterator sitr = stvars.iterator(); sitr.hasNext();) {
+          Element svar = (Element) sitr.next();
+          String snm = svar.getAttributeValue("name");
+          String sty = svar.getAttributeValue("type");
+          String sdsc = svar.getAttributeValue("description");
+          String[]sa = new String[]{snm, sty, sdsc};
+          s.add(sa);
+        }
+        b.add(s);
+
+        Element evtGrImg = behavior.getChild("EventGraphImage");
+        b.add(evtGrImg.getAttributeValue("dir"));
+
+        v.add(b);
       }
-      b.add(p);
-
-      List stvars = behavior.getChildren("stateVariable");
-      Vector s = new Vector();
-      for (Iterator sitr = stvars.iterator(); sitr.hasNext();) {
-        Element svar = (Element) sitr.next();
-        String snm = svar.getAttributeValue("name");
-        String sty = svar.getAttributeValue("type");
-        String sdsc = svar.getAttributeValue("description");
-        String[]sa = new String[]{snm, sty, sdsc};
-        s.add(sa);
-      }
-      b.add(s);
-
-      Element evtGrImg = behavior.getChild("EventGraphImage");
-      b.add(evtGrImg.getAttributeValue("dir"));
-
-      v.add(b);
     }
     return v;
   }
@@ -626,14 +637,9 @@ public class AnalystReportBuilder
    * @param fileDirectory the location of the assembly file
    * @return table the entityTable for the simConfig portion of the analyst report
    */
-  public Element makeEntityTable(String fileDirectory)
+  public Element makeEntityTable(String fileDirectory) throws Exception
   {
-    try {
-      setAssemblyDocument(loadXML(fileDirectory));
-    }
-    catch (IOException e) {
-      System.out.println("Unable to load: " + fileDirectory);
-    }
+    setAssemblyDocument(loadXML(fileDirectory));
 
     Element entityTable = new Element("EntityTable");
     Element rootElement = assemblyDocument.getRootElement();
@@ -768,21 +774,11 @@ public class AnalystReportBuilder
    * @param fileDir the location of the file
    * @return doc the document object of the loaded XML
    */
-  private Document loadXML(String fileDir) throws IOException
+  private Document loadXML(String fileDir) throws Exception
   {
-
-    try {
-      SAXBuilder builder = new SAXBuilder();
-      Document doc = builder.build(new File(fileDir));
-      return doc;
-    }
-    catch (JDOMException e) {
-      e.printStackTrace();
-    }
-    catch (NullPointerException e) {
-      e.printStackTrace();
-    }
-    return null;
+    SAXBuilder builder = new SAXBuilder();
+    Document doc = builder.build(new File(fileDir));
+    return doc;
   }
 
   /**
@@ -887,7 +883,10 @@ public class AnalystReportBuilder
   {
     List content = e.getContent();
     for(Iterator itr=content.iterator(); itr.hasNext();) {
-      Element celem = (Element)itr.next();
+      Object o = itr.next();
+      if(!(o instanceof Element))
+        continue;
+      Element celem = (Element)o;
       if(celem.getName().endsWith(suffix))
         return celem.getAttributeValue("text");
     }
@@ -940,7 +939,7 @@ public class AnalystReportBuilder
     setPrintBehaviorDescriptions(true);
     setPrintEventGraphDetails(true);
     setBehaviorDescription("***ENTER ENTITY BEHAVIOR DESCRIPTION HERE***");
-    setBehaviorConclusions("***ENTER BEHVIOR CONCLUSIONS HERE***");
+    setBehaviorConclusions("***ENTER ENTITY BEHAVIOR CONCLUSIONS HERE***");
 
     //StatisticalResults values
     setPrintStatsComments(true);
@@ -977,7 +976,12 @@ public class AnalystReportBuilder
   public void setAssemblyFile      (String assyFile)
   {
     assemblyFile = assyFile;
-    simConfig.addContent(makeEntityTable(assyFile));
+    try {
+      simConfig.addContent(makeEntityTable(assyFile));
+    }
+    catch (Exception e) {
+      System.err.println("Error processing assemblyFile");
+    }
     entityParameters.addContent(makeParameterTables());
     createBehaviorDefinitions();
   }

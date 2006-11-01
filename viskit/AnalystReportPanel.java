@@ -152,7 +152,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     AnalystReportBuilder arb = null;
     try {
-      arb = new AnalystReportBuilder(targetFile, currentAssyFile.getAbsolutePath());
+      String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
+      arb = new AnalystReportBuilder(targetFile, assyFile);
     }
     catch (Exception e) {
       System.err.println("Error parsing analyst report: "+e.getMessage());
@@ -344,7 +345,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     simLocImgTF.setEditable(false);
     imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(imp);
-    
+
     imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
     imp.add(new JLabel("    Location image: "));
@@ -383,8 +384,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimLocationDescription(locCommentsTA.getText());
     arb.setSimLocationConclusions(locConclusionsTA.getText());
     arb.setPrintSimLocationImage(wantLocImages.isSelected());
-    arb.setLocationImage(simLocImgTF.getText());
-    arb.setChartImage(simChartImgTF.getText());
+    String s = simLocImgTF.getText().trim();
+    if(s != null & s.length() > 0)
+      arb.setLocationImage(s);
+    s = simLocImgTF.getText().trim();
+    if(s != null & s.length() > 0)
+      arb.setChartImage(simChartImgTF.getText());
   }
 
   /************************/
@@ -470,10 +475,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimConfigurationConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
-    arb.setAssemblyImageLocation(configImgPathTF.getText());
+    String s = configImgPathTF.getText();
+    if(s != null && s.length()>0)
+      arb.setAssemblyImageLocation(s);
   }
 
-  /***********/
 
   JCheckBox wantEntityParamComments;
   JCheckBox wantEntityParamTables;
@@ -502,6 +508,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     wantEntityParamComments.setSelected(arb.isPrintParameterComments());
     wantEntityParamTables.setSelected(arb.isPrintParameterTable());
+
+    entityParamCommentsTA.setText(arb.getParameterComments());
 
     Vector colNames = new Vector();
     colNames.add("Category");
@@ -543,6 +551,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     arb.setPrintParameterComments(wantEntityParamComments.isSelected());
     arb.setPrintParameterTable(wantEntityParamTables.isSelected());
+    arb.setParameterDescription(entityParamCommentsTA.getText());
   }
 
   JCheckBox doBehaviorComments;
