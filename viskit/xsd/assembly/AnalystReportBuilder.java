@@ -575,7 +575,8 @@ public class AnalystReportBuilder
     while (itr.hasNext()) {
       Element temp = (Element) itr.next();
       String category = temp.getAttributeValue("type");
-      if (category.equals("diskit.SMAL.Classification")) table.addContent(makeTableEntry("Classification", temp));
+      if (category.equals("diskit.SMAL.Classification"))
+        table.addContent(makeTableEntry("Classification", temp));
       if (category.equals("diskit.SMAL.IdentificationParameters"))
         table.addContent(makeTableEntry("Identification", temp));
       if (category.equals("diskit.SMAL.PhysicalConstraints"))
@@ -820,7 +821,7 @@ public class AnalystReportBuilder
 
   private String unMakeImage(Element e, String imageID)
   {
-    return _unMakeContent(e,imageID+"Image");
+    return _unMakeContent(e,imageID+"Image","dir");
   }
   /**
    * Creates a standard 'Comments' element used by all sections of the report
@@ -832,9 +833,7 @@ public class AnalystReportBuilder
    */
   public void makeComments(Element parent, String commentTag, String commentText)
   {
-    Element e = _makeContent(commentTag,"Comments",commentText);
-    parent.removeChild(e.getName());
-    parent.addContent(e);
+    replaceChild(parent, _makeContent(commentTag,"Comments",commentText));
   }
 
   public Element xmakeComments(String commentTag,String commentText)
@@ -845,6 +844,12 @@ public class AnalystReportBuilder
   private String unMakeComments(Element e)
   {
     return _unMakeContent(e,"Comments");
+  }
+
+  private void replaceChild(Element parent, Element child)
+  {
+    parent.removeChildren(child.getName());
+    parent.addContent(child);
   }
 
   /**
@@ -862,9 +867,7 @@ public class AnalystReportBuilder
 
   public void makeConclusions(Element parent, String commentTag, String conclusionText)
   {
-    Element e = _makeContent(commentTag,"Conclusions",conclusionText);
-    parent.removeChild(e.getName());
-    parent.addContent(e);
+    replaceChild(parent,_makeContent(commentTag,"Conclusions",conclusionText));
   }
 
   public String unMakeConclusions(Element e)
@@ -881,6 +884,11 @@ public class AnalystReportBuilder
 
   private String _unMakeContent(Element e, String suffix)
   {
+    return _unMakeContent(e,suffix,"text");
+  }
+
+  private String _unMakeContent(Element e, String suffix, String attrName)
+  {
     List content = e.getContent();
     for(Iterator itr=content.iterator(); itr.hasNext();) {
       Object o = itr.next();
@@ -888,7 +896,7 @@ public class AnalystReportBuilder
         continue;
       Element celem = (Element)o;
       if(celem.getName().endsWith(suffix))
-        return celem.getAttributeValue("text");
+        return celem.getAttributeValue(attrName);
     }
     return "";
   }
@@ -1020,12 +1028,12 @@ public class AnalystReportBuilder
   public String  getSimLocationComments()          { return unMakeComments(simulationLocation);}
   public String  getSimLocationConclusions()       { return unMakeConclusions(simulationLocation);}
   public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location");}
-  public String  getChartImage()              { return unMakeImage(simulationLocation,"Location"); }
+  public String  getChartImage()              { return unMakeImage(simulationLocation,"Chart"); }
 
   public void setSimLocationDescription          (String s)    { makeComments(simulationLocation,"SL", s);}
   public void setSimLocationConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
-  public void setLocationImage           (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
-  public void setChartImage              (String s)    { simulationLocation.addContent(makeImage("Location", s)); }
+  public void setLocationImage           (String s)    { replaceChild(simulationLocation,makeImage("Location", s)); }
+  public void setChartImage              (String s)    { replaceChild(simulationLocation,makeImage("Chart", s)); }
 
   // entity-parameters
   //good
@@ -1073,7 +1081,7 @@ public class AnalystReportBuilder
   public void    setSimConfigurationDescription       (String s) { makeComments(simConfig,"SC", s); }
   public void    setSimConfigEntityTable    (String s) { }; //todo
   public void    setSimConfigurationConclusions    (String s) { makeConclusions(simConfig,"SC", s); }
-  public void    setAssemblyImageLocation   (String s) { simConfig.addContent(makeImage("Assembly", s)); }
+  public void    setAssemblyImageLocation   (String s) { replaceChild(simConfig,makeImage("Assembly", s)); }
 
   // stat results:
   // good
