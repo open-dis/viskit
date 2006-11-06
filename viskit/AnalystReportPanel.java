@@ -65,6 +65,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.net.URL;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener
 {
@@ -82,7 +83,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     doMenus();
 
     locationImageFileChooser = new JFileChooser("./images/BehaviorLibraries/SavageTactics/");
-    
+
   }
 
   JTextField titleTF = new JTextField();
@@ -845,11 +846,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JMenu file = new JMenu("File");
     JMenuItem open  = new JMenuItem("Open analyst report");
     JMenuItem save  = new JMenuItem("Save analyst report");
-    JMenuItem saveAs= new JMenuItem("Save analyst report as HTML...");
+    JMenuItem genHtml = new JMenuItem("Generate HTML");
 
     file.add(open);
     file.add(save);
-    file.add(saveAs);
+    file.add(genHtml);
     myMenuBar.add(file);
 
     open.addActionListener(new ActionListener()
@@ -871,6 +872,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
 
         JFileChooser openChooser = new JFileChooser("./AnalystReports");
+        openChooser.setMultiSelectionEnabled(false);
+        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
         int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
         if (resp != JFileChooser.APPROVE_OPTION)
           return;
@@ -885,6 +889,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       {
         JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
         saveChooser.setSelectedFile(reportFile);
+        saveChooser.setMultiSelectionEnabled(false);
+        saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
         int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
 
         if(resp!=JFileChooser.APPROVE_OPTION)
@@ -900,11 +907,77 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             outFile, "./AnalystReports/AnalystReportXMLtoHTML.xslt");
       }
     };
+    save.addActionListener(saveAsLis);
 
-    saveAs.addActionListener(saveAsLis);
-    save.addActionListener(saveAsLis);      //todo implement properly
+    ActionListener genHtmlLis = new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        if (dirty) {
+          int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
+              "Confirm", JOptionPane.WARNING_MESSAGE);
+          switch (result) {
+            case JOptionPane.YES_OPTION:
+              saveReport();
+              break;
+            case JOptionPane.CANCEL_OPTION:
+            case JOptionPane.NO_OPTION:
+            default:
+              break;
+          }
+        }
+
+        String outFile = reportFile.getAbsolutePath();
+        int idx = outFile.lastIndexOf(".");
+
+        outFile = outFile.substring(0,idx) + ".html";
+
+        JFileChooser genChooser = new JFileChooser("./AnalystReports");
+        genChooser.setSelectedFile(new File(outFile));
+        genChooser.setMultiSelectionEnabled(false);
+        genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
+
+        if(resp == JFileChooser.APPROVE_OPTION)
+            XsltUtility.runXslt(reportFile.getAbsolutePath(),
+                                genChooser.getSelectedFile().getAbsolutePath(),
+                                "./AnalystReports/AnalystReportXMLtoHTML.xslt");
+        showHtmlViewer(genChooser.getSelectedFile());
+
+      }
+    };
+    genHtml.addActionListener(genHtmlLis);
   }
 
+  private void showHtmlViewer(File f)
+  {
+    JFrame fr = new JFrame("Analyst Report -- "+f.getPath());
+    fr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    //fr.setSize(640,480);
+
+    Container con = fr.getContentPane();
+    con.setLayout(new BorderLayout());
+
+    JEditorPane jtp = new JEditorPane();
+    jtp.setEditable(false);
+    try {
+      URL url = new URL("file","localhost",f.getAbsolutePath());
+      jtp.setPage(url);
+
+      JScrollPane jsp = new JScrollPane(jtp);
+      jsp.setMinimumSize(new Dimension(10,10));
+      jsp.setPreferredSize(new Dimension(640,480));
+      con.add(jsp,BorderLayout.CENTER);
+      fr.pack();
+      fr.setLocation(300,300);
+      fr.setVisible(true);
+    }
+    catch (IOException e) {
+      JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+    }
+
+  }
   class fileChoiceListener implements ActionListener
   {
     JTextField tf;
