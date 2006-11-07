@@ -57,6 +57,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -843,15 +844,25 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void doMenus()
   {
     myMenuBar = new JMenuBar();
-    JMenu file = new JMenu("File");
-    JMenuItem open  = new JMenuItem("Open analyst report");
-    JMenuItem save  = new JMenuItem("Save analyst report");
-    JMenuItem genHtml = new JMenuItem("Generate HTML");
+    JMenu fileMenu = new JMenu("File");
+    fileMenu.setMnemonic(KeyEvent.VK_F);
+    JMenuItem open  = new JMenuItem("Open analyst report XML");
+    open.setMnemonic(KeyEvent.VK_O);
+    JMenuItem save  = new JMenuItem("Save analyst report XML");
+    save.setMnemonic(KeyEvent.VK_S);
+    JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
+    generateViewHtml.setMnemonic(KeyEvent.VK_V);
 
-    file.add(open);
-    file.add(save);
-    file.add(genHtml);
-    myMenuBar.add(file);
+    fileMenu.add(open);
+    fileMenu.add(save);
+    fileMenu.add(generateViewHtml);
+    myMenuBar.add(fileMenu);
+    
+    fileMenu.addSeparator();
+    JMenuItem quit = new JMenuItem("Exit");
+    quit.setMnemonic(KeyEvent.VK_X);
+    // TODO: KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)
+    fileMenu.add(quit);
 
     open.addActionListener(new ActionListener()
     {
@@ -909,7 +920,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     };
     save.addActionListener(saveAsLis);
 
-    ActionListener genHtmlLis = new ActionListener()
+    ActionListener generateViewHtmlListener = new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
@@ -947,7 +958,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
       }
     };
-    genHtml.addActionListener(genHtmlLis);
+    generateViewHtml.addActionListener(generateViewHtmlListener);
   }
 
   private void showHtmlViewer(File f)
