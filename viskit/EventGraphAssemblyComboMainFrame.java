@@ -49,6 +49,8 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.doe.*;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -127,7 +129,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
     ChangeListener tabChangeListener = new myTabChangeListener();
 
-    myQuitAction = new QuitAction("Quit");
+    myQuitAction = new ExitAction("Exit");
 
     // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
@@ -338,7 +340,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
         mb.add(m);
       }
       m.addSeparator();
-      mi = new JMenuItem("Quit");
+      mi = new JMenuItem("Exit");
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
       m.add(mi);
     }
 
@@ -348,9 +351,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     mi.setAction(qa);
   }
-  class QuitAction extends AbstractAction
+  class ExitAction extends AbstractAction
   {
-    public QuitAction(String s)
+    public ExitAction(String s)
     {
       super(s);
     }

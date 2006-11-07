@@ -182,17 +182,25 @@
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_N,accelMod)));
          fileMenu.add(buildMenuItem(controller,"open",             "Open", new Integer(KeyEvent.VK_O),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_O,accelMod)));
-         fileMenu.add(buildMenuItem(controller,"openRecent",       "Open Recent", null, null));
+         fileMenu.add(buildMenuItem(controller,"openRecent",       "Open Recent", new Integer(KeyEvent.VK_P), null));
          fileMenu.add(buildMenuItem(controller,"save",             "Save", new Integer(KeyEvent.VK_S),
                                                                KeyStroke.getKeyStroke(KeyEvent.VK_S,accelMod)));
          fileMenu.add(buildMenuItem(controller,"saveAs",           "Save as...", new Integer(KeyEvent.VK_A),null));
+         /* TODO:  add methods
+         fileMenu.add(buildMenuItem(controller,"close",            "Close",null,
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_W,accelMod)));
+         fileMenu.add(buildMenuItem(controller,"closeAll",         "Close All",null,null));
+          */
          fileMenu.addSeparator();
-         fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", null,null));
-         fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_G),null));
-         fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),null));
+         fileMenu.add(buildMenuItem(controller,"showXML",          "View Saved XML", new Integer(KeyEvent.VK_X),null));
+         fileMenu.add(buildMenuItem(controller,"generateJavaSource","Generate Java Source",new Integer(KeyEvent.VK_J),null));
+         fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save Screen Image", new Integer(KeyEvent.VK_I),
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_I,accelMod)));
+         
+         fileMenu.add(buildMenuItem(controller,"runAssembly","Run Assembly",new Integer(KeyEvent.VK_R),
+                                                               KeyStroke.getKeyStroke(KeyEvent.VK_R,accelMod)));
          if(contentOnly)
             fileMenu.add(buildMenuItem(controller,"export2grid","Export to Cluster Format",new Integer(KeyEvent.VK_C),null));
-         fileMenu.add(buildMenuItem(controller,"captureWindow",    "Save screen image",null,null));
          if(!contentOnly) {
             fileMenu.addSeparator();
             fileMenu.add(buildMenuItem(controller,"runEventGraphEditor", "Event Graph Editor", null,null));
@@ -223,13 +231,14 @@
          editMenu.addSeparator();
       
          editMenu.add(buildMenuItem(controller,"newEventGraphNode",   "Add Event Graph...",
-                                           new Integer(KeyEvent.VK_E),null));
+                                           new Integer(KeyEvent.VK_G),null));
          editMenu.add(buildMenuItem(controller,"newPropChangeListenerNode","Add Property Change Listener...",
-                                           new Integer(KeyEvent.VK_P),null));
+                                           new Integer(KeyEvent.VK_L),null));
       
          editMenu.addSeparator();
       
-         editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Assembly Properties...",null,null));
+         editMenu.add(buildMenuItem(controller,"editGraphMetaData","Edit Properties...", new Integer(KeyEvent.VK_E),
+                                                   KeyStroke.getKeyStroke(KeyEvent.VK_E,accelMod)));
       
       // Create a new menu bar and add the menus we created above to it
          myMenuBar = new JMenuBar();
@@ -241,11 +250,11 @@
          JMenu helpMenu = new JMenu("Help");
          helpMenu.setMnemonic(KeyEvent.VK_H);
       
-         helpMenu.add( buildMenuItem(help,"doContents","Contents",null,null));
-         helpMenu.add( buildMenuItem(help,"doSearch","Search",null,null));
+         helpMenu.add( buildMenuItem(help,"doContents","Contents", new Integer(KeyEvent.VK_C),null));
+         helpMenu.add( buildMenuItem(help,"doSearch","Search", new Integer(KeyEvent.VK_S),null));
          helpMenu.addSeparator();
-         helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial",null,null));
-         helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...", null, null ) );
+         helpMenu.add( buildMenuItem(help,"doTutorial","Tutorial", new Integer(KeyEvent.VK_T),null));
+         helpMenu.add( buildMenuItem(help, "aboutEventGraphEditor", "About...",  new Integer(KeyEvent.VK_A), null ) );
       //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
          myMenuBar.add(helpMenu);
       

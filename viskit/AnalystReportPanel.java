@@ -857,12 +857,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     fileMenu.add(save);
     fileMenu.add(generateViewHtml);
     myMenuBar.add(fileMenu);
-    
-    fileMenu.addSeparator();
-    JMenuItem quit = new JMenuItem("Exit");
-    quit.setMnemonic(KeyEvent.VK_X);
-    // TODO: KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)
-    fileMenu.add(quit);
 
     open.addActionListener(new ActionListener()
     {
