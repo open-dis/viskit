@@ -135,9 +135,9 @@ public class Vstatics
     Runtime run = Runtime.getRuntime();
     try {
       if(System.getProperty("os.name").indexOf("Mac") != -1)
-        run.exec("open "+path);
+        run.exec(new String[]{"open",path});
       else
-        run.exec(path);
+        run.exec(new String[]{path});
     }
     catch (Exception e) {
       return e.getMessage();
