@@ -506,7 +506,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       fileMenu.add(buildMenuItem(controller,"settings",       "Settings", null,null));
     }
     fileMenu.addSeparator();
-    fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X),null));
+    fileMenu.add(quitMenuItem = buildMenuItem(controller,"quit",             "Exit",new Integer(KeyEvent.VK_X), KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
 
     // Set up edit menu
     JMenu editMenu = new JMenu("Edit");
