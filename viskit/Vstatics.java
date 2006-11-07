@@ -7,7 +7,6 @@ import java.util.HashMap;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
@@ -133,9 +132,12 @@ public class Vstatics
   public static String runOSFile(String path)
   {
     Runtime run = Runtime.getRuntime();
+    String os = System.getProperty("os.name");
     try {
-      if(System.getProperty("os.name").indexOf("Mac") != -1)
+      if(os.indexOf("Mac") != -1)
         run.exec(new String[]{"open",path});
+      else if (os.indexOf("Win") != -1)
+        run.exec(new String[]{"start","iexplore",path});
       else
         run.exec(new String[]{path});
     }
