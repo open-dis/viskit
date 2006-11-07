@@ -201,7 +201,7 @@
     </target>
 
     <!--  === TARGET: compile === -->
-    <target depends="init,compile.simxml.util" name="compile">
+    <target depends="build.init,compile.simxml.util" name="compile">
         <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**"
             debug="on"
             source="1.4"
@@ -678,6 +678,10 @@
     <property name="izpack" value="${user.home}/IzPack" />
     <property name="launch4j" value="${user.home}/launch4j" />
     <property name="orangevolt" value="${user.home}/orangevolt"/>
+    <!-- it could be the case from a cvs checkout that asks for a pruned tree,
+        in which case, this would get set before build.init can complete the path 
+        which will break runtime.jars below -->
+    <mkdir dir="${dir.lib.ext}" />
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
     <!-- it should be named manually though for what version has been tested -->
