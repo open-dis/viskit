@@ -97,7 +97,7 @@ public class DoeMenuBar extends JMenuBar implements DoeEvents
 
         addSeparator();
       }
-      mi = buildMI("Quit", controller, EXIT_APP);
+      mi = buildMI("Exit", controller, EXIT_APP);
       add(mi);
     }
   }
