@@ -112,7 +112,7 @@ public class RecentFilesDialog extends JDialog
     
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-    p.add(new JLabel("Recent Eventgraphs"));
+    p.add(new JLabel("Recent Event Graphs"));
     p.add(Box.createHorizontalGlue());
     p.add(clearButt);
     p.add(Box.createHorizontalStrut(5));
