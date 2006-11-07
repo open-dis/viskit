@@ -63,7 +63,7 @@ public class Help {
       // Here we're setting up the action event peripherals for the tutorial menu selection
       tutorialComponent = new Button();
       tutListenerLauncher = new CSH.DisplayHelpFromSource(hb);
-      CSH.setHelpIDString(tutorialComponent, "tutorial");
+      CSH.setHelpIDString(tutorialComponent, "hTutorial");
     }
   
     /** Creates a new instance of Help */
