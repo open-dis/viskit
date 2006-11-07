@@ -7,6 +7,7 @@ import java.util.HashMap;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
@@ -122,6 +123,26 @@ public class Vstatics
     //c.setMinimumSize(new Dimension(Integer.MIN_VALUE,height));
     c.setMaximumSize(new Dimension(dmx.width,height));
     c.setMinimumSize(new Dimension(dmn.width,height));
+  }
+
+  /**
+   * Exec a file.
+   * @param path
+   * @return null if exec was ok, else error message
+   */
+  public static String runOSFile(String path)
+  {
+    Runtime run = Runtime.getRuntime();
+    try {
+      if(System.getProperty("os.name").indexOf("Mac") != -1)
+        run.exec("open "+path);
+      else
+        run.exec(path);
+    }
+    catch (Exception e) {
+      return e.getMessage();
+    }
+    return null;
   }
 
   static String getCustomClassPath()

@@ -957,6 +957,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void showHtmlViewer(File f)
   {
+    String errMsg = Vstatics.runOSFile(f.getAbsolutePath());
+    if(errMsg != null)
+      JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+errMsg,"Error",JOptionPane.ERROR_MESSAGE);
+/*
+
     JFrame fr = new JFrame("Analyst Report -- "+f.getPath());
     fr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     //fr.setSize(640,480);
@@ -981,8 +986,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     catch (IOException e) {
       JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
     }
-
+*/
   }
+
   class fileChoiceListener implements ActionListener
   {
     JTextField tf;
