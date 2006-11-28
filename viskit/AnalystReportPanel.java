@@ -910,6 +910,13 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         outFile = outFile.substring(0,idx) + ".html";
         XsltUtility.runXslt(reportFile.getAbsolutePath(),
             outFile, "./AnalystReports/AnalystReportXMLtoHTML.xslt");
+        
+        // pop up the system html viewer, or send currently running browser to html page
+        try {
+            viskit.util.BareBonesBrowserLaunch.openURL( (new File(outFile)).toURL().toString() );
+        } catch (java.net.MalformedURLException mue) {
+            System.out.println(outFile + " : malformed path error.");
+        }
       }
     };
     save.addActionListener(saveAsLis);
@@ -957,7 +964,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void showHtmlViewer(File f)
   {
-    String errMsg = Vstatics.runOSFile(f.getAbsolutePath());
+      String errMsg = null;
+      // pop up the system html viewer, or send currently running browser to html page
+        try {
+            viskit.util.BareBonesBrowserLaunch.openURL( f.toURL().toString() );
+        } catch (java.net.MalformedURLException mue) {
+            errMsg = f + " : malformed path error.";
+        }
+  
     if(errMsg != null)
       JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+errMsg,"Error",JOptionPane.ERROR_MESSAGE);
 /*
