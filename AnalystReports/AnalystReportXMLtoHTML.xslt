@@ -4,7 +4,6 @@
    <meta name="filename"    content="AnalystReport.xslt" />
    <meta name="author"      content="Patrick Sullivan" />
    <meta name="created"     content="21 July 2006" />
-   <meta name="revised"     content="21 July 2006" />
    <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format>
   </head>
   
@@ -116,10 +115,9 @@
       <b>Executive Summary</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Executive Summary</u>
-        :
-      </i>
+      
+        <i>Analyst Executive Summary.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -132,10 +130,9 @@
       <b>Simulation Location</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Considerations</u>
-        :
-      </i>
+      
+        <i>Analyst Considerations.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -143,10 +140,9 @@
   </xsl:template>
   <xsl:template match="SLConclusions">
     <p align="left">
-      <i>
-        <u>Post-Experiment Analysis</u>
-        :
-      </i>
+      
+        <i>Post-Experiment Analysis.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -154,17 +150,23 @@
   </xsl:template>
   <xsl:template match="LocationImage">
     <p align="center">
-      <xsl:element name="img">
-        <xsl:attribute name="border">
-          <xsl:text>1</xsl:text>
+      <xsl:element name="a">
+        <xsl:attribute name="href">
+          <xsl:value-of select="@dir"/>
         </xsl:attribute>
-        <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
-        <xsl:attribute name="width">
-          <xsl:text>640</xsl:text>
+        <xsl:attribute name="style">
+          <xsl:text>border:0</xsl:text>
         </xsl:attribute>
-        <xsl:attribute name="height">
-          <xsl:text>480</xsl:text>
-        </xsl:attribute>
+          <xsl:element name="img">
+            <xsl:attribute name="border">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
+            <xsl:attribute name="description">
+              <!-- TODO:  more info here -->
+              <xsl:text>location</xsl:text>
+            </xsl:attribute>
+          </xsl:element>
       </xsl:element>
     </p>
   </xsl:template>
@@ -175,10 +177,9 @@
       <b>Viskit Assembly Simulation Configuration</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Description</u>
-        :
-      </i>
+      
+        <i>Analyst Description.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -186,10 +187,9 @@
   </xsl:template>
   <xsl:template match="SCConclusions" mode="ConfigHeader">
     <p align="left">
-      <i>
-        <u>Post-Experiment Analysis</u>
-        :
-      </i>
+      
+        <i>Post-Experiment Analysis.</i>
+      
       <font color="#000099">
         <xsl:value-of select="@text"/>
       </font>
@@ -210,17 +210,25 @@
 
   <xsl:template match="AssemblyImage" mode="ConfigHeader">
     <p align="center">
-      <xsl:element name="img">
-        <xsl:attribute name="border">
-          <xsl:text>1</xsl:text>
+      <xsl:element name="a">
+        <xsl:attribute name="href">
+          <xsl:value-of select="@dir"/>
         </xsl:attribute>
-        <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
-        <xsl:attribute name="width">
-          <xsl:text>640</xsl:text>
+        <xsl:attribute name="style">
+          <xsl:text>border:0</xsl:text>
         </xsl:attribute>
-        <xsl:attribute name="height">
-          <xsl:text>480</xsl:text>
-        </xsl:attribute>
+        <xsl:element name="img">
+          <xsl:attribute name="border">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
+          <xsl:attribute name="title">
+            <xsl:text>Assembly graph</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="alt">
+            <xsl:text>Assembly graph</xsl:text>
+          </xsl:attribute>
+        </xsl:element>
       </xsl:element>
     </p>
   </xsl:template>
@@ -242,10 +250,9 @@
       <b>Entity Parameters</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Description</u>
-        :
-      </i>
+      
+        <i>Analyst Description.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -253,10 +260,9 @@
   </xsl:template>
   <xsl:template match="EPConclusions" mode="ParamHeader">
     <p align="left">
-      <i>
-        <u>Post-Experiment Analysis</u>
-        :
-      </i>
+      
+        <i>Post-Experiment Analysis.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -268,10 +274,11 @@
     <p/>
     <p/>
     <p/>
-    <xsl:text>Simulation Parameters for:</xsl:text>
+    <xsl:text>Simulation Parameters for </xsl:text>
     <b>
       <xsl:value-of select="@name"/>
     </b>
+    <!--  TODO:  add uniquely identifying information for this header -->
     <table border="1" width="75%" cellpadding="0" cellspacing="1">
 
       <!--Classification Values -->
@@ -409,10 +416,9 @@
       <b>Behavior Definitions</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Description</u>
-        :
-      </i>
+      <b>
+        <i>Analyst Description.</i>
+      </b>
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -420,10 +426,7 @@
   </xsl:template>
   <xsl:template match="BCConclusions" mode="BehaviorHeader">
     <p align="left">
-      <i>
-        <u>Post-Experiment Analysis</u>
-        :
-      </i>
+      <i>Post-Experiment Analysis..</i>
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -437,14 +440,14 @@
     <hr/>
     <p/>
     <p align="left">
-      <b>Behavior:</b>
+      <b>Behavior: </b>
       <xsl:value-of select="@name"/>
     </p>
 
     <!--Add the description -->
     <xsl:for-each select="description">
       <p align="left">
-        <b>Description:</b>
+        <b>Description: </b>
         <xsl:value-of select="@text"/>
       </p>
     </xsl:for-each>
@@ -452,17 +455,23 @@
     <!--Add the image of the event graph -->
     <xsl:for-each select="EventGraphImage">
       <p align="center">
-        <xsl:element name="img">
-          <xsl:attribute name="border">
-            <xsl:text>1</xsl:text>
-          </xsl:attribute>
-          <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
-          <xsl:attribute name="width">
-            <xsl:text>640</xsl:text>
-          </xsl:attribute>
-          <xsl:attribute name="height">
-            <xsl:text>480</xsl:text>
-          </xsl:attribute>
+          <xsl:element name="a">
+            <xsl:attribute name="href">
+              <xsl:value-of select="@dir"/>
+            </xsl:attribute>
+            <xsl:attribute name="style">
+              <xsl:text>border:0</xsl:text>
+            </xsl:attribute>
+            <xsl:element name="img">
+              <xsl:attribute name="border">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+              <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
+                <xsl:attribute name="description">
+                  <!-- TODO:  more info here -->
+                  <xsl:text>location</xsl:text>
+                </xsl:attribute>
+            </xsl:element>
         </xsl:element>
       </p>
     </xsl:for-each>
@@ -521,10 +530,9 @@
       <b>Statistical Results</b>
     </p>
     <p align="left">
-      <i>
-        <u>Analyst Description</u>
-        :
-      </i>
+      
+        <i>Analyst Description.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -532,10 +540,9 @@
   </xsl:template>
   <xsl:template match="SRConclusions" mode="StatsHeader">
     <p align="left">
-      <i>
-        <u>Post-Experiment Analysis</u>
-        :
-      </i>
+      
+        <i>Post-Experiment Analysis.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -545,10 +552,9 @@
   <xsl:template match="SimEntity" mode="RepStats">
     <p/>
     <p align="left">
-      <u>
+      
         <b>Replication Report</b>
-      </u>
-      :
+      
     </p>
     <p align="left">Entity:
       <b>
@@ -561,18 +567,24 @@
       </p>
       <xsl:for-each select="chartURL">
         <p align="center">
+      <xsl:element name="a">
+        <xsl:attribute name="href">
+          <xsl:value-of select="@dir"/>
+        </xsl:attribute>
+        <xsl:attribute name="style">
+          <xsl:text>border:0</xsl:text>
+        </xsl:attribute>
           <xsl:element name="img">
             <xsl:attribute name="border">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
             <xsl:attribute name="src"><xsl:value-of select="@dir"/></xsl:attribute>
-            <xsl:attribute name="width">
-              <xsl:text>640</xsl:text>
-            </xsl:attribute>
-            <xsl:attribute name="height">
-              <xsl:text>480</xsl:text>
+            <xsl:attribute name="description">
+                <!-- TODO:  better description -->
+              <xsl:text>statistical output</xsl:text>
             </xsl:attribute>
           </xsl:element>
+         </xsl:element>
         </p>
       </xsl:for-each>
       <p align="center">
@@ -634,10 +646,9 @@
   <xsl:template match="SummaryReport" mode="SumStats">
     <p/>
     <p align="left">
-      <u>
+      
         <b>Summary Report</b>
-      </u>
-      :
+      
     </p>
     <table border="1" width="80%">
       <tr>
@@ -703,9 +714,9 @@
       <b>Conclusions and Recommendations</b>
     </p>
     <p align="left">
-      <i>
-        <u>Conclusions</u>
-      </i>
+      
+        <i>Conclusions.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -713,10 +724,9 @@
   </xsl:template>
   <xsl:template match="CRConclusions">
     <p align="left">
-      <u>
-        <i>Recommendations for future work</i>
-      </u>
-      :
+      
+        <i>Recommendations for future work.</i>
+      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
