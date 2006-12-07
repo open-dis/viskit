@@ -90,12 +90,13 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
   JFrame mom;
 
-  String clusterDNS = "cluster.moves.nps.navy.mil";
+  // TODO: single variable for all viskit
+  String clusterDNS = "wipeout.hpr.nps.edu";
   int defaultClusterPort = 4444;
 
-  String clusterWebStatus1 = "http://cluster.moves.nps.navy.mil/ganglia/";
-  String clusterWebStatus2 = "http://cluster.moves.nps.navy.mil/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
-  String clusterWebStatus  = "http://cluster.moves.nps.navy.mil/ganglia/?r=hour&c=MOVES&h=&sh=0";
+  String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
+  String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
+  String clusterWebStatus  = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
   private JButton canButt;
   private JButton runButt;
   private SimkitAssembly jaxbRoot;
