@@ -395,7 +395,7 @@ public class ExternalAssemblyRunner extends JFrame
     public synchronized void doTick()
     {
       if (viskit.Vstatics.debug) System.out.println("doKeepTime");
-      this.waitDelay("Tick",0.0d);
+      this.waitDelay("Tick",0.0d,simkit.Priority.HIGHEST);
     }
   }
   /**

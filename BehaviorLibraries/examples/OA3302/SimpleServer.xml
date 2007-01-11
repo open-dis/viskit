@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleServer" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter type="simkit.random.RandomVariate" name="serviceTime"/>
-    <Parameter type="int" name="totalNumberServers"/>
+<SimEntity extend="SimEntityBase" name="SimpleServer" package="examples" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
+    <Parameter name="totalNumberServers" type="int"/>
     <StateVariable name="numberInQueue" type="int"/>
     <StateVariable name="numberAvailableServers" type="int"/>
     <Event name="Run">
@@ -11,16 +11,21 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>
-        <Coordinate y="0" x="10"/>
+        <Coordinate x="10" y="0"/>
     </Event>
     <Event name="Arrival">
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue + 1"/>
         </StateTransition>
-        <Schedule condition="numberAvailableServers &gt; 0" priority="1.0" delay="0.0" event="StartService"/>
-        <Coordinate y="100" x="10"/>
+        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="0">
+            <Comment/>
+            <EdgeParameter value="numberAvailableServers"/>
+        </Schedule>
+        <Coordinate x="10" y="100"/>
     </Event>
     <Event name="StartService">
+        <Comment/>
+        <Argument name="arg_0" type="int"/>
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue - 1"/>
         </StateTransition>
@@ -28,14 +33,15 @@
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
         <Schedule delay="serviceTime.generate()" event="EndService"/>
-        <Coordinate y="100" x="150"/>
+        <Code>System.out.println("numberAvailableServers"+arg_0);</Code>
+        <Coordinate x="150" y="100"/>
     </Event>
     <Event name="EndService">
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
         </StateTransition>
-        <Schedule condition="numberInQueue &gt; 0" priority="1.0" delay="0.0" event="StartService"/>
-        <Coordinate y="100" x="320"/>
+        <Schedule condition="numberInQueue &gt; 0" delay="0.0" event="StartService" priority="1.0"/>
+        <Coordinate x="320" y="100"/>
     </Event>
 </SimEntity>
 

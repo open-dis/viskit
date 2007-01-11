@@ -23,7 +23,7 @@ package viskit.xsd.assembly;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFileType;
 import viskit.xsd.bindings.assembly.UserType;
-
+//import viskit.doe.DoeSessionDriver;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Rick Goldberg
  */
-public class SessionManager {
+public class SessionManager /* compliments DoeSessionDriver*/ {
     private Hashtable sessions;
     private JAXBContext jaxbCtx;
     private static final String WTMP = "/var/gridkit/wtmp.xml";
@@ -62,7 +62,7 @@ public class SessionManager {
         log("SessionManager initialized");
     }
     
-    String login(String username, String password) {
+    public String login(String username, String password) {
  
         try {
             FileInputStream is = 
@@ -135,7 +135,7 @@ public class SessionManager {
      * without a valid usid, once.
      */
     
-    Boolean addUser(String usid, String newUser) {
+    public Boolean addUser(String usid, String newUser) {
         if ( isAdmin(usid) ) {
             
             File pwd = new File(PASSWD);
@@ -303,7 +303,7 @@ public class SessionManager {
         }
     }
  
-    boolean authenticate(String usid) {
+    public boolean authenticate(String usid) {
         // isAdmin only happens if no password file
         // has yet been created. 
         if ( sessions.get(usid) != null || isAdmin(usid)) {

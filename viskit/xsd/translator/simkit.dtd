@@ -94,7 +94,7 @@
 	delay	CDATA	"0.0"
 	event	IDREF	#REQUIRED
 	condition CDATA	#IMPLIED 
-        priority  CDATA  "0.0"	
+        priority  (HIGHEST|HIGHER|HIGH|DEFAULT|LOW|LOWER|LOWEST) "DEFAULT"
         description CDATA   #IMPLIED
 >
 

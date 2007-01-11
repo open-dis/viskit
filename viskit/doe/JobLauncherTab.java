@@ -659,7 +659,11 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
   StringWriter data;
 
-  public void run()
+  public void run() {
+      writeStatus("Hello");
+  }
+  
+  public void runOrig()
   {
     Vector args = new Vector(5);
 

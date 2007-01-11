@@ -57,16 +57,21 @@ public class AssemblyHandler implements XmlRpcHandler {
     InputStream inputStream;
     
     public AssemblyHandler(int port) {
+        this(port, new SessionManager());
+        
+    } 
+    
+    public AssemblyHandler(int port, SessionManager sessionManager) {
         this.port = port;
-        sessionManager = new SessionManager();
+        this.sessionManager = sessionManager;
         gridRuns = new Hashtable();
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
         } catch (Exception e) {
             sessionManager.log("Classpath error loading jaxb bindings?");
         }
-    } 
-      
+    }
+    
     /**
      * Implement the XmlRpcHandler interface directly to manually specify available
      * methods. Realize that many users will be calling this all at once, globals strong-bad.

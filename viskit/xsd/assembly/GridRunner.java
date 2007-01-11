@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamSource;
 import simkit.random.MersenneTwister;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.eventgraph.*; //?
+//import viskit.doe.DoeRunDriver;
 
 /**
  * The GridRunner launches a number of Gridlets to
@@ -59,7 +60,7 @@ import viskit.xsd.bindings.eventgraph.*; //?
  * @author Rick Goldberg
  */
 
-public class GridRunner {
+public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
     Integer jobID;
     int port;
@@ -154,7 +155,7 @@ public class GridRunner {
     
     // can be called either before or after setAssembly()
     // won't be processed until a run()
-    Boolean addEventGraph(String eventGraph) {
+    public Boolean addEventGraph(String eventGraph) {
         eventGraphs.add(eventGraph);
         return Boolean.TRUE;
     }
@@ -165,7 +166,7 @@ public class GridRunner {
     // file.size() / buffer.length + file.size() % buffer.length > 0 ? 0 : -1
     // and decrements to 0, which is the id of the last chunk
     int lastSequence = 0;
-    Integer transferJar(String filename, byte[] data, int sequence) {
+    public Integer transferJar(String filename, byte[] data, int sequence) {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
@@ -600,7 +601,7 @@ public class GridRunner {
         }
     }
     
-    Boolean run() {
+    public Boolean run() {
         File userDir;
         try { // install the eventgraphs in the assembly
             List eventGraphList = root.getEventGraph();

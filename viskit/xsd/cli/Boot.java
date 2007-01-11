@@ -48,6 +48,11 @@ public class Boot extends URLClassLoader implements Runnable {
         baseJarURL = urls[0];
     }
     
+    public Boot(URL[] urls, ClassLoader cloader) {
+        super(urls,cloader);
+        addURL(urls[0]);
+        baseJarURL = urls[0];
+    }
     
     // TODO: -P ackage up a self contained jar given above args.
     public Boot(String[] args) {

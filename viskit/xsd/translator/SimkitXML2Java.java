@@ -6,8 +6,8 @@
 
 package viskit.xsd.translator;
 
+import java.util.Iterator;
 import viskit.xsd.bindings.eventgraph.*;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
 
 /**
  *
@@ -138,68 +139,68 @@ public class SimkitXML2Java {
     }
 
     void buildVars(StringWriter vars, StringWriter accessorBlock) {
-
-	PrintWriter pw = new PrintWriter(vars);
-
-	ListIterator li = this.root.getParameter().listIterator();
-	List superParams = resolveSuperParams(this.root.getParameter());
-	boolean extend = (this.root.getExtend().indexOf("SimEntityBase") < 0);
-
-	while ( li.hasNext() ) {
-
-	    Parameter p = (Parameter) li.next();
-
+        
+        PrintWriter pw = new PrintWriter(vars);
+        
+        ListIterator li = this.root.getParameter().listIterator();
+        List superParams = resolveSuperParams(this.root.getParameter());
+        boolean extend = (this.root.getExtend().indexOf("SimEntityBase") < 0);
+        
+        while ( li.hasNext() ) {
+            
+            Parameter p = (Parameter) li.next();
+            
             if ( !superParams.contains(p) ) {
                 pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
             } else {
                 pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
             }
-
-	    if ( !extend )
-		buildParameterAccessor(p,accessorBlock);
-	    else if ( !superParams.contains(p) )
-		buildParameterAccessor(p,accessorBlock);
-
-	}
-
-	pw.println();
-
-  li = this.root.getStateVariable().listIterator();
-
-	while ( li.hasNext() ) {
-	    Class c = null;
-
-	    StateVariable s = (StateVariable) li.next();
-
-	    try {
-		c = Class.forName(s.getType());
-	    } catch ( ClassNotFoundException cnfe ) {
-	        pw.println(sp4 + "protected" + sp + stripLength(s.getType())
-			+ sp + s.getName() + sc);
-	    }
-
-	    if ( c != null ) {
+            
+            if ( !extend )
+                buildParameterAccessor(p,accessorBlock);
+            else if ( !superParams.contains(p) )
+                buildParameterAccessor(p,accessorBlock);
+            
+        }
+        
+        pw.println();
+        
+        li = this.root.getStateVariable().listIterator();
+        
+        while ( li.hasNext() ) {
+            Class c = null;
+            
+            StateVariable s = (StateVariable) li.next();
+            
+            try {
+                c = Class.forName(s.getType());
+            } catch ( ClassNotFoundException cnfe ) {
+                pw.println(sp4 + "protected" + sp + stripLength(s.getType())
+                + sp + s.getName() + sc);
+            }
+            
+            if ( c != null ) {
                 java.lang.reflect.Constructor cst = null;
-
+                
                 try {
                     cst = c.getConstructor(new Class[] {});
                 } catch (Exception e) { // no null constructors
                     ;
                 }
                 
-		if ( cst != null ) pw.println(sp4 + "protected" + sp + s.getType() + sp
-			+ s.getName() + sp + eq + sp + "new" + sp
-			+ s.getType() + lp + rp + sc ) ;
+                if ( cst != null ) pw.println(sp4 + "protected" + sp + s.getType() + sp
+                        + s.getName() + sp + eq + sp + "new" + sp
+                        + s.getType() + lp + rp + sc ) ;
                 else { // really not a bad case, most likely will be set by the reset()
                     pw.println(sp4 + "protected" + sp + s.getType() + sp
-                        + s.getName() + sp + eq + sp + "null" + sc
-                    );
+                            + s.getName() + sp + eq + sp + "null" + sc
+                            );
                 }
-	    }
-
-	    buildStateVariableAccessor(s,accessorBlock);
-	}
-
+            }
+            
+            buildStateVariableAccessor(s,accessorBlock);
+        }
+        
     }
 
     void buildParameterAccessor(Parameter p, StringWriter sw) {
@@ -638,70 +639,78 @@ public class SimkitXML2Java {
 	    }
 	}
 	pw.println(sp4 + cb);
-	pw.println();
-
+        pw.println();
+        
     }
-
+    
     void doSchedule(ScheduleType s, Event e, PrintWriter pw) {
-	List edges = s.getEdgeParameter();
-	ListIterator ei = edges.listIterator();
-	Class c = null;
-	String condent = "";
+        List edgeParams = s.getEdgeParameter();
+        ListIterator edgeParami = edgeParams.listIterator();
+        Class c = null;
+        String condent = "";
         EventType event = (EventType)s.getEvent();
         List eventArgs = event.getArgument();
         ListIterator eventArgsi = eventArgs.listIterator();
+        
+        if ( s.getCondition() != null ) {
+            condent = sp4;
+            pw.println(sp8 + "if" + sp + lp + s.getCondition() + rp + sp + ob);
+        }
 
-	if ( s.getCondition() != null ) {
-	    condent = sp4;
-	    pw.println(sp8 + "if" + sp + lp + s.getCondition() + rp + sp + ob);
-	}
-
-	pw.print(sp8 + condent + "waitDelay" + lp + qu + ((EventType)s.getEvent()).getName() + qu + cm);
-	pw.print(s.getDelay() + cm + "new Object[]" + ob);
-
-	while ( ei.hasNext() ) {
-            boolean prim = false;
-	    EdgeParameterType ep = (EdgeParameterType) ei.next();
-            ArgumentType arg = (ArgumentType) eventArgsi.next();
-	    try {
-	        c = Class.forName(arg.getType());
-	    } catch ( ClassNotFoundException cnfe ) {
-		// most likely a primitive type
-		String type = arg.getType();
-		String constructor = "new" + sp;
-		if (type.equals("int")) {
-		    constructor+="Integer";
-		} else if (type.equals("float")) {
-		    constructor+="Float";
-		} else if (type.equals("double")) {
-		    constructor+="Double";
-		} else if (type.equals("long")) {
-		    constructor+="Long";
-		} else if (type.equals("boolean")) {
-		    constructor+="Boolean";
-		} else if (type.equals("char")) {
-		    constructor+="Character";
-		} else if (type.equals("short")) {
-		    constructor+="Short";
-		} else { // see #93
-                    constructor = "";
-                    pw.print(ep.getValue());
-                } if ( !constructor.equals("") ) {
-		    pw.print(constructor + lp + ep.getValue() + rp);
-                    prim = true;
+        pw.print(sp8 + condent + "waitDelay" + lp + qu + ((EventType)s.getEvent()).getName() + qu + cm);
+        
+        // according to schema to meet Priority class definition, the following tags should be permitted:
+        // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
+        // however, historically these could be numbers.
+        // check if Number, assign TAG; tbd how these are scaled?
+        
+        int prioIndex = 0;
+        try {
+            prioIndex = Integer.parseInt(s.getPriority());
+        } catch (NumberFormatException nfe1) {
+            try {
+                prioIndex = (int) Double.parseDouble(s.getPriority());
+            } catch (NumberFormatException nfe2) {;}
+        }
+        
+        // numerical priority values from -3 to 3 
+        // this range may need to be scaled or shifted
+        // or not, see simkit
+        
+        if (prioIndex > 3) prioIndex=3;
+        if (prioIndex < -3) prioIndex=-3;
+        
+        String[] priorities = { "LOWEST","LOWER","LOW","DEFAULT","HIGH","HIGHER","HIGHEST" };
+        String prio = priorities[prioIndex + 3];
+        
+        pw.print(s.getDelay() + cm + "Priority" + pd + prio);
+        
+        // varargs can throw a mostly harmless compiler warning if there is only one arg here
+        // "warning: non-varargs call of varargs method with inexact argument type for last parameter""
+        // If there are more than one or none there is no ambiguity.
+        // If the one arg case is cast as Object then the warning is suppressed
+        
+        if (s.getEdgeParameter().size() == 1) {
+            
+            EdgeParameterType ep = (EdgeParameterType)(s.getEdgeParameter().get(0));
+            
+            pw.print(cm + "(Object)");
+            pw.print(ep.getValue());
+            
+        } else if (s.getEdgeParameter().size() > 1) {
+            pw.print(cm);
+            
+            for (ListIterator<EdgeParameterType> edgeParamIterator = s.getEdgeParameter().listIterator(); edgeParamIterator.hasNext();) {
+                EdgeParameterType param = edgeParamIterator.next();
+                pw.print(param.getValue());
+                if (edgeParamIterator.hasNext()) {
+                    pw.print(cm);
                 }
-	    }
-	    if (c != null && !prim) {
-		pw.print(ep.getValue());
-	    }
-
-	    if ( edges.size() > 1 && edges.indexOf(ep) < edges.size() - 1 ) {
-	        pw.print(cm);
-	    }
-
-	}
-	pw.println(cb + cm + s.getPriority() + rp + sc);
-
+            }
+        }
+        
+        pw.println(rp + sc);
+        
 	if ( s.getCondition() != null ) {
 	    pw.println(sp8 + cb);
 	}
@@ -1041,7 +1050,6 @@ public class SimkitXML2Java {
 	} catch (FileNotFoundException fnfe) {
 		sx2j.error("Bad filename " + sx2j.fileBaseName);
 	}
-
 
     }
 

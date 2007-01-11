@@ -464,7 +464,11 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
 
   StringWriter data;
 
-  public void run()
+  public void run() {
+      System.out.println("Hello Run");
+  }
+  
+  public void runOrig()
   {
     outputDirty = true;
     outputList = new ArrayList();

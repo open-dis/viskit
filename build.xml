@@ -204,8 +204,8 @@
     <target depends="build.init,compile.simxml.util" name="compile">
         <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -264,7 +264,7 @@
         </jar>
     
     </target>
-
+    
     <target depends="compile.bindings" name="jar-stage1">
         <!-- remove for dist
         <jar basedir="${dir.build.classes}" compress="false" excludes="*/test/*" jarfile="${dir.build.lib}/visxml.jar"/>
@@ -416,8 +416,8 @@
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -429,8 +429,8 @@
         </copy>
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -442,8 +442,8 @@
         </copy>
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -455,8 +455,8 @@
         </copy>
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -469,8 +469,8 @@
         <!--
         <javac destdir="${dir.build.classes}"
         debug="on"
-        source="1.4"
-        target="1.4">
+        source="1.5"
+        target="1.5">
         <classpath>
         <fileset dir="${dir.lib.xml}" includes="*.jar"/>
         </classpath>
@@ -488,8 +488,8 @@
        
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
@@ -499,8 +499,8 @@
         
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -512,8 +512,8 @@
         
         <javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.4"
-            target="1.4">
+            source="1.5"
+            target="1.5">
             <classpath>
                 <pathelement location="${dir.lib.xml}/jaxb-api.jar"/>
                 <pathelement location="${dir.lib}/visxml.jar"/>

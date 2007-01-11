@@ -80,6 +80,14 @@ public class Gridlet extends Thread {
     String filename;
     String pwd;
     
+    public Gridlet(int taskID, int jobID, int numTasks, String frontHost, int port, String usid, URL expFile ) {
+        try {
+            xmlrpc = new XmlRpcClientLite(frontHost, port);
+        } catch (java.net.MalformedURLException murle) {
+            murle.printStackTrace();
+        }
+    }
+    
     public Gridlet() {
        
         try {

@@ -51,6 +51,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
 import viskit.*;
+import viskit.doe.RemoteDriverImpl;
 import viskit.xsd.assembly.SessionManager;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatisticsType;
@@ -73,8 +74,7 @@ import java.util.List;
 
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener
 {
-  private XmlRpcClientLite rpc;
-  private String userID;
+    DoeRunDriver doe;
   Hashtable statsGraphs;
   String inputFileString;
   File inputFile;
@@ -364,50 +364,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     rightSplit.setDividerLocation(200);
     leftRightSplit.setDividerLocation(315);
     add(leftRightSplit, BorderLayout.CENTER);
-
-/*
-    JPanel botBar = new JPanel();
-    botBar.setLayout(new BoxLayout(botBar, BoxLayout.X_AXIS));
-
-    doQstatConsole = new JButton("Qstat Console");
-    doQstatConsole.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent ev)
-      {
-        if (qstatConsole == null) {
-          qstatConsole = new QstatConsole(unameTF.getText(), new String(upwPF.getPassword()), clusterTF.getText().trim(), portTF.getText().trim());
-        }
-        qstatConsole.show();
-      }
-    });
-    botBar.add(doQstatConsole);
-
-    p.add(buildClusterPanel());
-
-    //p.add(topPan);
-    JPanel saveButtCenterPan = new JPanel();
-    saveButtCenterPan.setLayout(new BoxLayout(saveButtCenterPan, BoxLayout.X_AXIS));
-    saveButtCenterPan.add(Box.createHorizontalGlue());
-//temp      saveButtCenterPan.add(topPan);
-    saveButtCenterPan.add(Box.createHorizontalGlue());
-
-    JPanel saveButtPan = new JPanel();
-    saveButtPan.setLayout(new BoxLayout(saveButtPan, BoxLayout.X_AXIS));
-    saveButtCenterPan.setAlignmentY(JComponent.BOTTOM_ALIGNMENT);
-    saveButtPan.add(saveButtCenterPan);
-    JButton sv = new JButton("Save");
-    sv.addActionListener(new svLister());
-    sv.setAlignmentY(JComponent.BOTTOM_ALIGNMENT);
-    sv.setToolTipText("<html><center>Save cluster run parameters<br>to assembly file<br>" +
-        "(not required to run job)");
-    sv.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), sv.getBorder()));
-    saveButtPan.add(sv);
-    p.add(saveButtPan);
-    //p.add(jsp);
-    p.add(Box.createVerticalStrut(8));
-    p.add(botBar);
-    p.setBorder(new EmptyBorder(10, 10, 10, 10));
-*/
 
     return this; //p;
   }
@@ -768,13 +724,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
           }
         }
         try {
-          if (rpc != null) {
-            Vector parms = new Vector();
-            rpc.execute("gridkit.clear", parms);
-          }
+          doe.clear();
+          doe = null; // will cause doe to logout() on GC if it's a grid run
         }
         catch (Exception e) {
-          System.err.println("RPC exception: " + e.getMessage());
+          System.err.println("DoeException: " + e.getMessage());
         }
 
       }
@@ -783,7 +737,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     jobKiller.start();
   }
 
-  private void writeStatus(final String s)
+  void writeStatus(final String s)
   {
     SwingUtilities.invokeLater(new Runnable()
     {
@@ -795,7 +749,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     });
   }
 
-  private boolean sendEGToServer(File file) throws Exception
+  private void addEventGraphFile(File file) throws Exception
   {
     FileInputStream fis = new FileInputStream(file);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -807,18 +761,44 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     baos.close();
     String egText = new String(baos.toByteArray());
 
-    Vector args = new Vector();
-    args.add(userID);
-    args.add(egText);
-
-    Boolean ret = (Boolean) rpc.execute("gridkit.addEventGraph", args);
-    return ret.booleanValue();
+    doe.addEventGraph(egText);
   }
 
   StringWriter data;
-
+  
+  // remove, for testing some loader stuff while writing it
+  public void runTesting() {
+      writeStatus("JobLauncherTab2.run()");
+      LocalBootLoader loader = new LocalBootLoader(new URL[]{}, Thread.currentThread().getContextClassLoader());
+      loader.setTab(this);
+      
+      // loader gets own copy of Viskit's libs, init method here
+      // will return it properly with any eventgraph's in a jar
+      // already loaded in its classpath
+      loader = loader.init();
+      
+      
+      for ( URL line:loader.getURLs() ) {
+          writeStatus("URL: "+line.toString());
+      }
+      
+  }
+  
+  // tbd gui: set gridMode true if logging into a remote service, or false if
+  // it should run locally
+  private boolean gridMode = true;
+  
   public void run()
   {
+      try {
+          if ( gridMode ) {
+              doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()) );
+          } else {
+              doe = new LocalDriverImpl();
+          }
+          
+   //
+          
     Vector args = new Vector(5);
 
     boolean doClustStat = this.doClusterStat.isSelected();
@@ -830,31 +810,15 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     {
       try {
         createOutputDir();
-        int chosenPort = Integer.parseInt(portTF.getText());
-        String clusterDNS = clusterTF.getText().trim();
 
-        writeStatus("Building XML-RPC client to " + clusterDNS + ".");
-        rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
-        // login
-        args.add(unameTF.getText());
-        args.add(new String(upwPF.getPassword()));
-        userID = (String) rpc.execute("gridkit.login", args);
-        if (userID.equalsIgnoreCase(SessionManager.LOGIN_ERROR)) {
-          userID = null;
-          throw new Exception("Login refused.");
-        }
-
-        // Send dependencies
+        // Send EventGraphs
         Collection egs = cntlr.getLoadedEventGraphs();
 
         for (Iterator itr = egs.iterator(); itr.hasNext();) {
-          sendEGToServer((File) itr.next());
+          addEventGraphFile((File) itr.next());
         }
 
         // Construct assembly
-        args.clear();
-        args.add(userID);
-
         fr = new FileReader(filteredFile);
         br = new BufferedReader(fr);
         data = new StringWriter();
@@ -866,50 +830,24 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         out.close();
 
         String dataS = data.toString().trim();
-        //String[]sa = dataS.split("<\\?xml.*\\?>"); // remove the hdr if present
-        //if(sa.length == 2)
-        //  dataS = sa[1].trim();
-        args.add(dataS);
-        if (viskit.Vstatics.debug) System.out.println(dataS);
-        writeStatus("Sending job file to " + clusterDNS);
-        Boolean retBool = (Boolean) rpc.execute("gridkit.setAssembly", args);
-        writeStatus("gridkit.setAssembly returned " + retBool.booleanValue());
-        if (!retBool.booleanValue()) {
-          throw new Exception("Set Assembly returned false.");
-        }
-        // Run it!
-        args.clear();
-        args.add(userID);
+        
+        doe.setAssembly(dataS);
+        
+        if (viskit.Vstatics.debug) writeStatus(dataS);
+        
         writeStatus("Executing job");
-        retBool = (Boolean) rpc.execute("gridkit.run", args);
-        //retBool = (Boolean)gr.run();                         //todo
-        writeStatus("gridkit.run returned " + retBool.booleanValue());
-        if (!retBool.booleanValue()) {
-          throw new Exception("Set Assembly returned false.");
-        }
+        
+        doe.run();
 
       }
+      
       catch (Exception e) {
 
-        //   if (thread != null)    // If normal error:
-        if (rpc == null) {
-          writeStatus("Error connecting to server: " + e.getMessage());
-          break lp3;
-        }
-        if (userID == null) {
-          writeStatus("Error authenticating to server: " + e.getMessage());
-          break lp3;
-        }
-
         writeStatus("Error: " + e.getMessage());
-        args.clear();
-        args.add(userID);
-        try {
-          rpc.execute("gridkit.logout", args);
-        }
-        catch (Exception e1) {
-        }
-        break lp3;
+        
+        
+        doe = null; // will cause GC to hit finally() which in grid will logout()
+        
       }
 
       // Bring up the 2 other windows
@@ -924,15 +862,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     }
 
-    args.clear();
-    args.add(userID);
-    try {
-      rpc.execute("gridkit.logout", args);
-    }
-    catch (Exception e) {
-    }
-
     stopRun();
+    
+    } catch ( DoeException de ) {
+          writeStatus(de.toString());
+      }
   }
 
   private void processResultsNew()
@@ -953,67 +887,47 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     try {
       // this shouldn't block on the very first call, the queue
       // is born dirty.
-      args.clear();
-      args.add(userID);
-      lastQueue = (Vector) rpc.execute("gridkit.getTaskQueue", args);
-
-      // initial number of tasks ( can also query getRemainingTasks )
-      args.clear();
-      args.add(userID);
-      int tasksRemaining = ((Integer) rpc.execute("gridkit.getRemainingTasks", args)).intValue(); //5 * 3;
+      
+      lastQueue = doe.getTaskQueue();
+      //5 * 3;
+      int tasksRemaining = doe.getRemainingTasks();
       writeStatus("Total tasks: " + tasksRemaining);
 
       while (tasksRemaining > 0) {
         // this will block until a task ends which could be
         // because it died, or because it completed, either way
         // check the logs returned by getResults will tell.
-        args.clear();
-        args.add(userID);
-        Vector queue = (Vector) rpc.execute("gridkit.getTaskQueue", args);
+        Vector queue = doe.getTaskQueue();
         for (int i = 0; i < queue.size(); i ++) {
           // trick: any change between queries indicates a transition at
           // taskID = i (well i+1 really, taskID's in SGE start at 1)
           if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
             int sampleIndex = i / designPoints; // 3; // number of designPoints chosed in this experiemnt was 3
             int designPtIndex = i % designPoints; // 3; // can also just use getResultByTaskID(int)
-            args.clear();
-            args.add(userID);
-            args.add(new Integer(sampleIndex));
-            args.add(new Integer(designPtIndex));
-            // this is reallllly verbose, you may wish to consider
-            // not getting the output logs unless there is a problem
-            // even so at that point the design points can be run
-            // as a regular assembly to reproduce. the complete
-            // logs are so far stored on the server.
-
+            
             if (/*verbose*/false) {
-              ret = rpc.execute("gridkit.getResult", args);
+              ret = doe.getResult(sampleIndex,designPtIndex);
               writeStatus("Result returned from task " + (i + 1));
               writeStatus(ret.toString());
             }
+            
             writeStatus("DesignPointStats from task " + (i + 1) + " is sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
-            ret = rpc.execute("gridkit.getDesignPointStats", args);
+            ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
             if (statsGraph == null) {
               final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
               statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);
               statsGraph.setVisible(true);
             }
             addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
-            //writeStatus(ret.toString());
+           
+            
             writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
             for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
               writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
-              args.clear();
-              args.add(userID);
-              args.add(new Integer(sampleIndex));
-              args.add(new Integer(designPtIndex));
-              args.add(new Integer(j));
-              ret = rpc.execute("gridkit.getReplicationStats", args);
-              //writeStatus(ret.toString());
+              ret = doe.getReplicationStats(sampleIndex,designPtIndex,j);
             }
             --tasksRemaining;
-            // could also call to get tasksRemaining:
-            // ((Integer)xmlrpc.execute("gridkit.getRemainingTasks",args)).intValue();
+            
           }
         }
         lastQueue = queue;
