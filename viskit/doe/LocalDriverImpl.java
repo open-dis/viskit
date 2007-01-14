@@ -3,8 +3,8 @@
  *
  * Created on January 8, 2007, 2:17 PM
  *
- * Implements a Local Doe Driver, to make pluggable with the
- * Remote (Grid) Driver, some methods are essentially NOP
+ * Implements a Local Doe Driver, to be interchangeable with the
+ * Remote (Grid Engine) Driver
  */
 
 package viskit.doe;
@@ -13,20 +13,21 @@ import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Vector;
+import viskit.xsd.assembly.GridRunner;
 
 /**
  *
  * @author Rick Goldberg
  */
 public class LocalDriverImpl implements DoeRunDriver {
-    int POOLSIZE = 4;
+
     LocalBootLoader loader;
-    Hashtable pool = new Hashtable();
-    Hashtable queue = new Hashtable();
+    GridRunner runner;
     
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() {
-        loader = new LocalBootLoader(new URL[]{}, Thread.currentThread().getContextClassLoader());
+        loader = new LocalBootLoader(new URL[]{}, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
+        runner = new GridRunner(loader);
     }
 
     public void clear() throws DoeException {

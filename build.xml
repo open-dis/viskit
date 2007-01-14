@@ -510,6 +510,7 @@
             <include name="Boot.java"/>
         </javac>
         
+        
         <javac destdir="${dir.build.classes}"
             debug="on"
             source="1.5"
@@ -524,7 +525,10 @@
                 <pathelement location="${dir.lib}/xerces.jar"/>
                 <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
             </classpath>
+            <src path="${dir.src}/viskit/doe"/>
             <src path="${dir.src.simasm.util}"/>
+            <include name="LocalBootLoader.java"/>
+            <include name="DoeException.java"/>
             <include name="SimkitAssemblyXML2Java.java"/>
             <include name="ViskitAssembly.java"/>
             <include name="BasicAssembly.java"/>

@@ -71,7 +71,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-import viskit.VGlobals;
+//import viskit.VGlobals;
 
 /**
  *
@@ -81,15 +81,13 @@ import viskit.VGlobals;
 public class LocalBootLoader extends URLClassLoader {
     String[] classPath;
     LocalBootLoader stage1;
-    JobLauncherTab2 tab;
+    File workDir;
     
-    public LocalBootLoader(URL[] classes, ClassLoader parent) {
-        super(classes,parent);
+    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
+        super(new URL[]{},parent);
+        workDir = workDir;
     }
     
-    public void setTab(JobLauncherTab2 t) {
-        tab = t;
-    }
     /** Creates a new instance of LocalBootLoader */
     public void initStage1() { 
         String classPathProp = System.getProperty("java.class.path");
@@ -99,7 +97,7 @@ public class LocalBootLoader extends URLClassLoader {
             System.out.println(line);
         }
         ClassLoader parentClassLoader = getParent();
-        stage1 = new LocalBootLoader( new URL[]{} , parentClassLoader );
+        stage1 = new LocalBootLoader( new URL[]{} , parentClassLoader, workDir );
         boolean loop=true;
         
         // if each LocalBootLoader individually has to read from
@@ -110,9 +108,9 @@ public class LocalBootLoader extends URLClassLoader {
         while(loop) {
             try {
                 stage1.loadClass("viskit.doe.LocalBootLoader");
-                if (tab!=null) tab.writeStatus("still found existing viskit context, going up one more...");
+                //if (tab!=null) tab.writeStatus("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader( new URL[]{}, parentClassLoader );
+                stage1 = new LocalBootLoader( new URL[]{}, parentClassLoader, workDir );
             } catch ( Exception e ) { // should probably be class not found exception
                 loop = false;
             }
@@ -121,7 +119,7 @@ public class LocalBootLoader extends URLClassLoader {
             try {
                 // build up stage1 libs
                 stage1.addURL( new File(path).toURL() );
-                tab.writeStatus("Added "+ new File(path).toURL().toString() );
+                //tab.writeStatus("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
             }
@@ -133,7 +131,7 @@ public class LocalBootLoader extends URLClassLoader {
     public void doAddURL(URL u) {
         super.addURL(u);
     }
-    
+  
     // create a context with viskit's libs along with
     // the generated eventgraphs, takes two stages
     
@@ -166,7 +164,8 @@ public class LocalBootLoader extends URLClassLoader {
     private File buildCleanWorkJar() {
         File newJar=null;
         try {
-            File currentDir = VGlobals.instance().getWorkDirectory();
+            //File currentDir = VGlobals.instance().getWorkDirectory();
+            File currentDir = workDir;
             File newDir = File.createTempFile("viskit","doe");
             newDir.delete();
             newDir.mkdir();
@@ -223,7 +222,7 @@ public class LocalBootLoader extends URLClassLoader {
                 if (entryClass.endsWith(".class")) { // else do nothing
                     
                     entryClass = entryClass.substring(0,entryClass.length() - 6);
-                    if (tab!=null) tab.writeStatus("Entry: " + entryClass);
+                    //if (tab!=null) tab.writeStatus("Entry: " + entryClass);
                     // it is possible, if one ran an Assembly before going to the
                     // DoE panel to create an Experiment, that a compiled version of
                     // the Assembly is in the work directory. Since this class has
@@ -240,7 +239,7 @@ public class LocalBootLoader extends URLClassLoader {
                         Class vzClz = stage1.loadClass("viskit.xsd.assembly.ViskitAssembly");
                         if (vzClz.isAssignableFrom(clz)) {
                             isEventGraph = false;
-                            tab.writeStatus("caught Assembly: "+entryClass);
+                            //tab.writeStatus("caught Assembly: "+entryClass);
                         }
                     } catch (ClassNotFoundException ex) {
                         //ex.printStackTrace();
