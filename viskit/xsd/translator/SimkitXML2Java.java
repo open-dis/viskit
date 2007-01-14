@@ -695,7 +695,7 @@ public class SimkitXML2Java {
             EdgeParameterType ep = (EdgeParameterType)(s.getEdgeParameter().get(0));
             
             pw.print(cm + "(Object)");
-            pw.print(ep.getValue());
+            pw.print(lp + ep.getValue() + rp);
             
         } else if (s.getEdgeParameter().size() > 1) {
             pw.print(cm);
