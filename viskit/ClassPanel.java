@@ -1,5 +1,7 @@
 package viskit;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -133,6 +135,7 @@ public class ClassPanel extends JPanel
       Class c = null;
       try {
         c = FindClassesForInterface.classFromFile(f, c);
+          
       }
       catch (Throwable e) {}
 

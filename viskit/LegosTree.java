@@ -76,11 +76,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     addJarFile(/*"diskit.DISEntity",*/ "lib/ext/diskit.jar");
 
     /*If this legos tree is for event graphs initialize default event graph directories*/
-    if (className.equals(eventGraphClassName)) {
-      for (int i = 0; i < evtGraphSubDirs.length; i++) {
-        addEventGraphXML(evtGraphTopLevelDir + "/" + evtGraphSubDirs[i]);
-      }
-    }
+    //if (className.equals(eventGraphClassName)) {
+      //for (int i = 0; i < evtGraphSubDirs.length; i++) {
+        //addEventGraphXML(evtGraphTopLevelDir + "/" + evtGraphSubDirs[i]);
+      //}
+    //}
 
     setModel(mod);
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);

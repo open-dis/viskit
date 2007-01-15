@@ -1,5 +1,6 @@
 package viskit;
 
+import java.net.URL;
 import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -12,6 +13,7 @@ import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.*;
 
 /**
@@ -76,21 +78,31 @@ public class FileBasedClassManager implements Runnable
     FileBasedAssyNode fban = null;
     Class fclass = null;
     if (f.getName().toLowerCase().endsWith(".xml")) {
-      PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
-
-      fclass = FindClassesForInterface.classFromFile(paf.f);   // Throwable from here possibly
-
-      fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
+      PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);      
+      String[] extraPaths = SettingsDialog.getExtraClassPath();
+      URL[] urls = new URL[extraPaths.length];
+      int index = 0;
+      for (String path:extraPaths) {
+          urls[index++] = (new File(path)).toURL();
+          
+      }
+      LocalBootLoader loader = new LocalBootLoader(urls, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
+      loader = loader.init();
+        //was:
+        //fclass = FindClassesForInterface.classFromFile(paf.f);   // Throwable from here possibly
+        //fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
       
       // since we're here, cache the parameter names
       JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
       Unmarshaller um = jaxbCtx.createUnmarshaller();
       try {
           SimEntityType simEntity =  (SimEntityType) um.unmarshal(f);
+          fclass = loader.loadClass(simEntity.getPackage()+"."+simEntity.getName());
+          fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
           List[] pa = new List[] { simEntity.getParameter() };
           Vstatics.putParameterList(fclass.getName(),pa);
           if (viskit.Vstatics.debug) System.out.println("Put "+fclass.getName()+simEntity.getParameter());
-      } catch (Exception e) {;}
+      } catch (Exception e) { e.printStackTrace();}
     }
     else if (f.getName().toLowerCase().endsWith(".class")) {
       fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly

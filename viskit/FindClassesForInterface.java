@@ -48,6 +48,7 @@ public class FindClassesForInterface
    */
   public static Class classFromFile(File f) throws java.lang.Throwable
   {
+
     return new MyClassLoader().buildIt(f);
   }
 
@@ -57,7 +58,7 @@ public class FindClassesForInterface
   static class MyClassLoader extends ClassLoader
   {
     private File f;
-
+    private Hashtable found = new Hashtable();
     Class buildIt(File fil) throws java.lang.Throwable
     {
       f = fil;
@@ -66,6 +67,7 @@ public class FindClassesForInterface
 
     protected Class findClass(String name) throws ClassNotFoundException
     {
+        if ( found.get(name) != null ) return (Class) found.get(name);
       byte[] buf = new byte[128 * 1024];        // todo make dynamically sized
       int num = 0;
       try {
@@ -80,11 +82,18 @@ public class FindClassesForInterface
         e.printStackTrace();
       }
 */
+      
+
       catch(Throwable thr) {
         throw new ClassNotFoundException(thr.getMessage());
       }
-      return defineClass(null, buf, 0, num);
+      try {
+          Class clz = defineClass(null,buf,0,num);
+          found.put(name,clz);
+          return clz;
+      } catch (Exception e) { return (Class)null;}
     }
+    
   }
 
 

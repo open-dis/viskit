@@ -82,10 +82,13 @@ public class LocalBootLoader extends URLClassLoader {
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
+    URL[] extUrls;
     
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[]{},parent);
-        workDir = workDir;
+        extUrls = classes;
+        this.workDir = new File(workDir.toURI());
+        //System.out.println("WorkDir: "+workDir);
     }
     
     /** Creates a new instance of LocalBootLoader */
@@ -93,10 +96,12 @@ public class LocalBootLoader extends URLClassLoader {
         String classPathProp = System.getProperty("java.class.path");
         String pathSep = System.getProperty("path.separator");
         classPath = classPathProp.split(pathSep);
-        for (String line:classPath) {
-            System.out.println(line);
-        }
+        //for (String line:classPath) {
+          //  System.out.println(line);
+        //}
         ClassLoader parentClassLoader = getParent();
+        //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
+        
         stage1 = new LocalBootLoader( new URL[]{} , parentClassLoader, workDir );
         boolean loop=true;
         
@@ -108,7 +113,7 @@ public class LocalBootLoader extends URLClassLoader {
         while(loop) {
             try {
                 stage1.loadClass("viskit.doe.LocalBootLoader");
-                //if (tab!=null) tab.writeStatus("still found existing viskit context, going up one more...");
+                //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
                 stage1 = new LocalBootLoader( new URL[]{}, parentClassLoader, workDir );
             } catch ( Exception e ) { // should probably be class not found exception
@@ -119,7 +124,7 @@ public class LocalBootLoader extends URLClassLoader {
             try {
                 // build up stage1 libs
                 stage1.addURL( new File(path).toURL() );
-                //tab.writeStatus("Added "+ new File(path).toURL().toString() );
+                //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
             }
@@ -130,6 +135,15 @@ public class LocalBootLoader extends URLClassLoader {
    
     public void doAddURL(URL u) {
         super.addURL(u);
+    }
+
+    public String[] getClassPath() {
+        return classPath;
+    }
+    
+    protected void addURL(URL u) {
+        super.addURL(u);
+        //System.out.println("Adding url "+u);
     }
   
     // create a context with viskit's libs along with
@@ -144,14 +158,19 @@ public class LocalBootLoader extends URLClassLoader {
     
     public LocalBootLoader init() {
         File jar;
-        
+        //System.out.println("Stage1 start init ");
         initStage1();
         
         jar = buildCleanWorkJar();
         
         //stage1 gets dirty during bring up of clean jar
         //reboot it with cleanWorkJar
+        //System.out.println("Stage1 reinit ");
         initStage1();
+        //System.out.println("Adding cleaned jar "+jar);
+        for (URL ext:extUrls) {
+            stage1.addURL(ext);
+        }
         try {
             stage1.addURL(jar.toURL());
         } catch (MalformedURLException ex) {
