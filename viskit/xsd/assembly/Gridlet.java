@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -41,6 +42,8 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
+import viskit.doe.DoeException;
+import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.cli.Boot;
@@ -53,6 +56,9 @@ import com.sun.tools.javac.Main;
  *
  * @author Rick Goldberg
  *
+ * Gridlet indexes itself to a DesignPoint within the Experiment file,
+ * creates an Assembly from that DesignPoint, compiles and runs it.
+ *
  * This is the compiled version of the Gridlet, formerly interpereted,
  * which is now in BshGridlet.
  *
@@ -62,7 +68,10 @@ import com.sun.tools.javac.Main;
  * which in java is represented by a single .class for the ViskitAssembly.
  * Also generated are any event-graph .classes, which also go there.
  *
- * Get 'em while there hot, these Gridlets should outperform the interpereted
+ * If a Gridlet was spawned by a LocalBootLoader, the EventGraphs should
+ * already be in the classpath, ie, currentContextClassLoader's.
+ *
+ * Get 'em while they're hot, these Gridlets should outperform the interpereted
  * mode, but most importantly enable entities with a large number of
  * parameters.
  *
@@ -71,6 +80,7 @@ import com.sun.tools.javac.Main;
 public class Gridlet extends Thread {
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
+    GridRunner gridRunner;
     int taskID;
     int numTasks;
     int jobID;
@@ -79,12 +89,27 @@ public class Gridlet extends Thread {
     String usid;
     String filename;
     String pwd;
+    File expFile;
+    
     
     public Gridlet(int taskID, int jobID, int numTasks, String frontHost, int port, String usid, URL expFile ) {
         try {
             xmlrpc = new XmlRpcClientLite(frontHost, port);
         } catch (java.net.MalformedURLException murle) {
             murle.printStackTrace();
+        }
+    }
+    
+    public Gridlet(int taskID, int jobID, int numTasks, GridRunner gridRunner, File expFile) throws DoeException {
+        this.taskID = taskID;
+        this.jobID = jobID;
+        this.numTasks = numTasks;
+        this.gridRunner = gridRunner;
+        this.expFile = expFile;
+        try {
+            this.sax2j = new SimkitAssemblyXML2Java(expFile.toURL().openStream());
+        } catch (Exception ex) {
+            throw new DoeException(ex.getMessage());
         }
     }
     
@@ -143,13 +168,40 @@ public class Gridlet extends Thread {
                 }
                 
             } else {
-                throw new RuntimeException("Not running as SGE job?");
+                // check if LocalBootLoader mode, otherwise throw exception
+                if ( !( Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader ) )
+                    throw new RuntimeException("Not running as SGE job or local mode?");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
+    public void setGridRunner(GridRunner gridRunner) {
+        this.gridRunner = gridRunner;
+    }
+    
+    public void setExperimentFile(File experimentFile) {
+        this.expFile = experimentFile;
+    }
+    
+    public void setTaskID(int taskID) {
+        this.taskID = taskID;
+    }
+    
+    public void setJobID(int jobID) {
+        this.jobID = jobID;
+    }
+    
+    public void setTotalTasks(int totalTasks) {
+        this.numTasks = totalTasks;
+    }
+    /*
+     task.setExperimentFile(experimentFile);
+     task.setTaskID(i+1);
+     task.setJobID(0); // tbd, enable multiple jobs
+     task.setTotalTasks(totalTasks);
+    */
     
     public static void main(String[] args) {
         Gridlet gridlet = new Gridlet();
@@ -303,8 +355,13 @@ public class Gridlet extends Thread {
              
             ClassLoader cloader = Thread.currentThread().getContextClassLoader();
             System.out.println("Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
-
-            ((Boot)cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+            
+            if(cloader instanceof Boot) {
+                ((Boot)cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+            } else if (cloader instanceof LocalBootLoader) {
+                ((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+            }
+          
             Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
             Constructor asmc = asmz.getConstructors()[0];
             ViskitAssembly sim = (ViskitAssembly)(asmc.newInstance(new Object[] {} ));
@@ -356,18 +413,22 @@ public class Gridlet extends Thread {
                     if (debug_io)
                         System.out.println(statXml);
                     
-                    Vector args = new Vector();
-                    args.add(usid);
-                    args.add(new Integer(sampleIndex));
-                    args.add(new Integer(designPtIndex));
-                    args.add(new Integer(designPointStats.length));
-                    args.add(statXml);
-                    if (debug_io) {
-                       System.out.println("sending DesignPointStat "+sampleIndex+" "+designPtIndex);
-                       System.out.println(statXml);
+                    if (gridRunner != null) { // local gridRunner
+                        gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
+                    } else {
+                        
+                        Vector args = new Vector();
+                        args.add(usid);
+                        args.add(new Integer(sampleIndex));
+                        args.add(new Integer(designPtIndex));
+                        args.add(new Integer(designPointStats.length));
+                        args.add(statXml);
+                        if (debug_io) {
+                            System.out.println("sending DesignPointStat "+sampleIndex+" "+designPtIndex);
+                            System.out.println(statXml);
+                        }
+                        xmlrpc.execute("gridkit.addDesignPointStat", args);
                     }
-                    xmlrpc.execute("gridkit.addDesignPointStat", args);
-                    
                     // replication stats similarly
                     
                     String repName = designPointStats[i].getName();
@@ -396,17 +457,21 @@ public class Gridlet extends Thread {
                                 }
                                 if (debug_io)
                                     System.out.println(statXml);
-                                args.clear();
-                                args.add(usid);
-                                args.add(new Integer(sampleIndex));
-                                args.add(new Integer(designPtIndex));
-                                args.add(new Integer(j));
-                                args.add(statXml);
-                                if (debug_io) {
-                                    System.out.println("sending ReplicationStat"+sampleIndex+" "+designPtIndex+" "+j);
-                                    System.out.println(statXml);
+                                if (gridRunner != null) { // local is a local gridRunner
+                                    gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
+                                } else { // use rpc to runner on grid
+                                    Vector args = new Vector();
+                                    args.add(usid);
+                                    args.add(new Integer(sampleIndex));
+                                    args.add(new Integer(designPtIndex));
+                                    args.add(new Integer(j));
+                                    args.add(statXml);
+                                    if (debug_io) {
+                                        System.out.println("sending ReplicationStat"+sampleIndex+" "+designPtIndex+" "+j);
+                                        System.out.println(statXml);
+                                    }
+                                    xmlrpc.execute("gridkit.addReplicationStat", args);
                                 }
-                                xmlrpc.execute("gridkit.addReplicationStat", args);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -496,24 +561,29 @@ public class Gridlet extends Thread {
                 out.println("</Results>");
                 out.println();
                 
-                //send results back to front end
-                Vector parms = new Vector();
-                parms.add(usid);
-                parms.add(new String(sw.toString()));
                 
-                if (debug_io) {
-                    System.out.println("sending Result ");
-                    System.out.println(sw.toString());
+                if ( gridRunner != null ) {
+                    gridRunner.addResult(sw.toString());
+                    gridRunner.removeTask(jobID,taskID);
+                } else {
+                    //send results back to front end
+                    Vector parms = new Vector();
+                    parms.add(usid);
+                    parms.add(new String(sw.toString()));
+                    
+                    if (debug_io) {
+                        System.out.println("sending Result ");
+                        System.out.println(sw.toString());
+                    }
+                    xmlrpc.execute("gridkit.addResult", parms);
+                    
+                    // this could be a new feature of SGE 6.0
+                    parms.clear();
+                    parms.add(usid);
+                    parms.add(new Integer(jobID));
+                    parms.add(new Integer(taskID));
+                    xmlrpc.execute("gridkit.removeTask", parms);
                 }
-                xmlrpc.execute("gridkit.addResult", parms);
-                
-                // this could be a new feature of SGE 6.0
-                parms.clear();
-                parms.add(usid);
-                parms.add(new Integer(jobID));
-                parms.add(new Integer(taskID));
-                xmlrpc.execute("gridkit.removeTask", parms);
-                
             } catch (Exception e) {
                 e.printStackTrace();
             }

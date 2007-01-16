@@ -26,9 +26,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import simkit.random.MersenneTwister;
+import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.bindings.eventgraph.*; //?
-//import viskit.doe.DoeRunDriver;
+import viskit.xsd.bindings.eventgraph.*; 
 
 /**
  * The GridRunner launches a number of Gridlets to
@@ -44,7 +44,8 @@ import viskit.xsd.bindings.eventgraph.*; //?
  * the DesignPoints, saves the experiment file, and
  * qsubs the Gridlets. 
  * 
- * NB:
+ * GridRunner can also run in single-host mode, 
+ * spawning locally run Gridlets as Threads.
  * 
  * First Gridlet should
  * report back the jobID via AssemblyServer chain,
@@ -99,10 +100,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // can be used by client by synchronized checking
     Vector queue;
     boolean queueClean = false; // dirty means unclaimed info
-    /** Creates a new instance of GridRunner */
-    public GridRunner(String usid, int port) {
-        this.usid = usid;
-        this.port = port;
+    
+    LocalBootLoader loader = null;
+    
+    GridRunner() {
         this.eventGraphs = new Vector();
         this.thirdPartyJars = new Hashtable();
         try {
@@ -111,8 +112,23 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader) {
+            this.usid = "LOCAL-RUN";
+            this.port = 0;
+        }
+    }
+    /** Creates a new instance of GridRunner */
+    public GridRunner(String usid, int port) {
+        this();
+        this.usid = usid;
+        this.port = port;
     }
      
+    public GridRunner(LocalBootLoader loader) {
+        this("LOCAL-RUN",0);
+        this.loader = loader;
+    }
+    
     /**
      * hook for gridkit.setAssembly XML-RPC call, used to initialize
      * From DOE panel. Accepts raw XML String of Assembly.
@@ -146,7 +162,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // timeout for synchronized calls as set by Experiment tag, or not means indefinite wait
         String to = root.getExperiment().getTimeout();
         this.timeout = Long.parseLong(to==null?"0":to);
-        this.queue = new Vector();
+        this.queue = new Vector(); // will be replaced in local run
         for ( int i = 0; i < totalSamples * designPointCount; i ++) {
             queue.add(Boolean.TRUE);
         }
@@ -458,9 +474,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     
     public Integer removeTask(int jobID, int taskID) {
         try {
-            if (debug) System.out.println("qdel: "+jobID+"."+taskID);        
-            Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
-            
+            if (debug) System.out.println("qdel: "+jobID+"."+taskID); 
+            if (!usid.equals("LOCAL-RUN")) {
+                Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
+            }
             
             tasksCompleted++;
             synchronized(queue) {
@@ -639,13 +656,71 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // spawn Gridlets
         int totalTasks = designPointCount*totalSamples;
         try {
-            Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
+            if (!usid.equals("LOCAL-RUN")) {
+                Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
+            } else {
+                localRun(experimentFile,totalTasks);
+            }
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
             return Boolean.FALSE;
         }
         
         return Boolean.TRUE;
+    }
+    
+    // spawn Gridlets, but not on the "Grid", ie Locally
+    // in Local mode, the number of concurrent threads
+    // should be limited to number of cpu's and cores on
+    // the local host machine. There really isn't a way
+    // I know of to get that number in a platform independent
+    // way. so default to 4 and be selectable, one thread
+    // at a time per core, recent JVM's can do this pretty
+    // well for most OS's hopefully, some quite well.
+    //
+    // In Grid mode, the TaskQueue is a synchronized
+    // array of Boolean's, to be pluggable, the Local
+    // queue is a list of Threads, whose get method
+    // returns the isAlive() state of the thread, only
+    // current threads in the pool get a start().
+    void localRun(File experimentFile, int totalTasks) {
+        Vector lastQueue;
+        queue = new LocalTaskQueue(this,experimentFile,totalTasks);
+        
+        // this shouldn't block on the very first call
+        int tasksRemaining = getRemainingTasks();
+        lastQueue = new Vector(getTaskQueue());
+        
+        // launch N of totalTasks tasks here
+        // active tasks are going to be hot so put them in the pool
+        
+        // if x tasks complete in this loop, activate x more
+        
+        while (tasksRemaining > 0) {
+            // this will block until a task ends which could be
+            // because it died, or because it completed, either way
+            // a check of the logs returned by getResults will tell.
+            Vector nextQueue = new Vector(getTaskQueue());
+            for (int i = 0; i < nextQueue.size(); i ++) {
+                // trick: any change between queries indicates a transition at
+                // taskID = i (well i+1 really, taskID's in SGE start at 1)
+                if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
+                    //int sampleIndex = i / designPoints; 
+                    //int designPtIndex = i % designPoints; // can also just use getResultByTaskID(int)
+                    
+                    // i changed due to end of task
+                    //
+                    // find next available task from nextQueue
+                    // task.start();
+                    
+                    
+                    
+                    --tasksRemaining;
+                    
+                }
+            }
+            lastQueue = nextQueue;
+        }
     }
     
     public Boolean calculateDesignPoints() {
@@ -820,8 +895,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public void doLatinHypercube() throws Exception {
         ExperimentType experiment = root.getExperiment();
         //int runs = replicationsPerDesignPoint; 
-        String initScript = experiment.getScript();
-        bsh.Interpreter bsh = new bsh.Interpreter();
+        //String initScript = experiment.getScript();
+        //bsh.Interpreter bsh = new bsh.Interpreter();
         
         int size = designPointCount;
         LatinPermutator latinSquares = new LatinPermutator(size);
