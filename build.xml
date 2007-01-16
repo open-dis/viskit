@@ -528,6 +528,7 @@
             <src path="${dir.src}/viskit/doe"/>
             <src path="${dir.src.simasm.util}"/>
             <include name="LocalBootLoader.java"/>
+            <include name="LocalTaskQueue.java"/>
             <include name="DoeException.java"/>
             <include name="SimkitAssemblyXML2Java.java"/>
             <include name="ViskitAssembly.java"/>
@@ -631,7 +632,7 @@
         <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
             <classpath path="runtime.classpath"/>
             <!-- Optional - If source roots are properly declared in project, should
-            work without setting source path.     
+            wor/home/rmgold/CVS/Viskit/viskit/xsd/assembly/GridRunner.java:683: cannot find symbolk without setting source path.     
             <sourcepath path="debug.sourcepath"/> -->
         </nbjpdastart>
         <java classname="viskit.Splash2" fork="true">
