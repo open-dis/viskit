@@ -141,6 +141,10 @@ public class LocalBootLoader extends URLClassLoader {
         return classPath;
     }
     
+    public URL[] getExtUrls() {
+        return extUrls;
+    }
+    
     protected void addURL(URL u) {
         super.addURL(u);
         //System.out.println("Adding url "+u);
@@ -276,6 +280,7 @@ public class LocalBootLoader extends URLClassLoader {
                         jos.closeEntry();
                     } catch (IOException ex) {
                         ex.printStackTrace();
+           
                     }
                 }
             }
