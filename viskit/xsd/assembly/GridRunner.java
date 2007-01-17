@@ -708,7 +708,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             for (int i = 0; i < nextQueue.size(); i ++) {
                 // any change between queries indicates a transition at
                 // taskID = i0, i1,..., indicating results for these tasks
-                // sinice it's possible more than one comes in at once
+                // since it's possible more than one comes in at once
                 if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
                     // i changed due to end of task
                     //
@@ -733,7 +733,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     private Vector cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
         Vector q = new Vector(localQ.size());
         for ( int i = 0; i < q.size(); i++ ) {
-            q.add(new Boolean((Boolean)localQ.get(i)));
+            q.set(i,new Boolean((Boolean)localQ.get(i)));
         }
         return q;
     }
