@@ -1,6 +1,5 @@
 package viskit;
 
-import java.lang.reflect.Field;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
 
@@ -14,8 +13,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URI;
-import java.net.URL;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.jar.JarFile;
 
@@ -27,6 +25,7 @@ import java.util.jar.JarFile;
  * By:   Mike Bailey
  * Date: May 14, 2004
  * Time: 9:44:31 AM
+ * @version $Id$
  */
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener
 {
@@ -34,33 +33,27 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private Class targetClass;
   private String targetClassName;
   private Color background = new Color(0xFB, 0xFB, 0xE5);
-  //private Icon standardClosedIcon;
   private ImageIcon myLeafIcon;
   private Icon standardNonLeafIcon;
   private Image myLeafIconImage;
   DefaultTreeModel mod;
   private DragStartListener lis;
-  private AssemblyController controller;
   private Vector recurseNogoList;
   private String genericTableToolTip = "Drag onto canvas";
-  private String eventGraphClassName = "simkit.BasicSimEntity";
-  private String evtGraphTopLevelDir = "BehaviorLibraries";  //Default dir for all event graphs
-  private String[] evtGraphSubDirs   = {"SavageTactics"};    //Array of sub directories that should be loaded by default
 
-  public LegosTree(String className, String iconPath, DragStartListener dslis, AssemblyController controller, String tooltip)
+  public LegosTree(String className, String iconPath, DragStartListener dslis, String tooltip)
   {
-    this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, controller, tooltip);
+    this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, tooltip);
   }
 
-  public LegosTree(String className, ImageIcon icon, DragStartListener dslis, AssemblyController controller, String tooltip)
+  public LegosTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip)
   {
     super();
+    setModel(mod = new DefaultTreeModel(root));
+
     lis = dslis;
     targetClassName = className;
-    this.controller = controller;
     genericTableToolTip = tooltip;
-
-    mod = new DefaultTreeModel(root);
 
     try {
       targetClass = Class.forName(targetClassName, false, this.getClass().getClassLoader()); //"simkit.BasicSimEntity");
@@ -71,29 +64,13 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return;
     }
 
-    /* It doesn't look like this was done correctly initially.  Forget looking for the classes. */
-    addJarFile(/*"simkit.SimEntity",*/ "lib/simkit.jar");
-    addJarFile(/*"diskit.DISEntity",*/ "lib/ext/diskit.jar");
-
-    /*If this legos tree is for event graphs initialize default event graph directories*/
-    //if (className.equals(eventGraphClassName)) {
-      //for (int i = 0; i < evtGraphSubDirs.length; i++) {
-        //addEventGraphXML(evtGraphTopLevelDir + "/" + evtGraphSubDirs[i]);
-      //}
-    //}
-
-    setModel(mod);
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-    //todo test  this.expandRow(1);
-    // expandAll(this, true);
 
     MyRenderer rendr = new MyRenderer();
     setCellRenderer(rendr);
 
-    //   collapseRow(1);
-
     setToolTipText("mama");  // needs to be done first to enable tt below
-    setRootVisible(false);
+    setRootVisible(true); // we want this to be false, but there is some sort of JTree bug...see paintComponent override below
     setShowsRootHandles(true);
     setVisibleRowCount(100);    // means always fill a normal size panel
     rendr.setBackgroundNonSelectionColor(background);
@@ -103,19 +80,37 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     standardNonLeafIcon = rendr.getOpenIcon();
 
     rendr.setLeafIcon(myLeafIcon);
-    //standardClosedIcon = rendr.getClosedIcon();
     DragSource dragSource = DragSource.getDefaultDragSource();
 
     dragSource.createDefaultDragGestureRecognizer(this, // component where drag originates
-        DnDConstants.ACTION_COPY_OR_MOVE, // actions
-        this); // drag gesture recognizer
-
+        DnDConstants.ACTION_COPY_OR_MOVE, this);
   }
+
+
+  // beginning of hack to hide the tree root
+  @Override
+  protected void paintComponent(Graphics g)
+  {
+    super.paintComponent(g);
+    if(bugHack)
+      doBugHack();
+  }
+
+  private boolean bugHack = true;
+  private void doBugHack()
+  {
+    expandRow(0);
+    setRootVisible(false);
+    collapseRow(0);
+    bugHack = false;
+  }
+
+  // end of hack to hide the tree root
 
   /**
    * Override to provide a global tooltip for entire table..not just for nodes
    *
-   * @param event
+   * @param event mouse event
    * @return tooltip string
    */
   public String getToolTipText(MouseEvent event)
@@ -165,8 +160,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             continue;
           FileBasedAssyNode fban = (FileBasedAssyNode) uo;
           try {
-            String s1 = fban.xmlSource.getCanonicalPath();
-            String s2 = f.getCanonicalPath();
             if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
               mod.removeNodeFromParent(n);
               FileBasedClassManager.inst().unloadFile(fban);
@@ -182,8 +175,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     return null;
   }
 
-  // todo if no valid leaves are found, remove the directory...at it is, it is represented in
+  // 2do if no valid leaves are found, remove the directory...as it is, it is represented in
   // the tree with the node icon.
+
   // 4 May 06 JMB The filter down below checks for empty dirs.  If there is a directory
   // with xml in it, it will show, but if it's children have errors when marshalling,
   // they will not appear.
@@ -204,7 +198,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     directoryRoots = new HashMap();
     classNodeCount = 0;
 
-    if (recurse == true)
+    if (recurse)
       recurseNogoList = new Vector();
     else
       recurseNogoList = null;
@@ -243,10 +237,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   // The two above are the public ones.
   private void addContentRoot(File f, boolean recurse, Vector rootVector)
   {
-
-    DefaultMutableTreeNode myNode = null;
+    DefaultMutableTreeNode myNode;
     if (f.isDirectory()) {
-      if (recurse == false) {
+      if (!recurse) {
         myNode = new DefaultMutableTreeNode(f.getPath());
         root.add(myNode);
         rootVector.add(myNode); // for later pruning
@@ -290,22 +283,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     // We're NOT a directory...
     else {
-      /*
-      if (f.getName().toLowerCase().endsWith(".xml")) {
-      myNode = handleEGxml(f);
-      if(myNode == null)
-      return;
-      }
-      else {
-      Class c = _getClass(f);
-      if (c == null)
-      return;
-      myNode = buildClassNode(c);
-      }
-
-      */
-
-      FileBasedAssyNode fban = null;
+      FileBasedAssyNode fban;
       try {
         fban = FileBasedClassManager.inst().loadFile(f);
         // Check here for duplicates of the classes which have been loaded on the classpath (simkit.jar);
@@ -338,59 +316,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       }
       classNodeCount++;
     }  // directory
-
   }
-
-  /**
-   * Try to build a tree node from the XML file
-   */
-  /*
-  private DefaultMutableTreeNode handleEGxml(File fxml)
-  {
-   File fc = AssemblyController.createTemporaryEventGraphClass(fxml);
-
-   Class fclass = null;
-   try {
-     fclass = FindClassesForInterface.classFromFile(fc);
-   }
-   catch (Throwable throwable) {
-     throwable.printStackTrace();
-   }
-   if(!FindClassesForInterface.matchClass(fclass,targetClass))
-     return null;
-
-   FileBasedAssyNode xn = new FileBasedAssyNode(fc,fclass.getName(),fxml);
-   classNodeCount++;
-
-   return new DefaultMutableTreeNode(xn);
-  }
-  */
 
   private int classNodeCount;
-
-  /*
-  private DefaultMutableTreeNode buildClassNode(Class c)
-  {
-   classNodeCount++;
-   return new DefaultMutableTreeNode(c);
-  }
-  */
   HashMap directoryRoots;
   DefaultMutableTreeNode rootNode;
-  /*
-  private Class _getClass(File f)
-  {
-   Class c = null;
-   try {
-     c = FindClassesForInterface.classFromFile(f, targetClass);
-   }
-   catch (Throwable e) {
-     System.out.println(e);
-     return null;
-   }
-   return c;
-  }
-  */
 
   HashMap packagesHM = new HashMap();
 
@@ -426,7 +356,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
   private void addJarFile(String jarFilePath)
   {
-    JarFile jf = null;
+    JarFile jf;
     try {
       jf = new JarFile(jarFilePath);
     }
@@ -437,10 +367,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     jarFileCommon(jf);
   }
 
-  /**
+  /*
    * @param classInJarFile
    * @param jarFileName
    */
+/*
   private void addJarFile(String classInJarFile, String jarFileName)
   {
     JarFile jarFile = null;
@@ -469,6 +400,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
     jarFileCommon(jarFile);
   }
+*/
 
   private void jarFileCommon(JarFile jarFile) {
       java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
@@ -483,7 +415,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           } catch (SecurityException ex) {
               ex.printStackTrace();
           } catch (NoSuchFieldException ex) {
-              ;
           }
           if (viskit.Vstatics.debug) System.out.println("adding " + c.getName());
           if (f != null) {
@@ -564,38 +495,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
   }
 
-  // If expand is true, expands all nodes in the tree.
-  // Otherwise, collapses all nodes in the tree.
-  private void expandAll(JTree tree, boolean expand)
-  {
-    TreeNode root = (TreeNode) tree.getModel().getRoot();
-
-    // Traverse tree from root
-    expandAll(tree, new TreePath(root), expand);
-  }
-
-  private void expandAll(JTree tree, TreePath parent, boolean expand)
-  {
-    // Traverse children
-    TreeNode node = (TreeNode) parent.getLastPathComponent();
-    if (node.getChildCount() >= 0) {
-      for (Enumeration e = node.children(); e.hasMoreElements();) {
-        TreeNode n = (TreeNode) e.nextElement();
-        TreePath path = parent.pathByAddingChild(n);
-        expandAll(tree, path, expand);
-      }
-    }
-
-    // Expansion or collapse must be done bottom-up
-    if (expand) {
-      tree.expandPath(parent);
-    }
-    else {
-      tree.collapsePath(parent);
-    }
-  }
-
-
   class MyClassSorter implements Comparator
   {
     public int compare(Object o1, Object o2)
@@ -662,7 +561,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public boolean accept(File f)
     {
       if (f.isDirectory()) {
-        if (dirsToo == false)
+        if (!dirsToo)
           return false;
         if (f.getName().equals("CVS"))
           return false;
@@ -680,16 +579,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           return true;
       }
 
-      if (f.isFile()) {
-        if (f.getName().endsWith(".class"))
-          return true;
-        if (f.getName().endsWith(".xml"))
-          return true;
-        else
-          return false;
-      }
-
-      return false;
+      return f.isFile() &&
+            (f.getName().endsWith(".class") || (f.getName().endsWith(".xml")));
     }
   }
 
@@ -701,7 +592,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     Object o = getUO();
     if (o == null)
       return;
-    Transferable xfer = null;
+    Transferable xfer;
 
     if (o instanceof FileBasedAssyNode) {
       FileBasedAssyNode xn = (FileBasedAssyNode) o;
@@ -747,11 +638,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
   public Object getUO()
   {
-    DefaultMutableTreeNode dmtn = null;
     TreePath path = getLeadSelectionPath();
     if (path == null)
       return path;
-    dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
+    DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
     return dmtn.getUserObject();
   }
 
@@ -765,28 +655,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return ((FileBasedAssyNode) o).loadedClass;
     return
         null;
-  }
-
-  public void addEventGraphXML(String topLevelDirectory)
-  {
-    File dir = new File(topLevelDirectory);
-    addContentRoot(dir,true);
-/*
-    File[] fa = dir.listFiles();
-    for (int i = 0; i < fa.length; i++) {
-      boolean recurse = true;
-      if (fa[i].isDirectory() && !fa[i].getName().equals("CVS")
-          && !fa[i].getName().equals("Scenarios")
-          && !fa[i].getName().equals("Locations")) {
-        addContentRoot(fa[i], recurse);
-      }
-      else if (!fa[i].getName().equals("CVS") &&
-          !fa[i].getName().equals("Scenarios")
-          && !fa[i].getName().equals("Locations")) {
-        addContentRoot(fa[i]);
-      }
-    }
-*/
   }
 }
 
