@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -195,8 +196,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         break;
 
       default:
-        //System.out.println("duh")
-        ;
+        //System.out.println("duh");
     }
     currentModelEvent = null;
   }
@@ -213,7 +213,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     if(currentModelEvent != null && currentModelEvent.getSource() != this.model)
       // bail if this came from outside
       return;  // this came in from outside, we don't have to inform anybody..prevent reentry
-    //todo confirm anyother events that should cause us to bail here
+    //todo confirm any other events that should cause us to bail here
     GraphModelEvent.GraphModelChange c = e.getChange();
     Object[] ch = c.getChanged();
     if (ch != null) {
@@ -423,12 +423,15 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
   // To customize my edges
   protected EdgeView createEdgeView(Object e, CellMapper cm)
   {
-    if (e instanceof vAssemblyEdgeCell)             // order important... 1st is sub of 2nd
-      return new vAssemblyEdgeView(e, this, cm);
-    // different edge types here
-    //else if (e instanceof vEdgeCell)
-      //return new vEdgeView(e, this, cm);
-    // else
+    if (e instanceof vAssemblyEdgeCell) {
+      Object o = ((vAssemblyEdgeCell)e).getUserObject();
+      if(o instanceof PropChangeEdge)
+        return new vAssyPclEdgeView(e, this, cm);
+      if(o instanceof AdapterEdge)
+        return new vAssyAdapterEdgeView(e, this, cm);
+      if(o instanceof SimEvListenerEdge)
+        return new vAssySelEdgeView(e, this, cm);
+    }
     return super.createEdgeView(e, cm);
   }
 
@@ -801,46 +804,8 @@ class vAssemblyPortView extends PortView
 		bounds.height = bounds.height + mysize;
 		return bounds;
 	}
+
 }
-
-
-/**
- * Sub class EdgeView to install our own renderer.
- */
-class vAssemblyEdgeView extends EdgeView
-{
-  public static vEdgeRenderer renderer = new vEdgeRenderer();
-
-  public vAssemblyEdgeView(Object cell, JGraph gr, CellMapper cm)
-  {
-    super(cell, gr, cm);
-  }
-
-  public CellViewRenderer getRenderer()
-  {
-    return renderer;
-  }
-}
-
-
-/**
- * Sub class EdgeView to support self-referring edges
- */
-/*class vSelfEdgeView extends vEdgeView
-{
-  public static vSelfEdgeRenderer renderer = new vSelfEdgeRenderer();
-
-  public vSelfEdgeView(Object cell, JGraph gr, CellMapper cm)
-  {
-    super(cell, gr, cm);
-  }
-
-  public CellViewRenderer getRenderer()
-  {
-    return renderer;
-  }
-}
-*/
 
 /**
  * To mark our nodes.
@@ -909,6 +874,171 @@ class AssemblyCircleView extends VertexView
 
 }
 
+// Begin support for custom line ends and double line (adapter) on assembly edges
+class vAssyAdapterEdgeView extends vEdgeView
+{
+  public static vAssyAdapterEdgeRenderer renderer = new vAssyAdapterEdgeRenderer();
+
+  public vAssyAdapterEdgeView(Object cell, JGraph gr, CellMapper cm)
+  {
+    super(cell, gr, cm);
+  }
+
+  public CellViewRenderer getRenderer()
+  {
+    return renderer;
+  }
+}
+
+class vAssySelEdgeView extends vEdgeView
+{
+  public static vAssySelEdgeRenderer renderer = new vAssySelEdgeRenderer();
+
+  public vAssySelEdgeView(Object cell, JGraph gr, CellMapper cm)
+  {
+    super(cell, gr, cm);
+  }
+
+  public CellViewRenderer getRenderer()
+  {
+    return renderer;
+  }
+}
+
+class vAssyPclEdgeView extends vEdgeView
+{
+  public static vAssyPclEdgeRenderer renderer = new vAssyPclEdgeRenderer();
+
+  public vAssyPclEdgeView(Object cell, JGraph gr, CellMapper cm)
+  {
+    super(cell, gr, cm);
+  }
+
+  public CellViewRenderer getRenderer()
+  {
+    return renderer;
+  }
+}
+
+class vAssyAdapterEdgeRenderer extends vEdgeRenderer
+{
+  /**
+    * Paint the renderer.  Overridden to do a double line and paint over the end shap
+    */
+   @Override
+   public void paint(Graphics g) {
+     Shape edgeShape = view.getShape();
+     // Sideeffect: beginShape, lineShape, endShape
+     if (edgeShape != null) {
+       Graphics2D g2 = (Graphics2D) g;
+       int c = BasicStroke.CAP_BUTT;
+       int j = BasicStroke.JOIN_MITER;
+
+       BasicStroke lineStroke = new BasicStroke(lineWidth, c, j);
+       BasicStroke whiteStripeStroke = new BasicStroke(lineWidth/3, c, j);
+       BasicStroke onePixStroke = new BasicStroke(1,c,j);
+
+       g2.setStroke(onePixStroke);
+
+       translateGraphics(g);
+       g.setColor(getForeground());
+       if (view.beginShape != null) {
+         if (beginFill)
+           g2.fill(view.beginShape);
+         g2.draw(view.beginShape);
+       }
+       if (view.endShape != null) {
+         if (endFill)
+           g2.fill(view.endShape);
+         g2.draw(view.endShape);
+       }
+       g2.setStroke(lineStroke);
+       if (lineDash != null) {// Dash For Line Only
+         g2.setStroke(new BasicStroke(lineWidth, c, j, 10.0f, lineDash, 0.0f));
+         whiteStripeStroke = new BasicStroke(lineWidth/3, c, j, 10.0f, lineDash, 0.0f);
+       }
+       if (view.lineShape != null) {
+         g2.draw(view.lineShape);
+
+         g2.setColor(Color.white);
+         g2.setStroke(whiteStripeStroke);
+         g2.draw(view.lineShape);
+         g2.setColor(getForeground());
+       }
+       if (selected) { // Paint Selected
+         g2.setStroke(GraphConstants.SELECTION_STROKE);
+         g2.setColor(graph.getHighlightColor());
+         if (view.beginShape != null)
+           g2.draw(view.beginShape);
+         if (view.lineShape != null)
+           g2.draw(view.lineShape);
+         if (view.endShape != null)
+           g2.draw(view.endShape);
+       }
+       if (graph.getEditingCell() != view.getCell()) {
+         Object label = graph.convertValueToString(view);
+         if (label != null) {
+           g2.setStroke(new BasicStroke(1));
+           g.setFont(getFont());
+           paintLabel(g, label.toString());
+         }
+       }
+     }
+  }
+
+  @Override
+  protected Shape createLineEnd(int size, int style, Point src, Point dst)
+  {
+    int d = (int) Math.max(1, dst.distance(src));
+    int ax = - (size * (dst.x - src.x) / d);
+    int ay = - (size * (dst.y - src.y) / d);
+    GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO,4);
+    path.moveTo(dst.x        - ay/3, dst.y        + ax/3);
+    path.lineTo(dst.x + ax/2       , dst.y + ay/2       );
+    path.lineTo(dst.x        + ay/3, dst.y        - ax/3);
+
+    return path;
+  }
+
+}
+
+class vAssySelEdgeRenderer extends vEdgeRenderer
+{
+  @Override
+  protected Shape createLineEnd(int size, int style, Point src, Point dst)
+  {
+    // Same as above
+    int d = (int) Math.max(1, dst.distance(src));
+    int ax = - (size * (dst.x - src.x) / d);
+    int ay = - (size * (dst.y - src.y) / d);
+    GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO,4);
+    path.moveTo(dst.x        - ay/3, dst.y        + ax/3);
+    path.lineTo(dst.x + ax/2       , dst.y + ay/2       );
+    path.lineTo(dst.x        + ay/3, dst.y        - ax/3);
+
+    return path;
+  }
+}
+
+class vAssyPclEdgeRenderer extends vEdgeRenderer
+{
+  @Override
+  protected Shape createLineEnd(int size, int style, Point src, Point dst)
+  {
+    int d = (int) Math.max(1, dst.distance(src));
+    int ax = - (size * (dst.x - src.x) / d);
+    int ay = - (size * (dst.y - src.y) / d);
+    GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO,4);
+    path.moveTo(dst.x        - ay/3, dst.y        + ax/3);
+    path.lineTo(dst.x + ax/2 - ay/3, dst.y + ay/2 + ax/3);
+    path.lineTo(dst.x + ax/2 + ay/3, dst.y + ay/2 - ax/3);
+    path.lineTo(dst.x        + ay/3, dst.y        - ax/3);
+
+    return path;
+  }
+}
+// End support for custom line ends and double adapter line on assembly edges
+
 /**
  * A replacement class to tweek the routing slightly so that the edges come into the node from other directions than
  * NSE and W.  Also, support offsetting edges between the same two nodes.
@@ -948,7 +1078,7 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing
     if (sig == 0)
       adjustFactor *= -1;
 
-    int adjustment = 0  + 35 * adjustFactor;       // little bias
+    int adjustment = /*0  + */ 35 * adjustFactor;       // little bias
 
     int dx = Math.abs(from.x - to.x);
     int dy = Math.abs(from.y - to.y);
