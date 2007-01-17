@@ -512,7 +512,6 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
   public boolean changePclNode(PropChangeListenerNode pclNode)
   {
-    System.out.println("AssemblyMode.changePclNode");
     boolean retcode = true;
     if(!nameCheck()) {
       controller.messageUser(JOptionPane.ERROR_MESSAGE,"Duplicate name detected: "+pclNode.getName()+
