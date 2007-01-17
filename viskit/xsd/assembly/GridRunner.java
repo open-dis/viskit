@@ -705,9 +705,6 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 // trick: any change between queries indicates a transition at
                 // taskID = i (well i+1 really, taskID's in SGE start at 1)
                 if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
-                    //int sampleIndex = i / designPoints; 
-                    //int designPtIndex = i % designPoints; // can also just use getResultByTaskID(int)
-                    
                     // i changed due to end of task
                     //
                     // find next available task from nextQueue

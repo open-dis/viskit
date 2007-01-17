@@ -149,6 +149,10 @@ public class LocalBootLoader extends URLClassLoader {
         super.addURL(u);
         //System.out.println("Adding url "+u);
     }
+    
+    public File getWorkDir() {
+        return workDir;
+    }
   
     // create a context with viskit's libs along with
     // the generated eventgraphs, takes two stages

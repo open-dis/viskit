@@ -42,7 +42,7 @@ public class LocalTaskQueue extends Vector {
         super(totalTasks);
         for (int i = 0; i<totalTasks; i++) {
             LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();
-            LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), ClassLoader.getSystemClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
+            LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), ClassLoader.getSystemClassLoader(), parent.getWorkDir());
             loader = loader.init();
             Gridlet task;
             Class gridletz;
