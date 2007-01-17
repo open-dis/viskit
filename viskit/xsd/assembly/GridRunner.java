@@ -689,18 +689,18 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         
         // this shouldn't block on the very first call
         int tasksRemaining = getRemainingTasks();
-        lastQueue = new Vector(getTaskQueue());
+        lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
         
         // launch N of totalTasks tasks here
         // active tasks are going to be hot so put them in the pool
         
-        // if x tasks complete in this loop, activate x more
+        // if x tasks complete in this loop, activate x more until no tasks remain
         
         while (tasksRemaining > 0) {
             // this will block until a task ends which could be
             // because it died, or because it completed, either way
             // a check of the logs returned by getResults will tell.
-            Vector nextQueue = new Vector(getTaskQueue());
+            LocalTaskQueue nextQueue = (LocalTaskQueue) getTaskQueue();
             for (int i = 0; i < nextQueue.size(); i ++) {
                 // trick: any change between queries indicates a transition at
                 // taskID = i (well i+1 really, taskID's in SGE start at 1)
@@ -711,16 +711,27 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     // i changed due to end of task
                     //
                     // find next available task from nextQueue
-                    // task.start();
-                    
-                    
+                    int j;
+                    for (j = i+1; j<nextQueue.size(); j++) {
+                        if ((Boolean)nextQueue.get(j)) 
+                            break;
+                    }
+                    nextQueue.activate(j);
                     
                     --tasksRemaining;
                     
                 }
             }
-            lastQueue = nextQueue;
+            lastQueue = cloneFromLocalTaskQueue(nextQueue); // 
         }
+    }
+    
+    private Vector cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
+        Vector q = new Vector(localQ.size());
+        for ( int i = 0; i < q.size(); i++ ) {
+            q.add(new Boolean((Boolean)localQ.get(i)));
+        }
+        return q;
     }
     
     public Boolean calculateDesignPoints() {

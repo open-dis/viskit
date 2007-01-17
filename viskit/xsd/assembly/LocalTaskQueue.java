@@ -68,18 +68,16 @@ public class LocalTaskQueue extends Vector {
     }
     
     /** 
-     * Activate Gridlet indexed at i-1
+     * Activate Gridlet indexed at i
      *
-     * A result of complimenting the SGE backend, where
-     * TaskID's start at 1. //still need to be done here?
      */
     public void activate(int i) {
-        ((Thread) super.get(i-1)).start();
+        ((Thread) super.get(i)).start();
     }
     
     public Object get(int i) {
         if (super.get(i) instanceof Thread)
-            return (Object)((Boolean) ((Thread)(super.get(i))).isAlive());
+            return (Object)(!(Boolean) ((Thread)(super.get(i))).isAlive());
         else return super.get(i);
     }
     
