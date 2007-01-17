@@ -42,7 +42,7 @@ public class LocalTaskQueue extends Vector {
         super(totalTasks);
         for (int i = 0; i<totalTasks; i++) {
             LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();
-            LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), ClassLoader.getSystemClassLoader(), parent.getWorkDir());
+            LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), parent /*ClassLoader.getSystemClassLoader()*/, parent.getWorkDir());
             loader = loader.init();
             Gridlet task;
             Class gridletz;
@@ -54,7 +54,8 @@ public class LocalTaskQueue extends Vector {
                     task.setTaskID(i+1);
                     task.setJobID(0); // tbd, enable multiple jobs
                     task.setTotalTasks(totalTasks);
-                    super.add(i,task);
+                    task.setGridRunner(gridRunner);
+                    super.set(i,task);
                 } catch (IllegalAccessException ex) {
                     ex.printStackTrace();
                 } catch (InstantiationException ex) {
@@ -75,6 +76,14 @@ public class LocalTaskQueue extends Vector {
         ((Thread) super.get(i)).start();
     }
     
+    // logic output:
+    // is thread
+    // lo - thread active
+    // hi - thread inactive
+    // is boolean
+    // lo - complete
+    // hi - never happens, therefore by reduction this could
+    // also just be false if not thread, keep might need half a bit later
     public Object get(int i) {
         if (super.get(i) instanceof Thread)
             return (Object)(!(Boolean) ((Thread)(super.get(i))).isAlive());

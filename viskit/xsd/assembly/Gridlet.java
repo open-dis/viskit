@@ -177,6 +177,9 @@ public class Gridlet extends Thread {
         }
     }
     
+    // GridRunner may have to be handled introspecively!
+    // if setting this with the parent's loader causes cast
+    // exception here then we know
     public void setGridRunner(GridRunner gridRunner) {
         this.gridRunner = gridRunner;
     }

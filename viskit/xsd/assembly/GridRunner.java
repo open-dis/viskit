@@ -103,7 +103,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     
     LocalBootLoader loader = null;
     
-    GridRunner() {
+    public GridRunner() {
         this.eventGraphs = new Vector();
         this.thirdPartyJars = new Hashtable();
         try {
@@ -629,6 +629,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 egt.getContent().add(eg);
                 eventGraphList.add(egt);
             }
+            // tbd make tmp dir
             userDir = new File(System.getProperty("user.dir"));
             // create experimentFile, an assembly tree with decorations
             // give it unique name
