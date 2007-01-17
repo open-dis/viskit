@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import edu.nps.util.CryptoMethods;
+import java.net.MalformedURLException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
@@ -786,7 +787,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   
   // tbd gui: set gridMode true if logging into a remote service, or false if
   // it should run locally
-  private boolean gridMode = true;
+  private boolean gridMode = false;
   
   public void run()
   {
@@ -794,7 +795,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
           if ( gridMode ) {
               doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()) );
           } else {
-              doe = new LocalDriverImpl();
+              String[] extClassPaths = SettingsDialog.getExtraClassPath();
+              URL[] extClassPathsUrls = new URL[extClassPaths.length];
+              int i = 0;
+              for (String path:extClassPaths) {
+                  File extFile = new File(path);
+                    try {
+                        extClassPathsUrls[i++] = extFile.toURL();
+                    } catch (MalformedURLException ex) {
+                        ex.printStackTrace();
+                    }
+              }
+              doe = new LocalDriverImpl(extClassPathsUrls,viskit.VGlobals.instance().getWorkDirectory());
           }
           
    //
