@@ -688,22 +688,27 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         queue = new LocalTaskQueue(this,experimentFile,totalTasks);
         
         // this shouldn't block on the very first call
-        int tasksRemaining = getRemainingTasks();
+        int tasksRemaining = getRemainingTasks(); // should be totalTasks
         lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
         
-        // launch N of totalTasks tasks here
+        // launch N starters of totalTasks tasks here
         // active tasks are going to be hot so put them in the pool
-        
-        // if x tasks complete in this loop, activate x more until no tasks remain
-        
+        // needed: a way to select the pool size
+        // here just test with N=4 for starters. GUI adjust tbd
+        int starters = 4>totalTasks?totalTasks:4;
+        for (int task = 0; task<starters; task++,tasksRemaining--) {
+           ((Thread) queue.get(task)).start();
+        }
+        // if starters tasks complete in this loop, activate upto starters more until no tasks remain
+        // this second time through the getTaskQueue should block until results in
+        // from a Gridlet
         while (tasksRemaining > 0) {
-            // this will block until a task ends which could be
-            // because it died, or because it completed, either way
-            // a check of the logs returned by getResults will tell.
+            // this should block until a task or a number of tasks ends
             LocalTaskQueue nextQueue = (LocalTaskQueue) getTaskQueue();
             for (int i = 0; i < nextQueue.size(); i ++) {
-                // trick: any change between queries indicates a transition at
-                // taskID = i (well i+1 really, taskID's in SGE start at 1)
+                // any change between queries indicates a transition at
+                // taskID = i0, i1,..., indicating results for these tasks
+                // sinice it's possible more than one comes in at once
                 if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
                     // i changed due to end of task
                     //
@@ -713,7 +718,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                         if ((Boolean)nextQueue.get(j)) 
                             break;
                     }
+                    
                     nextQueue.activate(j);
+                    nextQueue.set(i,Boolean.FALSE);
                     
                     --tasksRemaining;
                     
