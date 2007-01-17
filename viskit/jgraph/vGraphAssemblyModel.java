@@ -37,27 +37,28 @@ public class vGraphAssemblyModel extends DefaultGraphModel
     viskitAssyAdapterEdgeStyle = GraphConstants.createMap();
 
     GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle,false);
-    GraphConstants.setLineEnd  (viskitAssyAdapterEdgeStyle,GraphConstants.ARROW_TECHNICAL);
-    GraphConstants.setEndFill  (viskitAssyAdapterEdgeStyle, true);
-    GraphConstants.setEndSize  (viskitAssyAdapterEdgeStyle, 10);
-//todo    GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
+    GraphConstants.setLineEnd  (viskitAssyAdapterEdgeStyle,GraphConstants.ARROW_TECHNICAL);    // not used
+    GraphConstants.setEndFill  (viskitAssyAdapterEdgeStyle, false); //true);
+    GraphConstants.setEndSize  (viskitAssyAdapterEdgeStyle, 16);
+    GraphConstants.setBeginFill(viskitAssyAdapterEdgeStyle, false);
+    GraphConstants.setBeginSize(viskitAssyAdapterEdgeStyle, 16);
+    //GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
     GraphConstants.setBendable   (viskitAssyAdapterEdgeStyle, true);
     GraphConstants.setLineStyle  (viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
-    GraphConstants.setLineWidth  (viskitAssyAdapterEdgeStyle, 2.0f);
+    GraphConstants.setLineWidth  (viskitAssyAdapterEdgeStyle, 3.0f); //2.0f);
     GraphConstants.setOpaque     (viskitAssyAdapterEdgeStyle, true);
     GraphConstants.setBackground (viskitAssyAdapterEdgeStyle, new Color(255,255,255,180));
     //GraphConstants.setBorderColor(viskitAssyAdapterEdgeStyle, Color.red);
     GraphConstants.setForeground (viskitAssyAdapterEdgeStyle, Color.black);
     GraphConstants.setRouting    (viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
-    GraphConstants.setLineColor  (viskitAssyAdapterEdgeStyle, Color.lightGray); //new Color(0xA2,0xD9,0x9F));              // green
+    GraphConstants.setLineColor  (viskitAssyAdapterEdgeStyle, Color.black); //Color.lightGray); //new Color(0xA2,0xD9,0x9F)); // green
 
     viskitAssyPclEdgeStyle = GraphConstants.createMap();
     viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
     //GraphConstants.setDashPattern(viskitAssyPclEdgeStyle, new float[] { 3, 3 });
-    GraphConstants.setLineColor(viskitAssyPclEdgeStyle,new Color(0xff,0xc8,0xc8));
+    GraphConstants.setLineColor(viskitAssyPclEdgeStyle,new Color(134,87,87)); // not pink 0xff,0xc8,0xc8));
     GraphConstants.setLineWidth(viskitAssyPclEdgeStyle,1.5f);
-
 
     viskitAssySimEvLisEdgeStyle = GraphConstants.createMap();
     viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
