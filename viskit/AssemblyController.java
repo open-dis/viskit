@@ -1032,8 +1032,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
          String cp = getCustomClassPath();
 
-         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
-         
+         //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+         System.out.println("Compiling "+f.getCanonicalPath());
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});         
+
          if(reti == 0 || completeOnBadCompile)
            return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");
        }
