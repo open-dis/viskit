@@ -13,7 +13,10 @@
 package viskit.xsd.assembly;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Vector;
+import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 
 /**
@@ -38,32 +41,48 @@ public class LocalTaskQueue extends Vector {
      * ClassLoader, which is also a LocalBootLoader which 
      * provides the list of "ext" URL's. 
      */
-    public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) {
+    public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) throws DoeException {
         super(totalTasks);
         for (int i = 0; i<totalTasks; i++) {
             LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();
             LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), parent /*ClassLoader.getSystemClassLoader()*/, parent.getWorkDir());
             loader = loader.init();
-            Gridlet task;
+            //Gridlet task;
+            Object task;
             Class gridletz;
             try {
                 gridletz = loader.loadClass("viskit.xsd.assembly.Gridlet");
-                try {
-                    task = (Gridlet) gridletz.newInstance();
-                    task.setExperimentFile(experimentFile);
-                    task.setTaskID(i+1);
-                    task.setJobID(0); // tbd, enable multiple jobs
-                    task.setTotalTasks(totalTasks);
-                    task.setGridRunner(gridRunner);
-                    super.set(i,task);
-                } catch (IllegalAccessException ex) {
-                    ex.printStackTrace();
-                } catch (InstantiationException ex) {
-                    ex.printStackTrace();
-                }
-            } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
+                
+                Constructor constr = gridletz.getConstructor(new Class[]{});
+                task = constr.newInstance(new Object[]{});
+                
+                //task.setExperimentFile(experimentFile);
+                Method mthd = gridletz.getMethod("setExperimentFile",File.class);
+                mthd.invoke(task,new Object[]{});
+                                
+                //task.setTaskID(i+1);
+                mthd = gridletz.getMethod("setTaskID",Integer.class);
+                mthd.invoke(task,(i+1));
+                
+                //task.setJobID(0); // tbd, enable multiple jobs
+                mthd = gridletz.getMethod("setJobID",Integer.class);
+                mthd.invoke(task,0);
+                //task.setTotalTasks(totalTasks);
+                mthd = gridletz.getMethod("setTotalTasks",Integer.class);
+                mthd.invoke(task,totalTasks);
+                
+                // gridRunner to be done retrospectively on the other side
+                // so send as Object
+                //task.setGridRunner(gridRunner);
+                mthd = gridletz.getMethod("setGridRunner",Object.class);
+                mthd.invoke(task,(Object)gridRunner);
+                
+                super.set(i,task);
+                
+            } catch (Exception e) {
+                throw new DoeException(e.getMessage());
             }
+            
             
         }
     }

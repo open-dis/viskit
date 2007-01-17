@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -80,7 +81,11 @@ import com.sun.tools.javac.Main;
 public class Gridlet extends Thread {
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
-    GridRunner gridRunner;
+    // The gridRunner really is a GridRunner, however this instance came from 
+    // a LocalBootLoader, or possibly Boot on grid in which case not related, 
+    // either way, the gridRunner will not be recognized as a GridRunner because
+    // it comes from a different loader. To communicate back, use introspection.
+    Object gridRunner;
     int taskID;
     int numTasks;
     int jobID;
@@ -99,7 +104,7 @@ public class Gridlet extends Thread {
             murle.printStackTrace();
         }
     }
-    
+    // not used
     public Gridlet(int taskID, int jobID, int numTasks, GridRunner gridRunner, File expFile) throws DoeException {
         this.taskID = taskID;
         this.jobID = jobID;
@@ -180,7 +185,7 @@ public class Gridlet extends Thread {
     // GridRunner may have to be handled introspecively!
     // if setting this with the parent's loader causes cast
     // exception here then we know
-    public void setGridRunner(GridRunner gridRunner) {
+    public void setGridRunner(Object gridRunner) {
         this.gridRunner = gridRunner;
     }
     
@@ -417,7 +422,10 @@ public class Gridlet extends Thread {
                         System.out.println(statXml);
                     
                     if (gridRunner != null) { // local gridRunner
-                        gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
+                        Class gridRunnerz = gridRunner.getClass();
+                        Method mthd = gridRunnerz.getMethod("addDesignPointStat",Integer.class,Integer.class,Integer.class,String.class);
+                        mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
+                        //gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
                     } else {
                         
                         Vector args = new Vector();
@@ -461,8 +469,11 @@ public class Gridlet extends Thread {
                                 if (debug_io)
                                     System.out.println(statXml);
                                 if (gridRunner != null) { // local is a local gridRunner
-                                    gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
-                                } else { // use rpc to runner on grid
+                                    Class gridRunnerz = gridRunner.getClass();
+                                    Method mthd = gridRunnerz.getMethod("addReplicationStat",Integer.class,Integer.class,Integer.class,String.class);
+                                    mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
+                                    //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
+                                } else {// use rpc to runner on grid
                                     Vector args = new Vector();
                                     args.add(usid);
                                     args.add(new Integer(sampleIndex));
@@ -566,8 +577,15 @@ public class Gridlet extends Thread {
                 
                 
                 if ( gridRunner != null ) {
-                    gridRunner.addResult(sw.toString());
-                    gridRunner.removeTask(jobID,taskID);
+                    Class gridRunnerz = gridRunner.getClass();
+                    
+                    //gridRunner.addResult(sw.toString());
+                    Method mthd = gridRunnerz.getMethod("addResult",String.class);
+                    mthd.invoke(gridRunner,sw.toString());
+                    
+                    //gridRunner.removeTask(jobID,taskID);
+                    mthd = gridRunnerz.getMethod("removeTask",Integer.class,Integer.class);
+                    mthd.invoke(gridRunner,jobID,taskID);
                 } else {
                     //send results back to front end
                     Vector parms = new Vector();

@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import simkit.random.MersenneTwister;
+import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.eventgraph.*; 
@@ -112,10 +113,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader) {
+        //if (Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader) {
             this.usid = "LOCAL-RUN";
             this.port = 0;
-        }
+        //}
     }
     /** Creates a new instance of GridRunner */
     public GridRunner(String usid, int port) {
@@ -686,8 +687,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // current threads in the pool get a start().
     void localRun(File experimentFile, int totalTasks) {
         Vector lastQueue;
-        queue = new LocalTaskQueue(this,experimentFile,totalTasks);
-        
+        try {
+            queue = new LocalTaskQueue(this,experimentFile,totalTasks);  
+        } catch (DoeException e) {
+            e.printStackTrace();
+        }
+       
         // this shouldn't block on the very first call
         int tasksRemaining = getRemainingTasks(); // should be totalTasks
         lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 

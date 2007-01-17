@@ -854,7 +854,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
       }
       
       catch (Exception e) {
-
+e.printStackTrace();
         writeStatus("Error: " + e.getMessage());
         
         

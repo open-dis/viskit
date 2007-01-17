@@ -48,12 +48,15 @@ public class LocalDriverImpl implements DoeRunDriver {
             gridRunnerz = loader.loadClass("viskit.xsd.assembly.GridRunner");
             try {
                 
-                Constructor constr = gridRunnerz.getConstructor(new Class[]{});
-                runner = constr.newInstance(new Object[]{});
+                Constructor constr = gridRunnerz.getConstructor();
+                System.out.println("got constr "+constr);
+                runner = constr.newInstance();
+                System.out.println("got new runner inst "+ runner);
                 Method[] mthds = gridRunnerz.getMethods();
                 methods = new Hashtable();
                 for (Method m:mthds) {
                     methods.put(m.getName(),m);
+                    System.out.println("put "+m.getName()+" "+m);
                 }
                 //runner = (GridRunner) constr.newInstance(new Object[]{});
             } catch (IllegalArgumentException ex) {
@@ -216,10 +219,12 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
     
     public void run() throws DoeException {
+        Boolean ret = false;
         try {
-            ((Method)methods.get("run")).invoke(runner,new Object[]{});
+            Method runMethod = ((Method)methods.get("run"));
+            ret = (Boolean) runMethod.invoke(runner,(Object)null);
         } catch (Exception ex) {
-            throw new DoeException(ex.getMessage());
+            throw new DoeException(ret+" "+ex.getMessage());
         }
         //runner.run();
     }
