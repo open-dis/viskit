@@ -693,6 +693,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // queue is a list of Threads, whose get method
     // returns the isAlive() state of the thread, only
     // current threads in the pool get a start().
+    public static final int MAX_THREADS = 2;
     void localRun(File experimentFile, int totalTasks) {
         Vector lastQueue;
         try {
@@ -709,7 +710,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // active tasks are going to be hot so put them in the pool
         // needed: a way to select the pool size
         // here just test with N=4 for starters. GUI adjust tbd
-        int starters = 4>totalTasks?totalTasks:4;
+        int starters = MAX_THREADS>totalTasks?totalTasks:MAX_THREADS;
         for (int task = 0; task<starters; task++,tasksRemaining--) {
            ((LocalTaskQueue)queue).activate(task);
         }
