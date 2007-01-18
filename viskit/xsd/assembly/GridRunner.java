@@ -103,6 +103,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     boolean queueClean = false; // dirty means unclaimed info
     
     LocalBootLoader loader = null;
+    ClassLoader initLoader = null;
     
     public GridRunner() {
         this.eventGraphs = new Vector();
@@ -128,6 +129,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public GridRunner(LocalBootLoader loader) {
         this("LOCAL-RUN",0);
         this.loader = loader;
+        //Thread.currentThread().setContextClassLoader(loader);
     }
     
     /**
@@ -244,7 +246,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
         
         try {
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            //if (loader!=null) { 
+                // these need to swap back and forth depending on whether they are being
+                // called from a child or parent
+              //  initLoader = Thread.currentThread().getContextClassLoader();
+                //Thread.currentThread().setContextClassLoader(initLoader.getParent());
+            //}
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , this.getClass().getClassLoader());
             Unmarshaller u = jc.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
             int sample = Integer.parseInt(r.getSample());
@@ -724,8 +732,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                         if ((Boolean)nextQueue.get(j)) 
                             break;
                     }
-                    
-                    nextQueue.activate(j);
+                    if (j!=nextQueue.size())
+                        nextQueue.activate(j);
                     nextQueue.set(i,Boolean.FALSE);
                     
                     --tasksRemaining;
@@ -737,9 +745,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
     
     private Vector cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
-        Vector q = new Vector(localQ.size());
-        for ( int i = 0; i < q.size(); i++ ) {
-            q.set(i,new Boolean((Boolean)localQ.get(i)));
+        Vector q = new Vector();
+        for ( int i = 0; i < localQ.size(); i++ ) {
+            q.add(new Boolean((Boolean)localQ.get(i)));
         }
         return q;
     }

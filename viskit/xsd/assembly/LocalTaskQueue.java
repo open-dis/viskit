@@ -123,4 +123,8 @@ public class LocalTaskQueue extends Vector {
        
         return true;
     }
+    
+    public int size() {
+        return super.size(); // do fries come with that?
+    }
 }

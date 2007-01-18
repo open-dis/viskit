@@ -125,7 +125,11 @@ public class SimkitAssemblyXML2Java {
     }
     
     public SimkitAssemblyXML2Java(InputStream is) throws Exception {
-        this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+        try {
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+        } catch (Exception e) {
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
+        }
         this.fileInputStream = is;
     }
     
