@@ -90,7 +90,11 @@ public class SimkitAssemblyXML2Java {
         try {
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
         } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
     

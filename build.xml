@@ -574,7 +574,7 @@
 
     <!-- TARGET: Run - no ant splash -->
     <target depends="jar, examples, checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, no Splash" name="build-run-default">
-        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" jvmargs="-mx768m -XX:MaxPermSize=768m" >
             <arg value="viskit.EventGraphAssemblyComboMain"/>
         </java>
     </target>
@@ -586,7 +586,7 @@
 
     <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
     <target description="Run Viskit, don't check dependencies" name="quick-run">
-        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" maxmemory="768m" jvmargs="-mx768m -XX:MaxPermSize=768m">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
         </java>
     </target>
