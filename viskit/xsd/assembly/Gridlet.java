@@ -441,7 +441,7 @@ public class Gridlet extends Thread {
                     
                     if (gridRunner != null) { // local gridRunner
                         Class gridRunnerz = gridRunner.getClass();
-                        Method mthd = gridRunnerz.getMethod("addDesignPointStat",Integer.class,Integer.class,Integer.class,String.class);
+                        Method mthd = gridRunnerz.getMethod("addDesignPointStat",int.class,int.class,int.class,String.class);
                         mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
                         //gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
                     } else {
@@ -488,7 +488,7 @@ public class Gridlet extends Thread {
                                     System.out.println(statXml);
                                 if (gridRunner != null) { // local is a local gridRunner
                                     Class gridRunnerz = gridRunner.getClass();
-                                    Method mthd = gridRunnerz.getMethod("addReplicationStat",Integer.class,Integer.class,Integer.class,String.class);
+                                    Method mthd = gridRunnerz.getMethod("addReplicationStat",int.class,int.class,int.class,String.class);
                                     mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
                                     //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
                                 } else {// use rpc to runner on grid
@@ -602,7 +602,7 @@ public class Gridlet extends Thread {
                     mthd.invoke(gridRunner,sw.toString());
                     
                     //gridRunner.removeTask(jobID,taskID);
-                    mthd = gridRunnerz.getMethod("removeTask",Integer.class,Integer.class);
+                    mthd = gridRunnerz.getMethod("removeTask",int.class,int.class);
                     mthd.invoke(gridRunner,jobID,taskID);
                 } else {
                     //send results back to front end
