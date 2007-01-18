@@ -174,7 +174,9 @@ public class Gridlet extends Thread {
                 
             } else {
                 // check if LocalBootLoader mode, otherwise throw exception
-                if ( !( Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader ) )
+                Object loaderO = Thread.currentThread().getContextClassLoader();
+                Class loaderz = loaderO.getClass();
+                if ( !( loaderz.getName().equals("viskit.doe.LocalBootLoader") ) )
                     throw new RuntimeException("Not running as SGE job or local mode?");
             }
         } catch (Exception e) {

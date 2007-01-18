@@ -15,6 +15,7 @@ package viskit.xsd.assembly;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Vector;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
@@ -42,15 +43,27 @@ public class LocalTaskQueue extends Vector {
      * provides the list of "ext" URL's. 
      */
     public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) throws DoeException {
-        super(totalTasks);
+        //super(totalTasks);
         for (int i = 0; i<totalTasks; i++) {
-            LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();
-            LocalBootLoader loader = new LocalBootLoader(parent.getExtUrls(), parent /*ClassLoader.getSystemClassLoader()*/, parent.getWorkDir());
-            loader = loader.init();
+            //LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();// tbd gfd use reflection
+            Object parent = Thread.currentThread().getContextClassLoader();
+            Class parentz = parent.getClass();
+            try {
+                Method getExtUrls = parentz.getMethod("getExtUrls");
+                URL[] extUrls = (URL[]) getExtUrls.invoke(parent);
+                Method getWorkDir = parentz.getMethod("getWorkDir");
+                File workDir = (File) getWorkDir.invoke(parent);
+                
+                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader)parent /*ClassLoader.getSystemClassLoader()*/, workDir);
+                loader = loader.init();
+            //} catch (Exception e) {
+              //  e.printStackTrace();
+                //throw new DoeException(e.getMessage());
+            //}
             //Gridlet task;
             Object task;
             Class gridletz;
-            try {
+            //try {
                 gridletz = loader.loadClass("viskit.xsd.assembly.Gridlet");
                 
                 Constructor constr = gridletz.getConstructor(new Class[]{});
@@ -58,17 +71,17 @@ public class LocalTaskQueue extends Vector {
                 
                 //task.setExperimentFile(experimentFile);
                 Method mthd = gridletz.getMethod("setExperimentFile",File.class);
-                mthd.invoke(task,new Object[]{});
+                mthd.invoke(task,experimentFile);
                                 
                 //task.setTaskID(i+1);
-                mthd = gridletz.getMethod("setTaskID",Integer.class);
+                mthd = gridletz.getMethod("setTaskID",int.class);
                 mthd.invoke(task,(i+1));
                 
                 //task.setJobID(0); // tbd, enable multiple jobs
-                mthd = gridletz.getMethod("setJobID",Integer.class);
+                mthd = gridletz.getMethod("setJobID",int.class);
                 mthd.invoke(task,0);
                 //task.setTotalTasks(totalTasks);
-                mthd = gridletz.getMethod("setTotalTasks",Integer.class);
+                mthd = gridletz.getMethod("setTotalTasks",int.class);
                 mthd.invoke(task,totalTasks);
                 
                 // gridRunner to be done retrospectively on the other side
@@ -77,9 +90,10 @@ public class LocalTaskQueue extends Vector {
                 mthd = gridletz.getMethod("setGridRunner",Object.class);
                 mthd.invoke(task,(Object)gridRunner);
                 
-                super.set(i,task);
+                super.add(task);
                 
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new DoeException(e.getMessage());
             }
             

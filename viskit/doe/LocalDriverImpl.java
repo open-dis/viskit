@@ -219,12 +219,13 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
     
     public void run() throws DoeException {
-        Boolean ret = false;
+        Boolean ret = true;
         try {
             Method runMethod = ((Method)methods.get("run"));
-            ret = (Boolean) runMethod.invoke(runner,(Object)null);
+            runMethod.invoke(runner,(Object[])null);
         } catch (Exception ex) {
-            throw new DoeException(ret+" "+ex.getMessage());
+            ex.printStackTrace();
+            throw new DoeException(ex.getMessage());
         }
         //runner.run();
     }

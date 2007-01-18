@@ -703,7 +703,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // here just test with N=4 for starters. GUI adjust tbd
         int starters = 4>totalTasks?totalTasks:4;
         for (int task = 0; task<starters; task++,tasksRemaining--) {
-           ((Thread) queue.get(task)).start();
+           ((LocalTaskQueue)queue).activate(task);
         }
         // if starters tasks complete in this loop, activate upto starters more until no tasks remain
         // this second time through the getTaskQueue should block until results in
