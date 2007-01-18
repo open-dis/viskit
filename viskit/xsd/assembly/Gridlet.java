@@ -193,6 +193,18 @@ public class Gridlet extends Thread {
     
     public void setExperimentFile(File experimentFile) {
         this.expFile = experimentFile;
+        try {
+            //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
+            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ Thread.currentThread().getContextClassLoader());
+            //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ Thread.currentThread().getContextClassLoader());
+            sax2j = new SimkitAssemblyXML2Java(experimentFile.toURL().openStream());
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     public void setTaskID(int taskID) {

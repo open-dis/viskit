@@ -96,9 +96,9 @@ public class LocalBootLoader extends URLClassLoader {
         String classPathProp = System.getProperty("java.class.path");
         String pathSep = System.getProperty("path.separator");
         classPath = classPathProp.split(pathSep);
-        //for (String line:classPath) {
-          //  System.out.println(line);
-        //}
+        if(false)for (String line:classPath) {
+            System.out.println(line);
+        }
         ClassLoader parentClassLoader = getParent();
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
         

@@ -43,9 +43,7 @@ public class LocalTaskQueue extends Vector {
      * provides the list of "ext" URL's. 
      */
     public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) throws DoeException {
-        //super(totalTasks);
         for (int i = 0; i<totalTasks; i++) {
-            //LocalBootLoader parent = (LocalBootLoader)Thread.currentThread().getContextClassLoader();// tbd gfd use reflection
             Object parent = Thread.currentThread().getContextClassLoader();
             Class parentz = parent.getClass();
             try {
@@ -53,30 +51,28 @@ public class LocalTaskQueue extends Vector {
                 URL[] extUrls = (URL[]) getExtUrls.invoke(parent);
                 Method getWorkDir = parentz.getMethod("getWorkDir");
                 File workDir = (File) getWorkDir.invoke(parent);
-                
-                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader)parent /*ClassLoader.getSystemClassLoader()*/, workDir);
+                // really doesn't matter which ClassLoader gets passed to LBL, that's the whole point, it "boots" up from the bottom
+                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader)parent/* ClassLoader.getSystemClassLoader()*/, workDir);
                 loader = loader.init();
-            //} catch (Exception e) {
-              //  e.printStackTrace();
-                //throw new DoeException(e.getMessage());
-            //}
-            //Gridlet task;
-            Object task;
-            Class gridletz;
-            //try {
+                Thread.currentThread().setContextClassLoader(loader); // this line is not kidding around!
+                Object task;
+                Class gridletz;
+           
                 gridletz = loader.loadClass("viskit.xsd.assembly.Gridlet");
                 
                 Constructor constr = gridletz.getConstructor(new Class[]{});
                 task = constr.newInstance(new Object[]{});
-                
+                ((Thread)task).setContextClassLoader(loader);
+                //System.out.println("At this point, setting "+task+"'s loader to "+loader);
                 //task.setExperimentFile(experimentFile);
-                Method mthd = gridletz.getMethod("setExperimentFile",File.class);
-                mthd.invoke(task,experimentFile);
-                                
+                Class fileClass = loader.loadClass("java.io.File");
+                Constructor fileConstr = fileClass.getConstructor(java.net.URI.class);
+                Object fileObj = fileConstr.newInstance(experimentFile.toURI());
+                Method mthd = gridletz.getMethod("setExperimentFile",fileClass);
+                mthd.invoke(task,fileObj);
                 //task.setTaskID(i+1);
                 mthd = gridletz.getMethod("setTaskID",int.class);
                 mthd.invoke(task,(i+1));
-                
                 //task.setJobID(0); // tbd, enable multiple jobs
                 mthd = gridletz.getMethod("setJobID",int.class);
                 mthd.invoke(task,0);
@@ -100,7 +96,7 @@ public class LocalTaskQueue extends Vector {
             
         }
     }
-    
+
     /** 
      * Activate Gridlet indexed at i
      *
