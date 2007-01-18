@@ -375,13 +375,17 @@ public class Gridlet extends Thread {
                 }
             }
              
-            ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-            System.out.println("Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
+            //ClassLoader cloader = Thread.currentThread().getContextClassLoader(); // or not getContextClassLoader()?
+            ClassLoader cloader = getContextClassLoader();
+            System.out.println(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
             
             if(cloader instanceof Boot) {
                 ((Boot)cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
-            } else if (cloader instanceof LocalBootLoader) {
-                ((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+            } else if (cloader.getClass().getName().equals("viskit.doe.LocalBootLoader")) {
+                System.out.println("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
+                Method doAddURL = cloader.getClass().getMethod("doAddURL",java.net.URL.class);
+                doAddURL.invoke(cloader,new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+                //((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
             }
           
             Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
