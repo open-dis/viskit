@@ -569,18 +569,22 @@
         <java classname="viskit.EventGraphAssemblyComboMain" classpathref="runtime.classpath" fork="true"/>
     </target>
     <target depends="splashy, jar" description="Build and Run Viskit only, no module dependencies, display Splash" name="build-run-orig">
-        <java classname="viskit.Main" classpathref="runtime.classpath" fork="true"/>
+        <java classname="viskit.Main" classpathref="runtime.classpath" fork="true">
+          <jvmarg value="-Dswing.aatext=true"/>
+        </java>
     </target>
 
     <!-- TARGET: Run - no ant splash -->
     <target depends="jar, examples, checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, no Splash" name="build-run-default">
         <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" jvmargs="-mx768m -XX:MaxPermSize=768m" >
             <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <jvmarg value="-Dswing.aatext=true"/>
         </java>
     </target>
     <target depends="jar" description="Build and Run Viskit only, no module dependencies, no Splash" name="build-run-default-orig">
         <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
             <arg value="viskit.Main"/>
+            <jvmarg value="-Dswing.aatext=true"/>
         </java>
     </target>
 
@@ -588,11 +592,13 @@
     <target description="Run Viskit, don't check dependencies" name="quick-run">
         <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" maxmemory="768m" jvmargs="-mx768m -XX:MaxPermSize=768m">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <jvmarg value="-Dswing.aatext=true"/>
         </java>
     </target>
     <target description="Run Viskit, don't check dependencies" name="quick-run-orig">
         <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
             <arg value="viskit.Main"/>
+            <jvmarg value="-Dswing.aatext=true"/>
         </java>
     </target>
   
