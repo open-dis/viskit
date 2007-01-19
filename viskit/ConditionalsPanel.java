@@ -1,5 +1,6 @@
 package viskit;
 
+import edu.nps.util.BoxLayoutUtils;
 import viskit.model.Edge;
 
 import javax.swing.*;
@@ -40,6 +41,7 @@ public class ConditionalsPanel extends JPanel
       leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
      tp.add(leftParen);
      tp.add(Box.createHorizontalGlue());
+     BoxLayoutUtils.clampHeight(tp);
     add(tp);
 
      jta = new JTextArea(3,25);
@@ -58,6 +60,7 @@ public class ConditionalsPanel extends JPanel
       rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
      bp.add(rightParen);
      bp.add(Box.createHorizontalGlue());
+     BoxLayoutUtils.clampHeight(bp);
     add(bp);
 
     add(Box.createVerticalStrut(5));
@@ -72,10 +75,12 @@ public class ConditionalsPanel extends JPanel
     add(Box.createVerticalStrut(5));
 
     // This whole panel expands horizontally, but not vertically
+/*
     d = getPreferredSize();
     d.width = Integer.MAX_VALUE;
     setMinimumSize(d);
     setMaximumSize(d);
+*/
 
     jtaComments.addCaretListener(new CaretListener()
     {
