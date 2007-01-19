@@ -36,35 +36,36 @@ public class vGraphAssemblyModel extends DefaultGraphModel
 
     viskitAssyAdapterEdgeStyle = GraphConstants.createMap();
 
-    GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle,false);
-    GraphConstants.setLineEnd  (viskitAssyAdapterEdgeStyle,GraphConstants.ARROW_TECHNICAL);    // not used
-    GraphConstants.setEndFill  (viskitAssyAdapterEdgeStyle, false); //true);
-    GraphConstants.setEndSize  (viskitAssyAdapterEdgeStyle, 16);
-    GraphConstants.setBeginFill(viskitAssyAdapterEdgeStyle, false);
-    GraphConstants.setBeginSize(viskitAssyAdapterEdgeStyle, 16);
-    //GraphConstants.setFont       (viskitAssyAdapterEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
-    GraphConstants.setBendable   (viskitAssyAdapterEdgeStyle, true);
-    GraphConstants.setLineStyle  (viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
-    GraphConstants.setLineWidth  (viskitAssyAdapterEdgeStyle, 3.0f); //2.0f);
-    GraphConstants.setOpaque     (viskitAssyAdapterEdgeStyle, true);
-    GraphConstants.setBackground (viskitAssyAdapterEdgeStyle, new Color(255,255,255,180));
-    //GraphConstants.setBorderColor(viskitAssyAdapterEdgeStyle, Color.red);
-    GraphConstants.setForeground (viskitAssyAdapterEdgeStyle, Color.black);
-    GraphConstants.setRouting    (viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
-    GraphConstants.setLineColor  (viskitAssyAdapterEdgeStyle, Color.black); //Color.lightGray); //new Color(0xA2,0xD9,0x9F)); // green
+    // common to 3 types
+    GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle, false);
+    GraphConstants.setLineBegin     (viskitAssyAdapterEdgeStyle, GraphConstants.ARROW_TECHNICAL);  // arrow not drawn
+    GraphConstants.setBeginFill     (viskitAssyAdapterEdgeStyle, false);
+    GraphConstants.setBeginSize     (viskitAssyAdapterEdgeStyle, 16);
+    GraphConstants.setBendable      (viskitAssyAdapterEdgeStyle, true);
+    GraphConstants.setLineStyle     (viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
+    GraphConstants.setOpaque        (viskitAssyAdapterEdgeStyle, true);
+    GraphConstants.setForeground    (viskitAssyAdapterEdgeStyle, Color.black);
+    GraphConstants.setRouting       (viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
 
+    // duplicate for pcl
     viskitAssyPclEdgeStyle = GraphConstants.createMap();
     viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
-    //GraphConstants.setDashPattern(viskitAssyPclEdgeStyle, new float[] { 3, 3 });
-    GraphConstants.setLineColor(viskitAssyPclEdgeStyle,new Color(134,87,87)); // not pink 0xff,0xc8,0xc8));
-    GraphConstants.setLineWidth(viskitAssyPclEdgeStyle,1.5f);
-
+    // duplicate for sel
     viskitAssySimEvLisEdgeStyle = GraphConstants.createMap();
     viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
-    GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle,Color.black);
+    // Customize adapter
+    GraphConstants.setLineWidth(viskitAssyAdapterEdgeStyle, 3.0f); // wide line because we're doubling
+    GraphConstants.setLineColor(viskitAssyAdapterEdgeStyle, Color.black);
+
+    // Customize pcl
+    GraphConstants.setLineWidth(viskitAssyPclEdgeStyle, 1.5f);
+    GraphConstants.setLineColor(viskitAssyPclEdgeStyle, new Color(134,87,87)); // sort of blood color
+
+    // Customize sel
     GraphConstants.setLineWidth(viskitAssySimEvLisEdgeStyle, 1.0f);
+    GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle, Color.black);
   }
 
   public void changeEvent(AssemblyNode en)
