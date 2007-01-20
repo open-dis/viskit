@@ -1,5 +1,7 @@
 package viskit;
 
+import edu.nps.util.BoxLayoutUtils;
+import simkit.Priority;
 import viskit.model.*;
 
 import javax.swing.*;
@@ -7,17 +9,20 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -35,14 +40,21 @@ public class EdgeInspectorDialog extends JDialog
   private Edge edge;
   private static boolean modified = false;
   private JButton canButt,okButt;
-  private JRadioButton schrb,canrb;
   private JLabel srcEvent,targEvent;
   private JTextField delay;
   private EdgeParametersPanel parameters;
   private ConditionalsPanel conditionals;
   private JPanel delayPan;
   private Border delayPanBorder,delayPanDisabledBorder;
+
+  private JPanel priorityPan;
+  private JComboBox priorityCB;
+  private ArrayList<Priority> priorityList;  // matches combo box
+  
   private JPanel myParmPanel;
+
+  private JLabel schLab;
+  private JLabel canLab;
 
   /**
    * Set up and show the dialog.  The first Component argument
@@ -91,16 +103,20 @@ public class EdgeInspectorDialog extends JDialog
       // edge type
       JPanel typeP = new JPanel();
       typeP.setLayout(new BoxLayout(typeP,BoxLayout.X_AXIS));
-      JLabel lab = new JLabel("Type: ");
-      typeP.add(lab);
-      schrb = new JRadioButton("Scheduling");
-      schrb.setSelected(true);
-      canrb = new JRadioButton("Cancelling");
-      ButtonGroup bGroup = new ButtonGroup();
-      bGroup.add(schrb);
-      bGroup.add(canrb);
-      typeP.add(schrb);
-      typeP.add(canrb);
+        typeP.add(Box.createHorizontalGlue());
+        JLabel lab = new JLabel("Type: ");
+        BoxLayoutUtils.clampWidth(lab);
+        typeP.add(lab);
+        typeP.add(Box.createHorizontalStrut(5));
+        schLab = new JLabel("<html><b>Scheduling");
+        BoxLayoutUtils.clampWidth(schLab);
+        canLab = new JLabel("<html><b>Cancelling");
+        BoxLayoutUtils.clampWidth(canLab);
+        typeP.add(schLab);
+        typeP.add(canLab);
+        typeP.add(Box.createHorizontalGlue());
+
+      BoxLayoutUtils.clampHeight(typeP);
     con.add(typeP);
     con.add(Box.createVerticalStrut(5));
 
@@ -131,49 +147,21 @@ public class EdgeInspectorDialog extends JDialog
         keepSameSize(srcEvent,targEvent);
       srcTargP.add(stValuesP);
       srcTargP.add(Box.createHorizontalGlue());
+      BoxLayoutUtils.clampHeight(srcTargP);
     con.add(srcTargP);
 
-/*
-      JPanel dirP = new JPanel();
-      dirP.setLayout(new BoxLayout(dirP,BoxLayout.X_AXIS));
-        JPanel dirPSub = new JPanel();
-        dirPSub.setLayout(new BoxLayout(dirPSub,BoxLayout.Y_AXIS));
-          JPanel srcPan = new JPanel();
-          srcPan.setLayout(new BoxLayout(srcPan,BoxLayout.X_AXIS));
-          JLabel lab1 = new JLabel("Source event:");
-          srcPan.add(lab1);
-          srcPan.add(Box.createHorizontalStrut(5));
-            //srcEvent = new JComboBox(); //nodeList);
-            //srcEvent.setBackground(Color.white);
-            srcEvent = new JLabel("srcEvent");
-          srcPan.add(srcEvent);
-          Dimension d = srcPan.getPreferredSize();
-          d.width = Integer.MAX_VALUE;
-          srcPan.setMaximumSize(d);
-        dirPSub.add(srcPan);
-          JPanel targPan = new JPanel();
-          targPan.setLayout(new BoxLayout(targPan,BoxLayout.X_AXIS));
-          lab = new JLabel("Target event:");
-          // line it up with one above
-          lab.setMinimumSize(lab1.getMinimumSize());
-          lab.setMaximumSize(lab1.getMaximumSize());
-          lab.setPreferredSize(lab1.getPreferredSize());
-          targPan.add(lab);
-          targPan.add(Box.createHorizontalStrut(5));
-            //targEvent = new JComboBox(); //nodeList); //JTextField();
-            //targEvent.setBackground(Color.white);
-            targEvent = new JLabel("targEvent");
-          targPan.add(targEvent);
-          d = targPan.getPreferredSize();
-          d.width = Integer.MAX_VALUE;
-          targPan.setMaximumSize(d);
-        dirPSub.add(targPan);
-      dirP.add(dirPSub);
-        reverse = new JButton("reverse");
-      //dirP.add(reverse);
-      dirP.add(Box.createHorizontalGlue());
-    con.add(dirP);
-*/
+    con.add(Box.createVerticalStrut(5));
+
+    priorityPan = new JPanel();
+      priorityPan.setLayout(new BoxLayout(priorityPan,BoxLayout.X_AXIS));
+      priorityPan.setOpaque(false);
+      priorityPan.setBorder(BorderFactory.createTitledBorder("Priority"));
+        priorityCB = buildPriorityComboBox();
+        priorityPan.add(Box.createHorizontalGlue());
+        priorityPan.add(priorityCB);
+        priorityPan.add(Box.createHorizontalGlue());
+    BoxLayoutUtils.clampHeight(priorityPan);
+    con.add(priorityPan);
     con.add(Box.createVerticalStrut(5));
 
     delayPan = new JPanel();
@@ -193,12 +181,7 @@ public class EdgeInspectorDialog extends JDialog
                                     null,Color.gray);
     con.add(delayPan);
     con.add(Box.createVerticalStrut(5));
-
-      conditionals = new ConditionalsPanel(edge); //new JList();
-      //JScrollPane condSp = new JScrollPane(conditionals);
-      //condSp.setBorder(BorderFactory.createTitledBorder("Conditional Expression"));
-      //condSp.setOpaque(false);
-    //con.add(condSp)
+      conditionals = new ConditionalsPanel(edge);
     con.add(conditionals);
     con.add(Box.createVerticalStrut(5));
 
@@ -239,22 +222,11 @@ public class EdgeInspectorDialog extends JDialog
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
-    ChangeListener chlis = new myChangeListener();
-    schrb.addChangeListener(chlis);
-    canrb.addChangeListener(chlis);
-    //reverse.addActionListener(new reverseButtonListener());
+
+    myChangeListener chlis = new myChangeListener();
     conditionals.addChangeListener(chlis);
-    //ActionListener ttArgLis = new ArgumentsToolTipUpdater();
-    //targEvent.addActionListener(ttArgLis);
-    delay.addCaretListener(new CaretListener()
-    {
-      public void caretUpdate(CaretEvent e)
-      {
-        modified = true;
-        okButt.setEnabled(true);
-        getRootPane().setDefaultButton(okButt);        
-      }
-    });
+    priorityCB.addActionListener(chlis);
+    delay.addCaretListener(chlis);
 
     parameters.addDoubleClickedListener(new ActionListener()
     {
@@ -290,27 +262,49 @@ public class EdgeInspectorDialog extends JDialog
     a.setMinimumSize(d);
     b.setMinimumSize(d);
   }
+
+  private JComboBox buildPriorityComboBox()
+  {
+    Vector v = new Vector(10);
+    priorityList = new ArrayList<Priority>(10);
+    try {
+      Class c = Class.forName("simkit.Priority");
+      Field[] fa = c.getDeclaredFields();
+      for(Field f : fa) {
+        if(Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
+          v.add(f.getName());
+          priorityList.add((Priority)f.get(null)); // static objects
+        }
+      }
+      return new JComboBox(v);
+    }
+    catch (Exception e) {
+      System.err.println(e.getMessage());
+      return new JComboBox(new String[]{"simkit package not in class path"});
+    }
+  }
+
+  private int decodePriority(String pr)
+  {
+    for(Priority p : priorityList) {
+      int cmp = Double.compare(p.getPriority(), Double.parseDouble(pr));
+      if(cmp == 0)
+        return priorityList.indexOf(p);
+    }
+    System.err.println("Error in EdgeInspectorDialog: unrecognized priority: "+pr);
+    return 0;
+  }
+
   private void fillWidgets()
   {
     nodeList = mod.getAllNodes();                  // todo fix
-    //srcEvent.setModel(new DefaultComboBoxModel(nodeList));
-    //targEvent.setModel(new DefaultComboBoxModel(nodeList));
-    //setTargEventTT(targEvent);
 
-    if(edge instanceof SchedulingEdge) {
-      schrb.setSelected(true);
-      canrb.setSelected(false);
-    }
-    else {
-      canrb.setSelected(true);
-      schrb.setSelected(false);
-    }
     srcEvent.setText(edge.from.getName()); //setSelectedItem(edge.from);
     targEvent.setText(edge.to.getName());  //setSelectedItem(edge.to);
     myParmPanel.setBorder(BorderFactory.createTitledBorder("Edge Parameters -- to "+targEvent.getText()));
 
-   parameters.setArgumentList(edge.to.getArguments());  // 
-   parameters.setData(edge.parameters);
+    parameters.setArgumentList(edge.to.getArguments());  //
+    parameters.setData(edge.parameters);
 
     if(edge instanceof SchedulingEdge) {
       if(edge.conditional == null || edge.conditional.trim().length() <= 0)
@@ -324,6 +318,8 @@ public class EdgeInspectorDialog extends JDialog
         delay.setText(""+edge.delay);
       delay.setEnabled(true);
       delayPan.setBorder(delayPanBorder);
+
+      priorityCB.setSelectedIndex(decodePriority(((SchedulingEdge)edge).priority));
   }
     else {
       if(edge.conditional == null || edge.conditional.trim().length() <= 0)
@@ -331,15 +327,22 @@ public class EdgeInspectorDialog extends JDialog
       else
        conditionals.setText(edge.conditional);
       conditionals.setComment(edge.conditionalsComment);
-      //conditionals.setText(((Cancel)((CancellingEdge)edgeCopy).opaqueModelObject).getCondition());
+
       delay.setText("n/a");
       delay.setEnabled(false);
       delayPan.setBorder(delayPanDisabledBorder);
     }
+
+    schedTypeSelected(edge instanceof SchedulingEdge);
   }
 
   private void unloadWidgets()
   {
+    if(edge instanceof SchedulingEdge) {
+      int idx = priorityCB.getSelectedIndex();
+      Priority p = priorityList.get(priorityCB.getSelectedIndex());
+      ((SchedulingEdge)edge).priority = ""+p.getPriority();
+    }
     String delaySt = delay.getText();
     if(delaySt == null || delaySt.trim().length() <= 0)
       edge.delay = "0.0";
@@ -364,8 +367,6 @@ public class EdgeInspectorDialog extends JDialog
       EventNode en = edge.from;
       edge.from = edge.to;
       edge.to = en;
-      //srcEvent.setSelectedItem(edge.from);
-      //targEvent.setSelectedItem(edge.to);
       modified = true;
       okButt.setEnabled(true);
       getRootPane().setDefaultButton(okButt);
@@ -384,6 +385,12 @@ public class EdgeInspectorDialog extends JDialog
     public void actionPerformed(ActionEvent event)
     {
       if(modified) {
+      // todo fix beanshell syntax checking.  I don't know if this was ever complete enough.  The example to test it
+      // against is the edge from Run to Arrival in examples/ArrivalProcess.  The time delay is "interarrivalTime.generate()",
+      // which is good syntax if the state variable "RandomVariate interarrivalTime" is already in the beanshell context,
+      // which I don't think it is.  Must make the beanshell error checking smarter. 19 Jan 2007
+
+      /*
         StringBuffer sb = new StringBuffer();
         if(edge instanceof SchedulingEdge) {
           sb.append("double delay = ");
@@ -400,18 +407,22 @@ public class EdgeInspectorDialog extends JDialog
             boolean ret = BeanshellErrorDialog.showDialog(parseResults,EdgeInspectorDialog.this);
             if(!ret) // don't ignore
               return;
- /*           int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
-                                          "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-            if(ret != JOptionPane.YES_OPTION)
-              return;
-*/          }
+
+
+          //  int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
+          //                                "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+          //  if(ret != JOptionPane.YES_OPTION)
+          //    return;
+          }
         }
+      */
         unloadWidgets();
       }
       setVisible(false);
     }
   }
-  class myChangeListener implements ChangeListener
+
+  class myChangeListener implements ChangeListener,ActionListener,CaretListener
   {
     public void stateChanged(ChangeEvent event)
     {
@@ -419,43 +430,26 @@ public class EdgeInspectorDialog extends JDialog
       okButt.setEnabled(true);
       getRootPane().setDefaultButton(okButt);
     }
-  }
-/*
-  class ArgumentsToolTipUpdater implements ActionListener
-  {
+
     public void actionPerformed(ActionEvent e)
     {
-      JComboBox jcb = (JComboBox)e.getSource();
-      setTargEventTT(jcb);
-    }
-  }
-*/
-/*
-  private void setTargEventTT(JComboBox jcb)
-  {
-    EventNode en = (EventNode)jcb.getSelectedItem();
-    StringBuffer sb = new StringBuffer("<html><center>arguments</center>");
-    int idx = 0;
-    for(Iterator itr = en.getArguments().iterator(); itr.hasNext();) {
-      EventArgument ea = (EventArgument)itr.next();
-      sb.append("");
-      sb.append(idx++);
-      sb.append(" ");
-      sb.append(ea.getName());
-      sb.append(" (");
-      sb.append(ea.getType());
-      sb.append(")<br>");
-    }
-    if(idx == 0) // no arguments
-      targEvent.setToolTipText(null);
-    else {
-      sb.setLength(sb.length()-4);   // lose last <br>
-      sb.append("</html>");
-      targEvent.setToolTipText(sb.toString());
+      stateChanged(null);
     }
 
+    public void caretUpdate(CaretEvent e)
+    {
+      stateChanged(null);
+    }
   }
-*/
+
+  private void schedTypeSelected(boolean wh)
+  {
+    priorityPan.setVisible(wh);
+    delayPan.setVisible(wh);
+    schLab.setVisible(wh);
+    canLab.setVisible(!wh);
+  }
+
   class myCloseListener extends WindowAdapter
   {
     public void windowClosing(WindowEvent e)
