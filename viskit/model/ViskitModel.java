@@ -79,8 +79,8 @@ public interface ViskitModel
   public void    deleteEdge       (SchedulingEdge edge);
   public void    deleteCancelEdge (CancellingEdge edge);
 
-  public void    changeEdge       (Edge e);
-  public void    changeCancelEdge (Edge e);
+  public void    changeEdge       (SchedulingEdge e);
+  public void    changeCancelEdge (CancellingEdge e);
   public void    changeMetaData   (GraphMetaData gmd);
   public boolean changeEvent      (EventNode en);
 
