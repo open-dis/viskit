@@ -490,6 +490,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     src.getConnections().add(se);
     target.getConnections().add(se);
     se.conditional = ed.getCondition();
+    se.priority = ed.getPriority();
 
     List cmt = ed.getComment();
     if(!cmt.isEmpty()) {
@@ -1069,6 +1070,8 @@ public class Model extends mvcAbstractModel implements ViskitModel
       se.parameters = eps;
     }
 
+    se.priority = ""+simkit.Priority.DEFAULT.getPriority();  // set default
+
     this.edgeCache.put(sch,se);
     setDirty(true);
 
@@ -1144,7 +1147,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGEDELETED, "Cancelling edge deleted"));
   }
 
-  public void changeEdge(Edge e)
+  public void changeEdge(SchedulingEdge e)
   {
     Schedule sch = (Schedule)e.opaqueModelObject;
     sch.setCondition(e.conditional);
@@ -1153,8 +1156,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     sch.setDelay(""+e.delay);
 
     sch.setEvent((Event)e.to.opaqueModelObject);
-    sch.setPriority("0");  // todo implement priority
-
+    sch.setPriority(e.priority);
     sch.getEdgeParameter().clear();
     for(Iterator itr = e.parameters.iterator(); itr.hasNext();) {
       vEdgeParameter vp = (vEdgeParameter)itr.next();
@@ -1176,7 +1178,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     this.notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
   }
 
-  public void changeCancelEdge(Edge e)
+  public void changeCancelEdge(CancellingEdge e)
   {
     Cancel can = (Cancel)e.opaqueModelObject;
     can.setCondition(e.conditional);
