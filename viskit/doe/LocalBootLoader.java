@@ -67,6 +67,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.JarEntry;
@@ -128,6 +129,7 @@ public class LocalBootLoader extends URLClassLoader {
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
             }
+            stage1.classPath = classPath;
         }
         
     }
@@ -138,6 +140,9 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     public String[] getClassPath() {
+        if (false) for (String line:classPath) {
+            System.out.println(line);
+        }
         return classPath;
     }
     
@@ -178,13 +183,31 @@ public class LocalBootLoader extends URLClassLoader {
         //System.out.println("Adding cleaned jar "+jar);
         for (URL ext:extUrls) {
             stage1.addURL(ext);
+            String[] tmp = new String[classPath.length+1];
+            System.arraycopy(classPath,0,tmp,0,classPath.length);
+            try {
+                tmp[tmp.length-1] = new File(ext.toURI()).getCanonicalPath();
+                classPath = tmp;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (URISyntaxException ex) {
+                ex.printStackTrace();
+            }
         }
         try {
             stage1.addURL(jar.toURL());
+            String[] tmp = new String[classPath.length+1];
+            System.arraycopy(classPath,0,tmp,0,classPath.length);
+            try {
+                tmp[tmp.length-1] = jar.getCanonicalPath();
+                classPath = tmp;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         }
-        
+        stage1.classPath = classPath;
         return stage1;
     }
     

@@ -849,7 +849,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         
         writeStatus("Executing job");
         
-        doe.run();
+        //doe.run();
 
       }
       
@@ -898,13 +898,14 @@ e.printStackTrace();
 
     try {
       // this shouldn't block on the very first call, the queue
-      // is born dirty.
+      // is born dirty. unless its a local doe, which used up the
+      // first getTaskQueue... 
       
       lastQueue = doe.getTaskQueue();
-      //5 * 3;
+
       int tasksRemaining = doe.getRemainingTasks();
       writeStatus("Total tasks: " + tasksRemaining);
-
+      doe.run();
       while (tasksRemaining > 0) {
         // this will block until a task ends which could be
         // because it died, or because it completed, either way

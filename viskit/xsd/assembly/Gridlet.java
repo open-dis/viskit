@@ -142,15 +142,7 @@ public class Gridlet extends Thread {
                 //FIXME: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
                 
-                // not as needed as before
-                // still handy but possible
-                // 1 never starts or returns
-                // after 2 or any of the 
-                // concurrently running jobs
-                // see removeTask which
-                // handles the main case 
-                // where you'd need jobID
-                // better
+                // still needed?
                 if (taskID == 1) {
                     Vector v = new Vector();
                     v.add(usid);
@@ -178,25 +170,24 @@ public class Gridlet extends Thread {
                 Class loaderz = loaderO.getClass();
                 if ( !( loaderz.getName().equals("viskit.doe.LocalBootLoader") ) )
                     throw new RuntimeException("Not running as SGE job or local mode?");
+                usid = "LOCAL-RUN";
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    // GridRunner may have to be handled introspecively!
-    // if setting this with the parent's loader causes cast
-    // exception here then we know
+   
     public void setGridRunner(Object gridRunner) {
         this.gridRunner = gridRunner;
     }
     
     public void setExperimentFile(File experimentFile) {
         this.expFile = experimentFile;
+        this.filename = expFile.getName();
         try {
             //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
             //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ Thread.currentThread().getContextClassLoader());
-            //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ Thread.currentThread().getContextClassLoader());
+            //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURL().openStream());
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
@@ -218,12 +209,6 @@ public class Gridlet extends Thread {
     public void setTotalTasks(int totalTasks) {
         this.numTasks = totalTasks;
     }
-    /*
-     task.setExperimentFile(experimentFile);
-     task.setTaskID(i+1);
-     task.setJobID(0); // tbd, enable multiple jobs
-     task.setTotalTasks(totalTasks);
-    */
     
     public static void main(String[] args) {
         Gridlet gridlet = new Gridlet();
@@ -283,12 +268,32 @@ public class Gridlet extends Thread {
                 System.setOut(log);
             }
             
-            File workDir = new File(System.getProperty("user.dir"));
-            File tempDir = TempDir.createGeneratedName("gridkit",workDir);
-            // setting a classpath this way, we don't need to keep track of the
-            // actual files, ie "javac -d tempDir" will create subdirs 
-            String systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath+File.pathSeparator+tempDir.getCanonicalPath());
+            File workDir, tempDir;
+            String classPath=""; // for javac cmd line
+            if (!usid.equals("LOCAL-RUN")) {
+                
+                workDir = new File(System.getProperty("user.dir"));
+                tempDir = TempDir.createGeneratedName("gridkit",workDir);
+                // setting a classpath this way, we don't need to keep track of the
+                // actual files, ie "javac -d tempDir" will create subdirs
+                classPath = System.getProperty("java.class.path");
+                System.setProperty("java.class.path", classPath+File.pathSeparator+tempDir.getCanonicalPath());
+                classPath = System.getProperty("java.class.path");
+            } else {
+                
+                tempDir = File.createTempFile("viskit","doe");
+                tempDir.delete();
+                tempDir.mkdir();
+                tempDir.deleteOnExit();
+                workDir = new File(tempDir.toURI());
+                
+                Object loader = getContextClassLoader();
+                Class loaderz = loader.getClass();
+                String[] classPaths = (String[]) (loaderz.getMethod("getClassPath",new Class[]{})).invoke(loader,new Object[]{});
+                for (String path:classPaths) {
+                    classPath += path + File.pathSeparator;
+                }
+            }
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
@@ -342,7 +347,7 @@ public class Gridlet extends Thread {
             ArrayList cmdLine = new ArrayList();
             cmdLine.add("-verbose");
             cmdLine.add("-classpath");
-            cmdLine.add(System.getProperty("java.class.path"));
+            cmdLine.add(classPath);
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());
             

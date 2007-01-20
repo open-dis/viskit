@@ -53,14 +53,12 @@ public class LocalDriverImpl implements DoeRunDriver {
                 Method initr = loaderz.getMethod("init");
                 rloader = initr.invoke(rloader);
                 Constructor constr = gridRunnerz.getConstructor(loader.loadClass("viskit.doe.LocalBootLoader")); //yep
-                System.out.println("got constr "+constr);
                 runner = constr.newInstance(rloader);
-                System.out.println("got new runner inst "+ runner);
                 Method[] mthds = gridRunnerz.getMethods();
                 methods = new Hashtable();
                 for (Method m:mthds) {
                     methods.put(m.getName(),m);
-                    System.out.println("put "+m.getName()+" "+m);
+                    //System.out.println("put "+m.getName()+" "+m);
                 }
                 //runner = (GridRunner) constr.newInstance(new Object[]{});
             } catch (IllegalArgumentException ex) {

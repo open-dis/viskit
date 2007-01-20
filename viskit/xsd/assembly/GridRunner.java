@@ -114,10 +114,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //if (Thread.currentThread().getContextClassLoader() instanceof LocalBootLoader) {
-            this.usid = "LOCAL-RUN";
-            this.port = 0;
-        //}
+        
+        this.usid = "LOCAL-RUN";
+        this.port = 0;
+
     }
     /** Creates a new instance of GridRunner */
     public GridRunner(String usid, int port) {
@@ -246,12 +246,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(report.getBytes()));
         
         try {
-            //if (loader!=null) { 
-                // these need to swap back and forth depending on whether they are being
-                // called from a child or parent
-              //  initLoader = Thread.currentThread().getContextClassLoader();
-                //Thread.currentThread().setContextClassLoader(initLoader.getParent());
-            //}
+            
             JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , this.getClass().getClassLoader());
             Unmarshaller u = jc.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
@@ -502,9 +497,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             // a good place to also store this "core dump" filename for the 
             // session.
             if ( tasksCompleted == designPointCount * totalSamples) {
+                File dump = File.createTempFile(root.getName(),"Results.xml",experimentFile.getParentFile());
                 (new SimkitAssemblyXML2Java())
                 .marshal((javax.xml.bind.Element)root,
-                        (OutputStream)new FileOutputStream(new File(root.getName()+"Exp.xml")));
+                        (OutputStream)new FileOutputStream(dump));
             }
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
@@ -638,12 +634,21 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 egt.getContent().add(eg);
                 eventGraphList.add(egt);
             }
-            // tbd make tmp dir
-            userDir = new File(System.getProperty("user.dir"));
-            // create experimentFile, an assembly tree with decorations
-            // give it unique name
-            experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
-        
+            
+            if (!usid.equals("LOCAL-RUN")) {
+                // Grid runs put these in the gridkit daemon's user dir
+                userDir = new File(System.getProperty("user.dir"));
+                // create experimentFile, an assembly tree with decorations
+                // give it unique name
+                experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
+            } else {
+                File tempDir = File.createTempFile("viskit","exp");
+                tempDir.delete();
+                tempDir.mkdir();
+                tempDir.deleteOnExit();
+                experimentFile = File.createTempFile(root.getName()+"Exp",".xml",tempDir);
+            }
+            
         } catch (Exception e) {
             return Boolean.FALSE;
         }
@@ -693,7 +698,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // queue is a list of Threads, whose get method
     // returns the isAlive() state of the thread, only
     // current threads in the pool get a start().
-    public static final int MAX_THREADS = 2;
+    public static final int MAX_THREADS = 4;
     void localRun(File experimentFile, int totalTasks) {
         Vector lastQueue;
         try {
@@ -701,11 +706,11 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (DoeException e) {
             e.printStackTrace();
         }
-       
+        queueClean = false; // redirty
         // this shouldn't block on the very first call
         int tasksRemaining = getRemainingTasks(); // should be totalTasks
         lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
-        
+        //queueClean = false; // redirty it
         // launch N starters of totalTasks tasks here
         // active tasks are going to be hot so put them in the pool
         // needed: a way to select the pool size
