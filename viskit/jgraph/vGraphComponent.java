@@ -21,6 +21,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -228,7 +230,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
           vEdgeCell vc = (vEdgeCell) c;
           Edge se = (Edge) vc.getUserObject();
 
-          if (vc.getUserObject() instanceof SchedulingEdge) {
+          if (se instanceof SchedulingEdge) {
             sb.append("<center>Schedule</center>");
             if (se.conditionalsComment != null) {
               String cmt = se.conditionalsComment.trim();
@@ -238,6 +240,22 @@ public class vGraphComponent extends JGraph implements GraphModelListener
                 sb.append("<br>");
               }
             }
+            
+            double priority = Double.parseDouble(((SchedulingEdge)se).priority);
+            NumberFormat df = DecimalFormat.getNumberInstance();
+            df.setMaximumFractionDigits(3);
+            df.setMaximumIntegerDigits(3);
+            String s;
+            if(Double.compare(priority,Double.MAX_VALUE) >= 0)
+              s = "MAX";
+            else if(Double.compare(priority,-Double.MAX_VALUE) <= 0)
+              s = "MIN";
+            else
+              s = df.format(priority);
+            
+            sb.append("<u>priority</u><br>&nbsp;");
+            sb.append(s);
+            sb.append("<br>");
 
             if (se.delay != null) {
               String dly = se.delay.trim();
