@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 public class SchedulingEdge extends Edge
 {
+  public String priority;
+
   SchedulingEdge()       // package-limited
   {
     parameters = new ArrayList();
@@ -29,6 +31,7 @@ public class SchedulingEdge extends Edge
     se.delay = delay;
     se.conditional = conditional;
     se.conditionalsComment = conditionalsComment;
+    se.priority = priority;
     return se;
   }
 }
