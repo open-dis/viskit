@@ -20,5 +20,6 @@ abstract public class Edge extends ViskitElement
   public String    conditional;
   public String    conditionalsComment;
   public String    delay;
+
   abstract Object  copyShallow();
 }
