@@ -904,8 +904,11 @@ e.printStackTrace();
       lastQueue = doe.getTaskQueue();
 
       int tasksRemaining = doe.getRemainingTasks();
-      writeStatus("Total tasks: " + tasksRemaining);
+      writeStatus("Total tasks: " + lastQueue.size());
+      writeStatus("Started tasks: " + (lastQueue.size() - tasksRemaining));
+      
       doe.run();
+      
       while (tasksRemaining > 0) {
         // this will block until a task ends which could be
         // because it died, or because it completed, either way
@@ -925,7 +928,7 @@ e.printStackTrace();
             }
             
             writeStatus("DesignPointStats from task " + (i + 1) + " is sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
-            ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
+            ret = doe.getDesignPointStats(sampleIndex,designPtIndex);   
             if (statsGraph == null) {
               final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
               statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);

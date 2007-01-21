@@ -421,7 +421,7 @@ public class Gridlet extends Thread {
                 
                 for ( int i = 0; i < designPointStats.length; i++) {
                     
-                    if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics ) {
+                    if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics ) { // tbd handle this for local case too
                         
                         viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = 
                                 of.createIndexedSampleStatistics();
@@ -445,9 +445,11 @@ public class Gridlet extends Thread {
                         System.out.println(statXml);
                     
                     if (gridRunner != null) { // local gridRunner
+                        
                         Class gridRunnerz = gridRunner.getClass();
                         Method mthd = gridRunnerz.getMethod("addDesignPointStat",int.class,int.class,int.class,String.class);
                         mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
+                        
                         //gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
                     } else {
                         
@@ -494,7 +496,7 @@ public class Gridlet extends Thread {
                                 if (gridRunner != null) { // local is a local gridRunner
                                     Class gridRunnerz = gridRunner.getClass();
                                     Method mthd = gridRunnerz.getMethod("addReplicationStat",int.class,int.class,int.class,String.class);
-                                    mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
+                                    mthd.invoke(gridRunner,sampleIndex,designPtIndex,j,statXml);
                                     //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
                                 } else {// use rpc to runner on grid
                                     Vector args = new Vector();

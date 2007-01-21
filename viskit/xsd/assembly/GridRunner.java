@@ -147,7 +147,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         }
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
-            JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader() );
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssemblyType) u.unmarshal(inputStream);
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
@@ -413,7 +413,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , this.getClass().getClassLoader() );
             Unmarshaller u = jc.createUnmarshaller();
             SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
@@ -431,7 +431,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
         try {
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" );
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly", this.getClass().getClassLoader()  );
             Unmarshaller u = jc.createUnmarshaller();
             SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
@@ -706,11 +706,14 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (DoeException e) {
             e.printStackTrace();
         }
-        queueClean = false; // redirty
+        //queueClean = false; // redirty
         // this shouldn't block on the very first call
         int tasksRemaining = getRemainingTasks(); // should be totalTasks
-        lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
-        //queueClean = false; // redirty it
+        
+        //lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
+        
+        lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)queue);
+        queueClean = false; // redirty it
         // launch N starters of totalTasks tasks here
         // active tasks are going to be hot so put them in the pool
         // needed: a way to select the pool size
@@ -725,27 +728,29 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         while (tasksRemaining > 0) {
             // this should block until a task or a number of tasks ends
             LocalTaskQueue nextQueue = (LocalTaskQueue) getTaskQueue();
-            for (int i = 0; i < nextQueue.size(); i ++) {
-                // any change between queries indicates a transition at
-                // taskID = i0, i1,..., indicating results for these tasks
-                // since it's possible more than one comes in at once
-                if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
-                    // i changed due to end of task
-                    //
-                    // find next available task from nextQueue
-                    int j;
-                    for (j = i+1; j<nextQueue.size(); j++) {
-                        if ((Boolean)nextQueue.get(j)) 
-                            break;
+            synchronized(nextQueue) {
+                for (int i = 0; i < nextQueue.size(); i ++) {
+                    // any change between queries indicates a transition at
+                    // taskID = i0, i1,..., indicating results for these tasks
+                    // since it's possible more than one comes in at once
+                    if (!((Boolean) lastQueue.get(i)).equals(((Boolean) nextQueue.get(i)))) {
+                        // i changed due to end of task
+                        //
+                        // find next available task from nextQueue
+                        int j;
+                        for (j = i+1; j<nextQueue.size(); j++) {
+                            if (nextQueue.activate(j))
+                                break;
+                        }
+                        
+                        nextQueue.set(i,Boolean.FALSE);
+                        
+                        --tasksRemaining;
+                        
                     }
-                    if (j!=nextQueue.size())
-                        nextQueue.activate(j);
-                    nextQueue.set(i,Boolean.FALSE);
-                    
-                    --tasksRemaining;
-                    
                 }
             }
+            
             lastQueue = cloneFromLocalTaskQueue(nextQueue); // 
         }
     }

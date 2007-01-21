@@ -158,9 +158,17 @@ public class LocalDriverImpl implements DoeRunDriver {
         //return runner.getResultByTaskID(taskID);
     }
     
+    // users of the getTaskQueue() through DoeRunDriver, in local
+    // mode need a copy, not the same Vector; users of it in remote
+    // mode automatically get a copy. Since we don't actually need
+    // any of the internals, simple Booleans get copied in here
     public synchronized Vector getTaskQueue() throws DoeException {
         try {
-            return (Vector) ((Method)methods.get("getTaskQueue")).invoke(runner,new Object[]{});
+            Vector queue = (Vector) ((Method)methods.get("getTaskQueue")).invoke(runner,new Object[]{});
+            Vector cloneQueue = new Vector();
+            for (int i = 0; i<queue.size(); i++)
+                cloneQueue.add(new Boolean((Boolean)queue.get(i)));
+            return cloneQueue;
         } catch (Exception ex) {
             throw new DoeException(ex.getMessage());
         }

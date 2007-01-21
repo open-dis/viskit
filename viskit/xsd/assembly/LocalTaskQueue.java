@@ -101,21 +101,22 @@ public class LocalTaskQueue extends Vector {
      * Activate Gridlet indexed at i
      *
      */
-    public void activate(int i) {
-        ((Thread) super.get(i)).start();
+    public boolean activate(int i) {
+        Object o = super.get(i);
+        if (o instanceof Thread) {
+            if (! ((Thread)o).isAlive() ) {
+                ((Thread) super.get(i)).start();
+                return true;
+            }   
+        }
+        return false;
     }
     
-    // logic output:
-    // is thread
-    // lo - thread active
-    // hi - thread inactive
-    // is boolean
-    // lo - complete
-    // hi - never happens, therefore by reduction this could
-    // also just be false if not thread, keep might need half a bit later
+   
     public Object get(int i) {
         if (super.get(i) instanceof Thread)
-            return (Object)(!(Boolean) ((Thread)(super.get(i))).isAlive());
+            return Boolean.TRUE;
+        
         else return super.get(i);
     }
     
