@@ -61,8 +61,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
     lis = new enableApplyButtonListener();
 
-    sourceLab = new JLabel("listening event graph",JLabel.TRAILING);
-    targetLab = new JLabel("producing event graph",JLabel.TRAILING);
+    sourceLab = new JLabel("producing event graph",JLabel.TRAILING);
+    targetLab = new JLabel("listening event graph",JLabel.TRAILING);
     descLab   = new JLabel("description",JLabel.TRAILING);
 
     sourceTF = new JTextField();
