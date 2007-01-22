@@ -281,49 +281,54 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             String prop = ((PropChangeEdge)se).getProperty();
             prop = (prop != null &&prop.length()>0) ? prop : "*all*";
             sb.append("<center>Property Change Listener<br><u>");
-            sb.append(from);
-            sb.append("</u> listening to <u>");
             sb.append(to);
+            sb.append("</u> listening to <u>");
+            sb.append(from);
             sb.append(".");
             sb.append(prop);
             sb.append("</center>");
           }
-          if(se.getDescription() != null) {
-            String desc = se.getDescription().trim();
-            sb.append("<u>description</u><br>");
-            sb.append(wrapAtPos(escapeLTGT(desc),60));
+          String desc = se.getDescription();
+          if(desc != null) {
+            desc = desc.trim();
+            if(desc.length()>0) {
+              sb.append("<u>description</u><br>");
+              sb.append(wrapAtPos(escapeLTGT(desc),60));
+            }
           }
           sb.append("</html>");
           return sb.toString();
         }
-        else if (c instanceof AssemblyCircleCell) {
-          AssemblyCircleCell cc = (AssemblyCircleCell) c;
-          EvGraphNode en = (EvGraphNode) cc.getUserObject();
-          sb.append("<center><u>");
-          sb.append(en.getType());
-          sb.append("</u><br>");
-          sb.append(en.getName());
-          sb.append("</center>");
-          if(en.getDescription() != null) {
-            String desc = en.getDescription().trim();
-            sb.append("<u>description</u><br>");
-            sb.append(wrapAtPos(escapeLTGT(desc),60));
+        else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropListCell) {
+          String typ;
+          String name;
+          String desc;          
+          if (c instanceof AssemblyCircleCell) {
+            AssemblyCircleCell cc = (AssemblyCircleCell) c;
+            EvGraphNode en = (EvGraphNode) cc.getUserObject();
+            typ = en.getType();
+            name = en.getName();
+            desc = en.getDescription();
           }
-          sb.append("</HTML>");
-          return sb.toString();
-        }
-        else if (c instanceof AssemblyPropListCell) {
-          AssemblyPropListCell cc = (AssemblyPropListCell) c;
-          PropChangeListenerNode en = (PropChangeListenerNode) cc.getUserObject();
+          else /*if (c instanceof AssemblyPropListCell)*/ {
+            AssemblyPropListCell cc = (AssemblyPropListCell) c;
+            PropChangeListenerNode pcln = (PropChangeListenerNode) cc.getUserObject();
+            typ = pcln.getType();
+            name = pcln.getName();
+            desc = pcln.getDescription();
+          }
+
           sb.append("<center><u>");
-          sb.append(en.getType());
+          sb.append(typ);
           sb.append("</u><br>");
-          sb.append(en.getName());
+          sb.append(name);
           sb.append("</center>");
-          if(en.getDescription() != null) {
-            String desc = en.getDescription().trim();
-            sb.append("<u>description</u><br>");
-            sb.append(wrapAtPos(escapeLTGT(desc),60));
+          if (desc != null) {
+            desc = desc.trim();
+            if (desc.length() > 0) {
+              sb.append("<u>description</u><br>");
+              sb.append(wrapAtPos(escapeLTGT(desc), 60));
+            }
           }
           sb.append("</HTML>");
           return sb.toString();
