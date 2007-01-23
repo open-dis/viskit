@@ -125,8 +125,11 @@ public class Gridlet extends Thread {
             Process pr = Runtime.getRuntime().exec("env");
             InputStream is = pr.getInputStream();
             Properties p = System.getProperties();
-            p.load(is);
             
+            try {
+                p.load(is);
+            } catch (Exception e) {;}// do nothing, if on WINDOWS, getting the env properties will err
+                                     // which is OK since not on SGE here
             if (p.getProperty("SGE_TASK_ID")!=null) {
                 
                 taskID=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
