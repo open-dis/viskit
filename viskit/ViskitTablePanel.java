@@ -91,11 +91,12 @@ public abstract class ViskitTablePanel extends JPanel
      jsp = new JScrollPane(tab);
      jsp.setMinimumSize(new Dimension(defaultWidth,defaultHeight));       // jmb test
     add(jsp);
-    add(Box.createVerticalStrut(5));
+    //add(Box.createVerticalStrut(5));
 
     ActionListener lis = new MyAddDelEditHandler();
 
     if(wantAddDelButts) {// plus, minus and edit buttons
+     add(Box.createVerticalStrut(5));
      JPanel buttPan = new JPanel();
      buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
      buttPan.add(Box.createHorizontalGlue());
@@ -123,7 +124,7 @@ public abstract class ViskitTablePanel extends JPanel
      buttPan.add(minusButt);
      buttPan.add(Box.createHorizontalGlue());
     add(buttPan);
-    add(Box.createVerticalStrut(5));
+    //add(Box.createVerticalStrut(5));
       // install local add, delete handlers
       plusButt .addActionListener(lis);
       minusButt.addActionListener(lis);
