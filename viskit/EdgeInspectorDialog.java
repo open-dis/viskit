@@ -14,10 +14,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -50,6 +47,8 @@ public class EdgeInspectorDialog extends JDialog
   private JPanel priorityPan;
   private JComboBox priorityCB;
   private ArrayList<Priority> priorityList;  // matches combo box
+  private Vector<String> priorityNames;
+  private int priorityDefaultIndex = 3;  // set properly below
   
   private JPanel myParmPanel;
 
@@ -227,7 +226,7 @@ public class EdgeInspectorDialog extends JDialog
     conditionals.addChangeListener(chlis);
     priorityCB.addActionListener(chlis);
     delay.addCaretListener(chlis);
-
+    priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
     parameters.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent event)
@@ -265,18 +264,22 @@ public class EdgeInspectorDialog extends JDialog
 
   private JComboBox buildPriorityComboBox()
   {
-    Vector v = new Vector(10);
+    priorityNames = new Vector<String>(10);
     priorityList = new ArrayList<Priority>(10);
     try {
       Class c = Class.forName("simkit.Priority");
       Field[] fa = c.getDeclaredFields();
       for(Field f : fa) {
         if(Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
-          v.add(f.getName());
+          priorityNames.add(f.getName());
           priorityList.add((Priority)f.get(null)); // static objects
+          if(f.getName().equalsIgnoreCase("default"))
+            priorityDefaultIndex = priorityNames.size()-1;  // save the default one
         }
       }
-      return new JComboBox(v);
+      JComboBox jcb = new JComboBox(priorityNames);
+      jcb.setEditable(true); // this allows anything to be intered
+      return jcb;
     }
     catch (Exception e) {
       System.err.println(e.getMessage());
@@ -284,15 +287,35 @@ public class EdgeInspectorDialog extends JDialog
     }
   }
 
-  private int decodePriority(String pr)
+  private void setPriorityCBValue(String pr)
   {
-    for(Priority p : priorityList) {
-      int cmp = Double.compare(p.getPriority(), Double.parseDouble(pr));
-      if(cmp == 0)
-        return priorityList.indexOf(p);
+    try {
+      // Assume numeric comes in
+      double prd= Double.parseDouble(pr);
+      for(Priority p : priorityList) {
+        int cmp = Double.compare(p.getPriority(), prd);
+        if(cmp == 0) {
+          priorityCB.setSelectedIndex(priorityList.indexOf(p));
+          return;
+        }
+      }
+      // Must have been an odd one, but we know it's a good double
+      priorityCB.setSelectedItem(pr);
     }
-    System.err.println("Error in EdgeInspectorDialog: unrecognized priority: "+pr);
-    return 0;
+    catch (NumberFormatException e) {
+      // First try to find it in the list
+      int i=0;
+      for(String s : priorityNames) {
+        if(s.equalsIgnoreCase(pr)) {
+          priorityCB.setSelectedIndex(i);
+          return;
+        }
+        i++;
+      }
+
+      System.err.println("Unknown edge priority: "+pr+" -- setting to DEFAULT)");
+      priorityCB.setSelectedIndex(priorityDefaultIndex);
+    }
   }
 
   private void fillWidgets()
@@ -319,7 +342,8 @@ public class EdgeInspectorDialog extends JDialog
       delay.setEnabled(true);
       delayPan.setBorder(delayPanBorder);
 
-      priorityCB.setSelectedIndex(decodePriority(((SchedulingEdge)edge).priority));
+      setPriorityCBValue(((SchedulingEdge)edge).priority);
+
   }
     else {
       if(edge.conditional == null || edge.conditional.trim().length() <= 0)
@@ -340,8 +364,19 @@ public class EdgeInspectorDialog extends JDialog
   {
     if(edge instanceof SchedulingEdge) {
       int idx = priorityCB.getSelectedIndex();
-      Priority p = priorityList.get(priorityCB.getSelectedIndex());
-      ((SchedulingEdge)edge).priority = ""+p.getPriority();
+      if(idx < 0) {
+        String s = (String)priorityCB.getSelectedItem();
+        if(s.length()<=0) {
+          Priority p = priorityList.get(priorityDefaultIndex);
+          ((SchedulingEdge)edge).priority = ""+p.getPriority();
+        }
+        else
+          ((SchedulingEdge)edge).priority = s;
+      }
+      else {
+        Priority p = priorityList.get(priorityCB.getSelectedIndex());
+        ((SchedulingEdge)edge).priority = ""+p.getPriority();
+      }
     }
     String delaySt = delay.getText();
     if(delaySt == null || delaySt.trim().length() <= 0)
@@ -422,7 +457,7 @@ public class EdgeInspectorDialog extends JDialog
     }
   }
 
-  class myChangeListener implements ChangeListener,ActionListener,CaretListener
+  class myChangeListener extends KeyAdapter implements ChangeListener,ActionListener,CaretListener
   {
     public void stateChanged(ChangeEvent event)
     {
@@ -437,6 +472,11 @@ public class EdgeInspectorDialog extends JDialog
     }
 
     public void caretUpdate(CaretEvent e)
+    {
+      stateChanged(null);
+    }
+
+    public void keyTyped(KeyEvent e)
     {
       stateChanged(null);
     }
