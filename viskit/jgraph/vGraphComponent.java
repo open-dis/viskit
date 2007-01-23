@@ -240,19 +240,25 @@ public class vGraphComponent extends JGraph implements GraphModelListener
                 sb.append("<br>");
               }
             }
-            
-            double priority = Double.parseDouble(((SchedulingEdge)se).priority);
-            NumberFormat df = DecimalFormat.getNumberInstance();
-            df.setMaximumFractionDigits(3);
-            df.setMaximumIntegerDigits(3);
+
+            double priority;
             String s;
-            if(Double.compare(priority,Double.MAX_VALUE) >= 0)
-              s = "MAX";
-            else if(Double.compare(priority,-Double.MAX_VALUE) <= 0)
-              s = "MIN";
-            else
-              s = df.format(priority);
-            
+            try {
+              priority = Double.parseDouble(((SchedulingEdge)se).priority);
+              NumberFormat df = DecimalFormat.getNumberInstance();
+              df.setMaximumFractionDigits(3);
+              df.setMaximumIntegerDigits(3);
+              if(Double.compare(priority,Double.MAX_VALUE) >= 0)
+                s = "MAX";
+              else if(Double.compare(priority,-Double.MAX_VALUE) <= 0)
+                s = "MIN";
+              else
+                s = df.format(priority);
+            }
+            catch (NumberFormatException e) {
+              s = ((SchedulingEdge)se).priority;
+            }
+
             sb.append("<u>priority</u><br>&nbsp;");
             sb.append(s);
             sb.append("<br>");
