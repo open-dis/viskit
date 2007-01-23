@@ -5,10 +5,7 @@ import simkit.Priority;
 import viskit.model.*;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
@@ -54,6 +51,8 @@ public class EdgeInspectorDialog extends JDialog
 
   private JLabel schLab;
   private JLabel canLab;
+  private JButton addCondButt;
+  private JButton addDescButt;
 
   /**
    * Set up and show the dialog.  The first Component argument
@@ -95,6 +94,7 @@ public class EdgeInspectorDialog extends JDialog
 
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
+
     JPanel con = new JPanel();
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
     con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -135,11 +135,9 @@ public class EdgeInspectorDialog extends JDialog
         JPanel stValuesP = new JPanel();
         stValuesP.setLayout(new BoxLayout(stValuesP,BoxLayout.Y_AXIS));
           srcEvent = new JLabel("srcEvent");
-          //srcEvent.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
           srcEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         stValuesP.add(srcEvent);
           targEvent = new JLabel("targEvent");
-          //targEvent.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
           targEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         stValuesP.add(targEvent);
         stValuesP.setBorder(BorderFactory.createTitledBorder(""));
@@ -154,14 +152,13 @@ public class EdgeInspectorDialog extends JDialog
     priorityPan = new JPanel();
       priorityPan.setLayout(new BoxLayout(priorityPan,BoxLayout.X_AXIS));
       priorityPan.setOpaque(false);
-      priorityPan.setBorder(BorderFactory.createTitledBorder("Priority"));
+      priorityPan.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Priority")));
         priorityCB = buildPriorityComboBox();
-        priorityPan.add(Box.createHorizontalGlue());
+        priorityPan.add(Box.createHorizontalStrut(102));     // set packed width clamp here
         priorityPan.add(priorityCB);
-        priorityPan.add(Box.createHorizontalGlue());
-    BoxLayoutUtils.clampHeight(priorityPan);
+        priorityPan.add(Box.createHorizontalStrut(102));
     con.add(priorityPan);
-    con.add(Box.createVerticalStrut(5));
+    BoxLayoutUtils.clampHeight(priorityPan);
 
     delayPan = new JPanel();
       delayPan.setLayout(new BoxLayout(delayPan,BoxLayout.X_AXIS));
@@ -174,19 +171,17 @@ public class EdgeInspectorDialog extends JDialog
         d.width = Integer.MAX_VALUE;
         delay.setMaximumSize(d);
       delayPan.add(delay);
-      this.delayPanBorder = delayPan.getBorder();
-      this.delayPanDisabledBorder = BorderFactory.createTitledBorder(new LineBorder(Color.gray),"Time Delay",
+      delayPanBorder = delayPan.getBorder();
+      delayPanDisabledBorder = BorderFactory.createTitledBorder(new LineBorder(Color.gray),"Time Delay",
                                     TitledBorder.DEFAULT_JUSTIFICATION,TitledBorder.DEFAULT_POSITION,
                                     null,Color.gray);
     con.add(delayPan);
     con.add(Box.createVerticalStrut(5));
       conditionals = new ConditionalsPanel(edge);
     con.add(conditionals);
-    con.add(Box.createVerticalStrut(5));
 
     myParmPanel = new JPanel();
      myParmPanel.setLayout(new BoxLayout(myParmPanel,BoxLayout.Y_AXIS));
-     myParmPanel.setBorder(BorderFactory.createTitledBorder("Edge Parameters"));
 
        parameters = new EdgeParametersPanel(300);
        JScrollPane paramSp = new JScrollPane(parameters);
@@ -196,8 +191,25 @@ public class EdgeInspectorDialog extends JDialog
      myParmPanel.add(paramSp);
 
     con.add(myParmPanel);
-    con.add(Box.createVerticalStrut(5));
 
+    JPanel twoRowButtPan = new JPanel();
+    twoRowButtPan.setLayout(new BoxLayout(twoRowButtPan,BoxLayout.Y_AXIS));
+
+      JPanel tinyButtPan = new JPanel();
+      tinyButtPan.setLayout(new BoxLayout(tinyButtPan,BoxLayout.X_AXIS));
+    addCondButt = new JButton("add conditional");
+    addDescButt = new JButton("add description");
+
+    Font defButtFont = addCondButt.getFont();
+      int defButtFontSize = defButtFont.getSize();
+      addCondButt.setFont(defButtFont.deriveFont((float)(defButtFontSize-4)));
+      addDescButt.setFont(addCondButt.getFont());
+      tinyButtPan.add(Box.createHorizontalGlue());
+      tinyButtPan.add(addCondButt);
+      tinyButtPan.add(addDescButt);
+      tinyButtPan.add(Box.createHorizontalGlue());
+    twoRowButtPan.add(tinyButtPan);
+    twoRowButtPan.add(Box.createVerticalStrut(5));
 
       JPanel buttPan = new JPanel();
       buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
@@ -206,7 +218,9 @@ public class EdgeInspectorDialog extends JDialog
       buttPan.add(Box.createHorizontalGlue());
       buttPan.add(canButt);
       buttPan.add(okButt);
-    con.add(buttPan);
+    twoRowButtPan.add(buttPan);
+
+    con.add(twoRowButtPan);
     cont.add(con);
 
     fillWidgets();     // put the data into the widgets
@@ -227,6 +241,11 @@ public class EdgeInspectorDialog extends JDialog
     priorityCB.addActionListener(chlis);
     delay.addCaretListener(chlis);
     priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
+
+    addHideButtListener hideList = new addHideButtListener();
+    addCondButt.addActionListener(hideList);
+    addDescButt.addActionListener(hideList);
+    
     parameters.addDoubleClickedListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent event)
@@ -242,17 +261,21 @@ public class EdgeInspectorDialog extends JDialog
       }
     });
   }
+
   public void setParams(Component c, Edge e)
   {
     edge = e;
 
     fillWidgets();
+    pack();
+    
     modified = false;
     okButt.setEnabled(false);
     getRootPane().setDefaultButton(canButt);
 
     this.setLocationRelativeTo(c);
   }
+
   private void keepSameSize(JComponent a, JComponent b)
   {
     Dimension ad = a.getPreferredSize();
@@ -322,19 +345,32 @@ public class EdgeInspectorDialog extends JDialog
   {
     nodeList = mod.getAllNodes();                  // todo fix
 
-    srcEvent.setText(edge.from.getName()); //setSelectedItem(edge.from);
-    targEvent.setText(edge.to.getName());  //setSelectedItem(edge.to);
-    myParmPanel.setBorder(BorderFactory.createTitledBorder("Edge Parameters -- to "+targEvent.getText()));
-
+    srcEvent.setText(edge.from.getName());
+    targEvent.setText(edge.to.getName());
+    myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Edge Parameters -- to "+targEvent.getText())));
+ 
     parameters.setArgumentList(edge.to.getArguments());  //
     parameters.setData(edge.parameters);
+    if(edge.to.getArguments() == null || edge.to.getArguments().size()<=0)
+      myParmPanel.setVisible(false);
+    else
+      myParmPanel.setVisible(true);
 
     if(edge instanceof SchedulingEdge) {
-      if(edge.conditional == null || edge.conditional.trim().length() <= 0)
+      if(edge.conditional == null || edge.conditional.trim().length() <= 0) {
         conditionals.setText("true");
-      else
+        hideShowConditionals(false);
+      }
+      else {
         conditionals.setText(edge.conditional);
+        hideShowConditionals(true);
+      }
       conditionals.setComment(edge.conditionalsComment);
+      if(edge.conditionalsComment == null || edge.conditionalsComment.length()<=0)
+        hideShowDescription(false);
+      else
+        hideShowDescription(true);
+
       if(edge.delay == null || edge.delay.trim().length() <= 0)
         delay.setText("0.0");
       else
@@ -392,6 +428,31 @@ public class EdgeInspectorDialog extends JDialog
     edge.parameters.clear();
     for(Iterator itr = parameters.getData().iterator(); itr.hasNext(); ) {
       edge.parameters.add(itr.next());
+    }
+  }
+
+  private void hideShowConditionals(boolean show)
+  {
+    conditionals.showConditions(show);
+    addCondButt.setVisible(!show);
+    pack();
+  }
+
+  private void hideShowDescription(boolean show)
+  {
+    conditionals.showDescription(show);
+    addDescButt.setVisible(!show);
+    pack();
+  }
+  
+  class addHideButtListener implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      if(e.getSource().equals(addCondButt))
+        hideShowConditionals(true);
+      else if(e.getSource().equals(addDescButt))
+        hideShowDescription(true);
     }
   }
 
