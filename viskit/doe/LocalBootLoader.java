@@ -98,7 +98,7 @@ public class LocalBootLoader extends URLClassLoader {
         String pathSep = System.getProperty("path.separator");
         classPath = classPathProp.split(pathSep);
         if(false)for (String line:classPath) {
-            System.out.println(line);
+            System.out.println("classpath: "+line);
         }
         ClassLoader parentClassLoader = getParent();
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
@@ -264,11 +264,22 @@ public class LocalBootLoader extends URLClassLoader {
                 String entryClass=entryName;
                 try {
                     entryName = dirList[i].getCanonicalPath().substring(baseDir.getCanonicalPath().length() + 1);
-                } catch (IOException ex) { 
+                    //System.out.println("JarEntry started out as "+entryName);
+                    // WINDOWS bug: jar entries are / not \, but String.replace doesn't seem to work as expected with \\
+                    char[] entryChars = new char[entryName.length()];
+                    entryName.getChars(0,entryChars.length,entryChars,0);
+                    for (int ind = 0; ind < entryName.length(); ind++) {
+                        if (entryChars[ind]==File.separatorChar) {
+                            entryChars[ind] = '/'; // this should be redundant on non-windows
+                        }
+                    }
+                    entryName = new String(entryChars);
+                    //System.out.println("JarEntry name "+entryName);
+                } catch (Exception ex) { 
                     ex.printStackTrace();
                 }
-                entryClass = entryName.replace(File.separatorChar,'.');
-                
+                entryClass = entryName.replace('/','.');
+                //System.out.println("Entry Class "+entryClass);
                 if (entryClass.endsWith(".class")) { // else do nothing
                     
                     entryClass = entryClass.substring(0,entryClass.length() - 6);
@@ -289,7 +300,7 @@ public class LocalBootLoader extends URLClassLoader {
                         Class vzClz = stage1.loadClass("viskit.xsd.assembly.ViskitAssembly");
                         if (vzClz.isAssignableFrom(clz)) {
                             isEventGraph = false;
-                            //tab.writeStatus("caught Assembly: "+entryClass);
+                            //System.out.println("caught Assembly: "+entryClass);
                         }
                     } catch (ClassNotFoundException ex) {
                         //ex.printStackTrace();
