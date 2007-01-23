@@ -4,6 +4,8 @@ import edu.nps.util.BoxLayoutUtils;
 import viskit.model.Edge;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
@@ -23,64 +25,62 @@ import java.awt.*;
 public class ConditionalsPanel extends JPanel
 /*******************************************/
 {
-  JTextArea jta,jtaComments;
+  JTextArea condTA,jtaComments;
   Edge edge;
+  private JPanel conditionalsPan,ifTextPan;
+  private JScrollPane descJsp;
 
   public ConditionalsPanel(Edge edge)
   //=================================
   {
     this.edge = edge;
     setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-    setBorder(BorderFactory.createTitledBorder("Conditional Expression"));
+    setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
-    JPanel tp = new JPanel();
-     tp.setLayout(new BoxLayout(tp,BoxLayout.X_AXIS));
-     tp.add(Box.createHorizontalStrut(5));
-      JLabel leftParen = new JLabel("if (");
-      leftParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
-      leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-     tp.add(leftParen);
-     tp.add(Box.createHorizontalGlue());
-     BoxLayoutUtils.clampHeight(tp);
-    add(tp);
+    conditionalsPan = new JPanel();
+    conditionalsPan.setLayout(new BoxLayout(conditionalsPan,BoxLayout.Y_AXIS));
+    conditionalsPan.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Conditional Expression")));
 
-     jta = new JTextArea(3,25);
-     jta.setText(edge.conditional);
-     jta.setEditable(true);
-     JScrollPane jsp = new JScrollPane(jta);
-    add(jsp);
-     Dimension d = jsp.getPreferredSize();
-     jsp.setMinimumSize(d);
+      ifTextPan = new JPanel();
+      ifTextPan.setLayout(new BoxLayout(ifTextPan,BoxLayout.X_AXIS));
+        ifTextPan.add(Box.createHorizontalStrut(5));
+          JLabel leftParen = new JLabel("if (");
+          leftParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+          leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
+         ifTextPan.add(leftParen);
+         ifTextPan.add(Box.createHorizontalGlue());
+       BoxLayoutUtils.clampHeight(ifTextPan);
+    conditionalsPan.add(ifTextPan);
 
-     JPanel bp = new JPanel();
-     bp.setLayout(new BoxLayout(bp,BoxLayout.X_AXIS));
-     bp.add(Box.createHorizontalStrut(10));
-      JLabel rightParen = new JLabel(") then schedule/cancel target event");
-      rightParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
-      rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-     bp.add(rightParen);
-     bp.add(Box.createHorizontalGlue());
-     BoxLayoutUtils.clampHeight(bp);
-    add(bp);
+      condTA = new JTextArea(3,25);
+      condTA.setText(edge.conditional);
+      condTA.setEditable(true);
+      JScrollPane condJsp = new JScrollPane(condTA);
+    conditionalsPan.add(condJsp);
 
-    add(Box.createVerticalStrut(5));
+      Dimension d = condJsp.getPreferredSize();
+      condJsp.setMinimumSize(d);
 
-     jtaComments = new JTextArea(2,25);
-     jsp = new JScrollPane(jtaComments);
-     jsp.setBorder(BorderFactory.createTitledBorder("Description"));
-    add(jsp);
-     d = jsp.getPreferredSize();
-     jsp.setMinimumSize(d);
+      JPanel thenTextPan = new JPanel();
+      thenTextPan.setLayout(new BoxLayout(thenTextPan,BoxLayout.X_AXIS));
+        thenTextPan.add(Box.createHorizontalStrut(10));
+          JLabel rightParen = new JLabel(") then schedule/cancel target event");
+          rightParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+          rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
+        thenTextPan.add(rightParen);
+        thenTextPan.add(Box.createHorizontalGlue());
+      BoxLayoutUtils.clampHeight(thenTextPan);
+    conditionalsPan.add(thenTextPan);
 
-    add(Box.createVerticalStrut(5));
+    add(conditionalsPan);
 
-    // This whole panel expands horizontally, but not vertically
-/*
-    d = getPreferredSize();
-    d.width = Integer.MAX_VALUE;
-    setMinimumSize(d);
-    setMaximumSize(d);
-*/
+    jtaComments = new JTextArea(2,25);
+    descJsp = new JScrollPane(jtaComments);
+    descJsp.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Description")));
+    add(descJsp);
+
+     d = descJsp.getPreferredSize();
+     descJsp.setMinimumSize(d);
 
     jtaComments.addCaretListener(new CaretListener()
     {
@@ -91,37 +91,53 @@ public class ConditionalsPanel extends JPanel
         }
       }
     });
-    jta.addCaretListener(new CaretListener()
+    condTA.addCaretListener(new CaretListener()
     {
       public void caretUpdate(CaretEvent e)
       {
         if(lis != null) {
-          lis.stateChanged(new ChangeEvent(jta));
+          lis.stateChanged(new ChangeEvent(condTA));
         }
       }
     });
   }
 
-  public void setText(String s)
-  //---------------------------
+  public void showConditions(boolean wh)
   {
-    jta.setText(s);
+    conditionalsPan.setVisible(wh);
+  }
+
+  public void showDescription(boolean wh)
+  {
+    descJsp.setVisible(wh);
+  }
+
+  public boolean isConditionsVisible()
+  {
+    return conditionalsPan.isVisible();
+  }
+
+  public boolean isDescriptionVisible()
+  {
+    return descJsp.isVisible();
+  }
+
+  public void setText(String s)
+  {
+    condTA.setText(s);
   }
 
   public String getText()
-  //---------------------
   {
-    return jta.getText();
+    return condTA.getText();
   }
 
   public void setComment(String s)
-  //------------------------------
   {
     jtaComments.setText(s);
   }
 
   public String getComment()
-  //------------------------
   {
     return jtaComments.getText().trim();
   }
