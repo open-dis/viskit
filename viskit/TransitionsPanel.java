@@ -162,7 +162,9 @@ public class TransitionsPanel extends JPanel
       s += (String) en.nextElement();
       s += "\n";
     }
-    return s.substring(0, s.length() - 1);     // lose last cr
+    if(s.length()>0)
+      return s.substring(0, s.length() - 1);     // lose last cr
+    return s;
   }
 
   private ActionListener myPlusListener;
