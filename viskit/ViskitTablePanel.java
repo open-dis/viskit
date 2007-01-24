@@ -276,6 +276,11 @@ public abstract class ViskitTablePanel extends JPanel
     //return shadow;
   }
 
+  public boolean isEmpty()
+  {
+    return mod.getRowCount() == 0;
+  }
+  
   /**
    * Update the table row, typically after editing, representing the passed rowObject.
    * @param rowObject
