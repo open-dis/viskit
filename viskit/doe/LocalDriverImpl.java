@@ -55,7 +55,7 @@ public class LocalDriverImpl implements DoeRunDriver {
                 Constructor constr = gridRunnerz.getConstructor(loader.loadClass("viskit.doe.LocalBootLoader")); //yep
                 runner = constr.newInstance(rloader);
                 Method[] mthds = gridRunnerz.getMethods();
-                methods = new Hashtable();
+                methods = new Hashtable();// new Hashtable<String,Method>() ...
                 for (Method m:mthds) {
                     methods.put(m.getName(),m);
                     //System.out.println("put "+m.getName()+" "+m);
@@ -176,8 +176,12 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
     
     public String qstat() throws DoeException {
+        try {
+            return (String) ((Method)methods.get("qstat")).invoke(runner);
+        } catch (Exception ex) {
+            return "See Task Queue";
+        }
         
-        return "See Task Queue";
     }
     
     public String qstatXML() throws DoeException {

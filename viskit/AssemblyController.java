@@ -570,7 +570,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     AssemblyNode oA = (AssemblyNode)((DefaultGraphCell)nodes[0]).getUserObject();
     AssemblyNode oB = (AssemblyNode)((DefaultGraphCell)nodes[1]).getUserObject();
-
+ 
     AssemblyNode[] oArr = checkLegalForSEListenerArc(oA,oB);
 
     if(oArr == null) {
@@ -637,6 +637,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
   {
     AssemblyNode[] obArr = new AssemblyNode[2];
+    // tbd, reloading these classes is needed right now as
+    // we don't know if the workClassLoader is the same instance
+    // as it used to be when these were originally loaded
+    // the tbd here is to see if there can be a shared root loader
+    simEvSrcClass   = Vstatics.classForName("simkit.SimEventSource");
+    simEvLisClass   = Vstatics.classForName("simkit.SimEventListener");
+    propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
+    propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
     if(propChgSrcClass.isAssignableFrom(ca))
       obArr[0] = a;
     else if(propChgSrcClass.isAssignableFrom(cb))
@@ -654,6 +662,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class ca, Class cb)
   {
     AssemblyNode[] obArr = new AssemblyNode[2];
+    simEvSrcClass   = Vstatics.classForName("simkit.SimEventSource");
+    simEvLisClass   = Vstatics.classForName("simkit.SimEventListener");
+    propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
+    propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
     if(simEvSrcClass.isAssignableFrom(ca))
       obArr[0] = a;
     else if(simEvSrcClass.isAssignableFrom(cb))
@@ -1034,7 +1046,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
          //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
          System.out.println("Compiling "+f.getCanonicalPath());
-         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});         
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose","-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});         
 
          if(reti == 0 || completeOnBadCompile)
            return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");

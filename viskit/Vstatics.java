@@ -9,6 +9,7 @@ import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
 
@@ -149,19 +150,17 @@ public class Vstatics
 
   static String getCustomClassPath()
   {
-    // The order of the class path is 1) work dir, 2) extra paths, 3) existing classpath
+    // The order of the class path is 1) existing classpath, 2) extra paths, 3) work dir
     String sep = Vstatics.getPathSeparator();
+    sep = File.pathSeparator;
     StringBuffer cPath = new StringBuffer();
 
-    String appclassPath = System.getProperty("java.class.path");
-    File workDir = VGlobals.instance().getWorkDirectory();
-    // if the workDir is not already in the list, add it
-    if(appclassPath.indexOf(workDir.getAbsolutePath()) == -1){
-      cPath.append(workDir.getAbsolutePath());
-      cPath.append(sep);
+    LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
+    for ( String path:loader.getClassPath() ) {
+       cPath.append(path);
+       cPath.append(sep);
     }
-    cPath.append(getExtraClassPaths());
-    cPath.append(appclassPath);
+   
     return cPath.toString();
   }
 
@@ -192,13 +191,15 @@ public class Vstatics
    */
   public static Class classForName(String s)
   {
-    Class c = cForName(s,Vstatics.class.getClassLoader());
+    Class c;
+            
+    c = cForName(s,VGlobals.instance().getWorkClassLoader());
+    if (c==null) 
+        c = cForName(s,Vstatics.class.getClassLoader());
     if(c == null)
-      c = FileBasedClassManager.inst().getFileClass(s);
+        c = FileBasedClassManager.inst().getFileClass(s);
     if(c == null)
-      c = cForName(s,VGlobals.instance().getWorkClassLoader());
-    if(c == null)
-      c = cForName(s,new SimpleDirectoriesAndJarsClassLoader(Vstatics.class.getClassLoader(),getExtraClassPathArray()));
+        c = cForName(s,new SimpleDirectoriesAndJarsClassLoader(Vstatics.class.getClassLoader(),getExtraClassPathArray()));
     return c;
   }
 

@@ -239,7 +239,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     doQstatConsole.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent ev) {
             if (qstatConsole == null) {
-                qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
+                //qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
+                qstatConsole = new QstatConsole();
             }
             qstatConsole.setVisible(true);
         }

@@ -7,6 +7,7 @@ import edu.nps.util.FileIO;
 import edu.nps.util.SimpleDirectoryClassLoader;
 import edu.nps.util.SysExitHandler;
 import org.apache.commons.configuration.XMLConfiguration;
+import viskit.doe.LocalBootLoader;
 import viskit.model.*;
 
 import javax.swing.*;
@@ -42,6 +43,7 @@ public class VGlobals
   private DefaultComboBoxModel cbMod;
   private JPopupMenu popup;
   private myTypeListener myListener;
+  private LocalBootLoader lbl;
 
   private JFrame mainAppWindow;
 
@@ -837,10 +839,32 @@ public class VGlobals
   private ClassLoader workLoader;
   public ClassLoader getWorkClassLoader()
   {
-    if(workLoader == null)
-      workLoader = new SimpleDirectoryClassLoader(VGlobals.class.getClassLoader(),workDirectory);
+    if(workLoader == null) {
+      //workLoader = new SimpleDirectoryClassLoader(VGlobals.class.getClassLoader(),workDirectory);
+      String[] extraPaths = SettingsDialog.getExtraClassPath();
+      URL[] urls = new URL[extraPaths.length];
+      int index = 0;
+      for (String path:extraPaths) {
+          try {
+            urls[index++] = (new File(path)).toURL();
+          } catch (Exception e) {;} // Settings path dir gone?
+      }
+      LocalBootLoader loader = new LocalBootLoader(urls, Thread.currentThread().getContextClassLoader(), getWorkDirectory());
+      workLoader = loader.init(true);
+      
+    }
     return workLoader;
   }
+  
+  public void resetWorkClassLoader() {
+      workLoader = null;
+  }
+  
+  public ClassLoader getWorkClassLoader(boolean reboot) {
+    resetWorkClassLoader();
+    return getWorkClassLoader();
+  }
+  
   public String getUserConfigFile()
   {
     return userConfigPath;

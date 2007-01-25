@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.DirectoryWatch;
+import java.lang.reflect.Method;
 import simkit.Schedule;
 import viskit.xsd.assembly.ViskitAssembly;
 import viskit.xsd.assembly.BasicAssembly;
@@ -175,6 +176,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     catch (Throwable throwable) {
       JOptionPane.showMessageDialog(runPanel,"Error initializing Assembly object:\n"+throwable.getMessage(),"Java Error",JOptionPane.ERROR_MESSAGE);
       twiddleButtons(OFF);
+      throwable.printStackTrace();
       return;
     }
     twiddleButtons(InternalAssemblyRunner.REWIND);
@@ -190,20 +192,29 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     Class targetClass;
     Object targetObject;
 
+    // Assembly has been compile by now
+    VGlobals.instance().resetWorkClassLoader();
+    Thread.currentThread().setContextClassLoader(VGlobals.instance().getWorkClassLoader());
     targetClass = Vstatics.classForName(targetClassName);
     if (targetClass == null) throw new ClassNotFoundException();
     targetObject = targetClass.newInstance();
-    if (! (targetObject instanceof BasicAssembly))
-      throw new Throwable("Target class not instance of BasicAssembly");
-
-    BasicAssembly targetBasicAssembly = (BasicAssembly) targetObject;
-
-    runPanel.numRepsTF.setText("" + targetBasicAssembly.getNumberReplications());
-    runPanel.saveRepDataCB.setSelected(targetBasicAssembly.isSaveReplicationData());
-    runPanel.printRepReportsCB.setSelected(targetBasicAssembly.isPrintReplicationReports());
-    runPanel.printSummReportsCB.setSelected(targetBasicAssembly.isPrintSummaryReport());
-    runPanel.vcrVerbose.setSelected(targetBasicAssembly.isVerbose());
-    runPanel.vcrStopTime.setText("" + targetBasicAssembly.getStopTime());
+    // in order to see BasicAssembly this thread has to have
+    // the same loader as the one used since they don't
+    // share the same simkit or viskit.
+   
+    Method getNumberReplications = targetClass.getMethod("getNumberReplications");
+    Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
+    Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
+    Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
+    Method isVerbose = targetClass.getMethod("isVerbose");
+    Method getStopTime = targetClass.getMethod("getStopTime");
+    
+    runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
+    runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
+    runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
+    runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
+    runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
+    runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
   }
 
   PrintWriter pWriter;

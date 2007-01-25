@@ -586,19 +586,28 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
     
     public String qstat() {
-        try {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec(new String[]{"qstat","-f"});
-            java.io.InputStream i = p.getInputStream();
-            java.io.StringWriter sw = new java.io.StringWriter();
-            int c;
-            while ( (c=i.read()) > 0 ) {
-                sw.write(c);
+        
+        if (usid.equals("LOCAL-RUN")) {
+            if (queue != null) {
+                return ((LocalTaskQueue)queue).toString();
+            } else {
+                return "Waiting to run";
             }
-            return sw.toString();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return "QSTAT-ERROR";
+        } else {
+            try {
+                Runtime r = Runtime.getRuntime();
+                Process p = r.exec(new String[]{"qstat","-f"});
+                java.io.InputStream i = p.getInputStream();
+                java.io.StringWriter sw = new java.io.StringWriter();
+                int c;
+                while ( (c=i.read()) > 0 ) {
+                    sw.write(c);
+                }
+                return sw.toString();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return "QSTAT-ERROR";
+            }
         }
     }
     

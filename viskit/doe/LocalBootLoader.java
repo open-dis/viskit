@@ -84,6 +84,8 @@ public class LocalBootLoader extends URLClassLoader {
     LocalBootLoader stage1;
     File workDir;
     URL[] extUrls;
+
+    boolean allowAssembly = false;
     
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[]{},parent);
@@ -104,7 +106,7 @@ public class LocalBootLoader extends URLClassLoader {
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
         
         stage1 = new LocalBootLoader( new URL[]{} , parentClassLoader, workDir );
-        boolean loop=true;
+        boolean loop=!allowAssembly;
         
         // if each LocalBootLoader individually has to read from
         // a file, then each instance of the loader will have its own
@@ -158,6 +160,14 @@ public class LocalBootLoader extends URLClassLoader {
     public File getWorkDir() {
         return workDir;
     }
+    
+    public boolean getAllowAssemby() {
+        return allowAssembly;
+    }
+    
+    public void setAllowAssemby(boolean enable) {
+        this.allowAssembly = enable;
+    }
   
     // create a context with viskit's libs along with
     // the generated eventgraphs, takes two stages
@@ -169,11 +179,16 @@ public class LocalBootLoader extends URLClassLoader {
     // done by setting threads' contextClassLoaders to
     // their own LocalBootLoaders
     
+    public LocalBootLoader init(boolean allowAssembly) {
+        this.allowAssembly = allowAssembly;
+        return init();
+    }
+    
     public LocalBootLoader init() {
         File jar;
         //System.out.println("Stage1 start init ");
         initStage1();
-        
+        stage1.allowAssembly = this.allowAssembly;
         jar = buildCleanWorkJar();
         
         //stage1 gets dirty during bring up of clean jar
@@ -245,7 +260,9 @@ public class LocalBootLoader extends URLClassLoader {
             }
             jos.close();
             
-        } catch (IOException ex) {
+        } 
+        catch (java.util.zip.ZipException ze) {return dir2jar;} // could be first time through
+        catch (IOException ex) {
             ex.printStackTrace();
         }
         return jarOut;
@@ -306,7 +323,7 @@ public class LocalBootLoader extends URLClassLoader {
                         //ex.printStackTrace();
                     }
                     
-                    if (isEventGraph) try {
+                    if (isEventGraph|allowAssembly) try {
                         je = new JarEntry(entryName);
                         jos.putNextEntry(je);
                         fis = new FileInputStream(dirList[i]);

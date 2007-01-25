@@ -337,9 +337,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     controlP.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    qstatConsole = new QstatConsole(unameTF.getText(), new String(upwPF.getPassword()),
-        clusterTF.getText().trim(), portTF.getText().trim(),
-        false);
+    qstatConsole = new QstatConsole();
 
     leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlP, qstatConsole.getContent());
     leftSplit.setDividerLocation(235);
@@ -808,6 +806,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               }
               doe = new LocalDriverImpl(extClassPathsUrls,viskit.VGlobals.instance().getWorkDirectory());
           }
+          qstatConsole.setDoe(doe);
           
    //
           

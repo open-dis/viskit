@@ -128,4 +128,22 @@ public class LocalTaskQueue extends Vector {
     public int size() {
         return super.size(); // do fries come with that?
     }
+    
+    public String toString() {
+        String buf ="Task Queue Status:\n";
+        StringBuffer sbuf = new StringBuffer(buf);
+        for(int i = 0; i < size(); i++) {
+            String task = "\t";
+            if (super.get(i) instanceof Thread) {
+                task += 
+                        ((Thread)super.get(i)).isAlive()?"TaskID "+(i+1)+"RUNNING":"TaskID "+(i+1)+"WAITING";
+            } else {
+                task += "TaskID "+ (i=1) + (super.get(i).equals(Boolean.FALSE)?"DONE":"PENDING");
+            }
+            sbuf.append(task+"\n");
+        }
+        
+        
+        return buf;
+    }
 }

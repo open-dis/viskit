@@ -54,6 +54,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import viskit.doe.LocalBootLoader;
 
 public class SettingsDialog extends JDialog
 {
@@ -390,6 +391,7 @@ public class SettingsDialog extends JDialog
   {
     if(vConfig==null)
       initConfig();
+    VGlobals.instance().resetWorkClassLoader();
     return vConfig.getStringArray(xClassPathKey +"[@value]");
   }
 

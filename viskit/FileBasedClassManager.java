@@ -78,16 +78,8 @@ public class FileBasedClassManager implements Runnable
     FileBasedAssyNode fban = null;
     Class fclass = null;
     if (f.getName().toLowerCase().endsWith(".xml")) {
-      PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);      
-      String[] extraPaths = SettingsDialog.getExtraClassPath();
-      URL[] urls = new URL[extraPaths.length];
-      int index = 0;
-      for (String path:extraPaths) {
-          urls[index++] = (new File(path)).toURL();
-          
-      }
-      LocalBootLoader loader = new LocalBootLoader(urls, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
-      loader = loader.init();
+      PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
+      ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
         //was:
         //fclass = FindClassesForInterface.classFromFile(paf.f);   // Throwable from here possibly
         //fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
