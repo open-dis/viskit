@@ -580,7 +580,6 @@
         <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
             <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-mx256m"/>
             <jvmarg value="-XX:MaxPermSize=256m"/>
         </java>
     </target>
@@ -593,7 +592,7 @@
 
     <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
     <target description="Run Viskit, don't check dependencies" name="quick-run">
-        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" maxmemory="256m">
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" >
             <arg value="viskit.EventGraphAssemblyComboMain"/>
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-XX:MaxPermSize=256m"/>
