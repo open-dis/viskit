@@ -299,6 +299,7 @@ public class SourceWindow extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         searcher.startSearch();
+        jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
       }
     };
     againAct = new AbstractAction(searchAgainHandle) {
@@ -306,6 +307,7 @@ public class SourceWindow extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         searcher.searchAgain();
+        jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
       }
     };
 
