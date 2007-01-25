@@ -1,10 +1,14 @@
 package viskit;
 
 import javax.swing.*;
+import javax.swing.text.Document;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -22,6 +26,10 @@ public class SourceWindow extends JFrame
   Thread sysOutThread;
   JTextArea jta;
   private static JFileChooser saveChooser;
+  private JPanel contentPane;
+  private Searcher searcher;
+  private Action startAct;
+  private Action againAct;
 
   public SourceWindow(JFrame main, String source)
   {
@@ -30,10 +38,10 @@ public class SourceWindow extends JFrame
       saveChooser = new JFileChooser();
       saveChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
     }
-    JPanel outerPan = new JPanel(new BorderLayout());
-    setContentPane(outerPan);
+    contentPane = new JPanel(new BorderLayout());
+    setContentPane(contentPane);
     JPanel con = new JPanel();
-    outerPan.add(con,BorderLayout.CENTER);
+    contentPane.add(con,BorderLayout.CENTER);
 
     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
     con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -41,11 +49,15 @@ public class SourceWindow extends JFrame
     JButton fontPlus = new JButton("Larger");
     JButton fontMinus=new JButton("Smaller");
     JButton printB = new JButton("Print");
+    JButton searchButt = new JButton("Find"); // this text gets overwritten by action
+    JButton againButt  = new JButton("Find next");
     tb.add(new JLabel("Font:"));
     tb.add(fontPlus);
     tb.add(fontMinus);
-    //tb.add(new JLabel("     "));
     tb.add(printB);
+    tb.addSeparator();
+    tb.add(searchButt);
+    tb.add(againButt);
     fontPlus.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -61,7 +73,10 @@ public class SourceWindow extends JFrame
       }
     });
 
-    outerPan.add(tb,BorderLayout.NORTH);
+    printB.setEnabled(false); // todo
+    printB.setToolTipText("to be implemented");
+
+    contentPane.add(tb,BorderLayout.NORTH);
 
     jta = new JTextArea(); //src);
     jta.setText(addLineNums(src));
@@ -74,6 +89,7 @@ public class SourceWindow extends JFrame
 
     JPanel buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
+
     buttPan.add(Box.createHorizontalGlue());
 
     JButton compileButt = new JButton("Compile test");
@@ -88,6 +104,10 @@ public class SourceWindow extends JFrame
     //buttPan.add(Box.createHorizontalStrut(40));
     con.add(buttPan);
 
+    setupSearchKeys();
+    searchButt.setAction(startAct);
+    againButt.setAction(againAct);
+    
     if(main.isVisible()) {
       this.setSize(main.getWidth()-200,main.getHeight()-100);
       this.setLocationRelativeTo(main);
@@ -101,6 +121,15 @@ public class SourceWindow extends JFrame
       setLocationRelativeTo(null);
     }
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    //Make textArea get the focus whenever frame is activated.
+    addWindowListener(new WindowAdapter()
+    {
+      public void windowActivated(WindowEvent e)
+      {
+        jta.requestFocusInWindow();
+      }
+    });
 
     closeButt.addActionListener( new ActionListener()
     {
@@ -256,6 +285,106 @@ public class SourceWindow extends JFrame
       }
     }
     return "unnamed.java";
+  }
+
+  private String startSearchHandle = "Find";
+  private String searchAgainHandle = "Find next";
+
+  private void setupSearchKeys()
+  {
+    searcher = new Searcher(jta, contentPane);
+
+    startAct = new AbstractAction(startSearchHandle) {
+
+      public void actionPerformed(ActionEvent e)
+      {
+        searcher.startSearch();
+      }
+    };
+    againAct = new AbstractAction(searchAgainHandle) {
+
+      public void actionPerformed(ActionEvent e)
+      {
+        searcher.searchAgain();
+      }
+    };
+
+    // todo contentPane should work here so the focus can be on the bigger button, etc., and
+    // the search will still be done.  I'm doing something wrong.
+    InputMap  iMap = jta/*contentPane*/.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    ActionMap aMap = jta/*contentPane*/.getActionMap();
+
+    int cntlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_F,cntlKeyMask);
+    iMap.put(key,startSearchHandle);
+    aMap.put(startSearchHandle,startAct);
+
+    key = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
+    iMap.put(key,searchAgainHandle);
+    aMap.put(searchAgainHandle,againAct);
+
+    // Mac uses cmd-G
+    String vers = System.getProperty("os.name").toLowerCase();
+    if (vers.indexOf("mac") != -1) {
+      key = KeyStroke.getKeyStroke(KeyEvent.VK_G, cntlKeyMask);
+      iMap.put(key,searchAgainHandle);
+    }
+  }
+}
+
+class Searcher
+{
+  JTextComponent jtc;
+  Document doc;
+  JComponent comp;
+  Searcher(JTextComponent jt, JComponent comp)
+  {
+    jtc = jt;
+    doc = jt.getDocument();
+    this.comp = comp;
+  }
+
+  Matcher mat;
+  void startSearch()
+  {
+    String inputValue = JOptionPane.showInputDialog(comp,"Enter search string");
+    if(inputValue == null || inputValue.length()<=0)
+      return;
+
+    try {
+      String s = doc.getText(doc.getStartPosition().getOffset(),doc.getEndPosition().getOffset());
+      Pattern pat = Pattern.compile(inputValue,Pattern.CASE_INSENSITIVE);
+      mat = pat.matcher(s);
+
+      if(!checkAndShow()) {
+        mat = null;
+      }
+    }
+    catch (BadLocationException e1) {
+      System.err.println(e1.getMessage());
+    }
+  }
+
+  boolean checkAndShow()
+  {
+    if(mat.find()) {
+      jtc.select(mat.start(),mat.end());
+      return true;
+    }
+    jtc.select(0,0); // none
+    return false;
+  }
+
+  void searchAgain()
+  {
+    if(mat == null)
+      return;
+
+    if(!checkAndShow()) {
+      // We found one originally, but must have run out the bottom
+      mat.reset();
+      checkAndShow();
+    }
   }
 }
 
