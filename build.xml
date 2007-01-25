@@ -294,6 +294,7 @@
             <package name="viskit.xsd.bindings.cli"/>
             <package name="viskit.xsd.assembly"/>
             <package name="viskit.xsd.eventgraph"/>
+            <package name="viskit.doe"/>
         </javadoc>
     </target>
 
