@@ -287,7 +287,7 @@ public class EventInspectorDialog extends JDialog
   private void fillWidgets()
   {
     String nmSt = node.getName();
-    nmSt.replace(' ','_');
+    nmSt = nmSt.replace(' ','_');
     setTitle("Event Inspector: " + nmSt);
     name.setText(nmSt);
 
@@ -379,7 +379,7 @@ public class EventInspectorDialog extends JDialog
           String parseResults = VGlobals.instance().parseCode(evn, ps);
           if (parseResults != null) {
             boolean ret = BeanshellErrorDialog.showDialog(parseResults,EventInspectorDialog.this);
-            if(ret == false) // don't ignore
+            if(!ret) // don't ignore
               return;
 /*
             int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
@@ -483,7 +483,7 @@ public class EventInspectorDialog extends JDialog
   {
     public void windowClosing(WindowEvent e)
     {
-      if(modified == true) {
+      if(modified) {
         int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this,"Apply changes?",
             "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
         if(ret == JOptionPane.YES_OPTION)
