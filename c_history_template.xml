@@ -19,4 +19,12 @@
     <path>
     </path>
   </extraClassPath>
+  <application>
+    <tabs>
+      <EventGraphEditor visible="true"/>
+      <AssemblyEditor visible="true"/>
+      <AssemblyRun visible="true"/>
+      <AnalystReport visible="false"/>
+    </tabs>
+  </application>
 </ViskitConfig>
