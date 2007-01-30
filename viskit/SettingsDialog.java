@@ -47,6 +47,8 @@ import org.apache.commons.configuration.XMLConfiguration;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.CompoundBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -54,7 +56,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import viskit.doe.LocalBootLoader;
 
 public class SettingsDialog extends JDialog
 {
@@ -65,6 +66,10 @@ public class SettingsDialog extends JDialog
   private JButton okButt;
   private JTabbedPane tabbedPane;
   private JList classPathJlist;
+  private JCheckBox evGrCB;
+  private JCheckBox assyCB;
+  private JCheckBox runCB;
+  private JCheckBox analRptCB;
 
   public static boolean showDialog(JFrame mother)
   {
@@ -113,13 +118,19 @@ public class SettingsDialog extends JDialog
 
     pack();     // do this prior to next
     Dimension d = getSize();
-    d.width = Math.max(d.width,600);
+    d.width = Math.max(d.width,400);
     setSize(d);
     this.setLocationRelativeTo(mother);
 
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
+    VisibilityHandler vis = new VisibilityHandler();
+    evGrCB.addActionListener(vis);
+    assyCB.addActionListener(vis);
+    runCB.addActionListener(vis);
+    analRptCB.addActionListener(vis);
+
   }
 
   private void setParams()
@@ -140,7 +151,9 @@ public class SettingsDialog extends JDialog
     JPanel classpathP = new JPanel();
     classpathP.setLayout(new BoxLayout(classpathP,BoxLayout.Y_AXIS));
     classPathJlist = new JList(new DefaultListModel());
-    classpathP.add(new JScrollPane(classPathJlist));
+    JScrollPane jsp = new JScrollPane(classPathJlist);
+    jsp.setPreferredSize(new Dimension(70,70));  // don't want it to control size of dialog
+    classpathP.add(jsp);
     JPanel bPan = new JPanel();
     bPan.setLayout(new BoxLayout(bPan,BoxLayout.X_AXIS));
     bPan.add(Box.createHorizontalGlue());
@@ -179,6 +192,30 @@ public class SettingsDialog extends JDialog
 
     tabbedPane.addTab("Recent files lists",recentP);
 
+    JPanel visibleP = new JPanel();
+    visibleP.setLayout(new BoxLayout(visibleP,BoxLayout.Y_AXIS));
+    visibleP.add(Box.createVerticalGlue());
+      JPanel innerP = new JPanel();
+      innerP.setLayout(new BoxLayout(innerP,BoxLayout.Y_AXIS));
+      innerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      evGrCB = new JCheckBox("Event graph editor");
+      innerP.add(evGrCB);
+      assyCB = new JCheckBox("Assembly editor");
+      innerP.add(assyCB);
+      runCB = new JCheckBox("Assembly run");
+      innerP.add(runCB);
+      analRptCB = new JCheckBox("Analyst report");
+      innerP.add(analRptCB);
+      innerP.setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(3,3,3,3)));
+
+    visibleP.add(innerP,BorderLayout.CENTER);
+    visibleP.add(Box.createVerticalStrut(3));
+    JLabel lab = new JLabel("Changes are in effect at next Viskit launch.",JLabel.CENTER);
+    lab.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    visibleP.add(lab);
+    visibleP.add(Box.createVerticalGlue());
+
+    tabbedPane.addTab("Tab visibility",visibleP);
   }
 
   private static XMLConfiguration vConfig;
@@ -186,7 +223,12 @@ public class SettingsDialog extends JDialog
   private static String xClassPathClearKey = "extraClassPath";
   private static String recentEGClearKey = "history.EventGraphEditor.Recent";
   private static String recentAssyClearKey = "history.AssemblyEditor.Recent";
-  
+
+  private static String egEdVisibleKey = "application.tabs.EventGraphEditor[@visible]";
+  private static String asEdVisibleKey = "application.tabs.AssemblyEditor[@visible]";
+  private static String asRunVisibleKey= "application.tabs.AssemblyRun[@visible]";
+  private static String anRptVisibleKey= "application.tabs.AnalystReport[@visible]";
+
   private static void initConfig()
   {
     try {
@@ -195,6 +237,28 @@ public class SettingsDialog extends JDialog
     catch (Exception e) {
       System.out.println("Error loading config file: "+e.getMessage());
       vConfig = null;
+    }
+  }
+  
+  class VisibilityHandler implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      JCheckBox src = (JCheckBox)e.getSource();
+      if(src == evGrCB)
+        vConfig.setProperty(egEdVisibleKey,evGrCB.isSelected());
+      else if(src == assyCB)
+        vConfig.setProperty(asEdVisibleKey,assyCB.isSelected());
+      else if(src == runCB) {
+        if(runCB.isSelected()) {
+          // if we turn on the assembly runner, we need also the assy editor
+          if(!assyCB.isSelected())
+            assyCB.doClick(); // reenter here
+        }
+        vConfig.setProperty(asRunVisibleKey,runCB.isSelected());
+      }
+      else /* if(src == analRptCB) */
+        vConfig.setProperty(anRptVisibleKey,analRptCB.isSelected());
     }
   }
 
@@ -235,6 +299,11 @@ public class SettingsDialog extends JDialog
     for(int i=0;i<sa.length;i++)
       mod.addElement(sa[i]);
     classPathJlist.setModel(mod);
+
+    evGrCB.setSelected(isEventGraphEditorVisible());
+    assyCB.setSelected(isAssemblyEditorVisible());
+    runCB.setSelected(isAssemblyRunVisible());
+    analRptCB.setSelected(isAnalystReportVisible());
   }
 
   private void unloadWidgets()
@@ -395,4 +464,38 @@ public class SettingsDialog extends JDialog
     return vConfig.getStringArray(xClassPathKey +"[@value]");
   }
 
+  public static boolean getVisibilitySense(String prop)
+  {
+    if(vConfig==null)
+      initConfig();
+
+    boolean b = true; // by default
+    try {
+      b = vConfig.getBoolean(prop);
+    }
+    catch (Exception e) {
+      // probably no-such-element
+    }
+    return b;
+  }
+
+  public static boolean isEventGraphEditorVisible()
+  {
+    return getVisibilitySense(egEdVisibleKey);
+  }
+
+  public static boolean isAssemblyEditorVisible()
+  {
+    return getVisibilitySense(asEdVisibleKey);
+  }
+
+  public static boolean isAssemblyRunVisible()
+  {
+    return getVisibilitySense(asRunVisibleKey);
+  }
+
+  public static boolean isAnalystReportVisible()
+  {
+    return getVisibilitySense(anRptVisibleKey);
+  }
 }

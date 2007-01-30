@@ -47,18 +47,16 @@ import edu.nps.util.SysExitHandler;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import viskit.doe.*;
+import viskit.doe.DoeMain;
+import viskit.doe.DoeMainFrame;
+import viskit.doe.FileHandler;
+import viskit.doe.JobLauncherTab2;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -79,12 +77,16 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
   /** The initial assembly to load. */
   private String initialFile;
 
-  private final int TAB0_EGEDITOR_IDX = 0;
-  private final int TAB0_ASSYEDITOR_IDX = 1;
-  private final int TAB0_ASSYRUN_SUBTABS_IDX = 2;
-  private final int TAB0_ANAL_REPORT_IDX = 3;
+  private int TAB0_EGEDITOR_IDX = 0;
+  private int TAB0_ASSYEDITOR_IDX = 1;
+  private int TAB0_ASSYRUN_SUBTABS_IDX = 2;
+  private int TAB0_ANAL_REPORT_IDX = 3;
 
-  private final int TAB0_COUNT = TAB0_ANAL_REPORT_IDX +1;
+  private int[] tabIndices = { TAB0_EGEDITOR_IDX,       TAB0_ASSYEDITOR_IDX,
+                               TAB0_ASSYRUN_SUBTABS_IDX,TAB0_ANAL_REPORT_IDX};
+
+
+  private int TAB0_COUNT = tabIndices.length;
 
   private final int TAB1_LOCALRUN_IDX = 0;
   private final int TAB1_DOE_IDX = 1;
@@ -133,49 +135,83 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
 
     // Tabbed event graph editor
     egFrame = VGlobals.instance().initEventGraphViewFrame(true);
-    tabbedPane.add(egFrame.getContent(),TAB0_EGEDITOR_IDX);
-    tabbedPane.setTitleAt(TAB0_EGEDITOR_IDX,"Event Graph Editor");
-    tabbedPane.setToolTipTextAt(TAB0_EGEDITOR_IDX,"Visual editor for object class definitions");
-    menuBar = egFrame.getMenus();
-    menus.add(menuBar);
-    doCommonHelp(menuBar);
-    jamSettingsHandler(menuBar);
-    egFrame.setTitleListener(myTitleListener,TAB0_EGEDITOR_IDX);
-    setJMenuBar(menuBar);
-    jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
+    if(SettingsDialog.isEventGraphEditorVisible()) {
+      tabbedPane.add(egFrame.getContent());
+      int idx = tabbedPane.indexOfComponent(egFrame.getContent());
+      tabbedPane.setTitleAt(idx,"Event Graph Editor");
+      tabbedPane.setToolTipTextAt(idx,"Visual editor for object class definitions");
+      menuBar = egFrame.getMenus();
+      menus.add(menuBar);
+      doCommonHelp(menuBar);
+      jamSettingsHandler(menuBar);
+      egFrame.setTitleListener(myTitleListener,idx);
+      setJMenuBar(menuBar);
+      jamQuitHandler(egFrame.getQuitMenuItem(),myQuitAction,egFrame.getMenus());
+      tabIndices[TAB0_EGEDITOR_IDX] = idx;
+    }
+    else {
+      tabIndices[TAB0_EGEDITOR_IDX] = -1;
+    }
 
     // Assembly editor
     asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
-    tabbedPane.add(asyFrame.getContent(),TAB0_ASSYEDITOR_IDX);
-    tabbedPane.setTitleAt(TAB0_ASSYEDITOR_IDX,"Assembly Editor");
-    tabbedPane.setToolTipTextAt(TAB0_ASSYEDITOR_IDX,"Visual editor for simulation defined by assembly");
-    menuBar = asyFrame.getMenus();
-    menus.add(menuBar);
-    doCommonHelp(menuBar);
-    jamSettingsHandler(menuBar);
-    asyFrame.setTitleListener(myTitleListener,TAB0_ASSYEDITOR_IDX);
-    jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
+    if(SettingsDialog.isAssemblyEditorVisible()) {
+      tabbedPane.add(asyFrame.getContent());
+      int idx = tabbedPane.indexOfComponent(asyFrame.getContent());
+      tabbedPane.setTitleAt(idx,"Assembly Editor");
+      tabbedPane.setToolTipTextAt(idx,"Visual editor for simulation defined by assembly");
+
+      menuBar = asyFrame.getMenus();
+      menus.add(menuBar);
+      doCommonHelp(menuBar);
+      jamSettingsHandler(menuBar);
+      if(getJMenuBar()==null)
+        setJMenuBar(menuBar);
+      asyFrame.setTitleListener(myTitleListener,idx);
+      jamQuitHandler(asyFrame.getQuitMenuItem(),myQuitAction,asyFrame.getMenus());
+      tabIndices[TAB0_ASSYEDITOR_IDX] = idx;
+    }
+    else {
+      tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
+    }
 
     runTabbedPane = new JTabbedPane();
-    //tabbedPane.add(runTabbedPane,TAB0_ASSYRUN_SUBTABS_IDX);
-      JPanel p = new JPanel(new BorderLayout());
-      p.setBackground(new Color(206,206,255)); // light blue
-      p.add(runTabbedPane,BorderLayout.CENTER);
-    tabbedPane.add(p,TAB0_ASSYRUN_SUBTABS_IDX);
-    tabbedPane.setTitleAt(TAB0_ASSYRUN_SUBTABS_IDX,"Assembly Run");
-    tabbedPane.setToolTipTextAt(TAB0_ASSYRUN_SUBTABS_IDX,"Run simulation defined by assembly");
-    menus.add(null); // placeholder
+    JPanel p = new JPanel(new BorderLayout());
+    p.setBackground(new Color(206,206,255)); // light blue
+    p.add(runTabbedPane,BorderLayout.CENTER);
+    if(SettingsDialog.isAssemblyRunVisible()) {
+      tabbedPane.add(p);
+      int idx = tabbedPane.indexOfComponent(p);
+      tabbedPane.setTitleAt(idx,"Assembly Run");
+      tabbedPane.setToolTipTextAt(idx,"Run simulation defined by assembly");
+      menus.add(null); // placeholder
+      tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
+    }
+    else {
+      tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = -1;
+    }
 
     // Analyst report
-    tabbedPane.add(reportPanel=new AnalystReportPanel(),TAB0_ANAL_REPORT_IDX);
-    tabbedPane.setTitleAt(TAB0_ANAL_REPORT_IDX,"Analyst Report");
-    tabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX,"Support analyst assessment and produce report");
-    menuBar = reportPanel.getMenus();
-    menus.add(menuBar);
-    doCommonHelp(menuBar);
-    jamSettingsHandler(menuBar);
-    reportPanel.setTitleListener(myTitleListener,TAB0_ANAL_REPORT_IDX);
-    jamQuitHandler(null,myQuitAction,reportPanel.getMenus());
+
+    if(SettingsDialog.isAnalystReportVisible()) {
+      tabbedPane.add(reportPanel=new AnalystReportPanel());
+      int idx = tabbedPane.indexOfComponent(reportPanel);
+      tabbedPane.setTitleAt(idx,"Analyst Report");
+      tabbedPane.setToolTipTextAt(idx,"Support analyst assessment and produce report");
+      menuBar = reportPanel.getMenus();
+      menus.add(menuBar);
+      doCommonHelp(menuBar);
+      jamSettingsHandler(menuBar);
+      if(getJMenuBar() == null)
+        setJMenuBar(menuBar);
+      reportPanel.setTitleListener(myTitleListener,idx);
+      jamQuitHandler(null,myQuitAction,reportPanel.getMenus());
+      tabIndices[TAB0_ANAL_REPORT_IDX] = idx;
+    }
+    else {
+      tabIndices[TAB0_ANAL_REPORT_IDX] = -1;
+    }
+
 
     // Assembly runner
     asyRunComponent = new InternalAssemblyRunner();
@@ -186,7 +222,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     menus.add(menuBar);
     doCommonHelp(menuBar);
     jamSettingsHandler(menuBar);
-    asyRunComponent.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_LOCALRUN_IDX);
+    asyRunComponent.setTitleListener(myTitleListener,tabbedPane.getTabCount()+TAB1_LOCALRUN_IDX);
     jamQuitHandler(asyRunComponent.getQuitMenuItem(),myQuitAction,asyRunComponent.getMenus());
     AssemblyController controller = ((AssemblyController)asyFrame.getController());
     controller.setInitialFile(initialFile);
@@ -206,7 +242,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     }
     menus.add(menuBar);
     doCommonHelp(menuBar);
-    doeFrame.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_DOE_IDX);
+    doeFrame.setTitleListener(myTitleListener,tabbedPane.getTabCount()+TAB1_DOE_IDX);
     jamQuitHandler(doeMain.getQuitMenuItem(),myQuitAction,menuBar);
 
     // Grid run panel
@@ -220,7 +256,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     jamQuitHandler(null,myQuitAction,menuBar);
     menus.add(menuBar);
     doCommonHelp(menuBar);
-    runGridComponent.setTitleListener(myTitleListener,TAB0_COUNT+TAB1_CLUSTERUN_IDX);
+    runGridComponent.setTitleListener(myTitleListener,tabbedPane.getTabCount()+TAB1_CLUSTERUN_IDX);
 
     // Now setup the assembly file change listeners
     ViskitAssemblyController asyCntlr = (ViskitAssemblyController)asyFrame.getController();
@@ -268,8 +304,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     public void stateChanged(ChangeEvent e)
     {
       int i = tabbedPane.getSelectedIndex();
-      if(i == TAB0_ASSYRUN_SUBTABS_IDX)
-        i = TAB0_COUNT+runTabbedPane.getSelectedIndex();
+      if(i == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX])
+        i = tabbedPane.getTabCount()+runTabbedPane.getSelectedIndex();
 
       getJMenuBar().remove(hmen);
       JMenuBar newMB = (JMenuBar)menus.get(i);
@@ -363,31 +399,42 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
       VGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
-      tabbedPane.setSelectedIndex(TAB0_EGEDITOR_IDX);
-      if(((Controller)egFrame.getController()).preQuit()) {
-        tabbedPane.setSelectedIndex(TAB0_ASSYEDITOR_IDX);
-        if(((ViskitAssemblyController)asyFrame.getController()).preQuit()) {
-          tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
-          runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
-          if(doeMain.getController().preQuit()) {
-            //todo other preQuits here if needed
-
-            VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
-
-            ((ViskitController)egFrame.getController()).postQuit();
-            ((AssemblyController)asyFrame.getController()).postQuit();
-            doeMain.getController().postQuit();
-            //todo other postQuits here if needed
-
-            thisClassCleanup();
-            if (viskit.Vstatics.debug) System.out.println("in actionPerformed of exit");
-            VGlobals.instance().sysExit(0);  // quit application
-          }
+      outer: {
+        if(tabIndices[TAB0_EGEDITOR_IDX] != -1) {
+          tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
+          if(!((Controller)egFrame.getController()).preQuit())
+            break outer;
         }
-      }
+        if(tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
+          tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYEDITOR_IDX]);
+          if(!((ViskitAssemblyController)asyFrame.getController()).preQuit())
+            break outer;
+        }
+        if(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
+          tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
+          runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
+          if(!doeMain.getController().preQuit())
+            break outer;
+        }
+
+        //todo other preQuits here if needed
+        VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
+
+        if(tabIndices[TAB0_EGEDITOR_IDX] != -1)
+          ((ViskitController)egFrame.getController()).postQuit();
+        if(tabIndices[TAB0_ASSYEDITOR_IDX] != -1)
+          ((AssemblyController)asyFrame.getController()).postQuit();
+        if(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1)
+          doeMain.getController().postQuit();
+        //todo other postQuits here if needed
+
+        thisClassCleanup();
+        if (viskit.Vstatics.debug) System.out.println("in actionPerformed of exit");
+          VGlobals.instance().sysExit(0);  // quit application
+      } //outer
+
       // Here if somebody cancelled.
       VGlobals.instance().setSysExitHandler(defaultHandler);
-      return;
     }
   }
 
@@ -424,9 +471,11 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
       /** The default version of this does a RuntimeExex("java"....) to spawn a new
        * VM.  We want to run the assembly in a new VM, but not the GUI.
        */
-      tabbedPane.setSelectedIndex(TAB0_ASSYRUN_SUBTABS_IDX);
-      runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
-      asyRunComponent.initParams(execStrings);
+      if(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != 0) {
+        tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
+        runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
+        asyRunComponent.initParams(execStrings);
+      }
     }
   }
 
@@ -438,8 +487,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     {
       titles[key] = title;
       int tabIdx = tabbedPane.getSelectedIndex();
-      if(tabIdx == TAB0_ASSYRUN_SUBTABS_IDX)
-        tabIdx = TAB0_COUNT+runTabbedPane.getSelectedIndex();
+      if(tabIdx == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX])
+        tabIdx = tabbedPane.getTabCount()+runTabbedPane.getSelectedIndex();
 
       if(tabIdx == key)
         EventGraphAssemblyComboMainFrame.this.setTitle(title);
