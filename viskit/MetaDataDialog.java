@@ -122,7 +122,7 @@ abstract public class MetaDataDialog extends JDialog
 
     c.add(runtimePanel);
 
-    JLabel comLab = new JLabel("Comment");
+    JLabel comLab = new JLabel("Description");
     comLab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     c.add(comLab);
     c.add(Box.createVerticalStrut(5));
