@@ -236,7 +236,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      JPanel p = new JPanel();
      p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
      p.add(Box.createHorizontalGlue());
-      p.add(new JLabel("State Variables"));
+     JLabel stateVariableLabel = new JLabel("State Variables");
+     stateVariableLabel.setToolTipText ("State variables can be modified during event processing");
+     p.add(stateVariableLabel);
      p.add(Box.createHorizontalGlue());
     stateVariablesPanel.add(p);
 
@@ -273,7 +275,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      p = new JPanel();
      p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
      p.add(Box.createHorizontalGlue());
-     p.add(new JLabel("Event graph parameters"));
+     JLabel titleLable = new JLabel("Event Graph Parameters");
+     titleLable.setToolTipText ("Event graph parameters are initialized upon starting each simulation replication");
+     p.add(titleLable);
      p.add(Box.createHorizontalGlue());
     parametersPanel.add(p);
 
