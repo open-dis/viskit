@@ -610,8 +610,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     saveParamsToJaxbNoNotify();
 
     filteredFile = cntlr.doTempFileMarshall();
-
-    restoreExp((Experiment) jaxbRoot.getExperiment());
     cntlr.restorePrepRun();
 
     thread = new Thread(JobLauncherTab2.this);
