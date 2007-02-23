@@ -148,8 +148,9 @@ public class OpenAssembly
   {
     for(Iterator itr = listeners.iterator(); itr.hasNext();) {
       AssyChangeListener lis = (AssyChangeListener)itr.next();
-      if(lis != source)
-        lis.assyChanged(action,source,param);
+      if(lis != source) {
+            lis.assyChanged(action,source,param);
+      }
     }
   }
 

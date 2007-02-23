@@ -266,7 +266,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame
     asyCntlr.addAssemblyFileListener(asyRunComponent);
     asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
     asyCntlr.addAssemblyFileListener(runGridComponent);
-    asyCntlr.addAssemblyFileListener(reportPanel);
+    if (SettingsDialog.isAnalystReportVisible())
+        asyCntlr.addAssemblyFileListener(reportPanel);
     // Now setup the open-event graph listener(s)
     ViskitController cntl = (ViskitController)egFrame.getController();
     cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());

@@ -5,6 +5,7 @@ import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.jgraph.graph.DefaultGraphCell;
+import viskit.OpenAssembly;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
  * Time: 9:26:02 AM
  */
 
-public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController
+public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController, OpenAssembly.AssyChangeListener
 {
   Class simEvSrcClass,simEvLisClass,propChgSrcClass,propChgLisClass;
   private String initialFile;
@@ -254,6 +255,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
   };
 
+  public String getHandle() {
+      return assyChgListener.getHandle();
+  }
+  
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+      assyChgListener.assyChanged(action,source,param);
+  }
+  
+  
   /////////////////////////////////////////////////////////////////////////////////////
   // Methods to implement a scheme where other modules will be informed of file changes //
   // (Would Java Beans do this with more or less effort?
@@ -1191,29 +1201,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
   static String getCustomClassPath()
   {
+    VGlobals.instance().resetWorkClassLoader();
     return Vstatics.getCustomClassPath();
-/*
-    // The order of the class path is 1) work dir, 2) extra paths, 3) existing classpath
-    String sep = Vstatics.getPathSeparator();
-    StringBuffer cPath = new StringBuffer();
-
-    String appclassPath = System.getProperty("java.class.path");
-    File workDir = VGlobals.instance().getWorkDirectory();
-    // if the workDir is not already in the list, add it
-    if(appclassPath.indexOf(workDir.getAbsolutePath()) == -1){
-      cPath.append(workDir.getAbsolutePath());
-      cPath.append(sep);
-    }
-    String[] extraPaths = SettingsDialog.getExtraClassPath();
-    if(extraPaths != null && extraPaths.length>0) {
-      for(int i=0;i<extraPaths.length;i++) {
-        cPath.append(extraPaths[i]);
-        cPath.append(sep);
-      }
-    }
-    cPath.append(appclassPath);
-    return cPath.toString();
-*/
   }
 
   private static void handleFileBasedClasses()
