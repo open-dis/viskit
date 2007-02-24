@@ -55,8 +55,9 @@ import viskit.*;
 import viskit.doe.RemoteDriverImpl;
 import viskit.xsd.assembly.SessionManager;
 import viskit.xsd.bindings.assembly.Experiment;
+import viskit.xsd.bindings.assembly.ExperimentType;
 import viskit.xsd.bindings.assembly.SampleStatisticsType;
-import viskit.xsd.bindings.assembly.Schedule;
+import viskit.xsd.bindings.assembly.ScheduleType;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 import javax.swing.*;
@@ -75,7 +76,7 @@ import java.util.List;
 
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener
 {
-    DoeRunDriver doe;
+  DoeRunDriver doe;
   Hashtable statsGraphs;
   String inputFileString;
   File inputFile;
@@ -92,6 +93,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
   // TODO: single variable for all viskit
   String clusterDNS = "wipeout.hpr.nps.edu";
+  String clusterName = "localhost";
   String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
   String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
   String clusterWebStatus  = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
@@ -119,6 +121,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   private JTextField unameTF;
   private JCheckBox doClusterStat;
   private JCheckBox doGraphOutput;
+  private JCheckBox doLocalRun;
 
   private QstatConsole qstatConsole;
   private StatsGraph statsGraph;
@@ -189,7 +192,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     adminPan.setLayout(new BoxLayout(adminPan, BoxLayout.X_AXIS));
     adminPan.add(clusterTF);
     adminPan.add(adminButt);
-
+    JLabel localRunLab = new JLabel("Run Locally");
+    doLocalRun = new JCheckBox();
+    
+    
     clusPan.add(clusLab);
     clusPan.add(adminPan); //clusterTF);
     clusPan.add(unameLab);
@@ -198,8 +204,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     clusPan.add(portTF);
     clusPan.add(upwLab);
     clusPan.add(upwPF);
-
-    SpringUtilities.makeCompactGrid(clusPan, 2, 4, 10, 10, 10, 5);
+    clusPan.add(localRunLab);
+    clusPan.add(doLocalRun);
+    clusPan.add(new JLabel());
+    clusPan.add(new JLabel());
+    clusPan.add(new JLabel());
+    clusPan.add(new JLabel());
+    SpringUtilities.makeCompactGrid(clusPan, 3, 4, 10, 10, 10, 5);
     Dimension d = clusPan.getPreferredSize();
     clusPan.setMaximumSize(new Dimension(Integer.MAX_VALUE,d.height));
 
@@ -234,6 +245,32 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         configDialog.setVisible(false);
         configDialog=null;
       }
+    });
+    
+    doLocalRun.addActionListener(new ActionListener()
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            if (doLocalRun.getModel().isSelected()) {
+                clusterName = clusterTF.getText();
+                clusterTF.setText("localhost");
+                unameTF.setEnabled(false);
+                portTF.setEnabled(false);
+                upwPF.setEnabled(false);
+                adminButt.setEnabled(false);
+                clusterTF.setEnabled(false);
+                gridMode = false;
+            } else {
+                clusterTF.setText(clusterName);
+                unameTF.setEnabled(true);
+                portTF.setEnabled(true);
+                upwPF.setEnabled(true);
+                adminButt.setEnabled(true);
+                clusterTF.setEnabled(true);
+                gridMode = true;
+            }
+        }
+        
     });
 
     return allPan;
@@ -404,6 +441,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   public void setAssemblyFile(SimkitAssembly jaxbRoot, File file)
   {
     this.jaxbRoot = jaxbRoot;
+    numDPsTF.setText("" + jaxbRoot.getDesignParameters().size());
     setFile(file.getAbsolutePath(), file.getName());
   }
 
@@ -487,15 +525,28 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   private void saveParamsToJaxbNoNotify()
   {
     // Put the params from the GUI into the jaxbRoot
-    Experiment exp = null;
-    Schedule sch = null;
-    try {
-      exp = (Experiment) OpenAssembly.inst().jaxbFactory.createExperiment();
-      sch = OpenAssembly.inst().jaxbFactory.createSchedule();
+      int numDesignPts = jaxbRoot.getDesignParameters().size();
+      numDPsTF.setText("" + numDesignPts);
+      
+    ExperimentType exp = jaxbRoot.getExperiment();
+    ScheduleType sch = jaxbRoot.getSchedule();
+    if (exp == null) {
+        try {
+            exp = (Experiment) OpenAssembly.inst().jaxbFactory.createExperiment();
+        }
+        catch (JAXBException e) {
+            System.err.println("jaxb error: " + e.getMessage());
+        }
     }
-    catch (JAXBException e) {
-      System.err.println("jaxb error: " + e.getMessage());
+    if (sch == null) {
+        try {
+            sch = OpenAssembly.inst().jaxbFactory.createSchedule();
+        }
+        catch (JAXBException e) {
+            System.err.println("jaxb error: " + e.getMessage());
+        }
     }
+    
 
     String reps = numRepsTF.getText().trim();
     try {
@@ -783,7 +834,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   
   // tbd gui: set gridMode true if logging into a remote service, or false if
   // it should run locally
-  private boolean gridMode = false;
+  private boolean gridMode = true;
   
   public void run()
   {
