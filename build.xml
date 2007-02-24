@@ -336,6 +336,7 @@
                 <include name="commons-digester-1.6.jar"/>
                 <include name="commons-lang-2.0.jar"/>
                 <include name="commons-logging-1.0.4.jar"/>
+                <include name="jdom.jar"/>
             </fileset>
             <fileset dir="${dir.lib.ext}">
                 <include name="diskit.jar"/>
