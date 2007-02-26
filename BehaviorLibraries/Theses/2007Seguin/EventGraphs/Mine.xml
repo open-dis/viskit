@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="jmseguin" extend="diskit.DISMover3D" name="Mine" package="seadiver" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="start" type="diskit.Vec3d">
+        <Comment/>
+    </Parameter>
+    <Parameter name="maximumSpeed" type="double">
+        <Comment/>
+    </Parameter>
+    <Parameter name="moverID" type="int">
+        <Comment/>
+    </Parameter>
+    <Parameter name="sensorRange" type="double">
+        <Comment/>
+    </Parameter>
+    <StateVariable name="speedScale" type="double">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="proximitySensor" type="diskit.Sensor">
+        <Comment/>
+    </StateVariable>
+    <Event name="Init">
+        <Comment/>
+        <StateTransition state="proximitySensor">
+            <Assignment value="new diskit.SphereCutterSensor(this, sensorRange)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+            <Comment/>
+            <EdgeParameter value="proximitySensor"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment>Register mine as object</Comment>
+        <Argument name="mine" type="diskit.Mover3D"/>
+        <Code/>
+        <Coordinate x="120" y="30"/>
+    </Event>
+    <Event name="RegisterSensor">
+        <Comment/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <LocalVariable name="sensorIn" type="diskit.Sensor" value="sensor">
+            <Comment/>
+        </LocalVariable>
+        <Code>sensor.addSimEventListener(this);</Code>
+        <Coordinate x="120" y="110"/>
+    </Event>
+    <Event name="ApplySpeedScale">
+        <Comment>This event is scheduled by the diskit.ScenarioManager. All entities that have this event in their graph will adjust their speed values by the speed scale which will be applied throughout the entire simulation. Scheduling of this event occurs as part of the 'doRegisterTarget' process in diskit.ScenarioManager.</Comment>
+        <Argument name="speedScaleChange" type="double"/>
+        <StateTransition state="speedScale">
+            <Assignment value="speedScaleChange"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="30" y="110"/>
+    </Event>
+    <Event name="Run">
+        <Comment/>
+        <Code/>
+        <Coordinate x="30" y="200"/>
+    </Event>
+</SimEntity>
+

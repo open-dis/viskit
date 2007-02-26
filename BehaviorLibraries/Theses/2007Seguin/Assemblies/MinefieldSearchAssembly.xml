@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly name="MinefieldSearchAssembly" package="seadiver" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter name="speedScale" type="double" value="1"/>
+        <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.1.2.3"/>
+        <TerminalParameter name="port" type="int" value="6000"/>
+        <TerminalParameter name="siteID" type="int" value="0"/>
+        <TerminalParameter name="appID" type="int" value="1"/>
+        <Coordinate x="90" y="240"/>
+    </SimEntity>
+    <SimEntity description="Creates the area of operation for the simulation. Units are m/s." name="ZoneMap" type="seadiver.ZoneMap">
+        <MultiParameter type="diskit.X3DCoordinate">
+            <TerminalParameter name="X" type="double" value="0"/>
+            <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+            <TerminalParameter name="Z" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="20000"/>
+        <TerminalParameter name="width" type="double" value="20000"/>
+        <TerminalParameter name="height" type="double" value="10"/>
+        <Coordinate x="270" y="90"/>
+    </SimEntity>
+    <SimEntity description="Creates Seadiver UUVs for a minefield search.  Units are m/s." name="SeaDivers" type="seadiver.SeaDiver">
+        <TerminalParameter name="maximumSpeed" type="double" value="1.53"/>
+        <TerminalParameter name="firstMoverID" type="int" value="100"/>
+        <TerminalParameter name="numberDivers" type="int" value="2"/>
+        <TerminalParameter name="sensorRange" type="double" value="100"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infinity -&gt; +Infinity)" type="double" value="300"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="120"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="inputFileTemplate" type="java.lang.String" value="G:/ThesisCode/MissionFiles/SeaDiverTemplate.xml"/>
+        <TerminalParameter name="outputFileName" type="java.lang.String" value="G:/ThesisCode/MissionFiles/Diver.xml"/>
+        <TerminalParameter name="operatingDepth" type="double" value="5"/>
+        <Coordinate x="90" y="90"/>
+    </SimEntity>
+    <SimEntity description="" name="MineField" type="seadiver.MineField">
+        <TerminalParameter name="sensorRange" type="double" value="100"/>
+        <TerminalParameter name="numberMines" type="int" value="2"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate">
+                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
+                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="1"/>
+            </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter name="mineFieldWidth" type="double" value="20000"/>
+        <TerminalParameter name="mineFieldLength" type="double" value="20000"/>
+        <TerminalParameter name="firstMoverID" type="int" value="600"/>
+        <TerminalParameter name="mineFieldDepth" type="double" value="10"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate">
+                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
+                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="20000"/>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate">
+                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
+                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="20000"/>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="280" y="240"/>
+    </SimEntity>
+    <PropertyChangeListener description="" mode="replicationStats" name="DetectionsByMine" type="simkit.stat.SimpleStatsTally">
+        <TerminalParameter name="p[0] : " type="java.lang.String" value="numberOfDetectionsByMine"/>
+        <Coordinate x="380" y="240"/>
+    </PropertyChangeListener>
+    <SimEventListenerConnection listener="ScenarioManager" source="SeaDivers"/>
+    <SimEventListenerConnection listener="ZoneMap" source="SeaDivers"/>
+    <SimEventListenerConnection listener="SeaDivers" source="ZoneMap"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="MineField"/>
+    <PropertyChangeListenerConnection description="" listener="DetectionsByMine" property="numberOfDetectionsByMine" source="MineField"/>
+    <Schedule stopTime="100." verbose="false"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+
