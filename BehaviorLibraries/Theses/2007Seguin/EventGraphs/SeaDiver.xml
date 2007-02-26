@@ -37,7 +37,7 @@
     <StateVariable name="detectionData" type="java.util.HashMap">
         <Comment>Container that holds mine detection data.</Comment>
     </StateVariable>
-    <StateVariable name="numDetectedMines" type="int">
+    <StateVariable name="mineDetections" type="int">
         <Comment>Number of mines detected.</Comment>
     </StateVariable>
     <StateVariable name="fixMoverManager" type="seadiver.PathDeviationMoverManager">
@@ -62,7 +62,7 @@
         <Comment>Number of times the targets were detected.</Comment>
     </StateVariable>
     <StateVariable name="numberOfTargets" type="int">
-        <Comment>The number of surface/submerged targets in this simulation (if any).</Comment>
+        <Comment>The number of surface/submerged targets in this simulation (if any). Used to check if all targets located.</Comment>
     </StateVariable>
     <StateVariable name="totalNumberOfTargetDetections" type="int">
         <Comment>Stores total amount of target detections.</Comment>
@@ -87,7 +87,7 @@
         <StateTransition state="targetDetections">
             <Assignment value="0"/>
         </StateTransition>
-        <StateTransition state="numDetectedMines">
+        <StateTransition state="mineDetections">
             <Assignment value="0"/>
         </StateTransition>
         <StateTransition state="numberOfTargets">
@@ -186,7 +186,7 @@ sensor.setPersistant(false);</Code>
         <Schedule condition="true" delay="0.0" event="AllTargetDetections" priority="0">
             <Comment>(contact.getMoverID() &gt; 399) &amp;&amp; (contact.getMoverID() &lt; 500)</Comment>
         </Schedule>
-        <Code>System.out.println(sensor.getName() + " Detected: " + contact.getMoverID());</Code>
+        <Code>//System.out.println(sensor.getName() + " Detected: " + contact.getMoverID());</Code>
         <Coordinate x="60" y="350"/>
     </Event>
     <Event name="UnDetection">
@@ -318,8 +318,8 @@ diver.setTacticalMode(diskit.TacticalMode.IDLE);</Code>
     <Event name="RegisterMineDetection">
         <Comment/>
         <Argument name="mine" type="diskit.Mover3D"/>
-        <StateTransition state="numDetectedMines">
-            <Assignment value="numDetectedMines + 1"/>
+        <StateTransition state="mineDetections">
+            <Assignment value="mineDetections + 1"/>
         </StateTransition>
         <StateTransition state="mineCollector">
             <Operation method="add(mine)"/>

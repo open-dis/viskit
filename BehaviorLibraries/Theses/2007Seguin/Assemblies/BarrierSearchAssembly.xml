@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="BarrierSearchAssembly" package="seadiver" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity description="Parameters of Seadiver event graph. Units are m/s." name="SeaDivers" type="seadiver.SeaDiver">
+    <SimEntity description="List of identical seadiver robots that perform a cooperative search. Units are m/s." name="SeaDivers" type="seadiver.SeaDiver">
         <TerminalParameter name="maximumSpeed" type="double" value="1.53"/>
         <TerminalParameter name="firstMoverID" type="int" value="100"/>
         <TerminalParameter name="numberDivers" type="int" value="100"/>
@@ -25,7 +25,7 @@
         <TerminalParameter name="operatingDepth" type="double" value="50"/>
         <Coordinate x="70" y="170"/>
     </SimEntity>
-    <SimEntity description="Parameters of ZoneMap event graph. Units are m/s." name="ZoneMap" type="seadiver.ZoneMap">
+    <SimEntity description="Defines the overall search area for operation by targets and subdivided search by seadivers. Units are m/s." name="ZoneMap" type="seadiver.ZoneMap">
         <MultiParameter type="diskit.X3DCoordinate">
             <TerminalParameter name="X" type="double" value="0"/>
             <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
@@ -36,7 +36,7 @@
         <TerminalParameter name="height" type="double" value="100"/>
         <Coordinate x="240" y="170"/>
     </SimEntity>
-    <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
+    <SimEntity description="Controls the movement and detection of all targets and seadivers, along with providing DIS output." name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter name="speedScale" type="double" value="1.0"/>
         <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
         <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.1.2.3"/>
@@ -45,7 +45,7 @@
         <TerminalParameter name="appID" type="int" value="1"/>
         <Coordinate x="70" y="310"/>
     </SimEntity>
-    <SimEntity description="" name="Targets" type="seadiver.Target">
+    <SimEntity description="List of identical target ships/submarines to be detected.  Units are m/s." name="Targets" type="seadiver.Target">
         <TerminalParameter name="speed" type="double" value="6"/>
         <TerminalParameter name="numberOfTargets" type="int" value="10"/>
         <TerminalParameter name="numberOfWaypoints" type="int" value="1"/>
