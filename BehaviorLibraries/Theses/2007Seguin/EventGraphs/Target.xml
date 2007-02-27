@@ -17,7 +17,7 @@ No more than 99 targets allowed.</Comment>
     <Parameter name="inputFileTemplate" type="String">
         <Comment>File name and path of the template that the output mission files will be based.</Comment>
     </Parameter>
-    <Parameter name="outputFileName" type="String">
+    <Parameter name="outputFileAVCL" type="String">
         <Comment>Name and path where created mission files will be written.</Comment>
     </Parameter>
     <Parameter name="operatingDepth" type="double">
@@ -67,6 +67,9 @@ No more than 99 targets allowed.</Comment>
         <StateTransition state="randomNumberGenerator">
             <Assignment value="null"/>
         </StateTransition>
+        <StateTransition state="numberOfSeadiverDetections">
+            <Assignment value="0"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="DetermineTargetZones" priority="0">
             <Comment/>
             <EdgeParameter value="getNumberOfWaypoints()"/>
@@ -96,7 +99,7 @@ No more than 99 targets allowed.</Comment>
             <Assignment value="new seadiver.RandomNumberGenerator(randomVariateArray)"/>
         </StateTransition>
         <StateTransition state="targetWaypointCreator">
-            <Assignment value="new seadiver.TargetWaypointCreator(getZoneList(), getNumberOfTargets(), getRandomNumberGenerator(), getSpeed(), getInputFileTemplate(), getOutputFileName(), getOperatingDepth())"/>
+            <Assignment value="new seadiver.TargetWaypointCreator(getZoneList(), getNumberOfTargets(), getRandomNumberGenerator(), getSpeed(), getInputFileTemplate(), getOutputFileAVCL(), getOperatingDepth())"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="CreateTarget" priority="0">
             <Comment/>

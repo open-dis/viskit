@@ -19,7 +19,7 @@
     <Parameter name="inputFileTemplate" type="String">
         <Comment>Name and Path of file to parse for use as a template for generation of AUVW missions.</Comment>
     </Parameter>
-    <Parameter name="outputFileName" type="String">
+    <Parameter name="outputFileAVCL" type="String">
         <Comment>Name and path (without extention) that will be used to create and write seadiver AUVW mission files.</Comment>
     </Parameter>
     <Parameter name="operatingDepth" type="double">
@@ -127,7 +127,7 @@
             <EdgeParameter value="mover"/>
             <EdgeParameter value="waypoints[0]"/>
         </Schedule>
-        <Code>wpCreator[mover.getMoverID() - getFirstMoverID()] = new seadiver.LawnMowerWaypointCreator(mover, zone.getZone(mover.getMoverID()), getSensorRange(), getInputFileTemplate(), getOutputFileName(), getOperatingDepth());
+        <Code>wpCreator[mover.getMoverID() - getFirstMoverID()] = new seadiver.LawnMowerWaypointCreator(mover, zone.getZone(mover.getMoverID()), getSensorRange(), getInputFileTemplate(), getOutputFileAVCL(), getOperatingDepth());
 
 diskit.Vec3d[] waypoints = new diskit.Vec3d[numberDivers]; 
 waypoints =  wpCreator[mover.getMoverID()-firstMoverID].getWaypoints();
@@ -256,7 +256,7 @@ mover.setTacticalMode(diskit.TacticalMode.IDLE);</Code>
             <Comment/>
             <EdgeParameter value="getFirstMoverID()"/>
         </Schedule>
-        <Code>//Schedule.stopOnEvent("StopSimWhenAllObjectsDetected", 100);
+        <Code>Schedule.stopOnEvent("StopSimWhenAllObjectsDetected", 10);
 
 // new Class[] {diskit.Mover3D.class} ,</Code>
         <Coordinate x="60" y="130"/>
@@ -343,8 +343,10 @@ diver.setTacticalMode(diskit.TacticalMode.IDLE);</Code>
     </Event>
     <Event name="StopSimWhenAllObjectsDetected">
         <Comment>Stops simulation when all targets or mines detected.</Comment>
-        <Code>//System.out.println("numberTargets is: "+ getNumberOfTargets());</Code>
-        <Coordinate x="250" y="350"/>
+        <Code>//System.out.println("numberTargets is: "+ getNumberOfTargets());
+
+//if(targetDetections &gt;= 10) {};</Code>
+        <Coordinate x="240" y="350"/>
     </Event>
     <Event name="AllTargetDetections">
         <Comment>Counts total amount targets are detected.</Comment>
