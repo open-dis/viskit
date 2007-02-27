@@ -30,7 +30,7 @@
     <StateVariable name="area" type="diskit.ZoneGeometry">
         <Comment>ZoneGeometry created to encompass area.</Comment>
     </StateVariable>
-    <StateVariable name="numWaypoints" type="int">
+    <StateVariable name="numberOfWaypoints" type="int">
         <Comment>Number of zones to create for Targets.</Comment>
     </StateVariable>
     <StateVariable name="zoneList" type="java.util.LinkedList">
@@ -44,7 +44,7 @@
         <StateTransition state="axisAngle">
             <Operation method="set(0,0,-1,0)"/>
         </StateTransition>
-        <StateTransition state="numWaypoints">
+        <StateTransition state="numberOfWaypoints">
             <Assignment value="0"/>
         </StateTransition>
         <StateTransition state="numberOfTargets">
@@ -100,7 +100,7 @@
         <Comment/>
         <Argument name="numZones" type="int"/>
         <Argument name="numOfTargets" type="int"/>
-        <StateTransition state="numWaypoints">
+        <StateTransition state="numberOfWaypoints">
             <Assignment value="numZones"/>
         </StateTransition>
         <StateTransition state="numberOfTargets">
@@ -125,15 +125,15 @@
         <StateTransition state="zoneList">
             <Operation method="add(zone)"/>
         </StateTransition>
-        <Schedule condition="zoneIterator &lt; getNumWaypoints()" delay="0.0" event="CreateZones" priority="1.7976931348623157E308">
+        <Schedule condition="zoneIterator &lt; getNumberOfWaypoints()" delay="0.0" event="CreateZones" priority="1.7976931348623157E308">
             <Comment/>
             <EdgeParameter value="zoneIterator + 1"/>
         </Schedule>
-        <Schedule condition="zoneList.size() == getNumWaypoints()" delay="0.0" event="RegisterZones" priority="1.7976931348623157E308">
+        <Schedule condition="zoneList.size() == getNumberOfWaypoints()" delay="0.0" event="RegisterZones" priority="1.7976931348623157E308">
             <Comment/>
             <EdgeParameter value="getZoneList()"/>
         </Schedule>
-        <Code>double wdth = getWidth()/getNumWaypoints();
+        <Code>double wdth = getWidth()/getNumberOfWaypoints();
 double wdthOffset = wdth/2 + wdth*zoneIterator;
 
 diskit.X3DCoordinate centerPt = new diskit.X3DCoordinate(getLength()/2, 0.0, wdthOffset);

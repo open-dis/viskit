@@ -6,18 +6,15 @@
     <Parameter name="numberMines" type="int">
         <Comment>Number of mines in the field.</Comment>
     </Parameter>
-    <Parameter name="mineDistributionHeight" type="diskit.random.RandomVariateInstantiator">
-        <Comment>RV that determines the distribution of mines over the height of the field.</Comment>
+    <Parameter name="firstMoverID" type="int">
+            <Comment>Determines what number to start iterating mover IDs.</Comment>
     </Parameter>
     <Parameter name="mineFieldWidth" type="double">
         <Comment>Width (X) of the field.</Comment>
     </Parameter>
     <Parameter name="mineFieldLength" type="double">
         <Comment>Length (Y) of the field.</Comment>
-    </Parameter>
-    <Parameter name="firstMoverID" type="int">
-        <Comment>Determines what number to start iterating mover IDs.</Comment>
-    </Parameter>
+    </Parameter>    
     <Parameter name="mineFieldDepth" type="double">
         <Comment>Depth (Z) of the field.</Comment>
     </Parameter>
@@ -26,6 +23,9 @@
     </Parameter>
     <Parameter name="mineDistributionLength" type="diskit.random.RandomVariateInstantiator">
         <Comment>RV that determines the distribution of mines over the length of the field.</Comment>
+    </Parameter>
+    <Parameter name="mineDistributionDepth" type="diskit.random.RandomVariateInstantiator">
+            <Comment>RV that determines the distribution of mines over the height of the field.</Comment>
     </Parameter>
     <StateVariable name="numberOfDetectionsByMine" type="int">
         <Comment>Number of unique detections.</Comment>
@@ -54,7 +54,7 @@
         <LocalVariable name="y" type="double" value="mineDistributionLength.generate()">
             <Comment/>
         </LocalVariable>
-        <LocalVariable name="z" type="double" value="mineDistributionHeight.generate()">
+        <LocalVariable name="z" type="double" value="mineDistributionDepth.generate()">
             <Comment/>
         </LocalVariable>
         <Schedule condition="moverID &lt; (getFirstMoverID() + getNumberMines() - 1)" delay="0.0" event="CreateMine" priority="0">

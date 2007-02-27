@@ -49,26 +49,10 @@
     <SimEntity description="List of identical, non-moving mine objects distributed through the operating area.  Units are m/s." name="MineField" type="seadiver.MineField">
         <TerminalParameter name="sensorRange" type="double" value="100"/>
         <TerminalParameter name="numberMines" type="int" value="200"/>
-        <MultiParameter type="diskit.random.RandomVariateInstantiator">
-            <MultiParameter type="diskit.random.AR1Variate"/>
-            <MultiParameter type="diskit.random.BernoulliVariate"/>
-            <MultiParameter type="diskit.random.BetaVariate"/>
-            <MultiParameter type="diskit.random.BinomialVariate"/>
-            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-            <MultiParameter type="diskit.random.ExponentialVariate"/>
-            <MultiParameter type="diskit.random.GammaVariate"/>
-            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
-            <MultiParameter type="diskit.random.NormalVariate"/>
-            <MultiParameter type="diskit.random.PoissonVariate"/>
-            <MultiParameter type="diskit.random.UniformVariate">
-                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
-                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="1"/>
-            </MultiParameter>
-        </MultiParameter>
-        <TerminalParameter name="mineFieldWidth" type="double" value="20000"/>
-        <TerminalParameter name="mineFieldLength" type="double" value="20000"/>
         <TerminalParameter name="firstMoverID" type="int" value="600"/>
-        <TerminalParameter name="mineFieldDepth" type="double" value="10"/>
+        <TerminalParameter name="mineFieldWidth" type="double" value="20000"/>
+	<TerminalParameter name="mineFieldLength" type="double" value="20000"/>	        
+        <TerminalParameter name="mineFieldDepth" type="double" value="10"/>        
         <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
@@ -100,6 +84,22 @@
                 <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
                 <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="20000"/>
             </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+	            <MultiParameter type="diskit.random.AR1Variate"/>
+	            <MultiParameter type="diskit.random.BernoulliVariate"/>
+	            <MultiParameter type="diskit.random.BetaVariate"/>
+	            <MultiParameter type="diskit.random.BinomialVariate"/>
+	            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+	            <MultiParameter type="diskit.random.ExponentialVariate"/>
+	            <MultiParameter type="diskit.random.GammaVariate"/>
+	            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+	            <MultiParameter type="diskit.random.NormalVariate"/>
+	            <MultiParameter type="diskit.random.PoissonVariate"/>
+	            <MultiParameter type="diskit.random.UniformVariate">
+	                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
+	                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="1"/>
+	            </MultiParameter>
         </MultiParameter>
         <Coordinate x="270" y="330"/>
     </SimEntity>
