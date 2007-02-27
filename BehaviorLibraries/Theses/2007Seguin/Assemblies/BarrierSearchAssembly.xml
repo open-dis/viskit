@@ -20,8 +20,8 @@
             <MultiParameter type="diskit.random.PoissonVariate"/>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
-        <TerminalParameter name="inputFileTemplate" type="java.lang.String" value="G:/ThesisCode/MissionFiles/SeaDiverTemplate.xml"/>
-        <TerminalParameter name="outputFileName" type="java.lang.String" value="G:/ThesisCode/MissionFiles/BarrierSearch/Diver.xml"/>
+        <TerminalParameter name="inputFileTemplate" type="java.lang.String" value="BehaviorLibraries/Theses/2007Seguin/AvclMissions/SeaDiverTemplate.xml"/>
+        <TerminalParameter name="outputFileName" type="java.lang.String" value="BehaviorLibraries/Theses/2007Seguin/AvclMissions/Diver.xml"/>
         <TerminalParameter name="operatingDepth" type="double" value="50"/>
         <Coordinate x="70" y="170"/>
     </SimEntity>
@@ -65,8 +65,8 @@
             <MultiParameter type="diskit.random.PoissonVariate"/>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
-        <TerminalParameter name="inputFileTemplate" type="java.lang.String" value="G:/ThesisCode/MissionFiles/SeadiverTemplate.xml"/>
-        <TerminalParameter name="outputFileName" type="java.lang.String" value="G:/ThesisCode/MissionFiles/BarrierSearch/Target.xml"/>
+        <TerminalParameter name="inputFileTemplate" type="java.lang.String" value="BehaviorLibraries/Theses/2007Seguin/AvclMissions/SeadiverTemplate.xml"/>
+        <TerminalParameter name="outputFileName" type="java.lang.String" value="BehaviorLibraries/Theses/2007Seguin/AvclMissions/Target.xml"/>
         <TerminalParameter name="operatingDepth" type="double" value="50"/>
         <TerminalParameter name="sensorRange" type="double" value="100"/>
         <Coordinate x="240" y="310"/>
