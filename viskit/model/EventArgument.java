@@ -15,7 +15,7 @@ public class EventArgument extends ViskitElement
   private String name;
   private ArrayList comments=new ArrayList();
 
-  public ArrayList getComments()
+  public ArrayList getDescription()
   {
     return comments;
   }

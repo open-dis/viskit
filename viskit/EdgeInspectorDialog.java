@@ -33,15 +33,16 @@ public class EdgeInspectorDialog extends JDialog
   private static EdgeInspectorDialog dialog;
   private Edge edge;
   private static boolean modified = false;
+  private boolean schedulingType = true; // true=scheduling, false = cancelling
   private JButton canButt,okButt;
   private JLabel srcEvent,targEvent;
   private JTextField delay;
   private EdgeParametersPanel parameters;
-  private ConditionalsPanel conditionals;
-  private JPanel delayPan;
+  private ConditionalExpressionPanel conditionalExpressionPanel;
+  private JPanel timeDelayPanel;
   private Border delayPanBorder,delayPanDisabledBorder;
 
-  private JPanel priorityPan;
+  private JPanel priorityPanel;
   private JComboBox priorityCB;
   private ArrayList<Priority> priorityList;  // matches combo box
   private Vector<String> priorityNames;
@@ -49,10 +50,13 @@ public class EdgeInspectorDialog extends JDialog
   
   private JPanel myParmPanel;
 
-  private JLabel schLab;
-  private JLabel canLab;
-  private JButton addCondButt;
-  private JButton addDescButt;
+  private JLabel schedulingLabel;
+  private JLabel cancellingLabel;
+  private JButton addConditionalButton;
+  private JButton addDescriptionButton;
+    
+  private JTextArea descriptionJta;
+  private JScrollPane descriptionJsp;
 
   /**
    * Set up and show the dialog.  The first Component argument
@@ -95,93 +99,116 @@ public class EdgeInspectorDialog extends JDialog
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
 
-    JPanel con = new JPanel();
-    con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-    con.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-    con.add(Box.createVerticalStrut(5));
+    JPanel edgeInspectorPanel = new JPanel();
+    edgeInspectorPanel.setLayout(new BoxLayout(edgeInspectorPanel,BoxLayout.Y_AXIS));
+    edgeInspectorPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+    edgeInspectorPanel.add(Box.createVerticalStrut(5));
       // edge type
-      JPanel typeP = new JPanel();
-      typeP.setLayout(new BoxLayout(typeP,BoxLayout.X_AXIS));
-        typeP.add(Box.createHorizontalGlue());
-        JLabel lab = new JLabel("Type: ");
-        BoxLayoutUtils.clampWidth(lab);
-        typeP.add(lab);
-        typeP.add(Box.createHorizontalStrut(5));
-        schLab = new JLabel("<html><b>Scheduling");
-        BoxLayoutUtils.clampWidth(schLab);
-        canLab = new JLabel("<html><b>Cancelling");
-        BoxLayoutUtils.clampWidth(canLab);
-        typeP.add(schLab);
-        typeP.add(canLab);
-        typeP.add(Box.createHorizontalGlue());
+      JPanel typePanel = new JPanel();
+      typePanel.setLayout(new BoxLayout(typePanel,BoxLayout.X_AXIS));
+        typePanel.add(Box.createHorizontalGlue());
+        JLabel typeLabel = new JLabel("Type: ");
+        BoxLayoutUtils.clampWidth(typeLabel);
+        typePanel.add(typeLabel);
+        typePanel.add(Box.createHorizontalStrut(15));
+        schedulingLabel = new JLabel("<html><b>Scheduling");
+        BoxLayoutUtils.clampWidth(schedulingLabel);
+        cancellingLabel = new JLabel("<html><b>Cancelling");
+        BoxLayoutUtils.clampWidth(cancellingLabel);
+        typePanel.add(schedulingLabel);
+        typePanel.add(cancellingLabel);
+        typePanel.add(Box.createHorizontalGlue());
 
-      BoxLayoutUtils.clampHeight(typeP);
-    con.add(typeP);
-    con.add(Box.createVerticalStrut(5));
+      BoxLayoutUtils.clampHeight(typePanel);
+    edgeInspectorPanel.add(typePanel);
+    edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
-      JPanel srcTargP = new JPanel();
-      srcTargP.setLayout(new BoxLayout(srcTargP,BoxLayout.X_AXIS));
-      srcTargP.add(Box.createHorizontalGlue());
-        JPanel stNamesP = new JPanel();
-        stNamesP.setLayout(new BoxLayout(stNamesP,BoxLayout.Y_AXIS));
-          JLabel srcLab = new JLabel("Source event:");
-          srcLab.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-        stNamesP.add(srcLab);
-          JLabel tarLab = new JLabel("Target event:");
-          tarLab.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-        stNamesP.add(tarLab);
-      srcTargP.add(stNamesP);
-      srcTargP.add(Box.createHorizontalStrut(25));
-        JPanel stValuesP = new JPanel();
-        stValuesP.setLayout(new BoxLayout(stValuesP,BoxLayout.Y_AXIS));
+      JPanel sourceTargetPanel = new JPanel();
+      sourceTargetPanel.setLayout(new BoxLayout(sourceTargetPanel,BoxLayout.X_AXIS));
+      sourceTargetPanel.add(Box.createHorizontalGlue());
+        JPanel sourceTargetNamesPanel = new JPanel();
+        sourceTargetNamesPanel.setLayout(new BoxLayout(sourceTargetNamesPanel,BoxLayout.Y_AXIS));
+          JLabel sourceEventLabel = new JLabel("Source event:");
+          sourceEventLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+        sourceTargetNamesPanel.add(sourceEventLabel);
+          JLabel targetEventLabel = new JLabel("Target event:");
+          targetEventLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+        sourceTargetNamesPanel.add(targetEventLabel);
+      sourceTargetPanel.add(sourceTargetNamesPanel);
+      sourceTargetPanel.add(Box.createHorizontalStrut(5));
+        JPanel sourceTargetValuesPanel = new JPanel();
+        sourceTargetValuesPanel.setLayout(new BoxLayout(sourceTargetValuesPanel,BoxLayout.Y_AXIS));
           srcEvent = new JLabel("srcEvent");
           srcEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-        stValuesP.add(srcEvent);
+        sourceTargetValuesPanel.add(srcEvent);
           targEvent = new JLabel("targEvent");
           targEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-        stValuesP.add(targEvent);
-        stValuesP.setBorder(BorderFactory.createTitledBorder(""));
+        sourceTargetValuesPanel.add(targEvent);
+        sourceTargetValuesPanel.setBorder(BorderFactory.createTitledBorder(""));
+        sourceTargetValuesPanel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         keepSameSize(srcEvent,targEvent);
-      srcTargP.add(stValuesP);
-      srcTargP.add(Box.createHorizontalGlue());
-      BoxLayoutUtils.clampHeight(srcTargP);
-    con.add(srcTargP);
+      sourceTargetPanel.add(sourceTargetValuesPanel);
+      sourceTargetPanel.add(Box.createHorizontalGlue());
+      BoxLayoutUtils.clampHeight(sourceTargetPanel);
+    edgeInspectorPanel.add(sourceTargetPanel);
 
-    con.add(Box.createVerticalStrut(5));
+    edgeInspectorPanel.add(Box.createVerticalStrut(5));
+    
+    descriptionJta = new JTextArea(2,25);
+    descriptionJsp = new JScrollPane(descriptionJta);
+    descriptionJsp.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Description")));
+    edgeInspectorPanel.add(descriptionJsp);
 
-    priorityPan = new JPanel();
-      priorityPan.setLayout(new BoxLayout(priorityPan,BoxLayout.X_AXIS));
-      priorityPan.setOpaque(false);
-      priorityPan.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Priority")));
+    Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
+    descriptionJsp.setMinimumSize(descriptionJspDimension);
+    
+    descriptionJta.addCaretListener(new CaretListener()
+    {
+      public void caretUpdate(CaretEvent e)
+      {
+        if(changeListener != null) {
+          changeListener.stateChanged(new ChangeEvent(descriptionJta));
+        }
+      }
+    });
+    
+    KeyListener keyListener = new myKeyListener();
+    descriptionJta.addKeyListener(keyListener);
+    
+    conditionalExpressionPanel = new ConditionalExpressionPanel(edge, schedulingType);
+    edgeInspectorPanel.add(conditionalExpressionPanel);
+    
+    priorityPanel = new JPanel();
+      priorityPanel.setLayout(new BoxLayout(priorityPanel,BoxLayout.X_AXIS));
+      priorityPanel.setOpaque(false);
+      priorityPanel.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Priority")));
         priorityCB = buildPriorityComboBox();
-        priorityPan.add(Box.createHorizontalStrut(102));     // set packed width clamp here
-        priorityPan.add(priorityCB);
-        priorityPan.add(Box.createHorizontalStrut(102));
-    con.add(priorityPan);
-    BoxLayoutUtils.clampHeight(priorityPan);
+        priorityPanel.add(Box.createHorizontalStrut(102));     // set packed width clamp here
+        priorityPanel.add(priorityCB);
+        priorityPanel.add(Box.createHorizontalStrut(102));
+    edgeInspectorPanel.add(priorityPanel);
+    BoxLayoutUtils.clampHeight(priorityPanel);
 
-    delayPan = new JPanel();
-      delayPan.setLayout(new BoxLayout(delayPan,BoxLayout.X_AXIS));
-      delayPan.setOpaque(false);
-      delayPan.setBorder(BorderFactory.createTitledBorder("Time Delay"));
+    timeDelayPanel = new JPanel();
+      timeDelayPanel.setLayout(new BoxLayout(timeDelayPanel,BoxLayout.X_AXIS));
+      timeDelayPanel.setOpaque(false);
+      timeDelayPanel.setBorder(BorderFactory.createTitledBorder("Time Delay"));
         delay = new JTextField();
         delay.setOpaque(true);
         delay.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         Dimension d = delay.getPreferredSize();      // only expand in horiz direction
         d.width = Integer.MAX_VALUE;
         delay.setMaximumSize(d);
-      delayPan.add(delay);
-      delayPanBorder = delayPan.getBorder();
+      timeDelayPanel.add(delay);
+      delayPanBorder = timeDelayPanel.getBorder();
       delayPanDisabledBorder = BorderFactory.createTitledBorder(new LineBorder(Color.gray),"Time Delay",
                                     TitledBorder.DEFAULT_JUSTIFICATION,TitledBorder.DEFAULT_POSITION,
                                     null,Color.gray);
-    con.add(delayPan);
-    con.add(Box.createVerticalStrut(5));
-      conditionals = new ConditionalsPanel(edge);
-    con.add(conditionals);
+    edgeInspectorPanel.add(timeDelayPanel);
+    edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
     myParmPanel = new JPanel();
-     myParmPanel.setLayout(new BoxLayout(myParmPanel,BoxLayout.Y_AXIS));
+    myParmPanel.setLayout(new BoxLayout(myParmPanel,BoxLayout.Y_AXIS));
 
        parameters = new EdgeParametersPanel(300);
        JScrollPane paramSp = new JScrollPane(parameters);
@@ -190,26 +217,26 @@ public class EdgeInspectorDialog extends JDialog
 
      myParmPanel.add(paramSp);
 
-    con.add(myParmPanel);
+    edgeInspectorPanel.add(myParmPanel);
 
-    JPanel twoRowButtPan = new JPanel();
-    twoRowButtPan.setLayout(new BoxLayout(twoRowButtPan,BoxLayout.Y_AXIS));
+    JPanel twoRowButtonPanel = new JPanel();
+    twoRowButtonPanel.setLayout(new BoxLayout(twoRowButtonPanel,BoxLayout.Y_AXIS));
 
-      JPanel tinyButtPan = new JPanel();
-      tinyButtPan.setLayout(new BoxLayout(tinyButtPan,BoxLayout.X_AXIS));
-    addCondButt = new JButton("add conditional");
-    addDescButt = new JButton("add description");
+      JPanel tinyButtonPanel = new JPanel();
+      tinyButtonPanel.setLayout(new BoxLayout(tinyButtonPanel,BoxLayout.X_AXIS));
+    addDescriptionButton = new JButton("add description");
+    addConditionalButton = new JButton("add conditional");
 
-    Font defButtFont = addCondButt.getFont();
+    Font defButtFont = addConditionalButton.getFont();
       int defButtFontSize = defButtFont.getSize();
-      addCondButt.setFont(defButtFont.deriveFont((float)(defButtFontSize-4)));
-      addDescButt.setFont(addCondButt.getFont());
-      tinyButtPan.add(Box.createHorizontalGlue());
-      tinyButtPan.add(addCondButt);
-      tinyButtPan.add(addDescButt);
-      tinyButtPan.add(Box.createHorizontalGlue());
-    twoRowButtPan.add(tinyButtPan);
-    twoRowButtPan.add(Box.createVerticalStrut(5));
+      addConditionalButton.setFont(defButtFont.deriveFont((float)(defButtFontSize-4)));
+      addDescriptionButton.setFont(addConditionalButton.getFont());
+      tinyButtonPanel.add(Box.createHorizontalGlue());
+      tinyButtonPanel.add(addDescriptionButton);
+      tinyButtonPanel.add(addConditionalButton);
+      tinyButtonPanel.add(Box.createHorizontalGlue());
+    twoRowButtonPanel.add(tinyButtonPanel);
+    twoRowButtonPanel.add(Box.createVerticalStrut(5));
 
       JPanel buttPan = new JPanel();
       buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
@@ -218,10 +245,10 @@ public class EdgeInspectorDialog extends JDialog
       buttPan.add(Box.createHorizontalGlue());
       buttPan.add(canButt);
       buttPan.add(okButt);
-    twoRowButtPan.add(buttPan);
+    twoRowButtonPanel.add(buttPan);
 
-    con.add(twoRowButtPan);
-    cont.add(con);
+    edgeInspectorPanel.add(twoRowButtonPanel);
+    cont.add(edgeInspectorPanel);
 
     fillWidgets();     // put the data into the widgets
 
@@ -237,14 +264,14 @@ public class EdgeInspectorDialog extends JDialog
     okButt.addActionListener(new applyButtonListener());
 
     myChangeListener chlis = new myChangeListener();
-    conditionals.addChangeListener(chlis);
+    conditionalExpressionPanel.addChangeListener(chlis);
     priorityCB.addActionListener(chlis);
     delay.addCaretListener(chlis);
     priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
 
-    addHideButtListener hideList = new addHideButtListener();
-    addCondButt.addActionListener(hideList);
-    addDescButt.addActionListener(hideList);
+    addHideButtonListener hideList = new addHideButtonListener();
+    addConditionalButton.addActionListener(hideList);
+    addDescriptionButton.addActionListener(hideList);
     
     parameters.addDoubleClickedListener(new ActionListener()
     {
@@ -347,7 +374,7 @@ public class EdgeInspectorDialog extends JDialog
 
     srcEvent.setText(edge.from.getName());
     targEvent.setText(edge.to.getName());
-    myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Edge Parameters -- to "+targEvent.getText())));
+    myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0,0,5,0),BorderFactory.createTitledBorder("Edge Parameters passed to "+targEvent.getText())));
  
     parameters.setArgumentList(edge.to.getArguments());  //
     parameters.setData(edge.parameters);
@@ -358,15 +385,19 @@ public class EdgeInspectorDialog extends JDialog
 
     if(edge instanceof SchedulingEdge) {
       if(edge.conditional == null || edge.conditional.trim().length() <= 0) {
-        conditionals.setText("true");
+        conditionalExpressionPanel.setText("true");
         hideShowConditionals(false);
       }
       else {
-        conditionals.setText(edge.conditional);
+        conditionalExpressionPanel.setText(edge.conditional);
         hideShowConditionals(true);
       }
-      conditionals.setComment(edge.conditionalsComment);
-      if(edge.conditionalsComment == null || edge.conditionalsComment.length()<=0)
+      setDescription(edge.conditionalDescription);
+      
+//      always show
+//        hideShowDescription(true);
+        
+      if(edge.conditionalDescription == null || edge.conditionalDescription.length()<=0)
         hideShowDescription(false);
       else
         hideShowDescription(true);
@@ -376,24 +407,25 @@ public class EdgeInspectorDialog extends JDialog
       else
         delay.setText(""+edge.delay);
       delay.setEnabled(true);
-      delayPan.setBorder(delayPanBorder);
+      timeDelayPanel.setBorder(delayPanBorder);
 
       setPriorityCBValue(((SchedulingEdge)edge).priority);
 
   }
     else {
       if(edge.conditional == null || edge.conditional.trim().length() <= 0)
-        conditionals.setText("true");
+        conditionalExpressionPanel.setText("true");
       else
-       conditionals.setText(edge.conditional);
-      conditionals.setComment(edge.conditionalsComment);
+       conditionalExpressionPanel.setText(edge.conditional);
+      
+      setDescription(edge.conditionalDescription);
 
       delay.setText("n/a");
       delay.setEnabled(false);
-      delayPan.setBorder(delayPanDisabledBorder);
+      timeDelayPanel.setBorder(delayPanDisabledBorder);
     }
 
-    schedTypeSelected(edge instanceof SchedulingEdge);
+    setSchedulingType(edge instanceof SchedulingEdge);
   }
 
   private void unloadWidgets()
@@ -419,12 +451,12 @@ public class EdgeInspectorDialog extends JDialog
       edge.delay = "0.0";
     else
       edge.delay = delay.getText();
-    String condSt = conditionals.getText();
+    String condSt = conditionalExpressionPanel.getText();
     if(condSt == null || condSt.trim().length() <= 0)
       edge.conditional = "true";
     else
-      edge.conditional = conditionals.getText();
-    edge.conditionalsComment = conditionals.getComment();
+      edge.conditional = conditionalExpressionPanel.getText();
+    edge.conditionalDescription = getDescription();
     edge.parameters.clear();
     for(Iterator itr = parameters.getData().iterator(); itr.hasNext(); ) {
       edge.parameters.add(itr.next());
@@ -433,25 +465,25 @@ public class EdgeInspectorDialog extends JDialog
 
   private void hideShowConditionals(boolean show)
   {
-    conditionals.showConditions(show);
-    addCondButt.setVisible(!show);
+    conditionalExpressionPanel.showConditions(show);
+    addConditionalButton.setVisible(!show);
     pack();
   }
 
   private void hideShowDescription(boolean show)
   {
-    conditionals.showDescription(show);
-    addDescButt.setVisible(!show);
+    showDescription(show);
+    addDescriptionButton.setVisible(!show);
     pack();
   }
   
-  class addHideButtListener implements ActionListener
+  class addHideButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
-      if(e.getSource().equals(addCondButt))
+      if(e.getSource().equals(addConditionalButton))
         hideShowConditionals(true);
-      else if(e.getSource().equals(addDescButt))
+      else if(e.getSource().equals(addDescriptionButton))
         hideShowDescription(true);
     }
   }
@@ -494,11 +526,11 @@ public class EdgeInspectorDialog extends JDialog
           sb.append(";\n");
         }
         sb.append("if(");
-        sb.append(conditionals.getText());
+        sb.append(conditionalExpressionPanel.getText());
         sb.append("){;}");
 
         if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
-          String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionals.getText()+post);
+          String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionalExpressionPanel.getText()+post);
           if(parseResults != null) {
             boolean ret = BeanshellErrorDialog.showDialog(parseResults,EdgeInspectorDialog.this);
             if(!ret) // don't ignore
@@ -540,15 +572,46 @@ public class EdgeInspectorDialog extends JDialog
     public void keyTyped(KeyEvent e)
     {
       stateChanged(null);
+      // TODO:  update OK buttone when description field modified, rather than waiting to select another field
+      modified = true;
+      okButt.setEnabled(true);
     }
   }
 
-  private void schedTypeSelected(boolean wh)
+  private void setSchedulingType (boolean wh)
   {
-    priorityPan.setVisible(wh);
-    delayPan.setVisible(wh);
-    schLab.setVisible(wh);
-    canLab.setVisible(!wh);
+      schedulingType = wh;
+      priorityPanel.setVisible (wh);
+      timeDelayPanel.setVisible (wh);
+      schedulingLabel.setVisible (wh);
+      cancellingLabel.setVisible (!wh);
+  }
+
+  public void showDescription(boolean wh)
+  {
+    descriptionJsp.setVisible(wh);
+  }
+  public boolean isDescriptionVisible()
+  {
+    return descriptionJsp.isVisible();
+  }
+  public void setDescription(String s)
+  {
+      descriptionJta.setText (s);
+      modified = true;
+      okButt.setEnabled (true);
+  }
+
+  public String getDescription()
+  {
+    return descriptionJta.getText().trim();
+  }
+
+  private ChangeListener changeListener;
+  public void addChangeListener(ChangeListener listener)
+  //-----------------------------------------------
+  {
+    this.changeListener = listener;
   }
 
   class myCloseListener extends WindowAdapter
@@ -567,4 +630,13 @@ public class EdgeInspectorDialog extends JDialog
         canButt.doClick();
     }
   }
+  class myKeyListener extends KeyAdapter
+  {
+    public void keyTyped(KeyEvent e)
+    {
+      modified = true;
+      okButt.setEnabled(true);
+    }
+  }
+
 }

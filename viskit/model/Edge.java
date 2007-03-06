@@ -18,7 +18,7 @@ abstract public class Edge extends ViskitElement
   public EventNode from;
   public ArrayList parameters;
   public String    conditional;
-  public String    conditionalsComment;
+  public String    conditionalDescription;
   public String    delay;
 
   abstract Object  copyShallow();

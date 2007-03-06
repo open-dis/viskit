@@ -30,7 +30,7 @@ public class SchedulingEdge extends Edge
     se.parameters = parameters;
     se.delay = delay;
     se.conditional = conditional;
-    se.conditionalsComment = conditionalsComment;
+    se.conditionalDescription = conditionalDescription;
     se.priority = priority;
     return se;
   }

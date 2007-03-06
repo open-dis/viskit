@@ -626,7 +626,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                         BorderFactory.createEmptyBorder(4,4,4,4)));
 addEvent.setIcon(new EventNodeIcon());
     addSelfRef = makeJLabel("viskit/images/selfArc.png",
-                            "Drag onto an existing event node to add a self-referential edge");
+                            "Drag onto an existing event node to add a self-referential scheduling edge");
 
     addSelfRef.setBorder(BorderFactory.createCompoundBorder(
                          BorderFactory.createEtchedBorder(),
@@ -634,10 +634,12 @@ addEvent.setIcon(new EventNodeIcon());
     selectMode    = makeJTButton(null, "viskit/images/selectNode.png",
                                        "Select items on the graph");
     arcMode       = makeJTButton(null, "viskit/images/schedArc.png",
-                                       "Connect nodes with scheduling arcs");
-arcMode.setIcon(new SchedArcIcon());
+                                       "Connect nodes with a scheduling edge");
+    // TODO:  self-referential canceling edge?
+
+    arcMode.setIcon(new SchedArcIcon());
     cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
-                                       "Connect nodes with a canceling arc");
+                                       "Connect nodes with a cancelling edge");
 cancelArcMode.setIcon(new CanArcIcon());
 //    selfRefMode   = makeJTButton(null, "viskit/images/selfArc.png",
 //                                       "Add a self-referential edge to a node");

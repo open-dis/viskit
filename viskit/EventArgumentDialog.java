@@ -25,7 +25,7 @@ import java.awt.event.WindowEvent;
 public class EventArgumentDialog extends JDialog
 {
   private JTextField nameField;    // Text field that holds the parameter name
-  private JTextField commentField;          // Text field that holds the comment
+  private JTextField descriptionField;          // Text field that holds the description
   private JComboBox  parameterTypeCombo;    // Editable combo box that lets us select a type
 
   private static EventArgumentDialog dialog;
@@ -34,7 +34,7 @@ public class EventArgumentDialog extends JDialog
   private Component locationComp;
   private JButton okButt, canButt;
 
-  public static String newName, newType, newComment;
+  public static String newName, newType, newDescription;
 
   public static boolean showDialog(JFrame f, Component comp, EventArgument parm)
   {
@@ -59,35 +59,38 @@ public class EventArgumentDialog extends JDialog
     Container cont = getContentPane();
     cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
 
-     JPanel con = new JPanel();
-     con.setLayout(new BoxLayout(con,BoxLayout.Y_AXIS));
-     con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+     JPanel panel = new JPanel();
+     panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+     panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-      con.add(Box.createVerticalStrut(5));
+      panel.add(Box.createVerticalStrut(5));
       JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel,BoxLayout.Y_AXIS));
 
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
-        int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,commLab});
+        JLabel descriptionLabel = new JLabel("description");
+        int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,descriptionLabel});
 
-        nameField = new JTextField(15);   setMaxHeight(nameField);
-        commentField       = new JTextField(25);   setMaxHeight(commentField);
+        nameField = new JTextField(15);   
+        setMaxHeight(nameField);
+        descriptionField = new JTextField(25);   
+        setMaxHeight(descriptionField);
         //parameterTypeCombo = new JComboBox();
         //parameterTypeCombo.setModel(VGlobals.instance().getTypeCBModel(parameterTypeCombo));
         //                                       setMaxHeight(parameterTypeCombo);
         //parameterTypeCombo.setBackground(Color.white);
        // parameterTypeCombo.setEditable(true);
-        parameterTypeCombo = VGlobals.instance().getTypeCB(); setMaxHeight(parameterTypeCombo);
+        parameterTypeCombo = VGlobals.instance().getTypeCB(); 
+        setMaxHeight(parameterTypeCombo);
 
 
         fieldsPanel.add(new OneLinePanel(nameLab,w,nameField));
         fieldsPanel.add(new OneLinePanel(typeLab,w,parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
-       con.add(fieldsPanel);
-       con.add(Box.createVerticalStrut(5));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel,w,descriptionField));
+       panel.add(fieldsPanel);
+       panel.add(Box.createVerticalStrut(5));
 
        JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
@@ -96,9 +99,9 @@ public class EventArgumentDialog extends JDialog
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttPan.add(canButt);
         buttPan.add(okButt);
-       con.add(buttPan);
-       con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-      cont.add(con);
+       panel.add(buttPan);
+       panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+      cont.add(panel);
 
     fillWidgets();     // put the data into the widgets
 
@@ -114,10 +117,10 @@ public class EventArgumentDialog extends JDialog
     canButt.addActionListener(new cancelButtonListener());
     okButt .addActionListener(new applyButtonListener());
 
-    enableApplyButtonListener lis = new enableApplyButtonListener();
-    this.nameField.addCaretListener(lis);
-    this.commentField.      addCaretListener(lis);
-    this.parameterTypeCombo.addActionListener(lis);
+    enableApplyButtonListener listener = new enableApplyButtonListener();
+    this.nameField.addCaretListener(listener);
+    this.descriptionField.addCaretListener(listener);
+    this.parameterTypeCombo.addActionListener(listener);
   }
 
   private int maxWidth(JComponent[] c)
@@ -156,14 +159,14 @@ public class EventArgumentDialog extends JDialog
     if(myEA != null) {
       nameField.setText(myEA.getName());
       parameterTypeCombo.setSelectedItem(myEA.getType());
-      if(myEA.getComments().size() > 0)
-        commentField.setText((String)myEA.getComments().get(0));
+      if(myEA.getDescription().size() > 0)
+        descriptionField.setText((String)myEA.getDescription().get(0));
       else
-        commentField.setText("");
+        descriptionField.setText("");
     }
     else {
       nameField.setText("");
-      commentField.setText("");
+      descriptionField.setText("");
     }
   }
 
@@ -177,15 +180,15 @@ public class EventArgumentDialog extends JDialog
     if(myEA != null) {
       myEA.setName(nm);
       myEA.setType(ty);
-      myEA.getComments().clear();
-      String cs = commentField.getText().trim();
+      myEA.getDescription().clear();
+      String cs = descriptionField.getText().trim();
       if(cs.length() > 0)
-        myEA.getComments().add(0,cs);
+        myEA.getDescription().add(0,cs);
     }
     else {
       newName    = nm;
       newType    = ty;
-      newComment = commentField.getText().trim();
+      newDescription = descriptionField.getText().trim();
     }
   }
 

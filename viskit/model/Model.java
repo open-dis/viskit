@@ -499,7 +499,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         sb.append((String)itr.next());
         sb.append("  ");
       }
-      se.conditionalsComment = sb.toString().trim();
+      se.conditionalDescription = sb.toString().trim();
     }
     se.delay = ed.getDelay();
     se.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
@@ -525,7 +525,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         sb.append((String)itr.next());
         sb.append("  ");
       }
-      ce.conditionalsComment = sb.toString().trim();
+      ce.conditionalDescription = sb.toString().trim();
     }
 
     ce.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
@@ -962,7 +962,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
         arg.setName(nIe(ea.getName()));
         arg.setType(nIe(ea.getType()));
         arg.getComment().clear();
-        arg.getComment().addAll(ea.getComments());
+        arg.getComment().addAll(ea.getDescription());
         ea.opaqueModelObject = arg; // replace
         targ.add(arg);
       }
@@ -1152,7 +1152,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     Schedule sch = (Schedule)e.opaqueModelObject;
     sch.setCondition(e.conditional);
     sch.getComment().clear();
-    sch.getComment().add(e.conditionalsComment);
+    sch.getComment().add(e.conditionalDescription);
     sch.setDelay(""+e.delay);
 
     sch.setEvent((Event)e.to.opaqueModelObject);
@@ -1184,7 +1184,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
     can.setCondition(e.conditional);
     can.setEvent((Event)e.to.opaqueModelObject);
     can.getComment().clear();
-    can.getComment().add(e.conditionalsComment);
+    can.getComment().add(e.conditionalDescription);
 
     can.getEdgeParameter().clear();
      for(Iterator itr = e.parameters.iterator(); itr.hasNext();) {

@@ -37,9 +37,9 @@ public class ArgumentsPanel extends ViskitTablePanel
     String[] sa = new String[3];
     sa[0] = ((EventArgument)o).getName();
     sa[1] = ((EventArgument)o).getType();
-    ArrayList  ar = ((EventArgument)o).getComments();
+    ArrayList  ar = ((EventArgument)o).getDescription();
     if(ar.size() > 0)
-      sa[2] = (String)((EventArgument)o).getComments().get(0);
+      sa[2] = (String)((EventArgument)o).getDescription().get(0);
     else
       sa[2] = "";
     return sa;

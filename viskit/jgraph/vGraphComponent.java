@@ -232,8 +232,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener
 
           if (se instanceof SchedulingEdge) {
             sb.append("<center>Schedule</center>");
-            if (se.conditionalsComment != null) {
-              String cmt = se.conditionalsComment.trim();
+            if (se.conditionalDescription != null) {
+              String cmt = se.conditionalDescription.trim();
               if (cmt.length() > 0) {
                 sb.append("<br><u>description</u><br>");
                 sb.append(wrapAtPos(escapeLTGT(cmt), 60));
@@ -275,8 +275,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener
           else
           {
             sb.append("<center>Cancel</center>");
-            if (se.conditionalsComment != null) {
-              String cmt = se.conditionalsComment.trim();
+            if (se.conditionalDescription != null) {
+              String cmt = se.conditionalDescription.trim();
               if (cmt.length() > 0)
                 sb.append("<br><u>description</u><br>");
                 sb.append(wrapAtPos(escapeLTGT(cmt), 60));
