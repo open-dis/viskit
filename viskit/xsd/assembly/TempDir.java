@@ -25,12 +25,12 @@ import java.util.Iterator;
 
 public class TempDir {
     private static DirDeleter deleterThread;
-    
+
     static {
         deleterThread = new DirDeleter();
         Runtime.getRuntime().addShutdownHook(deleterThread);
     }
-    
+
     /**
      * Creates a temp directory with a generated name (given a certain prefix) in a given directory.
      * The directory (and all its content) will be destroyed on exit.
@@ -45,7 +45,7 @@ public class TempDir {
         deleterThread.add(tempFile);
         return tempFile;
     }
-    
+
     /**
      * Creates a temp directory with a given name in a given directory.
      * The directory (and all its content) will be destroyed on exit.
@@ -58,7 +58,7 @@ public class TempDir {
         deleterThread.add(tempFile);
         return tempFile;
     }
-    
+
 
 }
 

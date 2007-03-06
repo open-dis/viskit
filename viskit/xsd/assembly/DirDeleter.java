@@ -18,11 +18,11 @@ import java.io.File;
 
 public class DirDeleter extends Thread {
     private ArrayList dirList = new ArrayList();
-    
+
     public synchronized void add(File dir) {
         dirList.add(dir);
     }
-    
+
     public void run() {
         synchronized (this) {
             Iterator iterator = dirList.iterator();
@@ -33,10 +33,10 @@ public class DirDeleter extends Thread {
             }
         }
     }
-    
+
     private void deleteDirectory(File dir) {
         File[] fileArray = dir.listFiles();
-        
+
         if (fileArray != null) {
             for (int i = 0; i < fileArray.length; i++) {
                 //if (fileArray[i].isDirectory())
