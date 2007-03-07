@@ -492,7 +492,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // todo get from project
     lTree.addContentRoot(new File("lib/simkit.jar"));
     lTree.addContentRoot(new File("lib/ext/diskit.jar"));
-    //lTree.addContentRoot(new File("BehaviorLibraries/SavageTactics"),true);
+    lTree.addContentRoot(new File("BehaviorLibraries/SavageTactics"),true);
 
     LegosPanel lPan = new LegosPanel(lTree);
 
