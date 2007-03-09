@@ -98,9 +98,12 @@ public class ReportStatisticsConfig {
         int idx = 0;
         while(itr.hasNext()){
             String key = (String)itr.next();
-            seperator  = findUnderscore(key);
+            seperator  = findUnderscore(key); 
+// TODO:  verify this logic works with/without underscores present
             entityIndex[idx]   = key.substring(0, seperator);
-            propertyIndex[idx] = key.substring(seperator+1, key.length());
+            if (seperator > 0) propertyIndex[idx] = key.substring(seperator+1, key.length());
+            else               propertyIndex[idx] = key.substring(seperator, key.length());
+            
             //System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
             System.out.println(entityIndex[idx]+" "+propertyIndex[idx]);
             idx++;
