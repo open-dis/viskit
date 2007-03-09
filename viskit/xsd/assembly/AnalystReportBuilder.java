@@ -921,18 +921,17 @@ public class AnalystReportBuilder
     setPrintSimLocationImage(true);
     setSimLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
     setSimLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
-    //setLocationImage("");
-    //setChartImage("");
+    //setLocationImage(""); // TODO:  generate image, set file location
+    //setChartImage(""); // TODO:  generate image, set file location
 
     //Simulation Configuration Values
     setPrintSimConfigComments(true);
     setPrintAssemblyImage(true);
     setPrintEntityTable(true);
-    setAssemblyFile("./BehaviorLibraries/SavageTactics/Scenarios/Bremerton.xml");
     setSimConfigurationDescription("***ENTER SIMULATION CONFIGURATION DESCRIPTION HERE***");
     setSimConfigurationConclusions("***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***");
 
-    //setAssemblyImageLocation("");
+    //setAssemblyImageLocation(""); // TODO:  generate image, set file location
 
     //Entity Parameters values
     setPrintParameterComments(true);
