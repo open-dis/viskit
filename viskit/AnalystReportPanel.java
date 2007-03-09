@@ -261,15 +261,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     hdrPan.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     hdrPan.setMaximumSize(new Dimension(Integer.MAX_VALUE,hdrPan.getPreferredSize().height));
 
-    tabs.add("1 Heading",hdrPan);
+    tabs.add("1 Header",hdrPan);
 
     tabs.add("2 Executive Summary",makeExecSummPan());
     tabs.add("3 Simulation Location",makeSimLocPan());
-    tabs.add("4 Simulation Configuration",makeSimConfigPan());
+    tabs.add("4 Assembly Configuration",makeSimConfigPan());
     tabs.add("5 Entity Parameters",makeEntityParamsPan());
-    tabs.add("6 Behavior Definitions",makeBehaviorsPan());
+    tabs.add("6 Behavior Descriptions",makeBehaviorsPan());
     tabs.add("7 Statistical Results",makeStatsPan());
-    tabs.add("8 Conclusions and Recommendations",makeConRecPan());
+    tabs.add("8 Conclusions, Recommendations",makeConRecPan());
 
     add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
@@ -281,7 +281,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantExecSumm = new JCheckBox("Want executive summary", true));
+    p.add(wantExecSumm = new JCheckBox("Include executive summary", true));
     wantExecSumm.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp=new JScrollPane(execSummTA = new WrappingTextArea()));
@@ -324,16 +324,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantLocCommentsAndConclusions = new JCheckBox("Want location comments and conclusions", true));
+    p.add(wantLocCommentsAndConclusions = new JCheckBox("Include location features and post-experiment descriptions", true));
     wantLocCommentsAndConclusions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp=new JScrollPane(locCommentsTA = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Description"));
+    jsp.setBorder(new TitledBorder("Location Features"));
     p.add(jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
-    p.add(wantLocImages = new JCheckBox("Want location image(s)", true));
+    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
+    p.add(wantLocImages = new JCheckBox("Include location and chart image(s)", true));
     wantLocImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     JPanel imp = new JPanel();
@@ -409,14 +409,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantSimConfigCommentsAndConclusions = new JCheckBox("Want simulation configuration comments", true));
+    p.add(wantSimConfigCommentsAndConclusions = new JCheckBox("Include assembly-design and post-experiment analysis descriptions", true));
     wantSimConfigCommentsAndConclusions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp = new JScrollPane(simConfigComments = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Description"));
+    jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
 
-    p.add(wantEntityTable = new JCheckBox("Want entity table", true));
+    p.add(wantEntityTable = new JCheckBox("Include entity table", true));
     wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JPanel pp = new JPanel();
     pp.setLayout(new BoxLayout(pp,BoxLayout.X_AXIS));
@@ -429,8 +429,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
     p.add(jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea()));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
-    p.add(wantSimConfigImages = new JCheckBox("Want simulation configuration image", true));
+    jsp.setBorder(new TitledBorder("Post-Experiment Analysis"));
+    p.add(wantSimConfigImages = new JCheckBox("Include simulation configuration image", true));
     wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JPanel imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
@@ -492,12 +492,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantEntityParamComments = new JCheckBox("Want entity parameter comments", true));
+    p.add(wantEntityParamComments = new JCheckBox("Include entity parameter descriptions", true));
       wantEntityParamComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     p.add(new JScrollPane(entityParamCommentsTA=new WrappingTextArea()));
 
-    p.add(wantEntityParamTables = new JCheckBox("Want entity parameter tables", true));
+    p.add(wantEntityParamTables = new JCheckBox("Include entity parameter tables", true));
     wantEntityParamTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     entityParamTabs = new JTabbedPane(JTabbedPane.LEFT);
     entityParamTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -567,21 +567,21 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(doBehaviorComments = new JCheckBox("Want behavior comments", true));
+    p.add(doBehaviorComments = new JCheckBox("Include behavior design and post-experiment analysis", true));
     doBehaviorComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp = new JScrollPane(behaviorCommentsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Description"));
+    jsp.setBorder(new TitledBorder("Behavior Design Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
     jsp = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Analysis"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
 
-    p.add(doBehaviorDescriptions = new JCheckBox("Want behavior descriptions", true));
+    p.add(doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true));
     doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-    p.add(doBehaviorImages = new JCheckBox("Want behavior images", true));
+    p.add(doBehaviorImages = new JCheckBox("Include behavior images", true));
     doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
@@ -679,24 +679,24 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantStatsComments = new JCheckBox("Want statistical results comments", true));
+    p.add(wantStatsComments = new JCheckBox("Include statistical description and analysis", true));
       wantStatsComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp = new JScrollPane(statsComments=new WrappingTextArea()));
-    jsp.setBorder(new TitledBorder("Description"));
+    jsp.setBorder(new TitledBorder("Description of Expected Results"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp = new JScrollPane(statsConclusions= new WrappingTextArea()));
-    jsp.setBorder(new TitledBorder("Post-Experiment Description"));
+    jsp.setBorder(new TitledBorder("Analysis of Actual Results"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-    p.add(wantStatsReplications=new JCheckBox("Want replication statistics", true));
+    p.add(wantStatsReplications=new JCheckBox("Include replication statistics", true));
     wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     p.add(repsJsp = new JScrollPane(statsRepPanel = new JPanel()));
     repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     statsRepPanel.setLayout(new BoxLayout(statsRepPanel,BoxLayout.Y_AXIS));
 
-    p.add(wantStatsSummary = new JCheckBox("Want summary statistics", true));
+    p.add(wantStatsSummary = new JCheckBox("Include summary statistics", true));
     wantStatsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
     p.add(summJsp = new JScrollPane(statsSummaryPanel = new JPanel()));
@@ -795,7 +795,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantTotalConRec = new JCheckBox("Want overall conclusions and recommendations", true));
+    p.add(wantTotalConRec = new JCheckBox("Include conclusions and recommendations", true));
       wantTotalConRec.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     JScrollPane jsp;
     p.add(jsp = new JScrollPane(conRecConclusionsTA=new WrappingTextArea()));
