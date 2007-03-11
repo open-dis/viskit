@@ -1,0 +1,2376 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter name="speedScale" type="double" value=".5"/>
+        <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.8"/>
+        <TerminalParameter name="port" type="int" value="62040"/>
+        <TerminalParameter name="siteID" type="int" value="0"/>
+        <TerminalParameter name="appID" type="int" value="1"/>
+        <Coordinate x="280" y="270"/>
+    </SimEntity>
+    <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
+        <TerminalParameter name="isActive" type="boolean" value="true"/>
+        <TerminalParameter name="duration" type="double" value=".2"/>
+        <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
+        <Coordinate x="310" y="180"/>
+    </SimEntity>
+    <SimEntity description="" name="OilPlatform" type="Obstacles.OilPlatform">
+        <TerminalParameter name="moverID" type="int" value="800"/>
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="x" type="double" value="-2285.55"/>
+            <TerminalParameter name="y" type="double" value="0.0"/>
+            <TerminalParameter name="z (-Z is up)" type="double" value="-10"/>
+        </MultiParameter>
+        <TerminalParameter name="length" type="double" value="1000"/>
+        <TerminalParameter name="width" type="double" value="400"/>
+        <TerminalParameter name="height" type="double" value="50"/>
+        <MultiParameter type="diskit.Vec4d">
+            <TerminalParameter name="x" type="double" value="0"/>
+            <TerminalParameter name="y" type="double" value="0"/>
+            <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+            <TerminalParameter name="radianRotation" type="double" value="0"/>
+        </MultiParameter>
+        <MultiParameter type="diskit.Berth[]"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2685.65"/>
+                <TerminalParameter name="y" type="double" value="-1.27"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2646.57"/>
+                <TerminalParameter name="y" type="double" value="-1.27"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2607.56"/>
+                <TerminalParameter name="y" type="double" value="-1.27"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2568.48"/>
+                <TerminalParameter name="y" type="double" value="-1.27"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2529.46"/>
+                <TerminalParameter name="y" type="double" value="39.569"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2529.46"/>
+                <TerminalParameter name="y" type="double" value="-1.27"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2529.4"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2507.72"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2483.62"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2467.573"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2444.662"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2423.017"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2507.72"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2483.62"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2467.573"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2444.662"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2423.017"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2421.855"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2383.985"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2305.604"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2227.917"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2189.524"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2149.260"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2109.950"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2423.017"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2109.443"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2065.284"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2046.608"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2003.323"/>
+                <TerminalParameter name="y" type="double" value="-50.593"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2423.017"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2109.443"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2065.284"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2046.608"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2003.323"/>
+                <TerminalParameter name="y" type="double" value="41.62"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2109.443"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-2423.017"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1924.578"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter name="x" type="double" value="-1847.348"/>
+                <TerminalParameter name="y" type="double" value="-2.518"/>
+                <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="190" y="270"/>
+    </SimEntity>
+    <SimEntity description="A chart object that collects all of the information one could derive from a nautical chart" name="NauticalChart" type="Utilities.NauticalChart">
+        <MultiParameter type="diskit.AStarZoneGeometry[]">
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="ABOTAreaEast"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ABOT"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2279.193"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="543.44"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="300"/>
+                <TerminalParameter name="width" type="double" value="300"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="ABOTAreaWest"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ABOT"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2279.193"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-543.44"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="300"/>
+                <TerminalParameter name="width" type="double" value="300"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="ABOT"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="ABOT"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2477.409"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="0.0"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="300"/>
+                <TerminalParameter name="width" type="double" value="300"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.AStarZoneGeometry[]">
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="PersianGulf1"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="none"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="2500"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                    <TerminalParameter name="Z" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="3000"/>
+                <TerminalParameter name="width" type="double" value="200"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="PersianGulf2"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="none"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2500"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-4300"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="1000"/>
+                <TerminalParameter name="width" type="double" value="500"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="PersianGulf3"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="none"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2500"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                    <TerminalParameter name="Z" type="double" value="4300"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="1000"/>
+                <TerminalParameter name="width" type="double" value="500"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.AStarZoneGeometry">
+                <TerminalParameter name="name" type="java.lang.String" value="PersianGulf4"/>
+                <MultiParameter type="java.lang.String[]">
+                    <TerminalParameter name="" type="java.lang.String" value="none"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="2500"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                    <TerminalParameter name="Z" type="double" value="0"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="500"/>
+                <TerminalParameter name="width" type="double" value="3000"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="250" y="180"/>
+    </SimEntity>
+    <SimEntity description="" name="RHIB1" type="Friendly.MilitaryPatrolCraft">
+        <TerminalParameter name="moverID" type="int" value="101"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="0"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="0"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="RHIB"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="2"/>
+                    <TerminalParameter name="width" type="double" value="3.407"/>
+                    <TerminalParameter name="length" type="double" value="7"/>
+                    <TerminalParameter name="draft" type="double" value=".2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="12"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value=".5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value=".5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".02"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".02"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2295"/>
+                    <TerminalParameter name="y" type="double" value="107.08"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="101"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2265.47"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-140.739"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="1000"/>
+                <TerminalParameter name="width" type="double" value="96.737"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="101"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2266.87"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-588.444"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="96.737"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="360" y="240"/>
+    </SimEntity>
+    <SimEntity description="" name="RHIB2" type="Friendly.MilitaryPatrolCraft">
+        <TerminalParameter name="moverID" type="int" value="102"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="0"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="0"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="RHIB2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="2"/>
+                    <TerminalParameter name="width" type="double" value="3.407"/>
+                    <TerminalParameter name="length" type="double" value="7"/>
+                    <TerminalParameter name="draft" type="double" value=".2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="12"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value=".5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value=".5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".02"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".02"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2265"/>
+                    <TerminalParameter name="y" type="double" value="-102.28"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="102"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2271.79"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="556.712"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="96.737"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="102"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2259.85"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="143.134"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="1000"/>
+                <TerminalParameter name="width" type="double" value="96.737"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate">
+                <TerminalParameter name="mean (-Infinity -&gt; +Infinity)" type="double" value="5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="420" y="240"/>
+    </SimEntity>
+    <SimEntity description="USS O'Kane - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG77" type="Friendly.MilitaryShip">
+        <TerminalParameter name="moverID" type="int" value="104"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="USS O'KANE"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="51"/>
+                    <TerminalParameter name="width" type="double" value="18"/>
+                    <TerminalParameter name="length" type="double" value="153.92"/>
+                    <TerminalParameter name="draft" type="double" value="9.45"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="30"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="15"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".015"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="74080"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="37040"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="30"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="225"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="104"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="1857.792"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="168.904"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="4000"/>
+                <TerminalParameter name="width" type="double" value="4000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="420" y="300"/>
+    </SimEntity>
+    <SimEntity description="USS Princeton - a Ticonderoga (CG 47) Class US Navy Cruiser" name="CG59" type="Friendly.MilitaryShip">
+        <TerminalParameter name="moverID" type="int" value="105"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ship/index.html"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="USS PRINCETON"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="57.6"/>
+                    <TerminalParameter name="width" type="double" value="16.764"/>
+                    <TerminalParameter name="length" type="double" value="172.82"/>
+                    <TerminalParameter name="draft" type="double" value="10.058"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="30"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="15"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".015"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="74080"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="37040"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="30"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="225"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="105"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-6550.32"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="191.385"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="4000"/>
+                <TerminalParameter name="width" type="double" value="5000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="360" y="300"/>
+    </SimEntity>
+    <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
+        <TerminalParameter name="moverID" type="int" value="999"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value=""/>
+                <TerminalParameter name="reference" type="java.lang.String" value=""/>
+                <TerminalParameter name="rationale" type="java.lang.String" value=""/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist Cell Planner"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="0"/>
+                    <TerminalParameter name="width" type="double" value="0"/>
+                    <TerminalParameter name="length" type="double" value="0"/>
+                    <TerminalParameter name="draft" type="double" value="0"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="0"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="0"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="0"/>
+                <TerminalParameter name="entityDomain" type="int" value="0"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="10000"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="int[]">
+            <TerminalParameter name="" type="int" value="600"/>
+            <TerminalParameter name="" type="int" value="601"/>
+            <TerminalParameter name="" type="int" value="602"/>
+        </MultiParameter>
+        <MultiParameter type="java.lang.String[]">
+            <TerminalParameter name="" type="java.lang.String" value="CivilianMerchantShip"/>
+        </MultiParameter>
+        <MultiParameter type="java.lang.String[]">
+            <TerminalParameter name="" type="java.lang.String" value="ABOT"/>
+        </MultiParameter>
+        <MultiParameter type="diskit.Tactic[]">
+            <TerminalParameter name="" type="diskit.Tactic" value="diskit.Tactic.ATTACK"/>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate">
+                <TerminalParameter name="mean (0 -&gt; +Infinity)" type="double" value="30"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="20"/>
+        <Coordinate x="280" y="390"/>
+    </SimEntity>
+    <SimEntity description="" name="Terrorist1" type="Hostile.ExplosiveLadenVessel">
+        <TerminalParameter name="moverID" type="int" value="600"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist 1"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="2"/>
+                    <TerminalParameter name="width" type="double" value="5"/>
+                    <TerminalParameter name="length" type="double" value="18"/>
+                    <TerminalParameter name="draft" type="double" value=".5"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="18"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="190" y="390"/>
+    </SimEntity>
+    <SimEntity description="" name="Terrorist2" type="Hostile.ExplosiveLadenVessel">
+        <TerminalParameter name="moverID" type="int" value="601"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist 2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="2"/>
+                    <TerminalParameter name="width" type="double" value="5"/>
+                    <TerminalParameter name="length" type="double" value="18"/>
+                    <TerminalParameter name="draft" type="double" value=".5"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="18"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="350" y="390"/>
+    </SimEntity>
+    <SimEntity description="" name="Terrorist3" type="Hostile.ExplosiveLadenVessel">
+        <TerminalParameter name="moverID" type="int" value="602"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Terrorist 3"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="2"/>
+                    <TerminalParameter name="width" type="double" value="5"/>
+                    <TerminalParameter name="length" type="double" value="18"/>
+                    <TerminalParameter name="draft" type="double" value=".5"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="25"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="18"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="3"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".025"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="280" y="490"/>
+    </SimEntity>
+    <SimEntity description="A commercial container ship with an arbitrary neutral country assigned (Greece)" name="CommerShip1" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="206"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Commercial Ship Greece"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="40"/>
+                    <TerminalParameter name="width" type="double" value="18.9"/>
+                    <TerminalParameter name="length" type="double" value="138.684"/>
+                    <TerminalParameter name="draft" type="double" value="6.1"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="12"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value=".5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="1"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="82"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-21260"/>
+                    <TerminalParameter name="y" type="double" value="2000"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="206"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-21264.5"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="2079.83"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="2000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="206"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="12053.19"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="1090.65"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="2000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="480" y="300"/>
+    </SimEntity>
+    <SimEntity description="A commercial container ship with an arbitrary neutral country assigned (Panama)" name="CommerShip2" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="207"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Commercial Ship Panama"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="40"/>
+                    <TerminalParameter name="width" type="double" value="18.9"/>
+                    <TerminalParameter name="length" type="double" value="138.684"/>
+                    <TerminalParameter name="draft" type="double" value="6.1"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="12"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value=".5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="1"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="168"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-21260"/>
+                    <TerminalParameter name="y" type="double" value="2000"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="207"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="12053.19"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="1090.65"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="2000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="207"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-21264.5"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="2079.83"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="100"/>
+                <TerminalParameter name="width" type="double" value="2000"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="480" y="240"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow1" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="200"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow1"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="-2100"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="200"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2288.77"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-2105.365"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="540" y="240"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow2" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="201"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="-2100"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="201"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2288.77"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-2105.365"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="600" y="240"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow3" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="202"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow3"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="-2100"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="202"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2288.77"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="-2105.365"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="660" y="240"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow4" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="203"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow4"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="2600"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="203"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2229.683"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="2651.196"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="540" y="300"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow5" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="204"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow5"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="2600"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="204"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2229.683"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="2651.196"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="600" y="300"/>
+    </SimEntity>
+    <SimEntity description="A dhow, which is a common waterborne platform in the Persian Gulf.  This platform can be used for basic transport, fishing, or cargo shipping depending on the configuration of the ship." name="Dhow6" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="205"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations of this type of platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Dhow6"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="10"/>
+                    <TerminalParameter name="width" type="double" value="15"/>
+                    <TerminalParameter name="length" type="double" value="45.72"/>
+                    <TerminalParameter name="draft" type="double" value="2"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="10"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="5"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="5"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value=".025"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="3"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="5000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2200"/>
+                    <TerminalParameter name="y" type="double" value="2600"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="205"/>
+                <TerminalParameter name="probability" type="double" value="1"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2229.683"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0.0"/>
+                    <TerminalParameter name="Z" type="double" value="2651.196"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="7892.514"/>
+                <TerminalParameter name="width" type="double" value="3614.045"/>
+                <TerminalParameter name="height" type="double" value="0.0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="660" y="300"/>
+    </SimEntity>
+    <SimEntity description="AH-1W Super Cobra US Marine Corps helicopter" name="SuperCobra" type="Friendly.MilitaryHelicopter">
+        <TerminalParameter name="moverID" type="int" value="103"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="http://www.fas.org/man/dod-101/sys/ac/ah-1.htm"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are derived from an online, public source"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="Super Cobra"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="4.44"/>
+                    <TerminalParameter name="width" type="double" value="3.28"/>
+                    <TerminalParameter name="length" type="double" value="17.68"/>
+                    <TerminalParameter name="draft" type="double" value="0"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <TerminalParameter name="maximumSpeed" type="double" value="170"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="94.5"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="4495.8"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="3000"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="30"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="30"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="2"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value=".045"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="30000"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="2"/>
+                <TerminalParameter name="entityCountry" type="int" value="225"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-100"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="103"/>
+                <TerminalParameter name="probability" type="double" value=".8"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2291.69"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="500"/>
+                    <TerminalParameter name="Z" type="double" value="0.0"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="5000"/>
+                <TerminalParameter name="width" type="double" value="5000"/>
+                <TerminalParameter name="height" type="double" value="200"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="103"/>
+                <TerminalParameter name="probability" type="double" value=".2"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-2685.480"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="17"/>
+                    <TerminalParameter name="Z" type="double" value="-1.040"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="0"/>
+                <TerminalParameter name="width" type="double" value="0"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="720" y="240"/>
+    </SimEntity>
+    <SimEntity description="An Oil Tanker" name="OilTanker1" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="500"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations for this platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="OilTanker1"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="40"/>
+                    <TerminalParameter name="width" type="double" value="18.9"/>
+                    <TerminalParameter name="length" type="double" value="138.684"/>
+                    <TerminalParameter name="draft" type="double" value="6.1"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="15"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="9"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2056.475"/>
+                    <TerminalParameter name="y" type="double" value="-68.628"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="130" y="240"/>
+    </SimEntity>
+    <SimEntity description="An Oil Tanker" name="OilTanker2" type="Neutral.CivilianMerchantShip">
+        <TerminalParameter name="moverID" type="int" value="501"/>
+        <MultiParameter type="diskit.SMAL.EntityDefinition">
+            <MultiParameter type="diskit.SMAL.Classification">
+                <TerminalParameter name="level" type="java.lang.String" value="UNCLASSIFIED"/>
+                <TerminalParameter name="reference" type="java.lang.String" value="none"/>
+                <TerminalParameter name="rationale" type="java.lang.String" value="All values in this model are generic estimations for this platform"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.IdentificationParameters">
+                <TerminalParameter name="name" type="java.lang.String" value="OilTanker2"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.PhysicalParameters">
+                <MultiParameter type="diskit.SMAL.PhysicalConstraints">
+                    <TerminalParameter name="height" type="double" value="40"/>
+                    <TerminalParameter name="width" type="double" value="18.9"/>
+                    <TerminalParameter name="length" type="double" value="138.684"/>
+                    <TerminalParameter name="draft" type="double" value="6.1"/>
+                    <TerminalParameter name="grossWeight" type="double" value="0"/>
+                    <TerminalParameter name="fuelCapacity" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.DynamicResponseConstraints">
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <MultiParameter type="diskit.X3DCoordinate">
+                        <TerminalParameter name="X" type="double" value="0"/>
+                        <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                        <TerminalParameter name="Z" type="double" value="0"/>
+                    </MultiParameter>
+                    <MultiParameter type="diskit.X3DCoordinate"/>
+                    <TerminalParameter name="maximumSpeed" type="double" value="15"/>
+                    <TerminalParameter name="cruiseSpeed" type="double" value="9"/>
+                    <TerminalParameter name="maximumAltitude" type="double" value="0"/>
+                    <TerminalParameter name="cruiseAltitude" type="double" value="0"/>
+                    <TerminalParameter name="maximumDepth" type="double" value="0"/>
+                    <TerminalParameter name="cruiseDepth" type="double" value="0"/>
+                    <TerminalParameter name="maximumAcceleration" type="double" value="0"/>
+                    <TerminalParameter name="maximumDeceleration" type="double" value="0"/>
+                    <TerminalParameter name="minimumTurnRadius" type="double" value="0"/>
+                    <TerminalParameter name="maximumTurnRate" type="double" value="0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.SMAL.TacticalConstraints">
+                    <TerminalParameter name="maximumAirThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSubsurfaceThreatRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumAirDetectionRange" type="double" value="0"/>
+                    <TerminalParameter name="maximumSurfaceDetectionRange" type="double" value="10000"/>
+                    <TerminalParameter name="maximumSubsurfaceDetectionRange" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.NetworkedCommunicationParameters">
+                <TerminalParameter name="entityKind" type="int" value="1"/>
+                <TerminalParameter name="entityDomain" type="int" value="3"/>
+                <TerminalParameter name="entityCountry" type="int" value="0"/>
+                <TerminalParameter name="entityCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySubCategory" type="int" value="0"/>
+                <TerminalParameter name="entitySpecific" type="int" value="0"/>
+                <TerminalParameter name="entityExtra" type="int" value="0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.SMAL.LocationOrientation">
+                <MultiParameter type="diskit.Vec3d">
+                    <TerminalParameter name="x" type="double" value="-2056.475"/>
+                    <TerminalParameter name="y" type="double" value="-68.628"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
+                </MultiParameter>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="-1"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <MultiParameter type="diskit.random.RandomVariateInstantiator">
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate">
+                <TerminalParameter name="Mean (-Infitiny -&gt; +Infinity)" type="double" value="40"/>
+                <TerminalParameter name="Standard Deviation (0.0 -&gt; +Infinity)" type="double" value="20"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate"/>
+        </MultiParameter>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <Coordinate x="130" y="320"/>
+    </SimEntity>
+    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="NauticalChart"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="OilPlatform"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="RHIB1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="RHIB2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CG59"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="DDG77"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="TerroristCellPlanner"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist2"/>
+    <SimEventListenerConnection listener="Terrorist1" source="TerroristCellPlanner"/>
+    <SimEventListenerConnection listener="Terrorist2" source="TerroristCellPlanner"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist3"/>
+    <SimEventListenerConnection listener="Terrorist3" source="TerroristCellPlanner"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CommerShip2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="CommerShip1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow3"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow4"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow5"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Dhow6"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="SuperCobra"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="OilTanker1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="OilTanker2"/>
+    <SimEventListenerConnection listener="TerroristCellPlanner" source="ScenarioManager"/>
+    <Schedule stopTime="10000" verbose="false"/>
+    <Experiment timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+
