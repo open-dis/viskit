@@ -1,5 +1,6 @@
 package viskit.xsd.assembly;
 
+
 import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;
@@ -9,10 +10,13 @@ import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.*;
+import viskit.xsd.assembly.GridletEventList;
 
 /**
  * Base class for creating Simkit scenarios.
@@ -67,6 +71,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   private DecimalFormat form;
 
   private LinkedList entitiesWithStats;
+  
+  private ByteArrayOutputStream outputBuffer;
 
   /**
    * Default constructor sets paameters of BasicAssembly to their
@@ -97,7 +103,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     //TODO MIKE: instead of this.getName() We may not need to worry about the name of
     //the stats report file. Should discuss though.
     statsConfig = new ReportStatisticsConfig(this.getName());
-
+    outputBuffer = new ByteArrayOutputStream();
     //moved to run() to avoid beanshell upcall error
     //createObjects();
     //performHookups();
@@ -498,6 +504,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     Schedule.stopAtTime(getStopTime());
     if (isVerbose()) {
       Schedule.setVerbose(isVerbose());
+      // TBD stats not getting returned if other default EventList used
+      //Schedule.setDefaultEventList(new GridletEventList(1, new PrintWriter(outputBuffer)));
+      // protected int listId = Schedule.getNextAvailableID();
+      //Schedule.addNewEventList(GridletEventList.class);
+      // EventList newList = Schedule.getEventList(listId);
+      //simkit.EventList newList = Schedule.getEventList(1);
+      //Schedule.setDefaultEventList(newList);
     }
     if (isSingleStep()) {
       Schedule.setSingleStep(isSingleStep());
