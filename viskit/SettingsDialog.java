@@ -282,15 +282,47 @@ public class SettingsDialog extends JDialog
     vConfig.clearTree(xClassPathClearKey);
   }
 
-  private void saveClassPathEntries(String[] lis)
-  {
-    clearClassPathEntries();
-
-    for(int i=0;i<lis.length;i++) {
-      vConfig.setProperty(xClassPathKey +"("+i+")[@value]",lis[i]);
-    }
+  JDialog progressDialog = new JDialog(this);
+  JProgressBar progress = new JProgressBar(0,100);
+  private void saveClassPathEntries(String[] lis) {
+      clearClassPathEntries();
+      
+      for(int i=0;i<lis.length;i++) {
+          vConfig.setProperty(xClassPathKey +"("+i+")[@value]",lis[i]);
+      }
+      
+      progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      JPanel panel = new JPanel();
+      //progressDialog.add(panel, BorderLayout.PAGE_START);
+      progress.setIndeterminate(true);
+      progress.setString("Loading Libraries");
+      progress.setStringPainted(true);
+      progressDialog.add(progress);
+      //panel.add(progress);
+      progressDialog.pack();
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+      progressDialog.setLocation((d.width - progressDialog.getWidth()) / 2, (d.height - progressDialog.getHeight()) / 2);
+      progressDialog.setVisible(true);
+      progressDialog.setResizable(false);
+      Task t = new Task();
+      t.execute();
   }
-
+  
+  class Task extends SwingWorker<Void, Void> {
+      public Void doInBackground() {
+          progressDialog.setVisible(true);
+          progressDialog.toFront();
+          VGlobals.instance().rebuildTreePanels();
+          return null;
+      }
+      
+      public void done() {
+          progress.setIndeterminate(false);
+          progress.setValue(100);
+          progressDialog.setVisible(false);
+      }
+  }
+  
   private void fillWidgets()
   {
     //classPathJlist.removeAll();
