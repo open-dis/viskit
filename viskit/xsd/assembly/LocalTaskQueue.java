@@ -16,7 +16,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
+//import java.util.Vector;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 
@@ -24,9 +25,10 @@ import viskit.doe.LocalBootLoader;
  *
  * @author Rick Goldberg
  */
-public class LocalTaskQueue extends Vector {
+public class LocalTaskQueue extends /*Vector*/ ArrayList {
     GridRunner gridRunner;
     int totalTasks;
+    File experimentFile;
     /** Creates a new instance of LocalTaskQueue, instanced by
      * GridRunner in local mode.
      *
@@ -43,7 +45,28 @@ public class LocalTaskQueue extends Vector {
      * provides the list of "ext" URL's. 
      */
     public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) throws DoeException {
+        this.experimentFile = experimentFile;
+        this.totalTasks = totalTasks;
+        this.gridRunner = gridRunner;
+
         for (int i = 0; i<totalTasks; i++) {
+            super.add(new Boolean(true));
+        }
+          
+    }
+
+    /** 
+     * Activate Gridlet indexed at i
+     *
+     */
+    public boolean activate(int i) {
+        Object o = super.get(i);
+        if (o instanceof Thread) {
+            if (! ((Thread)o).isAlive() ) {
+                ((Thread) super.get(i)).start();
+                return true;
+            }   
+        } else if ((Boolean)o) {
             Object parent = Thread.currentThread().getContextClassLoader();
             Class parentz = parent.getClass();
             try {
@@ -80,34 +103,18 @@ public class LocalTaskQueue extends Vector {
                 mthd = gridletz.getMethod("setTotalTasks",int.class);
                 mthd.invoke(task,totalTasks);
                 
-                // gridRunner to be done retrospectively on the other side
+                // gridRunner to be done "retrospectively" on the other side
                 // so send as Object
                 //task.setGridRunner(gridRunner);
                 mthd = gridletz.getMethod("setGridRunner",Object.class);
                 mthd.invoke(task,(Object)gridRunner);
                 
-                super.add(task);
+                super.set(i,task);
+                ((Thread)task).start();
                 
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new DoeException(e.getMessage());
             }
-            
-            
-        }
-    }
-
-    /** 
-     * Activate Gridlet indexed at i
-     *
-     */
-    public boolean activate(int i) {
-        Object o = super.get(i);
-        if (o instanceof Thread) {
-            if (! ((Thread)o).isAlive() ) {
-                ((Thread) super.get(i)).start();
-                return true;
-            }   
         }
         return false;
     }
@@ -115,7 +122,7 @@ public class LocalTaskQueue extends Vector {
    
     public Object get(int i) {
         if (super.get(i) instanceof Thread)
-            return Boolean.TRUE;
+            return new Boolean(Boolean.TRUE);
         
         else return super.get(i);
     }
@@ -129,9 +136,10 @@ public class LocalTaskQueue extends Vector {
         return super.size(); // do fries come with that?
     }
     
-    public String toString() {
+    public String toString() { /// mostly unusable
         String buf ="Task Queue Status:\n";
         StringBuffer sbuf = new StringBuffer(buf);
+        
         for(int i = 0; i < size(); i++) {
             String task = "\t";
             if (super.get(i) instanceof Thread) {
@@ -142,8 +150,7 @@ public class LocalTaskQueue extends Vector {
             }
             sbuf.append(task+"\n");
         }
-        
-        
+
         return buf;
     }
 }
