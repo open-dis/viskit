@@ -111,6 +111,10 @@ public class VGlobals
     mod.init();
     return avf;
   }
+  
+  public void rebuildTreePanels() {
+      avf.rebuildTreePanels();
+  }
 
   public AssemblyModel getAssemblyModel()
   {

@@ -69,7 +69,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     MyRenderer rendr = new MyRenderer();
     setCellRenderer(rendr);
 
-    setToolTipText("mama");  // needs to be done first to enable tt below
+    setToolTipText("");  // needs to be done first to enable tt below
     setRootVisible(true); // we want this to be false, but there is some sort of JTree bug...see paintComponent override below
     setShowsRootHandles(true);
     setVisibleRowCount(100);    // means always fill a normal size panel
@@ -655,6 +655,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       return ((FileBasedAssyNode) o).loadedClass;
     return
         null;
+  }
+  
+  public void clear() {
+      root.removeAllChildren();
+      if (directoryRoots != null) directoryRoots.clear();
   }
 }
 

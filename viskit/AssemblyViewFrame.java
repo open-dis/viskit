@@ -484,16 +484,28 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   private JSplitPane panJsp;
 
+  void rebuildTreePanels() {
+     lTree.clear();
+     JSplitPane treeSplit = buildTreePanels();
+     jsp.setTopComponent(treeSplit);
+     treeSplit.setDividerLocation(250);
+     lTree.repaint();
+  }
+  
   private JSplitPane buildTreePanels()
   {
+      
     lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
         this, "Drag an Event Graph onto the canvas to add it to the assembly");
-
-    // todo get from project
-    lTree.addContentRoot(new File("lib/simkit.jar"));
-    lTree.addContentRoot(new File("lib/ext/diskit.jar"));
-    lTree.addContentRoot(new File("BehaviorLibraries/SavageTactics"),true);
-
+    
+    for ( String path : SettingsDialog.getExtraClassPath() ) { // tbd same for pcls
+        if (path.endsWith(".jar"))
+            lTree.addContentRoot(new File(path));
+        else
+            lTree.addContentRoot(new File(path),true);
+       
+    }
+    
     LegosPanel lPan = new LegosPanel(lTree);
 
     pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
@@ -536,23 +548,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
   class vDropTargetAdapter extends DropTargetAdapter
   {
-    /*
-    public void dragEnter(DropTargetDragEvent dtde)
-    {
-    }
-
-    public void dragExit(DropTargetEvent dte)
-    {
-    }
-
-    public void dragOver(DropTargetDragEvent dtde)
-    {
-    }
-
-    public void dropActionChanged(DropTargetDragEvent dtde)
-    {
-    }
-    */
 
     public void drop(DropTargetDropEvent dtde)
     {
