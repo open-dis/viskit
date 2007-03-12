@@ -21,6 +21,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -47,7 +48,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.util.SortOrder;
 import java.util.Hashtable;
 
-public class StatsGraph extends JFrame {
+public class StatsGraph extends JPanel {
     String[] properties;
     int designPoints;
     int samples;
@@ -55,33 +56,37 @@ public class StatsGraph extends JFrame {
     Hashtable minMaxs;
     Hashtable chartPanels;
     JTabbedPane tabbedPane;
+    ChartPanel chartPanel;
     
-    public StatsGraph(String expName, final String[] properties, int designPoints, int samples) {
-        this("Gridkit Statistics "+expName);
-        this.properties = properties;
-        this.designPoints = designPoints;
-        this.samples = samples;
+    public StatsGraph() {
         tabbedPane = new JTabbedPane();
         meanAndStandardDeviations = new Hashtable();
         minMaxs = new Hashtable();
         chartPanels = new Hashtable();
+        
+        add(tabbedPane);
+        //pack();
+        setVisible(true);
+        //super(title);
+        //setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+    
+    public void setProperties(String[] properties, int designPoints, int samples) {
+        this.designPoints = designPoints;
+        this.samples = samples;
         for (int i = 0; i < properties.length; i++) {
             if (viskit.Vstatics.debug) System.out.println("StatsGraph: createDataSets for "+properties[i]);
             createDataSets(properties[i]);
             tabbedPane.add(properties[i],(ChartPanel)chartPanels.get(properties[i]));  
+            //setPreferredSize(parent.getSize());
+            //chartPanel.setPreferredSize(parent.getSize());
         }
-        setContentPane(tabbedPane);
-        pack();
-        setVisible(true);
     }
     /**
      *
-     * @param title  the frame title.
+     *
      */
-    public StatsGraph(final String title) {
-        super(title);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
+   
 
     // add SampleStatistic to datasets at designPoint d and sample s
     public void addSampleStatistic(viskit.xsd.bindings.assembly.SampleStatisticsType sample, int d, int s) {
@@ -105,9 +110,9 @@ public class StatsGraph extends JFrame {
                 new CategoryPlot(),
                 false);
        
-        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel = new ChartPanel(chart);
         chartPanels.put(name,chartPanel);
-        chartPanel.setPreferredSize(new java.awt.Dimension(800,600));
+        //chartPanel.setPreferredSize(new java.awt.Dimension(800,600));
         chartPanel.setDomainZoomable(true);
         chartPanel.setRangeZoomable(true);
    
