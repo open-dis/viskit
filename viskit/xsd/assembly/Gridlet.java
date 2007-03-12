@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -42,6 +43,12 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
@@ -242,7 +249,7 @@ public class Gridlet extends Thread {
         
         
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
-        debug_io = true;
+
         if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
         
         //pass design args into design params
@@ -300,9 +307,9 @@ public class Gridlet extends Thread {
             
             List depends = root.getEventGraph();
             Iterator di = depends.iterator();
-            ArrayList eventGraphJavaFiles = new ArrayList();
+            ArrayList javaFiles = new ArrayList();
             
-            // submit all EventGraphs to the beanshell context
+            // submit all EventGraphs
             while ( di.hasNext() ) {
                 
                 EventGraphType d = (EventGraphType)(di.next());
@@ -338,7 +345,7 @@ public class Gridlet extends Thread {
                 // since there may be some kind of event-graph interdependency, compile
                 // all .java's "at once"; javac should be able to resolve these if given
                 // on the command line all at once.
-                eventGraphJavaFiles.add(eventGraphJavaFile);
+                javaFiles.add(eventGraphJavaFile);
                 
             }
             
@@ -346,22 +353,17 @@ public class Gridlet extends Thread {
             // direcory under tempDir
             
             String[] cmd;
-            Iterator it = eventGraphJavaFiles.iterator();
-            ArrayList cmdLine = new ArrayList();
+            Iterator it = javaFiles.iterator();
+            List<String> cmdLine = new ArrayList<String>();
+            
             cmdLine.add("-verbose");
             cmdLine.add("-classpath");
             cmdLine.add(classPath);
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());
             
-            // allow javac to resolve interdependencies by
-            // providing all .java's at once
-            while (it.hasNext()) {
-                File java = (File)(it.next());
-                cmdLine.add(java.getCanonicalPath());
-            }
             
-            // Now do the Assembly
+            // Now add the Assembly
             
             String assemblyJava = sax2j.translate();
             File assemblyJavaFile = new File(tempDir,sax2j.getRoot().getName()+".java");
@@ -369,21 +371,40 @@ public class Gridlet extends Thread {
             writer.write(assemblyJava);
             writer.flush();
             writer.close();
-            cmdLine.add(assemblyJavaFile.getCanonicalPath());
+            javaFiles.add(assemblyJavaFile);
             
-            cmd = (String[])cmdLine.toArray(new String[]{});
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics,null,null);
+            Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(javaFiles);
+            compiler.getTask(null, fileManager, null, cmdLine, null, compilationUnits).call();
+
             
-            int reti =  com.sun.tools.javac.Main.compile(cmd);
-            
-            if (debug_io) {
+            if (/*debug_io*/true) {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
                 System.out.println(sax2j.translate());
-                if (reti != 0) {
-                    //System.out.println("\tCompile Failed");
+                URI cwd = tempDir.toURI();
+                for (Diagnostic<? extends JavaFileObject> diagnostic :
+                    diagnostics.getDiagnostics()) {
+                    String kind = diagnostic.getKind().toString().toLowerCase();
+                    JavaFileObject source = diagnostic.getSource();
+                    if (source != null) {
+                        long line = diagnostic.getLineNumber();
+                        URI name = cwd.relativize(source.toUri());
+                        if (line != Diagnostic.NOPOS)
+                            System.out.format("%s:%s: %s: %s%n", name, line, kind,
+                                    diagnostic.getMessage(null));
+                        else
+                            System.out.format("%s:1: %s: %s%n", name, kind,
+                                    diagnostic.getMessage(null));
+                    } else {
+                        System.out.format("%s: %s%n", kind,
+                                diagnostic.getMessage(null));
+                    }
                 }
+                
             }
              
-            //ClassLoader cloader = Thread.currentThread().getContextClassLoader(); // or not getContextClassLoader()?
             ClassLoader cloader = getContextClassLoader();
             System.out.println(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
             
@@ -438,9 +459,9 @@ public class Gridlet extends Thread {
                             args.add(statForStat(allStat[j]));
 
                         }
-                        statXml = sax2j.marshalToString(iss);
+                        statXml = sax2j.marshalFragmentToString(iss);
                     } else {
-                        statXml = sax2j.marshalToString(statForStat(designPointStats[i]));
+                        statXml = sax2j.marshalFragmentToString(statForStat(designPointStats[i]));
                         
                     }
                     
@@ -547,7 +568,15 @@ public class Gridlet extends Thread {
             java.io.StringReader esr = new java.io.StringReader(baos.toString());
             java.io.BufferedReader ebr = new java.io.BufferedReader(sr);
             
-            try {
+            // TBD: The following only works correctly in grid mode, due to multithreaded mode's shared
+            // access to System.out. Either each thread synchronizes on System.out at the
+            // start of the run method, or expect verbose messages to appear in the wrong
+            // index. There doesn't appear to be a way to set Simkit's output stream for
+            // verbose true. Synchronizing on System.out is probably not the best thing, as
+            // it defeats the whole purpose of multithreading if there is more than one CPU.
+            // In this case it is probably best to turn verbose false, and emulate the built-in
+            // Simkit messages via SimEventListener.
+            try { 
 
                 PrintWriter out;
                 StringWriter sw;
