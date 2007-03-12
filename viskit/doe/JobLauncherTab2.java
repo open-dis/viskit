@@ -153,6 +153,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     doListeners();
 
     setFile(file, title);
+    
+    setGridMode();
   }
 
   public Container getContent()
@@ -252,7 +254,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void actionPerformed(ActionEvent e)
         {
             if (doLocalRun.getModel().isSelected()) {
-                clusterName = clusterTF.getText();
                 clusterTF.setText("localhost");
                 unameTF.setEnabled(false);
                 portTF.setEnabled(false);
@@ -335,7 +336,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     topPan.setBorder(new EtchedBorder());
     return topPan;
   }
-
+  
+  JSplitPane leftSplit;
+  JSplitPane rightSplit;
   private Container buildContent()
   {
     initConfig();
@@ -344,8 +347,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     setLayout(new BorderLayout());
 
     JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    JSplitPane leftSplit;
-    JSplitPane rightSplit;
+
 
     JPanel controlP = new JPanel();
     controlP.setLayout(new BoxLayout(controlP, BoxLayout.Y_AXIS));
@@ -393,14 +395,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     serrTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
     serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
     JScrollPane jspErr = new JScrollPane(serrTA);
-
-    rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, jspErr);
+    statsGraph = new StatsGraph();
+    rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, statsGraph);
     leftRightSplit.setLeftComponent(leftSplit);
     leftRightSplit.setRightComponent(rightSplit);
-    rightSplit.setDividerLocation(200);
+    rightSplit.setDividerLocation(400);
     leftRightSplit.setDividerLocation(315);
     add(leftRightSplit, BorderLayout.CENTER);
-
+        
     return this; //p;
   }
 
@@ -666,6 +668,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     thread = new Thread(JobLauncherTab2.this);
     thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
     thread.start();
+    
+    statusTextArea.setText("");
   }
 
   class ButtListener implements ActionListener
@@ -836,8 +840,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   // it should run locally
   private boolean gridMode = true;
   
-  public void run()
-  {
+  public void run() {
       try {
           if ( gridMode ) {
               doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()) );
@@ -847,163 +850,179 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               int i = 0;
               for (String path:extClassPaths) {
                   File extFile = new File(path);
-                    try {
-                        extClassPathsUrls[i++] = extFile.toURL();
-                    } catch (MalformedURLException ex) {
-                        ex.printStackTrace();
-                    }
+                  try {
+                      extClassPathsUrls[i++] = extFile.toURL();
+                  } catch (MalformedURLException ex) {
+                      ex.printStackTrace();
+                  }
               }
               doe = new LocalDriverImpl(extClassPathsUrls,viskit.VGlobals.instance().getWorkDirectory());
           }
           qstatConsole.setDoe(doe);
           
-   //
+          //
           
-    Vector args = new Vector(5);
-
-    boolean doClustStat = this.doClusterStat.isSelected();
-    boolean doGraphOut = this.doGraphOutput.isSelected();
-
-    outputDirty = true;
-    outputList = new ArrayList();
-    lp3:
-    {
-      try {
-        createOutputDir();
-
-        // Send EventGraphs
-        Collection egs = cntlr.getLoadedEventGraphs();
-
-        for (Iterator itr = egs.iterator(); itr.hasNext();) {
-          addEventGraphFile((File) itr.next());
-        }
-
-        // Construct assembly
-        fr = new FileReader(filteredFile);
-        br = new BufferedReader(fr);
-        data = new StringWriter();
-        out = new PrintWriter(data);
-        String line;
-        while ((line = br.readLine()) != null) {
-          out.println('\t' + line);
-        }
-        out.close();
-
-        String dataS = data.toString().trim();
-        
-        doe.setAssembly(dataS);
-        
-        if (viskit.Vstatics.debug) writeStatus(dataS);
-        
-        writeStatus("Executing job");
-        
-        //doe.run();
-
-      }
-      
-      catch (Exception e) {
-e.printStackTrace();
-        writeStatus("Error: " + e.getMessage());
-        
-        
-        doe = null; // will cause GC to hit finally() which in grid will logout()
-        
-      }
-
-      // Bring up the 2 other windows
-      if (doClustStat)
-        showClusterStatus(clusterWebStatus);
-      //if(doGraphOut)
-      //chartter = new JobResults(null, title);
-
-      writeStatus("Getting results:");
-
-      processResultsNew();
-
-    }
-
-    stopRun();
-    
-    } catch ( DoeException de ) {
+          
+          
+          boolean doClustStat = this.doClusterStat.isSelected();
+          boolean doGraphOut = this.doGraphOutput.isSelected();
+          
+          outputDirty = true;
+          outputList = new ArrayList();
+          lp3:
+          {
+              try {
+                  createOutputDir();
+                  
+                  // Send EventGraphs
+                  Collection egs = cntlr.getLoadedEventGraphs();
+                  
+                  for (Iterator itr = egs.iterator(); itr.hasNext();) {
+                      addEventGraphFile((File) itr.next());
+                  }
+                  
+                  // Construct assembly
+                  fr = new FileReader(filteredFile);
+                  br = new BufferedReader(fr);
+                  data = new StringWriter();
+                  out = new PrintWriter(data);
+                  String line;
+                  while ((line = br.readLine()) != null) {
+                      out.println('\t' + line);
+                  }
+                  out.close();
+                  
+                  String dataS = data.toString().trim();
+                  
+                  doe.setAssembly(dataS);
+                  
+                  if (viskit.Vstatics.debug) writeStatus(dataS);
+                  
+                  writeStatus("Executing job");
+                  
+                  //doe.run();
+                  
+              }
+              
+              catch (Exception e) {
+                  e.printStackTrace();
+                  writeStatus("Error: " + e.getMessage());
+                  
+                  
+                  doe = null; // will cause GC to hit finally() which in grid will logout()
+                  
+              }
+              
+              // Bring up the 2 other windows
+              if (doClustStat)
+                  showClusterStatus(clusterWebStatus);
+              //if(doGraphOut)
+              //chartter = new JobResults(null, title);
+              
+              writeStatus("Getting results:");
+              
+              processResults();
+              
+          }
+          
+          //stopRun();
+          
+      } catch ( DoeException de ) {
           writeStatus(de.toString());
       }
   }
 
-  private void processResultsNew()
-  {
-    Vector args = new Vector(5);
-    Object ret;
-    Experiment exp = (Experiment) jaxbRoot.getExperiment();
-    int samples = Integer.parseInt(exp.getTotalSamples());
-    int designPoints = jaxbRoot.getDesignParameters().size();
-    // synchronous single threaded results, uses
-    // a status buffer that locks until results are
-    // in, at which point a select can be performed.
-    // this saves server thread resources
-
-
-    Vector lastQueue;
-
-    try {
-      // this shouldn't block on the very first call, the queue
-      // is born dirty. unless its a local doe, which used up the
-      // first getTaskQueue... 
+  private boolean statsGraphSet=false;
+  private void processResults() {
+      Object ret;
+      Experiment exp = (Experiment) jaxbRoot.getExperiment();
+      int samples = Integer.parseInt(exp.getTotalSamples());
+      int designPoints = jaxbRoot.getDesignParameters().size();
+      // synchronous single threaded results, uses
+      // a status buffer that locks until results are
+      // in, at which point a select can be performed.
+      // this saves server thread resources
       
-      lastQueue = doe.getTaskQueue();
-
-      int tasksRemaining = doe.getRemainingTasks();
-      writeStatus("Total tasks: " + lastQueue.size());
-      writeStatus("Started tasks: " + (lastQueue.size() - tasksRemaining));
       
-      doe.run();
+      ArrayList lastQueue;
       
-      while (tasksRemaining > 0) {
-        // this will block until a task ends which could be
-        // because it died, or because it completed, either way
-        // check the logs returned by getResults will tell.
-        Vector queue = doe.getTaskQueue();
-        for (int i = 0; i < queue.size(); i ++) {
-          // trick: any change between queries indicates a transition at
-          // taskID = i (well i+1 really, taskID's in SGE start at 1)
-          if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
-            int sampleIndex = i / designPoints; // 3; // number of designPoints chosed in this experiemnt was 3
-            int designPtIndex = i % designPoints; // 3; // can also just use getResultByTaskID(int)
-            
-            if (/*verbose*/false) {
-              ret = doe.getResult(sampleIndex,designPtIndex);
-              writeStatus("Result returned from task " + (i + 1));
-              writeStatus(ret.toString());
-            }
-            
-            writeStatus("DesignPointStats from task " + (i + 1) + " is sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
-            ret = doe.getDesignPointStats(sampleIndex,designPtIndex);   
-            if (statsGraph == null) {
-              final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
-              statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);
-              statsGraph.setVisible(true);
-            }
-            addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
-           
-            
-            writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
-            for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
-              writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
-              ret = doe.getReplicationStats(sampleIndex,designPtIndex,j);
-            }
-            --tasksRemaining;
-            
+      try {
+          // this shouldn't block on the very first call, the queue
+          // is born dirty. unless its a local doe, which used up the
+          // first getTaskQueue...
+          
+          lastQueue = doe.getTaskQueue();
+          int totalTasks = lastQueue.size(); 
+          int tasksRemaining = totalTasks;
+          writeStatus("Total tasks: " + totalTasks);
+          //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
+          
+          doe.run();
+          
+          while (tasksRemaining > 0) {
+              try {
+                  // this will block until a task ends which could be
+                  // because it died, or because it completed, either way
+                  // check the logs returned by getResults will tell.
+                  ArrayList queue = doe.getTaskQueue();
+                  List sQueue = Collections.synchronizedList(queue);
+                  synchronized(sQueue) {
+                      ListIterator li = sQueue.listIterator();
+                      int i = 0;
+                      while (li.hasNext()) {
+                          //for (int i = 0; i < totalTasks; i ++) {
+                          // trick: any change between queries indicates a transition at
+                          // taskID = i (well i+1 really, taskID's in SGE start at 1)
+                          //if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
+                          
+                          boolean state = ((Boolean)li.next()).booleanValue();
+                          
+                          if (((Boolean)lastQueue.get(i)).booleanValue() != state) {
+                              int sampleIndex = i / designPoints;
+                              int designPtIndex = i % designPoints;
+                              
+                              if (/*verbose*/true) {
+                                  //ret = doe.getResult(sampleIndex,designPtIndex);
+                                  writeStatus("Result returned from task " + (i + 1) +" leaving "+tasksRemaining+" to go");
+                                  //writeStatus(ret.toString());
+                              }
+                              
+                              
+                              ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
+                              
+                              if (statsGraphSet == false) {
+                                  String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
+                                  //statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);
+                                  statsGraph.setProperties(properties,designPoints,samples);
+                                  //rightSplit.setRightComponent(statsGraph.getContentPane());
+                                  //statsGraph.setVisible(true);
+                                  statsGraphSet = true;
+                              }
+                              addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
+                              writeStatus("DesignPointStats from task " + (i + 1) + " at sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
+                              
+                              writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
+                              for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
+                                  writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
+                                  ret = doe.getReplicationStats(sampleIndex,designPtIndex,j);
+                              }
+                              --tasksRemaining;
+                              lastQueue.set(i,new Boolean(state));
+                          }
+                          i++;
+                      }
+                  }
+                  
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
+              //statsGraph = null;
           }
-        }
-        lastQueue = queue;
-
+      } catch (Exception e) {
+          e.printStackTrace();
+          writeStatus("Error in cluster execution: " + e.getMessage());
       }
-      statsGraph = null; // allow to gc after done
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      writeStatus("Error in cluster execution: " + e.getMessage());
-    }
-
+      stopRun();
   }
 
 
@@ -1347,7 +1366,13 @@ e.printStackTrace();
     }
     serverCfg = vConfig.getString(recentClusterKey + "[@server]");
     if (serverCfg == null || serverCfg.length() <= 0)
-      serverCfg = "127.0.0.1";
+      serverCfg = "localhost";
+    
+    if (serverCfg.equals("localhost")) {
+
+        gridMode = false; 
+    }
+    
     portCfg = vConfig.getString(recentClusterKey + "[@port]");
     if (portCfg == null || portCfg.length() <= 0)
       portCfg = "4444";
@@ -1405,5 +1430,15 @@ e.printStackTrace();
 
   }
 
-
+  private void setGridMode() {
+      if (!gridMode) {
+        doLocalRun.getModel().setSelected(true);
+        clusterTF.setText("localhost");
+        unameTF.setEnabled(false);
+        portTF.setEnabled(false);
+        upwPF.setEnabled(false);
+        adminButt.setEnabled(false);
+        clusterTF.setEnabled(false);
+      }
+  }
 }
