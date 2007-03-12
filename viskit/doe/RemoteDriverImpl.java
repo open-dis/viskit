@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
@@ -33,6 +34,8 @@ public class RemoteDriverImpl implements DoeDriver {
             rpc = new XmlRpcClientLite(host,port);
         } catch (MalformedURLException ex) {
             throw new DoeException("Malformed Url at "+host+":"+port);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (rpc == null) throw new DoeException("Can't connect to Gridkit service at "+host+":"+port);
        
@@ -234,17 +237,18 @@ public class RemoteDriverImpl implements DoeDriver {
         return ret;
     }
 
-    public synchronized Vector getTaskQueue() throws DoeException {
-        Vector ret = new Vector();
-        
+    public synchronized ArrayList getTaskQueue() throws DoeException {
+        Vector rpcret = new Vector();
+        ArrayList ret = new ArrayList();
         try {
-            ret = (Vector) rpc.execute("gridkit.getTaskQueue", makeArgs(usid) );
+            rpcret = (Vector) rpc.execute("gridkit.getTaskQueue", makeArgs(usid) );
         } catch (XmlRpcException xre) {
             throw new DoeException("getTaskQueue failed: "+xre.getMessage());
         } catch (IOException ioe) {
             throw new DoeException("getTaskQueue failed: "+ioe.getMessage());
         }
-        if (ret.isEmpty()) throw new DoeException("getTaskQueue failed: not logged in, set up or running? (this method blocks until data available)");
+        if (rpcret.isEmpty()) throw new DoeException("getTaskQueue failed: not logged in, set up or running? (this method blocks until data available)");
+        ret.addAll(rpcret);
         return ret;
     }
 

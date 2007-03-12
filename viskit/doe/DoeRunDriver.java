@@ -9,7 +9,7 @@ package viskit.doe;
 
 import java.io.File;
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -74,7 +74,7 @@ public interface DoeRunDriver {
 
     public String getResultByTaskID(int taskID) throws DoeException;
 
-    public Vector getTaskQueue() throws DoeException;
+    public ArrayList getTaskQueue() throws DoeException;
 
     public String qstat() throws DoeException;
 

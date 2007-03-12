@@ -43,6 +43,7 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
@@ -88,7 +89,7 @@ public class SimkitAssemblyXML2Java {
     
     public SimkitAssemblyXML2Java() {
         try {
-            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
         } catch (Exception e) {
             try {
                 this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
@@ -168,6 +169,7 @@ public class SimkitAssemblyXML2Java {
     public void marshal() {
         Marshaller m;
         try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     new Boolean(true));
@@ -188,9 +190,11 @@ public class SimkitAssemblyXML2Java {
             s = "<Errors/>";
         }
         try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",jaxb.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             m.marshal(jaxb,pw);
@@ -198,6 +202,33 @@ public class SimkitAssemblyXML2Java {
         } catch (Exception e) { e.printStackTrace(); }
         return s;
     }
+    
+    public String marshalFragmentToString(Object jaxb) {
+        Marshaller m;
+        String s;
+        if ( jaxb == null ) {
+            return "<Empty/>";
+        }
+        if (jaxb instanceof ResultsType) {
+            s = "<Result/>";
+        } else {
+            s = "<Errors/>";
+        }
+        try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",jaxb.getClass().getClassLoader());
+            m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                    new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
+            //m.setProperty(Marshaller.JAXB_ENCODING,)
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            m.marshal(jaxb,pw);
+            s = sw.toString();
+        } catch (Exception e) { e.printStackTrace(); }
+        return s;
+    }
+    
     
     public void marshal(File f) {
         FileOutputStream fos;
@@ -210,6 +241,7 @@ public class SimkitAssemblyXML2Java {
     public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
         Marshaller m;
         try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",node.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.marshal(node,o);

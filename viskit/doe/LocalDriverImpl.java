@@ -15,8 +15,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Vector;
 import viskit.xsd.assembly.GridRunner;
 
 /**
@@ -115,6 +115,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             return (Hashtable) ((Method)methods.get("getDesignPointStats")).invoke(runner,sampleIndex,designPtIndex);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getDesignPointStats(sampleIndex,designPtIndex);
@@ -125,6 +126,7 @@ public class LocalDriverImpl implements DoeRunDriver {
             return (Integer) ((Method)methods.get("getRemainingTasks")).invoke(runner,new Object[]{});
             
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getRemainingTasks();
@@ -134,6 +136,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             return (Hashtable) ((Method)methods.get("getReplicationStats")).invoke(runner,sampleIndex,designPtIndex,replicationIndex);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getReplicationStats(sampleIndex,designPtIndex,replicationIndex);
@@ -144,6 +147,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             return (String) ((Method)methods.get("getResult")).invoke(runner,sampleIndex,designPtIndex);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getResult(sample,designPt);
@@ -153,6 +157,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             return (String) ((Method)methods.get("getResultByTaskID")).invoke(runner,taskID);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getResultByTaskID(taskID);
@@ -162,14 +167,15 @@ public class LocalDriverImpl implements DoeRunDriver {
     // mode need a copy, not the same Vector; users of it in remote
     // mode automatically get a copy. Since we don't actually need
     // any of the internals, simple Booleans get copied in here
-    public synchronized Vector getTaskQueue() throws DoeException {
+    public synchronized ArrayList getTaskQueue() throws DoeException {
         try {
-            Vector queue = (Vector) ((Method)methods.get("getTaskQueue")).invoke(runner,new Object[]{});
-            Vector cloneQueue = new Vector();
+            ArrayList queue = (ArrayList) ((Method)methods.get("getTaskQueue")).invoke(runner,new Object[]{});
+            ArrayList cloneQueue = new ArrayList();
             for (int i = 0; i<queue.size(); i++)
                 cloneQueue.add(new Boolean((Boolean)queue.get(i)));
             return cloneQueue;
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getTaskQueue();
@@ -192,6 +198,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             ((Method)methods.get("removeIndexedTask")).invoke(runner,sampleIndex,designPtIndex);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //runner.removeIndexedTask(sampleIndex,designPtIndex);
@@ -201,6 +208,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             ((Method)methods.get("removeTask")).invoke(runner,jobID,taskID);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //runner.removeTask(jobID,taskID);
@@ -210,6 +218,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             ((Method)methods.get("setAssembly")).invoke(runner,assembly);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //runner.setAssembly(assembly);
@@ -219,6 +228,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             ((Method)methods.get("addEventGraph")).invoke(runner,eventGraph);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //runner.addEventGraph(eventGraph);
@@ -229,6 +239,8 @@ public class LocalDriverImpl implements DoeRunDriver {
             loader.doAddURL(jarFile.toURL());
         } catch (MalformedURLException ex) {
             throw new DoeException(ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     

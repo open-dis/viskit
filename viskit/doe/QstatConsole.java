@@ -33,7 +33,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     JTextArea textArea;
     JScrollPane scrollPane;
     Timer timer;
-    
+    int tsize=-1;
     static final int MIN_ROWS = 30;
     static final int MIN_FPM = 0;
     static final int MAX_FPM = 60;
@@ -134,6 +134,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
                 int lines = data.split("\\n").length;
                 textArea.setRows(lines > MIN_ROWS ? lines : MIN_ROWS);
                 textArea.setText(textArea.getText() + "\n" + data);
+               
             } catch (Exception e) {
                 textArea.setText("Can't qstat! \n" + e.toString());
             }

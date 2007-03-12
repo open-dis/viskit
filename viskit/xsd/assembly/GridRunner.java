@@ -15,14 +15,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import simkit.random.MersenneTwister;
@@ -99,8 +102,14 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // False: Complete or DOA, check Results to determine.
     // gets updated by removeTask or removeIndexedTask
     // can be used by client by synchronized checking
-    Vector queue;
+    ArrayList queue;
     boolean queueClean = false; // dirty means unclaimed info
+    // locking semaphores between set and get threads
+    // for designPts, results
+    List<Boolean> designPointStatsNotifiers;
+    List<Boolean> replicationStatsNotifiers;
+    List<Boolean> resultsNotifiers;
+    List<String> status;
     
     LocalBootLoader loader = null;
     ClassLoader initLoader = null;
@@ -165,10 +174,21 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // timeout for synchronized calls as set by Experiment tag, or not means indefinite wait
         String to = root.getExperiment().getTimeout();
         this.timeout = Long.parseLong(to==null?"0":to);
-        this.queue = new Vector(); // will be replaced in local run
+        this.queue = new ArrayList();
+        this.designPointStatsNotifiers = new ArrayList<Boolean>();
+        this.replicationStatsNotifiers = new ArrayList<Boolean>();
+        this.resultsNotifiers = new ArrayList<Boolean>();
+        this.status = new ArrayList<String>();
         for ( int i = 0; i < totalSamples * designPointCount; i ++) {
             queue.add(Boolean.TRUE);
+            designPointStatsNotifiers.add(new Boolean(false));
+            for (int j = 0; j < this.replicationsPerDesignPoint; j++) {
+                replicationStatsNotifiers.add(new Boolean(false));
+            }
+            resultsNotifiers.add(new Boolean(false));
+            status.add("Pending");
         }
+        
         return Boolean.TRUE;
     }
     
@@ -247,7 +267,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         
         try {
             
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , this.getClass().getClassLoader());
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , root.getClass().getClassLoader());
             Unmarshaller u = jc.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
             int sample = Integer.parseInt(r.getSample());
@@ -260,15 +280,19 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             // a lot of logs.
             
             List samples = root.getExperiment().getSample();
-            List designPoints = Collections.synchronizedList(((Sample)(samples.get(sample))).getDesignPoint());
-            
-            synchronized(designPoints) {
-                
+            //
+            List designPoints = ((Sample)samples.get(sample)).getDesignPoint();
+            int index = sample*designPointCount + designPt;
+            Boolean notifier = resultsNotifiers.get(index);
+            synchronized(notifier) {
                 DesignPointType designPoint = (DesignPointType) designPoints.get(designPt);
                 designPoint.setResults(r);
-                synchronized(designPoint) {
-                    designPoint.notify();
-                }
+                // notice these get swapped, the Boolean
+                // being waited on is no longer the one in 
+                // the Vector, however it only waits if FALSE
+                resultsNotifiers.set(index,new Boolean(true)); 
+                notifier.notifyAll();
+                
             }
             
           
@@ -308,22 +332,18 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     
     public synchronized String getResult(int sample, int designPt) {
         try {
-            Sample s = (Sample)(root.getExperiment().getSample().get(sample));
-            DesignPointType runner = (DesignPointType)(s.getDesignPoint().get(designPt));
-            ResultsType r = runner.getResults();
-            if ( r == null ) { // not while
-                synchronized(runner) {
-                    try {
-                        if (timeout == 0)
-                            runner.wait();
-                        else
-                            runner.wait(timeout);
-                    } catch (InterruptedException ie) {
-                        ;
-                    }
+            Sample s = (Sample)(root.getExperiment().getSample().get(sample)); 
+            DesignPointType designPoint = (DesignPointType)(s.getDesignPoint().get(designPt));
+            ResultsType r = designPoint.getResults();
+            int index = sample * designPointCount + designPt;
+            Boolean notifier = resultsNotifiers.get(index);
+            if ( ! notifier ) {
+                try {
+                    notifier.wait();
+                } catch (InterruptedException ie) {
+                    ;
                 }
-                r = runner.getResults();
-                
+                r = designPoint.getResults();
             }
             
             if ( r == null ) {
@@ -336,9 +356,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     e.printStackTrace();
                 }
             }
-            return (new SimkitAssemblyXML2Java()).marshalToString(r);
-        } catch (NullPointerException npe) {
-            ; // do nothing, the request came before design was in
+            return (new SimkitAssemblyXML2Java()).marshalFragmentToString(r);
+        } catch (Exception npe) {
+            npe.printStackTrace(); // do nothing, the request came before design was in
         }
         
         return "WAIT";
@@ -350,12 +370,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         DesignPointType dp = (DesignPointType) s.getDesignPoint().get(designPtIndex);
         Hashtable ret = new Hashtable();
         List stats = dp.getStatistics(); 
-        synchronized(stats) {
-            while ( stats.size() < numberOfStats ) {
+        int index = sampleIndex*designPointCount + designPtIndex;
+        Boolean notifier = designPointStatsNotifiers.get(index);
+        if(!notifier) {
+            int sz = stats.size();
+            while ( sz < numberOfStats ) { // tbd use boolean in notifier
                 try {
-                    stats.wait();
+                    notifier.wait();
                 } catch (InterruptedException ie) {
-                    ;
+                    ;//System.out.println("getDesignPointStats has size  "+stats.size());
                 }
             }
         }
@@ -366,10 +389,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             Object st = it.next();
             if ( st instanceof SampleStatistics ) {
                 name = ((SampleStatistics)st).getName();
-                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+                xml = (new SimkitAssemblyXML2Java()).marshalFragmentToString(st);
             } else if ( st instanceof IndexedSampleStatistics ) {
                 name = ((IndexedSampleStatistics)st).getName();
-                xml = (new SimkitAssemblyXML2Java()).marshalToString(st);
+                xml = (new SimkitAssemblyXML2Java()).marshalFragmentToString(st);
             }
             if ( name != null && xml != null ) ret.put(name,xml);
         }
@@ -384,15 +407,17 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         ReplicationType rp = (ReplicationType) dp.getReplication().get(replicationIndex);
         Hashtable ret = new Hashtable();
         List stats = rp.getStatistics();
-        synchronized(stats) {
-            while ( stats.size() < numberOfStats ) {
-                try {
-                    stats.wait();
-                } catch (InterruptedException ie) {
-                    ;
-                }
+        int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
+        Boolean notifier = replicationStatsNotifiers.get(index);
+        
+        if ( !notifier ) {
+            try {
+                notifier.wait();
+            } catch (InterruptedException ex) {
+                ;
             }
         }
+        
         Iterator it = stats.iterator();
         while (it.hasNext()) {
             String name = null;
@@ -413,18 +438,25 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , this.getClass().getClassLoader() );
+            this.numberOfStats = numberOfStats; // this really only needs to be set the first time
+            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , root.getClass().getClassLoader() );
             Unmarshaller u = jc.createUnmarshaller();
             SampleType sample = (SampleType) root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = (DesignPoint) sample.getDesignPoint().get(designPtIndex);
             Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
+            int index = (sampleIndex*designPointCount) + designPtIndex;
+            Boolean notifier = designPointStatsNotifiers.get(index);
             List statses = designPoint.getStatistics();
-            this.numberOfStats = numberOfStats; // this really only needs to be set the first time
-            synchronized(statses) {
+            
+            synchronized(notifier) {
                 statses.add(stats);
-                statses.notifyAll();
+                designPointStatsNotifiers.set(index,new Boolean(true));
+                notifier.notify();
+                    
+                System.out.println("addDesignPointStat "+stat);
             }
-        } catch (Exception e) { return Boolean.FALSE; }
+            
+        } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
         
         return Boolean.TRUE;
     }
@@ -438,11 +470,17 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             ReplicationType rep = (ReplicationType) designPoint.getReplication().get(replicationIndex);
             Object stats = u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
             List statses = rep.getStatistics();
-            synchronized(statses) {
+            int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
+            Boolean notifier = replicationStatsNotifiers.get(index);
+            
+            synchronized(notifier) {
                 statses.add(stats);
-                statses.notifyAll();
+                replicationStatsNotifiers.set(index,new Boolean(true));
+                notifier.notify();
+                
+                System.out.println("addReplicationStat "+stat);
             }
-        } catch (Exception e) { return Boolean.FALSE; }
+        } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
        
         return Boolean.TRUE;
     }
@@ -453,7 +491,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // SGE_JOB_ID ( subsequently every other Gridlet's in the array ).
     
     // called by DOE or anybody that indexes by sample and designPt
-    public Integer removeIndexedTask(int sampleIndex, int designPtIndex) {
+    public synchronized Integer removeIndexedTask(int sampleIndex, int designPtIndex) {
         int taskID = sampleIndex * designPointCount;
         taskID += designPtIndex;
         taskID += 1;
@@ -462,11 +500,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         
         // TBD check if result first then make an empty result if needed
         try {
-            ResultsType r = (ResultsType)(assemblyFactory.createResults());
+            Results r = (Results)(assemblyFactory.createResults());
             r.setDesignPoint(""+designPtIndex);
             r.setSample(""+sampleIndex);
             // release Results lock on thread
-            addResult((new SimkitAssemblyXML2Java()).marshalToString(r));
+            addResult((new SimkitAssemblyXML2Java()).marshalFragmentToString((JAXBElement)r));
+            System.out.println("addResult for "+(new SimkitAssemblyXML2Java()).marshalFragmentToString((JAXBElement)r));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -476,36 +515,92 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // called by Gridlet to remove itself after
     // completion
     
-    public Integer removeTask(int jobID, int taskID) {
+    public synchronized Integer removeTask(int jobID, int taskID) {
         try {
             if (debug) System.out.println("qdel: "+jobID+"."+taskID); 
             if (!usid.equals("LOCAL-RUN")) {
                 Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
+            } else {
+                status.set(taskID-1,"Complete");
             }
+            //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             
-            tasksCompleted++;
-            synchronized(queue) {
-                queue.set(taskID-1,Boolean.FALSE);
+            List sQueue = Collections.synchronizedList(queue);
+            
+            synchronized(sQueue) {
+                ListIterator li = sQueue.listIterator(taskID-1);
+                //ListIterator it = sQueue.listIterator(taskID-1);
+                //it.set(Boolean.FALSE);
+                
+                li.next(); 
+                li.set(new Boolean(Boolean.FALSE));
+                //sQueue.set(taskID-1,Boolean.FALSE);
+                //
                 queueClean = false;
-                queue.notify();
+                
+                // last case first
+                // if results not ready, wait on resultsNotifier
+                Boolean notifier = resultsNotifiers.get(taskID-1);
+                if ( ! notifier  ) /*synchronized(notifier)*/ {
+                    
+                    try {
+                        notifier.wait();
+                    } catch (InterruptedException ex) {
+                        ;
+                    }
+                    
+                }
+                // if replication stats not ready, wait on replicationStatsNotifier
+                // replications are always added in order by one thread,
+                // don't expect any a < b to be locked if b isn't
+                for (int i = 0; i < replicationsPerDesignPoint; i++) {
+                    int index = ((taskID-1)*replicationsPerDesignPoint) + i;
+                    notifier = replicationStatsNotifiers.get(index);
+                    if ( ! notifier ) /*synchronized(notifier)*/ {
+                        
+                        try {
+                            notifier.wait();
+                        } catch (InterruptedException ex) {
+                            ;
+                        }
+                        
+                    }
+                }
+                // if designPointStats not ready, wait on designPointStatsNotifier
+                notifier = designPointStatsNotifiers.get(taskID-1);
+                if ( ! notifier ) /*synchronized(notifier)*/ {
+                    
+                    try {
+                        notifier.wait();
+                    } catch (InterruptedException ex) {
+                        ;
+                    }
+                    
+                }
+                tasksCompleted++;
+                //queue.notify();
             }
+            //Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
             // if all results in, done! write out all results to storage
             // TBD, filename should include some session info since same
             // Assembly may be experimented on repeatedly. Really TBD,
             // SessionManager should keep a persistent cache of active
-            // sessions in case of server shutdown, and that would be 
-            // a good place to also store this "core dump" filename for the 
+            // sessions in case of server shutdown, and that would be
+            // a good place to also store this "core dump" filename for the
             // session.
             if ( tasksCompleted == designPointCount * totalSamples) {
                 File dump = File.createTempFile(root.getName(),"Results.xml",experimentFile.getParentFile());
+                
                 (new SimkitAssemblyXML2Java())
                 .marshal((javax.xml.bind.Element)root,
                         (OutputStream)new FileOutputStream(dump));
+                
             }
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
-
+        System.runFinalization();
+        System.gc();
         return new Integer(taskID);
         
     }
@@ -550,22 +645,24 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // there has been some change in the queue, and returns a Vector
     // of Booleans which can be compared to the previous return Vector
     // to see which was updated. It won't block the first time called.
-    public synchronized Vector getTaskQueue() {
+    public synchronized ArrayList getTaskQueue() {
         
         if (queueClean) {
             synchronized(queue) {
                 try {
-                    if (timeout == 0)
+                    //if (timeout == 0)
                         queue.wait(); // wait for dirtyness
-                    else
-                        queue.wait(timeout);
+                    //else
+                        //queue.wait(timeout);
                 } catch (InterruptedException ie) {
                     ;
-                }
-            } return queue;
+                } 
+                queueClean = true;
+            } 
+            return queue;
         }
         
-        queueClean = true;
+        
         return queue;
     }
     
@@ -589,7 +686,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         
         if (usid.equals("LOCAL-RUN")) {
             if (queue != null) {
-                return ((LocalTaskQueue)queue).toString();
+                String qstat = "Local Job Queue:\nTaskID:\tStatus:\n";
+                // taskIDs are evolved from the SGE notation
+                // which starts at 1
+                int taskID = 1; 
+                for ( String s : status ) {
+                    qstat += ""+(taskID++) +"\t"+s+"\n";
+                }
+                return qstat;
+                //return ((LocalTaskQueue)queue).toString();
             } else {
                 return "Waiting to run";
             }
@@ -709,17 +814,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // current threads in the pool get a start().
     public static final int MAX_THREADS = 4;
     void localRun(File experimentFile, int totalTasks) {
-        Vector lastQueue;
+        ArrayList lastQueue;
         try {
             queue = new LocalTaskQueue(this,experimentFile,totalTasks);  
         } catch (DoeException e) {
             e.printStackTrace();
         }
-        //queueClean = false; // redirty
+        
         // this shouldn't block on the very first call
         int tasksRemaining = getRemainingTasks(); // should be totalTasks
-        
-        //lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)getTaskQueue()); 
         
         lastQueue = cloneFromLocalTaskQueue((LocalTaskQueue)queue);
         queueClean = false; // redirty it
@@ -729,6 +832,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // here just test with N=4 for starters. GUI adjust tbd
         int starters = MAX_THREADS>totalTasks?totalTasks:MAX_THREADS;
         for (int task = 0; task<starters; task++,tasksRemaining--) {
+            status.set(task,"Running");
            ((LocalTaskQueue)queue).activate(task);
         }
         // if starters tasks complete in this loop, activate upto starters more until no tasks remain
@@ -748,27 +852,32 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                         // find next available task from nextQueue
                         int j;
                         for (j = i+1; j<nextQueue.size(); j++) {
-                            if (nextQueue.activate(j))
+                            if (nextQueue.activate(j)) {
+                                status.set(j,"Running");
                                 break;
+                            }
                         }
-                        
-                        nextQueue.set(i,Boolean.FALSE);
-                        
                         --tasksRemaining;
+                        nextQueue.set(i,Boolean.FALSE);
+                        nextQueue.notify();
+                        
                         
                     }
-                }
+                    lastQueue.set(i,nextQueue.get(i));
+                } 
+                //lastQueue = cloneFromLocalTaskQueue(nextQueue);
             }
             
-            lastQueue = cloneFromLocalTaskQueue(nextQueue); // 
         }
     }
     
-    private Vector cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
-        Vector q = new Vector();
-        for ( int i = 0; i < localQ.size(); i++ ) {
-            q.add(new Boolean((Boolean)localQ.get(i)));
-        }
+    private synchronized ArrayList cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
+        ArrayList q = new ArrayList();
+        //synchronized (localQ) {
+            for ( int i = 0; i < localQ.size(); i++ ) {
+                q.add(new Boolean((Boolean)localQ.get(i)));
+            }
+        //}
         return q;
     }
     
