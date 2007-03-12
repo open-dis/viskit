@@ -835,8 +835,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             ret = rpc.execute("gridkit.getDesignPointStats", args);
             if (statsGraph == null) {
                 final String[] properties = (String[])((Hashtable)ret).keySet().toArray(new String[0]);
-                statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
-                statsGraph.setVisible(true);
+                //statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
+                //statsGraph.setVisible(true);
             }
             addDesignPointStatsToGraphs((Hashtable)ret,designPtIndex,sampleIndex);
             //writeStatus(ret.toString());
