@@ -16,8 +16,9 @@
     </Cluster>
   </history>
   <extraClassPath>
-    <path>
-    </path>
+      <path value="lib/simkit.jar"/>
+      <path value="lib/ext/diskit.jar"/>
+      <path value="BehaviorLibraries/SavageTactics" />
   </extraClassPath>
   <application>
     <tabs>
