@@ -60,7 +60,8 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         content.add(sliderPanel);
         content.add(Box.createVerticalStrut(5));
         content.add(scrollPane);
-        
+        textArea.setForeground(Color.GREEN);
+        textArea.setBackground(Color.BLACK);
         pack();
         //setVisible(true);
         
