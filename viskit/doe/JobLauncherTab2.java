@@ -119,7 +119,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   private JTextField numDPsTF;
   private JTextField tmo;
   private JTextField unameTF;
-  private JCheckBox doClusterStat;
+  private JCheckBox doAnalystReports;
   private JCheckBox doGraphOutput;
   private JCheckBox doLocalRun;
 
@@ -310,10 +310,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     tmo = new JTextField(6);
     JLabel tmoLab = new JLabel("Replication time out (ms)");
 
-    JLabel clusterStatLab = new JLabel("Display cluster status in browser");
-    doClusterStat = new JCheckBox((String) null, false);
+    JLabel analystReportLab = new JLabel("Analyst report each run");
+    doAnalystReports = new JCheckBox((String) null, false);
     //JLabel doGraphLab = new JLabel("Graph job output");
-    JLabel doGraphLab = new JLabel("AnalystReports each run");
+    //JLabel doGraphLab = new JLabel("AnalystReports each run");
     doGraphOutput = new JCheckBox((String) null, false);
 
     numDPsTF.setEditable(false);
@@ -326,12 +326,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     topPan.add(numRepsTF);
     topPan.add(tmoLab);
     topPan.add(tmo);
-    //topPan.add(clusterStatLab);
-    //topPan.add(doClusterStat);
+    topPan.add(analystReportLab); // tooltip this with warning 
+    topPan.add(doAnalystReports);
     //topPan.add(doGraphLab);
     //topPan.add(doGraphOutput);
 
-    SpringUtilities.makeCompactGrid(topPan, 4, 2, 10, 10, 5, 5);
+    SpringUtilities.makeCompactGrid(topPan, 5, 2, 10, 10, 5, 5);
     topPan.setMaximumSize(new Dimension(topPan.getPreferredSize()));
     topPan.setMinimumSize(new Dimension(20, 20));
     topPan.setBorder(new EtchedBorder());
@@ -380,11 +380,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     qstatConsole = new QstatConsole();
 
     leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlP, qstatConsole.getContent());
-    leftSplit.setDividerLocation(200);
+    leftSplit.setDividerLocation(180);
 
     statusTextArea = new JTextArea("Grid system console:" + lineEnd +
         "--------------------" + lineEnd);
-    statusTextArea.setBackground(new Color(0xFB, 0xFB, 0xE5));
+    //statusTextArea.setBackground(new Color(0xFB, 0xFB, 0xE5));
+    statusTextArea.setBackground(Color.BLACK);
+    statusTextArea.setForeground(Color.GREEN);
     statusTextArea.setEditable(false);
     statusTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
     JScrollPane statusJsp = new JScrollPane(statusTextArea);
@@ -401,8 +403,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, stgSp);
     leftRightSplit.setLeftComponent(leftSplit);
     leftRightSplit.setRightComponent(rightSplit);
-    rightSplit.setDividerLocation(200);
-    leftRightSplit.setDividerLocation(315);
+    rightSplit.setDividerLocation(180);
+    leftRightSplit.setDividerLocation(300);
     add(leftRightSplit, BorderLayout.CENTER);
         
     return this; //p;
@@ -860,14 +862,17 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               }
               doe = new LocalDriverImpl(extClassPathsUrls,viskit.VGlobals.instance().getWorkDirectory());
           }
+          System.gc();
           qstatConsole.setDoe(doe);
           
-          statsGraph.reset();
+          //statsGraph.reset();
+          statsGraph = new StatsGraph();
+          rightSplit.setBottomComponent(new JScrollPane(statsGraph));
+          rightSplit.setDividerLocation(180);
           
-          
-          
-          boolean doClustStat = this.doClusterStat.isSelected();
-          boolean doGraphOut = this.doGraphOutput.isSelected();
+          //boolean doClustStat = this.doClusterStat.isSelected();
+          //boolean doGraphOut = this.doGraphOutput.isSelected();
+          viskit.xsd.assembly.BasicAssembly.setEnableAnalystReports(this.doAnalystReports.isSelected());
           
           outputDirty = true;
           outputList = new ArrayList();
@@ -915,11 +920,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               }
               
               // Bring up the 2 other windows
-              if (doClustStat)
-                  showClusterStatus(clusterWebStatus);
+              //if (doClustStat)
+                  //showClusterStatus(clusterWebStatus);
               //if(doGraphOut)
               //chartter = new JobResults(null, title);
-              
+              statsGraphSet = false;
               writeStatus("Getting results:");
               
               processResults();
@@ -938,18 +943,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
       Experiment exp = (Experiment) jaxbRoot.getExperiment();
       int samples = Integer.parseInt(exp.getTotalSamples());
       int designPoints = jaxbRoot.getDesignParameters().size();
-      // synchronous single threaded results, uses
-      // a status buffer that locks until results are
-      // in, at which point a select can be performed.
-      // this saves server thread resources
-      
       
       ArrayList lastQueue;
       
       try {
-          // this shouldn't block on the very first call, the queue
-          // is born dirty. unless its a local doe, which used up the
-          // first getTaskQueue...
           
           lastQueue = doe.getTaskQueue();
           int totalTasks = lastQueue.size(); 
@@ -1409,7 +1406,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     clusNameReadOnlyTF.setText(serverCfg);
   }
 
-  private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s)
+  private synchronized void addDesignPointStatsToGraphs(Hashtable ret, int d, int s)
   {
     if (viskit.Vstatics.debug)
       System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint " + d + " sample " + s);
@@ -1427,6 +1424,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         ex.printStackTrace();
       }
     }
+    statsGraph.repaint();
 
   }
 
