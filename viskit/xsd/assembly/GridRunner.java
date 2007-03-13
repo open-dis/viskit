@@ -453,7 +453,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 designPointStatsNotifiers.set(index,new Boolean(true));
                 notifier.notify();
                     
-                System.out.println("addDesignPointStat "+stat);
+                //System.out.println("addDesignPointStat "+stat);
             }
             
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
@@ -478,7 +478,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 replicationStatsNotifiers.set(index,new Boolean(true));
                 notifier.notify();
                 
-                System.out.println("addReplicationStat "+stat);
+                //System.out.println("addReplicationStat "+stat);
             }
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
        
@@ -523,25 +523,22 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             } else {
                 status.set(taskID-1,"Complete");
             }
-            //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            
             
             List sQueue = Collections.synchronizedList(queue);
             
             synchronized(sQueue) {
                 ListIterator li = sQueue.listIterator(taskID-1);
-                //ListIterator it = sQueue.listIterator(taskID-1);
-                //it.set(Boolean.FALSE);
                 
                 li.next(); 
                 li.set(new Boolean(Boolean.FALSE));
-                //sQueue.set(taskID-1,Boolean.FALSE);
-                //
+                
                 queueClean = false;
                 
                 // last case first
                 // if results not ready, wait on resultsNotifier
                 Boolean notifier = resultsNotifiers.get(taskID-1);
-                if ( ! notifier  ) /*synchronized(notifier)*/ {
+                if ( ! notifier  ) {
                     
                     try {
                         notifier.wait();
@@ -556,7 +553,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 for (int i = 0; i < replicationsPerDesignPoint; i++) {
                     int index = ((taskID-1)*replicationsPerDesignPoint) + i;
                     notifier = replicationStatsNotifiers.get(index);
-                    if ( ! notifier ) /*synchronized(notifier)*/ {
+                    if ( ! notifier ) {
                         
                         try {
                             notifier.wait();
@@ -568,7 +565,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 }
                 // if designPointStats not ready, wait on designPointStatsNotifier
                 notifier = designPointStatsNotifiers.get(taskID-1);
-                if ( ! notifier ) /*synchronized(notifier)*/ {
+                if ( ! notifier ) {
                     
                     try {
                         notifier.wait();
