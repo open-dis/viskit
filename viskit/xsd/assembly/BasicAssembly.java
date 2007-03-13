@@ -55,6 +55,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
    * TODO MIKE: Wire boolean filters to AnalystReport GUI
    * *************************************************
    */
+  static boolean enableAnalystReports = true;
   private boolean analystReplicationData = true;
   private boolean analystSummaryData = true;
   private boolean generateAnalystReport = true;
@@ -546,9 +547,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     //TODO MIKE: Wire the following to the analyst report GUI somehow
-    if (analystSummaryData)
+    if (enableAnalystReports && analystSummaryData)
       statsConfig.processSummaryReport(designPointStats);
-    if (generateAnalystReport) {
+    if (enableAnalystReports && generateAnalystReport) {
       //statsConfig.saveData();
       reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
       try {
@@ -562,6 +563,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     //saveState(replication);
 
+  }
+  
+
+  
+  public static void setEnableAnalystReports(boolean enable) {      
+           enableAnalystReports = enable;
   }
 
   /**
