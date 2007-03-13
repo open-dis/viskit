@@ -566,7 +566,7 @@ public class Gridlet extends Thread {
             java.io.BufferedReader br = new java.io.BufferedReader(sr);
             
             java.io.StringReader esr = new java.io.StringReader(baos.toString());
-            java.io.BufferedReader ebr = new java.io.BufferedReader(sr);
+            java.io.BufferedReader ebr = new java.io.BufferedReader(esr);
             
             // TBD: The following only works correctly in grid mode, due to multithreaded mode's shared
             // access to System.out. Either each thread synchronizes on System.out at the
