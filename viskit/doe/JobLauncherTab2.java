@@ -312,7 +312,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     JLabel clusterStatLab = new JLabel("Display cluster status in browser");
     doClusterStat = new JCheckBox((String) null, false);
-    JLabel doGraphLab = new JLabel("Graph job output");
+    //JLabel doGraphLab = new JLabel("Graph job output");
+    JLabel doGraphLab = new JLabel("AnalystReports each run");
     doGraphOutput = new JCheckBox((String) null, false);
 
     numDPsTF.setEditable(false);
@@ -325,12 +326,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     topPan.add(numRepsTF);
     topPan.add(tmoLab);
     topPan.add(tmo);
-    topPan.add(clusterStatLab);
-    topPan.add(doClusterStat);
-    topPan.add(doGraphLab);
-    topPan.add(doGraphOutput);
+    //topPan.add(clusterStatLab);
+    //topPan.add(doClusterStat);
+    //topPan.add(doGraphLab);
+    //topPan.add(doGraphOutput);
 
-    SpringUtilities.makeCompactGrid(topPan, 6, 2, 10, 10, 5, 5);
+    SpringUtilities.makeCompactGrid(topPan, 4, 2, 10, 10, 5, 5);
     topPan.setMaximumSize(new Dimension(topPan.getPreferredSize()));
     topPan.setMinimumSize(new Dimension(20, 20));
     topPan.setBorder(new EtchedBorder());
@@ -379,7 +380,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     qstatConsole = new QstatConsole();
 
     leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlP, qstatConsole.getContent());
-    leftSplit.setDividerLocation(235);
+    leftSplit.setDividerLocation(200);
 
     statusTextArea = new JTextArea("Grid system console:" + lineEnd +
         "--------------------" + lineEnd);
@@ -394,12 +395,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     serrTA.setEditable(false);
     serrTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
     serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
-    JScrollPane jspErr = new JScrollPane(serrTA);
+    
     statsGraph = new StatsGraph();
-    rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, statsGraph);
+    JScrollPane stgSp = new JScrollPane(statsGraph);
+    rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, stgSp);
     leftRightSplit.setLeftComponent(leftSplit);
     leftRightSplit.setRightComponent(rightSplit);
-    rightSplit.setDividerLocation(400);
+    rightSplit.setDividerLocation(200);
     leftRightSplit.setDividerLocation(315);
     add(leftRightSplit, BorderLayout.CENTER);
         
@@ -860,7 +862,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
           }
           qstatConsole.setDoe(doe);
           
-          //
+          statsGraph.reset();
           
           
           
@@ -899,8 +901,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                   if (viskit.Vstatics.debug) writeStatus(dataS);
                   
                   writeStatus("Executing job");
-                  
-                  //doe.run();
+
                   
               }
               
@@ -925,7 +926,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               
           }
           
-          //stopRun();
           
       } catch ( DoeException de ) {
           writeStatus(de.toString());

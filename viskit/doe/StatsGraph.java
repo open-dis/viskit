@@ -65,28 +65,27 @@ public class StatsGraph extends JPanel {
         chartPanels = new Hashtable();
         
         add(tabbedPane);
-        //pack();
         setVisible(true);
-        //super(title);
-        //setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        reset();
     }
     
     public void setProperties(String[] properties, int designPoints, int samples) {
         this.designPoints = designPoints;
         this.samples = samples;
+        tabbedPane.removeAll();
         for (int i = 0; i < properties.length; i++) {
             if (viskit.Vstatics.debug) System.out.println("StatsGraph: createDataSets for "+properties[i]);
             createDataSets(properties[i]);
             tabbedPane.add(properties[i],(ChartPanel)chartPanels.get(properties[i]));  
-            //setPreferredSize(parent.getSize());
-            //chartPanel.setPreferredSize(parent.getSize());
         }
     }
     /**
      *
      *
      */
-   
+    public void reset() {
+        setProperties(new String[]{"Viskit DOE Results"},1,1);
+    }
 
     // add SampleStatistic to datasets at designPoint d and sample s
     public void addSampleStatistic(viskit.xsd.bindings.assembly.SampleStatisticsType sample, int d, int s) {
@@ -112,7 +111,6 @@ public class StatsGraph extends JPanel {
        
         chartPanel = new ChartPanel(chart);
         chartPanels.put(name,chartPanel);
-        //chartPanel.setPreferredSize(new java.awt.Dimension(800,600));
         chartPanel.setDomainZoomable(true);
         chartPanel.setRangeZoomable(true);
    
