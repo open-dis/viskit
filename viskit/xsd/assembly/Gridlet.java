@@ -420,6 +420,7 @@ public class Gridlet extends Thread {
             Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
             Constructor asmc = asmz.getConstructors()[0];
             ViskitAssembly sim = (ViskitAssembly)(asmc.newInstance(new Object[] {} ));
+            sim.setEnableAnalystReports(false); // not needed in cluster mode, and threadly
             Thread runner = new Thread(sim);
            
             // trumpets...
