@@ -55,7 +55,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
    * TODO MIKE: Wire boolean filters to AnalystReport GUI
    * *************************************************
    */
-  static boolean enableAnalystReports = true;
+  private boolean enableAnalystReports = true;
   private boolean analystReplicationData = true;
   private boolean analystSummaryData = true;
   private boolean generateAnalystReport = true;
@@ -567,7 +567,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   
 
   
-  public static void setEnableAnalystReports(boolean enable) {      
+  public void setEnableAnalystReports(boolean enable) {      
            enableAnalystReports = enable;
   }
 
