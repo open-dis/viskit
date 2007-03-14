@@ -45,6 +45,8 @@ package viskit.doe;
 
 import edu.nps.util.CryptoMethods;
 import java.net.MalformedURLException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
@@ -78,6 +80,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 {
   DoeRunDriver doe;
   Hashtable statsGraphs;
+  BlockingQueue<DesignPointStatsWrapper> bQ;
   String inputFileString;
   File inputFile;
   File filteredFile;
@@ -122,7 +125,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   private JCheckBox doAnalystReports;
   private JCheckBox doGraphOutput;
   private JCheckBox doLocalRun;
-
+  private GraphUpdater graphUpdater;
   private QstatConsole qstatConsole;
   private StatsGraph statsGraph;
   private Thread thread;
@@ -670,7 +673,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     cntlr.restorePrepRun();
 
     thread = new Thread(JobLauncherTab2.this);
-    thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
+    thread.setPriority(Thread.MAX_PRIORITY); // don't inherit swing event thread prior
     thread.start();
     
     statusTextArea.setText("");
@@ -864,15 +867,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
           }
           System.gc();
           qstatConsole.setDoe(doe);
-          
-          //statsGraph.reset();
+
           statsGraph = new StatsGraph();
           rightSplit.setBottomComponent(new JScrollPane(statsGraph));
           rightSplit.setDividerLocation(180);
           
           //boolean doClustStat = this.doClusterStat.isSelected();
           //boolean doGraphOut = this.doGraphOutput.isSelected();
-          viskit.xsd.assembly.BasicAssembly.setEnableAnalystReports(this.doAnalystReports.isSelected());
+          
           
           outputDirty = true;
           outputList = new ArrayList();
@@ -953,9 +955,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
           int tasksRemaining = totalTasks;
           writeStatus("Total tasks: " + totalTasks);
           //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
-          
+          bQ = new ArrayBlockingQueue(totalTasks);
+          graphUpdater = new GraphUpdater(bQ,statsGraph);
           doe.run();
-          
+          graphUpdater.execute();
           while (tasksRemaining > 0) {
               try {
                   // this will block until a task ends which could be
@@ -984,15 +987,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                   //writeStatus(ret.toString());
                               }
                               
-                              
                               ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
                               
                               if (statsGraphSet == false) {
                                   String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
-                                  //statsGraph = new StatsGraph(jaxbRoot.getName(), properties, designPoints, samples);
                                   statsGraph.setProperties(properties,designPoints,samples);
-                                  //rightSplit.setRightComponent(statsGraph.getContentPane());
-                                  //statsGraph.setVisible(true);
                                   statsGraphSet = true;
                               }
                               addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
@@ -1007,13 +1006,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                               lastQueue.set(i,new Boolean(state));
                           }
                           i++;
+                          
                       }
                   }
                   
               } catch (Exception e) {
                   e.printStackTrace();
               }
-              //statsGraph = null;
+              
           }
       } catch (Exception e) {
           e.printStackTrace();
@@ -1406,28 +1406,68 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     clusNameReadOnlyTF.setText(serverCfg);
   }
 
-  private synchronized void addDesignPointStatsToGraphs(Hashtable ret, int d, int s)
-  {
-    if (viskit.Vstatics.debug)
-      System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint " + d + " sample " + s);
-    if (viskit.Vstatics.debug) System.out.println(ret);
-    java.util.Enumeration stats = ret.elements();
-    while (stats.hasMoreElements()) {
-      String data = (String) stats.nextElement();
-      try {
-        if (viskit.Vstatics.debug) System.out.println("\tAdding data " + data);
-        SampleStatisticsType sst = (SampleStatisticsType) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
-
-        statsGraph.addSampleStatistic(sst, d, s);
-      }
-      catch (JAXBException ex) {
-        ex.printStackTrace();
-      }
-    }
-    statsGraph.repaint();
-
+  private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s) {
+      
+      // for the SwingWorker to publish a single object 
+      bQ.add(new DesignPointStatsWrapper(ret,d,s));
+      
   }
+  
+  
 
+
+  class GraphUpdater extends SwingWorker<Void, DesignPointStatsWrapper> {
+      BlockingQueue<DesignPointStatsWrapper> bQ;
+      StatsGraph statsGraph;
+      GraphUpdater(BlockingQueue<DesignPointStatsWrapper> bQ,StatsGraph statsGraph) {
+          this.bQ = bQ; // bbq
+          this.statsGraph = statsGraph;
+      }
+      
+      @Override
+      public Void doInBackground() {
+          DesignPointStatsWrapper dp;
+          
+          try {
+              while ( (dp = bQ.take()) != null) {
+                  publish(dp);
+              }
+          } catch (InterruptedException ie) {;}
+          
+          return null;
+      }
+      
+      @Override
+      protected void process(List<DesignPointStatsWrapper> chunks) {
+          for (DesignPointStatsWrapper dp : chunks) {
+              java.util.Enumeration stats = dp.statsReturned.elements();
+              while (stats.hasMoreElements()) {
+                  String data = (String) stats.nextElement();
+                  try {
+                      if (viskit.Vstatics.debug) System.out.println("\tAdding data " + data);
+                      SampleStatisticsType sst = (SampleStatisticsType) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
+                      
+                      statsGraph.addSampleStatistic(sst, dp.designPtIndex, dp.sampleIndex);
+                  } catch (JAXBException ex) {
+                      ex.printStackTrace();
+                  }
+              }
+          }
+      }
+      
+  }
+  
+  class DesignPointStatsWrapper {
+      public Hashtable statsReturned;
+      public int designPtIndex;
+      public int sampleIndex;
+      DesignPointStatsWrapper(Hashtable statsReturned, int designPtIndex, int sampleIndex) {
+          this.statsReturned = statsReturned;
+          this.designPtIndex = designPtIndex;
+          this.sampleIndex = sampleIndex;
+      }
+  }
+  
   private void setGridMode() {
       if (!gridMode) {
         doLocalRun.getModel().setSelected(true);
