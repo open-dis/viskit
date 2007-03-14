@@ -577,7 +577,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 tasksCompleted++;
                 //queue.notify();
             }
-            //Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+            
             // if all results in, done! write out all results to storage
             // TBD, filename should include some session info since same
             // Assembly may be experimented on repeatedly. Really TBD,
