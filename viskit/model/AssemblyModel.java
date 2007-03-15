@@ -101,7 +101,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
 
       jaxbRoot.setName(nIe(metaData.name));
       jaxbRoot.setVersion(nIe(metaData.version));
-      jaxbRoot.setPackage(nIe(metaData.pkg));
+      jaxbRoot.setPackage(nIe(metaData.packageName));
       if (jaxbRoot.getSchedule() == null) {
         jaxbRoot.setSchedule(oFactory.createSchedule());
       }
@@ -892,7 +892,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       //  mymetaData.author = jaxbRoot.getAuthor();
         mymetaData.version = jaxbRoot.getVersion();
         mymetaData.name = jaxbRoot.getName();
-        mymetaData.pkg = jaxbRoot.getPackage();
+        mymetaData.packageName = jaxbRoot.getPackage();
 
         ScheduleType sch = jaxbRoot.getSchedule();
         if(sch != null) {

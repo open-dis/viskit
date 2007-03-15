@@ -25,9 +25,9 @@ import java.awt.event.WindowEvent;
 
 public class PclNodeInspectorDialog extends JDialog
 {
-  private JLabel handleLab;
+  private JLabel nameLabel;
   private JLabel typeLab;
-  private JTextField handleField;    // Text field that holds the parameter name
+  private JTextField nameField;    // Text field that holds the parameter name
   private JTextField typeField;
   private InstantiationPanel ip;
   private Class myClass;
@@ -85,11 +85,11 @@ public class PclNodeInspectorDialog extends JDialog
 
     //content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-    handleField = new JTextField();
-    Vstatics.clampHeight(handleField);
-    handleField.addCaretListener(lis);
-    handleLab = new JLabel("handle",JLabel.TRAILING);
-    handleLab.setLabelFor(handleField);
+    nameField = new JTextField();
+    Vstatics.clampHeight(nameField);
+    nameField.addCaretListener(lis);
+    nameLabel = new JLabel("name",JLabel.TRAILING);
+    nameLabel.setLabelFor(nameField);
 
     descTF = new JTextField();
     Vstatics.clampHeight(descTF);
@@ -98,7 +98,6 @@ public class PclNodeInspectorDialog extends JDialog
     descLab.setLabelFor(descTF);
 
     typeLab = new JLabel("type",JLabel.TRAILING);
-    //typeField = new JLabel("bogus",JLabel.CENTER);
     typeField = new JTextField();
     Vstatics.clampHeight(typeField);
     typeField.setEditable(false);
@@ -158,7 +157,7 @@ public class PclNodeInspectorDialog extends JDialog
 
       //Constructor[] cons = myClass.getConstructors();
 
-      handleField.setText(pclNode.getName());
+      nameField.setText(pclNode.getName());
       typeField.setText(pclNode.getType());
       descTF.setText(pclNode.getDescription());
 
@@ -175,8 +174,8 @@ public class PclNodeInspectorDialog extends JDialog
           BorderFactory.createLineBorder(new Color(0xff,0xc8,0xc8),4)));
 
       JPanel cont = new JPanel(new SpringLayout());
-      cont.add(handleLab);
-      cont.add(handleField);
+      cont.add(nameLabel);
+      cont.add(nameField);
 
       cont.add(descLab);
       cont.add(descTF);
@@ -200,14 +199,14 @@ public class PclNodeInspectorDialog extends JDialog
       setContentPane(content);
     }
     else {
-      handleField.setText("pclNode name");
+      nameField.setText("pclNode name");
       //commentField.setText("comments here");
     }
   }
 
   private void unloadWidgets()
   {
-    String nm = handleField.getText();
+    String nm = nameField.getText();
     nm = nm.replaceAll("\\s", "");
     if (pclNode != null) {
       pclNode.setName(nm);

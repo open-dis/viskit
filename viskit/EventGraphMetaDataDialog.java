@@ -15,12 +15,12 @@ import java.awt.*;
  * Time: 1:35:07 PM
  */
 
-public class EvGraphMetaDataDialog extends MetaDataDialog
+public class EventGraphMetaDataDialog extends MetaDataDialog
 {
   public static boolean showDialog(JFrame f, Component comp, GraphMetaData gmd)
   {
     if(dialog == null)
-      dialog = new EvGraphMetaDataDialog(f,comp,gmd);
+      dialog = new EventGraphMetaDataDialog(f,comp,gmd);
     else
       dialog.setParams(comp,gmd);
 
@@ -29,7 +29,7 @@ public class EvGraphMetaDataDialog extends MetaDataDialog
     return modified;
   }
 
-  EvGraphMetaDataDialog(JFrame f, Component c, GraphMetaData gmd)
+  EventGraphMetaDataDialog(JFrame f, Component c, GraphMetaData gmd)
   {
     super(f,c,gmd,"Event Graph Properties");
     remove(this.runtimePanel);  // only for assembly

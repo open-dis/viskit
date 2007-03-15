@@ -674,7 +674,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   // permit user to edit existing entities
   public boolean doEditEvGraphNode(EvGraphNode evNode)
   {
-    return EvGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), evNode);
+    return EventGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), evNode);
   }
 
   public boolean doEditPclNode(PropChangeListenerNode pclNode)

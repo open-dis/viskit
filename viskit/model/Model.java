@@ -147,15 +147,15 @@ public class Model extends mvcAbstractModel implements ViskitModel
         mymetaData.author = jaxbRoot.getAuthor();
         mymetaData.version = jaxbRoot.getVersion();
         mymetaData.name = jaxbRoot.getName();
-        mymetaData.pkg = jaxbRoot.getPackage();
-        mymetaData.extend = jaxbRoot.getExtend();
+        mymetaData.packageName = jaxbRoot.getPackage();
+        mymetaData.extendsPackageName = jaxbRoot.getExtend();
         List lis = jaxbRoot.getComment();
         StringBuffer sb = new StringBuffer("");
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
           sb.append((String)itr.next());
           sb.append(" ");
         }
-        mymetaData.comment = sb.toString().trim();
+        mymetaData.description = sb.toString().trim();
 
         VGlobals.instance().reset();
         stateVariables.removeAllElements();
@@ -229,12 +229,12 @@ public class Model extends mvcAbstractModel implements ViskitModel
       jaxbRoot.setName(nIe(metaData.name));
       jaxbRoot.setVersion(nIe(metaData.version));
       jaxbRoot.setAuthor(nIe(metaData.author));
-      jaxbRoot.setPackage(nIe(metaData.pkg));
-      jaxbRoot.setExtend(nIe(metaData.extend));
+      jaxbRoot.setPackage(nIe(metaData.packageName));
+      jaxbRoot.setExtend(nIe(metaData.extendsPackageName));
       List clis = jaxbRoot.getComment();
       clis.clear();
       ;
-      String cmt = nIe(metaData.comment);
+      String cmt = nIe(metaData.description);
       if (cmt != null)
         clis.add(cmt.trim());
 

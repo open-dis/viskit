@@ -689,7 +689,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //--------------------------
   {
     GraphMetaData gmd = ((ViskitModel)getModel()).getMetaData();
-    boolean modified = EvGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
+    boolean modified = EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
                                                         VGlobals.instance().getMainAppWindow(),gmd);
     if(modified)
       ((ViskitModel)getModel()).changeMetaData(gmd);

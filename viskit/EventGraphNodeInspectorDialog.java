@@ -23,13 +23,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class EvGraphNodeInspectorDialog extends JDialog
+public class EventGraphNodeInspectorDialog extends JDialog
 {
   private JLabel handleLab; //,outputLab;
   private JTextField handleField;
   private JCheckBox outputCheck;
   private InstantiationPanel ip;
-  private static EvGraphNodeInspectorDialog dialog;
+  private static EventGraphNodeInspectorDialog dialog;
   private static boolean modified = false;
   private EvGraphNode egNode;
   private Component locationComp;
@@ -46,7 +46,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
   {
     try {
       if (dialog == null)
-        dialog = new EvGraphNodeInspectorDialog(f, comp, parm);
+        dialog = new EventGraphNodeInspectorDialog(f, comp, parm);
       else
         dialog.setParams(comp, parm);
     }
@@ -63,7 +63,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     return modified;
   }
 
-  private EvGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv) throws ClassNotFoundException
+  private EventGraphNodeInspectorDialog(JFrame parent, Component comp, EvGraphNode lv) throws ClassNotFoundException
   {
     super(parent, "Event Graph Inspector", true);
     this.egNode = lv;
@@ -79,7 +79,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
 
     handleField = new JTextField();
     Vstatics.clampHeight(handleField);
-    handleLab = new JLabel("handle",JLabel.TRAILING);
+    handleLab = new JLabel("name",JLabel.TRAILING);
     handleLab.setLabelFor(handleField);
     //outputLab = new JLabel("detailed output",JLabel.TRAILING);
     outputCheck = new JCheckBox("detailed output");
@@ -263,7 +263,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     }   // testLp
 
     // Here if we found a problem
-    int ret = JOptionPane.showConfirmDialog(EvGraphNodeInspectorDialog.this, "All fields must be completed. Close anyway?",
+    int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "All fields must be completed. Close anyway?",
         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
     if (ret == JOptionPane.YES_OPTION)
       return false;  // don't cancel
@@ -276,7 +276,7 @@ public class EvGraphNodeInspectorDialog extends JDialog
     public void windowClosing(WindowEvent e)
     {
       if (modified == true) {
-        int ret = JOptionPane.showConfirmDialog(EvGraphNodeInspectorDialog.this, "Apply changes?",
+        int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (ret == JOptionPane.YES_OPTION)
           okButt.doClick();

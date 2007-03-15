@@ -34,7 +34,7 @@ abstract public class MetaDataDialog extends JDialog
   JTextField nameTf, packageTf, authorTf, versionTf, extendTf;
   JTextField stopTimeTf;
   JCheckBox verboseCb;
-  JTextArea commentTa;
+  JTextArea descriptionTextArea;
 
   public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd)
   {
@@ -122,21 +122,20 @@ abstract public class MetaDataDialog extends JDialog
 
     c.add(runtimePanel);
 
-    JLabel comLab = new JLabel("Description");
-    comLab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    c.add(comLab);
+    JLabel descriptionLabel = new JLabel("Description");
+    descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    c.add(descriptionLabel);
     c.add(Box.createVerticalStrut(5));
 
-    commentTa = new JTextArea(6,40);
-    commentTa.setWrapStyleWord(true);
-    commentTa.setLineWrap(true);
-    commentTa.setBorder(BorderFactory.createEmptyBorder());
-    JScrollPane csp = new JScrollPane(commentTa);
-    csp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    csp.setBorder(authorTf.getBorder());
+    descriptionTextArea = new JTextArea(6,40);
+    descriptionTextArea.setWrapStyleWord(true);
+    descriptionTextArea.setLineWrap(true);
+    descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+    JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
+    descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    descriptionScrollPane.setBorder(authorTf.getBorder());
 
-    c.add(csp);
-
+    c.add(descriptionScrollPane);
     c.add(Box.createVerticalStrut(5));
 
     JPanel buttPan = new JPanel();
@@ -179,11 +178,11 @@ abstract public class MetaDataDialog extends JDialog
     if(param == null)
       param = new GraphMetaData();
     nameTf.setText(param.name);
-    packageTf.setText(param.pkg);
+    packageTf.setText(param.packageName);
     authorTf.setText(param.author);
     versionTf.setText(param.version);
-    commentTa.setText(param.comment);
-    extendTf.setText(param.extend);
+    descriptionTextArea.setText(param.description);
+    extendTf.setText(param.extendsPackageName);
     stopTimeTf.setText(param.stopTime);
     verboseCb.setSelected(param.verbose);
     nameTf.selectAll();
@@ -191,11 +190,11 @@ abstract public class MetaDataDialog extends JDialog
   private void unloadWidgets()
   {
     param.author = authorTf.getText().trim();
-    param.comment = commentTa.getText().trim();
+    param.description = descriptionTextArea.getText().trim();
     param.name = nameTf.getText().trim();
-    param.pkg = packageTf.getText().trim();
+    param.packageName = packageTf.getText().trim();
     param.version = versionTf.getText().trim();
-    param.extend = extendTf.getText().trim();
+    param.extendsPackageName = extendTf.getText().trim();
     param.stopTime = stopTimeTf.getText().trim();
     param.verbose = verboseCb.isSelected();
   }

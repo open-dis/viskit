@@ -16,13 +16,13 @@ import viskit.xsd.bindings.assembly.SimkitAssemblyType;
 public class GraphMetaData
 {
   public String name = "EventGraphName";
-  public String pkg = "";
+  public String packageName = "";
   public String author = "";
   public String version = "1.0";
-  public String comment = "";
+  public String description = ""; // originally called "comment"
   public String stopTime = "100.";
   public boolean verbose = false;
-  public String extend = "";
+  public String extendsPackageName = "";
 
   public GraphMetaData()
   {
@@ -33,7 +33,7 @@ public class GraphMetaData
       viskit.xsd.bindings.eventgraph.ObjectFactory of =
           new viskit.xsd.bindings.eventgraph.ObjectFactory();
       SimEntityType tmp = of.createSimEntityType();
-      extend = tmp.getExtend();
+      extendsPackageName = tmp.getExtend();
     }
     catch (javax.xml.bind.JAXBException e) {
       e.printStackTrace();
@@ -49,7 +49,7 @@ public class GraphMetaData
         viskit.xsd.bindings.assembly.ObjectFactory of =
             new viskit.xsd.bindings.assembly.ObjectFactory();
         SimkitAssemblyType tmp = of.createSimkitAssemblyType();
-        extend = tmp.getExtend();
+        extendsPackageName = tmp.getExtend();
       }
       catch (javax.xml.bind.JAXBException e) {
         e.printStackTrace();
@@ -60,7 +60,7 @@ public class GraphMetaData
         viskit.xsd.bindings.eventgraph.ObjectFactory of =
             new viskit.xsd.bindings.eventgraph.ObjectFactory();
         SimEntityType tmp = of.createSimEntityType();
-        extend = tmp.getExtend();
+        extendsPackageName = tmp.getExtend();
       }
       catch (javax.xml.bind.JAXBException e) {
         e.printStackTrace();
@@ -71,9 +71,9 @@ public class GraphMetaData
   public GraphMetaData(String n, String p, String a, String v, String e)
   {
     name = n;
-    pkg = p;
+    packageName = p;
     author = a;
     version = v;
-    extend = e;
+    extendsPackageName = e;
   }
 }

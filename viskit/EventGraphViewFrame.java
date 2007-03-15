@@ -80,6 +80,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private JMenuItem quitMenuItem;
   private TitleListener titlList;
   private int titlKey;
+  private GraphMetaData param;
+  private JTextArea descriptionTextArea;
 
   private final static String frameDefaultTitle = "Viskit Event Graph Editor";
 
@@ -89,7 +91,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public EventGraphViewFrame(boolean contentOnly, Controller ctrl)
   //====================================================
   {
-    super("Viskit -- Simkit Event Graph Editor");
+    super(frameDefaultTitle);
     initMVC(ctrl);   // set up mvc linkages
     initUI(contentOnly);    // build widgets
 
@@ -220,9 +222,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       getController().setModel((Model)myVgcw.model);  // tell controller
       adjustMenus(myVgcw.model);                      // enable/disable menu items based on new EG
 
-      GraphMetaData gmd = myVgcw.model.getMetaData();
+      GraphMetaData gmd = myVgcw.model.getMetaData ();
       if(gmd != null)
-        setSelectedEventGraphName(gmd.name);
+      {
+          setSelectedEventGraphName (gmd.name);
+          // TODO:  find description and display
+          descriptionTextArea.setText (gmd.description);
+      }
+      else System.out.println ("error: EventGraphViewFrame gmd null..");
     }
   }
 
@@ -233,14 +240,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel,BoxLayout.Y_AXIS));
     stateVariablesPanel.add(Box.createVerticalStrut(5));
 
-     JPanel p = new JPanel();
-     p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-     p.add(Box.createHorizontalGlue());
+     JPanel eventGraphParametersSubpanel = new JPanel();
+     eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel,BoxLayout.X_AXIS));
+     eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
      JLabel stateVariableLabel = new JLabel("State Variables");
      stateVariableLabel.setToolTipText ("State variables can be modified during event processing");
-     p.add(stateVariableLabel);
-     p.add(Box.createHorizontalGlue());
-    stateVariablesPanel.add(p);
+     eventGraphParametersSubpanel.add(stateVariableLabel);
+     eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
+    stateVariablesPanel.add(eventGraphParametersSubpanel);
 
     VariablesPanel vp = new VariablesPanel(300,5);
     stateVariablesPanel.add(vp);
@@ -267,19 +274,37 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         ((ViskitController)getController()).stateVariableEdit((vStateVariable)event.getSource());
       }
     });
-
+    
     // Event graph parameters area
     JPanel parametersPanel = new JPanel();
     parametersPanel.setLayout(new BoxLayout(parametersPanel,BoxLayout.Y_AXIS)); //BorderLayout());
     parametersPanel.add(Box.createVerticalStrut(5));
-     p = new JPanel();
-     p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-     p.add(Box.createHorizontalGlue());
-     JLabel titleLable = new JLabel("Event Graph Parameters");
-     titleLable.setToolTipText ("Event graph parameters are initialized upon starting each simulation replication");
-     p.add(titleLable);
-     p.add(Box.createHorizontalGlue());
-    parametersPanel.add(p);
+
+    JLabel descriptionLabel = new JLabel("Description");
+    descriptionLabel.setToolTipText ("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
+    
+    descriptionTextArea = new JTextArea(2,40);
+    descriptionTextArea.setWrapStyleWord(true);
+    descriptionTextArea.setLineWrap(true);
+    descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+    JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
+    descriptionScrollPane.setBorder (BorderFactory.createEmptyBorder(4,4,4,4));
+    
+    parametersPanel.add(descriptionLabel);
+    parametersPanel.add(Box.createVerticalStrut(5));
+    parametersPanel.add(descriptionTextArea); // TODO descriptionScrollPane not working?
+    parametersPanel.add(Box.createVerticalStrut(5));
+
+    parametersPanel.setMinimumSize(new Dimension(20,20));
+    
+     eventGraphParametersSubpanel = new JPanel();
+     eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel,BoxLayout.X_AXIS));
+     eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
+     JLabel titleLabel = new JLabel("Event Graph Parameters");
+     titleLabel.setToolTipText ("Event graph parameters are initialized upon starting each simulation replication");
+     eventGraphParametersSubpanel.add(titleLabel);
+     eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
+    parametersPanel.add(eventGraphParametersSubpanel);
 
     ParametersPanel pp = new ParametersPanel(300,5);
     parametersPanel.add(pp);
@@ -308,6 +333,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     CodeBlockPanel codeblockPan = buildCodeBlockPanel();
 
+
     JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                  new JScrollPane(stateVariablesPanel),
                                                  buildCodeBlockComponent(codeblockPan));
@@ -315,8 +341,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                     new JScrollPane(parametersPanel),
                                                     stateCblockSplt);
+    
+    // TODO:  how to get description in as a separate pane?
+    JSplitPane descriptionSplitPane = new JSplitPane (JSplitPane.VERTICAL_SPLIT,
+                                                    descriptionScrollPane,
+                                                    spltPn);
     spltPn.setMinimumSize(new Dimension(20,20));
-
+   
     vgcw.stateParamSplitPane = spltPn;
     vgcw.paramPan = pp;
     vgcw.varPan = vp;
@@ -624,7 +655,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     addEvent.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(),
                         BorderFactory.createEmptyBorder(4,4,4,4)));
-addEvent.setIcon(new EventNodeIcon());
+    addEvent.setIcon(new EventNodeIcon());
     addSelfRef = makeJLabel("viskit/images/selfArc.png",
                             "Drag onto an existing event node to add a self-referential scheduling edge");
 
@@ -640,7 +671,7 @@ addEvent.setIcon(new EventNodeIcon());
     arcMode.setIcon(new SchedArcIcon());
     cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
                                        "Connect nodes with a cancelling edge");
-cancelArcMode.setIcon(new CanArcIcon());
+    cancelArcMode.setIcon(new CanArcIcon());
 //    selfRefMode   = makeJTButton(null, "viskit/images/selfArc.png",
 //                                       "Add a self-referential edge to a node");
 
@@ -1008,7 +1039,7 @@ cancelArcMode.setIcon(new CanArcIcon());
   public boolean doMetaGraphEdit(GraphMetaData gmd)
   //-----------------------------------------------
   {
-    return EvGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),getCurrentVgcw(),gmd);
+    return EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),getCurrentVgcw(),gmd);
   }
 
   public int genericAsk(String title, String msg)
