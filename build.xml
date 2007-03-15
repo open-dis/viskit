@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="build-run-default" name="Viskit">
     <description>
-        Ant build file for the NPS Viskit and associated libraries. Third
-        party jar files are not compiled from source here, but they are copied as
-        necessary for the Viskit distribution.  This buildfile was created and tested
-        using Ant version 1.5.1
+        Ant build file for the NPS Viskit and associated libraries. Third-party
+        jar files are not compiled from source here, but they are copied as
+        necessary for the Viskit distribution.
     </description>
 
     <!-- magic properties, do not change or delete -->
