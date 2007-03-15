@@ -131,7 +131,7 @@
     </p>
     <p align="left">
       
-        <i>Analyst Considerations.</i>
+        <i>Description of Location Features.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -141,7 +141,7 @@
   <xsl:template match="SLConclusions">
     <p align="left">
       
-        <i>Post-Experiment Analysis.</i>
+        <i>Post-Experiment Analysis of Significant Location Features.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -174,11 +174,11 @@
   <!--SimulationConfiguration templates-->
   <xsl:template match="SCComments" mode="ConfigHeader">
     <p align="left">
-      <b>Viskit Assembly Simulation Configuration</b>
+      <b>Assembly Configuration for Viskit Simulation</b>
     </p>
     <p align="left">
       
-        <i>Analyst Description.</i>
+        <i>Assembly Design Considerations.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -188,7 +188,7 @@
   <xsl:template match="SCConclusions" mode="ConfigHeader">
     <p align="left">
       
-        <i>Post-Experiment Analysis.</i>
+        <i>Post-Experiment Analysis of Simulation Assembly Design.</i>
       
       <font color="#000099">
         <xsl:value-of select="@text"/>
@@ -251,7 +251,7 @@
     </p>
     <p align="left">
       
-        <i>Analyst Description.</i>
+        <i>Entity Parameters Overview.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -261,7 +261,7 @@
   <xsl:template match="EPConclusions" mode="ParamHeader">
     <p align="left">
       
-        <i>Post-Experiment Analysis.</i>
+        <i>Post-Experiment Analysis of Entities.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -411,14 +411,11 @@
 
   <!--Behavior Definition templates-->
   <xsl:template match="BCComments" mode="BehaviorHeader">
-    <hr/>
     <p align="left">
       <b>Behavior Definitions</b>
     </p>
     <p align="left">
-      <b>
-        <i>Analyst Description.</i>
-      </b>
+        <i>Description of Behavior Design.</i>
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -426,7 +423,7 @@
   </xsl:template>
   <xsl:template match="BCConclusions" mode="BehaviorHeader">
     <p align="left">
-      <i>Post-Experiment Analysis..</i>
+      <i>Post-Experiment Analysis of Entity Behaviors.</i>
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -531,7 +528,7 @@
     </p>
     <p align="left">
       
-        <i>Analyst Description.</i>
+        <i>Description of Expected Results.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -541,7 +538,7 @@
   <xsl:template match="SRConclusions" mode="StatsHeader">
     <p align="left">
       
-        <i>Post-Experiment Analysis.</i>
+        <i>Analysis of Experimental Results.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
@@ -725,7 +722,7 @@
   <xsl:template match="CRConclusions">
     <p align="left">
       
-        <i>Recommendations for future work.</i>
+        <i>Recommendations for Future Work.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
