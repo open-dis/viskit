@@ -88,7 +88,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   }
 
   JTextField titleTF = new JTextField();
-  JTextField analyNameTF = new JTextField();
+  JTextField analystNameTF = new JTextField();
   JComboBox classifiedTF = new JComboBox(new String[]{"UNCLASSIFIED","FOUO","CONFIDENTIAL","SECRET","TOP SECRET"});
   JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
 
@@ -197,19 +197,19 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   {
     fillHeader();
     fillExecSumm();
-    fillSimLoc();
-    fillSimConfig();
+    fillSimulationLocation();
+    fillSimulationConfiguration();
     fillEntityParams();
     fillBehaviors();
     fillStatsPan();
-    fillConRecPan();
+    fillConclusionsRecommendationsPanel();
   }
   private void unFillLayout()
   {
     unFillHeader();
     unFillExecSumm();
-    unFillSimLoc();
-    unFillSimConfig();
+    unFillSimulationLocation();
+    unFillSimulationConfiguration();
     unFillEntityParams();
     unFillBehaviors();
     unFillStatsPan();
@@ -219,7 +219,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void fillHeader()
   {
     titleTF.setText(arb.getReportName());
-    analyNameTF.setText(arb.getAuthor());
+    analystNameTF.setText(arb.getAuthor());
     String date = arb.getDateOfReport();
     if(date != null && date.length()>0)
       dateTF.setText(date);
@@ -231,7 +231,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void unFillHeader()
   {
     arb.setReportName(titleTF.getText());
-    arb.setAuthor(analyNameTF.getText());
+    arb.setAuthor(analystNameTF.getText());
     arb.setDateOfReport(dateTF.getText());
     arb.setClassification((String)classifiedTF.getSelectedItem());
   }
@@ -241,51 +241,54 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
     JTabbedPane tabs = new JTabbedPane();
 
-    JPanel hdrPan = new JPanel(new SpringLayout());
-    hdrPan.add(new JLabel("Report Title"));
-    hdrPan.add(titleTF);
-    hdrPan.add(new JLabel("Report Author"));
-    hdrPan.add(analyNameTF);
-    hdrPan.add(new JLabel("Report Date"));
-    hdrPan.add(dateTF);
-    hdrPan.add(new JLabel("Report Classification"));
-    hdrPan.add(classifiedTF);
+    JPanel headerPanel = new JPanel(new SpringLayout());
+    headerPanel.add(new JLabel("Title"));
+    headerPanel.add(titleTF);
+    headerPanel.add(new JLabel("Author"));
+    headerPanel.add(analystNameTF);
+    headerPanel.add(new JLabel("Analysis Date"));
+    headerPanel.add(dateTF);
+    headerPanel.add(new JLabel("Report Classification"));
+    headerPanel.add(classifiedTF);
     Dimension d = new Dimension(Integer.MAX_VALUE,titleTF.getPreferredSize().height);
     titleTF.setMaximumSize(new Dimension(d));
-    analyNameTF.setMaximumSize(new Dimension(d));
+    analystNameTF.setMaximumSize(new Dimension(d));
     dateTF.setMaximumSize(new Dimension(d));
     classifiedTF.setMaximumSize(new Dimension(d));
-    SpringUtilities.makeCompactGrid(hdrPan, 4, 2, 10, 10, 5, 5);
+    SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
 
-    hdrPan.setBorder(new EmptyBorder(10,10,10,10));
-    hdrPan.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-    hdrPan.setMaximumSize(new Dimension(Integer.MAX_VALUE,hdrPan.getPreferredSize().height));
+    headerPanel.setBorder(new EmptyBorder(10,10,10,10));
+    headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
+    headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,headerPanel.getPreferredSize().height));
 
-    tabs.add("1 Header",hdrPan);
-
-    tabs.add("2 Executive Summary",makeExecSummPan());
-    tabs.add("3 Simulation Location",makeSimLocPan());
-    tabs.add("4 Assembly Configuration",makeSimConfigPan());
-    tabs.add("5 Entity Parameters",makeEntityParamsPan());
-    tabs.add("6 Behavior Descriptions",makeBehaviorsPan());
-    tabs.add("7 Statistical Results",makeStatsPan());
-    tabs.add("8 Conclusions, Recommendations",makeConRecPan());
+    tabs.add("1 Header",headerPanel);
+    tabs.add("2 Executive Summary",makeExecutiveSummaryPanel());
+    tabs.add("3 Simulation Location",makeSimulationLocationPanel());
+    tabs.add("4 Assembly Configuration",makeAssemblyDesignPanel());
+    tabs.add("5 Entity Parameters",makeEntityParamsPanel());
+    tabs.add("6 Behavior Descriptions",makeBehaviorsPanel());
+    tabs.add("7 Statistical Results",makeStatisticsPanel());
+    tabs.add("8 Conclusions, Recommendations",makeConclusionsRecommendationsPanel());
 
     add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
   }
 
-  JCheckBox wantExecSumm;
+  JCheckBox wantExecutiveSummary;
   JTextArea execSummTA;
-  private JPanel makeExecSummPan()
+  private JPanel makeExecutiveSummaryPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantExecSumm = new JCheckBox("Include executive summary", true));
-    wantExecSumm.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp;
-    p.add(jsp=new JScrollPane(execSummTA = new WrappingTextArea()));
+    wantExecutiveSummary = new JCheckBox("Include executive summary", true);
+    wantExecutiveSummary.setToolTipText ("Include entries in output report");
+    wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantExecutiveSummary);
+    
+    JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(jsp);
 
     /*
     execSummary = new Element("ExecutiveSummary");
@@ -300,19 +303,19 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   }
   private void fillExecSumm()
   {
-    wantExecSumm.setSelected(arb.isExecutiveSummaryComments());
+    wantExecutiveSummary.setSelected(arb.isExecutiveSummaryComments());
     execSummTA.setText(arb.getExecutiveSummary());
-    execSummTA.setEnabled(wantExecSumm.isSelected());
+    execSummTA.setEnabled(wantExecutiveSummary.isSelected());
   }
   private void unFillExecSumm()
   {
-    arb.setExecutiveSummaryComments(wantExecSumm.isSelected());
+    arb.setExecutiveSummaryComments(wantExecutiveSummary.isSelected());
     arb.setExecutiveSummary(execSummTA.getText());
   }
   /************************/
 
-  JCheckBox wantLocCommentsAndConclusions;
-  JCheckBox wantLocImages;
+  JCheckBox wantLocationDescriptions;
+  JCheckBox wantLocationImages;
   JTextArea locCommentsTA;
   JTextArea locConclusionsTA;
   JTextField simLocImgTF;
@@ -320,21 +323,29 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JTextField simChartImgTF;
   JButton    simChartImgButt;
 
-  private JPanel makeSimLocPan()
+  private JPanel makeSimulationLocationPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantLocCommentsAndConclusions = new JCheckBox("Include location features and post-experiment descriptions", true));
-    wantLocCommentsAndConclusions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp;
-    p.add(jsp=new JScrollPane(locCommentsTA = new WrappingTextArea()));
+    wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
+    wantLocationDescriptions.setToolTipText ("Include entries in output report");
+    wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantLocationDescriptions);
+    
+    JScrollPane jsp = new JScrollPane(locCommentsTA = new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Location Features"));
-    p.add(jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea()));
+    jsp.setBorder(new TitledBorder("Description of Location Features"));
+    p.add(jsp);
+    
+    jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
-    p.add(wantLocImages = new JCheckBox("Include location and chart image(s)", true));
-    wantLocImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(jsp);
+    
+    wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
+    wantLocationImages.setToolTipText ("Include entries in output report");
+    wantLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantLocationImages);
 
     JPanel imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
@@ -365,27 +376,27 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     return p;
   }
 
-  private void fillSimLoc()
+  private void fillSimulationLocation()
   {
-    wantLocCommentsAndConclusions.setSelected(arb.isPrintSimLocationComments());
+    wantLocationDescriptions.setSelected(arb.isPrintSimLocationComments());
     locCommentsTA.setText(arb.getSimLocationComments());
-    locCommentsTA.setEnabled(wantLocCommentsAndConclusions.isSelected());
+    locCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
     locConclusionsTA.setText(arb.getSimLocationConclusions());
-    locConclusionsTA.setEnabled(wantLocCommentsAndConclusions.isSelected());
-    wantLocImages.setSelected(arb.isPrintSimLocationImage());
-    simLocImgTF.setEnabled(wantLocImages.isSelected());
-    simLocImgButt.setEnabled(wantLocImages.isSelected());
-    simChartImgTF.setEnabled(wantLocImages.isSelected());
-    simChartImgButt.setEnabled(wantLocImages.isSelected());
+    locConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
+    wantLocationImages.setSelected(arb.isPrintSimLocationImage());
+    simLocImgTF.setEnabled(wantLocationImages.isSelected());
+    simLocImgButt.setEnabled(wantLocationImages.isSelected());
+    simChartImgTF.setEnabled(wantLocationImages.isSelected());
+    simChartImgButt.setEnabled(wantLocationImages.isSelected());
     simLocImgTF.setText(arb.getLocationImage());
     simChartImgTF.setText(arb.getChartImage());
   }
-  private void unFillSimLoc()
+  private void unFillSimulationLocation()
   {
-    arb.setPrintSimLocationComments(wantLocCommentsAndConclusions.isSelected());
+    arb.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
     arb.setSimLocationDescription(locCommentsTA.getText());
     arb.setSimLocationConclusions(locConclusionsTA.getText());
-    arb.setPrintSimLocationImage(wantLocImages.isSelected());
+    arb.setPrintSimLocationImage(wantLocationImages.isSelected());
     String s = simLocImgTF.getText().trim();
     if(s != null & s.length() > 0)
       arb.setLocationImage(s);
@@ -396,8 +407,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   /************************/
 
-  JCheckBox wantSimConfigCommentsAndConclusions;
-  JTextArea simConfigComments;
+  JCheckBox wantAssemblyDesignAndAnalysis;
+  JTextArea assemblyDesignConsiderations;
   JTextArea simConfigConclusions;
   JCheckBox wantSimConfigImages;
   JCheckBox wantEntityTable;
@@ -405,19 +416,30 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JTextField configImgPathTF;
   JButton   configImgButt;
 
-  private JPanel makeSimConfigPan()
+  private JPanel makeAssemblyDesignPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantSimConfigCommentsAndConclusions = new JCheckBox("Include assembly-design and post-experiment analysis descriptions", true));
-    wantSimConfigCommentsAndConclusions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp;
-    p.add(jsp = new JScrollPane(simConfigComments = new WrappingTextArea()));
+    wantAssemblyDesignAndAnalysis = new JCheckBox("Include assembly-design considerations and post-experiment analysis", true);
+    wantAssemblyDesignAndAnalysis.setToolTipText ("Include entries in output report");
+    wantAssemblyDesignAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantAssemblyDesignAndAnalysis);
+    
+    JScrollPane jsp = new JScrollPane(assemblyDesignConsiderations = new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
+    p.add(jsp);
+    
+    jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea());
+    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
+    p.add(jsp);
 
-    p.add(wantEntityTable = new JCheckBox("Include entity table", true));
+    wantEntityTable = new JCheckBox("Include entity definition table", true);
+    wantEntityTable.setToolTipText ("Include entries in output report");
     wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantEntityTable);
+    
     JPanel pp = new JPanel();
     pp.setLayout(new BoxLayout(pp,BoxLayout.X_AXIS));
     pp.add(Box.createHorizontalGlue());
@@ -427,11 +449,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(pp);
     //p.add(new JScrollPane(entityTable = new JTable()));
     entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
-    p.add(jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea()));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post-Experiment Analysis"));
-    p.add(wantSimConfigImages = new JCheckBox("Include simulation configuration image", true));
+    
+    wantSimConfigImages = new JCheckBox("Include simulation configuration image", true);
+    wantSimConfigImages.setToolTipText ("Include entries in output report");
     wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantSimConfigImages);
+    
     JPanel imp = new JPanel();
     imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
     imp.add(new JLabel("Configuration image: "));
@@ -448,16 +471,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     return p;
   }
 
-  private void fillSimConfig()
+  private void fillSimulationConfiguration()
   {
-    wantSimConfigCommentsAndConclusions.setSelected(arb.isPrintSimConfigComments());
-    simConfigComments.setText(arb.getSimConfigComments());
-    simConfigComments.setEnabled(wantSimConfigCommentsAndConclusions.isSelected());
+    wantAssemblyDesignAndAnalysis.setSelected(arb.isPrintSimConfigComments());
+    assemblyDesignConsiderations.setText(arb.getSimConfigComments());
+    assemblyDesignConsiderations.setEnabled(wantAssemblyDesignAndAnalysis.isSelected());
 
     wantEntityTable.setSelected(arb.isPrintEntityTable());
 
     String[][]sa = arb.getSimConfigEntityTable();
-    entityTable.setModel(new DefaultTableModel(sa,new String[]{"Entity Name","Behavior Definition"}));
+    entityTable.setModel(new DefaultTableModel(sa,new String[]{"Entity Name","Behavior Type"}));
     entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
     entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
@@ -470,10 +493,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     configImgPathTF.setText(arb.getAssemblyImageLocation());
   }
 
-  private void unFillSimConfig()
+  private void unFillSimulationConfiguration()
   {
-    arb.setPrintSimConfigComments(wantSimConfigCommentsAndConclusions.isSelected());
-    arb.setSimConfigurationDescription(simConfigComments.getText());
+    arb.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
+    arb.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
     arb.setSimConfigurationConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
@@ -483,22 +506,34 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   }
 
 
-  JCheckBox wantEntityParamComments;
-  JCheckBox wantEntityParamTables;
+  JCheckBox wantEntityParameterDescriptions;
+  JCheckBox wantEntityParameterTables;
   JTabbedPane entityParamTabs;
   JTextArea entityParamCommentsTA;
+  JScrollPane entityParamCommentsSP;
 
-  private JPanel makeEntityParamsPan()
+  private JPanel makeEntityParamsPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantEntityParamComments = new JCheckBox("Include entity parameter descriptions", true));
-      wantEntityParamComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    wantEntityParameterDescriptions = new JCheckBox("Include entity parameter descriptions", true);
+    wantEntityParameterDescriptions.setToolTipText ("Include entries in output report");
+    wantEntityParameterDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantEntityParameterDescriptions);
 
-    p.add(new JScrollPane(entityParamCommentsTA=new WrappingTextArea()));
+    entityParamCommentsTA=new WrappingTextArea();
+    entityParamCommentsSP = new JScrollPane(entityParamCommentsTA);
+    entityParamCommentsSP.setBorder(new TitledBorder("Entity Parameters Overview"));
+    entityParamCommentsSP.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(entityParamCommentsSP);
 
-    p.add(wantEntityParamTables = new JCheckBox("Include entity parameter tables", true));
-    wantEntityParamTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    wantEntityParameterTables = new JCheckBox("Include entity parameter tables", true);
+    wantEntityParameterTables.setToolTipText ("Include entries in output report");
+    wantEntityParameterTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantEntityParameterTables);
+    
+    // TODO: post-experiment
+    
     entityParamTabs = new JTabbedPane(JTabbedPane.LEFT);
     entityParamTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(entityParamTabs);
@@ -508,8 +543,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void fillEntityParams()
   {
-    wantEntityParamComments.setSelected(arb.isPrintParameterComments());
-    wantEntityParamTables.setSelected(arb.isPrintParameterTable());
+    wantEntityParameterDescriptions.setSelected(arb.isPrintParameterComments());
+    wantEntityParameterTables.setSelected(arb.isPrintParameterTable());
 
     entityParamCommentsTA.setText(arb.getParameterComments());
 
@@ -551,38 +586,46 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void unFillEntityParams()
   {
-    arb.setPrintParameterComments(wantEntityParamComments.isSelected());
-    arb.setPrintParameterTable(wantEntityParamTables.isSelected());
+    arb.setPrintParameterComments(wantEntityParameterDescriptions.isSelected());
+    arb.setPrintParameterTable(wantEntityParameterTables.isSelected());
     arb.setParameterDescription(entityParamCommentsTA.getText());
   }
 
-  JCheckBox doBehaviorComments;
+  JCheckBox doBehaviorDesignAnalysisDescriptions;
   JCheckBox doBehaviorDescriptions;
   JCheckBox doBehaviorImages;
-  JTextArea behaviorCommentsTA;
+  JTextArea behaviorDescriptionTA;
   JTextArea behaviorConclusionsTA;
   JTabbedPane behaviorTabs;
 
-  private JPanel makeBehaviorsPan()
+  private JPanel makeBehaviorsPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(doBehaviorComments = new JCheckBox("Include behavior design and post-experiment analysis", true));
-    doBehaviorComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp = new JScrollPane(behaviorCommentsTA = new WrappingTextArea());
+    doBehaviorDesignAnalysisDescriptions = new JCheckBox("Include behavior design and post-experiment analysis", true);
+    doBehaviorDesignAnalysisDescriptions.setToolTipText ("Include entries in output report");
+    doBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(doBehaviorDesignAnalysisDescriptions);
+    
+    JScrollPane jsp = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
     jsp.setBorder(new TitledBorder("Behavior Design Description"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
+    
     jsp = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Post-Experiment Analysis"));
+    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Entity Behaviors"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
-
-    p.add(doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true));
+    
+    doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true);
+    doBehaviorDescriptions.setToolTipText ("Include entries in output report");
     doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(doBehaviorDescriptions);
 
-    p.add(doBehaviorImages = new JCheckBox("Include behavior images", true));
+    doBehaviorImages = new JCheckBox("Include behavior images", true);
+    doBehaviorImages.setToolTipText ("Include entries in output report");
     doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(doBehaviorImages);
 
     behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
     behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -593,8 +636,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void unFillBehaviors()
   {
-    arb.setPrintBehaviorDefComments(doBehaviorComments.isSelected());
-    arb.setBehaviorDescription(behaviorCommentsTA.getText());
+    arb.setPrintBehaviorDefComments(doBehaviorDesignAnalysisDescriptions.isSelected());
+    arb.setBehaviorDescription(behaviorDescriptionTA.getText());
     arb.setBehaviorConclusions(behaviorConclusionsTA.getText());
     arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
     arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
@@ -603,71 +646,71 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   }
   private void fillBehaviors()
   {
-    doBehaviorComments.setSelected(arb.isPrintBehaviorDefComments());
-    behaviorCommentsTA.setText(arb.getBehaviorComments());
-    behaviorCommentsTA.setEnabled(doBehaviorComments.isSelected());
+    doBehaviorDesignAnalysisDescriptions.setSelected(arb.isPrintBehaviorDefComments());
+    behaviorDescriptionTA.setText(arb.getBehaviorComments());
+    behaviorDescriptionTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
     behaviorConclusionsTA.setText(arb.getBehaviorConclusions());
-    behaviorConclusionsTA.setEnabled(doBehaviorComments.isSelected());
+    behaviorConclusionsTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
     doBehaviorImages.setEnabled(arb.isPrintEventGraphImages());
     doBehaviorDescriptions.setSelected(arb.isPrintBehaviorDescriptions());
     behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
 
-    List lis = arb.getBehaviorList();
+    List behaviorList = arb.getBehaviorList();
 
     behaviorTabs.removeAll();
-    for(Iterator itr=lis.iterator(); itr.hasNext();) {
-      List b = (List)itr.next();
-      String nm = (String)b.get(0);
-      String dsc= (String)b.get(1);
-      List params = (List)b.get(2);
-      List stVars = (List)b.get(3);
-      String imgPath = (String) b.get(4);
+    for(Iterator itr=behaviorList.iterator(); itr.hasNext();) {
+      List   nextBehavior = (List)itr.next();
+      String behaviorName = (String)nextBehavior.get(0);
+      String behaviorDescription= (String)nextBehavior.get(1);
+      List   behaviorParameters = (List)nextBehavior.get(2);
+      List   behaviorStateVariables = (List)nextBehavior.get(3);
+      String behaviorImagePath = (String) nextBehavior.get(4);
 
       JPanel p = new JPanel();
       p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
 
-      JLabel lab;
-      p.add(lab=new JLabel("Description:  "+dsc));
+      JLabel lab = new JLabel("Description:  "+behaviorDescription);
       lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      p.add(lab);
 
-      p.add(lab = new JLabel("Image location:  "+imgPath));
-      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      lab = new JLabel("Image location:  "+behaviorImagePath);
+      p.add(lab);
 
       Vector cols = new Vector(3);
       cols.add("name");cols.add("type");cols.add("description");
 
-      Vector data = new Vector(params.size());
-      for(int i=0;i<params.size();i++) {
-        String[] sa = (String[])params.get(i);
+      Vector data = new Vector(behaviorParameters.size());
+      for(int i=0;i<behaviorParameters.size();i++) {
+        String[] sa = (String[])behaviorParameters.get(i);
         Vector row = new Vector(3);
         row.add(sa[0]);row.add(sa[1]);row.add(sa[2]);
         data.add(row);
       }
-      JScrollPane jsp;
-
-      p.add(jsp=new JScrollPane(new ROTable(data,cols)));
+      JScrollPane jsp = new JScrollPane(new ROTable(data,cols));
       jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
       jsp.setBorder(new TitledBorder("Parameters"));
+      p.add(jsp);
 
-      data = new Vector(stVars.size());
-      for(int i=0;i<stVars.size();i++) {
-        String[] sa = (String[])stVars.get(i);
+      data = new Vector(behaviorStateVariables.size());
+      for(int i=0;i<behaviorStateVariables.size();i++) {
+        String[] sa = (String[])behaviorStateVariables.get(i);
         Vector row = new Vector(3);
         row.add(sa[0]);row.add(sa[1]);row.add(sa[2]);
         data.add(row);
       }
-      p.add(jsp=new JScrollPane(new ROTable(data,cols)));
+      jsp=new JScrollPane(new ROTable(data,cols));
       jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
       jsp.setBorder(new TitledBorder("State variables"));
+      p.add(jsp);
 
-      behaviorTabs.add(nm,p);
+      behaviorTabs.add(behaviorName,p);
     }
 
   }
 
-  JCheckBox wantStatsComments;
+  JCheckBox wantStatisticsDescriptionAnalysis;
   JCheckBox wantStatsReplications;
-  JCheckBox wantStatsSummary;
+  JCheckBox wantStatisticsSummary;
   JTextArea statsComments;
   JTextArea statsConclusions;
   JPanel    statsSummaryPanel;
@@ -675,33 +718,45 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JScrollPane repsJsp;
   JScrollPane summJsp;
 
-  private JPanel makeStatsPan()
+  private JPanel makeStatisticsPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantStatsComments = new JCheckBox("Include statistical description and analysis", true));
-      wantStatsComments.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp;
-    p.add(jsp = new JScrollPane(statsComments=new WrappingTextArea()));
+    wantStatisticsDescriptionAnalysis = new JCheckBox("Include statistical description and analysis", true);
+    wantStatisticsDescriptionAnalysis.setToolTipText ("Include entries in output report");
+    wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantStatisticsDescriptionAnalysis);
+    
+    JScrollPane jsp = new JScrollPane(statsComments=new WrappingTextArea());
     jsp.setBorder(new TitledBorder("Description of Expected Results"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp = new JScrollPane(statsConclusions= new WrappingTextArea()));
-    jsp.setBorder(new TitledBorder("Analysis of Actual Results"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(jsp);
+    
+    jsp = new JScrollPane(statsConclusions= new WrappingTextArea());
+    jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
+    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(jsp);
 
-    p.add(wantStatsReplications=new JCheckBox("Include replication statistics", true));
+    wantStatsReplications=new JCheckBox("Include replication statistics", true);
+    wantStatsReplications.setToolTipText ("Include entries in output report");
     wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantStatsReplications);
 
-    p.add(repsJsp = new JScrollPane(statsRepPanel = new JPanel()));
+    repsJsp = new JScrollPane(statsRepPanel = new JPanel());
     repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     statsRepPanel.setLayout(new BoxLayout(statsRepPanel,BoxLayout.Y_AXIS));
+    p.add(repsJsp);
 
-    p.add(wantStatsSummary = new JCheckBox("Include summary statistics", true));
-    wantStatsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
+    wantStatisticsSummary.setToolTipText ("Include entries in output report");
+    wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantStatisticsSummary);
 
-    p.add(summJsp = new JScrollPane(statsSummaryPanel = new JPanel()));
+    summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
     summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel,BoxLayout.Y_AXIS));
+    p.add(summJsp);
 
     p.setBorder(new EmptyBorder(10,10,10,10));
     return p;
@@ -710,7 +765,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private void fillStatsPan()
   {
     boolean bool = arb.isPrintStatsComments();
-    wantStatsComments.setSelected(bool);
+    wantStatisticsDescriptionAnalysis.setSelected(bool);
     statsComments.setText(arb.getStatsComments());
     statsConclusions.setText(arb.getStatsConclusions());
     statsComments.setEnabled(bool);
@@ -719,7 +774,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     bool = arb.isPrintReplicationStats();
     wantStatsReplications.setSelected(bool);
     bool = arb.isPrintSummaryStats();
-    wantStatsSummary.setSelected(bool);
+    wantStatisticsSummary.setSelected(bool);
 
     List reps = arb.getStatsReplicationsList();
     statsRepPanel.removeAll();
@@ -780,38 +835,43 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void unFillStatsPan()
   {
-    arb.setPrintStatsComments(wantStatsComments.isSelected());
+    arb.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
     arb.setStatsDescription(statsComments.getText());
     arb.setStatsConclusions(statsConclusions.getText());
     arb.setPrintReplicationStats(wantStatsReplications.isSelected());
-    arb.setPrintSummaryStats(wantStatsSummary.isSelected());
+    arb.setPrintSummaryStats(wantStatisticsSummary.isSelected());
   }
 
-  JCheckBox wantTotalConRec;
+  JCheckBox wantConclusionsRecommendations;
   JTextArea conRecConclusionsTA;
   JTextArea conRecRecsTA;
 
-  private JPanel makeConRecPan()
+  private JPanel makeConclusionsRecommendationsPanel()
   {
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    p.add(wantTotalConRec = new JCheckBox("Include conclusions and recommendations", true));
-      wantTotalConRec.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    JScrollPane jsp;
-    p.add(jsp = new JScrollPane(conRecConclusionsTA=new WrappingTextArea()));
+    wantConclusionsRecommendations = new JCheckBox("Include conclusions and recommendations", true);
+    wantConclusionsRecommendations.setToolTipText ("Include entries in output report");
+    wantConclusionsRecommendations.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    p.add(wantConclusionsRecommendations);
+    
+    JScrollPane jsp = new JScrollPane(conRecConclusionsTA=new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     jsp.setBorder(new TitledBorder("Conclusions"));
-    p.add(jsp = new JScrollPane(conRecRecsTA=new WrappingTextArea()));
+    p.add(jsp);
+    
+    jsp = new JScrollPane(conRecRecsTA=new WrappingTextArea());
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     jsp.setBorder(new TitledBorder("Recommendations for Future Work"));
     p.setBorder(new EmptyBorder(10,10,10,10));
+    p.add(jsp);
     return p;
   }
 
-  private void fillConRecPan()
+  private void fillConclusionsRecommendationsPanel()
   {
     boolean bool = arb.isPrintRecommendationsConclusions();
-    wantTotalConRec.setSelected(bool);
+    wantConclusionsRecommendations.setSelected(bool);
     conRecConclusionsTA.setText(arb.getConclusions());
     conRecConclusionsTA.setEnabled(bool);
     conRecRecsTA.setText(arb.getRecommendations());
@@ -820,7 +880,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   private void unFillConRecPan()
   {
-    arb.setPrintRecommendationsConclusions(wantTotalConRec.isSelected());
+    arb.setPrintRecommendationsConclusions(wantConclusionsRecommendations.isSelected());
     arb.setConclusions(conRecConclusionsTA.getText());
     arb.setRecommendations(conRecRecsTA.getText());
   }

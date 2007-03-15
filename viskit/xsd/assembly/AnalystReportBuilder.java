@@ -914,7 +914,7 @@ public class AnalystReportBuilder
 
     //Executive Summary values
     setExecutiveSummaryComments(true);
-    setExecutiveSummary("***ENTER EXECUTIVE SUMMARY DESCRIPTION HERE***");
+    setExecutiveSummary("***ENTER EXECUTIVE SUMMARY HERE***");
 
     //SimulationLocation Values
     setPrintSimLocationComments(true);
@@ -928,8 +928,8 @@ public class AnalystReportBuilder
     setPrintSimConfigComments(true);
     setPrintAssemblyImage(true);
     setPrintEntityTable(true);
-    setSimConfigurationDescription("***ENTER SIMULATION CONFIGURATION DESCRIPTION HERE***");
-    setSimConfigurationConclusions("***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***");
+    setSimConfigurationDescription("***ENTER ASSEMBLY CONFIGURATION DESCRIPTION HERE***");
+    setSimConfigurationConclusions("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
 
     //setAssemblyImageLocation(""); // TODO:  generate image, set file location
 
@@ -957,7 +957,7 @@ public class AnalystReportBuilder
 
     //Recommendations/Conclusions
     setPrintRecommendationsConclusions(true);
-    setConclusions("***ENTER CONCLUSIONS DESCRIPTION HERE***");
+    setConclusions    ("***ENTER ANALYST CONCLUSIONS HERE***");
     setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
