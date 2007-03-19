@@ -505,7 +505,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       arb.setAssemblyImageLocation(s);
   }
 
-
   JCheckBox wantEntityParameterDescriptions;
   JCheckBox wantEntityParameterTables;
   JTabbedPane entityParamTabs;
@@ -908,12 +907,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     fileMenu.setMnemonic(KeyEvent.VK_F);
     JMenuItem open  = new JMenuItem("Open analyst report XML");
     open.setMnemonic(KeyEvent.VK_O);
+    JMenuItem view  = new JMenuItem("View analyst report XML");
+    view.setMnemonic(KeyEvent.VK_V);
+    view.setEnabled (false); // TODO:  imolement listener and view functionality
     JMenuItem save  = new JMenuItem("Save analyst report XML");
     save.setMnemonic(KeyEvent.VK_S);
     JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
     generateViewHtml.setMnemonic(KeyEvent.VK_V);
 
     fileMenu.add(open);
+    fileMenu.add(view);
     fileMenu.add(save);
     fileMenu.add(generateViewHtml);
     myMenuBar.add(fileMenu);
