@@ -557,13 +557,9 @@
       
     </p>
     <p align="left">Entity:
-      <b>
         <xsl:value-of select="@name"/>
-      </b>
       <p align="left">Property:
-        <b>
           <xsl:value-of select="@property"/>
-        </b>
       </p>
       <xsl:for-each select="chartURL">
         <p align="center">
