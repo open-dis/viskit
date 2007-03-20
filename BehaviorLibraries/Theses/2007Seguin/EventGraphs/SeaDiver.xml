@@ -256,9 +256,7 @@ mover.setTacticalMode(diskit.TacticalMode.IDLE);</Code>
             <Comment/>
             <EdgeParameter value="getFirstMoverID()"/>
         </Schedule>
-        <Code>Schedule.stopOnEvent("StopSimWhenAllObjectsDetected", 10);
-
-// new Class[] {diskit.Mover3D.class} ,</Code>
+        <Code>//Schedule.stopOnEvent("StopSimWhenAllObjectsDetected", 10);</Code>
         <Coordinate x="60" y="130"/>
     </Event>
     <Event name="CreateDiver">
@@ -358,4 +356,3 @@ diver.setTacticalMode(diskit.TacticalMode.IDLE);</Code>
     </Event>
     <Code/>
 </SimEntity>
-

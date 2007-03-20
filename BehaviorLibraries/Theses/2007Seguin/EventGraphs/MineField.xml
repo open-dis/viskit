@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity author="jmseguin" extend="SimEntityBase" name="MineField" package="seadiver" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Object which generates a minefield with a number of mines corresponding to numberMines parameter.  The distribution is based on random variates.</Comment>
     <Parameter name="sensorRange" type="double">
         <Comment>Range of mine's sensor.</Comment>
     </Parameter>
@@ -7,14 +8,14 @@
         <Comment>Number of mines in the field.</Comment>
     </Parameter>
     <Parameter name="firstMoverID" type="int">
-            <Comment>Determines what number to start iterating mover IDs.</Comment>
+        <Comment>Determines what number to start iterating mover IDs.</Comment>
     </Parameter>
     <Parameter name="mineFieldWidth" type="double">
         <Comment>Width (X) of the field.</Comment>
     </Parameter>
     <Parameter name="mineFieldLength" type="double">
         <Comment>Length (Y) of the field.</Comment>
-    </Parameter>    
+    </Parameter>
     <Parameter name="mineFieldDepth" type="double">
         <Comment>Depth (Z) of the field.</Comment>
     </Parameter>
@@ -25,7 +26,7 @@
         <Comment>RV that determines the distribution of mines over the length of the field.</Comment>
     </Parameter>
     <Parameter name="mineDistributionDepth" type="diskit.random.RandomVariateInstantiator">
-            <Comment>RV that determines the distribution of mines over the height of the field.</Comment>
+        <Comment>RV that determines the distribution of mines over the height of the field.</Comment>
     </Parameter>
     <StateVariable name="numberOfDetectionsByMine" type="int">
         <Comment>Number of unique detections.</Comment>
@@ -126,4 +127,3 @@ sensor.setPersistant(false);</Code>
         <Coordinate x="160" y="390"/>
     </Event>
 </SimEntity>
-

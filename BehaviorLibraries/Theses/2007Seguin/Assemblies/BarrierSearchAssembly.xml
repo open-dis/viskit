@@ -71,23 +71,22 @@
         <TerminalParameter name="sensorRange" type="double" value="100"/>
         <Coordinate x="240" y="310"/>
     </SimEntity>
-    <PropertyChangeListener description="" mode="replicationStats" name="TargetDetections" type="simkit.stat.SimpleStatsTally">
+    <PropertyChangeListener description="How many times did Seadiver detect Target." mode="replicationStats" name="TargetDetections" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="targetDetections"/>
         <Coordinate x="70" y="60"/>
     </PropertyChangeListener>
-    <PropertyChangeListener description="" mode="replicationStats" name="SeadiverDetections" type="simkit.stat.SimpleStatsTally">
+    <PropertyChangeListener description="How many times did Target detect Seadivers." mode="replicationStats" name="SeadiverDetections" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter name="p[0] : " type="java.lang.String" value="numberOfSeadiverDetections"/>
         <Coordinate x="360" y="310"/>
     </PropertyChangeListener>
-    <SimEventListenerConnection listener="ScenarioManager" source="SeaDivers"/>
-    <SimEventListenerConnection description="Connects the CreateMap events in each event graph." listener="ZoneMap" source="SeaDivers"/>
-    <SimEventListenerConnection listener="SeaDivers" source="ZoneMap"/>
-    <SimEventListenerConnection listener="Targets" source="ZoneMap"/>
-    <SimEventListenerConnection listener="ZoneMap" source="Targets"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="Targets"/>
-    <PropertyChangeListenerConnection description="" listener="TargetDetections" property="targetDetections" source="SeaDivers"/>
-    <PropertyChangeListenerConnection description="" listener="SeadiverDetections" property="numberOfSeadiverDetections" source="Targets"/>
+    <SimEventListenerConnection description="Scenario Manager is listening for register target and sensors." listener="ScenarioManager" source="SeaDivers"/>
+    <SimEventListenerConnection description="ZoneMap is listening for Create Map." listener="ZoneMap" source="SeaDivers"/>
+    <SimEventListenerConnection description="Seadivers is listening for Register Map." listener="SeaDivers" source="ZoneMap"/>
+    <SimEventListenerConnection description="Targets is listening to Register Zones." listener="Targets" source="ZoneMap"/>
+    <SimEventListenerConnection description="ZoneMap is listening for Determine Target Zones." listener="ZoneMap" source="Targets"/>
+    <SimEventListenerConnection description="Scenario Manager is listening for register target and sensors." listener="ScenarioManager" source="Targets"/>
+    <PropertyChangeListenerConnection description="Number of Target detections." listener="TargetDetections" property="targetDetections" source="SeaDivers"/>
+    <PropertyChangeListenerConnection description="Number of Seadiver Detections." listener="SeadiverDetections" property="numberOfSeadiverDetections" source="Targets"/>
     <Schedule stopTime="100." verbose="false"/>
     <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
-

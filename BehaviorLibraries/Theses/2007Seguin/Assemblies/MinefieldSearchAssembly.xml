@@ -51,8 +51,8 @@
         <TerminalParameter name="numberMines" type="int" value="200"/>
         <TerminalParameter name="firstMoverID" type="int" value="600"/>
         <TerminalParameter name="mineFieldWidth" type="double" value="20000"/>
-	<TerminalParameter name="mineFieldLength" type="double" value="20000"/>	        
-        <TerminalParameter name="mineFieldDepth" type="double" value="10"/>        
+        <TerminalParameter name="mineFieldLength" type="double" value="20000"/>
+        <TerminalParameter name="mineFieldDepth" type="double" value="10"/>
         <MultiParameter type="diskit.random.RandomVariateInstantiator">
             <MultiParameter type="diskit.random.AR1Variate"/>
             <MultiParameter type="diskit.random.BernoulliVariate"/>
@@ -86,20 +86,20 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.random.RandomVariateInstantiator">
-	            <MultiParameter type="diskit.random.AR1Variate"/>
-	            <MultiParameter type="diskit.random.BernoulliVariate"/>
-	            <MultiParameter type="diskit.random.BetaVariate"/>
-	            <MultiParameter type="diskit.random.BinomialVariate"/>
-	            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
-	            <MultiParameter type="diskit.random.ExponentialVariate"/>
-	            <MultiParameter type="diskit.random.GammaVariate"/>
-	            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
-	            <MultiParameter type="diskit.random.NormalVariate"/>
-	            <MultiParameter type="diskit.random.PoissonVariate"/>
-	            <MultiParameter type="diskit.random.UniformVariate">
-	                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
-	                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="1"/>
-	            </MultiParameter>
+            <MultiParameter type="diskit.random.AR1Variate"/>
+            <MultiParameter type="diskit.random.BernoulliVariate"/>
+            <MultiParameter type="diskit.random.BetaVariate"/>
+            <MultiParameter type="diskit.random.BinomialVariate"/>
+            <MultiParameter type="diskit.random.DiscreteUniformVariate"/>
+            <MultiParameter type="diskit.random.ExponentialVariate"/>
+            <MultiParameter type="diskit.random.GammaVariate"/>
+            <MultiParameter type="diskit.random.InverseGaussianVariate"/>
+            <MultiParameter type="diskit.random.NormalVariate"/>
+            <MultiParameter type="diskit.random.PoissonVariate"/>
+            <MultiParameter type="diskit.random.UniformVariate">
+                <TerminalParameter name="low Value (-Infinity -&gt; +Infinity)" type="double" value="0"/>
+                <TerminalParameter name="high Value (&gt;=lowValue -&gt; +Infinity)" type="double" value="1"/>
+            </MultiParameter>
         </MultiParameter>
         <Coordinate x="270" y="330"/>
     </SimEntity>
@@ -111,13 +111,12 @@
         <TerminalParameter name="p[0] : " type="java.lang.String" value="mineDetections"/>
         <Coordinate x="90" y="70"/>
     </PropertyChangeListener>
-    <SimEventListenerConnection listener="ScenarioManager" source="SeaDivers"/>
-    <SimEventListenerConnection listener="ZoneMap" source="SeaDivers"/>
-    <SimEventListenerConnection listener="SeaDivers" source="ZoneMap"/>
-    <SimEventListenerConnection listener="ScenarioManager" source="MineField"/>
-    <PropertyChangeListenerConnection description="" listener="DetectionsByMine" property="numberOfDetectionsByMine" source="MineField"/>
+    <SimEventListenerConnection description="Scenario Manager is listening for register target and sensors." listener="ScenarioManager" source="SeaDivers"/>
+    <SimEventListenerConnection description="ZoneMap listening for Create Map." listener="ZoneMap" source="SeaDivers"/>
+    <SimEventListenerConnection description="Seadiver listening for Register Map." listener="SeaDivers" source="ZoneMap"/>
+    <SimEventListenerConnection description="Scenario Manager is listening for register target and sensors." listener="ScenarioManager" source="MineField"/>
+    <PropertyChangeListenerConnection description="Number of detections by mines." listener="DetectionsByMine" property="numberOfDetectionsByMine" source="MineField"/>
     <PropertyChangeListenerConnection description="Number of unique mines detected." listener="MineDetections" property="mineDetections" source="SeaDivers"/>
     <Schedule stopTime="100." verbose="false"/>
     <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
-
