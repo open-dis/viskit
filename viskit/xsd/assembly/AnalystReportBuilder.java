@@ -699,7 +699,8 @@ public class AnalystReportBuilder
         Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
 
         //Chart title and label
-        chartTitle = ("Entity Name: " + tempEntity.getAttributeValue("name"));
+        chartTitle = ( // "Entity Name: " +   // TODO: fix missing @name in AnalystReports/statistics/someAssembly.xml/<ReportStatistics>/<SimEntity>
+                tempEntity.getAttributeValue("name"));
         axisLabel  = (temp.getAttributeValue("property")) ;
 
         while (itr2.hasNext()) {
