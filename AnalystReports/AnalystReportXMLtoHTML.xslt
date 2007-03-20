@@ -245,7 +245,8 @@
 
 
   <!--EntityParameter templates-->
-  <xsl:template match="EPComments" mode="ParamHeader">
+  <!--<xsl:template match="EPComments" mode="ParamHeader"> TODO:  reconcile these names-->
+  <xsl:template match="PCComments" mode="ParamHeader">
     <p align="left">
       <b>Entity Parameters</b>
     </p>
@@ -258,16 +259,18 @@
       </font>
     </p>
   </xsl:template>
+  <!-- not used
   <xsl:template match="EPConclusions" mode="ParamHeader">
     <p align="left">
       
-        <i>Post-Experiment Analysis of Entities.</i>
+        <i>Post-Experiment Analysis of Entity Behaviors.</i>
       
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
     </p>
   </xsl:template>
+  -->
 
   <!--Entity Parameter Tables-->
   <xsl:template match="EntityParameterTable">
