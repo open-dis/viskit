@@ -850,7 +850,7 @@ public class VGlobals
       int index = 0;
       for (String path:extraPaths) {
           try {
-            urls[index++] = (new File(path)).toURL();
+            urls[index++] = (new File(path)).toURI().toURL();   // URI encodes spaces
           } catch (Exception e) {;} // Settings path dir gone?
       }
       LocalBootLoader loader = new LocalBootLoader(urls, Thread.currentThread().getContextClassLoader(), getWorkDirectory());
