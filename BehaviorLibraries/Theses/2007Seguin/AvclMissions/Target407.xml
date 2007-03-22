@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AVCL xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" vehicleID="0" version="1.0" xsi:noNamespaceSchemaLocation="AVCL.xsd">
+    <head>
+        <meta content="AVCL 1.0 mission generated via XSLT from ACL 0.1 (AUV missions only) mission." name="description"/>
+        <meta content="John Seguin" name="author"/>
+    </head>
+    <body>
+        <MissionPreparation>
+            <UnitsOfMeasure angle="degrees" distance="meters" mass="kilograms" time="seconds"/>
+            <GeoOrigin latitude="25.0" longitude="40.0"/>
+            <Configuration>
+                <UnmannedUnderwaterVehicle>
+                    <Capability value="thrusterPowered"/>
+                </UnmannedUnderwaterVehicle>
+            </Configuration>
+            <UUVCommandScript description="Scripted AUV mission.">
+<SetPosition>
+<XYPosition x="73163.48926611553" y="-164516.0221029073"/>
+</SetPosition>
+<Thrusters value="false"/>
+<MakeKnots speedOverGround="false" value="6.0"/>
+<Waypoint>
+<XYPosition x="24279.83165055917" y="197355.60570843518"/>
+</Waypoint>
+<Waypoint>
+<XYPosition x="111214.56363511675" y="218096.47660702467"/>
+<Depth value="50.0"/>
+</Waypoint>
+</UUVCommandScript>
+        </MissionPreparation>
+    </body>
+</AVCL>
