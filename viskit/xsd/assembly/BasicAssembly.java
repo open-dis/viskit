@@ -1,6 +1,8 @@
 package viskit.xsd.assembly;
 
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;
@@ -75,6 +77,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   
   private ByteArrayOutputStream outputBuffer;
 
+  private PrintWriter println;
+
   /**
    * Default constructor sets paameters of BasicAssembly to their
    * default values.  These are:
@@ -105,6 +109,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     //the stats report file. Should discuss though.
     statsConfig = new ReportStatisticsConfig(this.getName());
     outputBuffer = new ByteArrayOutputStream();
+    println = new PrintWriter(System.out);
     //moved to run() to avoid beanshell upcall error
     //createObjects();
     //performHookups();
@@ -172,7 +177,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     while (itr.hasNext()) {
       Map.Entry entry = (Map.Entry) itr.next();
       entitiesWithStats.add(entry.getKey().toString());
-      System.out.println(entry.getKey().toString());
+      println.println(entry.getKey().toString());
+      println.flush();
     }
     statsConfig.setEntityIndex(entitiesWithStats);
 
@@ -488,6 +494,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     return (SimEntity[]) simEntity.clone();
   }
 
+  public void setOutputStream(OutputStream os) {
+      PrintStream out = new PrintStream(os);
+      this.println = new PrintWriter(os);
+      Schedule.setOutputStream(out);
+      // tbd, need a way to not use System.out as
+      // during multi-threaded runs, some applications
+      // send debug message directy to System.out.
+      // ie, one thread sets System.out then another
+      // takes it mid thread.
+      System.setOut(out);
+  }
   /**
    * Execute the simulation for the desired number of replications.
    */
@@ -497,7 +514,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     createObjects();
     performHookups();
-
+    // reset the document with
+    // existing parameters
+    // might have run before
+    statsConfig.reset();
+    statsConfig.setEntityIndex(entitiesWithStats);
     if (!hookupsCalled) {
       throw new RuntimeException("performHookups() hasn't been called!");
     }
@@ -525,9 +546,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     for (int replication = 0; replication < getNumberReplications(); replication++) {
-      Schedule.reset();
+      
       if(stopRun)
         break;
+      else 
+        Schedule.reset();
       Schedule.startSimulation();
 
       for (int i = 0; i < replicationStats.length; ++i) {
@@ -535,15 +558,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
       }
       if (isPrintReplicationReports()) {
-        System.out.println(getReplicationReport(replication));
+        println.println(getReplicationReport(replication));
+        println.flush();
       }
       if (isSaveReplicationData()) {
         saveReplicationStats();
       }
+      
     }
 
     if (isPrintSummaryReport()) {
-      System.out.println(getSummaryReport());
+      println.println(getSummaryReport());
+      println.flush();
     }
 
     //TODO MIKE: Wire the following to the analyst report GUI somehow
@@ -560,12 +586,24 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         System.err.println(e.getMessage());
       }
     }
-
+    System.gc();
+    System.runFinalization();
     //saveState(replication);
 
   }
   
-
+  public void pause() {
+      Schedule.pause();
+  }
+  
+  public void resume() {
+      Schedule.startSimulation();
+  }
+  
+  public void stop() {
+      Schedule.stopSimulation();
+      //Schedule.reset(); //?
+  }
   
   public void setEnableAnalystReports(boolean enable) {      
            enableAnalystReports = enable;
