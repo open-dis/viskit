@@ -40,7 +40,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     <StateVariable name="aStarSearch" type="diskit.AStarSearch">
         <Comment>The A* search algorithm for path finding</Comment>
     </StateVariable>
-    <StateVariable name="rn" type="java.util.Random">
+    <StateVariable name="rn" type="diskit.random.Generator">
         <Comment>A pseudorandom number generator for selecting attack plan components</Comment>
     </StateVariable>
     <StateVariable name="terroristID" type="int">
@@ -102,7 +102,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Assignment value="harborMap"/>
         </StateTransition>
         <StateTransition state="rn">
-            <Assignment value="new java.util.Random()"/>
+            <Assignment value="new diskit.random.Generator()"/>
         </StateTransition>
         <Schedule event="ChoosePlatformsToDeploy"/>
         <Schedule condition="true" delay="0.0" event="TargetListSent" priority="0">
@@ -115,11 +115,11 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <Coordinate x="130" y="120"/>
     </Event>
     <Event name="ChoosePlatformsToDeploy">
-        <Comment>Selects at random a number of units to deploy</Comment>
+        <Comment>Selects at random a Terrorist to deploy</Comment>
         <LocalVariable name="totalPossiblePlatforms" type="int" value="terroristIDs.length">
             <Comment>The maximum number of terrorist that this planner can deploy</Comment>
         </LocalVariable>
-        <LocalVariable name="terroristSelection" type="int" value="rn.nextInt(totalPossiblePlatforms)">
+        <LocalVariable name="terroristSelection" type="int" value="rn.randomInt(totalPossiblePlatforms)">
             <Comment>Generates a random selection between 1 and the maximum number of platforms</Comment>
         </LocalVariable>
         <StateTransition state="totalPlans">
@@ -134,8 +134,8 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     </Event>
     <Event name="CreateAttackPlan">
         <Comment>Creates a unique attack plan for each terrorist selected</Comment>
-        <Argument name="numOfPlans" type="int">
-            <Comment>The total number of plans to make</Comment>
+        <Argument name="selectedPlatform" type="int">
+            <Comment>The Terrorist platform to activate</Comment>
         </Argument>
         <Schedule condition="true" delay="0.0" event="SelectTerrorist" priority="0">
             <Comment>Selects a terrorist based on the current index of the plan by selecting the moverID number of the terrorist at that index position</Comment>
@@ -161,7 +161,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <LocalVariable name="potentialStartPositions" type="java.lang.String[]" value="harborChart.getPerimeterZoneNames()">
             <Comment>Returns the names of all of the perimeter zones</Comment>
         </LocalVariable>
-        <LocalVariable name="startIdx" type="int" value="rn.nextInt(potentialStartPositions.length)">
+        <LocalVariable name="startIdx" type="int" value="rn.randomInt(potentialStartPositions.length)">
             <Comment>Generates a random selection index bounded by the total number of possible perimeter zones to choose from</Comment>
         </LocalVariable>
         <LocalVariable name="startZoneName" type="java.lang.String" value="potentialStartPositions[startIdx]">
@@ -176,7 +176,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     </Event>
     <Event name="SelectGoalArea">
         <Comment>Identifies the area that the terrorist should head towards in executing this plan</Comment>
-        <LocalVariable name="goalIdx" type="int" value="rn.nextInt(initialAssignments.length)">
+        <LocalVariable name="goalIdx" type="int" value="rn.randomInt(initialAssignments.length)">
             <Comment>Selects a random initial goal for the plan bounded by the total number of possible destinations</Comment>
         </LocalVariable>
         <LocalVariable name="goalZoneName" type="java.lang.String" value="initialAssignments[goalIdx]">
@@ -191,7 +191,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     </Event>
     <Event name="SelectTactic">
         <Comment>Chooses a tactic to assign to the terrorist</Comment>
-        <LocalVariable name="tacticIdx" type="int" value="rn.nextInt(tacticalOptions.length)">
+        <LocalVariable name="tacticIdx" type="int" value="rn.randomInt(tacticalOptions.length)">
             <Comment>Picks a tactic index at random bounded by the length of the available options</Comment>
         </LocalVariable>
         <LocalVariable name="attackStart" type="double" value="attackStartDelay.generate()">
@@ -242,9 +242,9 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="radioCommunication">
             <Operation method="setType(&quot;AttackOrder&quot;)"/>
         </StateTransition>
-        <Schedule condition="planIndex &lt;= totalPlans " delay="0.0" event="CreateAttackPlan" priority="0">
+        <Schedule condition="planIndex &lt;= totalPlans " delay="0.0" event="CreateAttackPlan" priority="0.0">
             <Comment/>
-            <EdgeParameter value="totalPlans"/>
+            <EdgeParameter value="planIndex"/>
         </Schedule>
         <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
             <Comment/>
@@ -367,4 +367,3 @@ System.out.println("doStop in TCP");</Code>
         <Coordinate x="220" y="500"/>
     </Event>
 </SimEntity>
-
