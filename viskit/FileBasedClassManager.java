@@ -149,6 +149,10 @@ public class FileBasedClassManager implements Runnable
     }
     return c;
   }
+  
+  public File getFile(String className) {
+      return ((FileBasedAssyNode) (fileMap.get(className))).xmlSource;
+  }
 
   public void run()
   {
