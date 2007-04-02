@@ -82,6 +82,10 @@ public class ReportStatisticsConfig {
          reportStats = new ReportStatisticsDOM();
     }
     
+    public void reset() {
+        reportStats = new ReportStatisticsDOM();
+    }
+    
     /**
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
