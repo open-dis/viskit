@@ -82,6 +82,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   private int titlKey;
   private GraphMetaData param;
   private JTextArea descriptionTextArea;
+  public Controller controller;
 
   private final static String frameDefaultTitle = "Viskit Event Graph Editor";
 
@@ -92,6 +93,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   //====================================================
   {
     super(frameDefaultTitle);
+    this.controller = ctrl;
     initMVC(ctrl);   // set up mvc linkages
     initUI(contentOnly);    // build widgets
 
