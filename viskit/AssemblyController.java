@@ -748,10 +748,37 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     boolean ccbool = (selectionVector.size() > 0);
     ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
     ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
+    int egCount = 0;
+    for (Object o : selectionVector) {
+        if ( o instanceof EvGraphNode ) {
+            ActionIntrospector.getAction(this, "edit").setEnabled(true);
+            egCount ++;
+        }
+    }
+    if (egCount == 0) ActionIntrospector.getAction(this, "edit").setEnabled(false);
   }
 
   private Vector copyVector = new Vector();
 
+  public void edit() {
+      if (selectionVector.size() <= 0) return;
+      copyVector = (Vector) selectionVector.clone();
+      for ( Object o : copyVector ) {
+          if (! (o instanceof EvGraphNode)  ) {
+              JOptionPane.showMessageDialog(null, "Please select an Event Graph");
+              return;
+          }
+          String className = ((EvGraphNode)o).getType();
+          File f = FileBasedClassManager.inst().getFile(className);
+          if (f == null) {
+             JOptionPane.showMessageDialog(null, "Please select an XML Event Graph"); 
+             return;
+          }
+          VGlobals.instance().getEventGraphEditor().controller._doOpen(f);
+          //if ( ((EvGraphNode)o).getInstantiator().
+      }
+  }
+  
   public void copy()
   //----------------
   {

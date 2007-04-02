@@ -222,12 +222,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
     editMenu.add(buildMenuItem(controller, "paste", "Paste", new Integer(KeyEvent.VK_P),
         KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+    editMenu.add(buildMenuItem(controller, "edit","Load an EG Editor Tab", new Integer(KeyEvent.VK_E),
+        KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
-    // These 3 start off being disabled, until something is selected
+    // These 4 start off being disabled, until something is selected
     ActionIntrospector.getAction(controller, "cut").setEnabled(false);
     ActionIntrospector.getAction(controller, "copy").setEnabled(false);
     ActionIntrospector.getAction(controller, "paste").setEnabled(false);
-
+    ActionIntrospector.getAction(controller, "edit").setEnabled(false);
+    
     editMenu.addSeparator();
 
     editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...",
