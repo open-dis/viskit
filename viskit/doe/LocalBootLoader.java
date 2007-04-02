@@ -86,6 +86,8 @@ public class LocalBootLoader extends URLClassLoader {
     URL[] extUrls;
 
     boolean allowAssembly = false;
+
+    private boolean reloadSimkit = false;
     
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[]{},parent);
@@ -115,7 +117,11 @@ public class LocalBootLoader extends URLClassLoader {
         // see sample case StaticsTest
         while(loop) {
             try {
-                stage1.loadClass("viskit.doe.LocalBootLoader");
+                 if (reloadSimkit) {
+                    stage1.loadClass("simkit.random.RandomVariate");
+                } else {
+                    stage1.loadClass("viskit.doe.LocalBootLoader");
+                }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
                 stage1 = new LocalBootLoader( new URL[]{}, parentClassLoader, workDir );
@@ -167,6 +173,10 @@ public class LocalBootLoader extends URLClassLoader {
     
     public void setAllowAssemby(boolean enable) {
         this.allowAssembly = enable;
+    }
+    
+    public void setReloadSimkit(boolean reload) {
+        this.reloadSimkit = reload;
     }
   
     // create a context with viskit's libs along with
