@@ -154,7 +154,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
   }
 
-  private void _doOpen(File file)
+  public void _doOpen(File file)
   {
     Model mod = new Model(this);
     mod.init();
