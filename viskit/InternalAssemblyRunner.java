@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
  * @author Mike Bailey
+ * @author Rick Goldberg
  * @since Sep 26, 2005
  * @since 3:43:51 PM
  */
@@ -44,8 +45,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.DirectoryWatch;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import simkit.Schedule;
+import simkit.random.RandomVariateFactory;
 import viskit.xsd.assembly.ViskitAssembly;
 import viskit.xsd.assembly.BasicAssembly;
 import javax.swing.*;
@@ -60,13 +64,16 @@ import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.EventListener;
+import viskit.xsd.bindings.cli.Assembly;
+import viskit.doe.LocalBootLoader;
 
-/** Analogous to ExternalAssemblyRunner, but puts gui in calling thread and runs
- * sim in external VM.
+/** 
+ * Handles RunnerPanel2
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
 {
@@ -78,12 +85,24 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   static String lineSep = System.getProperty("line.separator");
   JMenuBar myMenuBar;
   BufferedReader backChan;
-
+  Thread simRunner;
+  PipedOutputStream pos;
+  PipedInputStream pis;
+  BasicAssembly assembly;
   private Process externalSimRunner;
   private String analystReportTempFile; // external runner saves a file
+  FileOutputStream fos;
+  FileInputStream fis; 
+  LocalBootLoader loader;
+  Class targetClass;
+  Object assemblyObj;
 
+  private ClassLoader lastLoaderNoReset;
+  private ClassLoader lastLoaderWithReset;
+  long seed;
   public InternalAssemblyRunner()
   {
+    
     saver = new saveListener();
     runPanel = new RunnerPanel2(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
     doMenus();
@@ -92,16 +111,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     runPanel.vcrRewind.addActionListener(new rewindListener());
     runPanel.vcrStep.addActionListener(new stepListener());
     runPanel.vcrVerbose.addActionListener(new verboseListener());
-    //runPanel.saveParms.addActionListener(new saveParmListener());
-
     runPanel.vcrStop.setEnabled(false);
     runPanel.vcrPlay.setEnabled(false);
     runPanel.vcrRewind.setEnabled(false);
     runPanel.vcrStep.setEnabled(false);
-
-    //runPanel.numRepsTF.addActionListener(new repsListener()); // this gets directly read at initRun()
-
+    seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
     twiddleButtons(OFF);
+    lastLoaderNoReset = Thread.currentThread().getContextClassLoader();
   }
 
   public JComponent getContent()
@@ -156,7 +172,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
    */
   public void initParams(String[]parms)
   {
-    parms[AssemblyController.EXEC_RUNNER_CLASS_NAME] = "viskit.InternalAssemblyRunner$ExternalSimRunner";
+    parms[AssemblyController.EXEC_RUNNER_CLASS_NAME] = "viskit.InternalAssemblyRunner$ExternalSimRunner"; // no longer used
     myCmdLine = parms;
 
     targetClassName = parms[AssemblyController.EXEC_TARGET_CLASS_NAME];
@@ -181,210 +197,249 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     }
     twiddleButtons(InternalAssemblyRunner.REWIND);
 
-    if (externalSimRunner != null) {
-      send(ExternalSimRunner.QUIT);
-      externalSimRunner = null;
-    }
-  }
-
-  private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable
-  {
-    Class targetClass;
-    Object targetObject;
-
-    // Assembly has been compile by now
-    VGlobals.instance().resetWorkClassLoader();
-    Thread.currentThread().setContextClassLoader(VGlobals.instance().getWorkClassLoader());
-    targetClass = Vstatics.classForName(targetClassName);
-    if (targetClass == null) throw new ClassNotFoundException();
-    targetObject = targetClass.newInstance();
-    // in order to see BasicAssembly this thread has to have
-    // the same loader as the one used since they don't
-    // share the same simkit or viskit.
-   
-    Method getNumberReplications = targetClass.getMethod("getNumberReplications");
-    Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
-    Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
-    Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
-    Method isVerbose = targetClass.getMethod("isVerbose");
-    Method getStopTime = targetClass.getMethod("getStopTime");
-    
-    runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
-    runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
-    runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
-    runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
-    runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
-    runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
-  }
-
-  PrintWriter pWriter;
-  private void initRun()
-  {
-    analystReportTempFile = null;
-    if(externalSimRunner == null) {
-      // disable this...it's not showing up because of the .exec below which
-      // is also being done in the Swing thread...redesign
-      // showLaunchingDialog(2*1000);
-      try {
-        externalSimRunner = Runtime.getRuntime().exec(myCmdLine);
-        runPanel.setStreams(externalSimRunner.getInputStream(),externalSimRunner.getErrorStream());
-        // set autoflush after every println
-        pWriter = new PrintWriter(new OutputStreamWriter(externalSimRunner.getOutputStream()),true);
-      }
-      catch (Exception e) {
-        System.out.println("Error launching virtual machine: "+e.getMessage());
-        return;
-      }
-      // not right placesend(ExternalSimRunner.SCHEDULE_RESET);
-      //pWriter.flush();
-    }
-    send(ExternalSimRunner.ASSY_NUM_REPS);
-    send(runPanel.numRepsTF.getText().trim());
-    send(ExternalSimRunner.ASSY_SAVE_REP_DATA);
-    send(runPanel.saveRepDataCB.isSelected());
-    send(ExternalSimRunner.ASSY_PRINT_REP_REPORTS);
-    send(runPanel.printRepReportsCB.isSelected());
-    send(ExternalSimRunner.ASSY_PRINT_SUMM_REPORTS);
-    send(runPanel.printSummReportsCB.isSelected());
-
-  }
-
-  private void showLaunchingDialog(int msToShow)
-  {
-    JDialog dia = null;
-    Frame[] frames = Frame.getFrames();
-    int i;
-    for(i=0;i<frames.length;i++) {
-      if(frames[i].isVisible())
-        break;
-    }
-    if(i < frames.length)
-      dia = new JDialog(frames[i]);
-    else
-      dia = new JDialog();   // no owner
-    dia.setModal(false);
-    dia.setUndecorated(true);
-    JPanel con = new JPanel(new BorderLayout());
-    JLabel lab = new JLabel("Launching external virtual machine...");
-    con.setBorder(new JTextArea().getBorder());
-    lab.setBorder(new EmptyBorder(20,20,20,20));
-    con.add(lab,BorderLayout.CENTER);
-    dia.setContentPane(con);
-    dia.pack();
-    dia.setLocationRelativeTo(runPanel);
-    dia.setVisible(true);
-
-    final Dialog diaFin = dia;
-
-    javax.swing.Timer timr = new javax.swing.Timer(msToShow,new ActionListener()
-    {
-      public void actionPerformed(ActionEvent actionEvent)
-      {
-        diaFin.setVisible(false);
-      }
-    });
-    timr.setRepeats(false);
-    timr.start();
   }
   
-  class startResumeListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      runPanel.vcrSimTime.setText("0.0");    // because no pausing
-      twiddleButtons(InternalAssemblyRunner.START);
-      Thread t = new Thread(new Runnable()
-      {
-        public void run()
-        {
-          initRun();
-          send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
-          send(false);
-          send(ExternalSimRunner.SCHEDULE_RESET); // because no pausing
-          _startLocalEnd();              // sends start command in different thread
-        }
-      }, "initRun");
-      t.setPriority(Thread.NORM_PRIORITY);
-      t.start();
-    }
+  Object targetObject;
+  private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
+      // Assembly has been compiled by now
+      VGlobals.instance().resetWorkClassLoader();
+      lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
+      Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+      targetClass = Vstatics.classForName(targetClassName);
+      if (targetClass == null) throw new ClassNotFoundException();
+      targetObject = targetClass.newInstance();
+      assembly = (BasicAssembly)targetObject;
+      // in order to see BasicAssembly this thread has to have
+      // the same loader as the one used since they don't
+      // share the same simkit or viskit.
+      
+      Method getNumberReplications = targetClass.getMethod("getNumberReplications");
+      Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
+      Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
+      Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
+      Method isVerbose = targetClass.getMethod("isVerbose");
+      Method getStopTime = targetClass.getMethod("getStopTime");
+      
+      runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
+      runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
+      runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
+      runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
+      runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
+      runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
   }
 
-  class stepListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      twiddleButtons(InternalAssemblyRunner.STEP);
-      Thread t = new Thread(new Runnable()
-      {
-        public void run()
-        {
-          initRun();
-          send(ExternalSimRunner.SCHEDULE_SETPAUSEAFTEREACHEVENT);
-          send(true);
-          _startLocalEnd();
-        }
-      }, "stepInitRun");
-      t.setPriority(Thread.NORM_PRIORITY);
-      t.start();
-    }
-  }
-
-  class stopListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      // not with no pause butt: send(ExternalSimRunner.SCHEDULE_PAUSESIMULATION);   // Our stop button pauses, because we want to rewind
-      send(ExternalSimRunner.SCHEDULE_STOPSIMULATION);
-      twiddleButtons(InternalAssemblyRunner.STOP);
-      send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
-    }
-  }
-  class rewindListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      send(ExternalSimRunner.SCHEDULE_RESET);
-      twiddleButtons(InternalAssemblyRunner.REWIND);
-      send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
-    }
-  }
-  class verboseListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      if(externalSimRunner != null) {
-        send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
-        send(((JCheckBox)e.getSource()).isSelected());
+  File tmpFile;
+  RandomAccessFile rTmpFile;
+  ClassLoader lastLoader;
+  boolean resetSeeds;
+  
+  private void initRun() {
+      Runnable assemblyRunnable;
+      try {
+          analystReportTempFile = null;
+          resetSeeds = runPanel.resetSeedCB.isSelected();
+          try {
+              tmpFile = File.createTempFile("viskit","dump");
+              tmpFile.setReadable(true);
+              tmpFile.setWritable(true);
+              rTmpFile = new RandomAccessFile(tmpFile,"rws"); 
+              if (fos!=null) {
+                  fos.flush();
+                  fos.close();
+                  rTmpFile.close();
+                  tmpFile.delete();
+              }
+              if (fis!=null) {
+                  fis.close();
+              }
+              fos = new FileOutputStream(tmpFile);
+              fis = new FileInputStream(tmpFile);
+              if (runPanel.fileChaser!=null) runPanel.fileChaser.cancel(true);
+              System.runFinalization();
+              System.gc();
+              runPanel.setFileChannel(rTmpFile.getChannel());
+          } catch (IOException ioe) {
+              System.err.println("Can't write to tmp space: "+ioe.getMessage());
+              ioe.printStackTrace();
+          }
+          if (!resetSeeds) { 
+              lastLoader = lastLoaderNoReset;
+              Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+              targetClass = lastLoaderNoReset.loadClass(targetClassName);
+              //RandomVariateFactory.getDefaultRandomNumber().setSeed(seed);
+              assembly = (BasicAssembly) targetClass.newInstance();
+              assembly.setOutputStream(fos);
+              assembly.setNumberReplications(Integer.parseInt(runPanel.numRepsTF.getText().trim()));
+              assembly.setSaveReplicationData(runPanel.saveRepDataCB.isSelected());
+              assembly.setPrintReplicationReports(runPanel.printRepReportsCB.isSelected());
+              assembly.setPrintSummaryReport(runPanel.printSummReportsCB.isSelected());
+              assembly.setEnableAnalystReports(runPanel.analystReportCB.isSelected());
+              assembly.setStopTime(getStopTime());
+              assembly.setVerbose(runPanel.vcrVerbose.isSelected());
+              assemblyRunnable = (Runnable)assembly;
+          // else, try to isolate a simkit context, which has to be done in new loader, introspected. 
+          // TBD: not needed collapse back
+          // was usfull for debugging a random bug by process of elimination.
+          } else { 
+              loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader(true); // true->reboot
+              Class obj = loader.loadClass("java.lang.Object");
+              loader = new LocalBootLoader(loader.getExtUrls(),obj.getClassLoader(),VGlobals.instance().getWorkDirectory());
+              loader = loader.init(true);
+              Thread.currentThread().setContextClassLoader(loader);
+              lastLoaderWithReset = loader;
+              targetClass = loader.loadClass(targetClass.getName());
+              assemblyObj = targetClass.newInstance();
+              Method setOutputStream = targetClass.getMethod("setOutputStream",OutputStream.class);
+              Method setNumberReplications = targetClass.getMethod("setNumberReplications",int.class);
+              Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData",boolean.class);
+              Method setPrintReplicationReports = targetClass.getMethod("setPrintReplicationReports",boolean.class);
+              Method setPrintSummaryReport = targetClass.getMethod("setPrintSummaryReport",boolean.class);
+              Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports",boolean.class);
+              Method setVerbose = targetClass.getMethod("setVerbose",boolean.class);
+              Method setStopTime = targetClass.getMethod("setStopTime",double.class);
+              Class RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
+              Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
+              Object rn = getDefaultRandomNumber.invoke(null);
+              Class RNClass = loader.loadClass("simkit.random.RandomNumber");
+              Method setSeed = RNClass.getMethod("setSeed",long.class);
+              setSeed.invoke(rn,seed);
+              setOutputStream.invoke(assemblyObj,fos);
+              setNumberReplications.invoke(assemblyObj,Integer.parseInt(runPanel.numRepsTF.getText().trim()));
+              setSaveReplicationData.invoke(assemblyObj,runPanel.saveRepDataCB.isSelected());
+              setPrintReplicationReports.invoke(assemblyObj,runPanel.printRepReportsCB.isSelected());
+              setPrintSummaryReport.invoke(assemblyObj,runPanel.printSummReportsCB.isSelected());
+              setEnableAnalystReports.invoke(assemblyObj,runPanel.analystReportCB.isSelected());
+              setStopTime.invoke(assemblyObj,getStopTime());
+              setVerbose.invoke(assemblyObj,runPanel.vcrVerbose.isSelected());
+              assemblyRunnable = (Runnable)assemblyObj;
+          }    
+          runPanel.wakeUpTextUpdater(fis);
+          simRunner = new Thread(assemblyRunnable);
+          (new SimThreadMonitor(simRunner)).start();
+          simRunner.join();
+          Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+      } catch (Exception e) {
+          e.printStackTrace();
       }
-    }
+  }
+  
+  public class SimThreadMonitor extends Thread {
+      Thread waitOn;
+      public SimThreadMonitor(Thread toWaitOn) {
+          waitOn=toWaitOn;
+      }
+      public void run() {
+          waitOn.start();
+            try {
+                waitOn.join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+          end();
+      }
+      public void end() {
+          
+          System.out.println("Simulation ended");
+          if(resetSeeds) {
+                try {
+                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                    Method setStopRun = targetClass.getMethod("setStopRun",boolean.class);
+                    setStopRun.invoke(assemblyObj,true);
+                    Class schedule = loader.loadClass("simkit.Schedule");
+                    Method clearRerun = schedule.getMethod("clearRerun");
+                    clearRerun.invoke(null);
+                    Method coldReset = schedule.getMethod("coldReset");
+                    try {
+                        // this doesn't cause exception, but does in !resetSeed mode, 
+                        // ie, non-disposable loader via non-introspected methods.
+                        coldReset.invoke(null);
+                    } catch (Exception e) {
+                        coldReset.invoke(null);
+                    }
+                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                } catch (SecurityException ex) {
+                    ex.printStackTrace();
+                } catch (IllegalArgumentException ex) {
+                    ex.printStackTrace();
+                } catch (NoSuchMethodException ex) {
+                    ex.printStackTrace();
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (InvocationTargetException ex) {
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
+                }
+          } else {
+            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            assembly.setStopRun(true);
+            Schedule.getDefaultEventList().clearRerun();
+            
+            // the following exception will happen, but not in LocalBootLoader mode
+            /*
+            Schedule.getDefaultEventList().coldReset();
+             *
+Exception in thread "Thread-3" java.lang.NullPointerException
+        at simkit.SimEntityBase.processSimEvent(SimEntityBase.java:142)
+        at simkit.SimEntityBase.handleSimEvent(SimEntityBase.java:124)
+        at simkit.EventList.startSimulation(EventList.java:622)
+        at simkit.Schedule.startSimulation(Schedule.java:96)
+        at viskit.xsd.assembly.BasicAssembly.run(BasicAssembly.java:554)
+        at java.lang.Thread.run(Thread.java:619)
+Exception in thread "Thread-4" simkit.SimkitConcurrencyException: Only one call to either startSimulation, reset, or coldReset allowed at a time.
+        at simkit.EventList.coldReset(EventList.java:976)
+        at viskit.InternalAssemblyRunner$SimThreadMonitor.end(InternalAssemblyRunner.java:385)
+        at viskit.InternalAssemblyRunner$SimThreadMonitor.run(InternalAssemblyRunner.java:341)
+           */     
+           
+          }
+          
+      }
+  }
+  
+  PrintWriter pWriter;
+  
+  class startResumeListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          runPanel.vcrSimTime.setText("0.0");    // because no pausing
+          twiddleButtons(InternalAssemblyRunner.START);
+          initRun();
+      }
   }
 
-  /* unused, currenlty this data gets set at initRun()
-  * right when the play button gets toggled
-   class repsListener implements ActionListener
- {
-     public void actionPerformed(ActionEvent e)
-     {
-         System.out.println(e);
-         int reps = Integer.parseInt(runPanel.numRepsTF.getText());
-         send(ExternalSimRunner.ASSY_NUM_REPS);
-         send(runPanel.numRepsTF.getText().trim());
-        
-         
-     }
- }
-  */
-  /* to handle the saving of the execution parms to the assembly file
-  class saveParmListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      //todo getexecution parms from runpanel
-      //todo makesure the dirwatch listeners don't get hit
-      //todo save the parmeters into the xml.
-    }
+  class stepListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          twiddleButtons(InternalAssemblyRunner.STEP);
+          initRun();
+      }
   }
-  */
+
+  class stopListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          twiddleButtons(InternalAssemblyRunner.STOP);
+          assembly.stop();
+          runPanel.fileChaser.stop();
+      }
+  }
+  class rewindListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          twiddleButtons(InternalAssemblyRunner.REWIND);
+      }
+  }
+  
+  class verboseListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          
+          assembly.setVerbose(((JCheckBox)e.getSource()).isSelected());
+      }
+  }
+  
+  class analystReportListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          assembly.setEnableAnalystReports(((JCheckBox)e.getSource()).isSelected());
+      }
+  }
+
   private JFileChooser saveChooser;
 
   class saveListener implements ActionListener
@@ -445,109 +500,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     return fil;
   }
 
-  private void _startLocalEnd()
-  {
-    if(backChan == null) {
-    try {
-      ServerSocket svrsocket = new ServerSocket(0);  // any port
-
-      send(ExternalSimRunner.OPEN_BACKCHANNEL);
-      send("" + svrsocket.getLocalPort());
-
-      svrsocket.setSoTimeout(3000); // 3 secs should be plenty
-      Socket sock = svrsocket.accept();
-      backChan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-      initBackChanReader();
-      svrsocket.close();
-    }
-    catch (SocketTimeoutException tmo) {
-      _startLocalBail("Back channel socket timeout");
-      return;
-    }
-    catch (IOException e) {
-      _startLocalBail("Bad Back Channel build: " + e.getMessage());
-      return;
-    }
-    }
-    send(ExternalSimRunner.SCHEDULE_STOPATTIME);
-    send(getStopTime());
-    send(ExternalSimRunner.SCHEDULE_SETVERBOSE);
-    send(getVerbose());
-    send(ExternalSimRunner.DUMP_OUTPUTS);
-
-    send(ExternalSimRunner.SCHEDULE_STARTSIMULATION);
-  }
-
-  private void _startLocalBail(String msg)
-  {
-    System.err.println(msg);
-    if (externalSimRunner != null){
-      externalSimRunner.destroy();
-      externalSimRunner = null;
-    }
-    backChan = null;
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      public void run()
-      {
-        //twiddleButtons(InternalAssemblyRunner.STOP);
-        runPanel.vcrStop.doClick();
-      }
-    });
-  }
-
-  private void initBackChanReader()
-  {
-    Thread bkChanRdr = new Thread(new BackChannelReader(), "BackChannelReader");
-    bkChanRdr.setPriority(Thread.NORM_PRIORITY);
-    bkChanRdr.start();
-  }
-
   String returnedSimTime;
-
-  class BackChannelReader implements Runnable
-  {
-    public void run()
-    {
-      try {
-        while (true) {
-          String line = backChan.readLine();
-          if (line.startsWith(ExternalSimRunner.RESP_BACKCHANNEL))
-            ;
-          else if (line.startsWith(ExternalSimRunner.RESP_TIMESTR)) {
-            returnedSimTime = line.substring(ExternalSimRunner.RESP_TIMESTR.length());
-            SwingUtilities.invokeLater(new Runnable()
-            {
-              public void run()
-              {
-                runPanel.vcrSimTime.setText(returnedSimTime);
-              }
-            });
-          }
-          else if (line.startsWith(ExternalSimRunner.RESP_SIMSTOPPED)) {
-            send(ExternalSimRunner.DUMP_OUTPUTS);
-            send(ExternalSimRunner.SCHEDULE_GETSIMTIMESTR);
-            SwingUtilities.invokeLater(new Runnable()
-            {
-              public void run()
-              {
-                twiddleButtons(InternalAssemblyRunner.STOP);
-                if(InternalAssemblyRunner.this.analystReportTempFile != null &&
-                   InternalAssemblyRunner.this.reportPanel != null)
-                  signalReportReady();
-              }
-            });
-          }
-          else if (line.startsWith(ExternalSimRunner.RESP_ANALYSTREPORTFILE)) {
-            analystReportTempFile = line.substring(ExternalSimRunner.RESP_ANALYSTREPORTFILE.length());
-          }
-        }
-      }
-      catch (Exception e) {
-        System.out.println("Back channel reader dead");
-      }
-    }
-  }
 
   private void signalReportReady()
   {
@@ -564,35 +517,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     return runPanel.vcrVerbose.isSelected();
   }
 
-  private String sendAndWait(int cmd) throws IOException
-  {
-    send(cmd);
-    return backChan.readLine();
-  }
-
-  private void send(int cmd)
-  {
-    //System.out.println("Queing "+ExternalSimRunner.cmdNames[cmd]);
-    pWriter.println(cmd);
-  }
-
-  private void send(boolean b)
-  {
-    //System.out.println("Queing "+b);
-    pWriter.println(b);
-  }
-
-  private void send(String s)
-  {
-    //System.out.println("Queing "+s);
-    pWriter.println(s);
-  }
-
-  private void send(double d)
-  {
-    //System.out.println("Queing "+d);
-    pWriter.println(d);
-  }
 
   public static final int START = 0;
   public static final int STOP = 1;
@@ -696,353 +620,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
       runPanel.soutTA.setText(null);
       runPanel.serrTA.setText(null);
     }
-  }
-  /**
-   * We have typically been fired-off from Viskit.  Our classpath has been set.  We just
-   * instantiate this object, and pass it the class name, whether defaultVerbose output is desired or not,
-   * and the list of output objects which should be (periodically dumped).
-
-   * @param args
-   */
-
- /*
-  public static void main(String[] args)
-  {
-    Vector v = null;
-    try {
-      v = _mainCommon(args);
-    }
-    catch (Exception e) {
-      System.exit(-1);
-    }
-
-    viskit.Main.setLandFandFonts(); // same as editor
-    new InternalAssemblyRunner(args[0],
-        Boolean.valueOf(args[1]).booleanValue(),
-        Double.valueOf(args[2]).doubleValue(), v);
-  }
-
-  private static String errMsg = "Wrong number of parameters to InternalAssemblyRunner.main().";
-  private static Vector _mainCommon(String[] args) throws Exception
-  {
-    if (args.length < 2) {
-      JOptionPane.showMessageDialog(null, errMsg,
-          "Internal Error", JOptionPane.ERROR_MESSAGE);
-      throw new Exception(errMsg);
-    }
-
-    Vector v = null;
-    if (args.length > 3) {
-      v = new Vector();
-      for (int i = 3; i < args.length; i++)
-        v.add(args[i]);
-    }
-
-    return v;
-  }
-
-  public static InternalAssemblyRunner main2(String[] args)
-  {
-    Vector v = null;
-    try {
-      v = _mainCommon(args);
-    }
-    catch (Exception e) {
-      return null;
-    }
-
-    return new InternalAssemblyRunner(true, args[0],
-        Boolean.valueOf(args[1]).booleanValue(),
-        Double.valueOf(args[2]).doubleValue(), v);
-  }
- */
-  /** This is the class that gets run when we launch */
-  public static class ExternalSimRunner
-  {
-    public static final int SCHEDULE_RESET = 0;                  // Schedule.reset();
-    public static final int SCHEDULE_GETSIMTIMESTR = 1;          // Schedule.getSimTimeStr());
-    public static final int SCHEDULE_SETPAUSEAFTEREACHEVENT = 2; // Schedule.setPauseAfterEachEvent(false);
-    public static final int SCHEDULE_STOPSIMULATION = 3;         // Schedule.stopSimulation();
-    public static final int SCHEDULE_PAUSESIMULATION = 4;
-    public static final int SCHEDULE_SETVERBOSE = 5;             // Schedule.setVerbose(getVerbose());
-    public static final int SCHEDULE_STARTSIMULATION =6;         // Schedule.startSimulation();
-    public static final int SCHEDULE_STOPATTIME = 7;             // Schedule.stopAtTime(double);
-
-    public static final int DUMP_OUTPUTS = 8;
-    public static final int OPEN_BACKCHANNEL = 9;
-    public static final int QUIT = 10;
-
-    public static final int ASSY_NUM_REPS = 11;
-    public static final int ASSY_SAVE_REP_DATA = 12;
-    public static final int ASSY_PRINT_REP_REPORTS = 13;
-    public static final int ASSY_PRINT_SUMM_REPORTS= 14;
-
-    public static String[] cmdNames = {"Reset","GetSimTimeString","SetStep",
-                                       "StopSim","PauseSim","SetVerbose","StartSim","StopAtTime",
-                                       "DumpOutputs","OpenBackchannel","Quit",
-                                       "SetNumReps","SaveRepData","PrintRepReports","PrintSummReports"};
-
-    public static final String RESP_TIMESTR           = "R1/";
-    public static final String RESP_SIMSTOPPED        = "R2/";
-    public static final String RESP_BACKCHANNEL       = "R3/";
-    public static final String RESP_ANALYSTREPORTFILE = "R4/";
-
-    private Vector outputs = new Vector();
-    private PrintStream extBackChannel;
-    private Object targetObject;
-    private BasicAssembly targetAssembly;
-
-    public static void main(String[] args)
-    {
-      new ExternalSimRunner(args);
-    }
-
-    private ExternalSimRunner(String[] args)
-    {
-      Class targetClass = null;
-      String targetClassName = args[AssemblyController.APP_TARGET_CLASS_NAME];
-      String errMsg = null;
-      try {
-        targetClass = Vstatics.classForName(targetClassName);
-          if(targetClass == null) throw new ClassNotFoundException();
-        targetObject = targetClass.newInstance();
-        if(! (targetObject instanceof BasicAssembly))
-          errMsg = "targetClassName not instanceof BasicAssembly";
-      }
-      // Error cases for instantiation:
-      catch (ClassNotFoundException e) {
-        errMsg = targetClassName+" could not be found.";
-      }
-      catch (InstantiationException e) {
-        errMsg = targetClassName+" could not be instantiated.";
-      }
-      catch (IllegalAccessException e) {
-        errMsg = targetClassName+" could not be accessed.";
-      }
-
-      if(errMsg != null) {
-        JOptionPane.showMessageDialog(null,errMsg);
-        System.out.println(errMsg);
-        System.out.flush();
-        System.exit(-1);
-      }
-      targetAssembly = (BasicAssembly)targetObject;
-      targetAssembly.setVerbose(Boolean.valueOf(args[AssemblyController.APP_VERBOSE_SWITCH]).booleanValue());
-      targetAssembly.setStopTime(Double.parseDouble(args[AssemblyController.APP_STOPTIME_SWITCH]));
-      outputs.clear();
-      if (args != null && args.length > 0) {
-        for (int i = AssemblyController.APP_FIRST_ENTITY_NAME; i < args.length; i++)
-          outputs.add(args[i]);
-      }
-
-      sendAnalystReportPath();  // if backchannel open at this point, else when it is
-
-      Schedule.reset();
-
-      execLoop();
-    }
-
-    Thread simThread;
-    private void execLoop()
-    {
-      Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-      BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-      try {
-
-        while(true) {
-          String cmd = in.readLine();
-
-          if(cmd == null)
-            System.exit(0);
-
-          int cmdIn  = Integer.parseInt(cmd);
-          switch(cmdIn) {
-            case OPEN_BACKCHANNEL:
-              String port = in.readLine();
-              openChannel(port);
-              if(extBackChannel != null) {
-                extBackChannel.println(RESP_BACKCHANNEL+"BackChannelOK");
-                sendAnalystReportPath();
-              }
-              break;
-            case SCHEDULE_RESET:
-              System.err.println("Got reset (not error)");
-              // todo remove the check if we always get a ViskitAssembly
-              if(targetAssembly instanceof ViskitAssembly)
-                ((ViskitAssembly)targetAssembly).reset();
-              else
-                Schedule.reset();
-              break;
-            case SCHEDULE_STOPSIMULATION:
-              System.err.println("Got stop sim (not error)");
-              // todo remove the check if we always get a ViskitAssembly
-              if(targetAssembly instanceof ViskitAssembly)
-                ((ViskitAssembly)targetAssembly).setStopRun(true);
-              else
-                Schedule.stopSimulation();
-              break;
-            case SCHEDULE_PAUSESIMULATION:
-              System.err.println("Got pause sim (not error)");
-              Schedule.pause();
-              break;
-            case SCHEDULE_STARTSIMULATION:
-              System.err.println("Got start sim (not error)");
-
-              if (simThread != null) {
-                System.err.println("Previous run not done");
-                break;
-              }
-              simThread = new Thread((Runnable) targetObject, "SimThread");
-              Thread watcherThread = new Thread(new Runnable()
-              {
-                public void run()
-                {
-                  try {
-                    simThread.start();   // This does Schedule.startSimulation()
-                    simThread.join();
-                  }
-                  catch (InterruptedException e) {
-                  }
-                  simThread = null;
-                  if ( extBackChannel != null ) {
-                    extBackChannel.println(RESP_SIMSTOPPED + "SimStopped");
-                  }
-                  System.err.println("Sim stopped (not error)");
-                }
-              }, "simEndWatcher");
-              watcherThread.setPriority(Thread.NORM_PRIORITY);
-              watcherThread.start();
-
-              break;
-            case SCHEDULE_SETPAUSEAFTEREACHEVENT:
-              String which = in.readLine();
-              boolean bool = Boolean.valueOf(which).booleanValue();
-              System.err.println("Got setPauseAfterEachEvent (not error) = "+bool);;
-              Schedule.setPauseAfterEachEvent(bool);
-              break;
-            case SCHEDULE_SETVERBOSE:
-              String verb = in.readLine();
-              bool = Boolean.valueOf(verb).booleanValue();
-              System.err.println("Got setVerbose (not error) = "+bool);
-              targetAssembly.setVerbose(bool);//Schedule.setVerbose(bool);
-              break;
-            case SCHEDULE_GETSIMTIMESTR:
-              System.err.println("Got getSimTimeString (not error)");
-              extBackChannel.println(RESP_TIMESTR+Schedule.getSimTimeStr());
-              break;
-            case SCHEDULE_STOPATTIME:
-              String tm = in.readLine();
-              System.err.println("Got stopAtTime (not error) =" + tm);
-              targetAssembly.setStopTime(Double.parseDouble(tm));//Schedule.stopAtTime(Double.parseDouble(tm));
-              break;
-            case ASSY_NUM_REPS:
-              String n = in.readLine();
-              int nint = 0;
-              try {
-                nint = Integer.parseInt(n);
-                if(!(targetAssembly instanceof ViskitAssembly))
-                    targetAssembly.setNumberReplications(1); // todo when fixed   nint);
-                else {
-                    ((ViskitAssembly)targetAssembly).setNumberReplications(nint);
-                }
-
-              }
-              catch (NumberFormatException e) {
-                System.err.println("Error parsing number of reps: "+n);
-              }
-              System.err.println("Got ASSY_NUM_REPS (not error) " + nint);
-              break;
-
-            case ASSY_SAVE_REP_DATA:
-              String boolSt = in.readLine();
-              bool = Boolean.valueOf(boolSt).booleanValue();
-              targetAssembly.setSaveReplicationData(bool);
-              System.err.println("Got ASSY_SAVE_REP_DATA (not error) "+bool);
-              break;
-
-            case ASSY_PRINT_REP_REPORTS:
-              boolSt = in.readLine();
-              bool = Boolean.valueOf(boolSt).booleanValue();
-              targetAssembly.setPrintReplicationReports(bool);
-              System.err.println("Got ASSY_PRINT_REP_REPORTS (not error) "+bool);
-              break;
-
-            case ASSY_PRINT_SUMM_REPORTS:
-              boolSt = in.readLine();
-              bool = Boolean.valueOf(boolSt).booleanValue();
-              targetAssembly.setPrintSummaryReport(bool);
-              System.err.println("Got ASSY_PRINT_SUMM_REPORTS (not error) "+bool);
-              break;
-
-            case DUMP_OUTPUTS:
-              System.err.println("Got dumpOutputs (not error)");
-              dumpOutputs();
-              break;
-            case QUIT:
-              System.err.println("Got quit (not error)");
-              System.exit(0);
-              break;
-
-            default:
-              throw new RuntimeException("Program error in InternalAssemblyRunner");
-          }
-        }
-      }
-      catch (Exception e) {
-        System.out.println("external assembly runner terminating. "+e.getMessage());
-      }
-
-    }
-
-    private void openChannel(String port)
-    {
-      try {
-        if(extBackChannel != null) {
-          extBackChannel.close();
-          extBackChannel = null;
-        }
-        Socket s = new Socket("localhost",Integer.parseInt(port));
-        extBackChannel = new PrintStream(s.getOutputStream(),true);
-      }
-      catch (IOException e) {
-        System.out.println("bad backChannel open");
-        e.printStackTrace();
-      }
-    }
-
-    private void sendAnalystReportPath()
-    {
-      String analystReportPath = targetAssembly.getAnalystReportPath();
-      if (analystReportPath != null && extBackChannel != null)
-        extBackChannel.println(RESP_ANALYSTREPORTFILE + analystReportPath);
-    }
-
-    private String borderString = "******************************";
-
-    private void dumpOutputs()
-    {
-      if(outputs == null)
-        return;
-
-      System.out.println("\n"+borderString);
-      boolean first=true;
-      for(Iterator itr = outputs.iterator();itr.hasNext();) {
-        try {
-          Field fld = targetObject.getClass().getField((String)itr.next());
-          if(first)
-            first=false;
-          else
-            System.out.println();
-          System.out.println(fld.getName()+" dump:\n"+fld.get(targetObject).toString());
-        }
-        catch (Exception e) {
-         // e.printStackTrace();
-        }
-      }
-      System.out.println(borderString+"\n");
-    }
-
-
   }
 
   private String namePrefix = "Viskit Assembly Runner";
