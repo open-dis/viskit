@@ -139,11 +139,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   private JPanel clusterConfigPanel;
   private Boolean clusterConfigReturn = null;
   private JDialog configDialog;
-
+  private JAXBContext jaxbCtx;
   public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame)
   {
     try {
-      JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+      jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader());
       unmarshaller = jaxbCtx.createUnmarshaller();
     }
     catch (JAXBException je) {
@@ -673,7 +673,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     cntlr.restorePrepRun();
 
     thread = new Thread(JobLauncherTab2.this);
-    thread.setPriority(Thread.MAX_PRIORITY); // don't inherit swing event thread prior
+    thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
     thread.start();
     
     statusTextArea.setText("");
@@ -1006,7 +1006,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                               lastQueue.set(i,new Boolean(state));
                           }
                           i++;
-                          
+                          System.gc();
+                          System.runFinalization();
                       }
                   }
                   
@@ -1444,6 +1445,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               while (stats.hasMoreElements()) {
                   String data = (String) stats.nextElement();
                   try {
+                      // creating an unmarshaller each time here is supposed to be more thread safe
+                      // if slower, however, this only gets hit by the swing thread
+                      // unmarshaller = jaxbCtx.createUnmarshaller();
                       if (viskit.Vstatics.debug) System.out.println("\tAdding data " + data);
                       SampleStatisticsType sst = (SampleStatisticsType) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
                       

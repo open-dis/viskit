@@ -114,7 +114,7 @@ public class SimkitAssemblyXML2Java {
     public SimkitAssemblyXML2Java(String xmlFile) {
         this.fileBaseName = baseNameOf(xmlFile);
         try {
-            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",this.getClass().getClassLoader()); // exp classLoader bit
             this.fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);
         } catch ( Exception e ) {
             e.printStackTrace();
