@@ -60,7 +60,7 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
     <StateVariable name="speedScalar" type="double">
         <Comment>The default speed scale for this entity</Comment>
     </StateVariable>
-    <StateVariable name="rn" type="java.util.Random">
+    <StateVariable name="rn" type="diskit.random.Generator">
         <Comment>A random number object for randomly selecting new places to travel in the harbor</Comment>
     </StateVariable>
     <StateVariable name="workingChart" type="diskit.AStarZoneMap">
@@ -90,7 +90,7 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
             <Assignment value="1"/>
         </StateTransition>
         <StateTransition state="rn">
-            <Assignment value="new java.util.Random()"/>
+            <Assignment value="new diskit.random.Generator()"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="ScaleSpeed" priority="0">
             <Comment/>
@@ -124,7 +124,7 @@ TODO: Future work. Allow control over where the patol boat will go</Comment>
             <Assignment value="new diskit.SphereCutterSensor(this, getEntityDefinition().getMaximumSurfaceDetectionRange())"/>
         </StateTransition>
         <StateTransition state="rn">
-            <Assignment value="new java.util.Random()"/>
+            <Assignment value="new diskit.random.Generator()"/>
         </StateTransition>
         <StateTransition state="atSecurityAlert">
             <Assignment value="false"/>
@@ -223,10 +223,10 @@ sensors[2] = collisionAvoidance;</Code>
         <LocalVariable name="potentialZones" type="java.lang.String[]" value="chart.getNavigatableZoneNames()">
             <Comment>The names of all navigatable water areas</Comment>
         </LocalVariable>
-        <LocalVariable name="startIdx" type="int" value="rn.nextInt(potentialZones.length)">
+        <LocalVariable name="startIdx" type="int" value="rn.randomInt(potentialZones.length)">
             <Comment>Returns a random selection of a start zone</Comment>
         </LocalVariable>
-        <LocalVariable name="goalIdx" type="int" value="rn.nextInt(potentialZones.length)">
+        <LocalVariable name="goalIdx" type="int" value="rn.randomInt(potentialZones.length)">
             <Comment>Returns a random index position</Comment>
         </LocalVariable>
         <LocalVariable name="selectedStart" type="diskit.AStarZoneGeometry" value="chart.getZone(potentialZones[startIdx])">
@@ -320,7 +320,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <LocalVariable name="potentialZones" type="java.lang.String[]" value="harborChart.getNavigatableZoneNames()">
             <Comment>A list of all possible zones</Comment>
         </LocalVariable>
-        <LocalVariable name="nextIdx" type="int" value="rn.nextInt(potentialZones.length)">
+        <LocalVariable name="nextIdx" type="int" value="rn.randomInt(potentialZones.length)">
             <Comment>A randomly selected index of the potential zones</Comment>
         </LocalVariable>
         <LocalVariable name="nextZone" type="diskit.AStarZoneGeometry" value="harborChart.getZone(potentialZones[nextIdx])">
@@ -483,4 +483,3 @@ setDestination(interceptPoint);</Code>
         <Coordinate x="390" y="220"/>
     </Event>
 </SimEntity>
-
