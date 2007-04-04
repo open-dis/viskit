@@ -157,11 +157,11 @@ public abstract class VInstantiator
                 if (paramsMatch(params,eparams[indx])) break;
                 else indx++;
             }
-            if (viskit.Vstatics.debug) System.out.println("Using constructor #"+indx);
+            if (viskit.Vstatics.debug) System.out.println(type+" VInstantiator using constructor #"+indx);
             
             if (eparams[indx] != null) { 
                 // now that the values, types, etc set, grab names from eg parameters
-                if ( args != null ) for ( int j = 0; j < args.size(); j++ ) {
+                if ( args != null ) for ( int j = 0; j < eparams[indx].size(); j++ ) {//for ( int j = 0; j < args.size(); j++ ) {
                     if (viskit.Vstatics.debug) System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
                     ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
                     ((VInstantiator)args.get(j)).setDescription(listToString(((ParameterType)eparams[indx].get(j)).getComment()));
