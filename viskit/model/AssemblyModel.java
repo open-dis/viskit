@@ -944,6 +944,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
       }
 
       catch (Exception ex) {
+          ex.printStackTrace();
         JOptionPane.showMessageDialog(null,"Exception constructing assembly" +
                                    "\n"+ f.getName(),
                                    "Error",JOptionPane.ERROR_MESSAGE);
