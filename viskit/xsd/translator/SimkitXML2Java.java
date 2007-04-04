@@ -357,14 +357,37 @@ public class SimkitXML2Java {
 	List sched = run.getScheduleOrCancel();
 	ListIterator schi = sched.listIterator();
 	List superPList = new ArrayList();
-
+        List<Parameter> pList = this.root.getParameter();
 
 	pw.println();
 	pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
 	pw.println();
+        
+        pw.println(sp4 + "@viskit.ParameterMap"+sp+lp);
+        pw.print(sp8 + "names =" + sp + ob);
+        for ( Parameter pt : pList ) {
+            pw.print(qu + pt.getName() + qu);
+            if ( pList.indexOf(pt) <  pList.size() - 1 ) {
+	            pw.print(cm);
+		    pw.println();
+		    pw.print(sp8 + sp4);
+	    }
+        }
+        pw.println(cb + cm);
+        pw.print(sp8 + "types =" + sp + ob);
+        for ( Parameter pt : pList ) {
+            pw.print(qu + pt.getType() + qu);
+            if ( pList.indexOf(pt) <  pList.size() - 1 ) {
+	            pw.print(cm);
+		    pw.println();
+		    pw.print(sp8 + sp4);
+	    }
+        }
+        pw.println(cb);
+        pw.println(sp4 + rp);
 	pw.print(sp4 + "public " + this.root.getName() + lp);
 
-	List pList = this.root.getParameter();
+	
 	li = pList.listIterator();
 
 	while ( li.hasNext() ) {
