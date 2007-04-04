@@ -1,5 +1,6 @@
 package viskit;
 
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import javax.swing.*;
 import java.io.File;
@@ -100,7 +101,7 @@ public class FileBasedClassManager implements Runnable
       fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly
       fban = new FileBasedAssyNode(f,fclass.getName(),fclass.getPackage().getName());
       
-      Vstatics.putParameterList(fclass.getName(), listOfParamNamesForNakedClass(fclass));
+      Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
     }
     else {
       throw new Exception ("Unsupported file type.");
@@ -112,30 +113,61 @@ public class FileBasedClassManager implements Runnable
     return fban;
   }
 
-  protected List[] listOfParamNamesForNakedClass(Class c) {
-      // brrr. 
-      // lets just take case 0
+  
+  
+  protected List[] listOfParamNames(Class c) {
       ObjectFactory of = new ObjectFactory();
       Constructor[] constr = c.getConstructors();
+      Annotation[] paramAnnots;
       ArrayList[] l = new ArrayList[constr.length];
       for ( int j = 0; j < constr.length; j++ ) {
           Class[] clz = constr[j].getParameterTypes();
-          l[j] = new ArrayList();
-          for (int i = 0; i < clz.length; i++) {
-              try {
-                  String zName = clz[i].getName();
-                  if (zName.indexOf(".class")>0) {
-                      zName = zName.split("\\.")[0];
+          paramAnnots = constr[j].getDeclaredAnnotations();
+          if (paramAnnots == null) {
+              l[j] = new ArrayList();
+              for (int i = 0; i < clz.length; i++) {
+                  try {
+                      String zName = clz[i].getName();
+                      if (zName.indexOf(".class")>0) {
+                          zName = zName.split("\\.")[0];
+                      }
+                      ParameterType p;
+                      p = of.createParameter();
+                      p.setName(" ");
+                      if (viskit.Vstatics.debug) System.out.println("setting type "+zName);
+                      p.setType(zName);
+                      l[j].add(p);
+                  } catch (javax.xml.bind.JAXBException e) {
+                      ;
                   }
-                  ParameterType p;
-                  p = of.createParameter();
-                  p.setName(" ");
-                  if (viskit.Vstatics.debug) System.out.println("setting type "+zName);
-                  p.setType(zName);
-                  l[j].add(p);
-              } catch (javax.xml.bind.JAXBException e) {
-                  ;
               }
+          } else {
+              System.err.println("Enter Annotation");
+              if (paramAnnots.length > 1) {
+                  throw new RuntimeException("Only one Annotation per constructor");
+              }
+              l = new ArrayList[1];
+              ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
+
+              if ( param != null ) {
+                  String[] names = ((ParameterMap)param).names();
+                  String[] types = ((ParameterMap)param).types();
+                  if (names.length != types.length) throw new RuntimeException("ParameterMap names and types length mismatch");
+                  for ( int i = 0; i < names.length; i ++) {
+                        ParameterType p;
+                        try {
+                            p = of.createParameter();
+                            p.setName(names[i]);
+                            p.setType(types[i]);
+                            l[0].add(p);
+                        } catch (JAXBException ex) {
+                            ex.printStackTrace();
+                        }
+                  }
+                  
+              } else throw new RuntimeException("Only One ParameterMap Annotation used");
+
+              
           }
       }
       return l;

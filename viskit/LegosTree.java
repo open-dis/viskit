@@ -1,5 +1,6 @@
 package viskit;
 
+import javax.xml.bind.JAXBException;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
 
@@ -292,10 +293,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           Class.forName(fban.loadedClass);
           return;  // don't proceed
         }
-        catch (ClassNotFoundException e) {
+        catch (Exception e) {
+            ;//e.printStackTrace();
         }
+        //catch (ClassNotFoundException e) {
+        //}
       }
       catch (Throwable throwable) {
+          throwable.printStackTrace();
         System.err.println("Couldn't handle " + f.getName() + ". " + throwable.getMessage());
         if (recurseNogoList != null)
           recurseNogoList.add(f.getName());
@@ -461,20 +466,42 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                   Class[] ptypes = constr[i].getParameterTypes();
                   plist[i] = new ArrayList();
                   if (viskit.Vstatics.debug) System.out.println("\t # params " + ptypes.length + " in constructor " + i);
-                  for (int k = 0; k < ptypes.length; k++) {
-                      try {
-                          ParameterType p = of.createParameter();
-                          String ptname = Vstatics.convertClassName(ptypes[k].getName());
-                          if (ptname.indexOf(".class") > 0) { //??
-                              ptname = ptname.split("\\.")[0];
+                  
+                  ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
+                  
+                  if ( param != null ) {
+                      String[] names = ((ParameterMap)param).names();
+                      String[] types = ((ParameterMap)param).types();
+                      if (names.length != types.length) throw new RuntimeException("ParameterMap names and types length mismatch");
+                      for ( int k = 0; k < names.length; k ++) {
+                          ParameterType pt;
+                          try {
+                              pt = of.createParameter();
+                              pt.setName(names[k]);
+                              pt.setType(types[k]);
+                              plist[i].add(pt);
+                          } catch (JAXBException ex) {
+                              ex.printStackTrace();
                           }
-                          p.setName("p[" + k + "] : ");
-                          p.setType(ptname);
-                          plist[i].add(p);
-                          if (viskit.Vstatics.debug) System.out.println("\t " + p.getName() + p.getType());
-                      } catch (Exception e) {
-                          e.printStackTrace();
                       }
+                      
+                  } else { // unknonws 
+                      for (int k = 0; k < ptypes.length; k++) {
+                          try {
+                              ParameterType p = of.createParameter();
+                              String ptname = Vstatics.convertClassName(ptypes[k].getName());
+                              if (ptname.indexOf(".class") > 0) { //??
+                                  ptname = ptname.split("\\.")[0];
+                              }
+                              p.setName("p[" + k + "] : ");
+                              p.setType(ptname);
+                              plist[i].add(p);
+                              if (viskit.Vstatics.debug) System.out.println("\t " + p.getName() + p.getType());
+                          } catch (Exception e) {
+                            e.printStackTrace();
+                          }
+                          
+                      } 
                   }
               }
           }
