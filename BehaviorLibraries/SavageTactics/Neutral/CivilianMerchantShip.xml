@@ -162,10 +162,12 @@
         <Code>/* either do this here, or make these parameters, or in the base class */
 if (avoidanceMoverManager == null) {
     avoidanceMoverManager = new diskit.AvoidanceMoverManager(null);
+    avoidanceMoverManager.setPersistant(false);
 }
 
 if (zoneMoverManager == null) {
     zoneMoverManager = new diskit.ZoneMoverManager(this,waypointCreator);
+    zoneMoverManager.setPersistant(false);
 }</Code>
         <Coordinate x="90" y="10"/>
     </Event>

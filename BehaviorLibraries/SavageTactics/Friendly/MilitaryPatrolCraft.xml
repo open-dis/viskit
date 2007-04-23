@@ -176,10 +176,12 @@
         <Code>/* either do this here, or make these parameters */
 if (avoidanceMoverManager == null) {
     avoidanceMoverManager = new diskit.AvoidanceMoverManager(null);
+    avoidanceMoverManager.setPersistant(false);
 }
 
 if (zoneMoverManager == null) {
     zoneMoverManager = new diskit.ZoneMoverManager(this);
+    zoneMoverManager.setPersistant(false);
 }</Code>
         <Coordinate x="120" y="10"/>
     </Event>
