@@ -953,6 +953,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       return x2j.translate();
     }
     catch (Exception e) {
+        e.printStackTrace();
       System.err.println("Error building Java from " + f.getName() + ": " + e.getMessage());
     }
     return null;
@@ -1083,7 +1084,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
          //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
          System.out.println("Compiling "+f.getCanonicalPath());
-         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose","-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});         
+         int reti =  com.sun.tools.javac.Main.compile(new String[]{"-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});         
 
          if(reti == 0 || completeOnBadCompile)
            return new File(f.getParentFile().getAbsoluteFile(),packagePath+baseName+".class");

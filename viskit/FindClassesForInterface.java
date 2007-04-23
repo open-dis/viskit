@@ -91,7 +91,7 @@ public class FindClassesForInterface
           Class clz = defineClass(null,buf,0,num);
           found.put(name,clz);
           return clz;
-      } catch (Exception e) { return (Class)null;}
+      } catch (Exception e) { e.printStackTrace();return (Class)null;}
     }
     
   }
