@@ -15,6 +15,12 @@
     <Parameter name="navalStationCommsChannel" type="int">
         <Comment>The comms channel used to communicate with the naval station security organization</Comment>
     </Parameter>
+    <Parameter name="visualSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="killZoneSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -71,25 +77,29 @@
         <StateTransition state="timeToManWeapon">
             <Assignment value="0"/>
         </StateTransition>
+        <StateTransition state="visualRange">
+            <Assignment value="getVisualSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="killZoneRange">
+            <Assignment value="getKillZoneSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="killZone">
+            <Assignment value="getKillZoneSensor()"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="10" y="250"/>
     </Event>
     <Event name="Init">
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
-        </Argument>
-        <StateTransition state="visualRange">
-            <Assignment value="600"/>
-        </StateTransition>
+        <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="visualPerception">
-            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
-        </StateTransition>
-        <StateTransition state="killZoneRange">
-            <Assignment value="100"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="killZone">
-            <Assignment value="new diskit.SphereCutterSensor(this, killZoneRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="shipBoardTransmission">
             <Assignment value="new diskit.RadioCommunication(shipBoardCommsChannel, this)"/>
@@ -103,14 +113,14 @@
         <StateTransition state="securityAlertCalled">
             <Assignment value="false"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="BuildSensorArray" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="BuildSensorArray" priority="0.0">
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="WatchPositionAssigned" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="WatchPositionAssigned" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="shipBoardCommsChannel"/>
@@ -319,4 +329,3 @@ multipleSensors[1] = killZone;</Code>
         <Coordinate x="260" y="100"/>
     </Event>
 </SimEntity>
-

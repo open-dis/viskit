@@ -83,9 +83,7 @@
     </Event>
     <Event name="Init">
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
-        </Argument>
+        <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="surfaceRadarRange">
             <Assignment value="getEntityDefinition().getMaximumSurfaceDetectionRange()"/>
         </StateTransition>
@@ -104,15 +102,15 @@
         <StateTransition state="collisionDetection">
             <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="zones.length == 0" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="zones.length == 0 &amp;&amp; init == this" delay="0.0" event="RegisterSensor" priority="0.0">
             <Comment>Only register the visualSensor if this entity is not moving</Comment>
             <EdgeParameter value="visualPerception"/>
         </Schedule>
-        <Schedule condition="zones.length &gt; 0" delay="0.0" event="BuildSensorArray" priority="0">
+        <Schedule condition="zones.length &gt; 0 &amp;&amp; init == this" delay="0.0" event="BuildSensorArray" priority="0.0">
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
         <Code/>
@@ -255,4 +253,3 @@ multipleSensors[2] = collisionDetection;</Code>
         <Coordinate x="10" y="220"/>
     </Event>
 </SimEntity>
-

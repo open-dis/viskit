@@ -29,17 +29,15 @@
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>Entity being initialized</Comment>
-        </Argument>
+        <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="proximitySensor">
             <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterSensor" priority="0.0">
             <Comment/>
             <EdgeParameter value="proximitySensor"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -101,4 +99,3 @@
     </Event>
     <Code/>
 </SimEntity>
-

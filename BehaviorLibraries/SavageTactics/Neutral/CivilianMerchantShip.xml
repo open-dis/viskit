@@ -16,6 +16,15 @@
     <Parameter name="communicationsChannel" type="int">
         <Comment>The channel that this entity is listening to</Comment>
     </Parameter>
+    <Parameter name="visualSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="collisionSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="surfaceRadarSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -75,9 +84,6 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Assignment value="null"/>
-        </StateTransition>
         <StateTransition state="avoidanceMoverManager">
             <Assignment value="null"/>
         </StateTransition>
@@ -87,34 +93,51 @@
         <StateTransition state="speedScale">
             <Assignment value="1.0"/>
         </StateTransition>
-        <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
-            <Comment>If zones have been specified, schedule movement setup events</Comment>
+        <StateTransition state="visualRange">
+            <Assignment value="getVisualSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="surfaceRadarRange">
+            <Assignment value="getSurfaceRadarSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="avoidanceRange">
+            <Assignment value="getCollisionSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="surfaceRadar">
+            <Assignment value="getSurfaceRadarSensor()"/>
+        </StateTransition>
+        <StateTransition state="collisionDetection">
+            <Assignment value="getCollisionSensor()"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator(zones)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
-        <Coordinate x="210" y="10"/>
+        <Coordinate x="10" y="10"/>
     </Event>
     <Event name="Init">
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>The entity that is being initialized, passed as an argument from diskit.SMALMover3D</Comment>
-        </Argument>
-        <StateTransition state="surfaceRadarRange">
-            <Assignment value="getEntityDefinition().getMaximumSurfaceDetectionRange()"/>
-        </StateTransition>
-        <StateTransition state="avoidanceRange">
-            <Assignment value="getEntityDefinition().getLength() * 1.5"/>
-        </StateTransition>
-        <StateTransition state="visualRange">
-            <Assignment value="600"/>
-        </StateTransition>
+        <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="visualPerception">
-            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="surfaceRadar">
-            <Assignment value="new diskit.SphereCutterSensor(this, surfaceRadarRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="collisionDetection">
-            <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="radioCommunication">
             <Assignment value="new diskit.RadioCommunication()"/>
@@ -125,19 +148,26 @@
         <StateTransition state="radioCommunication">
             <Operation method="setChannel(communicationsChannel)"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="zones.length == 0" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="zones.length == 0 &amp;&amp; init == this" delay="0.0" event="RegisterSensor" priority="0.0">
             <Comment>Only register the visualSensor if this entity is not moving</Comment>
             <EdgeParameter value="visualPerception"/>
         </Schedule>
-        <Schedule condition="zones.length &gt; 0" delay="0.0" event="BuildSensorArray" priority="0">
+        <Schedule condition="zones.length &gt; 0 &amp;&amp; init == this" delay="0.0" event="BuildSensorArray" priority="0.0">
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
-        <Code/>
-        <Coordinate x="10" y="10"/>
+        <Code>/* either do this here, or make these parameters, or in the base class */
+if (avoidanceMoverManager == null) {
+    avoidanceMoverManager = new diskit.AvoidanceMoverManager(null);
+}
+
+if (zoneMoverManager == null) {
+    zoneMoverManager = new diskit.ZoneMoverManager(this,waypointCreator);
+}</Code>
+        <Coordinate x="90" y="10"/>
     </Event>
     <Event name="ApplySpeedScale">
         <Comment>This event is scheduled by the diskit.ScenarioManager. All entities that have this event in their graph will adjust their speed values by the speed scale which will be applied throughout the entire simulation. Scheduling of this event occurs as part of the 'doRegisterTarget' process in diskit.ScenarioManager.</Comment>
@@ -148,7 +178,7 @@
             <Assignment value="speedScaleChange"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="220"/>
+        <Coordinate x="200" y="260"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
@@ -156,7 +186,7 @@
             <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="100" y="10"/>
+        <Coordinate x="200" y="10"/>
     </Event>
     <Event name="RegisterSensor">
         <Comment>If this entity is not moving (e.g. no probability zones) only the visual sensor is registered with this simulation</Comment>
@@ -164,7 +194,7 @@
             <Comment>The visual sensor for this entity</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="100" y="80"/>
+        <Coordinate x="200" y="90"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers the complete sensor array if and only if this entity has at least one probability zone</Comment>
@@ -172,22 +202,22 @@
             <Comment>The complete collection of sensors for this entity</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="100" y="150"/>
+        <Coordinate x="200" y="170"/>
     </Event>
     <Event name="ProcessZones">
         <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled.</Comment>
-        <StateTransition state="waypointCreator">
-            <Assignment value="new diskit.WaypointCreator(zones)"/>
-        </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
-        </StateTransition>
+        <Argument name="harborChart" type="diskit.AStarZoneMap"/>
         <StateTransition state="activeMoverManager">
             <Assignment value="zoneMoverManager"/>
         </StateTransition>
-        <Schedule event="StartMoving"/>
+        <StateTransition state="nauticalChart">
+            <Assignment value="harborChart"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.1" event="StartMoving" priority="0.0">
+            <Comment/>
+        </Schedule>
         <Code/>
-        <Coordinate x="210" y="160"/>
+        <Coordinate x="10" y="260"/>
     </Event>
     <Event name="StartMoving">
         <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
@@ -197,12 +227,18 @@
         <LocalVariable name="initialDestination" type="diskit.Vec3d" value="waypointCreator.createWaypoint()">
             <Comment>An initial destination selected from one of the zones</Comment>
         </LocalVariable>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setWaypointCreator(waypointCreator)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
         <Code>setMaximumSpeed(getEntityDefinition().getMaximumSpeed() * speedScale);
 setStartPosition(initialStartPosition);
 setDestination(initialDestination);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
 start();</Code>
-        <Coordinate x="210" y="260"/>
+        <Coordinate x="90" y="260"/>
     </Event>
     <Event name="Detection">
         <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
@@ -243,7 +279,7 @@ start();</Code>
             <Comment>Method call to diskit.SMALMover3D to get the exact avoidance point for this obstacle</Comment>
         </LocalVariable>
         <StateTransition state="avoidanceMoverManager">
-            <Assignment value="new diskit.AvoidanceMoverManager(this)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoidToOffset(avoidancePoint, getActiveMoverManager())"/>
@@ -256,22 +292,34 @@ start();</Code>
         <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[3]">
             <Comment>Initialized to the maximum number of sensors possible for this object</Comment>
         </LocalVariable>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0.0">
             <Comment/>
             <EdgeParameter value="multipleSensors"/>
         </Schedule>
-        <Code>multipleSensors[0] = visualPerception;
-multipleSensors[1] = surfaceRadar;
-multipleSensors[2] = collisionDetection;</Code>
-        <Coordinate x="10" y="150"/>
+        <Code>multipleSensors[0] =visualPerception;
+multipleSensors[1] = surfaceRadarSensor;
+multipleSensors[2] = collisionSensor;
+/*
+for (int i = 0; i &lt; 3; i++) {
+    System.out.println("####"+getName()+" setting  "+multipleSensors[i]);
+}
+*/</Code>
+        <Coordinate x="90" y="170"/>
     </Event>
-    <Event name="NauticalChartReceived">
-        <Comment>Recieves a copy of a Utilities.NauticalChart object from the Scenario Manager. When the NauticalChart registers with this simulation the scenario manager schedules a 'doNauticalChartRecieved' event for all movers registered with the simulation.  Only those entities with this exact event will actually receive the nautical chart object. It will be ignored otherwise.</Comment>
-        <Argument name="nauticalChart" type="diskit.AStarZoneMap">
-            <Comment>An A* zone map that is used as a nautical chart</Comment>
+    <Event name="AStarZoneMapDistributed">
+        <Comment>Recieves a copy of a Utilities.NauticalChart object from the Scenario Manager. When the NauticalChart registers with this simulation the scenario manager schedules a 'doNauticalChartRecieved' event for all movers registered with the simulation.  Only those entities with this exact event will actually receive the nautical chart object. It will be ignored otherwise. This entity doesn't use AStarZoneMap so no state transitions are needed.</Comment>
+        <Argument name="recipient" type="simkit.SimEntity">
+            <Comment>intended recipient of the harborChart</Comment>
         </Argument>
+        <Argument name="harborChart" type="diskit.AStarZoneMap">
+            <Comment>the harbor chart for this simulation</Comment>
+        </Argument>
+        <Schedule condition="recipient == this" delay="0.0" event="ProcessZones" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="harborChart"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="10" y="220"/>
+        <Coordinate x="10" y="170"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was received by this entity</Comment>
@@ -282,7 +330,7 @@ multipleSensors[2] = collisionDetection;</Code>
             <Comment>Indicates the type of message sent</Comment>
         </LocalVariable>
         <StateTransition state="radioResponseDelay">
-            <Assignment value="radioResponseTime.generate()"/>
+            <Assignment value="Math.max(5.0,radioResponseTime.generate())"/>
         </StateTransition>
         <Schedule condition="messageType.equals(&quot;Query&quot;)" delay="radioResponseDelay" event="RespondToQuery" priority="0">
             <Comment/>
@@ -317,11 +365,11 @@ multipleSensors[2] = collisionDetection;</Code>
         <StateTransition state="radioCommunication">
             <Operation method="setContext(this)"/>
         </StateTransition>
-        <Schedule condition="true" delay="10" event="SendRadioMessage" priority="0">
+        <Schedule condition="true" delay="10.0" event="SendRadioMessage" priority="0.0">
             <Comment/>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
-        <Code>System.out.println(getName() + " RadioDelay " + radioResponseDelay);</Code>
+        <Code>if (false) System.out.println(getName() + " RadioDelay " + radioResponseDelay);</Code>
         <Coordinate x="400" y="270"/>
     </Event>
     <Event name="SendRadioMessage">
@@ -333,4 +381,3 @@ multipleSensors[2] = collisionDetection;</Code>
         <Coordinate x="480" y="270"/>
     </Event>
 </SimEntity>
-

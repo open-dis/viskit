@@ -26,6 +26,9 @@
     <Parameter name="lightFlashInterval" type="double">
         <Comment>Interval between flashing of light (zero if no light) in seconds</Comment>
     </Parameter>
+    <Parameter name="buoyProximitySensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
     <StateVariable name="proximitySensor" type="diskit.Sensor">
         <Comment>Sensor used to detect when movers are getting close to the pier and should consider it for navigation</Comment>
     </StateVariable>
@@ -37,22 +40,23 @@
         <StateTransition state="closeContactQueue">
             <Operation method="clear()"/>
         </StateTransition>
+        <StateTransition state="proximitySensor">
+            <Assignment value="getBuoyProximitySensor()"/>
+        </StateTransition>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>Entity being initialized</Comment>
-        </Argument>
+        <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="proximitySensor">
-            <Assignment value="new diskit.SphereCutterSensor(this, getLength()/2)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterSensor" priority="0.0">
             <Comment/>
             <EdgeParameter value="proximitySensor"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -133,4 +137,3 @@
     </Event>
     <Code/>
 </SimEntity>
-

@@ -29,10 +29,8 @@
     </Event>
     <Event name="Init">
         <Comment>Used by diskit.ScenarioManager to register all entities</Comment>
-        <Argument name="entity" type="simkit.SimEntity">
-            <Comment>Entity being initialized</Comment>
-        </Argument>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Argument name="init" type="diskit.Mover3D"/>
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -47,4 +45,3 @@
     </Event>
     <Code/>
 </SimEntity>
-
