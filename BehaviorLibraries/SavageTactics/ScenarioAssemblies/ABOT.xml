@@ -223,6 +223,9 @@
                 <TerminalParameter name="y" type="double" value="-2.518"/>
                 <TerminalParameter name="z (-Z is up)" type="double" value="0.0"/>
             </MultiParameter>
+            <MultiParameter type="diskit.SphereCutterSensor">
+                <TerminalParameter name="maxRange" type="double" value="500.0"/>
+            </MultiParameter>
         </MultiParameter>
         <Coordinate x="190" y="270"/>
     </SimEntity>
@@ -498,6 +501,12 @@
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <MultiParameter type="diskit.SphereCutterSensor">
+            <TerminalParameter name="maxRange" type="double" value="500.0"/>
+        </MultiParameter>
+        <MultiParameter type="diskit.SphereCutterSensor">
+            <TerminalParameter name="maxRange" type="double" value="500.0"/>
+        </MultiParameter>
         <Coordinate x="360" y="240"/>
     </SimEntity>
     <SimEntity description="" name="RHIB2" type="Friendly.MilitaryPatrolCraft">
