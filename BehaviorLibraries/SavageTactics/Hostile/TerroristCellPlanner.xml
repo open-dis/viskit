@@ -90,22 +90,30 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="replicationNumber">
             <Assignment value="replicationNumber + 1"/>
         </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication(communicationsChannel,this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="30" y="30"/>
+        <Coordinate x="130" y="30"/>
     </Event>
     <Event name="AStarZoneMapDistributed">
-        <Comment>Listens to this event from the scenario manager and uses the object 'harborMap' to plan and order attacks. Must have a bi-directional listening connection to the scenario manager.</Comment>
-        <Argument name="harborMap" type="diskit.AStarZoneMap">
-            <Comment>The map of the harbor</Comment>
-        </Argument>
+        <Comment>Listens to this event from the scenario manager and uses the object 'harborMap' to plan and order attacks. Must have a bi-directional listening connection to the scenario manager. Since Run only happens once, but Init happens each replication, the map is also sent conditionally upon an Init.</Comment>
+        <Argument name="recipient" type="simkit.SimEntity"/>
+        <Argument name="harborMap" type="diskit.AStarZoneMap"/>
         <StateTransition state="harborChart">
             <Assignment value="harborMap"/>
         </StateTransition>
         <StateTransition state="rn">
             <Assignment value="new diskit.random.Generator()"/>
         </StateTransition>
-        <Schedule event="ChoosePlatformsToDeploy"/>
-        <Schedule condition="true" delay="0.0" event="TargetListSent" priority="0">
+        <Schedule condition="recipient == this" delay="0.0" event="ChoosePlatformsToDeploy" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Schedule condition="recipient == this" delay="0.0" event="TargetListSent" priority="0.0">
             <Comment/>
             <EdgeParameter value="targetPriorityList"/>
             <EdgeParameter value="this"/>
@@ -115,17 +123,24 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <Coordinate x="130" y="120"/>
     </Event>
     <Event name="ChoosePlatformsToDeploy">
-        <Comment>Selects at random a Terrorist to deploy</Comment>
+        <Comment>Selects at random a number of units to deploy</Comment>
         <LocalVariable name="totalPossiblePlatforms" type="int" value="terroristIDs.length">
             <Comment>The maximum number of terrorist that this planner can deploy</Comment>
         </LocalVariable>
         <LocalVariable name="terroristSelection" type="int" value="rn.randomInt(totalPossiblePlatforms)">
-            <Comment>Generates a random selection between 1 and the maximum number of platforms</Comment>
+            <Comment>Generates a random selection between 0 inclusive and the maximum number of platforms, not inclusive</Comment>
         </LocalVariable>
         <StateTransition state="totalPlans">
-            <Assignment value="terroristSelection"/>
+            <Assignment value="terroristSelection + 1"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="CreateAttackPlan" priority="0">
+        <StateTransition state="planIndex">
+            <Assignment value="totalPlans"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="CreateAttackPlan" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="planIndex"/>
+        </Schedule>
+        <Schedule condition="totalPlans &lt; terroristIDs.length" delay="0.0" event="NotifyInoperatives" priority="0.0">
             <Comment/>
             <EdgeParameter value="totalPlans"/>
         </Schedule>
@@ -134,12 +149,12 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
     </Event>
     <Event name="CreateAttackPlan">
         <Comment>Creates a unique attack plan for each terrorist selected</Comment>
-        <Argument name="selectedPlatform" type="int">
-            <Comment>The Terrorist platform to activate</Comment>
+        <Argument name="numOfPlans" type="int">
+            <Comment>The number of plans to make</Comment>
         </Argument>
-        <Schedule condition="true" delay="0.0" event="SelectTerrorist" priority="0">
+        <Schedule condition="numOfPlans &gt;  0" delay="0.0" event="SelectTerrorist" priority="0.0">
             <Comment>Selects a terrorist based on the current index of the plan by selecting the moverID number of the terrorist at that index position</Comment>
-            <EdgeParameter value="planIndex"/>
+            <EdgeParameter value="numOfPlans - 1"/>
         </Schedule>
         <Code/>
         <Coordinate x="130" y="300"/>
@@ -203,7 +218,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="attackStartTime">
             <Assignment value="attackStart"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="AttackOrderSent" priority="0">
+        <Schedule condition="true" delay="0.01" event="AttackOrderSent" priority="0.0">
             <Comment/>
             <EdgeParameter value="terroristID"/>
             <EdgeParameter value="attackPlanStartZone"/>
@@ -231,7 +246,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Comment>The order that is being given for an attack</Comment>
         </LocalVariable>
         <StateTransition state="planIndex">
-            <Assignment value="planIndex + 1"/>
+            <Assignment value="planIndex - 1"/>
         </StateTransition>
         <StateTransition state="radioCommunication">
             <Operation method="setMessage(attackOrder)"/>
@@ -242,7 +257,10 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="radioCommunication">
             <Operation method="setType(&quot;AttackOrder&quot;)"/>
         </StateTransition>
-        <Schedule condition="planIndex &lt;= totalPlans " delay="0.0" event="CreateAttackPlan" priority="0.0">
+        <StateTransition state="radioCommunication">
+            <Operation method="setSender(this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="CreateAttackPlan" priority="0.0">
             <Comment/>
             <EdgeParameter value="planIndex"/>
         </Schedule>
@@ -250,7 +268,7 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
             <Comment/>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
-        <Schedule condition="planIndex &gt; totalPlans" delay="0.0" event="BeginAttack" priority="0">
+        <Schedule condition="planIndex &gt;= 0" delay="0.0" event="BeginAttack" priority="0.0">
             <Comment/>
         </Schedule>
         <Code>/*System.out.println("**********************************");
@@ -285,7 +303,7 @@ System.out.println("**********************************\n");*/</Code>
     <Event name="BeginAttack">
         <Comment>Once all plans have been constructed and distributed the attacks are ordered to begin. Also clears the registration lists. By the time of the attack the sensors, terrorists, and munitions will have been registered</Comment>
         <Code/>
-        <Coordinate x="350" y="300"/>
+        <Coordinate x="340" y="300"/>
     </Event>
     <Event name="Stop">
         <Comment>Stops this replication if all attacks have finished</Comment>
@@ -316,7 +334,7 @@ System.out.println("doStop in TCP");</Code>
         <Schedule condition="attackResult.equals(&quot;Succeeded&quot;)" delay="0.0" event="RecordAttackResults" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="true" delay="2" event="Stop" priority="0">
+        <Schedule condition="completedAttacks == totalPlans" delay="2" event="Stop" priority="0.0">
             <Comment/>
         </Schedule>
         <Code>System.out.println("Attack Complete in TCP");</Code>
@@ -328,27 +346,28 @@ System.out.println("doStop in TCP");</Code>
             <Comment>The message to transmit</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="340" y="120"/>
+        <Coordinate x="280" y="80"/>
     </Event>
     <Event name="Init">
         <Comment>The initialization event for this simulation</Comment>
         <Argument name="entity" type="simkit.SimEntity"/>
         <StateTransition state="radioCommunication">
-            <Assignment value="new diskit.RadioCommunication(communicationsChannel, this)"/>
-        </StateTransition>
-        <StateTransition state="radioCommunication">
             <Operation method="setRecipients(hostileForceList)"/>
         </StateTransition>
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="130" y="30"/>
+        <Coordinate x="220" y="30"/>
     </Event>
     <Event name="RegisterTarget">
-        <Comment>Registers this entity with the simulation.</Comment>
+        <Comment>Registers this entity with the simulation. Note, even though the TerroristCellPlanner has no location, it still needs to correspond with the ScenarioManager.</Comment>
         <Argument name="mover" type="diskit.Mover3D">
             <Comment>The mover to register</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="220" y="30"/>
+        <Coordinate x="340" y="30"/>
     </Event>
     <Event name="RecordAttackResults">
         <Comment>Records the result of the attack as the reports are received</Comment>
@@ -356,7 +375,7 @@ System.out.println("doStop in TCP");</Code>
             <Assignment value="successfullAttacks + 1"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="120" y="490"/>
+        <Coordinate x="120" y="480"/>
     </Event>
     <Event name="RadioMessageRecieved">
         <Comment>Received a radio message from a terrorist</Comment>
@@ -365,5 +384,45 @@ System.out.println("doStop in TCP");</Code>
         </Argument>
         <Code/>
         <Coordinate x="220" y="500"/>
+    </Event>
+    <Event name="NotifyInoperatives">
+        <Comment/>
+        <Argument name="planCount" type="int">
+            <Comment>selected platforms count down from index, those above index are told to idle in a hidden zone so as not to cause any sensor interference at 0,0,0</Comment>
+        </Argument>
+        <Schedule condition="planCount &lt; terroristIDs.length - 1" delay="0.0" event="NotifyInoperatives" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="planCount + 1"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="NotAChosenPlatform" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="terroristIDs[planCount]"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="200"/>
+    </Event>
+    <Event name="NotAChosenPlatform">
+        <Comment/>
+        <Argument name="inoperative" type="int">
+            <Comment>notify inoperative to hang and wait</Comment>
+        </Argument>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(&quot;Terrorist #&quot;+inoperative+ &quot;, stand off... you are to hold position, stay safely away from the attack areas... await followup orders.&quot; )"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(&quot;StandOff&quot;)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setSender(this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="80"/>
     </Event>
 </SimEntity>
