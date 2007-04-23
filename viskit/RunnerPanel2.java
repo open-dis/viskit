@@ -191,6 +191,18 @@ public class RunnerPanel2 extends JPanel
     flowPan.add(labTF);
 
     numRepsTF = new JTextField(10);
+    numRepsTF.addActionListener(
+        new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int numReps = Integer.parseInt(numRepsTF.getText().trim());
+                if ( numReps < 1 ) {
+                    numRepsTF.setText("1");
+                }
+            }
+        
+        }
+            
+    );
     Vstatics.clampSize(numRepsTF,numRepsTF,numRepsTF);
     JLabel numRepsLab = new JLabel("# replications:");
     labTF = new JPanel();
