@@ -248,7 +248,10 @@
             <MultiParameter type="diskit.random.PoissonVariate"/>
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
-        <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <TerminalParameter name="communicationsChannel" type="int" value="16"/> 
+        <TerminalParameter name="visualSensor" type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter name="collisionSensor" type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),42.9)"/>
+        <TerminalParameter name="surfaceRadarSensor" type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),10000.0)"/>
         <Coordinate x="560" y="140"/>
     </SimEntity>
     <SimEntity description="A SeaFox unmanned surface vehicle" name="SeaFox" type="Friendly.USV">
@@ -360,6 +363,9 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),2.0*1.5)"/>       
         <Coordinate x="620" y="200"/>
     </SimEntity>
     <SimEntity description="A Sea Scan unmanned arial vehicle" name="SeaScan" type="Friendly.UAV">
@@ -488,6 +494,9 @@
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <TerminalParameter type="int" value="128"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),3000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.2*1.5)"/>        
         <Coordinate x="560" y="200"/>
     </SimEntity>
     <SimEntity description="" name="RHIB" type="Friendly.MilitaryPatrolCraft">
@@ -597,6 +606,8 @@
             <MultiParameter type="diskit.random.UniformVariate"/>
         </MultiParameter>
         <TerminalParameter name="communicationsChannel" type="int" value="16"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),7.0*1.5)"/>
         <Coordinate x="560" y="260"/>
     </SimEntity>
     <SimEntity description="A chart object that collects all of the information one could derive from a nautical chart" name="NauticalChart" type="Utilities.NauticalChart">
@@ -1127,6 +1138,11 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),37040.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),74080.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),153.92*1.5)"/>
         <Coordinate x="680" y="260"/>
     </SimEntity>
     <SimEntity description="USS Russell - an Arleigh Burke (DDG 51) Class US Navy Destroyer" name="DDG59" type="Friendly.MilitaryShip">
@@ -1201,6 +1217,11 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),37040.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),74080.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),153.92*1.5)"/>
         <Coordinate x="620" y="260"/>
     </SimEntity>
     <SimEntity description="USS Princeton - a Ticonderoga (CG 47) Class US Navy Cruiser" name="CG59" type="Friendly.MilitaryShip">
@@ -1275,6 +1296,11 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),37040.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),74080.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),172.82*1.5)"/>
         <Coordinate x="680" y="200"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyA13" type="Obstacles.Buoy">
@@ -1295,6 +1321,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>     
         <Coordinate x="150" y="130"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyA12" type="Obstacles.Buoy">
@@ -1315,6 +1342,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>        
         <Coordinate x="210" y="130"/>
     </SimEntity>
     <SimEntity description="" name="MorringBuoyA11" type="Obstacles.Buoy">
@@ -1335,6 +1363,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>
         <Coordinate x="270" y="130"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyL1" type="Obstacles.Buoy">
@@ -1355,6 +1384,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>
         <Coordinate x="270" y="190"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyL2" type="Obstacles.Buoy">
@@ -1375,6 +1405,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>    
         <Coordinate x="210" y="190"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyL3" type="Obstacles.Buoy">
@@ -1395,6 +1426,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>
         <Coordinate x="150" y="190"/>
     </SimEntity>
     <SimEntity description="" name="MooringBuoyL4" type="Obstacles.Buoy">
@@ -1415,6 +1447,7 @@
         </MultiParameter>
         <TerminalParameter name="buoyColor" type="java.lang.String" value="White"/>
         <TerminalParameter name="lightFlashInterval" type="double" value="0"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),1.0)"/>
         <Coordinate x="90" y="190"/>
     </SimEntity>
     <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
@@ -1591,6 +1624,9 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),20.0)"/>
         <Coordinate x="300" y="390"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist2" type="Hostile.ExplosiveLadenVessel">
@@ -1664,6 +1700,9 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),20.0)"/>
         <Coordinate x="460" y="390"/>
     </SimEntity>
     <SimEntity description="" name="Terrorist3" type="Hostile.ExplosiveLadenVessel">
@@ -1737,6 +1776,9 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),30.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),20.0)"/>
         <Coordinate x="390" y="490"/>
     </SimEntity>
     <SimEntity description="A Nimitz class air craft carrier" name="CVN70" type="Friendly.MilitaryShip">
@@ -1811,6 +1853,11 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),10000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),10000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),18.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),332.85*1.5)"/>
         <Coordinate x="680" y="140"/>
     </SimEntity>
     <SimEntity description="An Oliver Perry Class Frigate" name="FFG60" type="Friendly.MilitaryShip">
@@ -1885,6 +1932,11 @@
             </MultiParameter>
         </MultiParameter>
         <MultiParameter type="diskit.ProbabilityZoneGeometry[]"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),600.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),10000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),10000.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),18.0)"/>
+        <TerminalParameter type="diskit.Sensor" value="new diskit.SphereCutterSensor((diskit.Mover3D)getSimEntityByName(&quot;FishingTrawler&quot;),133.5*1.5)"/>
         <Coordinate x="620" y="140"/>
     </SimEntity>
     <PropertyChangeListener description="Statististics on number of reported contacts" mode="replicationStats" name="SeaScanReportedContacts" type="simkit.stat.SimpleStatsTally">
