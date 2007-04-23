@@ -201,8 +201,8 @@
 
     <!--  === TARGET: compile === -->
     <target depends="build.init,compile.simxml.util" name="compile">
-        <javac verbose="yes" destdir="${dir.build.classes}" excludes="xsd/**"
-            debug="on"
+        <javac verbose="no" destdir="${dir.build.classes}" excludes="xsd/**"
+            debug="off"
             source="1.5"
             target="1.5">
             <classpath>
@@ -418,7 +418,7 @@
     
     <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
         <javac destdir="${dir.build.classes}"
-            debug="on"
+            debug="off"
             source="1.5"
             target="1.5">
             <classpath>
@@ -490,7 +490,7 @@
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
        
         <javac destdir="${dir.build.classes}"
-            debug="on"
+            debug="off"
             source="1.5"
             target="1.5">
             <classpath>
@@ -559,9 +559,9 @@
     </target>   
     
     <!-- just add new modules to the depends variable here -->
-    <target depends="examples.diskit" description="compile application specific modules, like diskit" name="examples"/>
+    <target depends="fresh-diskit" description="compile application specific modules, like diskit" name="examples"/>
     
-    <target description="diskit module" name="examples.diskit">
+    <target description="diskit module" name="fresh-diskit">
         <echo message="Building Diskit:"/>
         <ant dir="${dir.diskit}" target="dist"/>
         <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
@@ -787,7 +787,7 @@
     </target>
     <target name="buildViskit" depends="checkViskit" unless="viskit.built" >
         <ant target="jar-executable"/>
-        <ant target="examples.diskit"/>
+        <ant target="fresh-diskit"/>
     </target>
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
