@@ -45,6 +45,8 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.DirectoryWatch;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -68,18 +70,21 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.EventListener;
 import viskit.xsd.bindings.cli.Assembly;
 import viskit.doe.LocalBootLoader;
 
-/** 
+/**
+ * 
  * Handles RunnerPanel2
  */
-public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
+public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener
 {
   String targetClassName;
   String targetClassPath;
   List outputs;
+  ArrayList<Long> seeds;
   RunnerPanel2 runPanel;
   ActionListener closer,saver;
   static String lineSep = System.getProperty("line.separator");
@@ -96,7 +101,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   LocalBootLoader loader;
   Class targetClass;
   Object assemblyObj;
-
+  private static int mutex = 0;
   private ClassLoader lastLoaderNoReset;
   private ClassLoader lastLoaderWithReset;
   long seed;
@@ -118,6 +123,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
     seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
     twiddleButtons(OFF);
     lastLoaderNoReset = Thread.currentThread().getContextClassLoader();
+    seeds = new ArrayList();
   }
 
   public JComponent getContent()
@@ -226,6 +232,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
       runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
       runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
       runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
+      
+      Schedule.clearRerun();
+      Schedule.coldReset();
   }
 
   File tmpFile;
@@ -234,12 +243,16 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
   boolean resetSeeds;
   
   private void initRun() {
+      mutex ++;
+      if ( mutex > 1 ) return;
       Runnable assemblyRunnable;
+      
       try {
           analystReportTempFile = null;
           resetSeeds = runPanel.resetSeedCB.isSelected();
           try {
               tmpFile = File.createTempFile("viskit","dump");
+              tmpFile.deleteOnExit();
               tmpFile.setReadable(true);
               tmpFile.setWritable(true);
               rTmpFile = new RandomAccessFile(tmpFile,"rws"); 
@@ -263,56 +276,53 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
               ioe.printStackTrace();
           }
           if (!resetSeeds) { 
-              lastLoader = lastLoaderNoReset;
-              Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-              targetClass = lastLoaderNoReset.loadClass(targetClassName);
-              //RandomVariateFactory.getDefaultRandomNumber().setSeed(seed);
-              assembly = (BasicAssembly) targetClass.newInstance();
-              assembly.setOutputStream(fos);
-              assembly.setNumberReplications(Integer.parseInt(runPanel.numRepsTF.getText().trim()));
-              assembly.setSaveReplicationData(runPanel.saveRepDataCB.isSelected());
-              assembly.setPrintReplicationReports(runPanel.printRepReportsCB.isSelected());
-              assembly.setPrintSummaryReport(runPanel.printSummReportsCB.isSelected());
-              assembly.setEnableAnalystReports(runPanel.analystReportCB.isSelected());
-              assembly.setStopTime(getStopTime());
-              assembly.setVerbose(runPanel.vcrVerbose.isSelected());
-              assemblyRunnable = (Runnable)assembly;
-          // else, try to isolate a simkit context, which has to be done in new loader, introspected. 
-          // TBD: not needed collapse back
-          // was usfull for debugging a random bug by process of elimination.
+              if ( seeds.size() > 0 ) {
+                // start with last cached seed
+                seed = seeds.get(seeds.size()-1);
+              }
           } else { 
-              loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader(true); // true->reboot
-              Class obj = loader.loadClass("java.lang.Object");
-              loader = new LocalBootLoader(loader.getExtUrls(),obj.getClassLoader(),VGlobals.instance().getWorkDirectory());
-              loader = loader.init(true);
-              Thread.currentThread().setContextClassLoader(loader);
-              lastLoaderWithReset = loader;
-              targetClass = loader.loadClass(targetClass.getName());
-              assemblyObj = targetClass.newInstance();
-              Method setOutputStream = targetClass.getMethod("setOutputStream",OutputStream.class);
-              Method setNumberReplications = targetClass.getMethod("setNumberReplications",int.class);
-              Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData",boolean.class);
-              Method setPrintReplicationReports = targetClass.getMethod("setPrintReplicationReports",boolean.class);
-              Method setPrintSummaryReport = targetClass.getMethod("setPrintSummaryReport",boolean.class);
-              Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports",boolean.class);
-              Method setVerbose = targetClass.getMethod("setVerbose",boolean.class);
-              Method setStopTime = targetClass.getMethod("setStopTime",double.class);
-              Class RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
-              Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
-              Object rn = getDefaultRandomNumber.invoke(null);
-              Class RNClass = loader.loadClass("simkit.random.RandomNumber");
-              Method setSeed = RNClass.getMethod("setSeed",long.class);
-              setSeed.invoke(rn,seed);
-              setOutputStream.invoke(assemblyObj,fos);
-              setNumberReplications.invoke(assemblyObj,Integer.parseInt(runPanel.numRepsTF.getText().trim()));
-              setSaveReplicationData.invoke(assemblyObj,runPanel.saveRepDataCB.isSelected());
-              setPrintReplicationReports.invoke(assemblyObj,runPanel.printRepReportsCB.isSelected());
-              setPrintSummaryReport.invoke(assemblyObj,runPanel.printSummReportsCB.isSelected());
-              setEnableAnalystReports.invoke(assemblyObj,runPanel.analystReportCB.isSelected());
-              setStopTime.invoke(assemblyObj,getStopTime());
-              setVerbose.invoke(assemblyObj,runPanel.vcrVerbose.isSelected());
-              assemblyRunnable = (Runnable)assemblyObj;
-          }    
+              seeds.clear();
+          }
+          
+          loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader(true); // true->reboot
+          Class obj = loader.loadClass("java.lang.Object");
+          loader = new LocalBootLoader(loader.getExtUrls(),obj.getClassLoader(),VGlobals.instance().getWorkDirectory());
+          loader = loader.init(true);
+          Thread.currentThread().setContextClassLoader(loader);
+          lastLoaderWithReset = loader;
+          targetClass = loader.loadClass(targetClass.getName());
+          assemblyObj = targetClass.newInstance();
+          
+          Method setOutputStream = targetClass.getMethod("setOutputStream",OutputStream.class);
+          Method setNumberReplications = targetClass.getMethod("setNumberReplications",int.class);
+          Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData",boolean.class);
+          Method setPrintReplicationReports = targetClass.getMethod("setPrintReplicationReports",boolean.class);
+          Method setPrintSummaryReport = targetClass.getMethod("setPrintSummaryReport",boolean.class);
+          Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports",boolean.class);
+          Method setVerbose = targetClass.getMethod("setVerbose",boolean.class);
+          Method setStopTime = targetClass.getMethod("setStopTime",double.class);
+          Method setVerboseReplication = targetClass.getMethod("setVerboseReplication",int.class);
+          Class RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
+          Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
+          Object rn = getDefaultRandomNumber.invoke(null);
+          Class RNClass = loader.loadClass("simkit.random.RandomNumber");
+          Method setSeed = RNClass.getMethod("setSeed",long.class);
+          
+          setSeed.invoke(rn,seed);
+          Class basicAssembly = loader.loadClass("viskit.xsd.assembly.BasicAssembly");
+          Method addPropertyChangeListener = basicAssembly.getMethod("addPropertyChangeListener",PropertyChangeListener.class);
+          setOutputStream.invoke(assemblyObj,fos);
+          setNumberReplications.invoke(assemblyObj,Integer.parseInt(runPanel.numRepsTF.getText().trim()));
+          setSaveReplicationData.invoke(assemblyObj,runPanel.saveRepDataCB.isSelected());
+          setPrintReplicationReports.invoke(assemblyObj,runPanel.printRepReportsCB.isSelected());
+          setPrintSummaryReport.invoke(assemblyObj,runPanel.printSummReportsCB.isSelected());
+          setEnableAnalystReports.invoke(assemblyObj,runPanel.analystReportCB.isSelected());
+          setStopTime.invoke(assemblyObj,getStopTime());
+          setVerbose.invoke(assemblyObj,runPanel.vcrVerbose.isSelected());
+          setVerboseReplication.invoke(assemblyObj,getVerboseReplicationNumber());
+          addPropertyChangeListener.invoke(assemblyObj,this);
+          assemblyRunnable = (Runnable)assemblyObj;
+          
           runPanel.wakeUpTextUpdater(fis);
           simRunner = new Thread(assemblyRunnable);
           (new SimThreadMonitor(simRunner)).start();
@@ -350,8 +360,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
                     clearRerun.invoke(null);
                     Method coldReset = schedule.getMethod("coldReset");
                     try {
-                        // this doesn't cause exception, but does in !resetSeed mode, 
-                        // ie, non-disposable loader via non-introspected methods.
                         coldReset.invoke(null);
                     } catch (Exception e) {
                         coldReset.invoke(null);
@@ -374,27 +382,25 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
             assembly.setStopRun(true);
             Schedule.getDefaultEventList().clearRerun();
-            
-            // the following exception will happen, but not in LocalBootLoader mode
-            /*
-            Schedule.getDefaultEventList().coldReset();
-             *
-Exception in thread "Thread-3" java.lang.NullPointerException
-        at simkit.SimEntityBase.processSimEvent(SimEntityBase.java:142)
-        at simkit.SimEntityBase.handleSimEvent(SimEntityBase.java:124)
-        at simkit.EventList.startSimulation(EventList.java:622)
-        at simkit.Schedule.startSimulation(Schedule.java:96)
-        at viskit.xsd.assembly.BasicAssembly.run(BasicAssembly.java:554)
-        at java.lang.Thread.run(Thread.java:619)
-Exception in thread "Thread-4" simkit.SimkitConcurrencyException: Only one call to either startSimulation, reset, or coldReset allowed at a time.
-        at simkit.EventList.coldReset(EventList.java:976)
-        at viskit.InternalAssemblyRunner$SimThreadMonitor.end(InternalAssemblyRunner.java:385)
-        at viskit.InternalAssemblyRunner$SimThreadMonitor.run(InternalAssemblyRunner.java:341)
-           */     
-           
           }
           
+          mutex--;
       }
+  }
+  
+  /**
+   * get the value of the RunnerPanel2 text field. This number
+   * starts counting at 0, the method will return -1 for blank
+   * or non-integer value.
+   */
+  public int getVerboseReplicationNumber() {
+      int ret = -1;
+      try {
+          ret = Integer.parseInt(runPanel.verboseRepNumberTF.getText().trim());
+      } catch (NumberFormatException ex) {
+          ;
+      }
+      return ret;
   }
   
   PrintWriter pWriter;
@@ -410,7 +416,7 @@ Exception in thread "Thread-4" simkit.SimkitConcurrencyException: Only one call 
   class stepListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           twiddleButtons(InternalAssemblyRunner.STEP);
-          initRun();
+          //initRun();
       }
   }
 
@@ -640,4 +646,10 @@ Exception in thread "Thread-4" simkit.SimkitConcurrencyException: Only one call 
     titlkey = key;
     doTitle(null);
   }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("seed")) {
+            seeds.add((Long)evt.getNewValue());
+        }
+    }
 }
