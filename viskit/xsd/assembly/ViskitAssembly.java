@@ -247,7 +247,7 @@ public class ViskitAssembly extends BasicAssembly {
         entity.setName(name);
         entities.put(name,entity);
         if (debug) {
-            System.out.println("ViskitAssembly addSimEntity "+name);
+            System.out.println("ViskitAssembly addSimEntity "+entity);
         }
     }
     
@@ -322,6 +322,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public SimEntity getSimEntityByName(String name) {
+        if (debug) System.out.println("getSimEntityByName for "+name+" "+entities.get(name));
         return (SimEntity) entities.get(name);
     }
     
