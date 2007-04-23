@@ -558,9 +558,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       }
     }
     runEntities = Schedule.getReruns();
-    //Schedule.setReallyVerbose(true);
+
     for (int replication = 0; replication < getNumberReplications(); replication++) {
-      if (replication == verboseReplicationNumber) {
+      if (replication == getVerboseReplication()) {
           Schedule.setVerbose(true);
           Schedule.setReallyVerbose(true);
       } else {
@@ -573,9 +573,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         break;
       } else {
           firePropertyChange("seed",new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed()));
-          if (Schedule.isRunning() /*&& !Schedule.getCurrentEvent().getName().equals("Run")*/) {
+          if (Schedule.isRunning()) {
               System.out.println("Already running.");
-              //Schedule.stopSimulation();
           }
           System.out.println("Starting Replication #"+(replication+1));
           try {
@@ -611,8 +610,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           if (isSaveReplicationData()) {
               saveReplicationStats();
           }
-          
-          
+
           //Schedule.stopSimulation();
           System.runFinalization();
       }
@@ -681,9 +679,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   }
 
     public void setVerboseReplication(int i) {
-        if (i > 0) {
-            this.verboseReplicationNumber = i;
-        }
+       this.verboseReplicationNumber = i;
     }
 
+    public int getVerboseReplication() {
+        return verboseReplicationNumber;
+    }
 }
