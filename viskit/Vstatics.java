@@ -356,6 +356,7 @@ public class Vstatics
   
   static public List[] resolveParameters(String type) {
       List[] resolved = (List[])(parameterMap.get(type));
+      if (debug) if (resolved != null) System.out.println("parameters already resolved");
       if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
           Class c = classForName(type);
           if(c == null) {
@@ -460,6 +461,7 @@ public class Vstatics
                                   ptname = convertClassName(ptname);
                               }
                           }
+                          
                           p.setName("p["+k+"] : ");
                           p.setType(ptname);
                           plist[i].add(p);
