@@ -422,104 +422,105 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           } catch (NoSuchFieldException ex) {
           }
           if (viskit.Vstatics.debug) System.out.println("adding " + c.getName());
-          if (f != null) {
-              if (viskit.Vstatics.debug) System.out.println(f+" is a parameterMap");
-              try {
-                  // parameters are in the following order
-                  // {
-                  //  { "type0","name0","type1","name1",... }
-                  //  { "type0","name0", ... }
-                  //  ...
-                  // }
-                  String[][] parameterMap = (String[][])(f.get(new String[0][0]));
-                  int numConstrs = parameterMap.length;
-                  
-                  for (int n = 0; n < numConstrs; n++) {
-                      String[] params = parameterMap[n];
-                      if (params != null) {
-                          plist[n] = new ArrayList();
-                          for (int k = 0; k < params.length; k+=2) {
-                              try {
-                                  ParameterType p = of.createParameter();
-                                  String ptype = params[k];
-                                  String pname = params[k+1];
-                                  
-                                  p.setName(pname);
-                                  p.setType(ptype);
-                                  plist[n].add(p);
-                                  if (viskit.Vstatics.debug) System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
-                              } catch (Exception e) {
-                                  e.printStackTrace();
-                              }
-                          }
+          
+          
+          if (viskit.Vstatics.debug) System.out.println("\t # constructors: " + constr.length);
+          for (int i = 0; i < constr.length; i ++) {
+              Class[] ptypes = constr[i].getParameterTypes();
+              plist[i] = new ArrayList();
+              if (viskit.Vstatics.debug) System.out.println("\t # params " + ptypes.length + " in constructor " + i);
+              
+              ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
+              // possible that a class inherited a parameterMap, check if annotated first
+              if ( param != null ) { 
+                  String[] names = ((ParameterMap)param).names();
+                  String[] types = ((ParameterMap)param).types();
+                  if (names.length != types.length) throw new RuntimeException("ParameterMap names and types length mismatch");
+                  for ( int k = 0; k < names.length; k ++) {
+                      ParameterType pt;
+                      try {
+                          pt = of.createParameter();
+                          pt.setName(names[k]);
+                          pt.setType(types[k]);
+                          plist[i].add(pt);
+                      } catch (JAXBException ex) {
+                          ex.printStackTrace();
                       }
                   }
-              } catch (IllegalArgumentException ex) {
-                  ex.printStackTrace();
-              } catch (IllegalAccessException ex) {
-                  ex.printStackTrace();
-              }
-          } else {
-              
-              if (viskit.Vstatics.debug) System.out.println("\t # constructors: " + constr.length);
-              for (int i = 0; i < constr.length; i ++) {
-                  Class[] ptypes = constr[i].getParameterTypes();
-                  plist[i] = new ArrayList();
-                  if (viskit.Vstatics.debug) System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                   
-                  ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
-                  
-                  if ( param != null ) {
-                      String[] names = ((ParameterMap)param).names();
-                      String[] types = ((ParameterMap)param).types();
-                      if (names.length != types.length) throw new RuntimeException("ParameterMap names and types length mismatch");
-                      for ( int k = 0; k < names.length; k ++) {
-                          ParameterType pt;
-                          try {
-                              pt = of.createParameter();
-                              pt.setName(names[k]);
-                              pt.setType(types[k]);
-                              plist[i].add(pt);
-                          } catch (JAXBException ex) {
-                              ex.printStackTrace();
+              } else if ( f != null ) {
+                  if (viskit.Vstatics.debug) System.out.println(f+" is a parameterMap");
+                  try {
+                      // parameters are in the following order
+                      // {
+                      //  { "type0","name0","type1","name1",... }
+                      //  { "type0","name0", ... }
+                      //  ...
+                      // }
+                      String[][] parameterMap = (String[][])(f.get(new String[0][0]));
+                      int numConstrs = parameterMap.length;
+                      
+                      for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs = constr.length
+                          String[] params = parameterMap[n];
+                          if (params != null) {
+                              plist[n] = new ArrayList();
+                              for (int k = 0; k < params.length; k+=2) {
+                                  try {
+                                      ParameterType p = of.createParameter();
+                                      String ptype = params[k];
+                                      String pname = params[k+1];
+                                      
+                                      p.setName(pname);
+                                      p.setType(ptype);
+                                      plist[n].add(p);
+                                      if (viskit.Vstatics.debug) System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                                  } catch (Exception e) {
+                                      e.printStackTrace();
+                                  }
+                              }
                           }
+                      } break; // fix this up, should index along with i not n
+                  } catch (IllegalArgumentException ex) {
+                      ex.printStackTrace();
+                  } catch (IllegalAccessException ex) {
+                      ex.printStackTrace();
+                  }
+              } else {// unknonws
+                  for (int k = 0; k < ptypes.length; k++) {
+                      try {
+                          ParameterType p = of.createParameter();
+                          String ptname = Vstatics.convertClassName(ptypes[k].getName());
+                          if (ptname.indexOf(".class") > 0) { //??
+                              ptname = ptname.split("\\.")[0];
+                          }
+                          p.setName("p[" + k + "] : ");
+                          p.setType(ptname);
+                          plist[i].add(p);
+                          if (viskit.Vstatics.debug) System.out.println("\t " + p.getName() + p.getType());
+                      } catch (Exception e) {
+                          e.printStackTrace();
                       }
                       
-                  } else { // unknonws 
-                      for (int k = 0; k < ptypes.length; k++) {
-                          try {
-                              ParameterType p = of.createParameter();
-                              String ptname = Vstatics.convertClassName(ptypes[k].getName());
-                              if (ptname.indexOf(".class") > 0) { //??
-                                  ptname = ptname.split("\\.")[0];
-                              }
-                              p.setName("p[" + k + "] : ");
-                              p.setType(ptname);
-                              plist[i].add(p);
-                              if (viskit.Vstatics.debug) System.out.println("\t " + p.getName() + p.getType());
-                          } catch (Exception e) {
-                            e.printStackTrace();
-                          }
-                          
-                      } 
                   }
               }
-          }
+          } // for
           Vstatics.putParameterList(c.getName(), plist);
-          
       }
+      
+      
+      
       if (list == null || list.size() <= 0) {
           JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
                   "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);
           return;
       }
-
-    DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
-    mod.insertNodeInto(localRoot, root, 0);
-
-    for (Iterator itr = list.iterator(); itr.hasNext();) {
-      hookToParent((Class) itr.next(), localRoot);
-    }
+      
+      DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
+      mod.insertNodeInto(localRoot, root, 0);
+      
+      for (Iterator itr = list.iterator(); itr.hasNext();) {
+          hookToParent((Class) itr.next(), localRoot);
+      }
   }
 
   class MyClassSorter implements Comparator
