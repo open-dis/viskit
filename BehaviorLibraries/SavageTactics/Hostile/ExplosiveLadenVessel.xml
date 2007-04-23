@@ -8,6 +8,18 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
         <Comment>The SMAL entity definition for this entity</Comment>
     </Parameter>
+    <Parameter name="visualSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="collisionSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="detonateProximitySensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="radioChannel" type="int">
+        <Comment>channel to listen to for attack plans</Comment>
+    </Parameter>
     <StateVariable name="avoidanceRange" type="double">
         <Comment>The proximity tollerance for this entity</Comment>
     </StateVariable>
@@ -107,19 +119,28 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
     <StateVariable name="evasiveManuever" type="boolean">
         <Comment>Whether this entity is performing evasive manuevers</Comment>
     </StateVariable>
+    <StateVariable name="avoidanceMoverManager" type="diskit.AvoidanceMoverManager">
+        <Comment>avoid detected obstacles</Comment>
+    </StateVariable>
+    <StateVariable name="activeMoverManager" type="diskit.MoverManager">
+        <Comment>currently active mover manager</Comment>
+    </StateVariable>
+    <StateVariable name="self" type="ExplosiveLadenVessel">
+        <Comment>be able to use "this" methods as state variable calls</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
         <StateTransition state="avoidanceRange">
-            <Assignment value="30"/>
+            <Assignment value="getCollisionSensor().getMaxRange()"/>
         </StateTransition>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
         <StateTransition state="visualRange">
-            <Assignment value="600"/>
+            <Assignment value="getVisualSensor().getMaxRange()"/>
         </StateTransition>
         <StateTransition state="blastRadius">
-            <Assignment value="20"/>
+            <Assignment value="getDetonateProximitySensor().getMaxRange()"/>
         </StateTransition>
         <StateTransition state="attackAuthorized">
             <Assignment value="false"/>
@@ -139,16 +160,49 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="destroyedTarget">
             <Assignment value="null"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="ScaleSpeed" priority="0">
+        <StateTransition state="visualPerception">
+            <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Assignment value="getCollisionSensor()"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Assignment value="getDetonateProximitySensor()"/>
+        </StateTransition>
+        <StateTransition state="commsChannel">
+            <Assignment value="radioChannel"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Assignment value="new diskit.RadioCommunication(radioChannel,this)"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Operation method="setRecipients(hostileForceList)"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="harborChart">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Assignment value="this"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
             <Comment/>
-            <EdgeParameter value="speedScalar"/>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
-        <Coordinate x="20" y="10"/>
+        <Coordinate x="10" y="100"/>
     </Event>
     <Event name="Init">
-        <Comment/>
-        <Argument name="entity" type="diskit.Mover3D"/>
+        <Comment>stage 1 initialization, some code blocks here may be pushed down to base classes.</Comment>
+        <Argument name="init" type="diskit.Mover3D"/>
         <LocalVariable name="numOfSensors" type="int" value="3">
             <Comment>Number of Sensors this entity has</Comment>
         </LocalVariable>
@@ -159,13 +213,13 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
             <Assignment value="new diskit.util.MovementCalculator(this)"/>
         </StateTransition>
         <StateTransition state="visualPerception">
-            <Assignment value="new diskit.SphereCutterSensor(this, visualRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="detonateProximity">
-            <Assignment value="new diskit.SphereCutterSensor(this, blastRadius)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="collisionAvoidance">
-            <Assignment value="new diskit.SphereCutterSensor(this, avoidanceRange)"/>
+            <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="targetQueue">
             <Assignment value="new diskit.TargetQueue(startPosition)"/>
@@ -173,26 +227,45 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="evasiveManuever">
             <Assignment value="false"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="CreateSensors" priority="0">
+        <Schedule condition="init == this" delay="0.0" event="CreateSensors" priority="0.0">
             <Comment/>
         </Schedule>
-        <Schedule event="CreateExplosive"/>
-        <Code>//TODO: Elegant construction of sensors array
-sensors[0] = visualPerception;
-sensors[1] = detonateProximity;
-sensors[2] = collisionAvoidance;
-//Schedule.stopOnEvent("Stop");</Code>
-        <Coordinate x="80" y="90"/>
+        <Schedule condition="init == this &amp;&amp; plasticExplosives == null" delay="0.0" event="CreateExplosive" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Schedule condition="init == this &amp;&amp; plasticExplosives != null" delay="0.0" event="RegisterMunition" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code>sensors[0] = getVisualSensor();
+sensors[1] = getDetonateProximitySensor();
+sensors[2] = getCollisionSensor();</Code>
+        <Coordinate x="80" y="100"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment/>
         <Argument name="target" type="diskit.Mover3D"/>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator(moverID,15000.0)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Assignment value="new diskit.AvoidanceMoverManager(null)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setPersistant(false)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this,waypointCreator)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setPersistant(false)"/>
+        </StateTransition>
         <Code/>
-        <Coordinate x="160" y="90"/>
+        <Coordinate x="160" y="100"/>
     </Event>
     <Event name="Detection">
         <Comment>Determines whether or not a detected contact is a high value unit and makes a decision based on the evaluation of the entity</Comment>
@@ -214,7 +287,7 @@ sensors[2] = collisionAvoidance;
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="3&gt;7 &amp;&amp; !contactType.equals(primaryTarget)" delay="0.0" event="AssessObstacle" priority="0">
+        <Schedule condition="!contactType.equals(primaryTarget)" delay="0.0" event="AssessObstacle" priority="0.0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -229,9 +302,8 @@ sensors[2] = collisionAvoidance;
         <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="0">
             <Comment/>
         </Schedule>
-        <Code>/*System.out.println(getName() + " detected: " + contact.getName());*/
-contact.waitDelay("Die", 0.0);</Code>
-        <Coordinate x="230" y="370"/>
+        <Code/>
+        <Coordinate x="170" y="370"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
@@ -248,7 +320,7 @@ contact.waitDelay("Die", 0.0);</Code>
             <Operation method="addSimEventListener(this)"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="160" y="170"/>
+        <Coordinate x="160" y="200"/>
     </Event>
     <Event name="Attack">
         <Comment>Determines the correct heading for an attack and attacks at Maximum speed</Comment>
@@ -273,11 +345,12 @@ contact.waitDelay("Die", 0.0);</Code>
         <StateTransition state="destroyedTarget">
             <Assignment value="target"/>
         </StateTransition>
-        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-            <EdgeParameter value="plasticExplosives"/>
-        </Schedule>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setStartPosition(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed())"/>
+        </StateTransition>
         <Schedule condition="true   " delay="detonateTime - .5" event="PrepareRadioMessage" priority="0">
             <Comment>This message is sent right before the terrorist blows up</Comment>
             <EdgeParameter value="&quot;DestroyedTarget&quot;"/>
@@ -285,11 +358,20 @@ contact.waitDelay("Die", 0.0);</Code>
             <EdgeParameter value="attackReport"/>
             <EdgeParameter value="this"/>
         </Schedule>
+        <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
         <Code>setStartPosition(getLocation());
-setDestination(attackDestination);
+setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed());
 System.out.println("I've chosen to attack: " + target.getName());
 //System.out.println("Attack Position is: " + attackDestination);</Code>
-        <Coordinate x="340" y="440"/>
+        <Coordinate x="340" y="530"/>
     </Event>
     <Event name="CreateSensors">
         <Comment>Builds array of all sensors to be registered</Comment>
@@ -299,26 +381,29 @@ System.out.println("I've chosen to attack: " + target.getName());
         <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
             <Comment>Array to add all sensors</Comment>
         </LocalVariable>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0.0">
             <Comment/>
             <EdgeParameter value="sensors"/>
         </Schedule>
         <Code>sensors[0] = visualPerception;
 sensors[1] = detonateProximity;
 sensors[2] = collisionAvoidance;</Code>
-        <Coordinate x="80" y="170"/>
+        <Coordinate x="80" y="200"/>
     </Event>
     <Event name="CreateExplosive">
         <Comment>Creates the explosive for this entity</Comment>
         <StateTransition state="plasticExplosives">
-            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), getMoverID(), blastRadius)"/>
+            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), this, blastRadius);"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setPersistant(false)"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="RegisterMunition" priority="0">
             <Comment/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
         <Code/>
-        <Coordinate x="80" y="10"/>
+        <Coordinate x="10" y="10"/>
     </Event>
     <Event name="RegisterMunition">
         <Comment>Register the explosive with scenario Manager</Comment>
@@ -333,7 +418,7 @@ sensors[2] = collisionAvoidance;</Code>
     </Event>
     <Event name="Detonate">
         <Comment/>
-        <Argument name="shooter" type="diskit.Mover3D"/>
+        <Argument name="operator" type="diskit.Mover3D"/>
         <Argument name="munition" type="diskit.Munition"/>
         <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
             <Comment>Returns the zone that was closest to the attack</Comment>
@@ -342,26 +427,24 @@ sensors[2] = collisionAvoidance;</Code>
             <Comment>The name of the closest zone for reporting purposes</Comment>
         </LocalVariable>
         <StateTransition state="zoneMoverManager">
-            <Assignment value="null"/>
+            <Operation method="setMover(null)"/>
         </StateTransition>
-        <Schedule condition="shooter == this &amp;&amp; tacticalMode != diskit.TacticalMode.DEAD" delay="0.0" event="Die" priority="0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-        </Schedule>
-        <Code>setCruiseSpeed(0);
-stop();</Code>
-        <Coordinate x="540" y="370"/>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="520" y="370"/>
     </Event>
     <Event name="AStarZoneMapDistributed">
         <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
-        <Argument name="chart" type="diskit.AStarZoneMap">
-            <Comment>The chart that the terrorist sent</Comment>
-        </Argument>
-        <StateTransition state="harborChart">
-            <Assignment value="chart"/>
-        </StateTransition>
+        <Argument name="recipient" type="simkit.SimEntity"/>
+        <Argument name="chart" type="diskit.AStarZoneMap"/>
+        <Schedule condition="recipient == this" delay="0.0" event="SetNavigableMap" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="chart"/>
+        </Schedule>
         <Code/>
-        <Coordinate x="350" y="40"/>
+        <Coordinate x="20" y="260"/>
     </Event>
     <Event name="TargetListSent">
         <Comment>Receives the target priority list from the terrorist cell planner</Comment>
@@ -379,9 +462,6 @@ stop();</Code>
         </StateTransition>
         <StateTransition state="terroristLeader">
             <Assignment value="cellPlanner"/>
-        </StateTransition>
-        <StateTransition state="radioMsg">
-            <Assignment value="new diskit.RadioCommunication(channelNumber, this)"/>
         </StateTransition>
         <StateTransition state="radioMsg">
             <Operation method="setRecipients(hostileForceList)"/>
@@ -412,9 +492,6 @@ stop();</Code>
         <LocalVariable name="tacticCopy" type="diskit.Tactic" value="tactic">
             <Comment>Local copy of order information in case the order is for this terrorist</Comment>
         </LocalVariable>
-        <StateTransition state="targetQueue">
-            <Operation method="setRelativePoint(attackGoal.getLocation())"/>
-        </StateTransition>
         <Schedule condition="terroristID == moverID" delay="0.0" event="BeginAttackPlanning" priority="0">
             <Comment/>
             <EdgeParameter value="start"/>
@@ -438,17 +515,17 @@ stop();</Code>
         <LocalVariable name="tacticToImplement" type="diskit.Tactic" value="orderedTactic">
             <Comment>Copy of the tactic that has been ordered</Comment>
         </LocalVariable>
+        <LocalVariable name="aStarZones" type="java.util.LinkedList" value="new java.util.LinkedList(); aStarZones.add(orderedStart);aStarZones.add(orderedGoal)">
+            <Comment>set up waypointCreator</Comment>
+        </LocalVariable>
         <StateTransition state="startZone">
             <Assignment value="orderedStart"/>
         </StateTransition>
         <StateTransition state="goalZone">
             <Assignment value="orderedGoal"/>
         </StateTransition>
-        <StateTransition state="aStarSearch">
-            <Assignment value="new diskit.AStarSearch(harborChart)"/>
-        </StateTransition>
         <StateTransition state="waypointCreator">
-            <Assignment value="new diskit.WaypointCreator()"/>
+            <Assignment value="new diskit.WaypointCreator(this,aStarZones)"/>
         </StateTransition>
         <StateTransition state="chosenToAttack">
             <Assignment value="true"/>
@@ -456,7 +533,12 @@ stop();</Code>
         <StateTransition state="waypointCreator">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <Schedule event="PickStartPosition"/>
+        <StateTransition state="targetQueue">
+            <Operation method="setRelativePoint(orderedGoal.getLocation())"/>
+        </StateTransition>
+        <Schedule condition="harborChart != null" delay="0.0" event="PickStartPosition" priority="0.0">
+            <Comment/>
+        </Schedule>
         <Code/>
         <Coordinate x="270" y="140"/>
     </Event>
@@ -478,7 +560,7 @@ stop();</Code>
             <Assignment value="initialWaypoint"/>
         </StateTransition>
         <Schedule event="FinalizePlan"/>
-        <Code/>
+        <Code>//setStartPosition(initialWaypoint);</Code>
         <Coordinate x="350" y="140"/>
     </Event>
     <Event name="FinalizePlan">
@@ -490,13 +572,31 @@ stop();</Code>
             <Assignment value="true"/>
         </StateTransition>
         <StateTransition state="zoneMoverManager">
-            <Assignment value="new diskit.ZoneMoverManager(this, waypointCreator)"/>
+            <Operation method="setWaypointCreator(waypointCreator)"/>
         </StateTransition>
-        <Schedule condition="attackAuthorized" delay="0.0" event="StartMove" priority="0">
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.APPROACHING"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Operation method="setAStarZones(attackPath)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(attackStartWaypoint)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(maximumSpeed)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setDestination(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <Schedule condition="attackAuthorized" delay="0.1" event="StartMove" priority="0.0">
             <Comment/>
+            <EdgeParameter value="this"/>
         </Schedule>
-        <Code>waypointCreator.setAStarZones(attackPath);
-//aStarSearch.printPath(attackPath);</Code>
+        <Code/>
         <Coordinate x="430" y="140"/>
     </Event>
     <Event name="BeginAttack">
@@ -504,32 +604,54 @@ stop();</Code>
         <StateTransition state="attackAuthorized">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule condition="planFinalized" delay="0.0" event="StartMove" priority="0">
+        <Schedule condition="planFinalized" delay="0.1" event="StartMove" priority="0.0">
             <Comment/>
-        </Schedule>
-        <Schedule condition="!chosenToAttack" delay="0.0" event="NotAChosenPlatform" priority="0">
-            <Comment>If this entity hasn't been selected for the attack, hide it from view as an inactive platform</Comment>
+            <EdgeParameter value="this"/>
         </Schedule>
         <Code/>
-        <Coordinate x="560" y="40"/>
+        <Coordinate x="500" y="30"/>
     </Event>
     <Event name="StartMove">
         <Comment/>
-        <StateTransition state="tacticalMode">
-            <Assignment value="diskit.TacticalMode.APPROACHING"/>
-        </StateTransition>
-        <Code>setCruiseSpeed(maximumSpeed);
-setStartPosition(attackStartWaypoint);
-setDestination(waypointCreator.createWaypoint());</Code>
+        <Argument name="mover" type="diskit.Mover3D"/>
+        <Code>//setCruiseSpeed(maximumSpeed);
+//setStartPosition(attackStartWaypoint);
+//setDestination(waypointCreator.createWaypoint());</Code>
         <Coordinate x="500" y="140"/>
     </Event>
     <Event name="NotAChosenPlatform">
-        <Comment>Hides inactive platforms not chosen for attack</Comment>
-        <LocalVariable name="hiddenPosition" type="diskit.Vec3d" value="new diskit.Vec3d(0, 0, 1000)">
-            <Comment>A position that is removed from the scenario, hides the terrorist from view when not being used</Comment>
-        </LocalVariable>
-        <Code>setStartPosition(hiddenPosition);</Code>
-        <Coordinate x="600" y="140"/>
+        <Comment>Wasn't selected for this attack order, notification from TerroristCellPlanner to go hide somewhere far away and wait for followup orders.</Comment>
+        <Argument name="inoperative" type="int">
+            <Comment>terrorist selected to be inoperative, go hide out far away</Comment>
+        </Argument>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.IDLE"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setDestination(waypointCreator.createWaypoint());"/>
+        </StateTransition>
+        <Schedule condition="inoperative == moverID" delay="0.0" event="StartMove" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code>/* all of the ExplosiveLadenVessels will get this event once with the current planner's orders. At this point in the initialization, the waypointCreator has been set to the "hidden zone", so go and hide until waypointCreator gets swapped out for the attack plan's waypoints.
+*/
+
+//setStartPosition(waypointCreator.createWaypoint());
+/*
+setDestination(waypointCreator.createWaypoint());
+setCruiseSpeed(0.0);
+*/</Code>
+        <Coordinate x="570" y="140"/>
     </Event>
     <Event name="AttackComplete">
         <Comment>Notifies the terrorist cell planner that the attack has ended. This does not mean that the attack succeeded just that it is over</Comment>
@@ -546,7 +668,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <Comment>Identify this entity as the reporting unit</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="640" y="500"/>
+        <Coordinate x="680" y="500"/>
     </Event>
     <Event name="DestinationReached">
         <Comment/>
@@ -556,12 +678,18 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <StateTransition state="arrivedAtGoal">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0">
-            <Comment>If there is a target to attack, attack it</Comment>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setWaypointCreator(null)"/>
+        </StateTransition>
+        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0.0">
+            <Comment>If there is a target to attack, attack it, otherwise loiter until one arrives</Comment>
             <EdgeParameter value="targetChoice"/>
         </Schedule>
+        <Schedule condition="targetChoice == null" delay="0.0" event="Loiter" priority="0.0">
+            <Comment/>
+        </Schedule>
         <Code>//System.out.println(getName() + ": I have arrived at " + //goalZone.getName());</Code>
-        <Coordinate x="340" y="640"/>
+        <Coordinate x="340" y="690"/>
     </Event>
     <Event name="PickFromTargets">
         <Comment/>
@@ -576,7 +704,7 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <EdgeParameter value="target"/>
         </Schedule>
         <Code/>
-        <Coordinate x="340" y="530"/>
+        <Coordinate x="340" y="610"/>
     </Event>
     <Event name="CannotEscape">
         <Comment>If the terrorist has been intercepted he will detonate</Comment>
@@ -598,11 +726,6 @@ setDestination(waypointCreator.createWaypoint());</Code>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.DETONATING"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Detonate" priority="0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-            <EdgeParameter value="plasticExplosives"/>
-        </Schedule>
         <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0">
             <Comment/>
             <EdgeParameter value="&quot;FailedAttack&quot;"/>
@@ -610,22 +733,23 @@ setDestination(waypointCreator.createWaypoint());</Code>
             <EdgeParameter value="failedReport"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BlewUpBarrier" priority="0">
+        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0">
             <Comment/>
             <EdgeParameter value="mover"/>
         </Schedule>
+        <Schedule event="Detonate"/>
         <Code>/*System.out.println("Detonate Proximity sensed");
 System.out.println("I'm blowing up "+  mover.getName());*/
 setCruiseSpeed(0);</Code>
         <Coordinate x="340" y="370"/>
     </Event>
-    <Event name="ScaleSpeed">
+    <Event name="ApplyScaleSpeed">
         <Comment>Allows the scenario manager to add a cross the board speed scale to all entities</Comment>
         <Argument name="speedScale" type="double">
             <Comment>The scale to apply to the max speed of this entity</Comment>
         </Argument>
         <Code>setMaximumSpeed(getMaximumSpeed() * speedScale);</Code>
-        <Coordinate x="20" y="90"/>
+        <Coordinate x="270" y="260"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>If something is determined to be potential obstacle assess whether or not there will be a collision</Comment>
@@ -640,7 +764,7 @@ setCruiseSpeed(0);</Code>
             <EdgeParameter value="obstacle"/>
         </Schedule>
         <Code>//System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
-        <Coordinate x="130" y="370"/>
+        <Coordinate x="90" y="370"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>Avoids an obstacle if a collision is going to happen</Comment>
@@ -650,14 +774,20 @@ setCruiseSpeed(0);</Code>
         <LocalVariable name="avoidancePoint" type="diskit.Vec3d" value="calc.getCollisionAvoidance(obstacle)">
             <Comment>The point that avoids the collision</Comment>
         </LocalVariable>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="avoidToOffset(avoidancePoint,getActiveMoverManager())"/>
+        </StateTransition>
         <Code>setStartPosition(getLocation());
 setDestination(avoidancePoint);</Code>
-        <Coordinate x="40" y="370"/>
+        <Coordinate x="10" y="370"/>
     </Event>
-    <Event name="Die">
-        <Comment>Stops this entity</Comment>
+    <Event name="Neutralized">
+        <Comment>ScenarioManager confirms kill, stops this entity</Comment>
         <Argument name="mover" type="diskit.Mover3D">
-            <Comment>Terrorist killed himself</Comment>
+            <Comment>Terrorist dies</Comment>
         </Argument>
         <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
             <Comment>Returns the zone that was closest to the attack</Comment>
@@ -668,21 +798,20 @@ setDestination(avoidancePoint);</Code>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.DEAD"/>
         </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Assignment value="null"/>
-        </StateTransition>
-        <StateTransition state="terroristLeader">
-            <Operation method="waitDelay(&quot;AttackComplete&quot;,0.0,new Object[]{attackSuccess,destroyedTarget,areaOfAttack,this},0)"/>
-        </StateTransition>
-        <Schedule condition="true" delay="0.0" event="AttackComplete" priority="0">
+        <Schedule condition="mover == this" delay="0.0" event="AttackComplete" priority="0.0">
             <Comment/>
             <EdgeParameter value="attackSuccess"/>
             <EdgeParameter value="destroyedTarget"/>
             <EdgeParameter value="areaOfAttack"/>
             <EdgeParameter value="this"/>
         </Schedule>
+        <Cancel condition="mover == this" event="Detonate">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Cancel>
         <Code/>
-        <Coordinate x="640" y="370"/>
+        <Coordinate x="680" y="370"/>
     </Event>
     <Event name="TargetSpotted">
         <Comment>Adds spotted targets to queue in the event that the this entity has not reached it's ordered destination</Comment>
@@ -693,7 +822,7 @@ setDestination(avoidancePoint);</Code>
             <Operation method="add(target)"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="230" y="460"/>
+        <Coordinate x="180" y="490"/>
     </Event>
     <Event name="SpottedByEnemy">
         <Comment>Marks when this entity was spotted by any Friendly force</Comment>
@@ -701,7 +830,7 @@ setDestination(avoidancePoint);</Code>
             <Assignment value="Schedule.getSimTime()"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="460"/>
+        <Coordinate x="100" y="490"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was transmitted to this entity</Comment>
@@ -722,7 +851,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="msgContext"/>
         </Schedule>
         <Code/>
-        <Coordinate x="510" y="630"/>
+        <Coordinate x="450" y="620"/>
     </Event>
     <Event name="UpdateTargetQueue">
         <Comment>This entity changes updates it's targets if a destroyed target report comes across the radio</Comment>
@@ -746,7 +875,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="this"/>
         </Schedule>
         <Code>System.out.println(getName() + " Received DestroyedTarget");</Code>
-        <Coordinate x="510" y="530"/>
+        <Coordinate x="450" y="540"/>
     </Event>
     <Event name="PrepareRadioMessage">
         <Comment>Prepares the radio communication object for transmission</Comment>
@@ -776,7 +905,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="radioMsg"/>
         </Schedule>
         <Code/>
-        <Coordinate x="540" y="440"/>
+        <Coordinate x="520" y="440"/>
     </Event>
     <Event name="SendRadioMessage">
         <Comment>Transmits a radio message through the scenario manager</Comment>
@@ -784,15 +913,66 @@ setDestination(avoidancePoint);</Code>
             <Comment>The message to transmit</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="580" y="530"/>
+        <Coordinate x="590" y="550"/>
     </Event>
-    <Event name="BlewUpBarrier">
-        <Comment>This entity blew up an existing barrier</Comment>
+    <Event name="BarrierTargeted">
+        <Comment>This entity attempted to blow up a barrier. Barrier and other entities will receive a damage status from ScenarioManager. This event can probably go in this case.</Comment>
         <Argument name="barrier" type="diskit.Mover3D">
             <Comment>The barrier segment that was targeted</Comment>
         </Argument>
         <Code>barrier.waitDelay("BarrierAttacked", 0.0);</Code>
-        <Coordinate x="480" y="260"/>
+        <Coordinate x="340" y="440"/>
+    </Event>
+    <Event name="SetNavigableMap">
+        <Comment/>
+        <Argument name="chart" type="diskit.AStarZoneMap"/>
+        <StateTransition state="harborChart">
+            <Assignment value="chart"/>
+        </StateTransition>
+        <StateTransition state="aStarSearch">
+            <Assignment value="new diskit.AStarSearch(harborChart)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="130" y="260"/>
+    </Event>
+    <Event name="DamageSustained">
+        <Comment>Damage was received by the ScenarioManager by the base class, by an integer amount. Deduct this amount from the total. TBD, send radio message if not critical.</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>mover that got damaged</Comment>
+        </Argument>
+        <Argument name="hit" type="double">
+            <Comment>amount of damage</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="680" y="230"/>
+    </Event>
+    <Event name="CriticalHit">
+        <Comment>Notice of a CriticalHit</Comment>
+        <Argument name="mover" type="diskit.Mover3D"/>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="null"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="680" y="300"/>
+    </Event>
+    <Event name="Loiter">
+        <Comment/>
+        <StateTransition state="self">
+            <Operation method="stop()"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setVelocity(new diskit.Vec3d(0.0,0.0,0.0))"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="250" y="690"/>
     </Event>
 </SimEntity>
-
