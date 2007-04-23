@@ -3,10 +3,13 @@ package viskit.xsd.assembly;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import javax.swing.JOptionPane;
 import simkit.BasicSimEntity;
+import simkit.Priority;
 import simkit.Schedule;
 import simkit.SimEntity;
 import simkit.SimEvent;
+import simkit.random.RandomVariateFactory;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
@@ -19,6 +22,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.*;
 import viskit.xsd.assembly.GridletEventList;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**
  * Base class for creating Simkit scenarios.
@@ -31,15 +35,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 {
 
   protected LinkedHashMap replicationData;
-
   protected SampleStatistics[] replicationStats;
   protected SampleStatistics[] designPointStats;
   protected SimEntity[] simEntity;
   protected PropertyChangeListener[] propertyChangeListener;
-
   protected boolean hookupsCalled;
   protected boolean stopRun;
   protected int startRepNumber = 0;
+  protected Set<SimEntity> runEntities;
 
   private double stopTime;
   private boolean verbose;
@@ -78,6 +81,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   private ByteArrayOutputStream outputBuffer;
 
   private PrintWriter println;
+
+  private int verboseReplicationNumber;
 
   /**
    * Default constructor sets paameters of BasicAssembly to their
@@ -128,6 +133,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     startRepNumber = 0;
   }
 
+  // mask the Thread run() 
+  public void doRun() {
+      
+  }
   /**
    * Create all the objects used.  This is called from the constructor.
    * The <code>createSimEntities()</code> method is abstract and will
@@ -236,6 +245,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
     }
     stopTime = time;
+    System.out.println("stopTime: "+time);
   }
 
   public double getStopTime()
@@ -302,7 +312,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     // but, isFinished didn't happen for the 0th
     // replication
     if (Schedule.getDefaultEventList().isFinished())
-      Schedule.reset();
+      
+            try {
+                Schedule.reset();
+            } catch (java.util.ConcurrentModificationException cme) {
+                System.out.println("Maybe not finished in Event List "+Schedule.getDefaultEventList().getID());
+                
+            }
   }
 
   public void setNumberReplications(int num)
@@ -463,6 +479,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       buf.append(form.format(replicationStats[i].getVariance()));
       buf.append('\t');
       buf.append(form.format(replicationStats[i].getStandardDeviation()));
+      replicationStats[i].reset();
     }
     return buf.toString();
   }
@@ -505,13 +522,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       // takes it mid thread.
       System.setOut(out);
   }
+  
   /**
    * Execute the simulation for the desired number of replications.
    */
   public void run()
   {
     stopRun = false;
-
+    if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
+        System.out.println("Already running.");
+        //Schedule.stopSimulation();
+    }
+    System.out.println("stopTime set at "+getStopTime());
     createObjects();
     performHookups();
     // reset the document with
@@ -522,50 +544,79 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     if (!hookupsCalled) {
       throw new RuntimeException("performHookups() hasn't been called!");
     }
-
+    System.out.println("Stopping at "+getStopTime());
     Schedule.stopAtTime(getStopTime());
-    if (isVerbose()) {
-      Schedule.setVerbose(isVerbose());
-      // TBD stats not getting returned if other default EventList used
-      //Schedule.setDefaultEventList(new GridletEventList(1, new PrintWriter(outputBuffer)));
-      // protected int listId = Schedule.getNextAvailableID();
-      //Schedule.addNewEventList(GridletEventList.class);
-      // EventList newList = Schedule.getEventList(listId);
-      //simkit.EventList newList = Schedule.getEventList(1);
-      //Schedule.setDefaultEventList(newList);
-    }
+    Schedule.setEventSourceVerbose(true);
+    Schedule.setVerbose(isVerbose());
     if (isSingleStep()) {
       Schedule.setSingleStep(isSingleStep());
     }
-
     if (isSaveReplicationData()) {
       replicationData.clear();
       for (int i = 0; i < replicationStats.length; ++i) {
         replicationData.put(new Integer(i), new ArrayList());
       }
     }
-
+    runEntities = Schedule.getReruns();
+    //Schedule.setReallyVerbose(true);
     for (int replication = 0; replication < getNumberReplications(); replication++) {
-      
-      if(stopRun)
+      if (replication == verboseReplicationNumber) {
+          Schedule.setVerbose(true);
+          Schedule.setReallyVerbose(true);
+      } else {
+          Schedule.setVerbose(isVerbose());
+          Schedule.setReallyVerbose(isVerbose());
+      }
+      if(stopRun) {
+          System.out.println("Stopped in Replication# "+replication+1);
+          
         break;
-      else 
-        Schedule.reset();
-      Schedule.startSimulation();
-
-      for (int i = 0; i < replicationStats.length; ++i) {
-        fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
-        fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+      } else {
+          firePropertyChange("seed",new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed()));
+          if (Schedule.isRunning() /*&& !Schedule.getCurrentEvent().getName().equals("Run")*/) {
+              System.out.println("Already running.");
+              //Schedule.stopSimulation();
+          }
+          System.out.println("Starting Replication #"+(replication+1));
+          try {
+              Schedule.reset();
+          } catch (java.util.ConcurrentModificationException cme) {
+              JOptionPane.showMessageDialog(null,"Viskit has detected a possible error condition in the simulation entities. \nIt is possible that one of the entities is instancing a SimEntity type unsafely, \nplease check that any internally created entities are handled appropriately. \nYou'll probably have to restart Viskit, however Viskit will now try to swap in\n a new EventList for debugging purposes only.");
+              int newEventListId = Schedule.addNewEventList();
+              Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
+              for (SimEntity entity:simEntity) {
+                  entity.setEventListID(newEventListId);
+              }
+              Schedule.setReallyVerbose(true);
+              Schedule.stopSimulation();
+              Schedule.clearRerun();
+              for (SimEntity entity:runEntities) {
+                  Schedule.addRerun(entity);
+              }
+              //Schedule.reset();
+              
+          }
+          
+          Schedule.startSimulation();
+          
+          
+          for (int i = 0; i < replicationStats.length; ++i) {
+              fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
+              fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+          }
+          if (isPrintReplicationReports()) {
+              println.println(getReplicationReport(replication));
+              println.flush();
+          }
+          if (isSaveReplicationData()) {
+              saveReplicationStats();
+          }
+          
+          
+          //Schedule.stopSimulation();
+          System.runFinalization();
       }
-      if (isPrintReplicationReports()) {
-        println.println(getReplicationReport(replication));
-        println.flush();
-      }
-      if (isSaveReplicationData()) {
-        saveReplicationStats();
-      }
-      
-    }
+    } // for
 
     if (isPrintSummaryReport()) {
       println.println(getSummaryReport());
@@ -589,7 +640,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     System.gc();
     System.runFinalization();
     //saveState(replication);
-
+    
+    //}
   }
   
   public void pause() {
@@ -600,9 +652,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       Schedule.startSimulation();
   }
   
+  // this is getting called by the Assembly Runner stop
+  // button, which may get called on startup.
   public void stop() {
-      Schedule.stopSimulation();
+      //Schedule.stopSimulation();
       //Schedule.reset(); //?
+      stopRun=true;
   }
   
   public void setEnableAnalystReports(boolean enable) {      
@@ -624,5 +679,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       System.err.println("Error creating AnalystReport file: " + e.getMessage());
     }
   }
+
+    public void setVerboseReplication(int i) {
+        if (i > 0) {
+            this.verboseReplicationNumber = i;
+        }
+    }
 
 }
