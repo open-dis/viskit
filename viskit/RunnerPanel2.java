@@ -106,6 +106,7 @@ public class RunnerPanel2 extends JPanel
   public JTextField numRepsTF;
   public JScrollBar bar;
   private JLabel titl;
+  public JTextField verboseRepNumberTF;
   public RunnerPanel2(boolean verbose, boolean skipCloseButt)
   {
     this(null,skipCloseButt);
@@ -203,6 +204,11 @@ public class RunnerPanel2 extends JPanel
     vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
     flowPan.add(vcrVerbose);
 
+    verboseRepNumberTF = new JTextField(7);
+    Vstatics.clampSize(verboseRepNumberTF);
+    verboseRepNumberTF.setToolTipText("Select a single replication number (0..N) to be verbose");
+    flowPan.add(verboseRepNumberTF);
+    
     closeButt = new JButton("Close");
     closeButt.setToolTipText("Close this window");
     if(!skipCloseButt) {
@@ -301,6 +307,11 @@ public class RunnerPanel2 extends JPanel
       textUpdater.execute();
       fileChaser = new FileChaser(fc,bq);
       fileChaser.execute();
+        //try {
+            //Thread.sleep(100);
+        //} catch (InterruptedException ex) {
+            //ex.printStackTrace();
+        //}
   }
   
  
