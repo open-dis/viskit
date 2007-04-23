@@ -678,9 +678,6 @@ setCruiseSpeed(0.0);
         <StateTransition state="arrivedAtGoal">
             <Assignment value="true"/>
         </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Operation method="setWaypointCreator(null)"/>
-        </StateTransition>
         <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0.0">
             <Comment>If there is a target to attack, attack it, otherwise loiter until one arrives</Comment>
             <EdgeParameter value="targetChoice"/>
@@ -958,8 +955,9 @@ setDestination(avoidancePoint);</Code>
         <Code/>
         <Coordinate x="680" y="300"/>
     </Event>
-    <Event name="Loiter">
+    <Event name="StopMoving">
         <Comment/>
+        <Argument name="mover" type="diskit.Mover3D"/>
         <StateTransition state="self">
             <Operation method="stop()"/>
         </StateTransition>
@@ -973,6 +971,11 @@ setDestination(avoidancePoint);</Code>
             <Operation method="setVelocity(new diskit.Vec3d(0.0,0.0,0.0))"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="250" y="690"/>
+        <Coordinate x="500" y="210"/>
+    </Event>
+    <Event name="Loiter">
+        <Comment/>
+        <Code/>
+        <Coordinate x="240" y="690"/>
     </Event>
 </SimEntity>
