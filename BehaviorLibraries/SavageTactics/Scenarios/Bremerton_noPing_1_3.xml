@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="Bremerton_noPing_1_3" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
+    <SimEntity description="" name="Clock" type="diskit.DISPinger">
         <TerminalParameter name="isActive" type="boolean" value="false"/>
         <TerminalParameter name="duration" type="double" value=".2"/>
         <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
-        <Coordinate x="290" y="40"/>
+        <Coordinate x="350" y="110"/>
     </SimEntity>
     <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter name="speedScale" type="double" value=".5"/>
@@ -469,7 +469,7 @@
                 </MultiParameter>
             </MultiParameter>
         </MultiParameter>
-        <Coordinate x="450" y="110"/>
+        <Coordinate x="430" y="110"/>
     </SimEntity>
     <SimEntity description="Controls the movements of the terrorists and issues attack orders to the terrorists it has selected. The cell also serves as a relay and registers it's terrorist, their sensors and their munitions. The terrorist cell must have a connection to the NauticalChart so that it understands the environment. The terrorists receive all of their information from the planner and report back at the end of their attack" name="TerroristCellPlanner" type="Hostile.TerroristCellPlanner">
         <TerminalParameter name="moverID" type="int" value="999"/>
@@ -805,7 +805,7 @@
         <TerminalParameter type="int" value="20"/>
         <Coordinate x="390" y="490"/>
     </SimEntity>
-    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Clock"/>
     <SimEventListenerConnection listener="ScenarioManager" source="NauticalChart"/>
     <SimEventListenerConnection listener="ScenarioManager" source="TerroristCellPlanner"/>
     <SimEventListenerConnection listener="TerroristCellPlanner" source="ScenarioManager"/>
