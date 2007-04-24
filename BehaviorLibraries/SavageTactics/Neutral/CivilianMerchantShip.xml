@@ -84,9 +84,6 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
-        <StateTransition state="avoidanceMoverManager">
-            <Assignment value="null"/>
-        </StateTransition>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
         </StateTransition>
@@ -116,9 +113,6 @@
         </StateTransition>
         <StateTransition state="waypointCreator">
             <Assignment value="new diskit.WaypointCreator(zones)"/>
-        </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Assignment value="null"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
             <Comment/>
