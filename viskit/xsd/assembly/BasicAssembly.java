@@ -135,7 +135,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
   // mask the Thread run() 
   public void doRun() {
-      
+      setPersistant(false);
   }
   /**
    * Create all the objects used.  This is called from the constructor.
@@ -558,7 +558,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       }
     }
     runEntities = Schedule.getReruns();
-
+    int runCount = runEntities.size();
     for (int replication = 0; replication < getNumberReplications(); replication++) {
       if (replication == getVerboseReplication()) {
           Schedule.setVerbose(true);
@@ -566,6 +566,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       } else {
           Schedule.setVerbose(isVerbose());
           Schedule.setReallyVerbose(isVerbose());
+      }
+      int nextRunCount = Schedule.getReruns().size();
+      if (nextRunCount != runCount) {
+          System.out.println("Reruns changed old: "+runCount+" new: "+nextRunCount);
+          firePropertyChange("rerunCount",runCount,nextRunCount);
+          runCount = nextRunCount;
+          // print out new reRuns
+          System.out.println("ReRun entities added since startup: ");
+          for (SimEntity entity:Schedule.getDefaultEventList().getRerun()) {
+              if ( !runEntities.contains(entity) ) {
+                  System.out.print(entity.getName()+" ");
+              }
+          }
+          
       }
       if(stopRun) {
           System.out.println("Stopped in Replication# "+replication+1);
@@ -613,6 +627,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
           //Schedule.stopSimulation();
           System.runFinalization();
+          System.gc();
       }
     } // for
 
