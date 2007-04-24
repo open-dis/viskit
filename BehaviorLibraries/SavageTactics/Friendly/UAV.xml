@@ -93,12 +93,6 @@
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.TRANSITING"/>
         </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Assignment value="null"/>
-        </StateTransition>
-        <StateTransition state="avoidanceMoverManager">
-            <Assignment value="null"/>
-        </StateTransition>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
         </StateTransition>
@@ -167,13 +161,15 @@
         <Schedule condition="zones.length &gt; 0 &amp;&amp; init == this" delay="0.0" event="BuildSensorArray" priority="0.0">
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
-        <Code>/* either do this here, make these parameters, or push down to base classes */
+        <Code>/* see example in ExplosiveLadenVessel how to do without code blocks  */
 if (avoidanceMoverManager == null) {
     avoidanceMoverManager = new diskit.AvoidanceMoverManager(null);
+    avoidanceMoverManager.setPersistant(true);
 }
 
 if (zoneMoverManager == null) {
     zoneMoverManager = new diskit.ZoneMoverManager(this);
+    zoneMoverManager.setPersistant(true);
 }</Code>
         <Coordinate x="100" y="10"/>
     </Event>
