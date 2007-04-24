@@ -93,7 +93,10 @@ NOTE: Though this entity is not a mover it is instantiated as one so that it has
         <StateTransition state="radioCommunication">
             <Assignment value="new diskit.RadioCommunication(communicationsChannel,this)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(hostileForceList)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -348,26 +351,13 @@ System.out.println("doStop in TCP");</Code>
         <Code/>
         <Coordinate x="280" y="80"/>
     </Event>
-    <Event name="Init">
-        <Comment>The initialization event for this simulation</Comment>
-        <Argument name="entity" type="simkit.SimEntity"/>
-        <StateTransition state="radioCommunication">
-            <Operation method="setRecipients(hostileForceList)"/>
-        </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0.0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-        </Schedule>
-        <Code/>
-        <Coordinate x="220" y="30"/>
-    </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this entity with the simulation. Note, even though the TerroristCellPlanner has no location, it still needs to correspond with the ScenarioManager.</Comment>
         <Argument name="mover" type="diskit.Mover3D">
-            <Comment>The mover to register</Comment>
+            <Comment>The mover to register, there will be a very minor event duplication between this and the terrorists, the scenario manger does the check to see if already registered.</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="340" y="30"/>
+        <Coordinate x="220" y="30"/>
     </Event>
     <Event name="RecordAttackResults">
         <Comment>Records the result of the attack as the reports are received</Comment>
