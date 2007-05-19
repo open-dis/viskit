@@ -25,15 +25,19 @@
             <author name="Pat Sullivan" email="pjsulliv@nps.edu"/>
         </authors>
         <url>http://diana.gl.nps.navy.mil/Viskit</url>
-        <javaversion>1.5</javaversion>
+        <javaversion>1.6</javaversion>
     </info>
     
     <guiprefs height="600" width="800" resizable="yes">
+        
         <laf name="liquid">
             <os family="mac,unix,windows"/>
         </laf>
+        
     </guiprefs>
-    
+    <variables>
+            <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
+    </variables>
     <locale>
         <langpack iso3="usa"/>
         <langpack iso3="eng"/>
@@ -47,22 +51,27 @@
     <resources>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
 	<res src="stage/Intro.html" id="HTMLInfoPanel.info"/>
+        <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
     </resources>
     
     <panels>
-        <panel classname="HelloPanel"/>
-        <panel classname="HTMLInfoPanel"/>
-        <panel classname="LicencePanel"/><!--not my english-->
-        <panel classname="PacksPanel"/>
-        <panel classname="TargetPanel"/>
-        <panel classname="InstallPanel"/>
-        <panel classname="SimpleFinishPanel"/>
+        <panel classname="HelloPanel" id="hellopanel"/>
+        <panel classname="HTMLInfoPanel" id="infopanel" />
+        <panel classname="LicencePanel" id="licensepanel"/><!--not my english-->
+        <panel classname="PacksPanel" id="packspanel"/>
+        <panel classname="TargetPanel" id="targetpanel"/>
+        <panel classname="InstallPanel" id="installpanel"/>
+        <panel classname="ShortcutPanel" id="shortcutpanel"/>
+        <panel classname="SimpleFinishPanel" id="finishpanel"/>
     </panels>
-    
+    <listeners>
+        <listener installer="SummaryLoggerInstallerListener"/>
+    </listeners>
     <packs>
         <pack name="Core" required="yes">
             <description>Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
+                <include name="images/**/*"/>
                 <include name="lib/**/*" />
                 <include name="Viskit.exe"/>
 		<include name="viskit-exe.jar"/>
@@ -86,5 +95,8 @@
             </fileset>
         </pack> 
     </packs>
-
+    <native type="izpack" name="ShellLink.dll"/>
+    <native type="3rdparty" name="COIOSHelper.dll" stage="both">
+        <os family="windows"/>
+    </native>
 </installation>
