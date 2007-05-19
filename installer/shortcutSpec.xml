@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+
+  <skipIfNotSupported />
+
+  <programGroup defaultName="Viskit\Viskit-0.4.1" location="applications"/>
+
+  <shortcut
+     name="Viskit"
+     programGroup="yes"
+     desktop="yes"
+     applications="yes"
+     startMenu="yes"
+     startup="no"
+     target="$INSTALL_PATH\Viskit.exe"
+     commandLine=""
+     description="Viskit"
+     iconFile="$INSTALL_PATH\images\ViskitIcon.ico"
+     iconIndex="0"
+     initialState="noShow">
+   
+     <createForPack name="Core"/>
+     
+   </shortcut>
+
+   <shortcut
+     name="Viskit-0.4.1 Uninstaller"
+     programGroup="yes"
+     desktop="no"
+     applications="no"
+     startMenu="no"
+     startup="no"
+     target="$INSTALL_PATH\Uninstaller\uninstaller.jar"     
+     commandLine=""
+	 iconFile="%SystemRoot%\system32\SHELL32.dll"
+     iconIndex="31" 
+     description="This uninstalls Viskit 0.4.1">
+     
+     <createForPack name="Core" />
+   </shortcut>
+   
+</shortcuts>
