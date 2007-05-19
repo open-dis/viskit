@@ -59,6 +59,8 @@
     
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
     
+    <property description="images directory" location="${basedir}/images" name="dir.images"/>
+    
     <path id="runtime.extension.classes.path">
         <fileset dir="${dir.lib.ext}" includes="*.jar" id="runtime.extension.classes" />
     </path>
@@ -601,7 +603,7 @@
             <arg value="viskit.EventGraphAssemblyComboMain"/>
             <!-- <jvmarg value="-Dswing.aatext=true"/> -->
             <jvmarg value="-XX:MaxPermSize=512m"/>
-            <jvmarg value="-Xmx1024m"/>
+            <jvmarg value="-Xmx768m"/>
             <jvmarg value="-client"/>
         </java>
     </target>
@@ -709,7 +711,7 @@
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
     <!-- it should be named manually though for what version has been tested -->
-    <property name="winJreExe" value="jre-1_5_0_06-windows-i586-p.exe"/>
+    <property name="winJreExe" value="jre-6u1-windows-i586.exe"/>
     <property name="winJre" value="${user.home}${file.separator}${winJreExe}" />
     
     <target name="checkJre" >
@@ -728,7 +730,7 @@
         <available file="${izpack}/lib/compiler.jar" property="izPack.exists" />
     </target>
     <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
-        <get src="http://download.berlios.de/izpack/IzPack-install-reg-3.8.1.jar" dest="${user.home}/izpack-install.jar" />
+        <get src="http://download.berlios.de/izpack/IzPack-install-3.10.2.jar" dest="${user.home}/izpack-install.jar" />
         <echo>Installing IzPack from web, please just use default install path when prompted.</echo>
         <java fork="true" jar="${user.home}/izpack-install.jar" />
         <ant target="moveIzPack"/>
@@ -796,6 +798,12 @@
         <mkdir dir="${installer}/build" />
         <delete dir="${installer}/stage"/>
         <mkdir dir="${installer}/stage/lib"/>
+        <delete dir="${installer}/stage/images"/>
+        <mkdir dir="${installer}/stage/images"/>
+        
+        <copy todir="${installer}/stage/images">
+            <fileset dir="${dir.images}"/>
+        </copy>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
         </copy>
