@@ -263,7 +263,7 @@ sensors[2] = getCollisionSensor();</Code>
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp; (contactType.equals(&quot;MilitaryPatrolCraft&quot;) || contactType.equals(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0">
+        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp; (contactType.endsWith(&quot;MilitaryPatrolCraft&quot;) || contactType.endsWith(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0.0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -282,7 +282,7 @@ sensors[2] = getCollisionSensor();</Code>
         <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="0">
             <Comment/>
         </Schedule>
-        <Code/>
+        <Code>System.out.println("Contact type "+contact.getEntityType());</Code>
         <Coordinate x="170" y="370"/>
     </Event>
     <Event name="RegisterSensors">
@@ -347,9 +347,30 @@ sensors[2] = getCollisionSensor();</Code>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
-        <Code>setStartPosition(getLocation());
+        <Code>//setStartPosition(getLocation());
+//stop();
+//attackDestination = getInterceptPoint();
+//detonateTime = getInterceptTime();
+/* 
+  * solve, normalize and adjust velocity vector for max speed
+  * (P1  + V1t) - (P0 - V0(max speed)t)) = (0,0,0)
+
+diskit.Vec3d vel = new diskit.Vec3d(target.getLocation());
+vel.sub(getLocation());
+vel.sub(target.getVelocity());
+vel.normalize();
+vel.scale(getEntityDefinition().getMaximumSpeed());
+double[] times = diskit.Math3D.solveIntersection(getLocation(), vel, 
+            1.0, target.getLocation(), target.getVelocity() );
+
+detonateTime = times[1];
+System.out.println("new detonate time "+times[0]+" or "+times[1]);
+vel.scale(detonateTime);
+vel.add(getLocation());
+attackDestination = new diskit.Vec3d(vel);
+*/
 setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed());
-System.out.println("I've chosen to attack: " + target.getName());
+System.out.println(getName()+" Attacking: " + target.getName());
 //System.out.println("Attack Position is: " + attackDestination);</Code>
         <Coordinate x="340" y="530"/>
     </Event>
@@ -699,7 +720,11 @@ setCruiseSpeed(0.0);
             <Comment/>
             <EdgeParameter value="mover"/>
         </Schedule>
-        <Schedule event="Detonate"/>
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
         <Code>/*System.out.println("Detonate Proximity sensed");
 System.out.println("I'm blowing up "+  mover.getName());*/
 setCruiseSpeed(0);</Code>
@@ -790,7 +815,7 @@ setDestination(avoidancePoint);</Code>
             <Operation method="add(target)"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="180" y="490"/>
+        <Coordinate x="170" y="540"/>
     </Event>
     <Event name="SpottedByEnemy">
         <Comment>Marks when this entity was spotted by any Friendly force</Comment>
@@ -798,7 +823,7 @@ setDestination(avoidancePoint);</Code>
             <Assignment value="Schedule.getSimTime()"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="490"/>
+        <Coordinate x="100" y="540"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was transmitted to this entity</Comment>

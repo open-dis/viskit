@@ -87,6 +87,9 @@
     <StateVariable name="nauticalChart" type="diskit.AStarZoneMap">
         <Comment>The nautical chart object created for this simulation</Comment>
     </StateVariable>
+    <StateVariable name="self" type="Friendly.MilitaryShip">
+        <Comment>reference to this</Comment>
+    </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
         <StateTransition state="tacticalMode">
@@ -127,6 +130,18 @@
         </StateTransition>
         <StateTransition state="avoidanceRange">
             <Assignment value="getCollisionSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Assignment value="this"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(getEntityDefinition().getLocation())"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setNextWaypoint(getEntityDefinition().getLocation(),0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setVelocity(new diskit.Vec3d(0.0,0.0,0.0))"/>
         </StateTransition>
         <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
             <Comment/>

@@ -504,9 +504,10 @@ setDestination(patrolDestination);</Code>
     </Event>
     <Event name="SecurityAlert">
         <Comment/>
+        <Argument name="message" type="diskit.RadioCommunication"/>
         <Schedule event="PursueHostile"/>
-        <Code/>
-        <Coordinate x="300" y="380"/>
+        <Code>System.out.println("***Got a warning:" + message);</Code>
+        <Coordinate x="310" y="370"/>
     </Event>
     <Event name="SendRadioMessage">
         <Comment/>
@@ -531,6 +532,9 @@ setDestination(patrolDestination);</Code>
         <Schedule condition="sender != this &amp;&amp;  messageType != null &amp;&amp; messageType.equals(&quot;QueryResponse&quot;)" delay="0.0" event="QueryResponseReceived" priority="0">
             <Comment>Response received process the response</Comment>
             <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="sender != this &amp;&amp;  messageType != null &amp;&amp; messageType.equals(&quot;WarningReport&quot;)" delay="0.0" event="SecurityAlert" priority="0.0">
+            <Comment/>
         </Schedule>
         <Code/>
         <Coordinate x="550" y="440"/>

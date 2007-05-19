@@ -10,6 +10,15 @@
     <Parameter name="zones" type="diskit.ProbabilityZoneGeometry[]">
         <Comment>General areas from which waypoints should be generated for this entity.</Comment>
     </Parameter>
+    <Parameter name="visualSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="airSearchRadarSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="collisionSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The range of the camera sensor on this platform</Comment>
     </StateVariable>
@@ -75,11 +84,21 @@
         <StateTransition state="speedScale">
             <Assignment value="1.0"/>
         </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="airSearchRadar">
+            <Assignment value="getAirSearchRadarSensor()"/>
+        </StateTransition>
+        <StateTransition state="collisionDetection">
+            <Assignment value="getCollisionSensor()"/>
+        </StateTransition>
         <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
             <Comment>If zones have been specified, schedule movement setup events</Comment>
         </Schedule>
+        <Schedule event="Init"/>
         <Code/>
-        <Coordinate x="210" y="10"/>
+        <Coordinate x="30" y="20"/>
     </Event>
     <Event name="Init">
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
@@ -110,7 +129,7 @@
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
         <Code/>
-        <Coordinate x="10" y="10"/>
+        <Coordinate x="140" y="20"/>
     </Event>
     <Event name="ApplySpeedScale">
         <Comment>This event is scheduled by the diskit.ScenarioManager. All entities that have this event in their graph will adjust their speed values by the speed scale which will be applied throughout the entire simulation. Scheduling of this event occurs as part of the 'doRegisterTarget' process in diskit.ScenarioManager.</Comment>
@@ -121,7 +140,7 @@
             <Assignment value="speedScaleChange"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="220"/>
+        <Coordinate x="230" y="230"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
@@ -129,7 +148,7 @@
             <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="100" y="10"/>
+        <Coordinate x="230" y="20"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers the complete sensor array if and only if this entity has at least one probability zone</Comment>
@@ -137,7 +156,7 @@
             <Comment>The complete collection of sensors for this entity</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="100" y="150"/>
+        <Coordinate x="230" y="160"/>
     </Event>
     <Event name="ProcessZones">
         <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled.</Comment>
@@ -150,9 +169,11 @@
         <StateTransition state="activeMoverManager">
             <Assignment value="zoneMoverManager"/>
         </StateTransition>
-        <Schedule event="StartMoving"/>
+        <Schedule condition="true" delay="0.01" event="StartMoving" priority="0.0">
+            <Comment/>
+        </Schedule>
         <Code/>
-        <Coordinate x="210" y="160"/>
+        <Coordinate x="30" y="170"/>
     </Event>
     <Event name="StartMoving">
         <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
@@ -167,7 +188,7 @@ setStartPosition(initialStartPosition);
 setDestination(initialDestination);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
 start();</Code>
-        <Coordinate x="210" y="260"/>
+        <Coordinate x="30" y="270"/>
     </Event>
     <Event name="Detection">
         <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
@@ -228,6 +249,6 @@ start();</Code>
         <Code>multipleSensors[0] = visualPerception;
 multipleSensors[1] = airSearchRadar;
 multipleSensors[2] = collisionDetection;</Code>
-        <Coordinate x="10" y="150"/>
+        <Coordinate x="140" y="160"/>
     </Event>
 </SimEntity>
