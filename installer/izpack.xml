@@ -11,8 +11,8 @@
 <installation version="1.0">
     
     <info>
-        <appname>Viskit</appname>
-        <appversion>"0.4.1"</appversion>
+        <appname>Viskit-0.4.3</appname>
+        <appversion>"0.4.3"</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
