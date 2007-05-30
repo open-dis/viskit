@@ -746,7 +746,7 @@ setCruiseSpeed(0);</Code>
         <StateTransition state="calc">
             <Operation method="checkCollision(obstacle, collisionAvoidance, avoidanceRange)"/>
         </StateTransition>
-        <Schedule condition="calc.willCollide()" delay="0.0" event="AvoidObstacle" priority="0">
+        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0.0">
             <Comment/>
             <EdgeParameter value="obstacle"/>
         </Schedule>

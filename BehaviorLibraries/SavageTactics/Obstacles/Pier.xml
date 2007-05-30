@@ -21,6 +21,10 @@
     </Parameter>
     <Event name="Run">
         <Comment>Initializes all state variables for each simulation run.</Comment>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
         <Code/>
         <Coordinate x="30" y="30"/>
     </Event>
