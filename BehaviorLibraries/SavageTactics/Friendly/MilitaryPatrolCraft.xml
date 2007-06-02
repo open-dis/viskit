@@ -273,7 +273,7 @@ start();</Code>
         <StateTransition state="driverResponseTime">
             <Assignment value="driverReactionTime.generate()"/>
         </StateTransition>
-        <Schedule condition="( sensor == collisionDetection || sensor == visualSensor ) &amp;&amp; (alreadyIDd || isFriendlyForce || ( contact.getEntityDefinition().getName().equals(&quot;diskit.Obstacle&quot;)) )" delay="0.0" event="AssessObstacle" priority="0.0">
+        <Schedule condition="( ( sensor == getCollisionDetection() ) &amp;&amp; (alreadyIDd || isFriendlyForce || ( contact.getEntityDefinition().getName().equals(&quot;diskit.Obstacle&quot;)) ) ) &amp;&amp; !obstacleQueue.contains(contact)" delay="0.0" event="AssessObstacle" priority="0.0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -292,9 +292,15 @@ start();</Code>
         <LocalVariable name="obstacleToAvoid" type="boolean" value="willCollide(obstacle, collisionDetection, avoidanceRange)">
             <Comment>Method call to diskit.SMALMover3D that uses diskit.util.MovementCalculator to determine if there will be a collision</Comment>
         </LocalVariable>
+        <StateTransition state="obstacleQueue">
+            <Operation method="setRelativePoint(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="add(obstacle)"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0.0">
             <Comment>If I am going to hit this obstacle, and its bigger then I am (give way vessel simulated) or it's not moving then avoid it</Comment>
-            <EdgeParameter value="obstacle"/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
         <Code/>
         <Coordinate x="650" y="240"/>
@@ -313,7 +319,14 @@ start();</Code>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoid(obstacle, getActiveMoverManager())"/>
         </StateTransition>
-        <Code>setStartPosition(getLocation());</Code>
+        <StateTransition state="obstacleQueue">
+            <Operation method="removeClosest()"/>
+        </StateTransition>
+        <Schedule condition="!obstacleQueue.isEmpty()" delay="0.0" event="AvoidObstacle" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
+        </Schedule>
+        <Code>//setStartPosition(getLocation());</Code>
         <Coordinate x="650" y="340"/>
     </Event>
     <Event name="BuildSensorArray">
