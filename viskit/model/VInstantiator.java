@@ -125,6 +125,7 @@ public abstract class VInstantiator
         
         if (viskit.Vstatics.debug) System.out.println("Building Constr for "+type);
         if (viskit.Vstatics.debug) System.out.println("Required Parameters:");
+        
         java.util.ListIterator li = params.listIterator();
         while(li.hasNext()) {
             Object o = li.next();
@@ -158,9 +159,21 @@ public abstract class VInstantiator
                 else indx++;
             }
             if (viskit.Vstatics.debug) System.out.println(type+" VInstantiator using constructor #"+indx);
-            
+            // bug: weird case where params came in 0 length but no 0 length constuctors
+            // happens if external class used as parameter?
+            if ( params.size() != eparams[indx].size() ) {
+                args = buildInstantiators(eparams[indx]);
+                if (viskit.Vstatics.debug) System.err.println("Warning: VInstantiator.Constr tried 0 length when it was more");
+            }
             if (eparams[indx] != null) { 
                 // now that the values, types, etc set, grab names from eg parameters
+                if ( viskit.Vstatics.debug ) {
+                    System.out.println("args came back from buildInstantiators as: ");
+                    for (int i = 0 ; i < args.size(); i++) {
+                        System.out.println(args.get(i));
+                    }
+                    System.out.println();
+                }
                 if ( args != null ) for ( int j = 0; j < eparams[indx].size(); j++ ) {//for ( int j = 0; j < args.size(); j++ ) {
                     if (viskit.Vstatics.debug) System.out.println("setting name "+((ParameterType)eparams[indx].get(j)).getName());
                     ((VInstantiator)args.get(j)).setName(((ParameterType)eparams[indx].get(j)).getName());
@@ -281,6 +294,17 @@ public abstract class VInstantiator
         if (p.getType().endsWith("]")) {
             vAorC = buildMultiParameter(p,true);
         } else {
+            System.out.println("Trying to buildMultiParamter "+p.getType());
+            List tmp = p.getParameters();
+            
+            if ( tmp.isEmpty() ) {
+                tmp = Vstatics.resolveParameters(p.getType())[0];
+            }
+            Iterator li = tmp.iterator();
+            while (li.hasNext()) {
+                System.out.println(li.next());
+            }
+            
             vAorC = new VInstantiator.Constr(p.getParameters(),p.getType());
         }
         return vAorC;
