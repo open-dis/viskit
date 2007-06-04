@@ -177,7 +177,7 @@ public class SourceWindow extends JFrame
         System.setOut(newSysOut);
         System.setErr(newSysOut);
 
-        //AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
+        AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
         int retc = AssemblyController.compileJavaFromStringAndHandleDependencies(src);
         
         newSysOut.flush();
