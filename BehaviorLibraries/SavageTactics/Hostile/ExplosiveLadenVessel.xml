@@ -184,6 +184,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="self">
             <Assignment value="this"/>
         </StateTransition>
+        <StateTransition state="attackSuccess">
+            <Assignment value="&quot;Failed&quot;"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="Register" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -342,10 +345,8 @@ sensors[2] = getCollisionSensor();</Code>
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0.0">
+        <Schedule condition="true" delay="detonateTime" event="Succeeded" priority="0.0">
             <Comment/>
-            <EdgeParameter value="this"/>
-            <EdgeParameter value="plasticExplosives"/>
         </Schedule>
         <Code>//setStartPosition(getLocation());
 //stop();
@@ -1024,5 +1025,15 @@ setDestination(avoidancePoint);</Code>
         </Schedule>
         <Code/>
         <Coordinate x="590" y="140"/>
+    </Event>
+    <Event name="Succeeded">
+        <Comment/>
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="410" y="440"/>
     </Event>
 </SimEntity>
