@@ -280,7 +280,13 @@ start();</Code>
         <StateTransition state="driverResponseTime">
             <Assignment value="driverReactionTime.generate()"/>
         </StateTransition>
+<!--        
         <Schedule condition="(sensor == collisionDetection || sensor == visualSensor ) &amp;&amp; (alreadyIDd || isFriendlyForce || ( contact.getEntityDefinition().getName().equals(&quot;diskit.Obstacle&quot;)) )" delay="0.0" event="AssessObstacle" priority="0.0">
+            <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+-->        
+        <Schedule condition="(sensor == collisionDetection) &amp;&amp; (alreadyIDd || isFriendlyForce || ( contact.getEntityDefinition().getName().equals(&quot;diskit.Obstacle&quot;)) )" delay="0.0" event="AssessObstacle" priority="0.0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
