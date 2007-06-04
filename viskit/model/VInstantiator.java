@@ -294,14 +294,14 @@ public abstract class VInstantiator
         if (p.getType().endsWith("]")) {
             vAorC = buildMultiParameter(p,true);
         } else {
-            System.out.println("Trying to buildMultiParamter "+p.getType());
+            if (Vstatics.debug) System.out.println("Trying to buildMultiParamter "+p.getType());
             List tmp = p.getParameters();
             
             if ( tmp.isEmpty() ) {
                 tmp = Vstatics.resolveParameters(p.getType())[0];
             }
             Iterator li = tmp.iterator();
-            while (li.hasNext()) {
+            if ( Vstatics.debug) while (li.hasNext()) {
                 System.out.println(li.next());
             }
             
