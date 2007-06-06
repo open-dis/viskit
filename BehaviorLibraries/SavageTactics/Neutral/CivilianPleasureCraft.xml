@@ -247,7 +247,7 @@ System.out.println("StartMoving");</Code>
         <StateTransition state="obstacleQueue">
             <Operation method="removeClosest()"/>
         </StateTransition>
-        <Schedule condition="!obstacleQueue.isEmpty()" delay="0.0" event="AvoidObstacle" priority="0.0">
+        <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
