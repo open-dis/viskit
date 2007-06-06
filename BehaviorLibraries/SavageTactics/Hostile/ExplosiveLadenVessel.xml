@@ -187,6 +187,9 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="attackSuccess">
             <Assignment value="&quot;Failed&quot;"/>
         </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="Register" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -270,7 +273,7 @@ sensors[2] = getCollisionSensor();</Code>
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="!contactType.equals(primaryTarget)" delay="0.0" event="AssessObstacle" priority="0.0">
+        <Schedule condition="!contactType.equals(primaryTarget) &amp;&amp; sensor == getCollisionSensor()" delay="0.0" event="AssessObstacle" priority="0.0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -285,7 +288,7 @@ sensors[2] = getCollisionSensor();</Code>
         <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="0">
             <Comment/>
         </Schedule>
-        <Code>System.out.println("Contact type "+contact.getEntityType());</Code>
+        <Code>//System.out.println("Contact type "+contact.getEntityType());</Code>
         <Coordinate x="170" y="370"/>
     </Event>
     <Event name="RegisterSensors">
@@ -654,7 +657,7 @@ setCruiseSpeed(0.0);
             <Comment>Identify this entity as the reporting unit</Comment>
         </Argument>
         <Schedule event="StopMoving"/>
-        <Code/>
+        <Code>//System.out.println("AttackComplete in ELV: " + attackResult); </Code>
         <Coordinate x="680" y="500"/>
     </Event>
     <Event name="DestinationReached">
@@ -747,9 +750,15 @@ setCruiseSpeed(0);</Code>
         <StateTransition state="calc">
             <Operation method="checkCollision(obstacle, collisionAvoidance, avoidanceRange)"/>
         </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="setRelativePoint(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="add(obstacle)"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0.0">
             <Comment/>
-            <EdgeParameter value="obstacle"/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
         <Code>//System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
         <Coordinate x="90" y="370"/>
@@ -766,9 +775,17 @@ setCruiseSpeed(0);</Code>
             <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="avoidanceMoverManager">
-            <Operation method="avoidToOffset(avoidancePoint,getActiveMoverManager())"/>
+            <Operation method="avoid(obstacle,getActiveMoverManager())"/>
         </StateTransition>
-        <Code>setStartPosition(getLocation());
+        <StateTransition state="obstacleQueue">
+            <Operation method="removeClosest()"/>
+        </StateTransition>
+        <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
+        </Schedule>        <Code>
+System.out.println("***ELV avoid: " + obstacle.getName());        
+        setStartPosition(getLocation());
 setDestination(avoidancePoint);</Code>
         <Coordinate x="10" y="370"/>
     </Event>
@@ -804,7 +821,7 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Cancel>
-        <Code/>
+        <Code>System.out.println("*** Neutralized");</Code>
         <Coordinate x="680" y="370"/>
     </Event>
     <Event name="TargetSpotted">
@@ -937,7 +954,7 @@ setDestination(avoidancePoint);</Code>
         <Argument name="hit" type="double">
             <Comment>amount of damage</Comment>
         </Argument>
-        <Code/>
+        <Code>System.out.println("*** " + getName() + " has been hit!"); </Code>
         <Coordinate x="680" y="230"/>
     </Event>
     <Event name="CriticalHit">
@@ -946,7 +963,7 @@ setDestination(avoidancePoint);</Code>
         <StateTransition state="zoneMoverManager">
             <Operation method="setMover(null)"/>
         </StateTransition>
-        <Code/>
+        <Code>System.out.println("*** " + getName() + " is Dead!"); </Code>
         <Coordinate x="680" y="300"/>
     </Event>
     <Event name="StopMoving">
