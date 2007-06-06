@@ -582,10 +582,6 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="self">
             <Operation method="setDestination(waypointCreator.createWaypoint())"/>
         </StateTransition>
-        <Schedule condition="attackAuthorized" delay="0.1" event="StartMove" priority="0.0">
-            <Comment/>
-            <EdgeParameter value="this"/>
-        </Schedule>
         <Code/>
         <Coordinate x="430" y="140"/>
     </Event>
@@ -783,7 +779,8 @@ setCruiseSpeed(0);</Code>
         <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
-        </Schedule>        <Code>
+        </Schedule>
+        <Code>
 System.out.println("***ELV avoid: " + obstacle.getName());        
         setStartPosition(getLocation());
 setDestination(avoidancePoint);</Code>
