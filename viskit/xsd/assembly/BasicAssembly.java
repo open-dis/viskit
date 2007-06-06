@@ -557,12 +557,23 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         replicationData.put(new Integer(i), new ArrayList());
       }
     }
+    
+    SimEntity timer = null;
     runEntities = Schedule.getReruns();
+    for ( SimEntity entity:runEntities ) {
+        if ( entity.getName().equals("Clock") || entity.getName().equals("DISPinger") ) {
+            timer = entity;
+        }
+    }
     int runCount = runEntities.size();
     for (int replication = 0; replication < getNumberReplications(); replication++) {
+      if (getVerboseReplication() >= 0) {
+          timer.waitDelay("Stop",0.0);
+      }
       if (replication == getVerboseReplication()) {
           Schedule.setVerbose(true);
           Schedule.setReallyVerbose(true);
+          timer.waitDelay("Ping",0.0);
       } else {
           Schedule.setVerbose(isVerbose());
           Schedule.setReallyVerbose(isVerbose());
@@ -635,6 +646,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       println.println(getSummaryReport());
       println.flush();
     }
+    
 
     //TODO MIKE: Wire the following to the analyst report GUI somehow
     if (enableAnalystReports && analystSummaryData)
