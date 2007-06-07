@@ -720,14 +720,19 @@ setCruiseSpeed(0.0);
             <Comment/>
             <EdgeParameter value="mover"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
+        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
-        <Code>System.out.println("Detonate Proximity sensed");
+        <Code>//System.out.println("Detonate Proximity sensed");
 System.out.println("I'm blowing up "+  mover.getName());
-setCruiseSpeed(0);</Code>
+//setCruiseSpeed(0);
+
+diskit.Vec4d v = getIntercept(mover);
+diskit.Vec3d p = new diskit.Vec3d(v.get(0),v.get(1),v.get(2));
+double detonateTime = v.get(3);
+setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <Coordinate x="340" y="370"/>
     </Event>
     <Event name="ApplyScaleSpeed">
@@ -756,7 +761,7 @@ setCruiseSpeed(0);</Code>
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
-        <Code>//System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
+        <Code>System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
         <Coordinate x="90" y="370"/>
     </Event>
     <Event name="AvoidObstacle">
