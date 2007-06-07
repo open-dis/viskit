@@ -566,14 +566,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
     }
     int runCount = runEntities.size();
+    boolean clockChecker = false; // tbd hook this up and fix properly
     for (int replication = 0; replication < getNumberReplications(); replication++) {
-      if (getVerboseReplication() >= 0) {
+      if (clockChecker && getVerboseReplication() >= 0) {
           timer.waitDelay("Stop",0.0);
       }
       if (replication == getVerboseReplication()) {
           Schedule.setVerbose(true);
           Schedule.setReallyVerbose(true);
-          timer.waitDelay("Ping",0.0);
+          if (clockChecker) timer.waitDelay("Ping",0.0);
       } else {
           Schedule.setVerbose(isVerbose());
           Schedule.setReallyVerbose(isVerbose());
