@@ -337,19 +337,14 @@ sensors[2] = getCollisionSensor();</Code>
         <StateTransition state="plasticExplosives">
             <Operation method="setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed())"/>
         </StateTransition>
-        <Schedule condition="true   " delay="detonateTime - .5" event="PrepareRadioMessage" priority="0">
-            <Comment>This message is sent right before the terrorist blows up</Comment>
-            <EdgeParameter value="&quot;DestroyedTarget&quot;"/>
-            <EdgeParameter value="target"/>
-            <EdgeParameter value="attackReport"/>
-            <EdgeParameter value="this"/>
-        </Schedule>
         <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0.0">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
         <Schedule condition="true" delay="detonateTime" event="Succeeded" priority="0.0">
             <Comment/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="attackReport"/>
         </Schedule>
         <Code>//setStartPosition(getLocation());
 //stop();
@@ -955,7 +950,7 @@ setDestination(avoidancePoint);</Code>
         <Argument name="hit" type="double">
             <Comment>amount of damage</Comment>
         </Argument>
-        <Code>System.out.println("*** " + getName() + " has been hit!"); </Code>
+        <Code>System.out.println("*** " + getName() + " has been hit!  dp left: " + ((diskit.SMAL.SMALMover3D)mover).getDamagePoints()); </Code>
         <Coordinate x="680" y="230"/>
     </Event>
     <Event name="CriticalHit">
@@ -1046,11 +1041,24 @@ setDestination(avoidancePoint);</Code>
     </Event>
     <Event name="Succeeded">
         <Comment/>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to attack</Comment>
+        </Argument>
+        <Argument name="attackReport" type="java.lang.String">
+            <Comment>Whether or not the attack was succesfull</Comment>
+        </Argument>        
         <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
+        <Schedule condition="true   " delay="0" event="PrepareRadioMessage" priority="0">
+            <Comment>This message is sent right before the terrorist blows up</Comment>
+            <EdgeParameter value="&quot;DestroyedTarget&quot;"/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="attackReport"/>
+            <EdgeParameter value="this"/>
+        </Schedule>        
         <Code/>
         <Coordinate x="410" y="440"/>
     </Event>
