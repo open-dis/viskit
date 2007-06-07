@@ -269,7 +269,7 @@ sensors[2] = getCollisionSensor();</Code>
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp; (contactType.endsWith(&quot;MilitaryPatrolCraft&quot;) || contactType.endsWith(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0.0">
+        <Schedule condition="sensor == detonateProximity &amp;&amp;  tacticalMode != diskit.TacticalMode.DETONATING &amp;&amp; (contactType.endsWith(&quot;Barrier&quot;))" delay="0.0" event="CannotEscape" priority="0.0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
@@ -325,9 +325,6 @@ sensors[2] = getCollisionSensor();</Code>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.ATTACKING"/>
         </StateTransition>
-        <StateTransition state="attackSuccess">
-            <Assignment value="&quot;Succeeded&quot;"/>
-        </StateTransition>
         <StateTransition state="destroyedTarget">
             <Assignment value="target"/>
         </StateTransition>
@@ -373,6 +370,9 @@ vel.scale(detonateTime);
 vel.add(getLocation());
 attackDestination = new diskit.Vec3d(vel);
 */
+diskit.Vec4d v = getIntercept(target);
+attackDestination.set(v.get(0),v.get(1),v.get(2));
+detonateTime = v.get(3);
 setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed());
 System.out.println(getName()+" Attacking: " + target.getName());
 //System.out.println("Attack Position is: " + attackDestination);</Code>
@@ -600,7 +600,7 @@ sensors[2] = collisionAvoidance;</Code>
     <Event name="StartMove">
         <Comment/>
         <Argument name="mover" type="diskit.Mover3D"/>
-        <Code>//setCruiseSpeed(maximumSpeed);
+        <Code>super.doStartMove(mover);
 //setStartPosition(attackStartWaypoint);
 //setDestination(waypointCreator.createWaypoint());</Code>
         <Coordinate x="500" y="140"/>
@@ -725,8 +725,8 @@ setCruiseSpeed(0.0);
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
-        <Code>/*System.out.println("Detonate Proximity sensed");
-System.out.println("I'm blowing up "+  mover.getName());*/
+        <Code>System.out.println("Detonate Proximity sensed");
+System.out.println("I'm blowing up "+  mover.getName());
 setCruiseSpeed(0);</Code>
         <Coordinate x="340" y="370"/>
     </Event>
@@ -780,10 +780,9 @@ setCruiseSpeed(0);</Code>
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
-        <Code>
-System.out.println("***ELV avoid: " + obstacle.getName());        
+        <Code>//System.out.println("***ELV avoid: " + obstacle.getName());        
         setStartPosition(getLocation());
-setDestination(avoidancePoint);</Code>
+//setDestination(avoidancePoint);</Code>
         <Coordinate x="10" y="370"/>
     </Event>
     <Event name="Neutralized">
@@ -800,12 +799,6 @@ setDestination(avoidancePoint);</Code>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.DEAD"/>
         </StateTransition>
-        <StateTransition state="waypointCreator">
-            <Assignment value="new diskit.WaypointCreator(moverID,15000.0)"/>
-        </StateTransition>
-        <StateTransition state="zoneMoverManager">
-            <Operation method="setWaypointCreator(waypointCreator)"/>
-        </StateTransition>
         <Schedule condition="mover == this" delay="0.0" event="AttackComplete" priority="0.0">
             <Comment/>
             <EdgeParameter value="attackSuccess"/>
@@ -813,12 +806,14 @@ setDestination(avoidancePoint);</Code>
             <EdgeParameter value="areaOfAttack"/>
             <EdgeParameter value="this"/>
         </Schedule>
+        <Cancel condition="mover == this" event="Succeeded"/>
         <Cancel condition="mover == this" event="Detonate">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
         </Cancel>
-        <Code>System.out.println("*** Neutralized");</Code>
+        <Cancel event="PrepareRadioMessage"/>
+        <Code>System.out.println("*** Neutralized  mover: " + mover.getName());</Code>
         <Coordinate x="680" y="370"/>
     </Event>
     <Event name="TargetSpotted">
@@ -1042,6 +1037,9 @@ setDestination(avoidancePoint);</Code>
     </Event>
     <Event name="Succeeded">
         <Comment/>
+        <StateTransition state="attackSuccess">
+            <Assignment value="&quot;Succeeded&quot;"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
