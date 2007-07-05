@@ -134,6 +134,9 @@
         <StateTransition state="currentContact">
             <Assignment value="null"/>
         </StateTransition>
+        <StateTransition state="targetQueue">
+            <Assignment value="new diskit.TargetQueue(getStartPosition());"/>
+        </StateTransition>
         <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -199,7 +202,7 @@ if (zoneMoverManager == null) {
     zoneMoverManager = new diskit.ZoneMoverManager(this);
     zoneMoverManager.setPersistant(false);
 }</Code>
-        <Coordinate x="120" y="10"/>
+        <Coordinate x="90" y="10"/>
     </Event>
     <Event name="ApplySpeedScale">
         <Comment>This event is scheduled by the diskit.ScenarioManager. All entities that have this event in their graph will adjust their speed values by the speed scale which will be applied throughout the entire simulation. Scheduling of this event occurs as part of the 'doRegisterTarget' process in diskit.ScenarioManager.</Comment>
@@ -210,7 +213,7 @@ if (zoneMoverManager == null) {
             <Assignment value="speedScaleChange"/>
         </StateTransition>
         <Code/>
-        <Coordinate x="100" y="220"/>
+        <Coordinate x="390" y="10"/>
     </Event>
     <Event name="RegisterTarget">
         <Comment>Registers this mover with the diskit.ScenarioManager</Comment>
@@ -218,7 +221,7 @@ if (zoneMoverManager == null) {
             <Comment>This object should pass itself as an argument to this event as part of the registration process</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="230" y="10"/>
+        <Coordinate x="170" y="10"/>
     </Event>
     <Event name="RegisterSensor">
         <Comment>If this entity is not moving (e.g. no probability zones) only the visual sensor is registered with this simulation</Comment>
@@ -226,7 +229,7 @@ if (zoneMoverManager == null) {
             <Comment>The visual sensor for this entity</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="230" y="90"/>
+        <Coordinate x="170" y="90"/>
     </Event>
     <Event name="RegisterSensors">
         <Comment>Registers the complete sensor array if and only if this entity has at least one probability zone</Comment>
@@ -234,12 +237,12 @@ if (zoneMoverManager == null) {
             <Comment>The complete collection of sensors for this entity</Comment>
         </Argument>
         <Code/>
-        <Coordinate x="230" y="150"/>
+        <Coordinate x="170" y="150"/>
     </Event>
     <Event name="ProcessZones">
         <Comment>This event creates waypoint creator and mover manager objects with the zones that were included as a parameter to this graph. If no zones are specificed the movement process will not be scheduled. This event should come after setting AStarZoneMaps, since the harborChart is used after StarMoving to identify location within the ProbabilityZones, which otherwise could happen before the harborChart is set.</Comment>
         <StateTransition state="waypointCreator">
-            <Assignment value="new diskit.WaypointCreator(zones)"/>
+            <Assignment value="new diskit.WaypointCreator(zones,true)"/>
         </StateTransition>
         <StateTransition state="zoneMoverManager">
             <Operation method="setWaypointCreator(waypointCreator)"/>
@@ -251,7 +254,7 @@ if (zoneMoverManager == null) {
             <Comment/>
         </Schedule>
         <Code/>
-        <Coordinate x="100" y="310"/>
+        <Coordinate x="390" y="100"/>
     </Event>
     <Event name="StartMoving">
         <Comment>Begins the movement of this entity. Continuous movement based on waypoints from the provided zones will continue until the mover manager is changed</Comment>
@@ -267,7 +270,7 @@ setStartPosition(initialStartPosition);
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
 setDestination(initialDestination);
 start();</Code>
-        <Coordinate x="100" y="400"/>
+        <Coordinate x="390" y="190"/>
     </Event>
     <Event name="Detection">
         <Comment>A detection event from any sensor that this entity is listening to (e.g. registered with the simulation)</Comment>
@@ -304,7 +307,7 @@ start();</Code>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
-        <Coordinate x="650" y="110"/>
+        <Coordinate x="360" y="250"/>
     </Event>
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
@@ -325,7 +328,7 @@ start();</Code>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
         <Code/>
-        <Coordinate x="650" y="240"/>
+        <Coordinate x="360" y="380"/>
     </Event>
     <Event name="AvoidObstacle">
         <Comment>If a collision will occur avoid the obstacle using the avoidance mover manager. The avoidance mover manager will perform the avoidance and then reset the activeMoverManager to its pre-avoidance value after completing the avoidance maneuver.</Comment>
@@ -341,15 +344,12 @@ start();</Code>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoid(obstacle, getActiveMoverManager())"/>
         </StateTransition>
-        <StateTransition state="obstacleQueue">
-            <Operation method="removeClosest()"/>
-        </StateTransition>
         <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
-	    <Comment/>
+            <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
-        <Code>//setStartPosition(getLocation());</Code>
-        <Coordinate x="650" y="340"/>
+        <Code>setStartPosition(getLocation());</Code>
+        <Coordinate x="360" y="480"/>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
@@ -362,7 +362,7 @@ start();</Code>
         </Schedule>
         <Code>multipleSensors[0] = visualPerception;
 multipleSensors[1] = collisionDetection;</Code>
-        <Coordinate x="120" y="150"/>
+        <Coordinate x="90" y="150"/>
     </Event>
     <Event name="AStarZoneMapDistributed">
         <Comment>Recieves a copy of a Utilities.NauticalChart object from the Scenario Manager. When the NauticalChart registers with this simulation the scenario manager schedules a 'doNauticalChartRecieved' event for all movers registered with the simulation.  Only those entities with this exact event will actually receive the nautical chart object. It will be ignored otherwise.</Comment>
@@ -377,19 +377,13 @@ multipleSensors[1] = collisionDetection;</Code>
             <EdgeParameter value="harborChart"/>
         </Schedule>
         <Code/>
-        <Coordinate x="10" y="220"/>
+        <Coordinate x="300" y="10"/>
     </Event>
     <Event name="Intercept">
         <Comment>Gets the intercept point and determines if intercept is possible based on speed of contact and maximum speed of this entity</Comment>
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>Contact being evaluated</Comment>
         </Argument>
-        <LocalVariable name="interceptPoint" type="diskit.Vec3d" value="getInterceptPoint()">
-            <Comment>Get the intercept point</Comment>
-        </LocalVariable>
-        <LocalVariable name="timeToIntercept" type="double" value="getInterceptTime()">
-            <Comment>Get the amount of time that it will take to intercept this contact</Comment>
-        </LocalVariable>
         <LocalVariable name="contactLocation" type="java.lang.String" value="nauticalChart.findClosestZone(contact.getLocation()).getName()">
             <Comment/>
         </LocalVariable>
@@ -408,30 +402,31 @@ multipleSensors[1] = collisionDetection;</Code>
         <StateTransition state="responseFromContact">
             <Assignment value="false"/>
         </StateTransition>
-        <StateTransition state="timeSpentIntercepting">
-            <Assignment value="timeToIntercept"/>
-        </StateTransition>
         <StateTransition state="currentContact">
             <Assignment value="contact"/>
         </StateTransition>
-        <Schedule condition='contact.getEntityType().contains("Explosive")' delay="0" event="Interdict" priority="0">
+        <StateTransition state="timeSpentIntercepting">
+            <Assignment value="timeSpentIntercepting + time"/>
+        </StateTransition>
+        <StateTransition state="successfulIntercepts">
+            <Assignment value="successfulIntercepts + 1"/>
+        </StateTransition>
+        <Schedule condition="!targetQueue.isEmpty()" delay="0" event="Interdict" priority="0.0">
             <Comment/>
-            <EdgeParameter value="contact"/>
+            <EdgeParameter value="targetQueue.closest()"/>
         </Schedule>
-<!--        
-        <Schedule condition="true" delay="timeToIntercept" event="QueryContact" priority="0">
-            <Comment/>
-            <EdgeParameter value="contact"/>
-        </Schedule>
--->        
         <Schedule condition="true" delay="0.0" event="SendRadioMessage" priority="0">
             <Comment/>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
-        <Code>setCruiseSpeed(getMaximumSpeed());
-setStartPosition(getLocation());
-setDestination(interceptPoint);</Code>
-        <Coordinate x="480" y="110"/>
+        <Code>targetQueue.setRelativePoint(getLocation());
+
+diskit.Vec4d v = getIntercept(contact,machineGun.getRange()/4.0);
+diskit.Vec3d interceptPoint = new diskit.Vec3d(v.get(0),v.get(1),v.get(2));
+double distance = diskit.Vec3d.distance(getLocation(),interceptPoint);
+double time = distance/getMaximumSpeed();
+setNextWaypoint(interceptPoint,getMaximumSpeed());</Code>
+        <Coordinate x="240" y="220"/>
     </Event>
     <Event name="QueryContact">
         <Comment>After completing an intercept this vessel will call the contact on the radio to make an identification and shadow the contacts course and speed</Comment>
@@ -474,7 +469,7 @@ setDestination(interceptPoint);</Code>
 setCruiseSpeed(contact.getCruiseSpeed());
 setDestination(contact.getDestination());
 System.out.println("Contact query "+attemptedQueries);</Code>
-        <Coordinate x="380" y="110"/>
+        <Coordinate x="160" y="340"/>
     </Event>
     <Event name="IDContact">
         <Comment>Contact has been identified and is not in any exclusion zone. Add to contact picture and make contact report to other friendly forces</Comment>
@@ -511,7 +506,7 @@ System.out.println("Contact query "+attemptedQueries);</Code>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
         <Code/>
-        <Coordinate x="330" y="290"/>
+        <Coordinate x="80" y="460"/>
     </Event>
     <Event name="ResumePatrol">
         <Comment/>
@@ -524,32 +519,31 @@ System.out.println("Contact query "+attemptedQueries);</Code>
         <Code>setStartPosition(getLocation());
 setCruiseSpeed(getEntityDefinition().getCruiseSpeed() * speedScale);
 setDestination(patrolDestination);</Code>
-        <Coordinate x="300" y="210"/>
+        <Coordinate x="10" y="340"/>
     </Event>
     <Event name="PursueHostile">
         <Comment/>
         <Argument name="hostile" type="diskit.Mover3D">
             <Comment>The contact that has been identified as hostile</Comment>
         </Argument>
-        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(hostile, avoidanceRange)">
-            <Comment>Checks to see if an intercept is possible, offset by avoidance range</Comment>
-        </LocalVariable>
-        <Schedule condition="canIntercept" delay="5" event="Intercept" priority="0">
+        <StateTransition state="targetQueue">
+            <Operation method="add(hostile)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Intercept" priority="0.0">
             <Comment/>
             <EdgeParameter value="hostile"/>
         </Schedule>
-        <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
+        <Schedule condition="false" delay="0.0" event="StandOff" priority="0.0">
             <Comment/>
         </Schedule>
         <Code/>
-        <Coordinate x="460" y="330"/>
+        <Coordinate x="240" y="630"/>
     </Event>
     <Event name="StandOff">
         <Comment>Intercept was not possible, stand off and allow interior defenses to pursue the contact</Comment>
-        <Code>
-           stop();
-           </Code>
-        <Coordinate x="460" y="420"/>
+        <Code>System.out.println("***"+getName()+" can not intercept");
+waitDelay("ResumePatrol",0.0);</Code>
+        <Coordinate x="290" y="540"/>
     </Event>
     <Event name="Evading">
         <Argument name="hostile" type="diskit.Mover3D">
@@ -561,7 +555,7 @@ setDestination(patrolDestination);</Code>
         </Schedule>
         <Cancel event="Intercept"/>
         <Code/>
-        <Coordinate x="540" y="330"/>
+        <Coordinate x="340" y="630"/>
     </Event>
     <Event name="SecurityAlert">
         <Comment/>
@@ -583,13 +577,13 @@ setDestination(patrolDestination);</Code>
             <EdgeParameter value="contactOfInterest"/>
         </Schedule>
         <Code/>
-        <Coordinate x="200" y="320"/>
+        <Coordinate x="10" y="630"/>
     </Event>
     <Event name="SendRadioMessage">
         <Comment/>
         <Argument name="message" type="diskit.RadioCommunication"/>
         <Code/>
-        <Coordinate x="420" y="240"/>
+        <Coordinate x="200" y="460"/>
     </Event>
     <Event name="RadioMessageReceived">
         <Comment>A radio message was transmitted by the scenario manager to this entity</Comment>
@@ -609,14 +603,14 @@ setDestination(patrolDestination);</Code>
             <Comment>Response received process the response</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sender != this &amp;&amp;  messageType != null &amp;&amp; messageType.equals(&quot;WarningReport&quot;) &amp;&amp; !atSecurityAlert" delay="0.0" event="SecurityAlert" priority="0.0">
+        <Schedule condition="sender != this &amp;&amp;  messageType != null &amp;&amp; messageType.equals(&quot;HostileReport&quot;) &amp;&amp; !atSecurityAlert" delay="0.0" event="SecurityAlert" priority="0.0">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>
         //System.out.println("Got radio message: type: " + messageType.equals("WarningReport") + " sender: " + (sender != this));
         </Code>
-        <Coordinate x="200" y="430"/>
+        <Coordinate x="80" y="550"/>
     </Event>
     <Event name="QueryResponseReceived">
         <Comment>When the contact makes a response the radio transmission recieved is processed</Comment>
@@ -648,7 +642,7 @@ setDestination(patrolDestination);</Code>
             <EdgeParameter value="radioCommunication"/>
         </Schedule>
         <Code/>
-        <Coordinate x="570" y="240"/>
+        <Coordinate x="160" y="600"/>
     </Event>
     <Event name="SetNavigableZones">
         <Comment/>
@@ -660,23 +654,30 @@ setDestination(patrolDestination);</Code>
             <Comment/>
         </Schedule>
         <Code/>
-        <Coordinate x="10" y="310"/>
+        <Coordinate x="300" y="100"/>
     </Event>
     <Event name="ContactOut">
         <Comment>Contact has been taken out by the ScenarioManager, registered by the QueryContact event to the ScenarioManager</Comment>
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>recipient of last SendRadioMessage or last PursueHostile</Comment>
         </Argument>
+        <StateTransition state="targetQueue">
+            <Operation method="remove(contact)"/>
+        </StateTransition>
         <Cancel condition="true" event="QueryContact">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Cancel>
-        <Schedule condition="contact == currentContact" delay="0.0" event="ResumePatrol" priority="0.0">
+        <Schedule condition="targetQueue.isEmpty()" delay="0.0" event="ResumePatrol" priority="0.0">
             <Comment/>
         </Schedule>
         <Cancel event="Engage"/>
+        <Cancel event="Interdict"/>
+        <Schedule condition="!targetQueue.isEmpty()" delay="0.0" event="NextHostile" priority="0.0">
+            <Comment/>
+        </Schedule>
         <Code/>
-        <Coordinate x="300" y="110"/>
+        <Coordinate x="80" y="380"/>
     </Event>
     <Event name="Interdict">
         <Comment/>
@@ -695,7 +696,7 @@ setDestination(patrolDestination);</Code>
         </Schedule>
         <Cancel event="QueryContact"/>
         <Code/>
-        <Coordinate x="380" y="20"/>
+        <Coordinate x="160" y="250"/>
     </Event>
     <Event name="Engage">
         <Comment/>
@@ -703,17 +704,60 @@ setDestination(patrolDestination);</Code>
         <StateTransition state="machineGun">
             <Operation method="fireAt(hostile)"/>
         </StateTransition>
-        <Schedule condition="true" delay="machineGun.getRateOfFire()" event="Engage" priority="0.0">        
+        <Schedule condition="true" delay="machineGun.getRateOfFire()" event="Engage" priority="0.0">
             <Comment/>
-   	    <EdgeParameter value="hostile"/>
+            <EdgeParameter value="hostile"/>
         </Schedule>
         <Code>System.out.println("Engaging hostile: " + hostile.getName()); </Code>
-        <Coordinate x="300" y="20"/>
+        <Coordinate x="80" y="260"/>
     </Event>
     <Event name="RegisterWeapon">
         <Comment/>
         <Argument name="gun" type="diskit.Weapon"/>
         <Code/>
-        <Coordinate x="10" y="100"/>
+        <Coordinate x="30" y="150"/>
+    </Event>
+    <Event name="UnDetection">
+        <Comment/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Schedule condition="sensor == getCollisionSensor() &amp;&amp; obstacleQueue.contains(contact)" delay="0.0" event="ObstacleClear" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="420" y="250"/>
+    </Event>
+    <Event name="ObstacleClear">
+        <Comment/>
+        <Argument name="obstacle" type="diskit.Mover3D"/>
+        <StateTransition state="obstacleQueue">
+            <Operation method="remove(obstacle)"/>
+        </StateTransition>
+        <Schedule condition="obstacleQueue.isEmpty()" delay="0.0" event="ResumePath" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="420" y="380"/>
+    </Event>
+    <Event name="ResumePath">
+        <Comment/>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="420" y="480"/>
+    </Event>
+    <Event name="NextHostile">
+        <Comment/>
+        <StateTransition state="targetQueue">
+            <Operation method="setRelativePoint(getLocation())"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Intercept" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="targetQueue.closest()"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="10" y="220"/>
     </Event>
 </SimEntity>
