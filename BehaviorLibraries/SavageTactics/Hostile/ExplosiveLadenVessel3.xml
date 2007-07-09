@@ -1,0 +1,1140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="diskit.HostileForce" name="ExplosiveLadenVessel3" package="Hostile" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Terrorist that starts from a point randomly within ProbabilityZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
+keeps priority list of targets for multi staged attack
+This version has the added tactic to penetrate a barrier, it is assumed he is equipped with a toolkit sufficient to cut bolts, blow torch, small charges, and that a sufficient amount of time passes before he can proceed to the next waypoint or target.</Comment>
+    <Parameter name="moverID" type="int">
+        <Comment>Unique DIS entity ID number</Comment>
+    </Parameter>
+    <Parameter name="entityDefinition" type="diskit.SMAL.EntityDefinition">
+        <Comment>The SMAL entity definition for this entity</Comment>
+    </Parameter>
+    <Parameter name="visualSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="collisionSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="detonateProximitySensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
+    <Parameter name="radioChannel" type="int">
+        <Comment>channel to listen to for attack plans</Comment>
+    </Parameter>
+    <StateVariable name="avoidanceRange" type="double">
+        <Comment>The proximity tollerance for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="visualPerception" type="diskit.Sensor">
+        <Comment>Sensor object that processes all targets in the state space before attacking</Comment>
+    </StateVariable>
+    <StateVariable name="waypointCreator" type="diskit.WaypointCreator">
+        <Comment>The utility that creates waypoints based on the arguments passed</Comment>
+    </StateVariable>
+    <StateVariable name="targetQueue" type="diskit.TargetQueue">
+        <Comment>The queue of active targets for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="collisionAvoidance" type="diskit.Sensor">
+        <Comment>Sensor that implements collision avoidance</Comment>
+    </StateVariable>
+    <StateVariable name="obstacleQueue" type="diskit.ObstacleQueue">
+        <Comment>The active list of obstacles that this entity is concerned with. Special class that organizes the queue based on the proximity of the obstacles</Comment>
+    </StateVariable>
+    <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+        <Comment>The current tactical mode of this entity</Comment>
+    </StateVariable>
+    <StateVariable name="calc" type="diskit.util.MovementCalculator">
+        <Comment>A utility class that performs 3D vector math calculations</Comment>
+    </StateVariable>
+    <StateVariable name="detonateProximity" type="diskit.Sensor">
+        <Comment>Sensor that determines if the contact is close enough to kill</Comment>
+    </StateVariable>
+    <StateVariable name="visualRange" type="double">
+        <Comment>Visual range for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="plasticExplosives" type="diskit.Explosive">
+        <Comment>Explosives that this entity is carrying</Comment>
+    </StateVariable>
+    <StateVariable name="blastRadius" type="double">
+        <Comment>The radius of the explosives</Comment>
+    </StateVariable>
+    <StateVariable name="harborChart" type="diskit.AStarZoneMap">
+        <Comment>A map of the environment that contains the collection of search nodes for path finding</Comment>
+    </StateVariable>
+    <StateVariable name="primaryTarget" type="java.lang.String">
+        <Comment>The primary target for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="aStarSearch" type="diskit.AStarSearch">
+        <Comment>The A* search implementation that is used for path finding</Comment>
+    </StateVariable>
+    <StateVariable name="tactic" type="diskit.Tactic">
+        <Comment>The tactic that has been ordered for this terrorist</Comment>
+    </StateVariable>
+    <StateVariable name="startZone" type="diskit.AStarZoneGeometry">
+        <Comment>The zone from which the terrorist should start</Comment>
+    </StateVariable>
+    <StateVariable name="goalZone" type="diskit.AStarZoneGeometry">
+        <Comment>The area where this terrorist should head towards to execute it's tactics</Comment>
+    </StateVariable>
+    <StateVariable name="attackAuthorized" type="boolean">
+        <Comment>A flag to indicate whether or not the cell planner has authorized the execution of the attack plan</Comment>
+    </StateVariable>
+    <StateVariable name="planFinalized" type="boolean">
+        <Comment>A flag that indicates that this entity has processed it's attack order and is ready to attack</Comment>
+    </StateVariable>
+    <StateVariable name="zoneMoverManager" type="diskit.ZoneMoverManager">
+        <Comment>The primary mover for this entity, moves using A* search zone geometry</Comment>
+    </StateVariable>
+    <StateVariable name="attackStartWaypoint" type="diskit.Vec3d">
+        <Comment>The waypoint selected to start the attack</Comment>
+    </StateVariable>
+    <StateVariable name="chosenToAttack" type="boolean">
+        <Comment>Flag that is set to true when this entity has been selected to attack</Comment>
+    </StateVariable>
+    <StateVariable name="arrivedAtGoal" type="boolean">
+        <Comment>Flags when the entity has reached it's destination</Comment>
+    </StateVariable>
+    <StateVariable name="speedScalar" type="double">
+        <Comment>The default speed scale for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="attackSuccess" type="java.lang.String">
+        <Comment>String report of the result of the attack</Comment>
+    </StateVariable>
+    <StateVariable name="destroyedTarget" type="diskit.Mover3D">
+        <Comment>The mover that was destroyed</Comment>
+    </StateVariable>
+    <StateVariable name="terroristLeader" type="simkit.SimEntity">
+        <Comment>The entity that is giving the orders to this terrorist</Comment>
+    </StateVariable>
+    <StateVariable name="attackDelay" type="double">
+        <Comment>The amount of time from when an order is received</Comment>
+    </StateVariable>
+    <StateVariable name="timeUndetected" type="double">
+        <Comment>The amount of time from simulation start before this attacker was detected by a friendly force</Comment>
+    </StateVariable>
+    <StateVariable name="commsChannel" type="int">
+        <Comment>The radio channel for this entity</Comment>
+    </StateVariable>
+    <StateVariable name="radioMsg" type="diskit.RadioCommunication">
+        <Comment>The communication object that this entity uses to send messages</Comment>
+    </StateVariable>
+    <StateVariable name="evasiveManuever" type="boolean">
+        <Comment>Whether this entity is performing evasive manuevers</Comment>
+    </StateVariable>
+    <StateVariable name="avoidanceMoverManager" type="diskit.AvoidanceMoverManager">
+        <Comment>avoid detected obstacles</Comment>
+    </StateVariable>
+    <StateVariable name="activeMoverManager" type="diskit.MoverManager">
+        <Comment>currently active mover manager</Comment>
+    </StateVariable>
+    <StateVariable name="self" type="ExplosiveLadenVessel3">
+        <Comment>be able to use "this" methods as state variable calls</Comment>
+    </StateVariable>
+    <StateVariable name="targetPriorityList" type="java.util.ArrayList">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment>Represents the reseting features and initial events for this entity. State variables are reset to the desired state at the start of each simulation run</Comment>
+        <StateTransition state="avoidanceRange">
+            <Assignment value="getCollisionSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.TRANSITING"/>
+        </StateTransition>
+        <StateTransition state="visualRange">
+            <Assignment value="getVisualSensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="blastRadius">
+            <Assignment value="getDetonateProximitySensor().getMaxRange()"/>
+        </StateTransition>
+        <StateTransition state="attackAuthorized">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="planFinalized">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="chosenToAttack">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="arrivedAtGoal">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="speedScalar">
+            <Assignment value="1"/>
+        </StateTransition>
+        <StateTransition state="destroyedTarget">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Assignment value="getCollisionSensor()"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Assignment value="getDetonateProximitySensor()"/>
+        </StateTransition>
+        <StateTransition state="commsChannel">
+            <Assignment value="radioChannel"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Assignment value="new diskit.RadioCommunication(radioChannel,this)"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Operation method="setRecipients(hostileForceList)"/>
+        </StateTransition>
+        <StateTransition state="harborChart">
+            <Assignment value="null"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Assignment value="this"/>
+        </StateTransition>
+        <StateTransition state="attackSuccess">
+            <Assignment value="&quot;Failed&quot;"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="targetPriorityList">
+            <Assignment value="new java.util.ArrayList()"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Register" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="zoneMoverManager == null" delay="0.0" event="Init" priority="10.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="10" y="100"/>
+    </Event>
+    <Event name="Register">
+        <Comment>stage 1 initialization, some code blocks here may be pushed down to base classes.</Comment>
+        <Argument name="init" type="diskit.Mover3D"/>
+        <LocalVariable name="numOfSensors" type="int" value="3">
+            <Comment>Number of Sensors this entity has</Comment>
+        </LocalVariable>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="calc">
+            <Assignment value="new diskit.util.MovementCalculator(this)"/>
+        </StateTransition>
+        <StateTransition state="visualPerception">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Assignment value="new diskit.TargetQueue(startPosition)"/>
+        </StateTransition>
+        <StateTransition state="evasiveManuever">
+            <Assignment value="false"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="init == this" delay="0.0" event="CreateSensors" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Schedule condition="init == this &amp;&amp; plasticExplosives != null" delay="0.0" event="RegisterMunition" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code>sensors[0] = getVisualSensor();
+sensors[1] = getDetonateProximitySensor();
+sensors[2] = getCollisionSensor();</Code>
+        <Coordinate x="80" y="100"/>
+    </Event>
+    <Event name="RegisterTarget">
+        <Comment/>
+        <Argument name="target" type="diskit.Mover3D"/>
+        <Code/>
+        <Coordinate x="160" y="100"/>
+    </Event>
+    <Event name="Detection">
+        <Comment>Determines whether or not a detected contact is a high value unit and makes a decision based on the evaluation of the entity</Comment>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <LocalVariable name="isHostileForce" type="boolean" value="hostileForces.contains(contact.getMoverID())">
+            <Comment>Check to see if contact is of the same force</Comment>
+        </LocalVariable>
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(contact)">
+            <Comment>Can I intercept the contact and blow it up</Comment>
+        </LocalVariable>
+        <LocalVariable name="currentTacticalMode" type="diskit.TacticalMode" value="getTacticalMode()">
+            <Comment>The tactical mode of the entity when he detects the contact</Comment>
+        </LocalVariable>
+        <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
+            <Comment>Checks the entity type of the contact</Comment>
+        </LocalVariable>
+        <Schedule condition="!contactType.equals(primaryTarget) &amp;&amp; sensor == getCollisionSensor()" delay="0.0" event="AssessObstacle" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="( sensor == visualPerception &amp;&amp; contactType.endsWith(primaryTarget) &amp;&amp;  arrivedAtGoal &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING ) || ( sensor == detonateProximity &amp;&amp; contactType.endsWith(primaryTarget) &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING )" delay="0.0" event="Attack" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="sensor == visualPerception &amp;&amp;  targetPriorityList.contains(contactType) &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="TargetSpotted" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="0">
+            <Comment/>
+        </Schedule>
+        <Code>System.out.println("***ELV3: Contact type "+contact.getEntityType());
+if (sensor == visualPerception) {
+    System.out.println("Visual contact "+contact);
+} else if ( sensor == collisionSensor ) {
+    System.out.println("Collision contact "+contact);
+} else if ( sensor == detonateProximitySensor ) {
+    System.out.println("Proximity contact "+contact);
+}
+
+if (targetPriorityList.contains(contactType)) {
+    System.out.println("Target in prio list "+contactType);
+} else {
+    System.out.println("Target not in prio list"+contactType);
+}
+
+if ( arrivedAtGoal ) {
+    System.out.println("Arrived already at goal");
+} else {
+    System.out.println("Haven't arrived at goal yet");
+}
+
+System.out.println(currentTacticalMode);</Code>
+        <Coordinate x="170" y="370"/>
+    </Event>
+    <Event name="RegisterSensors">
+        <Comment>Registers Sensors for this entity, and adds simEventListenerConnections</Comment>
+        <Argument name="sensors[]" type="diskit.Sensor[]">
+            <Comment>Sensors for this entity</Comment>
+        </Argument>
+        <StateTransition state="visualPerception">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <StateTransition state="detonateProximity">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <StateTransition state="collisionAvoidance">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="160" y="200"/>
+    </Event>
+    <Event name="Attack">
+        <Comment>Determines the correct heading for an attack and attacks at Maximum speed</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to attack</Comment>
+        </Argument>
+        <LocalVariable name="attackDestination" type="diskit.Vec3d" value="new diskit.Vec3d()">
+            <Comment>The location where an attack will succeed</Comment>
+        </LocalVariable>
+        <LocalVariable name="delayTime" type="double" value="0.0">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="attackReport" type="java.lang.String" value="&quot;Leader, I have succeeded. Good luck to all of you. I am attacking &quot; + target.getName() +&quot;. ----{Loud Explosion...Radio goes dead}&quot;">
+            <Comment>The final report of a successfull attack</Comment>
+        </LocalVariable>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.ATTACKING"/>
+        </StateTransition>
+        <StateTransition state="destroyedTarget">
+            <Assignment value="target"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setStartPosition(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed())"/>
+        </StateTransition>
+        <Schedule condition="true   " delay="delayTime" event="PrepareRadioMessage" priority="0.0">
+            <Comment>This message is sent right before the terrorist blows up</Comment>
+            <EdgeParameter value="&quot;DestroyedTarget&quot;"/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="attackReport"/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;)" delay="delayTime" event="BarrierTargeted" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Schedule condition="!target.getEntityType().equals(&quot;Barrier&quot;)" delay="delayTime" event="Succeeded" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code>double offset;
+if (target.getEntityType().equals("Barrier")) {
+    offset = 10.0;
+} else {
+    offset = 0.0;
+}
+
+diskit.Vec4d v = getIntercept(target,offset);
+attackDestination.set(v.get(0),v.get(1),v.get(2));
+delayTime = Math.abs(v.get(3));
+setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed());
+
+if ( target.getEntityType().equals("Barrier") ) {
+    double skillMultiplier = 4.0;
+    double skillOffset = 20.0;
+    double meanTimeToPenetrate =  
+         (double) (target.getEntityDefinition().getOperatorSkillLevel()) -
+         (double) (getEntityDefinition().getOperatorSkillLevel());
+    simkit.random.ExponentialVariate ev = new simkit.random.ExponentialVariate();
+    ev.setMean((meanTimeToPenetrate+skillOffset)*skillMultiplier );
+    // isn't necessarily a detonate at this point.
+    waitDelay("StopMoving",delayTime, new Object[] {this});
+    System.out.println("ArrivalTime "+delayTime);
+    delayTime+=ev.generate();
+    System.out.println("PenetrateTime "+delayTime);
+}
+
+System.out.println(getName()+" Attacking: " + target.getName()+" type "+target.getEntityType());
+System.out.println("Attack Position is: " + attackDestination);</Code>
+        <Coordinate x="340" y="530"/>
+    </Event>
+    <Event name="CreateSensors">
+        <Comment>Builds array of all sensors to be registered</Comment>
+        <LocalVariable name="numOfSensors" type="int" value="3">
+            <Comment>Number of Sensors for this entity</Comment>
+        </LocalVariable>
+        <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
+            <Comment>Array to add all sensors</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="sensors"/>
+        </Schedule>
+        <Code>sensors[0] = visualPerception;
+sensors[1] = detonateProximity;
+sensors[2] = collisionAvoidance;</Code>
+        <Coordinate x="80" y="200"/>
+    </Event>
+    <Event name="RegisterMunition">
+        <Comment>Register the explosive with scenario Manager</Comment>
+        <Argument name="munition" type="diskit.Munition">
+            <Comment>The explosives just created</Comment>
+        </Argument>
+        <StateTransition state="plasticExplosives">
+            <Operation method="addSimEventListener(this)"/>
+        </StateTransition>
+        <Code>this.addSimEventListener(munition);</Code>
+        <Coordinate x="80" y="10"/>
+    </Event>
+    <Event name="Detonate">
+        <Comment/>
+        <Argument name="operator" type="diskit.Mover3D"/>
+        <Argument name="munition" type="diskit.Munition"/>
+        <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
+            <Comment>Returns the zone that was closest to the attack</Comment>
+        </LocalVariable>
+        <LocalVariable name="areaOfAttack" type="java.lang.String" value="closestZone.getName()">
+            <Comment>The name of the closest zone for reporting purposes</Comment>
+        </LocalVariable>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="520" y="370"/>
+    </Event>
+    <Event name="AStarZoneMapDistributed">
+        <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
+        <Argument name="recipient" type="simkit.SimEntity"/>
+        <Argument name="chart" type="diskit.AStarZoneMap"/>
+        <Schedule condition="recipient == this" delay="0.0" event="SetNavigableMap" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="chart"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="260"/>
+    </Event>
+    <Event name="TargetListSent">
+        <Comment>Receives the target priority list from the terrorist cell planner</Comment>
+        <Argument name="targetList" type="java.lang.String[]">
+            <Comment>The list of target types in order of priority</Comment>
+        </Argument>
+        <Argument name="cellPlanner" type="simkit.SimEntity">
+            <Comment>The entity who is giving the orders</Comment>
+        </Argument>
+        <Argument name="channelNumber" type="int">
+            <Comment>The channel this entity should use for the radio</Comment>
+        </Argument>
+        <StateTransition state="primaryTarget">
+            <Assignment value="targetList[0]"/>
+        </StateTransition>
+        <StateTransition state="terroristLeader">
+            <Assignment value="cellPlanner"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Operation method="setRecipients(hostileForceList)"/>
+        </StateTransition>
+        <Code>targetPriorityList.clear();
+for ( int i = 0; i &lt; targetList.length; i ++ ) { 
+    System.out.println("adding target type "+targetList[i] );
+    targetPriorityList.add(targetList[i]);
+}</Code>
+        <Coordinate x="430" y="30"/>
+    </Event>
+    <Event name="AttackOrderSent">
+        <Comment>Checks to see if the order is for this entity. If so it begins to process the instructions and form a tactical plan. If not the order is ignored.  The target queue's relative point is set to the location of the destination of this entity.  The target queue uses this location to sort potential targets in order of proximity to this agents destination.</Comment>
+        <Argument name="terroristID" type="int">
+            <Comment>The moverID number of the terrorist the order is for</Comment>
+        </Argument>
+        <Argument name="attackStart" type="diskit.AStarZoneGeometry">
+            <Comment>The start zone for this order</Comment>
+        </Argument>
+        <Argument name="attackGoal" type="diskit.AStarZoneGeometry">
+            <Comment>The general goal area for this order</Comment>
+        </Argument>
+        <Argument name="tactic" type="diskit.Tactic">
+            <Comment>The tactic for this order</Comment>
+        </Argument>
+        <LocalVariable name="start" type="diskit.AStarZoneGeometry" value="attackStart">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <LocalVariable name="goal" type="diskit.AStarZoneGeometry" value="attackGoal">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <LocalVariable name="tacticCopy" type="diskit.Tactic" value="tactic">
+            <Comment>Local copy of order information in case the order is for this terrorist</Comment>
+        </LocalVariable>
+        <Schedule condition="terroristID == moverID" delay="0.0" event="BeginAttackPlanning" priority="0">
+            <Comment/>
+            <EdgeParameter value="start"/>
+            <EdgeParameter value="goal"/>
+            <EdgeParameter value="tacticCopy"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="270" y="30"/>
+    </Event>
+    <Event name="BeginAttackPlanning">
+        <Comment>Takes the order information and prepares for its attack. Preparations include: 1) setting the startZone and goalZone state variables 2) Initializing a waypoint creator 3) Initializing an A* search object for path finding 4) Initializing a ZoneMoverManager for movement</Comment>
+        <Argument name="orderedStart" type="diskit.AStarZoneGeometry">
+            <Comment>The starting perimeter zone for this attack</Comment>
+        </Argument>
+        <Argument name="orderedGoal" type="diskit.AStarZoneGeometry">
+            <Comment>The goal zone for this attack</Comment>
+        </Argument>
+        <Argument name="orderedTactic" type="diskit.Tactic">
+            <Comment>The tactic for this attack</Comment>
+        </Argument>
+        <LocalVariable name="tacticToImplement" type="diskit.Tactic" value="orderedTactic">
+            <Comment>Copy of the tactic that has been ordered</Comment>
+        </LocalVariable>
+        <LocalVariable name="aStarZones" type="java.util.LinkedList" value="new java.util.LinkedList(); aStarZones.add(orderedStart);aStarZones.add(orderedGoal)">
+            <Comment>set up waypointCreator</Comment>
+        </LocalVariable>
+        <StateTransition state="startZone">
+            <Assignment value="orderedStart"/>
+        </StateTransition>
+        <StateTransition state="goalZone">
+            <Assignment value="orderedGoal"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator(this,aStarZones)"/>
+        </StateTransition>
+        <StateTransition state="chosenToAttack">
+            <Assignment value="true"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="targetQueue">
+            <Operation method="setRelativePoint(orderedGoal.getLocation())"/>
+        </StateTransition>
+        <Schedule condition="harborChart != null" delay="0.0" event="PickStartPosition" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="270" y="140"/>
+    </Event>
+    <Event name="PickStartPosition">
+        <Comment>Terrorist uses the start zone to select an exact start position. It then determines which zone on the map is the closest to his starting position and updates it's A* search object with its destination and first zone to visit.   This implementation purposely decouples perimeter zones from the zones of the environment to allow analysts to alter terrorist starting options without effecting the overall structure of the basic environment map (e.g. navigatable water spaces). Futhermore it allows developers to prevent defending forces from knowing exactly where terrorists are going to retreat to (e.g. where they started).</Comment>
+        <LocalVariable name="initialWaypoint" type="diskit.Vec3d" value="waypointCreator.createWaypoint(startZone)">
+            <Comment>Generates a waypoint from the starting perimeter zone</Comment>
+        </LocalVariable>
+        <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(initialWaypoint)">
+            <Comment>Returns the A* zone that is not a perimeter zone and is the closest to the initial waypoint provided</Comment>
+        </LocalVariable>
+        <StateTransition state="aStarSearch">
+            <Operation method="setStartZone(closestZone)"/>
+        </StateTransition>
+        <StateTransition state="aStarSearch">
+            <Operation method="setGoalZone(goalZone)"/>
+        </StateTransition>
+        <StateTransition state="attackStartWaypoint">
+            <Assignment value="initialWaypoint"/>
+        </StateTransition>
+        <Schedule event="FinalizePlan"/>
+        <Code>//setStartPosition(initialWaypoint);</Code>
+        <Coordinate x="350" y="140"/>
+    </Event>
+    <Event name="FinalizePlan">
+        <Comment>Uses the closest zone as the first destination and generates a path. Then a path mover manager is created with the attack plan. If the attack has been authorized by the terrorist planner while the terrorist was making its plan, the terrorist will start it's attack immediately after the plan is made. Otherwise it will wait for the 'BeginAttack' order from the terrorist cell planner</Comment>
+        <LocalVariable name="attackPath" type="java.util.LinkedList" value="aStarSearch.createZonePath()">
+            <Comment>Returns the zones that should be used to generate waypoints in the order that they should be used by the waypoint creator</Comment>
+        </LocalVariable>
+        <StateTransition state="planFinalized">
+            <Assignment value="true"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setWaypointCreator(waypointCreator)"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.APPROACHING"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
+        <StateTransition state="waypointCreator">
+            <Operation method="setAStarZones(attackPath)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(attackStartWaypoint)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(getEntityDefinition().getMaximumSpeed())"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setDestination(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="430" y="140"/>
+    </Event>
+    <Event name="BeginAttack">
+        <Comment>The execution order giving this terrorist permission to start its attack when ready</Comment>
+        <StateTransition state="attackAuthorized">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule condition="planFinalized" delay="0.1" event="StartMove" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="500" y="30"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <Argument name="mover" type="diskit.Mover3D"/>
+        <Code>super.doStartMove(mover);
+//setStartPosition(attackStartWaypoint);
+//setDestination(waypointCreator.createWaypoint());</Code>
+        <Coordinate x="500" y="140"/>
+    </Event>
+    <Event name="NotAChosenPlatform">
+        <Comment>Wasn't selected for this attack order, notification from TerroristCellPlanner to go hide somewhere far away and wait for followup orders.</Comment>
+        <Argument name="inoperative" type="int">
+            <Comment>terrorist selected to be inoperative, go hide out far away</Comment>
+        </Argument>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.IDLE"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setDestination(waypointCreator.createWaypoint());"/>
+        </StateTransition>
+        <Schedule condition="inoperative == moverID" delay="0.0" event="HideAway" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code>/* all of the ExplosiveLadenVessels will get this event once with the current planner's orders. At this point in the initialization, the waypointCreator has been set to the "hidden zone", so go and hide until waypointCreator gets swapped out for the attack plan's waypoints.
+*/
+
+//setStartPosition(waypointCreator.createWaypoint());
+/*
+setDestination(waypointCreator.createWaypoint());
+setCruiseSpeed(0.0);
+*/</Code>
+        <Coordinate x="590" y="30"/>
+    </Event>
+    <Event name="AttackComplete">
+        <Comment>Notifies the terrorist cell planner that the attack has ended. This does not mean that the attack succeeded just that it is over</Comment>
+        <Argument name="attackResult" type="java.lang.String">
+            <Comment>Whether or not the attack was succesfull</Comment>
+        </Argument>
+        <Argument name="targetDestroyed" type="diskit.Mover3D">
+            <Comment>The target that was destroyed</Comment>
+        </Argument>
+        <Argument name="attackLocation" type="java.lang.String">
+            <Comment>The name of the area where the attack took place</Comment>
+        </Argument>
+        <Argument name="reportingUnit" type="diskit.Mover3D">
+            <Comment>Identify this entity as the reporting unit</Comment>
+        </Argument>
+        <Schedule event="StopMoving"/>
+        <Code>System.out.println("AttackComplete in ELV: " + attackResult);
+setNextWaypoint(getLocation(),1.0);</Code>
+        <Coordinate x="680" y="500"/>
+    </Event>
+    <Event name="DestinationReached">
+        <Comment/>
+        <LocalVariable name="targetChoice" type="diskit.Mover3D" value="targetQueue.closest()">
+            <Comment>Picks the closest target</Comment>
+        </LocalVariable>
+        <StateTransition state="arrivedAtGoal">
+            <Assignment value="true"/>
+        </StateTransition>
+        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0.0">
+            <Comment>If there is a target to attack, attack it, otherwise loiter until one arrives</Comment>
+            <EdgeParameter value="targetChoice"/>
+        </Schedule>
+        <Schedule condition="targetChoice == null" delay="0.0" event="Loiter" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code>//System.out.println(getName() + ": I have arrived at " + //goalZone.getName());
+
+System.out.println("Current "+targetQueue);</Code>
+        <Coordinate x="450" y="690"/>
+    </Event>
+    <Event name="PickFromTargets">
+        <Comment/>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to attack</Comment>
+        </Argument>
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getEntityDefinition().getWidth() )">
+            <Comment>Determines if this target can be intercepted</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="Attack" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="target"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="340" y="610"/>
+    </Event>
+    <Event name="CannotEscape">
+        <Comment>If the terrorist has been intercepted he will detonate</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>The mover that set off the sensor</Comment>
+        </Argument>
+        <LocalVariable name="failedReport" type="java.lang.String" value="&quot;Leader I have failed. I cannot achieve my objective.  I will sacrifice myself for our cause!!!!  I am destroying &quot; + mover.getName()">
+            <Comment>A report of a failed attack</Comment>
+        </LocalVariable>
+        <LocalVariable name="entityType" type="java.lang.String" value="mover.getEntityType()">
+            <Comment>The type of entity encountered</Comment>
+        </LocalVariable>
+        <StateTransition state="attackSuccess">
+            <Assignment value="&quot;Failed&quot;"/>
+        </StateTransition>
+        <StateTransition state="destroyedTarget">
+            <Assignment value="mover"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.DETONATING"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="&quot;FailedAttack&quot;"/>
+            <EdgeParameter value="mover"/>
+            <EdgeParameter value="failedReport"/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0">
+            <Comment/>
+            <EdgeParameter value="mover"/>
+        </Schedule>
+        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code>//System.out.println("Detonate Proximity sensed");
+System.out.println("I'm blowing up "+  mover.getName());
+//setCruiseSpeed(0);
+
+diskit.Vec4d v = getIntercept(mover);
+diskit.Vec3d p = new diskit.Vec3d(v.get(0),v.get(1),v.get(2));
+double detonateTime = v.get(3);
+setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
+        <Coordinate x="390" y="380"/>
+    </Event>
+    <Event name="ApplyScaleSpeed">
+        <Comment>Allows the scenario manager to add a cross the board speed scale to all entities</Comment>
+        <Argument name="speedScale" type="double">
+            <Comment>The scale to apply to the max speed of this entity</Comment>
+        </Argument>
+        <Code>setMaximumSpeed(getMaximumSpeed() * speedScale);</Code>
+        <Coordinate x="270" y="260"/>
+    </Event>
+    <Event name="AssessObstacle">
+        <Comment>If something is determined to be potential obstacle assess whether or not there will be a collision</Comment>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>The mover that is a potential obstacle</Comment>
+        </Argument>
+        <StateTransition state="calc">
+            <Operation method="checkCollision(obstacle, collisionAvoidance, avoidanceRange)"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="setRelativePoint(getLocation())"/>
+        </StateTransition>
+        <StateTransition state="obstacleQueue">
+            <Operation method="add(obstacle)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
+        </Schedule>
+        <Code>System.out.println(getName() + " Assessing Obstacle: " + obstacle.getName());</Code>
+        <Coordinate x="90" y="370"/>
+    </Event>
+    <Event name="AvoidObstacle">
+        <Comment>Avoids an obstacle if a collision is going to happen</Comment>
+        <Argument name="obstacle" type="diskit.Mover3D">
+            <Comment>The obstacle that needs to be avoided</Comment>
+        </Argument>
+        <LocalVariable name="avoidancePoint" type="diskit.Vec3d" value="calc.getCollisionAvoidance(obstacle)">
+            <Comment>The point that avoids the collision</Comment>
+        </LocalVariable>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="avoid(obstacle,getActiveMoverManager())"/>
+        </StateTransition>
+        <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="obstacleQueue.closest()"/>
+        </Schedule>
+        <Code>//System.out.println("***ELV avoid: " + obstacle.getName());        
+//        setStartPosition(getLocation());
+//setDestination(avoidancePoint);</Code>
+        <Coordinate x="10" y="370"/>
+    </Event>
+    <Event name="Neutralized">
+        <Comment>ScenarioManager confirms kill, stops this entity</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>Terrorist dies</Comment>
+        </Argument>
+        <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
+            <Comment>Returns the zone that was closest to the attack</Comment>
+        </LocalVariable>
+        <LocalVariable name="areaOfAttack" type="java.lang.String" value="closestZone.getName()">
+            <Comment>The name of the general area of the attack</Comment>
+        </LocalVariable>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.DEAD"/>
+        </StateTransition>
+        <Schedule condition="mover == this" delay="0.0" event="AttackComplete" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="attackSuccess"/>
+            <EdgeParameter value="destroyedTarget"/>
+            <EdgeParameter value="areaOfAttack"/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Cancel condition="mover == this" event="Succeeded"/>
+        <Cancel condition="mover == this" event="Detonate">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Cancel>
+        <Cancel event="PrepareRadioMessage"/>
+        <Code>System.out.println("*** Neutralized  mover: " + mover.getName());</Code>
+        <Coordinate x="680" y="330"/>
+    </Event>
+    <Event name="TargetSpotted">
+        <Comment>Adds spotted targets to queue in the event that the this entity has not reached it's ordered destination</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to add to the target list</Comment>
+        </Argument>
+        <StateTransition state="targetQueue">
+            <Operation method="add(target)"/>
+        </StateTransition>
+        <Code>//System.out.println(targetQueue);</Code>
+        <Coordinate x="170" y="540"/>
+    </Event>
+    <Event name="SpottedByEnemy">
+        <Comment>Marks when this entity was spotted by any Friendly force</Comment>
+        <StateTransition state="timeUndetected">
+            <Assignment value="Schedule.getSimTime()"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="100" y="540"/>
+    </Event>
+    <Event name="RadioMessageReceived">
+        <Comment>A radio message was transmitted to this entity</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message that was received</Comment>
+        </Argument>
+        <LocalVariable name="msgType" type="java.lang.String" value="msg.getType()">
+            <Comment>The type of message sent</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgContext" type="diskit.Mover3D" value="msg.getContext()">
+            <Comment>The contact the message is about</Comment>
+        </LocalVariable>
+        <LocalVariable name="msgSender" type="diskit.Mover3D" value="msg.getSender()">
+            <Comment>The person who sent this message</Comment>
+        </LocalVariable>
+        <Schedule condition="msgType.equals(&quot;DestroyedTarget&quot;) &amp;&amp; targetQueue.contains(msgContext) &amp;&amp; msgSender != this" delay="0.0" event="UpdateTargetQueue" priority="0">
+            <Comment>If this is a destruction report and we have this target on our list, remove it</Comment>
+            <EdgeParameter value="msgContext"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="520" y="540"/>
+    </Event>
+    <Event name="UpdateTargetQueue">
+        <Comment>This entity changes updates it's targets if a destroyed target report comes across the radio</Comment>
+        <Argument name="target" type="diskit.Mover3D">
+            <Comment>The target to evaluate</Comment>
+        </Argument>
+        <LocalVariable name="closestZone" type="diskit.AStarZoneGeometry" value="harborChart.findClosestZone(getLocation())">
+            <Comment>Gets the updated closest zone base on the current location of this entity for reporting purposes</Comment>
+        </LocalVariable>
+        <LocalVariable name="messageReport" type="java.lang.String" value="(&quot;This is &quot; + getName() + &quot;. I've updated my target list, I am still inbound in the vicinity of &quot; + closestZone.getName())">
+            <Comment>The text of the message</Comment>
+        </LocalVariable>
+        <StateTransition state="targetQueue">
+            <Operation method="removeByType(target.getEntityType())"/>
+        </StateTransition>
+        <StateTransition state="targetPriorityList">
+            <Operation method="remove(target.getEntityType())"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="&quot;UpdateReport&quot;"/>
+            <EdgeParameter value="target"/>
+            <EdgeParameter value="messageReport"/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;) &amp;&amp; arrivedAtGoal" delay="0.0" event="DestinationReached" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code>System.out.println(getName() + " Received DestroyedTarget");
+// if obstacle targets destroyed focus on hvu
+if ( targetPriorityList.size() &gt; 1 ) {
+    targetPriorityList.remove(target.getEntityType());
+}
+
+//System.out.println(targetQueue);</Code>
+        <Coordinate x="450" y="540"/>
+    </Event>
+    <Event name="PrepareRadioMessage">
+        <Comment>Prepares the radio communication object for transmission</Comment>
+        <Argument name="msgType" type="java.lang.String">
+            <Comment>The type of message</Comment>
+        </Argument>
+        <Argument name="msgContext" type="diskit.Mover3D">
+            <Comment>The context of the message</Comment>
+        </Argument>
+        <Argument name="msgText" type="java.lang.String">
+            <Comment>The text of the message</Comment>
+        </Argument>
+        <Argument name="msgSender" type="diskit.Mover3D">
+            <Comment>The sender of the message</Comment>
+        </Argument>
+        <StateTransition state="radioMsg">
+            <Operation method="setType(msgType)"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Operation method="setContext(msgContext)"/>
+        </StateTransition>
+        <StateTransition state="radioMsg">
+            <Operation method="setMessage(msgText)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0" event="SendRadioMessage" priority="0">
+            <Comment/>
+            <EdgeParameter value="radioMsg"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="520" y="440"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits a radio message through the scenario manager</Comment>
+        <Argument name="radioCommunication" type="diskit.RadioCommunication">
+            <Comment>The message to transmit</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="590" y="540"/>
+    </Event>
+    <Event name="BarrierTargeted">
+        <Comment>This entity attempted to blow up a barrier. Barrier and other entities will receive a damage status from ScenarioManager. This event can probably go in this case.</Comment>
+        <Argument name="barrier" type="diskit.Mover3D">
+            <Comment>The barrier segment that was targeted</Comment>
+        </Argument>
+        <StateTransition state="obstacleQueue">
+            <Operation method="remove(barrier)"/>
+        </StateTransition>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.APPROACHING"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="UpdateTargetQueue" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="barrier"/>
+        </Schedule>
+        <Code>diskit.Explosive tnt = new diskit.Explosive(barrier.getLocation(), 0.0, 1,1.5);
+tnt.setPersistant(false);
+waitDelay("RegisterMunition",0.0,new Object[]{tnt});
+tnt.waitDelay("Detonate",0.01,new Object[]{this,tnt});</Code>
+        <Coordinate x="390" y="450"/>
+    </Event>
+    <Event name="SetNavigableMap">
+        <Comment/>
+        <Argument name="chart" type="diskit.AStarZoneMap"/>
+        <StateTransition state="harborChart">
+            <Assignment value="chart"/>
+        </StateTransition>
+        <StateTransition state="aStarSearch">
+            <Assignment value="new diskit.AStarSearch(harborChart)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="130" y="260"/>
+    </Event>
+    <Event name="DamageSustained">
+        <Comment>Damage was received by the ScenarioManager by the base class, by an integer amount. Deduct this amount from the total. TBD, send radio message if not critical.</Comment>
+        <Argument name="mover" type="diskit.Mover3D">
+            <Comment>mover that got damaged</Comment>
+        </Argument>
+        <Argument name="hit" type="double">
+            <Comment>amount of damage</Comment>
+        </Argument>
+        <Code>System.out.println("*** " + getName() + " has been hit!"); </Code>
+        <Coordinate x="680" y="140"/>
+    </Event>
+    <Event name="CriticalHit">
+        <Comment>Notice of a CriticalHit</Comment>
+        <Argument name="mover" type="diskit.Mover3D"/>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code>System.out.println("*** " + getName() + " is Dead!"); </Code>
+        <Coordinate x="680" y="250"/>
+    </Event>
+    <Event name="StopMoving">
+        <Comment/>
+        <Argument name="mover" type="diskit.Mover3D"/>
+        <StateTransition state="self">
+            <Operation method="stop()"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setVelocity(new diskit.Vec3d(0.0,0.0,0.0))"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="680" y="590"/>
+    </Event>
+    <Event name="Loiter">
+        <Comment/>
+        <Code/>
+        <Coordinate x="240" y="690"/>
+    </Event>
+    <Event name="Init">
+        <Comment/>
+        <Argument name="init" type="diskit.Mover3D"/>
+        <StateTransition state="waypointCreator">
+            <Assignment value="new diskit.WaypointCreator(moverID,15000.0)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Assignment value="new diskit.AvoidanceMoverManager(null)"/>
+        </StateTransition>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setPersistant(true)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Assignment value="new diskit.ZoneMoverManager(this,waypointCreator)"/>
+        </StateTransition>
+        <StateTransition state="zoneMoverManager">
+            <Operation method="setPersistant(true)"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Assignment value="new diskit.Explosive(getLocation(), getMaximumSpeed(), this, blastRadius)"/>
+        </StateTransition>
+        <StateTransition state="plasticExplosives">
+            <Operation method="setPersistant(true)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(getMaximumSpeed())"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="10" y="180"/>
+    </Event>
+    <Event name="HideAway">
+        <Comment/>
+        <StateTransition state="tacticalMode">
+            <Assignment value="diskit.TacticalMode.IDLE"/>
+        </StateTransition>
+        <StateTransition state="activeMoverManager">
+            <Assignment value="zoneMoverManager"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setCruiseSpeed(0.0)"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setStartPosition(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <StateTransition state="self">
+            <Operation method="setDestination(waypointCreator.createWaypoint())"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="590" y="140"/>
+    </Event>
+    <Event name="Succeeded">
+        <Comment/>
+        <StateTransition state="attackSuccess">
+            <Assignment value="&quot;Succeeded&quot;"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+            <EdgeParameter value="plasticExplosives"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="340" y="330"/>
+    </Event>
+    <Event name="UnDetection">
+        <Comment/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Schedule condition="sensor == getCollisionSensor() &amp;&amp; obstacleQueue.contains(contact)" delay="0.0" event="ObstacleClear" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="540"/>
+    </Event>
+    <Event name="ObstacleClear">
+        <Comment/>
+        <Argument name="obstacle" type="diskit.Mover3D"/>
+        <StateTransition state="obstacleQueue">
+            <Operation method="remove(obstacle)"/>
+        </StateTransition>
+        <Schedule condition="obstacleQueue.isEmpty()" delay="0.0" event="ResumePath" priority="0.0">
+            <Comment/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="630"/>
+    </Event>
+    <Event name="ResumePath">
+        <Comment/>
+        <StateTransition state="avoidanceMoverManager">
+            <Operation method="setMover(null)"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="100" y="630"/>
+    </Event>
+</SimEntity>
