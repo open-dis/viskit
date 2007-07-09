@@ -27,6 +27,9 @@
     <Parameter name="collisionSensor" type="diskit.Sensor">
         <Comment/>
     </Parameter>
+    <Parameter name="lodSensor" type="diskit.Sensor">
+        <Comment/>
+    </Parameter>
     <StateVariable name="visualRange" type="double">
         <Comment>The visual range of a human on this platform</Comment>
     </StateVariable>
@@ -42,8 +45,14 @@
     <StateVariable name="avoidanceRange" type="double">
         <Comment>Contact proximity tolerance for this entity, used for collision avoidance</Comment>
     </StateVariable>
+    <StateVariable name="radioCommunication" type="diskit.RadioCommunication">
+        <Comment>An object used to transmit radio traffic</Comment>
+    </StateVariable>    
     <StateVariable name="visualPerception" type="diskit.Sensor">
         <Comment>The digital camera on this platform</Comment>
+    </StateVariable>
+    <StateVariable name="lodDetection" type="diskit.Sensor">
+        <Comment>The line of demarcation</Comment>
     </StateVariable>
     <StateVariable name="surfaceRadar" type="diskit.Sensor">
         <Comment>The surface radar on this platform</Comment>
@@ -57,6 +66,9 @@
     <StateVariable name="collisionDetection" type="diskit.Sensor">
         <Comment>A collision avoidance sensor for this platform</Comment>
     </StateVariable>
+    <StateVariable name="threatPicture" type="diskit.ContactPicture">
+        <Comment>List of all contacts in this entities contact picture</Comment>
+    </StateVariable>    
     <StateVariable name="activeMoverManager" type="diskit.MoverManager">
         <Comment>The mover manager that is currently being used. Primarily used for swapping between mover manager types</Comment>
     </StateVariable>
@@ -87,9 +99,6 @@
     <StateVariable name="nauticalChart" type="diskit.AStarZoneMap">
         <Comment>The nautical chart object created for this simulation</Comment>
     </StateVariable>
-    <StateVariable name="self" type="Friendly.MilitaryShip">
-        <Comment>reference to this</Comment>
-    </StateVariable>
     <Event name="Run">
         <Comment>The run event sets the parameter values for each simulation run</Comment>
         <StateTransition state="tacticalMode">
@@ -103,6 +112,9 @@
         </StateTransition>
         <StateTransition state="visualPerception">
             <Assignment value="getVisualSensor()"/>
+        </StateTransition>
+        <StateTransition state="lodDetection">
+            <Assignment value="getLodSensor()"/>
         </StateTransition>
         <StateTransition state="visualRange">
             <Assignment value="getVisualSensor().getMaxRange()"/>
@@ -131,18 +143,6 @@
         <StateTransition state="avoidanceRange">
             <Assignment value="getCollisionSensor().getMaxRange()"/>
         </StateTransition>
-        <StateTransition state="self">
-            <Assignment value="this"/>
-        </StateTransition>
-        <StateTransition state="self">
-            <Operation method="setStartPosition(getEntityDefinition().getLocation())"/>
-        </StateTransition>
-        <StateTransition state="self">
-            <Operation method="setNextWaypoint(getEntityDefinition().getLocation(),0.0)"/>
-        </StateTransition>
-        <StateTransition state="self">
-            <Operation method="setVelocity(new diskit.Vec3d(0.0,0.0,0.0))"/>
-        </StateTransition>
         <Schedule condition="true" delay="0.0" event="Init" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -154,6 +154,9 @@
         <Comment>An initialization event that is scheduled by diskit.SMALMover3D to initialize it's subclasses. The event creates sensor objects and registers this mover and it's sensors with the diskit.ScenarioManager.</Comment>
         <Argument name="init" type="diskit.Mover3D"/>
         <StateTransition state="visualPerception">
+            <Operation method="setMover(this)"/>
+        </StateTransition>
+        <StateTransition state="lodDetection">
             <Operation method="setMover(this)"/>
         </StateTransition>
         <StateTransition state="surfaceRadar">
@@ -168,6 +171,16 @@
         <StateTransition state="collisionDetection">
             <Operation method="setMover(this)"/>
         </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Assignment value="new diskit.RadioCommunication(16,this)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setRecipients(friendlyForceList)"/>
+        </StateTransition>
+        <StateTransition state="threatPicture">
+            <Operation method="clear()"/>
+        </StateTransition>
+        
         <Schedule condition="init == this" delay="0.0" event="RegisterTarget" priority="0.0">
             <Comment/>
             <EdgeParameter value="this"/>
@@ -175,9 +188,8 @@
         <Schedule condition="zones.length &gt; 0 &amp;&amp; init == this" delay="0.0" event="BuildSensorArray" priority="0.0">
             <Comment>If this zone is moving register all sensors</Comment>
         </Schedule>
-        <Schedule condition="zones.length == 0 &amp;&amp; init == this" delay="0.0" event="RegisterSensor" priority="0.0">
+        <Schedule condition="zones.length == 0 &amp;&amp; init == this" delay="0.0" event="BuildStationarySensorArray" priority="0.0">
             <Comment>If I'm not moving the only sensor is the visual perception of the watchstanders</Comment>
-            <EdgeParameter value="visualPerception"/>
         </Schedule>
         <Code>/* see example in ExplosiveLadenVessel how to not use code block  */
 if (avoidanceMoverManager == null) {
@@ -258,13 +270,50 @@ start();</Code>
         <Argument name="contact" type="diskit.Mover3D">
             <Comment>The mover that was detected</Comment>
         </Argument>
+        <LocalVariable name="isFriendlyForce" type="boolean" value="friendlyForces.contains(contact.getMoverID())">
+            <Comment>Check to see if this is a contact of like forces</Comment>
+        </LocalVariable>        
         <Schedule condition="sensor == collisionDetection" delay="0.0" event="AssessObstacle" priority="0">
             <Comment>If the sensor that detected the mover is the collision detection sensor, process the mover as an obstacle</Comment>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Schedule condition="sensor == lodDetection &amp;&amp; !isFriendlyForce" delay="0.0" event="AssessThreat" priority="0">
+            <Comment>Line of demarcation breached</Comment>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Code>/*System.out.println(getName() + " Detected: " + contact.getName());*/</Code>
         <Coordinate x="300" y="90"/>
     </Event>
+    <Event name="AssessThreat">
+        <Comment></Comment>
+        <Argument name="contact" type="diskit.Mover3D">
+            <Comment>The threat</Comment>
+        </Argument>
+        <LocalVariable name="alreadyNotified" type="boolean" value="threatPicture.contains(contact)">
+            <Comment>Check to see if this contact is part of the entity's threat picture</Comment>
+        </LocalVariable>    
+        <LocalVariable name="contactArea" type="diskit.AStarZoneGeometry" value="nauticalChart.findClosestZone(contact.getLocation())">
+            <Comment>Returns the zone closest to the contact</Comment>
+        </LocalVariable>
+        <LocalVariable name="contactLocation" type="java.lang.String" value="contactArea.getName()">
+            <Comment>Returns the general area of the contact</Comment>
+        </LocalVariable>
+        <LocalVariable name="warningText" type="java.lang.String" value="&quot;All stations, there is an inbound hostile contact inside the line of demarcation of &quot; + contactLocation">
+            <Comment>message text for warning other entities</Comment>
+        </LocalVariable>        
+        <StateTransition state="threatPicture">
+            <Operation method="add(contact)"/>
+        </StateTransition>
+        <Schedule condition="!alreadyNotified" delay="0.0" event="PrepareRadioMessage" priority="0">        
+            <Comment/>
+            <EdgeParameter value="warningText"/>
+            <EdgeParameter value="&quot;HostileReport&quot;"/>
+            <EdgeParameter value="contact"/>
+        </Schedule>
+        <Code>System.out.println("Assessing threat in LOD  alreadyNotified: " + alreadyNotified); </Code>
+        <Coordinate x="300" y="170"/>
+    </Event>
+    
     <Event name="AssessObstacle">
         <Comment>This event uses diskit.util.MovementCalculator to determine if this entity is going to collide with the obstacle</Comment>
         <Argument name="obstacle" type="diskit.Mover3D">
@@ -299,7 +348,7 @@ start();</Code>
     </Event>
     <Event name="BuildSensorArray">
         <Comment>Combines all sensors in an array</Comment>
-        <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[5]">
+        <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[6]">
             <Comment>Initialized to the maximum number of sensors possible for this object</Comment>
         </LocalVariable>
         <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
@@ -310,7 +359,23 @@ start();</Code>
 multipleSensors[1] = surfaceRadar;
 multipleSensors[2] = airSearchRadar;
 multipleSensors[3] = sonar;
-multipleSensors[4] = collisionDetection;</Code>
+multipleSensors[4] = collisionDetection;
+multipleSensors[5] = lodDetection;
+</Code>
+        <Coordinate x="90" y="150"/>
+    </Event>
+    <Event name="BuildStationarySensorArray">
+        <Comment>Combines all sensors in an array</Comment>
+        <LocalVariable name="multipleSensors" type="diskit.Sensor[]" value="new diskit.Sensor[2]">
+            <Comment>Initialized to the maximum number of sensors possible for this object</Comment>
+        </LocalVariable>
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+            <Comment/>
+            <EdgeParameter value="multipleSensors"/>
+        </Schedule>
+        <Code>multipleSensors[0] = visualPerception;
+multipleSensors[1] = lodDetection;
+</Code>
         <Coordinate x="90" y="150"/>
     </Event>
     <Event name="RegisterSensor">
@@ -355,4 +420,39 @@ multipleSensors[4] = collisionDetection;</Code>
         <Code/>
         <Coordinate x="400" y="120"/>
     </Event>
+    <Event name="PrepareRadioMessage">
+        <Comment>Prepares a radio message for transmitting</Comment>
+        <Argument name="msgText" type="java.lang.String">
+            <Comment>The text of the message</Comment>
+        </Argument>
+        <Argument name="msgType" type="java.lang.String">
+            <Comment>The type of message being sent</Comment>
+        </Argument>
+        <Argument name="msgContext" type="diskit.Mover3D">
+            <Comment>The context of the message</Comment>
+        </Argument>
+        <StateTransition state="radioCommunication">
+            <Operation method="setMessage(msgText)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setType(msgType)"/>
+        </StateTransition>
+        <StateTransition state="radioCommunication">
+            <Operation method="setContext(msgContext)"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0" event="SendRadioMessage" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="radioCommunication"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="170" y="360"/>
+    </Event>
+    <Event name="SendRadioMessage">
+        <Comment>Transmits the radio message via the scenario manager.  Since this entity sends messages to different types of movers the recipient of the message is reset after transmission to ensure that the default is set</Comment>
+        <Argument name="msg" type="diskit.RadioCommunication">
+            <Comment>The message to transmit</Comment>
+        </Argument>
+        <Code/>
+        <Coordinate x="300" y="360"/>
+    </Event>    
 </SimEntity>
