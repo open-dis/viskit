@@ -598,11 +598,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           
         break;
       } else {
-          firePropertyChange("seed",new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed()));
+          Long seed = new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed());
+          firePropertyChange("seed",seed);
           if (Schedule.isRunning()) {
               System.out.println("Already running.");
           }
-          System.out.println("Starting Replication #"+(replication+1));
+          System.out.println("Starting Replication #"+(replication+1)+" with random seed "+seed);
           try {
               Schedule.reset();
           } catch (java.util.ConcurrentModificationException cme) {
