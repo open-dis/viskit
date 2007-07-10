@@ -147,6 +147,7 @@ public class SourceWindow extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         PrintStream origSysOut = System.out;
+        PrintStream origSysErr = System.err;
          PipedOutputStream pos = new PipedOutputStream();
          PrintStream newSysOut = new PrintStream(pos);
          PipedInputStream pis = new PipedInputStream();
@@ -172,21 +173,24 @@ public class SourceWindow extends JFrame
           }
         });
 
-        sysOutThread.start();
+        
 
         System.setOut(newSysOut);
         System.setErr(newSysOut);
-
-        AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
+        sysOutThread.start();
+        //AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
         int retc = AssemblyController.compileJavaFromStringAndHandleDependencies(src);
         
         newSysOut.flush();
         System.setOut(origSysOut);
+        System.setErr(origSysErr);
         newSysOut.close();
 
         // We're on the Swing event thread here so this is slightly lousy:
-        while(sysOutThread != null)
+        while(sysOutThread != null) {
+          
           Thread.yield();
+        }
 
         // Display the commpile results:
 
@@ -194,6 +198,7 @@ public class SourceWindow extends JFrame
           JOptionPane.showMessageDialog(SourceWindow.this,"Compiler returned error code "+retc,"Compile Error",JOptionPane.ERROR_MESSAGE);
 
         sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
+        
       }
     });
 
@@ -473,4 +478,6 @@ class sysOutDialog extends JDialog implements ActionListener
   {
     sysOutDialog.dialog.setVisible(false);
   }
+  
+  
 }
