@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import javax.tools.Diagnostic;
@@ -128,28 +129,20 @@ public class Gridlet extends Thread {
     public Gridlet() {
        
         try {
-           
-            Process pr = Runtime.getRuntime().exec("env");
-            InputStream is = pr.getInputStream();
-            Properties p = System.getProperties();
+            Map<String,String> props = System.getenv();
             
-            try {
-                p.load(is);
-            } catch (Exception e) {;}// do nothing, if on WINDOWS, getting the env properties will err
-                                     // which is OK since not on SGE here
-            if (p.getProperty("SGE_TASK_ID")!=null) {
-                
-                taskID=Integer.parseInt(p.getProperty("SGE_TASK_ID"));
-                jobID=Integer.parseInt(p.getProperty("JOB_ID"));
-                numTasks=Integer.parseInt(p.getProperty("SGE_TASK_LAST"));
-                frontHost = p.getProperty("SGE_O_HOST");
-                usid = p.getProperty("USID");
-                filename = p.getProperty("FILENAME");
-                port = Integer.parseInt(p.getProperty("PORT"));
-                pwd = p.getProperty("PWD");
+            if (props.get("SGE_TASK_ID")!=null) {  
+                taskID=Integer.parseInt(props.get("SGE_TASK_ID"));
+                jobID=Integer.parseInt(props.get("JOB_ID"));
+                numTasks=Integer.parseInt(props.get("SGE_TASK_LAST"));
+                frontHost = props.get("SGE_O_HOST");
+                usid = props.get("USID");
+                filename = props.get("FILENAME");
+                port = Integer.parseInt(props.get("PORT"));
+                pwd = props.get("PWD");
                 sax2j = new SimkitAssemblyXML2Java(new URL("file:"+pwd+"/"+filename).openStream());
                 System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd); 
-                //FIXME: should also check if SSL
+                //TBD: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
                 
                 // still needed?
