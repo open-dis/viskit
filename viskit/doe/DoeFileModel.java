@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import java.util.Map;
 import org.jdom.Document;
 import viskit.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
@@ -54,6 +55,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import viskit.xsd.bindings.assembly.DoubleRange;
 
 public class DoeFileModel
 {
@@ -63,78 +65,8 @@ public class DoeFileModel
   private List simEntities;
   public Document jdomDocument;
   public boolean dirty=false;
-
+  private Map<String,Integer> nameSpace = new HashMap();
   public HashMap seTerminalParamsHM;
-
-/*
-  // todo remove the jdom stuff
-  public File xmarshall() throws Exception
-  {
-    File f = File.createTempFile("DOEtemp",".grd");
-    return xmarshall(f);
-  }
-
-  // todo remove the jdom stuff 
-  public File xmarshall(File f) throws Exception
-  {
-    // Throw away existing design points
-    // Go down rows, update the nameRef and value fields (type, content aren't changed)
-    // For each row that's a factor (design point) add a design point TP at top
-    // If experiment tag doesn't exist add it with default values
-
-    ParamTableModel ptm = (ParamTableModel)paramTable.getModel();
-    int n = ptm.getRowCount();
-
-    Element root = jdomDocument.getRootElement();
-    root.removeChildren("TerminalParameter"); // design points at the top
-
-    int dpCount = 0;
-    for(int r=0;r<n;r++)  {
-      if(!ptm.isCellEditable(r,ParamTableModel.FACTOR_COL))
-        continue;
-
-      Object[] rData = ptm.getRowData(r);
-      Element el = (Element)ptm.getElementAtRow(r);
-
-      String val = (String)rData[ParamTableModel.VALUE_COL];
-      if(val != null && val.length()>0)
-        el.setAttribute("value",val);
-
-      if(((Boolean)rData[ParamTableModel.FACTOR_COL]).booleanValue() == true) {
-        String nmrf = (String)rData[ParamTableModel.NAME_COL];
-        if(nmrf != null && nmrf.length()>0)
-          el.setAttribute("nameRef",nmrf);
-        else
-          el.setAttribute("nameRef","noname"+r);
-
-        Element tp = new Element("TerminalParameter");
-        tp.setAttribute("type",el.getAttribute("type").getValue());
-        if(val != null && val.length()>0)
-          tp.setAttribute("value",val);
-
-        tp.setAttribute("name",el.getAttribute("nameRef").getValue());
-        Content cont = new CDATA(buildTPContent(rData,el));
-        tp.addContent(cont);
-
-        root.getChildren().add(dpCount++,tp); // at top in order
-      }
-    }
-
-    Element elm = root.getChild("Experiment");
-    if(elm == null) {
-      elm = new Element("Experiment");
-      elm.setAttribute("type","latin-hypercube");
-      elm.setAttribute("totalSamples","5");
-      elm.setAttribute("runsPerDesignPoint","7");
-      elm.setAttribute("timeout","30000");
-      List lis = root.getChildren();
-      lis.add(lis.size(),elm);   //at bottom
-    }
-
-    FileHandler.marshallJdom(f,jdomDocument);
-    return f;
-  }
-*/
 
   public File marshallJaxb() throws Exception
   {
@@ -149,56 +81,6 @@ public class DoeFileModel
     return f;
   }
 
-
-/*
-  private static String s0 = "Double[] ";
-  private static String s1 = "() {return new Double[] { new Double(";
-  private static String s2 = "), new Double(";
-  private static String s3 = ") };}";
-*/
-
-/*
-  private String buildTPContent(Object[] rData, Element elm)
-  {
-    String name = elm.getAttribute("nameRef").getValue();
-    //String type = (String)rData[ParamTableModel.TYPE_COL];
-    //String valu = (String)rData[ParamTableModel.VALUE_COL];
-    String min  = (String)rData[ParamTableModel.MIN_COL];
-    String max  = (String)rData[ParamTableModel.MAX_COL];
-
-
-    StringBuffer sb = new StringBuffer();
-    sb.append(s0);
-    sb.append(name);
-    sb.append(s1);
-    sb.append(min);
-    sb.append(s2);
-    sb.append(max);
-    sb.append(s3);
-
-    return sb.toString();
-  }
-  private String buildTPContent(Object[] rData, String nmrf)
-  {
-    //String type = (String)rData[ParamTableModel.TYPE_COL];
-    //String valu = (String)rData[ParamTableModel.VALUE_COL];
-    String min  = (String)rData[ParamTableModel.MIN_COL];
-    String max  = (String)rData[ParamTableModel.MAX_COL];
-
-
-    StringBuffer sb = new StringBuffer();
-    sb.append(s0);
-    sb.append(nmrf);
-    sb.append(s1);
-    sb.append(min);
-    sb.append(s2);
-    sb.append(max);
-    sb.append(s3);
-
-   return sb.toString();
-  }
-*/
-
   public void saveEventGraphsToJaxb(Collection evGraphs)
   {
     SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
@@ -208,10 +90,7 @@ public class DoeFileModel
     for(Iterator itr = evGraphs.iterator(); itr.hasNext();) {
       File f = (File)itr.next();
       try {
-        //SimkitXML2Java s2j = new SimkitXML2Java(f);
-        //s2j.unmarshal();
-        //String src = s2j.translate();
-
+        
         FileReader fr = new FileReader(f);
         StringBuffer sb = new StringBuffer();
         char[] cbuf = new char[4096];
@@ -274,8 +153,16 @@ public class DoeFileModel
         String name = (String)rData[ParamTableModel.NAME_COL];
         name = name.replace('.','_');  // periods illegal in java identifiers
         tp.setName(name);
-        tp.setLinkRef(name+"_DP");
-
+        Integer cnt = nameSpace.get(name);
+        if ( cnt == null ) {
+            cnt = 0;
+            
+        } else {
+            cnt ++;
+        }
+        nameSpace.put(name,cnt);
+        //tp.setLinkRef(name+"_"+cnt.toString()+"_DP");
+        tp.setName(name+"_"+cnt);
         // Create a designpoint TP with a name
         TerminalParameter newTP;
         try {
@@ -286,8 +173,8 @@ public class DoeFileModel
           designParms.clear();
           return;
         }
-        //newTP.setName(name);
-        newTP.setLink(name+"_DP");
+        newTP.setName(name+"_"+cnt.toString());
+        newTP.setLink(name+"_"+cnt.toString());
         newTP.setType(tp.getType());
         newTP.setValue(tp.getValue());  //may not be required with below:
 
@@ -318,111 +205,13 @@ public class DoeFileModel
         
         designParms.add(dpCount++,newTP);
 
-
-        // Set the nameref of the SimEntity TP to be a ref to the design point tp
-        // todo the following is permanently changing the jaxbroot, and will thusly get saved into xml.
-        //  The user has not necessarily requested that at this point, so we need to be able to undo the change
-        //   after marshalling.
         tp.setLinkRef(newTP);
-        //tp.setName(null);
-
+        
       }
     }
-    /* dont do this here.  do it in the runpanel
-    Element elm = root.getChild("Experiment");
-    if(elm == null) {
-      elm = new Element("Experiment");
-      elm.setAttribute("type","latin-hypercube");
-      elm.setAttribute("totalSamples","5");
-      elm.setAttribute("runsPerDesignPoint","7");
-      elm.setAttribute("timeout","30000");
-      List lis = root.getChildren();
-      lis.add(lis.size(),elm);   //at bottom
-    }
-
-    FileHandler.marshallJdom(f,jdomDocument);
-    return f;
- */
-
+   
   }
- /*
-  public void jaxbMarshall() throws Exception
-  {
-    JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-    File of = File.createTempFile("DOEtoCluster",".grd");
-    FileOutputStream fos  = new FileOutputStream(of);
-    Marshaller m = jaxbCtx.createMarshaller();
-
-    fillRoot();
-    m.marshal(jaxbRoot,fos);
-  }
-
-  private void fillRoot()
-  {
-    ObjectFactory oFactory = new ObjectFactory();
-
-    Experiment exp = null;
-    try {
-      exp = oFactory.createExperiment();
-    }
-    catch (JAXBException e) {
-      System.out.println("Exception in DoeFileModel.fillRoot()");
-      e.printStackTrace();
-    }
-    exp.setType("latin-hypercube");
-    exp.setTotalSamples("100");
-    exp.setRunsPerDesignPoint("5");
-    jaxbRoot.setExperiment(exp);
-
-  }
-
-*/
-/*
-  private void setDesignPoints(ObjectFactory oFactory)
-  {
-    List dps = jaxbRoot.getDesignParameters();
-    dps.clear();
-    TableModel tm = paramTable.getModel();
-    int rows = tm.getRowCount();
-    for(int r=0;r<rows;r++) {
-      Boolean b = (Boolean)tm.getValueAt(r,ParamTableModel.FACTOR_COL);
-      if(b.booleanValue()==true) {
-        String name = (String)tm.getValueAt(r,ParamTableModel.NAME_COL);
-        String type = (String)tm.getValueAt(r,ParamTableModel.TYPE_COL);
-        String valu = (String)tm.getValueAt(r,ParamTableModel.VALUE_COL);
-        String min  = (String)tm.getValueAt(r,ParamTableModel.MIN_COL);
-        String max  = (String)tm.getValueAt(r,ParamTableModel.MAX_COL);
-
-        TerminalParameter tp = null;
-        try {
-          tp = oFactory.createTerminalParameter();
-        }
-        catch (JAXBException e) {
-          e.printStackTrace();
-        }
-        tp.setValue("5.0"); //test valu);
-        tp.setName(name);
-        tp.setNameRef(null);
-        tp.setType(type);
-        List content = tp.getContent();
-        content.clear();
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(s0);
-        sb.append(name);
-        sb.append(s1);
-        sb.append(min);
-        sb.append(s2);
-        sb.append(max);
-        sb.append(s3);
-
-        content.add(sb.toString());
-        dps.add(tp);
-      }
-    }
-
-  }
-*/
+ 
   public List getSimEntities()
   {
     return simEntities;
@@ -432,30 +221,6 @@ public class DoeFileModel
     simEntities = se;   //jdom
     seTerminalParamsHM = new HashMap(se.size());
 
-    // switch to jaxb
-/*
-    se = jaxbRoot.getSimEntity();
-    for(Iterator itr = se.iterator(); itr.hasNext();) {
-      SimEntity sime = (SimEntity)itr.next();
-
-      sime.
-      String nm = sime.getName();
-      seTerminalParamsHM.put(nm,sime);
-    }
-*/
-
   }
 
-/*
-  private void addTPs(List lis)
-  {
-    for(Iterator itr=lis.iterator(); itr.hasNext();) {
-      Object o = itr.next();
-      if(o instanceof TerminalParameter) {
-        TerminalParameter tp = (TerminalParameter)o;
-
-      }
-    }
-  }
-*/
 }
