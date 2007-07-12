@@ -18,7 +18,8 @@
   <extraClassPath>
       <path value="lib/simkit.jar"/>
       <path value="lib/ext/diskit.jar"/>
-      <path value="BehaviorLibraries/SavageTactics"/>
+      <path value="BehaviorLibraries"/>
+      <path value="../ViskitModelsFOUO/SavageDefenseTactics"/>
       <path value="examples"/>
   </extraClassPath>
   <application>
