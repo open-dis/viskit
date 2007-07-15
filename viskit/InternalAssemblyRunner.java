@@ -582,13 +582,16 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     JMenuItem copy = new JMenuItem("Copy");
     JMenuItem selAll = new JMenuItem("Select all");
     JMenuItem clrAll = new JMenuItem("Clear all");
+    JMenuItem view = new JMenuItem("View output in text editor");
 
     save.addActionListener(saver);
     copy.addActionListener(new copyListener());
     selAll.addActionListener(new selectAllListener());
     clrAll.addActionListener(new clearListener());
-
+    view.addActionListener(new viewListener());
+    
     file.add(save);
+    file.add(view);
 
     file.addSeparator();
     file.add(new JMenuItem("Settings"));
@@ -626,6 +629,24 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       runPanel.soutTA.setText(null);
       runPanel.serrTA.setText(null);
     }
+  }
+  
+  class viewListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
+          File f = tmpFile;
+          String osName = System.getProperty("os.name");
+          String filePath;
+          String tool = "notepad";
+          if ( !osName.startsWith("Windows") ) {
+              tool = "gedit";
+          }
+          try {
+              filePath = f.getCanonicalPath();
+              Runtime.getRuntime().exec(tool+" "+filePath);
+          } catch (IOException ex) {
+              ex.printStackTrace();
+          }
+      }
   }
 
   private String namePrefix = "Viskit Assembly Runner";
