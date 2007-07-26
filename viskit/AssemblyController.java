@@ -953,8 +953,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       return x2j.translate();
     }
     catch (Exception e) {
-        e.printStackTrace();
-      System.err.println("Error building Java from " + f.getName() + ": " + e.getMessage());
+      if ( viskit.Vstatics.debug ) e.printStackTrace();
+      System.err.println("Error building Java from " + f.getName() + ": " + e.getMessage() + ", non event-graph xml found");
     }
     return null;
   }

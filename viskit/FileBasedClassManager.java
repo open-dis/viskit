@@ -95,7 +95,7 @@ public class FileBasedClassManager implements Runnable
           List[] pa = new List[] { simEntity.getParameter() };
           Vstatics.putParameterList(fclass.getName(),pa);
           if (viskit.Vstatics.debug) System.out.println("Put "+fclass.getName()+simEntity.getParameter());
-      } catch (Exception e) { e.printStackTrace();}
+      } catch (Exception e) { if (viskit.Vstatics.debug) e.printStackTrace(); }
     }
     else if (f.getName().toLowerCase().endsWith(".class")) {
       fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly

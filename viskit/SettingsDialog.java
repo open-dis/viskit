@@ -70,6 +70,7 @@ public class SettingsDialog extends JDialog
   private JCheckBox assyCB;
   private JCheckBox runCB;
   private JCheckBox analRptCB;
+  private JCheckBox debugMsgsCB;
 
   public static boolean showDialog(JFrame mother)
   {
@@ -130,6 +131,10 @@ public class SettingsDialog extends JDialog
     assyCB.addActionListener(vis);
     runCB.addActionListener(vis);
     analRptCB.addActionListener(vis);
+    debugMsgsCB.addActionListener(vis);
+    
+    // post process anything
+    Vstatics.debug = isVerboseDebug();
 
   }
 
@@ -206,6 +211,8 @@ public class SettingsDialog extends JDialog
       innerP.add(runCB);
       analRptCB = new JCheckBox("Analyst report");
       innerP.add(analRptCB);
+      debugMsgsCB = new JCheckBox("Verbose debug messages");
+      innerP.add(debugMsgsCB);
       innerP.setBorder(new CompoundBorder(new LineBorder(Color.black),new EmptyBorder(3,3,3,3)));
 
     visibleP.add(innerP,BorderLayout.CENTER);
@@ -228,6 +235,8 @@ public class SettingsDialog extends JDialog
   private static String asEdVisibleKey = "application.tabs.AssemblyEditor[@visible]";
   private static String asRunVisibleKey= "application.tabs.AssemblyRun[@visible]";
   private static String anRptVisibleKey= "application.tabs.AnalystReport[@visible]";
+  
+  private static String debugMsgsKey   = "application.debug";
 
   private static void initConfig()
   {
@@ -256,6 +265,10 @@ public class SettingsDialog extends JDialog
             assyCB.doClick(); // reenter here
         }
         vConfig.setProperty(asRunVisibleKey,runCB.isSelected());
+      }
+      else if(src == debugMsgsCB) {
+        vConfig.setProperty(debugMsgsKey,debugMsgsCB.isSelected());
+        Vstatics.debug = debugMsgsCB.isSelected();
       }
       else /* if(src == analRptCB) */
         vConfig.setProperty(anRptVisibleKey,analRptCB.isSelected());
@@ -336,6 +349,7 @@ public class SettingsDialog extends JDialog
     assyCB.setSelected(isAssemblyEditorVisible());
     runCB.setSelected(isAssemblyRunVisible());
     analRptCB.setSelected(isAnalystReportVisible());
+    debugMsgsCB.setSelected(isVerboseDebug());
   }
 
   private void unloadWidgets()
@@ -529,5 +543,10 @@ public class SettingsDialog extends JDialog
   public static boolean isAnalystReportVisible()
   {
     return getVisibilitySense(anRptVisibleKey);
+  }
+  
+  public static boolean isVerboseDebug() 
+  {
+    return getVisibilitySense(debugMsgsKey);
   }
 }

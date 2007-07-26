@@ -300,7 +300,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         //}
       }
       catch (Throwable throwable) {
-          throwable.printStackTrace();
+        if ( viskit.Vstatics.debug ) throwable.printStackTrace();
         System.err.println("Couldn't handle " + f.getName() + ". " + throwable.getMessage());
         if (recurseNogoList != null)
           recurseNogoList.add(f.getName());
