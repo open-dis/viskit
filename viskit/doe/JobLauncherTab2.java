@@ -928,8 +928,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
               //chartter = new JobResults(null, title);
               statsGraphSet = false;
               writeStatus("Getting results:");
-              
-              processResults();
+              Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+              //processResults();
+              ProcessResults processResults = new ProcessResults(doe,jaxbRoot,statsGraph);
+              processResults.execute();
               
           }
           
@@ -940,88 +942,109 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
   }
 
   private boolean statsGraphSet=false;
-  private void processResults() {
-      Object ret;
-      Experiment exp = (Experiment) jaxbRoot.getExperiment();
-      int samples = Integer.parseInt(exp.getTotalSamples());
-      int designPoints = jaxbRoot.getDesignParameters().size();
+  
+  class ProcessResults extends SwingWorker<Void,Void> {
+      SimkitAssembly jaxbRoot;
+      DoeRunDriver doe;
+      StatsGraph statsGraph;
+      public ProcessResults(DoeRunDriver doe, SimkitAssembly jaxbRoot, StatsGraph statsGraph) {
+          this.doe = doe;
+          this.jaxbRoot = jaxbRoot;
+          this.statsGraph = statsGraph;
+          Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      }
       
-      ArrayList lastQueue;
+      protected Void doInBackground() throws Exception {
+          processResults();
+          return (Void)null;
+      }
       
-      try {
+      private void processResults() {
+          Object ret;
+          Experiment exp = (Experiment) jaxbRoot.getExperiment();
+          int samples = Integer.parseInt(exp.getTotalSamples());
+          int designPoints = jaxbRoot.getDesignParameters().size();
           
-          lastQueue = doe.getTaskQueue();
-          int totalTasks = lastQueue.size(); 
-          int tasksRemaining = totalTasks;
-          writeStatus("Total tasks: " + totalTasks);
-          //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
-          bQ = new ArrayBlockingQueue(totalTasks);
-          graphUpdater = new GraphUpdater(bQ,statsGraph);
-          doe.run();
-          graphUpdater.execute();
-          while (tasksRemaining > 0) {
-              try {
-                  // this will block until a task ends which could be
-                  // because it died, or because it completed, either way
-                  // check the logs returned by getResults will tell.
-                  ArrayList queue = doe.getTaskQueue();
-                  List sQueue = Collections.synchronizedList(queue);
-                  synchronized(sQueue) {
-                      ListIterator li = sQueue.listIterator();
-                      int i = 0;
-                      while (li.hasNext()) {
-                          //for (int i = 0; i < totalTasks; i ++) {
-                          // trick: any change between queries indicates a transition at
-                          // taskID = i (well i+1 really, taskID's in SGE start at 1)
-                          //if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
-                          
-                          boolean state = ((Boolean)li.next()).booleanValue();
-                          
-                          if (((Boolean)lastQueue.get(i)).booleanValue() != state) {
-                              int sampleIndex = i / designPoints;
-                              int designPtIndex = i % designPoints;
+          ArrayList lastQueue;
+          
+          try {
+              
+              lastQueue = doe.getTaskQueue();
+              int totalTasks = lastQueue.size();
+              int tasksRemaining = totalTasks;
+              writeStatus("Total tasks: " + totalTasks);
+              //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
+              bQ = new ArrayBlockingQueue(totalTasks);
+              graphUpdater = new GraphUpdater(bQ,statsGraph);
+              doe.run();
+              graphUpdater.execute();
+              while (tasksRemaining > 0) {
+                  try {
+                      // this will block until a task ends which could be
+                      // because it died, or because it completed, either way
+                      // check the logs returned by getResults will tell.
+                      ArrayList queue = doe.getTaskQueue();
+                      List sQueue = Collections.synchronizedList(queue);
+                      synchronized(sQueue) {
+                          ListIterator li = sQueue.listIterator();
+                          int i = 0;
+                          while (li.hasNext()) {
+                              //for (int i = 0; i < totalTasks; i ++) {
+                              // trick: any change between queries indicates a transition at
+                              // taskID = i (well i+1 really, taskID's in SGE start at 1)
+                              //if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
                               
-                              if (/*verbose*/true) {
-                                  //ret = doe.getResult(sampleIndex,designPtIndex);
-                                  writeStatus("Result returned from task " + (i + 1) +" leaving "+tasksRemaining+" to go");
-                                  //writeStatus(ret.toString());
+                              boolean state = ((Boolean)li.next()).booleanValue();
+                              
+                              if (((Boolean)lastQueue.get(i)).booleanValue() != state) {
+                                  int sampleIndex = i / designPoints;
+                                  int designPtIndex = i % designPoints;
+                                  
+                                  if (/*verbose*/true) {
+                                      //ret = doe.getResult(sampleIndex,designPtIndex);
+                                      writeStatus("Result returned from task " + (i + 1) +" leaving "+tasksRemaining+" to go");
+                                      //writeStatus(ret.toString());
+                                  }
+                                  
+                                  ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
+                                  
+                                  if (statsGraphSet == false) {
+                                      String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
+                                      statsGraph.setProperties(properties,designPoints,samples);
+                                      statsGraphSet = true;
+                                  }
+                                  addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
+                                  writeStatus("DesignPointStats from task " + (i + 1) + " at sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
+                                  
+                                  writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
+                                  for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
+                                      writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
+                                      ret = doe.getReplicationStats(sampleIndex,designPtIndex,j);
+                                  }
+                                  --tasksRemaining;
+                                  lastQueue.set(i,new Boolean(state));
                               }
-                              
-                              ret = doe.getDesignPointStats(sampleIndex,designPtIndex);
-                              
-                              if (statsGraphSet == false) {
-                                  String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
-                                  statsGraph.setProperties(properties,designPoints,samples);
-                                  statsGraphSet = true;
-                              }
-                              addDesignPointStatsToGraphs((Hashtable) ret, designPtIndex, sampleIndex);
-                              writeStatus("DesignPointStats from task " + (i + 1) + " at sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
-                              
-                              writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
-                              for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
-                                  writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
-                                  ret = doe.getReplicationStats(sampleIndex,designPtIndex,j);
-                              }
-                              --tasksRemaining;
-                              lastQueue.set(i,new Boolean(state));
+                              i++;
+                              System.gc();
+                              System.runFinalization();
                           }
-                          i++;
-                          System.gc();
-                          System.runFinalization();
                       }
+                      
+                  } catch (Exception e) {
+                      e.printStackTrace();
                   }
                   
-              } catch (Exception e) {
-                  e.printStackTrace();
               }
-              
+          } catch (Exception e) {
+              e.printStackTrace();
+              writeStatus("Error in cluster execution: " + e.getMessage());
           }
-      } catch (Exception e) {
-          e.printStackTrace();
-          writeStatus("Error in cluster execution: " + e.getMessage());
+          stopRun();
       }
-      stopRun();
   }
+  
+  
+  
 
 
   ArrayList outputList;

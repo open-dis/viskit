@@ -1,5 +1,7 @@
 package viskit;
 
+import java.net.URI;
+import java.util.Arrays;
 import javax.swing.*;
 import javax.swing.text.Document;
 import javax.swing.text.BadLocationException;
@@ -9,6 +11,14 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+import viskit.VGlobals;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -21,8 +31,10 @@ import java.util.regex.Matcher;
  */
 public class SourceWindow extends JFrame
 {
-  final String src;
-
+  // weird compiler error, lets src be visible as final
+  // but not className???
+  public static String className;
+  public final String src;
   Thread sysOutThread;
   JTextArea jta;
   private static JFileChooser saveChooser;
@@ -31,8 +43,9 @@ public class SourceWindow extends JFrame
   private Action startAct;
   private Action againAct;
 
-  public SourceWindow(JFrame main, String source)
+  public SourceWindow(JFrame main, String className, String source)
   {
+    this.className = className;
     this.src = source;
     if(saveChooser == null) {
       saveChooser = new JFileChooser();
@@ -144,98 +157,151 @@ public class SourceWindow extends JFrame
       StringBuffer sb = new StringBuffer();
       BufferedReader br;
       String nl = System.getProperty("line.separator");
-      public void actionPerformed(ActionEvent e)
-      {
-        PrintStream origSysOut = System.out;
-        PrintStream origSysErr = System.err;
-         PipedOutputStream pos = new PipedOutputStream();
-         PrintStream newSysOut = new PrintStream(pos);
-         PipedInputStream pis = new PipedInputStream();
-         try {pos.connect(pis);}catch (IOException e1) {JOptionPane.showMessageDialog(null,"bad pos.connect!");}
-         br = new BufferedReader(new InputStreamReader(pis));
 
-         sysOutThread = new Thread(new Runnable() {
-           public void run()
-           {
-             try {
-               String ln;
-               while((ln = br.readLine()) != null)
-               {
-                 sb.append(ln);
-                 sb.append(nl);
-               }
-             }
-             catch (IOException e1) {
-              // normal termination
-             }
-             try {br.close();}catch (IOException e1) {}
-             sysOutThread = null;
-          }
-        });
-
-        
-
-        System.setOut(newSysOut);
-        System.setErr(newSysOut);
-        sysOutThread.start();
-        //AssemblyController.compileJavaClassFromStringAndHandleDependencies(src);
-        int retc = AssemblyController.compileJavaFromStringAndHandleDependencies(src);
-        
-        newSysOut.flush();
-        System.setOut(origSysOut);
-        System.setErr(origSysErr);
-        newSysOut.close();
-
-        // We're on the Swing event thread here so this is slightly lousy:
-        while(sysOutThread != null) {
+      public void actionPerformed(ActionEvent e) {
+     
+          ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+          ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+          JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+          StringBuffer diagnosticMessages = new StringBuffer();
+          CompilerDiagnosticListener diag = new CompilerDiagnosticListener(diagnosticMessages);
+          String clName = SourceWindow.className;
+          JavaObjectFromString jofs;
           
-          Thread.yield();
-        }
+          try {
+              jofs = new JavaObjectFromString(clName, src);
+              File workDir = VGlobals.instance().getWorkDirectory();
+              StandardJavaFileManager sjfm = compiler.getStandardFileManager(diag,null,null);
+              Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
+              String workDirPath = workDir.toURI().getPath();
+              String[] workClassPath = ((viskit.doe.LocalBootLoader)(VGlobals.instance().getWorkClassLoader())).getClassPath();
+              StringBuffer classPaths = new StringBuffer();
+              
+              for (String cPath: workClassPath) {
+                  classPaths.append(cPath+File.pathSeparator);
+              }
+              
+              String[] options = {
+                "-classpath",
+                classPaths.toString(),
+                "-d",
+                workDirPath
+              };
+              java.util.List<String> optionsList = Arrays.asList(options);
+              
+              String[] classes = {
+                  "viskit.ParameterMap"
+              };
+              java.util.List<String> clNameList = Arrays.asList(classes);
+              
+              compiler.getTask(
+                      new BufferedWriter(new OutputStreamWriter(baosOut)),
+                      sjfm,
+                      diag,
+                      optionsList,
+                      //clNameList,
+                      null,
+                      fileObjects
+              ).call();
+              sb.append(baosOut.toString());
+              sb.append(diag.messageString);
+              //JOptionPane.showMessageDialog(SourceWindow.this,"Compiler diagnostics "+retc,"",JOptionPane.ERROR_MESSAGE);
+              sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
+              
+              //SourceWindow.this.
+              
+          } catch (Exception ex) {
+              ex.printStackTrace();
+          }
+          
 
-        // Display the commpile results:
-
-        if(retc != 0)
-          JOptionPane.showMessageDialog(SourceWindow.this,"Compiler returned error code "+retc,"Compile Error",JOptionPane.ERROR_MESSAGE);
-
-        sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
-        
+          
+          // Display the commpile results:
+          /*
+          if(retc != 0)
+              
+          
+          
+          */
       }
     });
-
-    saveButt.addActionListener( new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        String fn = getFileName();
-        saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(),fn));
-        int ret =  saveChooser.showSaveDialog(SourceWindow.this);
-        if(ret != JFileChooser.APPROVE_OPTION)
-          return;
-        File f = saveChooser.getSelectedFile();
-
-        if(f.exists()) {
-          int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?","Confirm",
-                                                JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-          if(r != JOptionPane.YES_OPTION)
-            return;
+    
+    saveButt.addActionListener( new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            String fn = getFileName();
+            saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(),fn));
+            int ret =  saveChooser.showSaveDialog(SourceWindow.this);
+            if(ret != JFileChooser.APPROVE_OPTION)
+                return;
+            File f = saveChooser.getSelectedFile();
+            
+            if(f.exists()) {
+                int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?","Confirm",
+                        JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+                if(r != JOptionPane.YES_OPTION)
+                    return;
+            }
+            
+            try {
+                FileWriter fw = new FileWriter(f);
+                fw.write(src);
+                fw.close();
+                SourceWindow.this.dispose();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null,"Exception on source file write" +
+                        "\n"+ f.getName() +
+                        "\n"+ ex.getMessage(),
+                        "File I/O Error",JOptionPane.ERROR_MESSAGE);
+            }
+            
         }
-
-        try {
-          FileWriter fw = new FileWriter(f);
-          fw.write(src);
-          fw.close();
-          SourceWindow.this.dispose();
-        }
-        catch (IOException ex) {
-          JOptionPane.showMessageDialog(null,"Exception on source file write" +
-                                     "\n"+ f.getName() +
-                                     "\n"+ ex.getMessage(),
-                                     "File I/O Error",JOptionPane.ERROR_MESSAGE);
-        }
-
-      }
     });
   }
+  
+  public class CompilerDiagnosticListener implements DiagnosticListener {
+      
+      public StringBuffer messageString;
+      
+      public CompilerDiagnosticListener(StringBuffer messageString) {
+          this.messageString = messageString;
+      }
+      public void report(Diagnostic message) {
+          String msg = message.getMessage(null);
+          if ( msg.indexOf("should be declared in a file named") > 0 ) {
+              msg = "No Compiler Errors";
+              messageString.append(msg).append('\n');
+          } else {
+              
+            messageString
+                  .append("Viskit has detected ").append(msg).append('\n')
+                  .append("Code: ").append(message.getCode()).append('\n')
+                  .append("Kind: ").append(message.getKind()).append('\n')
+                  .append("Line Number: ").append(message.getLineNumber()).append('\n')
+                  .append("Column Number: ").append(message.getColumnNumber()).append('\n')
+                  .append("Position: ").append(message.getPosition()).append('\n')
+                  .append("Start Position: ").append(message.getStartPosition()).append('\n')
+                  .append("End Position: ").append(message.getEndPosition()).append('\n')
+                  .append("Source: ").append(message.getSource());
+          }
+          
+      }
+  }
+
+  public class JavaObjectFromString extends SimpleJavaFileObject{
+      private String contents = null;
+      public JavaObjectFromString(String className, String contents) throws Exception{
+          super(new URI(className), Kind.SOURCE);
+          this.contents = contents;
+      }
+      public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+          return contents;
+      }
+  }
+  
+  
+  
+  
+  
   private String addLineNums(String src)
   {
     // Choose the right line ending

@@ -478,7 +478,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 replicationStatsNotifiers.set(index,new Boolean(true));
                 notifier.notify();
                 
-                //System.out.println("addReplicationStat "+stat);
+                System.out.println("addReplicationStat "+stat);
             }
         } catch (Exception e) { e.printStackTrace(); return Boolean.FALSE; }
        

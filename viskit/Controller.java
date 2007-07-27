@@ -612,8 +612,10 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if(checkSave() == false || lastFile == null)
       return;
     String source = ((ViskitModel)getModel()).buildJavaSource();
-    if(source != null && source.length() > 0)
-      ((ViskitView)getView()).showAndSaveSource(source,lastFile.getName());
+    if(source != null && source.length() > 0) {
+        String className = ((ViskitModel)getModel()).getMetaData().packageName+"."+((ViskitModel)getModel()).getMetaData().name;
+      ((ViskitView)getView()).showAndSaveSource(className,source,lastFile.getName());
+    }
   }
 
   public void showXML()

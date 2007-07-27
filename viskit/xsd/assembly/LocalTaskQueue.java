@@ -86,6 +86,7 @@ public class LocalTaskQueue extends /*Vector*/ ArrayList {
                 Constructor constr = gridletz.getConstructor(new Class[]{});
                 task = constr.newInstance(new Object[]{});
                 ((Thread)task).setContextClassLoader(loader);
+                ((Thread)task).setPriority(Thread.MAX_PRIORITY);
                 //System.out.println("At this point, setting "+task+"'s loader to "+loader);
                 //task.setExperimentFile(experimentFile);
                 Class fileClass = loader.loadClass("java.io.File");

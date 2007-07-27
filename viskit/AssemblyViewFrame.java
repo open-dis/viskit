@@ -861,9 +861,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
    *
    * @param s Java source
    */
-  public void showAndSaveSource(String s)
+  public void showAndSaveSource(String className, String s)
   {
-    JFrame f = new SourceWindow(this, s);
+    JFrame f = new SourceWindow(this, className, s);
     f.setTitle("Generated source from " + filename);
     f.setVisible(true);
   }

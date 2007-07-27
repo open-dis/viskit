@@ -81,10 +81,7 @@ public class FileBasedClassManager implements Runnable
     if (f.getName().toLowerCase().endsWith(".xml")) {
       PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
       ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
-        //was:
-        //fclass = FindClassesForInterface.classFromFile(paf.f);   // Throwable from here possibly
-        //fban = new FileBasedAssyNode(paf.f,fclass.getName(),f,paf.pkg);
-      
+       
       // since we're here, cache the parameter names
       JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
       Unmarshaller um = jaxbCtx.createUnmarshaller();

@@ -1125,9 +1125,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
    * to save.
    * @param s Java source
    */
-  public void showAndSaveSource(String s, String filename)
+  public void showAndSaveSource(String className, String s, String filename)
   {
-    JFrame f = new SourceWindow(this,s);
+    JFrame f = new SourceWindow(this,className,s);
     f.setTitle("Generated source from "+filename);
     f.setVisible(true);
   }

@@ -53,7 +53,7 @@ public interface ViskitAssemblyView
   //public String  getStopTime();
   //public boolean getVerbose();
 
-  public void    showAndSaveSource(String s);
+  public void    showAndSaveSource(String className, String s);
   public void    displayXML(File f);
 
 }

@@ -47,7 +47,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   public AssemblyModel(ViskitAssemblyController cont)
   {
     controller = cont;
-    metaData = new GraphMetaData();
+    metaData = new GraphMetaData(this);
   }
 
   public void init()
@@ -882,7 +882,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
     }
     else {
       try {
-        mymetaData = new GraphMetaData();
+        mymetaData = new GraphMetaData(this);
         Unmarshaller u = jc.createUnmarshaller();
         // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
         // see u.isValidating()

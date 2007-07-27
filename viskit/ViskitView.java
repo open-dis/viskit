@@ -40,7 +40,7 @@ public interface ViskitView
   public void    delTab(ViskitModel mod); // When a tab is removed
   public ViskitModel[] getOpenModels();
 
-  public void    showAndSaveSource(String s, String filename);
+  public void    showAndSaveSource(String className, String s, String filename);
   public void    displayXML(File f);
 
   public void    prepareToQuit();

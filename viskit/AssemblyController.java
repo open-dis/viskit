@@ -918,8 +918,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   public void generateJavaSource()
   {
     String source = produceJavaClass();
-    if(source != null && source.length() > 0)
-      ((ViskitAssemblyView)getView()).showAndSaveSource(source);
+    if(source != null && source.length() > 0) {
+      String className = ((ViskitAssemblyModel)getModel()).getMetaData().packageName +"."+ ((ViskitAssemblyModel)getModel()).getMetaData().name;
+      ((ViskitAssemblyView)getView()).showAndSaveSource(className,source);
+    }
   }
 
   private String produceJavaClass()
