@@ -591,7 +591,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       if (f.isDirectory()) {
         if (!dirsToo)
           return false;
-        if (f.getName().equals("CVS"))
+        if (f.getName().equals("CVS") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 )
           return false;
         File[] fa = f.listFiles(new MyClassTypeFilter(true));
         if(fa == null || fa.length <= 0)

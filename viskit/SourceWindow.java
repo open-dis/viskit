@@ -3,6 +3,7 @@ package viskit;
 import java.net.URI;
 import java.util.Arrays;
 import javax.swing.*;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -205,24 +206,25 @@ public class SourceWindow extends JFrame
               ).call();
               sb.append(baosOut.toString());
               sb.append(diag.messageString);
-              //JOptionPane.showMessageDialog(SourceWindow.this,"Compiler diagnostics "+retc,"",JOptionPane.ERROR_MESSAGE);
+              
               sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
               
-              //SourceWindow.this.
+              if (diag.messageString.toString().indexOf("No Compiler Errors") < 0) {
+                  ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.RED);
+                  int startOffset = (int)diag.getLineNumber()*5 + (int)diag.getStartOffset();
+                  int endOffset = (int)diag.getLineNumber()*5 + (int)diag.getEndOffset();
+                  SourceWindow.this.jta.getHighlighter().addHighlight(startOffset,endOffset,errorHighlightPainter);
+                  SourceWindow.this.jta.getCaret().setBlinkRate(250);
+                  SourceWindow.this.jta.getCaret().setVisible(true);
+                  SourceWindow.this.jta.setCaretPosition(startOffset);
+              }
+              
               
           } catch (Exception ex) {
               ex.printStackTrace();
           }
           
 
-          
-          // Display the commpile results:
-          /*
-          if(retc != 0)
-              
-          
-          
-          */
       }
     });
     
@@ -261,6 +263,9 @@ public class SourceWindow extends JFrame
   public class CompilerDiagnosticListener implements DiagnosticListener {
       
       public StringBuffer messageString;
+      public long startOffset = -1;
+      public long endOffset = 0;
+      public long line;
       
       public CompilerDiagnosticListener(StringBuffer messageString) {
           this.messageString = messageString;
@@ -284,6 +289,25 @@ public class SourceWindow extends JFrame
                   .append("Source: ").append(message.getSource());
           }
           
+          if (startOffset == -1)
+              startOffset = message.getStartPosition();
+          else 
+              startOffset = startOffset < message.getStartPosition() ? startOffset:message.getStartPosition();
+          
+          endOffset = message.getEndPosition();
+          line = message.getLineNumber();
+      }
+      
+      public long getStartOffset() {
+        return startOffset;
+      }
+      
+      public long getEndOffset() {
+          return endOffset;
+      }
+      
+      public long getLineNumber() {
+          return line;
       }
   }
 
@@ -298,7 +322,11 @@ public class SourceWindow extends JFrame
       }
   }
   
-  
+  class ErrorHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+      public ErrorHighlightPainter(Color color) {
+          super(color);
+      }
+  }
   
   
   

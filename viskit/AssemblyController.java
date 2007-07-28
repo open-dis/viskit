@@ -769,9 +769,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
               return;
           }
           String className = ((EvGraphNode)o).getType();
-          File f = FileBasedClassManager.inst().getFile(className);
+          File f = null; 
+          try {
+            f = FileBasedClassManager.inst().getFile(className);
+          } catch (Exception e) {
+              if ( viskit.Vstatics.debug ) e.printStackTrace();
+          }
           if (f == null) {
-             JOptionPane.showMessageDialog(null, "Please select an XML Event Graph"); 
+             JOptionPane.showMessageDialog(null, "Please select an XML Event Graph to load to EG Editor tab"); 
              return;
           }
           VGlobals.instance().getEventGraphEditor().controller._doOpen(f);
@@ -1174,7 +1179,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       }
       File f = compileJavaClassFromString(source,continueOnBadCompile);
       if (f != null) {
-        f.deleteOnExit();
+        //f.deleteOnExit(); // these get cached now for startup
         return new PkgAndFile(pkg, f);
       }
     }

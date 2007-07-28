@@ -809,32 +809,44 @@ public class VGlobals
 
   private File workDirectory;
 
-  private void setupWorkDirectory()
-  {
-    try {
-      workDirectory = File.createTempFile("viskit","work");   // actually creates
-      String p = workDirectory.getAbsolutePath();   // just want the name part of it
-      workDirectory.delete();        // Don't want the file to be made yet
-      workDirectory = new File(p);
-      workDirectory.mkdir();
-      workDirectory.deleteOnExit();
-
-      File nf = new File(workDirectory,"simkit");     // most go here
-      nf.mkdir();
-      nf.deleteOnExit();
-      nf = new File(nf,"examples");
-      nf.mkdir();
-      nf.deleteOnExit();
-      return;
-    }
-    catch (IOException e) {}
-
-    if(workDirectory.mkdir()==false)
-        JOptionPane.showMessageDialog(null,"The directory "+ workDirectory.getPath()+
-                    " could not be created.  Correct permissions before proceeding.",
-                                      "Error",JOptionPane.ERROR_MESSAGE);
+  private void setupWorkDirectory() {
+      
+      java.util.List<String> cache = Arrays.asList(getHistoryConfig().getStringArray("Cached.EventGraphs"+"[@xml]"));
+      
+      if (cache.isEmpty()) {
+          newWorkDir();
+      } else { 
+          workDirectory = new File(getHistoryConfig().getString("Cached[@workDir]"));
+          if (workDirectory.listFiles().length == 0)
+              newWorkDir();
+            
+      }
   }
 
+  private void newWorkDir() {
+      try {
+              workDirectory = File.createTempFile("viskit","work");   // actually creates
+              String p = workDirectory.getAbsolutePath();   // just want the name part of it
+              workDirectory.delete();        // Don't want the file to be made yet
+              workDirectory = new File(p);
+              workDirectory.mkdir();
+              workDirectory.deleteOnExit();
+              
+              File nf = new File(workDirectory,"simkit");     // most go here
+              nf.mkdir();
+              nf.deleteOnExit();
+              nf = new File(nf,"examples");
+              nf.mkdir();
+              nf.deleteOnExit();
+              return;
+          } catch (IOException e) {}
+          
+          if(workDirectory.mkdir()==false)
+              JOptionPane.showMessageDialog(null,"The directory "+ workDirectory.getPath()+
+                      " could not be created.  Correct permissions before proceeding.",
+                      "Error",JOptionPane.ERROR_MESSAGE);
+  }
+  
   private XMLConfiguration hConfig;
   private String userConfigPath = System.getProperty("user.home")+
                                   System.getProperty("file.separator") +
