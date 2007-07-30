@@ -3,7 +3,7 @@ package viskit;
 import javax.xml.bind.JAXBException;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.ParameterType;
-
+import org.apache.commons.configuration.XMLConfiguration;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -188,7 +188,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     if (!f.getName().equals("CVS")) {
       if (f.getName().toLowerCase().endsWith(".jar"))
         addJarFile(f.getPath());
-      else  // new 15 NOV 05
+      else if ( !f.getName().endsWith(".java") )
         addContentRoot(f, false);
     }
   }
@@ -203,8 +203,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       recurseNogoList = new Vector();
     else
       recurseNogoList = null;
-
-    addContentRoot(f, recurse, v);
+    if ( !f.getName().endsWith(".java") )
+        addContentRoot(f, recurse, v);
     /* Skip the bad news reporting
     if(recurseNogoList != null && recurseNogoList.size()>0) {
     JOptionPane.showMessageDialog(this,recurseNogoList.toArray(new String[0]),"Classes or files not added:",JOptionPane.INFORMATION_MESSAGE);
@@ -214,20 +214,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     if (classNodeCount != 0)
       return;
 
-    // Here if we maybe added a bunch of directories, but twernt no leaves in our tree.
-    /*
-    int ret = JOptionPane.showConfirmDialog(LegosTree.this, "No classes of type " + targetClass.getName() + "\nfound " +
-      "in " + f.getName() +
-      ", or duplicate class type encountered. \nInsert in list anyway?", "Error",
-      JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-    if (ret == JOptionPane.YES_OPTION)
-    return;
-
-    for (Iterator iterator = v.iterator(); iterator.hasNext();) {
-    DefaultMutableTreeNode n = (DefaultMutableTreeNode) iterator.next();
-    mod.removeNodeFromParent(n);
-    }
-    */
     JOptionPane.showMessageDialog(LegosTree.this, "Compile error in " + f.getName() + ",\n" +
         "or no classes of type " + targetClass.getName() +
         " found,\n" +
@@ -285,25 +271,27 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     // We're NOT a directory...
     else {
       FileBasedAssyNode fban;
+      if ( FileBasedClassManager.inst().isCacheMiss(f) ) return;
+      
       try {
         fban = FileBasedClassManager.inst().loadFile(f);
         // Check here for duplicates of the classes which have been loaded on the classpath (simkit.jar);
-        // No dups accepted
+        // No dups accepted, should throw exception upon success
         try {
           Class.forName(fban.loadedClass);
           return;  // don't proceed
-        }
-        catch (Exception e) {
+        } catch (Exception e) { // expectecd
             ;//e.printStackTrace();
         }
-        //catch (ClassNotFoundException e) {
-        //}
-      }
-      catch (Throwable throwable) {
+        
+      } catch (Throwable throwable) {
         if ( viskit.Vstatics.debug ) throwable.printStackTrace();
-        System.err.println("Couldn't handle " + f.getName() + ". " + throwable.getMessage());
+        System.err.println("Couldn't handle " + f + ". " + throwable.getMessage());
         if (recurseNogoList != null)
           recurseNogoList.add(f.getName());
+
+        FileBasedClassManager.inst().addCacheMiss(f);
+
         return;
       }
       myNode = new DefaultMutableTreeNode(fban);
@@ -372,40 +360,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     jarFileCommon(jf);
   }
 
-  /*
-   * @param classInJarFile
-   * @param jarFileName
-   */
-/*
-  private void addJarFile(String classInJarFile, String jarFileName)
-  {
-    JarFile jarFile = null;
-    try {
-      // This way doesn't need jar file dir on classpath
-      Class c = Class.forName(classInJarFile, false, this.getClass().getClassLoader());
-
-      String clsName = "/" + c.getName().replace('.', '/') + ".class";
-      URL classU = c.getResource(clsName);
-      String jp = classU.getPath();
-      int bang = jp.indexOf('!');
-      if (bang >= 0)
-        jp = jp.substring(0, bang);
-      URI jui = new URI(jp.toString());
-      jarFile = new JarFile(jui.getPath());
-
-      // This way needs jar file directory on classpath
-      //URL jurl = ClassLoader.getSystemResource(jarFileName);
-      //URI juri = new URI(jurl.toString());
-      //jarFile = new JarFile(juri.getPath()); //jarFileName);
-    }
-    catch (Exception e) {
-      JOptionPane.showMessageDialog(LegosTree.this, "Error reading " + jarFileName, "I/O Error", JOptionPane.ERROR_MESSAGE);
-      return;
-
-    }
-    jarFileCommon(jarFile);
-  }
-*/
 
   private void jarFileCommon(JarFile jarFile) {
       java.util.List list = FindClassesForInterface.findClasses(jarFile, targetClass);
@@ -591,18 +545,20 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
       if (f.isDirectory()) {
         if (!dirsToo)
           return false;
-        if (f.getName().equals("CVS") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 )
+        // TBD add an ignore in SettingsDialog, and in history file
+        if (       
+                   f.getName().equals("CVS") 
+                || f.getName().indexOf("Assemblies") > -1 
+                || f.getName().indexOf("Assembly") > -1 
+                || f.getName().indexOf("Scenario") > -1 
+                || f.getName().indexOf("Locations") > -1 
+                
+           )
           return false;
         File[] fa = f.listFiles(new MyClassTypeFilter(true));
         if(fa == null || fa.length <= 0)
           return false;   // don't include empty dirs.
-/*
-      else if (f.getName().equals("CVS") ||
-          f.getName().equals("Scenarios") ||
-          f.getName().equals("Locations")){
-        return false;
-      }
-*/
+
         else
           return true;
       }
@@ -639,9 +595,12 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
     else
       return; // 24 Nov 04
-
-    e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
-        new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
+    try {
+        e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
+            new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
+    } catch ( java.awt.dnd.InvalidDnDOperationException dnde ) {
+        ;// nop, it works, makes some complaint, but works, why? 
+    }
   }
 
   public void dragDropEnd(DragSourceDropEvent e)

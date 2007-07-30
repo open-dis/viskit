@@ -3,6 +3,7 @@ package viskit;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Map;
 import javax.swing.*;
@@ -92,7 +93,7 @@ public class FileBasedClassManager implements Runnable
       Class fclass = null;
       // if it is cached, cache directory exists and will be loaded on start
       if (f.getName().toLowerCase().endsWith(".xml")) {
-          if (!isCached(f)) {
+          if (!isCached(f) && !isCacheMiss(f)) {
               PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
               ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
               
@@ -111,7 +112,7 @@ public class FileBasedClassManager implements Runnable
               addCache(f,fban.classFile);
               
           } else {
-              f = getCached(f);
+              f = getCachedClass(f);
               File fXml = getCachedXML(f);
               ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
               JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
@@ -124,22 +125,22 @@ public class FileBasedClassManager implements Runnable
                   Vstatics.putParameterList(fclass.getName(),pa);
                   if (viskit.Vstatics.debug) System.out.println("Put "+fclass.getName()+simEntity.getParameter());
               } catch (Exception e) { if (viskit.Vstatics.debug) e.printStackTrace(); }
-              
-              
-              
+        
               if (viskit.Vstatics.debug) System.out.println(f+" loaded "+fclass.getPackage()+"."+fclass);
-              //fban = new FileBasedAssyNode(f,fclass.getName(),fclass.getPackage().getName());
-          
-              //Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
-              //loadFile( getCached(f) );
+
           }
       } else if (f.getName().toLowerCase().endsWith(".class")) {
+          
           fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly
-          fban = new FileBasedAssyNode(f,fclass.getName(),fclass.getPackage().getName());
+
+          String pkg = fclass.getName().substring(0,fclass.getName().lastIndexOf("."));
+          fban = new FileBasedAssyNode(f,fclass.getName(),pkg);
           
           Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
       } else {
-          throw new Exception("Unsupported file type.");
+          
+          if ( !f.getName().toLowerCase().endsWith(".java") )
+            throw new Exception("Unsupported file type.");
       }
       addFileClass(fclass);
       synchronized (fileMap) {
@@ -148,7 +149,7 @@ public class FileBasedClassManager implements Runnable
       return fban;
   }
   
-  private void addCache(File xmlEg,File classFile) {
+  public void addCache(File xmlEg,File classFile) {
       try {
           List<String> cache = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
           if (viskit.Vstatics.debug) {
@@ -163,15 +164,24 @@ public class FileBasedClassManager implements Runnable
               }
               vConfig.setProperty("Cached[@workDir]",VGlobals.instance().getWorkDirectory().getCanonicalPath());
           }
-          
+          // delete cache file as package could have changed which would relocate 
+          // the cached .class file
+          if ( isCached(xmlEg) ) {
+              deleteCache(xmlEg);
+              cache = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
+          }
           vConfig.setProperty("Cached.EventGraphs("+cache.size()+")[@xml]",xmlEg.getCanonicalPath());
           vConfig.setProperty("Cached.EventGraphs("+cache.size()+")[@class]",classFile.getCanonicalPath());
+          // if used to miss, unmiss it
+          removeCacheMiss(xmlEg);
+          removeCacheMiss(classFile); // class files aren't currently cached but could be sometime
+          
       } catch (IOException ex) {
           ex.printStackTrace();
       }
   }
   
-  private boolean isCached(File file) {
+  public boolean isCached(File file) {
       List<String> cache = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
       
       try {
@@ -194,7 +204,7 @@ public class FileBasedClassManager implements Runnable
   }
 
   // return cached class file given its cached XML file
-  private File getCached(File file) {
+  public File getCachedClass(File file) {
       List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
       List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@class]"));
       int index = 0;
@@ -216,7 +226,7 @@ public class FileBasedClassManager implements Runnable
   }
   
   // return XML file given its cached class file
-  private File getCachedXML(File file) {
+  public File getCachedXML(File file) {
       List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
       List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@class]"));
       int index = 0;
@@ -237,7 +247,67 @@ public class FileBasedClassManager implements Runnable
       return cachedFile;
   }
 
+  // delete cache given either xml or class file
+  public void deleteCache(File file) {
+      List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@xml]"));
+      List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs"+"[@class]"));
+      String filePath;
+      try {
+          filePath = file.getCanonicalPath();
+          
+          int index = - 1;
+          if ( cacheXML.contains(filePath) ) {
+              index = cacheXML.lastIndexOf(filePath);
+          } else if ( cacheClass.contains(file.getCanonicalPath()) ) {
+              index = cacheClass.lastIndexOf(filePath);
+          }
+          
+          if ( index >= 0 ) {
+              vConfig.clearProperty("Cached.EventGraphs("+index+")");
+          }
+      } catch (IOException ex) {
+          ex.printStackTrace();
+      }
+  }
   
+  public boolean isCacheMiss(File file) {
+      List<String> cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss"));
+      int index;
+      try {
+          index = cacheMisses.lastIndexOf(file.getCanonicalPath());
+          return index >= 0;
+      } catch (IOException ex) {
+          ex.printStackTrace();
+      }
+      return false;
+  }
+  
+  public void addCacheMiss(File file) {
+      System.out.println("Adding Cache Miss "+file);
+      deleteCache(file);
+      removeCacheMiss(file); // remove any old ones
+      try {
+          vConfig.addProperty("Cached.Miss",file.getCanonicalPath());
+      } catch (IOException ex) {
+          ex.printStackTrace();
+      }
+  }
+  
+  public void removeCacheMiss(File file) {
+      List<String> cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss"));
+      int index;
+      try {
+          while ( (index = cacheMisses.lastIndexOf(file.getCanonicalPath()) ) > -1 ) {
+          
+              vConfig.clearProperty("Cached.Miss("+index+")");
+              cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss"));
+          }
+          
+      } catch (IOException ex) {
+          ex.printStackTrace();
+      }
+      
+  }
   
   protected List[] listOfParamNames(Class c) {
       ObjectFactory of = new ObjectFactory();
@@ -272,25 +342,25 @@ public class FileBasedClassManager implements Runnable
               }
               l = new ArrayList[1];
               ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
-
+              
               if ( param != null ) {
                   String[] names = ((ParameterMap)param).names();
                   String[] types = ((ParameterMap)param).types();
                   if (names.length != types.length) throw new RuntimeException("ParameterMap names and types length mismatch");
                   for ( int i = 0; i < names.length; i ++) {
-                        ParameterType p;
-                        try {
-                            p = of.createParameter();
-                            p.setName(names[i]);
-                            p.setType(types[i]);
-                            l[0].add(p);
-                        } catch (JAXBException ex) {
-                            ex.printStackTrace();
-                        }
+                      ParameterType p;
+                      try {
+                          p = of.createParameter();
+                          p.setName(names[i]);
+                          p.setType(types[i]);
+                          l[0].add(p);
+                      } catch (JAXBException ex) {
+                          ex.printStackTrace();
+                      }
                   }
                   
               } else throw new RuntimeException("Only One ParameterMap Annotation used");
-
+              
               
           }
       }

@@ -43,6 +43,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 /*******************************************************************************/
 {
 
+  static  File lastFile;
+  
   public Controller()
   //=================
   {
@@ -51,6 +53,11 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     this._setFileLists();
   }
 
+  
+  public static File getLastFile() {
+      return lastFile;
+  }
+  
   public void begin()
   //-----------------
   {
@@ -167,7 +174,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
     ((ViskitView)getView()).setSelectedEventGraphName(mod.getMetaData().name);
     adjustRecentList(file);
-
+    
     fileWatchOpen(file);
   }
 
@@ -199,6 +206,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   {
     try {
       watchDir = File.createTempFile("egs","current");   // actually creates
+      //watchDir = viskit.VGlobals.instance().getWorkDirectory();
       String p = watchDir.getAbsolutePath();   // just want the name part of it
       watchDir.delete();        // Don't want the file to be made yet
       watchDir = new File(p);
@@ -221,6 +229,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   private void fileWatchOpen(File f)
   {
     String nm = f.getName();
+    lastFile = f;
     File ofile = new File(watchDir,nm);
     try {
       FileIO.copyFile(f,ofile,true);

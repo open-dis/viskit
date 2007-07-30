@@ -330,17 +330,28 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void fileChanged(File file, int action, DirectoryWatch source)
     {
       ViskitAssemblyView view = (ViskitAssemblyView)getView();
+      File actualFileThatReallyGotChangedNotTheCopyBeingListenedTo = Controller.getLastFile();
       switch(action)
       {
         case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-          view.addToEventGraphPallette(file);
+          view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
           break;
         case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-          view.removeFromEventGraphPallette(file);
+          view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
           break;
         case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
           // If an event graph has changed, recompile it
-          createTemporaryEventGraphClass(file);
+          //createTemporaryEventGraphClass(file);
+            
+            // TBD: why?
+            
+            Object paf = createEventGraphClass(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+            if ( paf != null ) {
+               view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo); 
+            } else {
+               view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+               FileBasedClassManager.inst().addCacheMiss(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+            }
           break;
         default:
           throw new RuntimeException("Program error in AssemblyController.egListener.fileChanged");
@@ -1135,13 +1146,32 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       String src = x2j.translate();
 */
       String src = buildJavaEventGraphSource(xmlFile);
-      return compileJavaClassAndSetPackage(src);
+      PkgAndFile paf = compileJavaClassAndSetPackage(src);
+      FileBasedClassManager.inst().addCache(xmlFile,paf.f);
+      return paf;
      }
      catch (Exception e) {
        System.err.println("Error creating Java class file from "+xmlFile+": "+e.getMessage());
+       FileBasedClassManager.inst().addCacheMiss(xmlFile);
+       //     ((ViskitAssemblyView)getView()).removeFromEventGraphPallette(xmlFile);
      }
      return null;
 
+  }
+  
+  public PkgAndFile createEventGraphClass(File xmlFile) {
+      try {
+          String src = buildJavaEventGraphSource(xmlFile);
+          PkgAndFile paf = compileJavaClassAndSetPackage(src);
+          FileBasedClassManager.inst().addCache(xmlFile,paf.f);
+          return paf;
+      } catch (Exception e) {
+          System.err.println("Error creating Java class file from "+xmlFile+": "+e.getMessage());
+          FileBasedClassManager.inst().addCacheMiss(xmlFile);
+          //((ViskitAssemblyView)getView()).removeFromEventGraphPallette(xmlFile);
+      }
+      return null;
+      
   }
 
 /*

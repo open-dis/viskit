@@ -10,7 +10,6 @@ import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModelEvent;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -504,7 +503,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     for ( String path : SettingsDialog.getExtraClassPath() ) { // tbd same for pcls
         if (path.endsWith(".jar"))
             lTree.addContentRoot(new File(path));
-        else
+        else 
             lTree.addContentRoot(new File(path),true);
        
     }
@@ -595,6 +594,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       }
     }
   }
+  
 
   private FileBasedAssyNode isFileBasedAssyNode(String s)
   {
@@ -944,3 +944,5 @@ interface DragStartListener
 {
   public void startingDrag(Transferable trans);
 }
+
+

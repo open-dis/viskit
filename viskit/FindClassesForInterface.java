@@ -74,28 +74,26 @@ public class FindClassesForInterface
         DataInputStream dis = new DataInputStream(new FileInputStream(f));
         num = dis.read(buf);
       }
-/*
-      catch (FileNotFoundException e) {
-        e.printStackTrace();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-*/
-      
 
       catch(Throwable thr) {
         throw new ClassNotFoundException(thr.getMessage());
       }
       try {
-          Class clz = defineClass(null,buf,0,num);
+          System.out.println("FindClassForInterface: findClass for "+name);
+          
+          Class clz = defineClass(null,buf,0,num); // do this to get proper name/pkg
+          
+          //clz = defineClass(clz.getName(),buf,0,num);
           found.put(name,clz);
+          // bug here, a byte[] loaded class will not have its package set, but 
+          // has it in the name. this causes problems later on when trying to create
+          // a FileBasedAssemblyNode
+          System.out.println("FindClassForInterface: found Class "+clz.getPackage()+"."+clz.getName());
           return clz;
       } catch (Exception e) { e.printStackTrace();return (Class)null;}
     }
     
   }
-
 
     /**
      * Create a list of the classes (Class objects) implementing

@@ -204,15 +204,18 @@ public class SourceWindow extends JFrame
                       null,
                       fileObjects
               ).call();
+              sb = new StringBuffer();
               sb.append(baosOut.toString());
               sb.append(diag.messageString);
               
               sysOutDialog.showDialog(SourceWindow.this,SourceWindow.this,sb.toString(),getFileName());
               
               if (diag.messageString.toString().indexOf("No Compiler Errors") < 0) {
-                  ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.RED);
+                  ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.PINK);
                   int startOffset = (int)diag.getLineNumber()*5 + (int)diag.getStartOffset();
                   int endOffset = (int)diag.getLineNumber()*5 + (int)diag.getEndOffset();
+                  int columnNumber = (int)diag.getColumnNumber();
+                  if ( startOffset == endOffset ) startOffset = endOffset - columnNumber;
                   SourceWindow.this.jta.getHighlighter().addHighlight(startOffset,endOffset,errorHighlightPainter);
                   SourceWindow.this.jta.getCaret().setBlinkRate(250);
                   SourceWindow.this.jta.getCaret().setVisible(true);
@@ -266,6 +269,7 @@ public class SourceWindow extends JFrame
       public long startOffset = -1;
       public long endOffset = 0;
       public long line;
+      public long columnNumber = 0;
       
       public CompilerDiagnosticListener(StringBuffer messageString) {
           this.messageString = messageString;
@@ -308,6 +312,10 @@ public class SourceWindow extends JFrame
       
       public long getLineNumber() {
           return line;
+      }
+      
+      public long getColumnNumber() {
+          return columnNumber;
       }
   }
 
