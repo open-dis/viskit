@@ -45,7 +45,7 @@ public class Model extends mvcAbstractModel implements ViskitModel
   SimEntity jaxbRoot;
   File currentFile;
 
-  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/simkit.xsd";
+  public static final String schemaLoc = "http://diana.nps.edu/Simkit/simkit.xsd";
   HashMap evNodeCache = new HashMap();
   HashMap edgeCache = new HashMap();
   Vector stateVariables = new Vector();

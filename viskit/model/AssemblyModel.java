@@ -39,7 +39,7 @@ public class AssemblyModel  extends mvcAbstractModel implements ViskitAssemblyMo
   private GraphMetaData metaData;
   HashMap nodeCache = new HashMap();
   HashMap assEdgeCache = new HashMap();
-  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
+  public static final String schemaLoc = "http://diana.nps.edu/Simkit/assembly.xsd";
   private Point pointLess = new Point(100,100);
 
   private ViskitAssemblyController controller;

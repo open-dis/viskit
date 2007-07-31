@@ -61,7 +61,7 @@ import java.util.List;
 
 public class FileHandler
 {
-  public static final String schemaLoc = "http://diana.gl.nps.navy.mil/Simkit/assembly.xsd";
+  public static final String schemaLoc = "http://diana.nps.edu/Simkit/assembly.xsd";
 
 
   public static DoeFileModel openFile(File f) throws Exception
