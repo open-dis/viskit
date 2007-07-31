@@ -8,13 +8,17 @@ import javax.help.HelpBroker;
 import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import viskit.util.Version;
 /**
  * @version $Id$
  * @author  ahbuss
  */
 public class Help {
     
-    public static final String VERSION = "0.4.3";
+    public static final Version VERSION = new Version("viskit/version.txt");
+    
+    public static final String VERSION_STRING
+            = VERSION.getVersionString();
     
     private Component parent;
     private Icon icon;
@@ -22,10 +26,10 @@ public class Help {
     private static final String CR = System.getProperty("line.separator");
     
     public static final String ABOUT_EG_STRING =
-        "Viskit Event Graph Editor" + CR + "   version " + VERSION + CR + CR;
+        "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR + CR;
     
     public static final String ABOUT_ASSEMBLY_STRING =
-        "Viskit Assembly Editor" + CR + "   version " + VERSION + CR + CR ;
+        "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR + CR ;
 
     
     public static final String DEVELOPERS =         
@@ -40,7 +44,7 @@ public class Help {
     public static final String SIMKITPAGE =
         CR +
         "Visit the Simkit home page at" + CR +
-        "  http://diana.gl.nps.navy.mil/Simkit/"+CR;
+        "  http://diana.nps.edu/Simkit/"+CR;
 
     private static HelpBroker hb;
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
