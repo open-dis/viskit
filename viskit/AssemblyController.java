@@ -38,13 +38,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 {
   Class simEvSrcClass,simEvLisClass,propChgSrcClass,propChgLisClass;
   private String initialFile;
-
+  public static AssemblyController inst;
   public AssemblyController()
   {
     initConfig();
-    initFileWatch();
+    //initFileWatch();
+    inst = this;
   }
 
+  public static AssemblyController instance() {
+      return inst;
+  }
+  
   public void setInitialFile(String fil)
   {
     if (viskit.Vstatics.debug) System.out.println("Initial file set: " + fil);
@@ -329,34 +334,30 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
   {
     public void fileChanged(File file, int action, DirectoryWatch source)
     {
-      ViskitAssemblyView view = (ViskitAssemblyView)getView();
-      File actualFileThatReallyGotChangedNotTheCopyBeingListenedTo = Controller.getLastFile();
+     ;
+    }
+    /*//ViskitAssemblyView view = (ViskitAssemblyView)getView();
+      //File actualFileThatReallyGotChangedNotTheCopyBeingListenedTo = Controller.getLastFile();
       switch(action)
       {
         case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-          view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+          //view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
           break;
         case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-          view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+          //view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
           break;
         case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-          // If an event graph has changed, recompile it
-          //createTemporaryEventGraphClass(file);
-            
-            // TBD: why?
-            
             Object paf = createEventGraphClass(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
             if ( paf != null ) {
-               view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo); 
+               //view.addToEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo); 
             } else {
-               view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
-               FileBasedClassManager.inst().addCacheMiss(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
+               //view.removeFromEventGraphPallette(actualFileThatReallyGotChangedNotTheCopyBeingListenedTo);
             }
           break;
         default:
           throw new RuntimeException("Program error in AssemblyController.egListener.fileChanged");
       }
-    }
+    }*/
   };
 
   public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener()
@@ -790,8 +791,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
              JOptionPane.showMessageDialog(null, "Please select an XML Event Graph to load to EG Editor tab"); 
              return;
           }
+          // _doOpen checks if a tab is already opened
           VGlobals.instance().getEventGraphEditor().controller._doOpen(f);
-          //if ( ((EvGraphNode)o).getInstantiator().
       }
   }
   
@@ -1113,38 +1114,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
        return null;
   }
 
-  /** do a temporary file gig to point to a java class file which we created from
-   * a passed eventgraph xml file.
-   * @param xmlFile
-   * @return temp file
-   */
-/*
-  public static File xcreateTemporaryEventGraphClass(File xmlFile)
-  {
-    try {
-      System.out.println("xunmarshalling "+xmlFile.getPath());
-      dumpFile(xmlFile);
-      SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
-      x2j.unmarshal();
-      String src = x2j.translate();
-      return compileJavaClassFromString(src);
-     }
-     catch (Exception e) {
-       e.printStackTrace();
-     }
-     return null;
-  }
-*/
   public static PkgAndFile createTemporaryEventGraphClass(File xmlFile)
   {
     try {
-/*
-      System.out.println("eg unmarshalling "+xmlFile.getPath());
-      dumpFile(xmlFile);
-      SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
-      x2j.unmarshal();
-      String src = x2j.translate();
-*/
       String src = buildJavaEventGraphSource(xmlFile);
       PkgAndFile paf = compileJavaClassAndSetPackage(src);
       FileBasedClassManager.inst().addCache(xmlFile,paf.f);

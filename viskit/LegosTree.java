@@ -41,7 +41,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private DragStartListener lis;
   private Vector recurseNogoList;
   private String genericTableToolTip = "Drag onto canvas";
-
   public LegosTree(String className, String iconPath, DragStartListener dslis, String tooltip)
   {
     this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, tooltip);
@@ -225,6 +224,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
   private void addContentRoot(File f, boolean recurse, Vector rootVector)
   {
     DefaultMutableTreeNode myNode;
+    removeContentRoot(f);
     if (f.isDirectory()) {
       if (!recurse) {
         myNode = new DefaultMutableTreeNode(f.getPath());
@@ -271,10 +271,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     // We're NOT a directory...
     else {
       FileBasedAssyNode fban;
-      if ( FileBasedClassManager.inst().isCacheMiss(f) ) return;
-      
       try {
         fban = FileBasedClassManager.inst().loadFile(f);
+        if (fban == null) return;
         // Check here for duplicates of the classes which have been loaded on the classpath (simkit.jar);
         // No dups accepted, should throw exception upon success
         try {
@@ -289,13 +288,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         System.err.println("Couldn't handle " + f + ". " + throwable.getMessage());
         if (recurseNogoList != null)
           recurseNogoList.add(f.getName());
-
-        FileBasedClassManager.inst().addCacheMiss(f);
-
         return;
       }
       myNode = new DefaultMutableTreeNode(fban);
-
       DefaultMutableTreeNode par = (DefaultMutableTreeNode) directoryRoots.get(f.getParent());
       if (par != null) {
         par.add(myNode);

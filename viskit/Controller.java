@@ -165,10 +165,23 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   {
     Model mod = new Model(this);
     mod.init();
-
+    // these may init to null on startup, check
+    // before doing any openAlready lookups
     ((ViskitView) getView()).addTab(mod,false);
-
-    if (false == mod.newModel(file)) {
+    ViskitModel[] openAlready = null;
+    if ((ViskitView)getView() != null) {
+        openAlready = ((ViskitView )getView()).getOpenModels();
+    }
+    boolean isOpenAlready = false;
+    if ( openAlready != null ) for ( ViskitModel model:openAlready ) {
+        if ( model.getLastFile() != null ) {
+            String path = model.getLastFile().getAbsolutePath();
+            if ( path.equals(file.getAbsolutePath()) ) {
+                isOpenAlready = true;
+            }
+        }
+    }
+    if ( false == mod.newModel(file) || isOpenAlready ) {
       ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
       return;
     }
@@ -204,9 +217,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   private File watchDir;
   private void initFileWatch()
   {
-    try {
+    try { // TBD this may be obsolete
       watchDir = File.createTempFile("egs","current");   // actually creates
-      //watchDir = viskit.VGlobals.instance().getWorkDirectory();
       String p = watchDir.getAbsolutePath();   // just want the name part of it
       watchDir.delete();        // Don't want the file to be made yet
       watchDir = new File(p);
@@ -237,12 +249,21 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     catch (IOException e) {
       e.printStackTrace();
     }
+    ViskitAssemblyView view = (ViskitAssemblyView)(AssemblyController.inst.getView());
+    Object paf = AssemblyController.createTemporaryEventGraphClass(f); // not temporary, but use static method
+    if ( paf != null ) {
+        view.addToEventGraphPallette(f); 
+    } else {
+        view.removeFromEventGraphPallette(f);
+    }
   }
   private void fileWatchClose(File f)
   {
     String nm = f.getName();
     File ofile = new File(watchDir,nm);
     ofile.delete();
+    ViskitAssemblyView view = (ViskitAssemblyView)(AssemblyController.inst.getView());
+    view.removeFromEventGraphPallette(f);
   }
 
   public void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis)
