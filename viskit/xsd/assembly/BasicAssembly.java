@@ -3,6 +3,8 @@ package viskit.xsd.assembly;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import javax.swing.JOptionPane;
 import simkit.BasicSimEntity;
 import simkit.Priority;
@@ -558,11 +560,36 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       }
     }
     
+    
+    // TBD: there should be a pluggable way to have Viskit
+    // directly modify entities. One possible way is to enforce
+    // packages that wish to take advantage of exposed controls
+    // all agree to be dependent on ie viskit.simulation.Interface
     SimEntity timer = null;
+    SimEntity scenarioManager = null;
     runEntities = Schedule.getReruns();
     for ( SimEntity entity:runEntities ) {
         if ( entity.getName().equals("Clock") || entity.getName().equals("DISPinger") ) {
             timer = entity;
+        } else if ( entity.getName().indexOf("ScenarioManager") > -1 ) {
+            scenarioManager = entity;
+            // access the SM's numberOfReplications parameter setter
+            try {
+                Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications",int.class);
+                try {
+                    setNumberOfReplications.invoke(scenarioManager,getNumberReplications());
+                } catch (IllegalArgumentException ex) {
+                    //ex.printStackTrace(); // nop, this is the default case
+                } catch (InvocationTargetException ex) {
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
+                }
+            } catch (SecurityException ex) {
+                ex.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ;//ex.printStackTrace(); // nop, this is the default case
+            }
         }
     }
     int runCount = runEntities.size();
@@ -642,8 +669,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           System.runFinalization();
           System.gc();
       }
+      
+      if ( false&&scenarioManager != null ) {
+          try {
+              Method doStop = scenarioManager.getClass().getMethod("doStop");
+              try {
+                  doStop.invoke(scenarioManager,getNumberReplications());
+              } catch (IllegalArgumentException ex) {
+                  //ex.printStackTrace();
+              } catch (InvocationTargetException ex) {
+                  ex.printStackTrace();
+              } catch (IllegalAccessException ex) {
+                  ex.printStackTrace();
+              }
+          } catch (SecurityException ex) {
+              ex.printStackTrace();
+          } catch (NoSuchMethodException ex) {
+              ex.printStackTrace();
+          }
+          //scenarioManager.waitDelay("Stop",0.0);
+      }
     } // for
 
+    
     if (isPrintSummaryReport()) {
       println.println(getSummaryReport());
       println.flush();
