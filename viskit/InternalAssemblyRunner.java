@@ -50,6 +50,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import org.gjt.sp.jedit.jEdit;
 import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
 import viskit.xsd.assembly.ViskitAssembly;
@@ -251,7 +252,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           analystReportTempFile = null;
           resetSeeds = runPanel.resetSeedCB.isSelected();
           try {
-              tmpFile = File.createTempFile("viskit","dump");
+              tmpFile = File.createTempFile("viskit","out.txt");
               tmpFile.deleteOnExit();
               tmpFile.setReadable(true);
               tmpFile.setWritable(true);
@@ -642,13 +643,34 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           }
           try {
               filePath = f.getCanonicalPath();
-              Runtime.getRuntime().exec(tool+" "+filePath);
+              ThreadGroup tg = new ThreadGroup("jEdit ThreadGroup");
+              JEditThread je = new JEditThread(tg,filePath);
+              je.start();
+              
           } catch (IOException ex) {
               ex.printStackTrace();
           }
       }
   }
 
+  private class JEditThread extends Thread {
+      String path;
+      
+      public JEditThread(ThreadGroup tg,String path) {
+          super(tg,"jEdit");
+          this.path=path;
+      }
+      public void run() {
+            try {
+                java.awt.Desktop.getDesktop().open(new File(path));
+                //jEdit.main(new String[]{"-reuseview",path});
+                //Runtime.getRuntime().exec("java -Xmx1024 -jar lib/jedit.jar "+path);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+      }
+  }
+  
   private String namePrefix = "Viskit Assembly Runner";
   private String currentTitle = namePrefix;
   private void doTitle(String nm)

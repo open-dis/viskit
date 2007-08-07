@@ -11,8 +11,8 @@
 <installation version="1.0">
     
     <info>
-        <appname>Viskit-0.4.3</appname>
-        <appversion>"0.4.3"</appversion>
+        <appname>Viskit-0.4.6</appname>
+        <appversion>"0.4.6"</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
@@ -20,6 +20,7 @@
             <author name="Arnie Buss" email="abuss@nps.edu"/>
             <author name="Len Daly" email="leonard.daly@realism.com"/>
             <author name="Rick Goldberg" email="rick@aniviza.com"/>
+            <author name="Alan Hudson" email="giles@yumetech.com"/>
             <author name="Don McGregor" email="mcgredo@nps.edu"/>
             <author name="Terry Norbraten" email="tdnorbra@nps.edu"/>
             <author name="Pat Sullivan" email="pjsulliv@nps.edu"/>
@@ -91,9 +92,15 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <include name="BehaviorLibraries/**/*"/>
                 <include name="images/**/*"/>
-                <include name="AnalystReports/**/*"/>
+                <!--<include name="AnalystReports/**/*"/>-->
             </fileset>
-        </pack> 
+        </pack>
+        <pack name="Sources" required="yes">
+            <description>Viskit, Diskit, and Simkit source trees ( 08/05/2007 )</description>
+            <fileset dir="stage" targetdir="$INSTALL_PATH">
+                <include name="sources/**/*"/>
+            </fileset>
+        </pack>
     </packs>
     <native type="izpack" name="ShellLink.dll"/>
     <native type="3rdparty" name="COIOSHelper.dll" stage="both">

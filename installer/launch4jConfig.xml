@@ -21,10 +21,10 @@
     <stayAlive>true</stayAlive>
     <icon>images/ViskitIcon.ico</icon>
     <jre>
-      <minVersion>1.5.0</minVersion>
+      <minVersion>1.6.0</minVersion>
       <!-- Heap sizes in MB, 0-use default -->
-      <initialHeapSize>30</initialHeapSize>
-      <maxHeapSize>256</maxHeapSize>
+      <initialHeapSize>512</initialHeapSize>
+      <maxHeapSize>1024</maxHeapSize>
       <args>-client</args>
     </jre>
     
