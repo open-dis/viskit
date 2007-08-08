@@ -67,7 +67,7 @@
     <EventGraph filename="Fisherman.xml" >
 	<![CDATA[
         
-        <SimEntity extend="diskit.DISMover3D" name="Fisherman" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <SimEntity extend="diskit.DISMover3D" name="Fisherman" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <Comment>A fisherman or passerby with RandomMoverManager, generates a BeingEscorted event when a Defender is attempting to Escort an unknown.
             </Comment>
             <Parameter name="startPosition" type="diskit.Vec3d">

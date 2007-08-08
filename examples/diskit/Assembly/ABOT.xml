@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Head>
+        <Meta name="" content=""/>
+        <Meta name="created" content="XX AUG 07"/>
+    </Head>
     <SimEntity name="RHIB1" type="diskit.SurfacePatrolCraft">
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter type="double" value="-2265"/>
