@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="SimEntityBase" name="Obstacles" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="Obstacles" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Accepts as its argument an array of DISMover3D objects which represent both stationary and moving obstacles.  Normally the speed will be set to zero but the class uses DISMover3D to allow for obstacles that can move such as barriers and buoys.</Comment>
     <Parameter name="obstacles" type="DISMover3D[]">
         <Comment>Array of all obstacles for a port or scene.</Comment>

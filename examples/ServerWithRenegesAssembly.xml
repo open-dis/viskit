@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerWithRenegesAssembly" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ServerWithRenegesAssembly" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="arrivalProcess" type="examples.ArrivalProcess">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter type="java.lang.String" value="Exponential"/>

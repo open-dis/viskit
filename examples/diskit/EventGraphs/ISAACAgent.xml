@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Patrick Sullivan" extend="diskit.FriendlyForce" name="ISAACAgent" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Patrick Sullivan" extend="diskit.FriendlyForce" name="ISAACAgent" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A SurfacePatrolCraft is a waterborne surface patrol craft. Common examples are RHIB's and unmanned surface vehicles.  Only friendly force entities should be created with this graph as hostile attackers will evaluate these entities as a potential target.  For larger scenarios with multiple military forces it would be wise to create new version of FriendlyForce (i.e. OrangeForce, PurpleForce).  In so doing the various forces will be able to 'recognize' their own force, their allies, and hostiles.</Comment>
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Start Position - different than first waypoint</Comment>

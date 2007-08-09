@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity extend="simkit.smdx.PathMoverManager" author="rmgoldbe" version="1.0" package="examples.movers.wfpsim" name="PBMM" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity extend="simkit.smdx.PathMoverManager" author="rmgoldbe" version="1.0" package="examples.movers.wfpsim" name="PBMM" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>PatrolBoatMoverManager ( PBMM for short )</Comment>
     <Parameter name="patrolBoatMover" type="simkit.smdx.UniformLinearMover">
         <Comment/>

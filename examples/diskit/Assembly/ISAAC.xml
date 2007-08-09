@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ISAAC" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ISAAC" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
         <TerminalParameter type="boolean" value="false"/>
         <TerminalParameter name="" type="java.lang.String" value="239.255.5.8"/>

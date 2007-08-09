@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="pjsulliv" extend="diskit.DISMover3D" name="Terrorist" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="pjsulliv" extend="diskit.DISMover3D" name="Terrorist" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Terrorist that starts from a point randomly within ZoneGeometry objects.  Terrorist will proceed towards the harbor, scans the area for potential targets and attacks the targets in order of proximity and order in which detected.
 
 TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>

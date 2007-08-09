@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Patrick Sullivan" extend="diskit.FriendlyForce" name="PatrolCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Patrick Sullivan" extend="diskit.FriendlyForce" name="PatrolCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A Patrol Craft Entity based on Rick Goldberg's Fisherman Event Graph to provide a simple base from which to develop a Patrol agent with naval tactical behavior.</Comment>
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Start Position - different than first waypoint</Comment>

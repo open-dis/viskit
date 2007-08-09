@@ -35,7 +35,7 @@
 	  </TerminalParameter>
     <EventGraph fileName="ArrivalProcess.xml">
 	  
-	    &lt;SimEntity name="ArrivalProcess" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+	    &lt;SimEntity name="ArrivalProcess" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	        &lt;Parameter type="simkit.random.RandomVariate" name="interarrivalTime"/&gt;
 	        &lt;StateVariable name="numberArrivals" type="int"/&gt;
 	        &lt;Event name="Run"&gt;
@@ -58,7 +58,7 @@
 	  </EventGraph>
     <EventGraph fileName="SimpleServer.xml">
 	  
-	    &lt;SimEntity name="SimpleServer" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.gl.nps.navy.mil/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+	    &lt;SimEntity name="SimpleServer" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	        &lt;Parameter type="simkit.random.RandomVariate" name="serviceTime"/&gt;
 	        &lt;Parameter type="int" name="totalNumberServers"/&gt;
 	        &lt;StateVariable name="numberInQueue" type="int"/&gt;
