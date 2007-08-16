@@ -1,9 +1,9 @@
-<!ELEMENT SimEntity ( Head?, Comment*, Parameter*, StateVariable*, Event*, Code? ) >
+<!ELEMENT SimEntity ( head?, Comment*, Parameter*, StateVariable*, Event*, Code? ) >
 
-<!ELEMENT Head (Meta*) >
+<!ELEMENT head (meta*) >
 
-<!ELEMENT Meta EMPTY >
-<!ATTLIST Meta 
+<!ELEMENT meta EMPTY >
+<!ATTLIST meta
 	name CDATA #REQUIRED
 	content CDATA #IMPLIED
 >
@@ -11,7 +11,7 @@
 <!ATTLIST SimEntity
         name            CDATA   #REQUIRED
         package         CDATA   "examples"
-	version		CDATA	#REQUIRED
+        version         CDATA	  "1.0"
         author          CDATA   #IMPLIED
         extend          CDATA   "SimEntityBase"
         implement       CDATA   #IMPLIED
@@ -50,7 +50,7 @@
 >
 
 
-<!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) > 
+<!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) >
 <!ATTLIST Event
 	name		ID	#REQUIRED
         description     CDATA   #IMPLIED
@@ -59,7 +59,7 @@
 <!ELEMENT Code (#PCDATA) >
 
 <!ELEMENT Coordinate EMPTY >
-<!ATTLIST Coordinate 
+<!ATTLIST Coordinate
 	x	CDATA	#REQUIRED
 	y	CDATA	#REQUIRED
 >
@@ -67,7 +67,7 @@
 <!ELEMENT Operation EMPTY >
 <!ATTLIST Operation
         method  CDATA   #REQUIRED
-        description CDATA   #IMPLIED   
+        description CDATA   #IMPLIED
 >
 
 <!ELEMENT Assignment EMPTY >
@@ -82,7 +82,7 @@
 	index		IDREF	#IMPLIED
         description CDATA   #IMPLIED
 >
-  
+
 <!ELEMENT EdgeParameter EMPTY >
 <!ATTLIST EdgeParameter
         value   CDATA	#REQUIRED
@@ -93,7 +93,7 @@
 <!ATTLIST Schedule
 	delay	CDATA	"0.0"
 	event	IDREF	#REQUIRED
-	condition CDATA	#IMPLIED 
+	condition CDATA	#IMPLIED
         priority  (HIGHEST|HIGHER|HIGH|DEFAULT|LOW|LOWER|LOWEST) "DEFAULT"
         description CDATA   #IMPLIED
 >
@@ -101,6 +101,6 @@
 <!ELEMENT Cancel (Code*,Comment*,EdgeParameter*) >
 <!ATTLIST Cancel
 	event	IDREF	#REQUIRED
-	condition CDATA	#IMPLIED 
-        description CDATA   #IMPLIED	
+	condition CDATA	#IMPLIED
+        description CDATA   #IMPLIED
 >

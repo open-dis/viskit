@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Head>
-        <Meta name="" content=""/>
-        <Meta name="created" content="XX AUG 07"/>
-    </Head>
+<SimkitAssembly name="ABOT" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="C:\CvsProjects\Viskit+DiskitProject\Viskit+Diskit\Viskit\viskit\xsd\assembly/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <head>
+        <meta name="created" content="15 August 2007"/>
+    </head>
     <SimEntity name="RHIB1" type="diskit.SurfacePatrolCraft">
         <MultiParameter type="diskit.Vec3d">
             <TerminalParameter type="double" value="-2265"/>
@@ -824,6 +823,6 @@
     <SimEventListenerConnection listener="ScenarioManager" source="OilTanker"/>
     <SimEventListenerConnection listener="X3DCreateObstacles" source="ABOTObstacles"/>
     <Schedule stopTime="10000" verbose="false"/>
-    <Experiment runsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
 
