@@ -1,19 +1,5 @@
 package viskit;
 
-import actions.ActionIntrospector;
-import actions.ActionUtilities;
-import viskit.images.AdapterIcon;
-import viskit.images.PropChangeListenerIcon;
-import viskit.images.SimEventListenerIcon;
-import viskit.jgraph.vGraphAssemblyComponent;
-import viskit.jgraph.vGraphAssemblyModel;
-import viskit.model.*;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcModelEvent;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -26,6 +12,25 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+
+// Application specific imports
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
+import edu.nps.util.ContainsFilenameFilter;
+import org.apache.log4j.Logger;
+import viskit.images.AdapterIcon;
+import viskit.images.PropChangeListenerIcon;
+import viskit.images.SimEventListenerIcon;
+import viskit.jgraph.vGraphAssemblyComponent;
+import viskit.jgraph.vGraphAssemblyModel;
+import viskit.model.*;
+import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcModelEvent;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -35,6 +40,8 @@ import java.util.Map;
  * By:   Mike Bailey
  * Date: May 10, 2004
  * Time: 2:07:37 PM
+ *
+ * @version $Id$
  */
 
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
@@ -778,21 +785,33 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   }
 
   // ViskitView-required methods:
-  private JFileChooser jfc;
+  private JFileChooser jfc = new JFileChooser(new File("."));
 
-  public File openFileAsk()
-  //-----------------------
-  {
-    if (jfc == null) {
-      jfc = new JFileChooser(System.getProperty("user.dir") +
-          System.getProperty("file.separator") + "BehaviorLibraries" + System.getProperty("file.separator") +
-          "SavageTactics" + System.getProperty("file.separator") + "Scenarios");
+  public File openFileAsk() {
+      
+//      if (jfc == null) {
+//          jfc = new JFileChooser(System.getProperty("user.dir") +
+//                  System.getProperty("file.separator") + "BehaviorLibraries" + System.getProperty("file.separator") +
+//                  "SavageTactics" + System.getProperty("file.separator") + "Scenarios");
+//          jfc.setDialogTitle("Open Assembly File");
+//      }
+//      int retv = jfc.showOpenDialog(this);
+//      if (retv == JFileChooser.APPROVE_OPTION)
+//          return jfc.getSelectedFile();
+//      return null;
+      
       jfc.setDialogTitle("Open Assembly File");
-    }
-    int retv = jfc.showOpenDialog(this);
-    if (retv == JFileChooser.APPROVE_OPTION)
-      return jfc.getSelectedFile();
-    return null;
+      jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+      // Look for assembly in the filename
+      FileFilter filter = new ContainsFilenameFilter("assembly");
+      jfc.setFileFilter(filter);
+      int returnVal = jfc.showOpenDialog(this);
+      if(returnVal == JFileChooser.APPROVE_OPTION) {
+          System.out.println("You chose to open this file: " + jfc.getSelectedFile().getName());
+          return jfc.getSelectedFile();
+      }
+      return null;
   }
 
   public File openRecentFilesAsk(Collection lis)
@@ -829,30 +848,25 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     return fil;
   }
 
-  public File saveFileAsk(String suggName, boolean showUniqueName)
-  //-----------------------
-  {
-    if (jfc == null)
-      jfc = new JFileChooser(System.getProperty("user.dir") +
-          System.getProperty("file.separator") + "BehaviorLibraries" + System.getProperty("file.separator") +
-          "SavageTactics" + System.getProperty("file.separator") + "Scenarios");
-
-    File fil = new File(suggName);
-    if (showUniqueName)
-      fil = getUniqueName(suggName);
-
-    jfc.setSelectedFile(fil);
-    int retv = jfc.showSaveDialog(this);
-    if (retv == JFileChooser.APPROVE_OPTION) {
-      if (jfc.getSelectedFile().exists()) {
-        if (JOptionPane.YES_OPTION !=
-            JOptionPane.showConfirmDialog(this, "File exists.  Overwrite?", "Confirm",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE))
-          return null;
+  public File saveFileAsk(String suggName, boolean showUniqueName) {
+      
+      jfc.setDialogTitle("Save Assembly File");
+      File fil = new File(suggName);
+      if (showUniqueName)
+          fil = getUniqueName(suggName);
+      
+      jfc.setSelectedFile(fil);
+      int retv = jfc.showSaveDialog(this);
+      if (retv == JFileChooser.APPROVE_OPTION) {
+          if (jfc.getSelectedFile().exists()) {
+              if (JOptionPane.YES_OPTION !=
+                      JOptionPane.showConfirmDialog(this, "File exists.  Overwrite?", "Confirm",
+                      JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE))
+                  return null;
+          }
+          return jfc.getSelectedFile();
       }
-      return jfc.getSelectedFile();
-    }
-    return null;
+      return null;
   }
 
   /**
