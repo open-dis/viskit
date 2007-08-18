@@ -243,9 +243,10 @@
                 <include name="**/*.png"/>
                 <include name="**/*.gif"/>
                 <include name="**/*.jpg"/>
-                <include name="*.txt"/>
                 <exclude name="build/"/>
+                <exclude name="ReadMe.txt"/>
             </fileset>
+            <fileset file="log4j.properties"/>
         </copy>
     </target>
     <!--  === TARGET: jar === -->
