@@ -46,15 +46,18 @@ import viskit.mvc.mvcModelEvent;
 
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener
 {
-  private JSplitPane jsp;
-  private Color background = new Color(0xFB, 0xFB, 0xE5);
+    /** log4j logger instance */
+    static Logger log = Logger.getLogger(AssemblyViewFrame.class);
 
+    
   // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
   public static final int SELECT_MODE = 0;
   public static final int ADAPTER_MODE = 1;
   public static final int SIMEVLIS_MODE = 2;
   public static final int PCL_MODE = 3;
 
+  private JSplitPane jsp;
+  private Color background = new Color(0xFB, 0xFB, 0xE5);
   private String filename;
 
   /**
@@ -787,6 +790,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
   // ViskitView-required methods:
   private JFileChooser jfc = new JFileChooser(new File("."));
 
+  /** Display a file chooser filtered by Assembly XML files only */
   public File openFileAsk() {
       
 //      if (jfc == null) {
@@ -803,12 +807,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       jfc.setDialogTitle("Open Assembly File");
       jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-      // Look for assembly in the filename
+      // Look for assembly in the filename, Bug 1247 fix
       FileFilter filter = new ContainsFilenameFilter("assembly");
       jfc.setFileFilter(filter);
       int returnVal = jfc.showOpenDialog(this);
       if(returnVal == JFileChooser.APPROVE_OPTION) {
-          System.out.println("You chose to open this file: " + jfc.getSelectedFile().getName());
+          log.info("You chose to open: " + jfc.getSelectedFile().getName());
           return jfc.getSelectedFile();
       }
       return null;

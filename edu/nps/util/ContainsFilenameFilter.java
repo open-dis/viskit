@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  *     Date:     17 AUG 07
  *     Time:     1852Z
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.ContainsFilenameFilter">Terry Norbraten, NPS MOVES</a>
- *     Comments: 1) Initial
+ *     Comments: 1) Initial, Bug 1247 fix
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.ContainsFilenameFilter">Terry Norbraten</a>
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 public final class ContainsFilenameFilter extends FileFilter {
     
     /** log4j logger instance */
-    static Logger log = Logger.getLogger(ContainsFilenameFilter.class);    
+    static Logger log = Logger.getLogger(ContainsFilenameFilter.class);
     
     /** we filter to accept only files starting with this string */
     private final String contains;
@@ -86,9 +86,10 @@ public final class ContainsFilenameFilter extends FileFilter {
     public ContainsFilenameFilter(String contains) {this.contains = contains.toLowerCase();}
 
     /**
-     * Select only Files containing with our String.
+     * Select only files containing with our String.  Does expose directories 
+     * for ease of navigation
      *
-     * @param f  the file name to discern
+     * @param f  the file for naming determination 
      *
      * @return true if and only if the name should be included in the file list;
      *         false otherwise.
@@ -98,6 +99,7 @@ public final class ContainsFilenameFilter extends FileFilter {
         return f.getName().toLowerCase().contains(contains);        
     }
     
+    /** @return a fileview description of the filter */
     public String getDescription() {return "Viskit Assembly XML Files Only";}
 
 } // end class file ContainsFilenameFilter.java
