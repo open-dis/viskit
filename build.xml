@@ -178,8 +178,14 @@
         <mkdir dir="${dir.lib.ext}"/>
     </target>
 
-    <target depends="init" description="build the help search database" name="javahelp">
-        <java classname="com.sun.java.help.search.Indexer">
+    <target depends="init" 
+            description="build the help search database" 
+            name="javahelp">
+        <java classname="com.sun.java.help.search.Indexer"
+              fork="true">            
+                  
+            <!-- turn this on to make sure it's working -->
+            <!--arg value="-verbose"/-->
             <arg value="-db"/>
             <arg value="${build.javahelp}/JavaHelpSearch"/>
             <arg value="${javahelp}/Pages"/>
