@@ -976,7 +976,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         
         // pop up the system html viewer, or send currently running browser to html page
         try {
-            viskit.util.BareBonesBrowserLaunch.openURL( (new File(outFile)).toURL().toString() );
+            viskit.util.BareBonesBrowserLaunch.openURL( (new File(outFile)).toURI().toURL().toString() );
         } catch (java.net.MalformedURLException mue) {
             System.out.println(outFile + " : malformed path error.");
         }
@@ -1030,7 +1030,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       String errMsg = null;
       // pop up the system html viewer, or send currently running browser to html page
         try {
-            viskit.util.BareBonesBrowserLaunch.openURL( f.toURL().toString() );
+            viskit.util.BareBonesBrowserLaunch.openURL( f.toURI().toURL().toString() );
         } catch (java.net.MalformedURLException mue) {
             errMsg = f + " : malformed path error.";
         }
