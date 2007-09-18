@@ -35,8 +35,8 @@ public class ChartDrawer {
      * Creates a histogram image in PNG format based on the parameters provided.
      *
      *@param data an array of doubles that are to be plotted
-     *@param outFileName the name of the file to save the image out to
-     *@return url the path name of the created object
+     *@param fileName the name of the file to save the image out to
+     *@return the path name of the created object
      */
     public String createHistogram(String title, String label, double[] data, String fileName){
         String fileLocation = "./AnalystReports/charts/"+fileName+".png";

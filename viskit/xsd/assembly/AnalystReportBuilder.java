@@ -809,7 +809,7 @@ public class AnalystReportBuilder
   /**
    * Creates a stand 'Image' element used by all sections of the report
    *
-   * @param imageId a unique identifier for this XML Element
+   * @param imageID a unique identifier for this XML Element
    * @param dir     the directory of the image
    * @return image the Image url embedded in well formed XML
    */
@@ -830,7 +830,6 @@ public class AnalystReportBuilder
    *
    * @param commentTag  the tag used to identify unique Comments (used by XSLT)
    * @param commentText the text comments
-   * @return comments the Comments embedded in well formed XML
    */
   public void makeComments(Element parent, String commentTag, String commentText)
   {
