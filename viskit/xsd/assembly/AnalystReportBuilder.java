@@ -79,7 +79,9 @@ public class AnalystReportBuilder
   public static void main(String[] args)
   {
     AnalystReportBuilder ar = new AnalystReportBuilder();
-  } /**
+  } 
+  
+  /**
    * Build a default AnalystReport object.
    */
   public AnalystReportBuilder()
@@ -98,7 +100,6 @@ public class AnalystReportBuilder
     if(assyFile != null)
       setAssemblyFile(assyFile);
   }
-
 
   /**
    * Build an AnalystReport object from an existing statisticsReport document
@@ -142,7 +143,6 @@ public class AnalystReportBuilder
   /**
     * File I/O that saves the report in XML format
     */
-
   public File writeToXMLFile(File fil) throws Exception
   {
     if(fil == null)
@@ -223,7 +223,6 @@ public class AnalystReportBuilder
     rootElement.addContent(simulationLocation);
   }
 
-
   /**
    * Creates the simulation configuration portion of the Analyst report XML
    */
@@ -263,12 +262,8 @@ public class AnalystReportBuilder
     rootElement.addContent(entityParameters);
   }
 
-
-  /**
-   * Creates the behavior parameters portion of the report
-   */
-  private void createBehaviorDefinitions()
-  {
+  /** Creates the behavior parameters portion of the report */
+  private void createBehaviorDefinitions() {
     behaviorDefinitions = new Element("BehaviorDefinitions");
     behaviorDefinitions.setAttribute("comments", "true");
     behaviorDefinitions.setAttribute("descriptions", "true");
@@ -278,10 +273,10 @@ public class AnalystReportBuilder
     makeConclusions(behaviorDefinitions,"BC", "");
 
     try {
-      behaviorDefinitions.addContent(processBehaviors(true,true,true));
+      behaviorDefinitions.addContent(processBehaviors(true, true, true));
     }
     catch (Exception e) {
-      System.err.println("Error processing assembly file: "+e.getMessage());
+      System.err.println("Error processing assembly file: " + e.getMessage());
     }
 
     rootElement.removeChild("BehaviorDefinitions");
@@ -397,11 +392,8 @@ public class AnalystReportBuilder
     rootElement.addContent(concRec);
   }
 
-  /**
-   * Creates Behavior definition references in the analyst report template
-   */
-  private Element processBehaviors(boolean descript, boolean image, boolean details) throws Exception
-  {
+  /** Creates Behavior definition references in the analyst report template */
+  private Element processBehaviors(boolean descript, boolean image, boolean details) throws Exception {
     Element behaviorList = new Element("BehaviorList");
     if (eventGraphNames != null) {
       for (int i = 0; i < eventGraphNames.size(); i++) {
@@ -413,7 +405,7 @@ public class AnalystReportBuilder
         if (descript) {
           Document tmp = loadXML((String) eventGraphFiles.get(i));
           rootElement = tmp.getRootElement();
-          descriptText = tmp.getRootElement().getChild("Comment").getText();
+          descriptText = rootElement.getChild("Comment").getText();
 
           Element description = new Element("description");
           description.setAttribute("text", descriptText);
@@ -747,25 +739,25 @@ public class AnalystReportBuilder
    *
    * @param fileType the type of XML file being used
    */
-  private void saveEventGraphReferences(String fileType)
-  {
+  private void saveEventGraphReferences(String fileType) {
     char letter;
     int idx = 0;
     for (int i = 0; i < fileType.length(); i++) {
       letter = fileType.charAt(i);
       if (letter == '.') idx = i;
-
     }
-    String dir = "./BehaviorLibraries/SavageTactics/" + fileType.substring(0, idx) + "/";
+    String dir = System.getProperty("user.dir") + "/" + fileType.substring(0, idx) + "/";
+    dir = dir.replaceAll("\\\\", "/");
     String file = fileType.substring(idx + 1, fileType.length());
-    String eventGraphDirectory = (dir + file + ".xml");
-    String imgDirectory = "../images/BehaviorLibraries/SavageTactics/" + fileType.substring(0, idx) + "/" + file + ".xml.png";
+    String eventGraphFile = (dir + file + ".xml");
+    String img = System.getProperty("user.dir") + "/images/" + fileType.substring(0, idx) + "/" + file + ".xml.png";
+    img = img.replaceAll("\\\\", "/");
     
-    //Get the absolute path to resolve the broken url problem
+    // Get the absolute path to resolve the broken url problem
     
-    if (!eventGraphFiles.contains(eventGraphDirectory)) {
-      eventGraphFiles.add(eventGraphDirectory);
-      eventGraphImages.add(imgDirectory);
+    if (!eventGraphFiles.contains(eventGraphFile)) {
+      eventGraphFiles.add(eventGraphFile);
+      eventGraphImages.add(img);
       eventGraphNames.add(fileType.substring(idx + 1, fileType.length()));
     }
   }

@@ -926,9 +926,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   //-----------------------
   {
     if (jfc == null) {
-      jfc = new JFileChooser(System.getProperty("user.dir")+
-                             System.getProperty("file.separator")+"BehaviorLibraries"+
-									  System.getProperty("file.separator")+"SavageTactics");
+      jfc = new JFileChooser(System.getProperty("user.dir") +
+                             System.getProperty("file.separator") + "BehaviorLibraries");
       jfc.setDialogTitle("Open Event Graph File");
     }
     int retv = jfc.showOpenDialog(this);

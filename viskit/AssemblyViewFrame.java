@@ -795,8 +795,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       
 //      if (jfc == null) {
 //          jfc = new JFileChooser(System.getProperty("user.dir") +
-//                  System.getProperty("file.separator") + "BehaviorLibraries" + System.getProperty("file.separator") +
-//                  "SavageTactics" + System.getProperty("file.separator") + "Scenarios");
+//                  System.getProperty("file.separator") + "examples");
 //          jfc.setDialogTitle("Open Assembly File");
 //      }
 //      int retv = jfc.showOpenDialog(this);

@@ -62,10 +62,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
    * TODO MIKE: Wire boolean filters to AnalystReport GUI
    * *************************************************
    */
-  private boolean enableAnalystReports = true;
+  
+  /** A checkbox is user enabled from the Analyst Report Panel */
+  private boolean enableAnalystReports = false;
   private boolean analystReplicationData = true;
   private boolean analystSummaryData = true;
-  private boolean generateAnalystReport = true;
   private AnalystReportBuilder reportBuilder;
   /**
    * ***********************************************
@@ -109,7 +110,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     setNumberReplications(1);
     hookupsCalled = false;
 
-    initReportFile();    // Creates the temp file
     //Creates a report stats config object and names it based on the name of this
     //Assembly.
     //TODO MIKE: instead of this.getName() We may not need to worry about the name of
@@ -356,10 +356,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     return printSummaryReport;
   }
 
-  public String getAnalystReportPath()
-  {
-    return analystReportFile.getAbsolutePath();
-  }
+  /** @return the absolute path to the temporary analyst report */
+  public String getAnalystReport() {return analystReportFile.getAbsolutePath();}
 
   public void setDesignPointID(int id)
   {
@@ -690,30 +688,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           //scenarioManager.waitDelay("Stop",0.0);
       }
     } // for
-
     
     if (isPrintSummaryReport()) {
       println.println(getSummaryReport());
       println.flush();
-    }
-    
+    }    
 
     //TODO MIKE: Wire the following to the analyst report GUI somehow
-    if (enableAnalystReports && analystSummaryData)
-      statsConfig.processSummaryReport(designPointStats);
-    if (enableAnalystReports && generateAnalystReport) {
-      //statsConfig.saveData();
-      reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
-      try {
-        reportBuilder.writeToXMLFile(analystReportFile);
-      }
-      catch (Exception e) {
-        System.err.println("BasicAssembly can't write analyst report XML to " + analystReportFile.getAbsolutePath());
-        System.err.println(e.getMessage());
-      }
+    if (enableAnalystReports) {
+        
+        // Creates the temp file only when user required
+        initReportFile();
+        //statsConfig.saveData();
+        statsConfig.processSummaryReport(designPointStats);
+        reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
+        try {
+            reportBuilder.writeToXMLFile(analystReportFile);
+        } catch (Exception e) {
+            System.err.println("BasicAssembly can't write analyst report XML to " + analystReportFile.getAbsolutePath());
+            System.err.println(e.getMessage());
+        }
     }
-    System.gc();
     System.runFinalization();
+    System.gc();
     //saveState(replication);
     
     //}
@@ -736,7 +733,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   }
   
   public void setEnableAnalystReports(boolean enable) {      
-           enableAnalystReports = enable;
+      enableAnalystReports = enable;
   }
 
   /**
@@ -748,6 +745,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   {
     try {
       analystReportFile = File.createTempFile("ViskitAnalystReport", ".xml");
+//      analystReportFile.deleteOnExit();
     }
     catch (IOException e) {
       analystReportFile = null;

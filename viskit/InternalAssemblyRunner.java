@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.EventListener;
+import org.apache.log4j.Logger;
 import viskit.xsd.bindings.cli.Assembly;
 import viskit.doe.LocalBootLoader;
 
@@ -81,13 +82,15 @@ import viskit.doe.LocalBootLoader;
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener
 {
+  static Logger log = Logger.getLogger(InternalAssemblyRunner.class);
+  static String lineSep = System.getProperty("line.separator");
+  
   String targetClassName;
   String targetClassPath;
   List outputs;
   ArrayList<Long> seeds;
   RunnerPanel2 runPanel;
   ActionListener closer,saver;
-  static String lineSep = System.getProperty("line.separator");
   JMenuBar myMenuBar;
   BufferedReader backChan;
   Thread simRunner;
@@ -95,18 +98,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   PipedInputStream pis;
   BasicAssembly assembly;
   private Process externalSimRunner;
-  private String analystReportTempFile; // external runner saves a file
+  private String analystReportTempFile = null; // external runner saves a file
   FileOutputStream fos;
   FileInputStream fis; 
   LocalBootLoader loader;
-  Class targetClass;
+  Class basicAssembly, targetClass;
   Object assemblyObj;
   private static int mutex = 0;
   private ClassLoader lastLoaderNoReset;
   private ClassLoader lastLoaderWithReset;
   long seed;
-  public InternalAssemblyRunner()
-  {
+  
+  /** Default Constructor */
+  public InternalAssemblyRunner() {
     
     saver = new saveListener();
     runPanel = new RunnerPanel2(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
@@ -248,7 +252,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       Runnable assemblyRunnable;
       
       try {
-          analystReportTempFile = null;
           resetSeeds = runPanel.resetSeedCB.isSelected();
           try {
               tmpFile = File.createTempFile("viskit","out.txt");
@@ -309,7 +312,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           Method setSeed = RNClass.getMethod("setSeed",long.class);
           
           setSeed.invoke(rn,seed);
-          Class basicAssembly = loader.loadClass("viskit.xsd.assembly.BasicAssembly");
+          basicAssembly = loader.loadClass("viskit.xsd.assembly.BasicAssembly");
           Method addPropertyChangeListener = basicAssembly.getMethod("addPropertyChangeListener",PropertyChangeListener.class);
           setOutputStream.invoke(assemblyObj,fos);
           setNumberReplications.invoke(assemblyObj,Integer.parseInt(runPanel.numRepsTF.getText().trim()));
@@ -321,13 +324,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           setVerbose.invoke(assemblyObj,runPanel.vcrVerbose.isSelected());
           setVerboseReplication.invoke(assemblyObj,getVerboseReplicationNumber());
           addPropertyChangeListener.invoke(assemblyObj,this);
-          assemblyRunnable = (Runnable)assemblyObj;
+          assemblyRunnable = (Runnable)assemblyObj;          
           
           runPanel.wakeUpTextUpdater(fis);
           simRunner = new Thread(assemblyRunnable);
           (new SimThreadMonitor(simRunner)).start();
           simRunner.join();
           Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+          
       } catch (Exception e) {
           e.printStackTrace();
       }
@@ -335,9 +339,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   
   public class SimThreadMonitor extends Thread {
       Thread waitOn;
+      
       public SimThreadMonitor(Thread toWaitOn) {
           waitOn=toWaitOn;
       }
+      
       public void run() {
           waitOn.start();
             try {
@@ -345,8 +351,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+          
           end();
+          
+          // Grab the temp analyst report and signal the AnalystPeportPanel
+          try {
+              Method getAnalystReport = basicAssembly.getMethod("getAnalystReport");
+              analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
+              log.info("Analyst Report before REGEX: " + analystReportTempFile);
+          } catch (SecurityException ex) {log.fatal(ex);}
+            catch (NoSuchMethodException ex) {log.fatal(ex);}
+            catch (IllegalArgumentException ex) {log.fatal(ex);}
+            catch (IllegalAccessException ex) {log.fatal(ex);}
+            catch (InvocationTargetException ex) {log.fatal(ex);}
+          signalReportReady();
       }
+      
       public void end() {
           
           System.out.println("Simulation ended");
@@ -384,7 +404,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Schedule.getDefaultEventList().clearRerun();
           }
           
-          mutex--;
+          mutex--;                    
       }
   }
   
@@ -402,9 +422,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       }
       return ret;
   }
-  
-  PrintWriter pWriter;
-  
+    
   class startResumeListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           runPanel.vcrSimTime.setText("0.0");    // because no pausing
@@ -424,9 +442,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       public void actionPerformed(ActionEvent e) {
           twiddleButtons(InternalAssemblyRunner.STOP);
           assembly.stop();
-          runPanel.fileChaser.stop();
+          runPanel.fileChaser.stop();          
       }
   }
+  
   class rewindListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           twiddleButtons(InternalAssemblyRunner.REWIND);
@@ -440,6 +459,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       }
   }
   
+  // TODO: Not used.  Not sure this listener is even necessary
   class analystReportListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           assembly.setEnableAnalystReports(((JCheckBox)e.getSource()).isSelected());

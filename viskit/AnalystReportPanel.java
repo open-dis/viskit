@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.FileIO;
+import org.apache.log4j.Logger;
 import viskit.xsd.assembly.AnalystReportBuilder;
 import viskit.xsd.assembly.XsltUtility;
 
@@ -70,21 +71,22 @@ import java.net.URL;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener
 {
+  static Logger log = Logger.getLogger(AnalystReportPanel.class);  
+  
   private AnalystReportBuilder arb;
   private File reportFile;
 
-  private boolean dirty=false;
+  /** boolean to show that raw report has not been saved AnalystReports */
+  private boolean dirty = false;
   private JMenuBar myMenuBar;
 
   private JFileChooser locationImageFileChooser;
-  public AnalystReportPanel()
-  {
+  public AnalystReportPanel() {
     setLayout();
     setBackground(new Color(251,251,229)); // yellow
     doMenus();
 
-    locationImageFileChooser = new JFileChooser("./images/BehaviorLibraries/SavageTactics/");
-
+    locationImageFileChooser = new JFileChooser("./images/");
   }
 
   JTextField titleTF = new JTextField();
@@ -125,31 +127,30 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   // From assy runner:
 
-  public void setReportXML(String path)
-  {
-    File srcFil = new File(path);
-
-    File anDir = new File("./AnalystReports");
-    anDir.mkdirs();
-
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-    String output = formatter.format(new Date());// today
-
-    String usr = System.getProperty("user.name");
-    String outputFile = (usr + "AnalystReport_"+output+".xml");
-
-    File targetFile = new File(anDir,outputFile);
-    try {
-      FileIO.copyFile(srcFil,targetFile,true);
-      srcFil.deleteOnExit();
-    }
-    catch (IOException e) {
-      System.err.println("Exception copying Analyst Report File: "+e.getMessage());
-    }
-
-    doTitle(targetFile.getName());
-    buildArb(targetFile);
+  public void setReportXML(String path) {
+   
+      log.info("Parameter path: " + path);
+      File srcFil = new File(path);
+      
+      File anDir = new File("./AnalystReports");
+      anDir.mkdirs();
+      
+      SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+      String output = formatter.format(new Date()); // today
+      
+      String usr = System.getProperty("user.name");
+      String outputFile = (usr + "AnalystReport_" + output + ".xml");
+      
+      File targetFile = new File(anDir, outputFile);
+      try {
+          FileIO.copyFile(srcFil, targetFile, true);
+          srcFil.deleteOnExit();
+      } catch (IOException ioe) {log.fatal(ioe);}
+      
+      doTitle(targetFile.getName());
+      buildArb(targetFile);
   }
+  
   private void buildArb(File targetFile)
   {
     AnalystReportBuilder arb = null;
@@ -909,7 +910,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     open.setMnemonic(KeyEvent.VK_O);
     JMenuItem view  = new JMenuItem("View analyst report XML");
     view.setMnemonic(KeyEvent.VK_V);
-    view.setEnabled (false); // TODO:  imolement listener and view functionality
+    view.setEnabled (false); // TODO:  implement listener and view functionality
     JMenuItem save  = new JMenuItem("Save analyst report XML");
     save.setMnemonic(KeyEvent.VK_S);
     JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
@@ -955,6 +956,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     {
       public void actionPerformed(ActionEvent e)
       {
+        log.info("In second actionPerformed");
         JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
         saveChooser.setSelectedFile(reportFile);
         saveChooser.setMultiSelectionEnabled(false);
