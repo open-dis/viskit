@@ -62,7 +62,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
    * TODO MIKE: Wire boolean filters to AnalystReport GUI
    * *************************************************
    */
-  
+
   /** A checkbox is user enabled from the Analyst Report Panel */
   private boolean enableAnalystReports = false;
   private boolean analystReplicationData = true;
@@ -80,7 +80,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   private DecimalFormat form;
 
   private LinkedList entitiesWithStats;
-  
+
   private ByteArrayOutputStream outputBuffer;
 
   private PrintWriter println;
@@ -135,7 +135,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     startRepNumber = 0;
   }
 
-  // mask the Thread run() 
+  // mask the Thread run()
   public void doRun() {
       setPersistant(false);
   }
@@ -314,12 +314,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     // but, isFinished didn't happen for the 0th
     // replication
     if (Schedule.getDefaultEventList().isFinished())
-      
+
             try {
                 Schedule.reset();
             } catch (java.util.ConcurrentModificationException cme) {
                 System.out.println("Maybe not finished in Event List "+Schedule.getDefaultEventList().getID());
-                
+
             }
   }
 
@@ -357,7 +357,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   }
 
   /** @return the absolute path to the temporary analyst report */
-  public String getAnalystReport() {return analystReportFile.getAbsolutePath();}
+  public String getAnalystReport() {
+     if (analystReportFile == null)
+        return null;
+
+     return analystReportFile.getAbsolutePath();
+  }
 
   public void setDesignPointID(int id)
   {
@@ -522,7 +527,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       // takes it mid thread.
       System.setOut(out);
   }
-  
+
   /**
    * Execute the simulation for the desired number of replications.
    */
@@ -557,8 +562,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         replicationData.put(new Integer(i), new ArrayList());
       }
     }
-    
-    
+
+
     // TBD: there should be a pluggable way to have Viskit
     // directly modify entities. One possible way is to enforce
     // packages that wish to take advantage of exposed controls
@@ -616,11 +621,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                   System.out.print(entity.getName()+" ");
               }
           }
-          
+          System.out.println();
+
       }
       if(stopRun) {
           System.out.println("Stopped in Replication# "+replication+1);
-          
+
         break;
       } else {
           Long seed = new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed());
@@ -645,12 +651,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                   Schedule.addRerun(entity);
               }
               //Schedule.reset();
-              
+
           }
-          
+
           Schedule.startSimulation();
-          
-          
+
+
           for (int i = 0; i < replicationStats.length; ++i) {
               fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
               fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
@@ -667,7 +673,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           System.runFinalization();
           System.gc();
       }
-      
+
       if ( false&&scenarioManager != null ) {
           try {
               Method doStop = scenarioManager.getClass().getMethod("doStop");
@@ -688,15 +694,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
           //scenarioManager.waitDelay("Stop",0.0);
       }
     } // for
-    
+
     if (isPrintSummaryReport()) {
       println.println(getSummaryReport());
       println.flush();
-    }    
+    }
+
 
     //TODO MIKE: Wire the following to the analyst report GUI somehow
     if (enableAnalystReports) {
-        
+
         // Creates the temp file only when user required
         initReportFile();
         //statsConfig.saveData();
@@ -712,18 +719,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     System.runFinalization();
     System.gc();
     //saveState(replication);
-    
+
     //}
   }
-  
+
   public void pause() {
       Schedule.pause();
   }
-  
+
   public void resume() {
       Schedule.startSimulation();
   }
-  
+
   // this is getting called by the Assembly Runner stop
   // button, which may get called on startup.
   public void stop() {
@@ -731,8 +738,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       //Schedule.reset(); //?
       stopRun=true;
   }
-  
-  public void setEnableAnalystReports(boolean enable) {      
+
+  public void setEnableAnalystReports(boolean enable) {
       enableAnalystReports = enable;
   }
 
