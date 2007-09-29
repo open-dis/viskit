@@ -77,14 +77,14 @@ import viskit.xsd.bindings.cli.Assembly;
 import viskit.doe.LocalBootLoader;
 
 /**
- * 
+ *
  * Handles RunnerPanel2
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener
 {
   static Logger log = Logger.getLogger(InternalAssemblyRunner.class);
   static String lineSep = System.getProperty("line.separator");
-  
+
   String targetClassName;
   String targetClassPath;
   List outputs;
@@ -100,7 +100,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   private Process externalSimRunner;
   private String analystReportTempFile = null; // external runner saves a file
   FileOutputStream fos;
-  FileInputStream fis; 
+  FileInputStream fis;
   LocalBootLoader loader;
   Class basicAssembly, targetClass;
   Object assemblyObj;
@@ -108,10 +108,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   private ClassLoader lastLoaderNoReset;
   private ClassLoader lastLoaderWithReset;
   long seed;
-  
-  /** Default Constructor */
-  public InternalAssemblyRunner() {
-    
+
+  private SimulationStateListener simListener;
+  private boolean inRegressionMode;
+
+  public InternalAssemblyRunner()
+  {
+    inRegressionMode = false;
+
     saver = new saveListener();
     runPanel = new RunnerPanel2(null,true); //"Initialize using Assembly Edit tab, then Run button",true);
     doMenus();
@@ -128,6 +132,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     twiddleButtons(OFF);
     lastLoaderNoReset = Thread.currentThread().getContextClassLoader();
     seeds = new ArrayList();
+  }
+
+  /**
+   * Are we running in regression mode.
+   *
+   * @param regress Should we run in regression mode
+   */
+  public void setRegressionMode(boolean regress) {
+    inRegressionMode = regress;
+
+    if (inRegressionMode) {
+        runPanel.analystReportCB.setSelected(true);
+    }
   }
 
   public JComponent getContent()
@@ -208,7 +225,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     twiddleButtons(InternalAssemblyRunner.REWIND);
 
   }
-  
+
   Object targetObject;
   private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
       // Assembly has been compiled by now
@@ -222,21 +239,21 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       // in order to see BasicAssembly this thread has to have
       // the same loader as the one used since they don't
       // share the same simkit or viskit.
-      
+
       Method getNumberReplications = targetClass.getMethod("getNumberReplications");
       Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
       Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
       Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
       Method isVerbose = targetClass.getMethod("isVerbose");
       Method getStopTime = targetClass.getMethod("getStopTime");
-      
+
       runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
       runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
       runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
       runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
       runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
       runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
-      
+
       Schedule.clearRerun();
       Schedule.coldReset();
   }
@@ -245,12 +262,18 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   RandomAccessFile rTmpFile;
   ClassLoader lastLoader;
   boolean resetSeeds;
-  
-  private void initRun() {
+
+  protected void initRun(SimulationStateListener listener, boolean regression) {
+    simListener = listener;
+    setRegressionMode(regression);
+    initRun();
+  }
+
+  protected void initRun() {
       mutex ++;
       if ( mutex > 1 ) return;
       Runnable assemblyRunnable;
-      
+
       try {
           resetSeeds = runPanel.resetSeedCB.isSelected();
           try {
@@ -258,7 +281,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
               tmpFile.deleteOnExit();
               tmpFile.setReadable(true);
               tmpFile.setWritable(true);
-              rTmpFile = new RandomAccessFile(tmpFile,"rws"); 
+              rTmpFile = new RandomAccessFile(tmpFile,"rws");
               if (fos!=null) {
                   fos.flush();
                   fos.close();
@@ -278,15 +301,15 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
               System.err.println("Can't write to tmp space: "+ioe.getMessage());
               ioe.printStackTrace();
           }
-          if (!resetSeeds) { 
+          if (!resetSeeds) {
               if ( seeds.size() > 0 ) {
                 // start with last cached seed
                 seed = seeds.get(seeds.size()-1);
               }
-          } else { 
+          } else {
               seeds.clear();
           }
-          
+
           loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader(true); // true->reboot
           Class obj = loader.loadClass("java.lang.Object");
           loader = new LocalBootLoader(loader.getExtUrls(),obj.getClassLoader(),VGlobals.instance().getWorkDirectory());
@@ -295,7 +318,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           lastLoaderWithReset = loader;
           targetClass = loader.loadClass(targetClass.getName());
           assemblyObj = targetClass.newInstance();
-          
+
           Method setOutputStream = targetClass.getMethod("setOutputStream",OutputStream.class);
           Method setNumberReplications = targetClass.getMethod("setNumberReplications",int.class);
           Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData",boolean.class);
@@ -310,7 +333,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           Object rn = getDefaultRandomNumber.invoke(null);
           Class RNClass = loader.loadClass("simkit.random.RandomNumber");
           Method setSeed = RNClass.getMethod("setSeed",long.class);
-          
+
           setSeed.invoke(rn,seed);
           basicAssembly = loader.loadClass("viskit.xsd.assembly.BasicAssembly");
           Method addPropertyChangeListener = basicAssembly.getMethod("addPropertyChangeListener",PropertyChangeListener.class);
@@ -319,45 +342,48 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
           setSaveReplicationData.invoke(assemblyObj,runPanel.saveRepDataCB.isSelected());
           setPrintReplicationReports.invoke(assemblyObj,runPanel.printRepReportsCB.isSelected());
           setPrintSummaryReport.invoke(assemblyObj,runPanel.printSummReportsCB.isSelected());
+
           setEnableAnalystReports.invoke(assemblyObj,runPanel.analystReportCB.isSelected());
           setStopTime.invoke(assemblyObj,getStopTime());
           setVerbose.invoke(assemblyObj,runPanel.vcrVerbose.isSelected());
           setVerboseReplication.invoke(assemblyObj,getVerboseReplicationNumber());
           addPropertyChangeListener.invoke(assemblyObj,this);
-          assemblyRunnable = (Runnable)assemblyObj;          
-          
+          assemblyRunnable = (Runnable)assemblyObj;
+
           runPanel.wakeUpTextUpdater(fis);
           simRunner = new Thread(assemblyRunnable);
           (new SimThreadMonitor(simRunner)).start();
           simRunner.join();
           Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-          
+
       } catch (Exception e) {
           e.printStackTrace();
       }
   }
-  
+
   public class SimThreadMonitor extends Thread {
       Thread waitOn;
-      
+
       public SimThreadMonitor(Thread toWaitOn) {
           waitOn=toWaitOn;
       }
-      
+
       public void run() {
+System.out.println("Inside IAR run");
           waitOn.start();
             try {
                 waitOn.join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-          
+
           end();
-          
+
           // Grab the temp analyst report and signal the AnalystPeportPanel
           try {
               Method getAnalystReport = basicAssembly.getMethod("getAnalystReport");
               analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
+
               log.info("Analyst Report before REGEX: " + analystReportTempFile);
           } catch (SecurityException ex) {log.fatal(ex);}
             catch (NoSuchMethodException ex) {log.fatal(ex);}
@@ -366,9 +392,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             catch (InvocationTargetException ex) {log.fatal(ex);}
           signalReportReady();
       }
-      
+
       public void end() {
-          
+          if (simListener != null)
+            simListener.simulationEnded();
+
           System.out.println("Simulation ended");
           if(resetSeeds) {
                 try {
@@ -403,11 +431,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             assembly.setStopRun(true);
             Schedule.getDefaultEventList().clearRerun();
           }
-          
-          mutex--;                    
+          mutex--;
       }
   }
-  
+
   /**
    * get the value of the RunnerPanel2 text field. This number
    * starts counting at 0, the method will return -1 for blank
@@ -422,7 +449,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       }
       return ret;
   }
-    
+  PrintWriter pWriter;
+
   class startResumeListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           runPanel.vcrSimTime.setText("0.0");    // because no pausing
@@ -442,24 +470,23 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       public void actionPerformed(ActionEvent e) {
           twiddleButtons(InternalAssemblyRunner.STOP);
           assembly.stop();
-          runPanel.fileChaser.stop();          
+          runPanel.fileChaser.stop();
       }
   }
-  
+
   class rewindListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           twiddleButtons(InternalAssemblyRunner.REWIND);
       }
   }
-  
+
   class verboseListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
-          
+
           assembly.setVerbose(((JCheckBox)e.getSource()).isSelected());
       }
   }
-  
-  // TODO: Not used.  Not sure this listener is even necessary
+
   class analystReportListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           assembly.setEnableAnalystReports(((JCheckBox)e.getSource()).isSelected());
@@ -530,7 +557,12 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
   private void signalReportReady()
   {
-    reportPanel.setReportXML(analystReportTempFile); 
+    if (analystReportTempFile == null) {
+        // No report to print
+        return;
+    }
+
+    reportPanel.setReportXML(analystReportTempFile);
   }
 
   double getStopTime()
@@ -609,7 +641,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     selAll.addActionListener(new selectAllListener());
     clrAll.addActionListener(new clearListener());
     view.addActionListener(new viewListener());
-    
+
     file.add(save);
     file.add(view);
 
@@ -650,7 +682,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       runPanel.serrTA.setText(null);
     }
   }
-  
+
   class viewListener implements ActionListener {
       public void actionPerformed(ActionEvent e) {
           File f = tmpFile;
@@ -670,7 +702,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 } catch (IOException ex1) {
                     ex1.printStackTrace();
                 }
-              
           }
       }
   }
