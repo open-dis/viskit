@@ -356,7 +356,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     return printSummaryReport;
   }
 
-  /** @return the absolute path to the temporary analyst report if actuall created*/
+  /** @return the absolute path to the temporary analyst report if user enabled
+   *          only
+   */
   public String getAnalystReport() {
      return (analystReportFile == null) ? null : analystReportFile.getAbsolutePath();
   }
@@ -697,8 +699,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
       println.flush();
     }
 
-
-    //TODO MIKE: Wire the following to the analyst report GUI somehow
+    // TODO MIKE: Wire the following to the analyst report GUI somehow
     if (enableAnalystReports) {
 
         // Creates the temp file only when user required
