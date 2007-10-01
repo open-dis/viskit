@@ -356,12 +356,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     return printSummaryReport;
   }
 
-  /** @return the absolute path to the temporary analyst report */
+  /** @return the absolute path to the temporary analyst report if actuall created*/
   public String getAnalystReport() {
-     if (analystReportFile == null)
-        return null;
-
-     return analystReportFile.getAbsolutePath();
+     return (analystReportFile == null) ? null : analystReportFile.getAbsolutePath();
   }
 
   public void setDesignPointID(int id)
