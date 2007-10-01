@@ -95,9 +95,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
 
   File currentAssyFile;
-  /* to get the name of the assembly file */
-  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
-  {
+  
+  /** Captures the name of the assembly file */
+  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
     switch (action) {
       case NEW_ASSY:
         currentAssyFile = (File)param;
@@ -115,21 +115,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
   }
 
-  public String getHandle()
-  {
-    return "";
-  }
+  public String getHandle() {return "";}
 
-  public JMenuBar getMenus()
-  {
-    return myMenuBar;
-  }
+  public JMenuBar getMenus() {return myMenuBar;}
 
   // From assy runner:
 
   public void setReportXML(String path) {
    
-      log.info("Parameter path: " + path);
+      log.debug("Parameter path: " + path);
       File srcFil = new File(path);
       
       File anDir = new File("./AnalystReports");
