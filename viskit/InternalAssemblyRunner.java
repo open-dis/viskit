@@ -109,7 +109,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   private ClassLoader lastLoaderWithReset;
   long seed;
 
-  private SimulationStateListener simListener;
+//  private SimulationStateListener simListener;
   private boolean inRegressionMode;
 
   public InternalAssemblyRunner()
@@ -263,11 +263,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
   ClassLoader lastLoader;
   boolean resetSeeds;
 
-  protected void initRun(SimulationStateListener listener, boolean regression) {
-    simListener = listener;
-    setRegressionMode(regression);
-    initRun();
-  }
+//  protected void initRun(SimulationStateListener listener, boolean regression) {
+//    simListener = listener;
+//    setRegressionMode(regression);
+//    initRun();
+//  }
 
   protected void initRun() {
       mutex ++;
