@@ -392,8 +392,8 @@ System.out.println("Inside IAR run");
       }
 
       public void end() {
-          if (simListener != null)
-            simListener.simulationEnded();
+//          if (simListener != null)
+//            simListener.simulationEnded();
 
           System.out.println("Simulation ended");
           if(resetSeeds) {
