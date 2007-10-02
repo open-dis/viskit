@@ -383,8 +383,6 @@ System.out.println("Inside IAR run");
           try {
               Method getAnalystReport = basicAssembly.getMethod("getAnalystReport");
               analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
-
-              log.info("Analyst Report before REGEX: " + analystReportTempFile);
           } catch (SecurityException ex) {log.fatal(ex);}
             catch (NoSuchMethodException ex) {log.fatal(ex);}
             catch (IllegalArgumentException ex) {log.fatal(ex);}
