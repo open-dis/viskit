@@ -2,14 +2,7 @@
  * AnalystReportBuilder.java
  *
  * Created on July 18, 2006, 7:04 PM
- *
- * This class constructs and exports an analyst report based on the parameters selected
- * by the Analyst Report panel in the Viskit UI.  This file uses the assembly file, and
- * event graph files as well as customizable items (images, comments) to construct a report
- * that is saved in XML and html formats.
- *
- *@author Patrick Sullivan
- *@version $Id$
+ * 
  */
 
 package viskit.xsd.assembly;
@@ -26,7 +19,14 @@ import java.io.IOException;
 import java.util.*;
 import java.text.DateFormat;
 
-
+/** This class constructs and exports an analyst report based on the parameters 
+ * selected by the Analyst Report panel in the Viskit UI.  This file uses the 
+ * assembly file, and event graph files as well as customizable items (images, 
+ * comments) to construct a report that is saved in XML and html formats.
+ *
+ * @author Patrick Sullivan
+ * @version $Id$
+ */
 public class AnalystReportBuilder
 {
   private boolean debug = false;
@@ -269,8 +269,8 @@ public class AnalystReportBuilder
     behaviorDefinitions.setAttribute("descriptions", "true");
     behaviorDefinitions.setAttribute("image", "true");
     behaviorDefinitions.setAttribute("details", "true");
-    makeComments(behaviorDefinitions,"BC", "");
-    makeConclusions(behaviorDefinitions,"BC", "");
+    makeComments(behaviorDefinitions,"BD", "");
+    makeConclusions(behaviorDefinitions,"BD", "");
 
     try {
       behaviorDefinitions.addContent(processBehaviors(true, true, true));
@@ -1053,8 +1053,8 @@ public class AnalystReportBuilder
 
   public String  getBehaviorComments()         { return unMakeComments(behaviorDefinitions); }
   public String  getBehaviorConclusions()      { return unMakeConclusions(behaviorDefinitions); }
-  public void setBehaviorDescription         (String s) { makeComments(behaviorDefinitions,"BC", s); }
-  public void setBehaviorConclusions      (String s) { makeConclusions(behaviorDefinitions,"BC", s); }
+  public void setBehaviorDescription         (String s) { makeComments(behaviorDefinitions,"BD", s); }
+  public void setBehaviorConclusions      (String s) { makeConclusions(behaviorDefinitions,"BD", s); }
   public List getBehaviorList()          { return unMakeBehaviorList(behaviorDefinitions); }
   // sim-config:
   //good
