@@ -7,6 +7,7 @@
 
 package viskit.xsd.assembly;
 
+import org.apache.log4j.Logger;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
@@ -27,8 +28,9 @@ import java.text.DateFormat;
  * @author Patrick Sullivan
  * @version $Id$
  */
-public class AnalystReportBuilder
-{
+public class AnalystReportBuilder {
+    
+    static Logger log = Logger.getLogger(AnalystReportBuilder.class);
   private boolean debug = false;
 
   /**
@@ -276,7 +278,7 @@ public class AnalystReportBuilder
       behaviorDefinitions.addContent(processBehaviors(true, true, true));
     }
     catch (Exception e) {
-      System.err.println("Error processing assembly file: " + e.getMessage());
+      log.error("Error processing assembly file: " + e.getMessage());
     }
 
     rootElement.removeChild("BehaviorDefinitions");
