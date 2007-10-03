@@ -409,8 +409,10 @@ public class AnalystReportBuilder {
         if (descript) {
           Document tmp = loadXML((String) eventGraphFiles.get(i));
           rootElement = tmp.getRootElement();
-          descriptText = rootElement.getChild("Comment").getText();
-
+          
+          // prevent returning a null if there was no attribute value
+          descriptText = (rootElement.getChildText("Comment") == null) ? "no comment provided" : rootElement.getChildText("Comment");
+                    
           Element description = new Element("description");
           description.setAttribute("text", descriptText);
           behavior.addContent(description);
@@ -422,7 +424,9 @@ public class AnalystReportBuilder {
               Element param = new Element("parameter");
               param.setAttribute("name", temp.getAttributeValue("name"));
               param.setAttribute("type", temp.getAttributeValue("type"));
-              param.setAttribute("description", temp.getChildText("Comment"));
+              
+              // The data "null" is not legal for a JDOM attribute
+              param.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
               behavior.addContent(param);
             }
             Iterator itr2 = rootElement.getChildren("StateVariable").iterator();
@@ -431,7 +435,9 @@ public class AnalystReportBuilder {
               Element stvar = new Element("stateVariable");
               stvar.setAttribute("name", temp.getAttributeValue("name"));
               stvar.setAttribute("type", temp.getAttributeValue("type"));
-              stvar.setAttribute("description", temp.getChildText("Comment"));
+                            
+              // The data "null" is not legal for a JDOM attribute
+              stvar.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
               behavior.addContent(stvar);
             }
           }
