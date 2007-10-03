@@ -602,7 +602,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     p.add(doBehaviorDesignAnalysisDescriptions);
     
     JScrollPane jsp = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Behavior Design Description"));
+    jsp.setBorder(new TitledBorder("Behavior Design Descriptions"));
     jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     p.add(jsp);
     

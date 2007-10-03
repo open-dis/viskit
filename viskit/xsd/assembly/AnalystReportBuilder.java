@@ -137,7 +137,7 @@ public class AnalystReportBuilder {
     createSimulationLocation();
     createSimulationConfiguration();
     createEntityParameters();
-    createBehaviorDefinitions();
+    createBehaviorDescriptions();
     createStatisticalResults();
     createConclusionsRecommendations();
   }
@@ -265,8 +265,8 @@ public class AnalystReportBuilder {
   }
 
   /** Creates the behavior parameters portion of the report */
-  private void createBehaviorDefinitions() {
-    behaviorDefinitions = new Element("BehaviorDefinitions");
+  private void createBehaviorDescriptions() {
+    behaviorDefinitions = new Element("BehaviorDescriptions");
     behaviorDefinitions.setAttribute("comments", "true");
     behaviorDefinitions.setAttribute("descriptions", "true");
     behaviorDefinitions.setAttribute("image", "true");
@@ -278,7 +278,9 @@ public class AnalystReportBuilder {
       behaviorDefinitions.addContent(processBehaviors(true, true, true));
     }
     catch (Exception e) {
-      log.error("Error processing assembly file: " + e.getMessage());
+      System.err.println("Error processing assembly file: " + e.getMessage());
+      log.error(e);
+      e.printStackTrace();
     }
 
     rootElement.removeChild("BehaviorDefinitions");
@@ -422,7 +424,6 @@ public class AnalystReportBuilder {
               param.setAttribute("type", temp.getAttributeValue("type"));
               param.setAttribute("description", temp.getChildText("Comment"));
               behavior.addContent(param);
-
             }
             Iterator itr2 = rootElement.getChildren("StateVariable").iterator();
             while (itr2.hasNext()) {
@@ -984,7 +985,7 @@ public class AnalystReportBuilder {
       System.err.println("Error processing assemblyFile");
     }
     entityParameters.addContent(makeParameterTables());
-    createBehaviorDefinitions();
+    createBehaviorDescriptions();
   }
   public void setFileName          (String fileName)           { this.fileName = fileName; }
   //public void setReportJdomDocument(Document doc)              { this.reportJdomDocument = doc; }
