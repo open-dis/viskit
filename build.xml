@@ -211,7 +211,8 @@
     <!--  === TARGET: compile === -->
     <target depends="build.init,compile.simxml.util" name="compile">
         <javac verbose="no" destdir="${dir.build.classes}" excludes="xsd/**"
-            debug="off"
+            debug="true"
+            debugLevel="lines,vars,source"
             source="1.5"
             target="1.5">
             <classpath>
@@ -501,9 +502,9 @@
     <target depends="jar-stage1" description="Build xml2java utils" name="compile.simxml.util">
        
         <javac destdir="${dir.build.classes}"
-            debug="off"
-            source="1.5"
-            target="1.5">
+               debug="off"
+               source="1.5"
+               target="1.5">
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <!-- <pathelement location="${dir.lib.xml}/jaxb-api.jar"/> -->
@@ -517,13 +518,13 @@
             target="1.5">
             <classpath>
                 <!-- <pathelement location="${dir.lib.xml}/jaxb-api.jar"/> -->
+                <pathelement location="${dir.lib}/log4j-1.2.14.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
             </classpath>
             <src path="${dir.src.cli.util}"/>
             <include name="Launcher.java"/>
             <include name="Boot.java"/>
-        </javac>
-        
+        </javac>        
         
         <javac destdir="${dir.build.classes}"
             debug="on"
@@ -538,6 +539,7 @@
                 <pathelement location="${dir.lib}/jdom.jar"/>
                 <pathelement location="${dir.lib}/xercesImpl.jar"/>
                 <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
+                <pathelement location="${dir.lib}/log4j-1.2.14.jar"/>
             </classpath>
             <src path="${dir.src}/viskit/doe"/>
             <src path="${dir.src.simasm.util}"/>
@@ -563,8 +565,7 @@
             <include name="DirDeleter.java"/>
             <include name="BshGridlet.java"/>
             <include name="ChartDrawer.java"/>
-        </javac>
-        
+        </javac>        
 
         <jar update="yes" jarfile="${dir.build.lib}/visxml.jar" basedir="${dir.build.classes}" compress="false" />
     </target>   
