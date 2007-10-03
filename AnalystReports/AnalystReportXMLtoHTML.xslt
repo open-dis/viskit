@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   <head>
-   <meta name="filename"    content="AnalystReport.xslt" />
+   <meta name="filename"    content="AnalystReportXMLtoHTML.xslt" />
    <meta name="author"      content="Patrick Sullivan" />
    <meta name="created"     content="21 July 2006" />
    <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format>
@@ -422,7 +422,7 @@
   </xsl:template>
 
   <!--Behavior Definition templates-->
-  <xsl:template match="BCComments" mode="BehaviorHeader">
+  <xsl:template match="BDComments" mode="BehaviorHeader">
     <p align="left">
       <b>Behavior Definitions</b>
     </p>
@@ -433,7 +433,7 @@
       </font>
     </p>
   </xsl:template>
-  <xsl:template match="BCConclusions" mode="BehaviorHeader">
+  <xsl:template match="BDConclusions" mode="BehaviorHeader">
     <p align="left">
       <i>Post-Experiment Analysis of Entity Behaviors.</i>
       <font color="#00006C">
