@@ -3,6 +3,7 @@ package viskit;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.JSplitPaneInitDivider;
+import org.apache.log4j.Logger;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
@@ -59,6 +60,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   public final static int ARC_MODE = 2;
   public final static int CANCEL_ARC_MODE = 3;
   public final static int SELF_REF_MODE = 4;
+  
+  static Logger log = Logger.getLogger(EventGraphViewFrame.class);
 
   /**
    * Toolbar for dropping icons, connecting, etc.
@@ -961,9 +964,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   //-----------------------
   {
     if(jfc == null)
-      jfc = new JFileChooser(System.getProperty("user.dir"));
+      jfc = new JFileChooser(/*System.getProperty("user.dir")*/);
 
-    File fil = new File(suggName);
+    File fil = new File(System.getProperty("user.dir") + suggName);
     if(showUniqueName)
       fil = getUniqueName(suggName);
 

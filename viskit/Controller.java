@@ -4,6 +4,7 @@ import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -44,6 +45,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 {
 
   static  File lastFile;
+  static Logger log = Logger.getLogger(Controller.class);
   
   public Controller()
   //=================
@@ -769,16 +771,19 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     File lastFile = ((ViskitModel)getModel()).getLastFile();
     if (lastFile != null)
       fileName = lastFile.getName();
+    
+    String imagesDir = "/images/";
 
-    File fil = ((ViskitView)getView()).saveFileAsk(fileName+imgSaveCount+".png",true);
+    File fil = ((ViskitView) getView()).saveFileAsk(imagesDir + fileName+imgSaveCount + ".png", false);
+    
     if(fil == null)
       return;
 
-    final Timer tim = new Timer(100,new timerCallback(fil));
+    final Timer tim = new Timer(100, new timerCallback(fil));
     tim.setRepeats(false);
     tim.start();
 
-    imgSaveCount = ""+ (++imgSaveInt);
+    imgSaveCount = "" + (++imgSaveInt);
   }
 
   class timerCallback implements ActionListener
