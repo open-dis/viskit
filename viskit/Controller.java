@@ -54,7 +54,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     initFileWatch();
     this._setFileLists();
   }
-
   
   public static File getLastFile() {
       return lastFile;
@@ -416,12 +415,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void save()
   //----------------
   {
-    ViskitModel mod = (ViskitModel)getModel();
+    ViskitModel mod = (ViskitModel) getModel();
     File lastFile = mod.getLastFile();
     if(lastFile == null)
       saveAs();
     else {
-      ((ViskitModel)getModel()).saveModel(lastFile);
+      ((ViskitModel) getModel()).saveModel(lastFile);
       fileWatchSave(lastFile);
     }
   }
@@ -429,8 +428,8 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   public void saveAs()
   //------------------
   {
-    ViskitModel mod = (ViskitModel)getModel();
-    ViskitView view = (ViskitView)getView();
+    ViskitModel mod = (ViskitModel) getModel();
+    ViskitView view = (ViskitView) getView();
     GraphMetaData gmd = mod.getMetaData();
 
     File saveFile = view.saveFileAsk(gmd.name+".xml",false);
@@ -772,9 +771,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (lastFile != null)
       fileName = lastFile.getName();
     
-    String imagesDir = "/images/";
-
-    File fil = ((ViskitView) getView()).saveFileAsk(imagesDir + fileName+imgSaveCount + ".png", false);
+    File fil = ((ViskitView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false);
     
     if(fil == null)
       return;

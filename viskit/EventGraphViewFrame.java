@@ -964,9 +964,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   //-----------------------
   {
     if(jfc == null)
-      jfc = new JFileChooser(/*System.getProperty("user.dir")*/);
+      jfc = new JFileChooser(System.getProperty("user.dir"));
 
-    File fil = new File(System.getProperty("user.dir") + suggName);
+    File fil = new File(suggName);
     if(showUniqueName)
       fil = getUniqueName(suggName);
 
