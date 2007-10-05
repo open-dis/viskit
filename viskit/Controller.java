@@ -767,7 +767,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //-------------------------
   {
     String fileName = "ViskitScreenCapture";
-    File lastFile = ((ViskitModel)getModel()).getLastFile();
+    File lastFile = ((ViskitModel) getModel()).getLastFile();
     if (lastFile != null)
       fileName = lastFile.getName();
     
