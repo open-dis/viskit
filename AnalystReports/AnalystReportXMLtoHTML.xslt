@@ -56,9 +56,9 @@
         <p/>
         <hr/>
         <!--Behavior Definitions -->
-        <xsl:apply-templates select="//BehaviorDefinitions" mode="BehaviorHeader"/>
+        <xsl:apply-templates select="//BehaviorDescriptions" mode="BehaviorHeader"/>
         <p/>
-        <xsl:apply-templates select="//BehaviorDefinitions/BehaviorList"/>
+        <xsl:apply-templates select="//BehaviorDescriptions/BehaviorList"/>
         <p/>
         <p/>
         <p/>
@@ -85,7 +85,6 @@
       </body>
     </html>
   </xsl:template>
-
 
   <!--Title information template-->
   <xsl:template match="AnalystReport">
@@ -216,7 +215,6 @@
       </table>
     </div>
   </xsl:template>
-
   <xsl:template match="AssemblyImage" mode="ConfigHeader">
     <p align="center">
       <xsl:element name="a">
@@ -240,7 +238,7 @@
         </xsl:element>
       </xsl:element>
     </p>
-  </xsl:template>
+  </xsl:template>  
   <xsl:template match="SimEntity" mode="EntitiesTable">
     <tr>
       <td>
@@ -252,10 +250,9 @@
     </tr>
   </xsl:template>
 
-
   <!--EntityParameter templates-->
   <!--<xsl:template match="EPComments" mode="ParamHeader"> TODO:  reconcile these names-->
-  <xsl:template match="PCComments" mode="ParamHeader">
+  <xsl:template match="EPComments" mode="ParamHeader">
     <p align="left">
       <b>Entity Parameters</b>
     </p>
@@ -645,7 +642,6 @@
         </table>
       </p>
     </p>
-
   </xsl:template>
 
   <xsl:template match="SummaryReport" mode="SumStats">

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -76,7 +76,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   private AnalystReportBuilder arb;
   private File reportFile;
 
-  /** boolean to show that raw report has not been saved AnalystReports */
+  /** 
+   * TODO: rewire this functionality?
+   * boolean to show that raw report has not been saved to AnalystReports 
+   */
   private boolean dirty = false;
   private JMenuBar myMenuBar;
 
@@ -100,9 +103,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
     switch (action) {
       case NEW_ASSY:
-        currentAssyFile = (File)param;
+        currentAssyFile = (File) param;
         if(arb != null)
-          arb.setAssemblyFile(((File)param).getAbsolutePath());
+          arb.setAssemblyFile(currentAssyFile.getAbsolutePath());
         break;
 
       case CLOSE_ASSY:
@@ -119,15 +122,17 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
   public JMenuBar getMenus() {return myMenuBar;}
 
-  // From assy runner:
-
+  /** Called from the InternalAssemblyRunner when the temp Analysts report is
+   * filled out and ready to copy
+   * @param path the path to the temp Analyst Report that will be copied
+   */
   public void setReportXML(String path) {
    
-      log.debug("Parameter path: " + path);
+      log.debug("Path of temp AR: " + path);
       File srcFil = new File(path);
       
       File anDir = new File("./AnalystReports");
-      anDir.mkdirs();
+      if (!anDir.exists()) {anDir.mkdirs();}
       
       SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
       String output = formatter.format(new Date()); // today
@@ -145,15 +150,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       buildArb(targetFile);
   }
   
-  private void buildArb(File targetFile)
-  {
+  private void buildArb(File targetFile) {
     AnalystReportBuilder arb = null;
     try {
       String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
+//      System.out.println("AnalystReportPanel.java:154 - Current Assembly file: " + assyFile);
       arb = new AnalystReportBuilder(targetFile, assyFile);
-    }
-    catch (Exception e) {
-      System.err.println("Error parsing analyst report: "+e.getMessage());
+    } catch (Exception e) {
+      System.err.println("Error parsing analyst report: " + e.getMessage());
       return;
     }
     setContent(arb);
@@ -161,8 +165,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     dirty=false;
   }
 
-  public void setContent(AnalystReportBuilder arb)
-  {
+  public void setContent(AnalystReportBuilder arb) {
     if(arb != null && dirty) {
       int resp = JOptionPane.showConfirmDialog(this,"<html>The experiment has completed and the report is ready to be displayed.<br>"+
                                                     "The current report data has not been saved. Save current report before continuing?",
@@ -199,6 +202,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     fillStatsPan();
     fillConclusionsRecommendationsPanel();
   }
+  
   private void unFillLayout()
   {
     unFillHeader();
@@ -488,15 +492,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     configImgPathTF.setText(arb.getAssemblyImageLocation());
   }
 
-  private void unFillSimulationConfiguration()
-  {
+  private void unFillSimulationConfiguration() {
     arb.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
     arb.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
     arb.setSimConfigurationConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
-    String s = configImgPathTF.getText();
-    if(s != null && s.length()>0)
+    String s = "file:///" + configImgPathTF.getText();
+    if(s != null && s.length() > 0)
       arb.setAssemblyImageLocation(s);
   }
 
@@ -950,7 +953,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     {
       public void actionPerformed(ActionEvent e)
       {
-        log.info("In second actionPerformed");
         JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
         saveChooser.setSelectedFile(reportFile);
         saveChooser.setMultiSelectionEnabled(false);
@@ -1021,18 +1023,17 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     generateViewHtml.addActionListener(generateViewHtmlListener);
   }
 
-  private void showHtmlViewer(File f)
-  {
+  private void showHtmlViewer(File f) {
       String errMsg = null;
       // pop up the system html viewer, or send currently running browser to html page
-        try {
-            viskit.util.BareBonesBrowserLaunch.openURL( f.toURI().toURL().toString() );
-        } catch (java.net.MalformedURLException mue) {
-            errMsg = f + " : malformed path error.";
-        }
-  
-    if(errMsg != null)
-      JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+errMsg,"Error",JOptionPane.ERROR_MESSAGE);
+      try {
+          viskit.util.BareBonesBrowserLaunch.openURL( f.toURI().toURL().toString() );
+      } catch (java.net.MalformedURLException mue) {
+          errMsg = f + " : malformed path error.";
+      }
+      
+      if(errMsg != null)
+          JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+errMsg,"Error",JOptionPane.ERROR_MESSAGE);
 /*
 
     JFrame fr = new JFrame("Analyst Report -- "+f.getPath());

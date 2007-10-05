@@ -444,7 +444,7 @@ public class AnalystReportBuilder {
         }
         if (image) {
           Element evtGraphImage = new Element("EventGraphImage");
-          evtGraphImage.setAttribute("dir", (String) eventGraphImages.get(i));
+          evtGraphImage.setAttribute("dir", "file:///" + (String) eventGraphImages.get(i));
           behavior.addContent(evtGraphImage);
         }
         behaviorList.addContent(behavior);
@@ -669,7 +669,6 @@ public class AnalystReportBuilder {
       }
     }
 
-
     return entityTable;
   }
 
@@ -730,11 +729,10 @@ public class AnalystReportBuilder {
           }
           Element chartDir = new Element("chartURL");
           String filename = axisLabel;
-          chartDir.setAttribute("dir",chart.createHistogram(chartTitle, axisLabel, data, filename));
+          chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));
           entity.addContent(chartDir);
           repReports.addContent(entity);
         }
-
       }
     }
     return repReports;
@@ -808,7 +806,7 @@ public class AnalystReportBuilder {
   }
 
   /**
-   * Creates a stand 'Image' element used by all sections of the report
+   * Creates a standard 'Image' element used by all sections of the report
    *
    * @param imageID a unique identifier for this XML Element
    * @param dir     the directory of the image
@@ -962,7 +960,6 @@ public class AnalystReportBuilder {
     setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
-
   public boolean isDebug()                           { return debug; }
 
   public Document   getAssemblyDocument()      { return assemblyDocument; }
@@ -1045,8 +1042,8 @@ public class AnalystReportBuilder {
   public String  getParameterComments()    { return unMakeComments(entityParameters);}
   public String  getParameterConclusions() { return unMakeConclusions(entityParameters);}
   public Vector  getParameterTables()      { return unMakeParameterTables(entityParameters);}
-  public void setParameterDescription         (String s){ makeComments(entityParameters,"PC", s); }
-  public void setParameterConclusions      (String s){ makeConclusions(entityParameters,"PC", s); }
+  public void setParameterDescription         (String s){ makeComments(entityParameters,"EP", s); }
+  public void setParameterConclusions      (String s){ makeConclusions(entityParameters,"EP", s); }
 
   // behavior definitions:
   //good
@@ -1081,7 +1078,7 @@ public class AnalystReportBuilder {
   public void    setSimConfigurationDescription       (String s) { makeComments(simConfig,"SC", s); }
   public void    setSimConfigEntityTable    (String s) { }; //todo
   public void    setSimConfigurationConclusions    (String s) { makeConclusions(simConfig,"SC", s); }
-  public void    setAssemblyImageLocation   (String s) { replaceChild(simConfig,makeImage("Assembly", s)); }
+  public void    setAssemblyImageLocation   (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
 
   // stat results:
   // good
