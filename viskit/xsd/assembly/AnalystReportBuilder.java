@@ -283,7 +283,7 @@ public class AnalystReportBuilder {
       e.printStackTrace();
     }
 
-    rootElement.removeChild("BehaviorDefinitions");
+    rootElement.removeChild("BehaviorDescriptions");
     rootElement.addContent(behaviorDefinitions);
   }
 
