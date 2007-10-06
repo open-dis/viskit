@@ -248,16 +248,13 @@ public class AnalystReportBuilder {
     rootElement.addContent(simConfig);
   }
 
-  /**
-   * Creates the entity parameter section of this analyst report
-   */
-  private void createEntityParameters()
-  {
+  /** Creates the entity parameter section of this analyst report */
+  private void createEntityParameters() {
     entityParameters = new Element("EntityParameters");
     entityParameters.setAttribute("comments", "true");
     entityParameters.setAttribute("parameterTables", "true");
-    makeComments(entityParameters,"EP", "");
-    makeConclusions(entityParameters,"EP", "");
+    makeComments(entityParameters, "EP", "");
+    makeConclusions(entityParameters, "EP", "");
     if(assemblyFile != null)
       entityParameters.addContent(makeParameterTables());
 
@@ -504,7 +501,6 @@ public class AnalystReportBuilder {
     return v;
   }
 
-
   Vector unMakeParameterTables(Element rootOfTabs)
   {
     Element elm = rootOfTabs.getChild("ParameterTables");
@@ -535,9 +531,9 @@ public class AnalystReportBuilder {
   /**
    * Creates parameter tables for all files in the assembly that have SMAL definitions.
    * TODO: extract all parameters?  How to format in the report?
+   * @return a Parameter Table for a given event graph
    */
-  private Element makeParameterTables()
-  {
+  private Element makeParameterTables() {
     Element parameterTables = new Element("ParameterTables");
     Element rootElement = assemblyDocument.getRootElement();
     List simEntityList = rootElement.getChildren("SimEntity");
@@ -596,7 +592,7 @@ public class AnalystReportBuilder {
    *
    * @param category the category for this table entry
    * @param data     the element that corresponds to the category
-   * @return tableEntry the parameter in table format
+   * @return the parameter in table format
    */
   private Element makeTableEntry(String category, Element data)
   {
@@ -637,7 +633,7 @@ public class AnalystReportBuilder {
    * Creates the entity table for this analyst xml object
    *
    * @param fileDirectory the location of the assembly file
-   * @return table the entityTable for the simConfig portion of the analyst report
+   * @return the entityTable for the simConfig portion of the analyst report
    */
   public Element makeEntityTable(String fileDirectory) throws Exception
   {
@@ -668,7 +664,6 @@ public class AnalystReportBuilder {
         entityTable.addContent(tableEntry);
       }
     }
-
     return entityTable;
   }
 
@@ -736,7 +731,6 @@ public class AnalystReportBuilder {
       }
     }
     return repReports;
-
   }
 
   /**
@@ -787,23 +781,11 @@ public class AnalystReportBuilder {
    * an attribute value in the Analyst report XML.
    *
    * @param booleanFlag the boolean variable to convert
-   * @return str the string representation of the boolean variable
+   * @return the string representation of the boolean variable
    */
-  private String booleanToString(boolean booleanFlag)
-  {
-    String str = "";
-    if (booleanFlag) str = "true";
-    if (!booleanFlag) str = "false";
-    return str;
-  }
+  private String booleanToString(boolean booleanFlag) {return booleanFlag ? "true" : "false";}
 
-  private boolean stringToBoolean(String s)
-  {
-    if(s.equalsIgnoreCase("true"))
-      return true;
-    else
-      return false;
-  }
+  private boolean stringToBoolean(String s) {return s.equalsIgnoreCase("true");}
 
   /**
    * Creates a standard 'Image' element used by all sections of the report
@@ -960,7 +942,7 @@ public class AnalystReportBuilder {
     setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
   }
 
-  public boolean isDebug()                           { return debug; }
+  public boolean isDebug()                     { return debug; }
 
   public Document   getAssemblyDocument()      { return assemblyDocument; }
   public Document   getReportJdomDocument()    { return reportJdomDocument; }
@@ -978,18 +960,18 @@ public class AnalystReportBuilder {
   public String     getReportName()            { return rootElement.getAttributeValue("name"); }
 
   public void setAssemblyDocument  (Document assemblyDocument) { this.assemblyDocument = assemblyDocument; }
-  public void setAssemblyFile      (String assyFile)
-  {
+  
+  public void setAssemblyFile(String assyFile) {
     assemblyFile = assyFile;
     try {
       simConfig.addContent(makeEntityTable(assyFile));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       System.err.println("Error processing assemblyFile");
     }
     entityParameters.addContent(makeParameterTables());
     createBehaviorDescriptions();
   }
+  
   public void setFileName          (String fileName)           { this.fileName = fileName; }
   //public void setReportJdomDocument(Document doc)              { this.reportJdomDocument = doc; }
   //public void setRootElement       (Element el)                { this.rootElement = el; }
@@ -1106,4 +1088,3 @@ public class AnalystReportBuilder {
   public void setEventGraphImages(LinkedList eventGraphImages) { this.eventGraphImages = eventGraphImages; }
   public void setEventGraphNames(LinkedList eventGraphNames) { this.eventGraphNames = eventGraphNames; }
 }
-
