@@ -246,19 +246,25 @@
         </javac>
         <copy todir="${dir.build.classes}">
             <fileset dir="${dir.src}">
-                <include name="**/*.txt"/>
-                <include name="**/*.png"/>
-                <include name="**/*.gif"/>
-                <include name="**/*.jpg"/>
-                <include name="log4j.properties"/>
-                <exclude name="build/"/>
+                <exclude name="${dir.build.classes}"/>
+                <exclude name="${dir.lib}"/>
                 <exclude name="ReadMe.txt"/>
+                <exclude name="license/"/>
+                <include name="viskit/xsd/cli/manif.txt"/>
+                <include name="viskit/images/*.png"/>
+                <include name="viskit/images/*.gif"/>
+                <include name="viskit/images/*.jpg"/>
+                <include name="log4j.properties"/>
             </fileset>
         </copy>
     </target>
     <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">
-        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit.jar"/>
+        <jar basedir="${dir.build.classes}" 
+             compress="false" 
+             jarfile="${dir.build.lib}/viskit.jar">
+           <metainf file="${dir.src}/license/lgpl.txt"/>
+        </jar>
     </target>
     
     <target depends="compile" name="jar-executable">
@@ -609,7 +615,7 @@
 
     <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
     <target description="Run Viskit, don't check dependencies" name="quick-run">
-        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true" >
+        <java classname="viskit.Splash2" classpathref="runtime.classpath" fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
             <!-- <jvmarg value="-Dswing.aatext=true"/> -->
             <jvmarg value="-XX:MaxPermSize=512m"/>
