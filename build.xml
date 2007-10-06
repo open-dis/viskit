@@ -250,6 +250,7 @@
                 <exclude name="${dir.lib}"/>
                 <exclude name="ReadMe.txt"/>
                 <exclude name="license/"/>
+                <include name="viskit/version.txt"/>
                 <include name="viskit/xsd/cli/manif.txt"/>
                 <include name="viskit/images/*.png"/>
                 <include name="viskit/images/*.gif"/>
