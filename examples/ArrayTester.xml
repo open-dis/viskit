@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="$author$" extend="SimEntityBase" name="ArrayTester" package="pkg" version="$id$" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="$author$" extend="SimEntityBase" name="ArrayTester" package="examples" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <StateVariable name="sinus" type="double[180]">
         <Comment/>
     </StateVariable>

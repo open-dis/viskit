@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="ahbuss" extend="SimEntityBase" name="EntityCreator" package="test" version="$Id$" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Event name="Arrival">
+        <Comment/>
+        <Schedule condition="true" delay="0.0" event="EntityArrival" priority="0.0">
+            <Comment/>
+            <EdgeParameter value="new simkit.Entity()"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="20" y="190"/>
+    </Event>
+    <Event name="EntityArrival">
+        <Comment/>
+        <Argument name="customer" type="simkit.Entity"/>
+        <Code/>
+        <Coordinate x="120" y="190"/>
+    </Event>
+</SimEntity>

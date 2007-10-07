@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleMachineFailure" version="0.1" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleMachineFailure" version="0.1" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter type="int" name="totalNumberMachines"/>
     <Parameter type="int" name="totalNumberRepairPeople"/>
     <Parameter type="simkit.random.RandomVariate" name="timeToFailure"/>
