@@ -1099,7 +1099,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     if(titlList != null)
       titlList.setTitle(currentTitle,titlkey);
   }
-
 }
 
 class WrappingTextArea extends JTextArea

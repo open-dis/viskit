@@ -39,8 +39,10 @@ public class ViskitConfig
 
   private ViskitConfig(String cfile)
   {
-    Logger.getRootLogger().setLevel(Level.FATAL);        // don't show everything
-    BasicConfigurator.configure();
+      // TODO: Since this is carry over from AUV Workbench, may need some INFO
+      // level detail for T/S
+//    Logger.getRootLogger().setLevel(Level.FATAL);        // don't show everything
+//    BasicConfigurator.configure();
     try {
       ConfigurationFactory factory = new ConfigurationFactory();
       factory.setConfigurationFileName(cfile);

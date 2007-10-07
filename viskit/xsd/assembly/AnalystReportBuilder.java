@@ -738,29 +738,43 @@ public class AnalystReportBuilder {
    * adds it to the list of event graphs with the proper formatting of the file's
    * path
    *
-   * @param fileType the type of XML file being used
+   * @param fileType the type of XML file being used to include package name
    */
   private void saveEventGraphReferences(String fileType) {
-    char letter;
-    int idx = 0;
-    for (int i = 0; i < fileType.length(); i++) {
-      letter = fileType.charAt(i);
-      if (letter == '.') idx = i;
-    }
-    String dir = System.getProperty("user.dir") + "/" + fileType.substring(0, idx) + "/";
-    dir = dir.replaceAll("\\\\", "/");
-    String file = fileType.substring(idx + 1, fileType.length());
-    String eventGraphFile = (dir + file + ".xml");
-    String img = System.getProperty("user.dir") + "/images/" + fileType.substring(0, idx) + "/" + file + ".xml.png";
-    img = img.replaceAll("\\\\", "/");
-    
-    // Get the absolute path to resolve the broken url problem
-    
-    if (!eventGraphFiles.contains(eventGraphFile)) {
-      eventGraphFiles.add(eventGraphFile);
-      eventGraphImages.add(img);
-      eventGraphNames.add(fileType.substring(idx + 1, fileType.length()));
-    }
+      log.debug("Paramter fileType: " + fileType);
+      char letter;
+      int idx = 0;
+      int fileTypeLength = fileType.length();
+      for (int i = 0; i < fileTypeLength; i++) {
+          letter = fileType.charAt(i);
+          if (letter == '.') idx = i;
+      }
+      
+      String userDir = System.getProperty("user.dir");
+      String fileTypePackageToPath = fileType.substring(0, idx) + "/";
+      String eventGraphImageDir = userDir + "/AnalystReports/images/EventGraphs/";
+      
+      String eventGraphDir = userDir + "/" + fileTypePackageToPath;
+      eventGraphDir = eventGraphDir.replaceAll("\\\\", "/");
+      log.debug("Event Graph Directory: " + eventGraphDir);
+      
+      String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
+      log.debug("Event Graph Name: " + eventGraphName);
+      
+      String eventGraphFile = eventGraphDir + eventGraphName + ".xml";
+      log.debug("Event Graph File: " + eventGraphFile);
+      
+      String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
+      imgFile = imgFile.replaceAll("\\\\", "/");
+      log.debug("Preceived image file location: " + imgFile);
+      
+      // Get the absolute path to resolve the broken url problem
+      
+      if (!eventGraphFiles.contains(eventGraphFile)) {
+          eventGraphFiles.add(eventGraphFile);
+          eventGraphImages.add(imgFile);
+          eventGraphNames.add(eventGraphName);
+      }
   }
 
   /**

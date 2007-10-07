@@ -50,17 +50,13 @@
         <hr/>
         <!--Entity Parameters -->
         <xsl:apply-templates select="//EntityParameters" mode="ParamHeader"/>
-        <p/>
         <xsl:apply-templates select="//EntityParameters/ParameterTables/EntityParameterTable"/>
         <p/>
         <p/>
         <hr/>
-        <!--Behavior Definitions -->
+        <!--Behavior Descriptions -->
         <xsl:apply-templates select="//BehaviorDescriptions" mode="BehaviorHeader"/>
-        <p/>
         <xsl:apply-templates select="//BehaviorDescriptions/BehaviorList"/>
-        <p/>
-        <p/>
         <p/>
         <p/>
         <hr/>
@@ -379,7 +375,7 @@
         <xsl:for-each select="parameter">
           <tr>
             <td width="132"></td>
-            <!--						<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
+            <!--td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td-->
             <td width="190">
               <xsl:value-of select="@name"/>
             </td>
@@ -404,8 +400,7 @@
         <xsl:for-each select="parameter">
           <tr>
             <td width="132"></td>
-
-            <!--					<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
+            <!--td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td-->
             <td width="190">
               <xsl:value-of select="@name"/>
             </td>
@@ -418,10 +413,10 @@
     </table>
   </xsl:template>
 
-  <!--Behavior Definition templates-->
+  <!--Behavior Description templates-->
   <xsl:template match="BDComments" mode="BehaviorHeader">
     <p align="left">
-      <b>Behavior Definitions</b>
+      <b>Behavior Descriptions</b>
     </p>
     <p align="left">
         <i>Description of Behavior Design.</i>
@@ -439,11 +434,10 @@
     </p>
   </xsl:template>
 
-  <!--Event Graph image and details -->
+  <!-- Event Graph image and details -->
   <xsl:template match="Behavior">
     <p/>
     <p/>
-    <hr/>
     <p/>
     <p align="left">
       <b>Behavior: </b>
@@ -554,7 +548,6 @@
       </font>
     </p>
   </xsl:template>
-
   <xsl:template match="SimEntity" mode="RepStats">
     <p/>
     <p align="left">
@@ -643,7 +636,6 @@
       </p>
     </p>
   </xsl:template>
-
   <xsl:template match="SummaryReport" mode="SumStats">
     <p/>
     <p align="left">
@@ -733,6 +725,5 @@
       </font>
     </p>
   </xsl:template>
-
 
 </xsl:stylesheet>
