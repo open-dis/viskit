@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ZoneMoverAssembly" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ZoneMoverAssembly" package="ExampleAssemblies" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
         <TerminalParameter name="isActive" type="boolean" value="true"/>
         <TerminalParameter name="duration" type="double" value=".2"/>
