@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity extend="SimEntityBase" name="TransferLineComponent" package="examples" version="0.0.2" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="totalNumberServers" type="int[]"/>
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate[]"/>
+    <StateVariable name="numberAvailableServers" type="int[totalNumberServers.length]"/>
+    <StateVariable name="numberInQueue" type="int[totalNumberServers.length]"/>
+    <Event name="Run">
+        <LocalVariable name="j" type="int" value="0">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="_idxvar_0" type="int" value="0">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <LocalVariable name="_idxvar_1" type="int" value="0">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_0" state="numberAvailableServers">
+            <Assignment value="totalNumberServers[_idxvar_0]"/>
+        </StateTransition>
+        <StateTransition index="_idxvar_1" state="numberInQueue">
+            <Assignment value="0"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="InitializeWorkcenter">
+            <EdgeParameter value="0"/>
+        </Schedule>
+        <Coordinate x="0" y="0"/>
+    </Event>
+    <Event name="InitializeWorkcenter">
+        <Argument name="i" type="int"/>
+        <LocalVariable name="_idxvar_26" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <LocalVariable name="_idxvar_27" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_26" state="numberInQueue">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition index="_idxvar_27" state="numberAvailableServers">
+            <Assignment value="totalNumberServers[i]"/>
+        </StateTransition>
+        <Schedule condition="i &lt; totalNumberServers.length - 1" event="InitializeWorkcenter">
+            <EdgeParameter value="i+1"/>
+        </Schedule>
+        <Coordinate x="120" y="0"/>
+    </Event>
+    <Event name="Arrival">
+        <Argument name="i" type="int"/>
+        <LocalVariable name="_idxvar_47" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_47" state="numberInQueue">
+            <Assignment value="numberInQueue[i] + 1"/>
+        </StateTransition>
+        <Schedule condition="getNumberAvailableServers(i) &gt; 0" event="StartService">
+            <EdgeParameter value="i"/>
+        </Schedule>
+        <Coordinate x="0" y="180"/>
+    </Event>
+    <Event name="StartService">
+        <Argument name="i" type="int"/>
+        <LocalVariable name="_idxvar_48" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <LocalVariable name="_idxvar_49" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_48" state="numberInQueue">
+            <Assignment value="numberInQueue[i] + 1"/>
+        </StateTransition>
+        <StateTransition index="_idxvar_49" state="numberAvailableServers">
+            <Assignment value="numberAvailableServers[i] - 1"/>
+        </StateTransition>
+        <Schedule delay="serviceTime[i].generate()" event="EndService">
+            <EdgeParameter value="i"/>
+        </Schedule>
+        <Coordinate x="160" y="100"/>
+    </Event>
+    <Event name="EndService">
+        <Argument name="i" type="int"/>
+        <LocalVariable name="_idxvar_50" type="int" value="i">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_50" state="numberAvailableServers">
+            <Assignment value="numberAvailableServers[i]+1"/>
+        </StateTransition>
+        <Schedule condition="getNumberInQueue(i) &gt; 0" event="StartService"/>
+        <Schedule condition="i &lt; totalNumberServers.length - 1" event="Arrival"/>
+        <Coordinate x="330" y="200"/>
+    </Event>
+</SimEntity>

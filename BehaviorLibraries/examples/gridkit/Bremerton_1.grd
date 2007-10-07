@@ -1,0 +1,433 @@
+<SimkitAssembly name="Bremerton_1" package="atfp" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <TerminalParameter type="double" value="-1400.0" name="exclusion_zone_1_position_y" >
+	<![CDATA[
+    
+        Double[] exclusion_zone_1_position_y() {
+            double center = -1000;
+            double offset = 100.0;
+            Double[] yValues = new Double[2];
+            yValues[0] = center + offset;
+            yValues[1] = center - offset;
+            return yValues;
+        }
+
+	]]>
+        
+    </TerminalParameter>
+    
+    <TerminalParameter type="double" value="700.0" name="exclusion_zone_0_radius" >
+    
+	<![CDATA[
+
+        Double[] exclusion_zone_0_radius() {
+            return new Double[] { new Double(700.0), new Double(300.0) };
+        }
+        
+	]]>
+        
+    </TerminalParameter>
+    
+    <TerminalParameter type="double" value="-1001.0" name="terrorist1_start_x" >
+
+	<![CDATA[
+    
+        Double[] terrorist1_start_x() {
+            return new Double[] { new Double(-1001.0), new Double(-960.0) };
+        }
+
+	]]>
+        
+    </TerminalParameter>
+    
+    <TerminalParameter type="double" value="100.0" name="machinegun2_surefire_range" >
+    
+	<![CDATA[
+
+        Double[] machinegun2_surefire_range() {
+            return new Double[] { new Double(100.0), new Double(50.0) };
+        }
+
+	]]>
+        
+    </TerminalParameter>
+    
+    <TerminalParameter type="double" value="5.0" name="machinegun2_impact_radius" >
+    
+	<![CDATA[
+
+        Double[] machinegun2_impact_radius() {
+            return new Double[] { new Double(7.0), new Double(4.0) };
+        }
+
+	]]>
+        
+    </TerminalParameter>
+    
+    <EventGraph filename="Fisherman.xml" >
+	<![CDATA[
+        
+        <SimEntity extend="diskit.DISMover3D" name="Fisherman" package="atfp" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <Comment>A fisherman or passerby with RandomMoverManager, generates a BeingEscorted event when a Defender is attempting to Escort an unknown.
+            </Comment>
+            <Parameter name="startPosition" type="diskit.Vec3d">
+                <Comment/>
+            </Parameter>
+            <Parameter name="cruisingSpeed" type="double">
+                <Comment/>
+            </Parameter>
+            <Parameter name="moverID" type="int">
+                <Comment/>
+            </Parameter>
+            <StateVariable name="tacticalMode" type="diskit.TacticalMode">
+                <Comment/>
+            </StateVariable>
+            <Event name="Run">
+                <Comment/>
+                <Comment/>
+                <StateTransition state="tacticalMode">
+                    <Assignment value="diskit.TacticalMode.TRANSITING"/>
+                </StateTransition>
+            </Event>
+            <Event name="Start">
+                <Comment/>
+                <LocalVariable name="movement" type="boolean" value="true; setCruisingSpeed(getMaxSpeed()); start()">
+                    <Comment/>
+                </LocalVariable>
+                <StateTransition state="tacticalMode">
+                    <Assignment value="diskit.TacticalMode.TRANSITING"/>
+                </StateTransition>
+            </Event>
+            <Event name="BeingEscorted">
+                <Comment/>
+                <Argument name="contact" type="diskit.Mover3D"/>
+                <Argument name="mover" type="diskit.Mover3D"/>
+                <Argument name="safePoint" type="diskit.Vec3d"/>
+                <StateTransition state="tacticalMode">
+                    <Assignment value="diskit.TacticalMode.ESCORTED"/>
+                </StateTransition>
+                <Cancel event="EndMove"/>
+                <Schedule condition="true" delay="0.0" event="GoTo" priority="0">
+                    <Comment/>
+                    <EdgeParameter value="mover"/>
+                    <EdgeParameter value="safePoint"/>
+                </Schedule>
+            </Event>
+            <Event name="EndMove">
+                <Comment/>
+                <Argument name="mover" type="diskit.Mover3D"/>
+                <LocalVariable name="m" type="boolean" value="true; setStartPosition(getLocation())">
+                    <Comment/>
+                </LocalVariable>
+                <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="Start" priority="0">
+                    <Comment/>
+                </Schedule>
+            </Event>
+            <Event name="GoTo">
+                <Comment/>
+                <Argument name="mover" type="diskit.Mover3D"/>
+                <Argument name="safetyPoint" type="diskit.Vec3d"/>
+                <LocalVariable name="movement" type="boolean" value="true; setDestination(safetyPoint,cruisingSpeed)">
+                    <Comment/>
+                </LocalVariable>
+            </Event>
+            <Event name="Init">
+                <Comment/>
+                <Argument name="entity" type="simkit.SimEntity"/>
+                <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+                    <Comment/>
+                    <EdgeParameter value="this"/>
+                </Schedule>
+            </Event>
+            <Event name="RegisterTarget">
+                <Comment/>
+                <Argument name="target" type="diskit.Mover3D"/>
+                <Schedule event="Start"/>
+            </Event>
+            <Event name="Escort">
+                <Comment/>
+                <Argument name="contact" type="diskit.Mover3D"/>
+                <Argument name="mover" type="diskit.Mover3D"/>
+                <Argument name="safePoint" type="diskit.Vec3d"/>
+                <Schedule condition="true" delay="0.0" event="BeingEscorted" priority="0">
+                    <Comment/>
+                    <EdgeParameter value="contact"/>
+                    <EdgeParameter value="mover"/>
+                    <EdgeParameter value="safePoint"/>
+                </Schedule>
+            </Event>
+            <Event name="Killed">
+                <Comment/>
+                <Argument name="dead" type="diskit.Mover3D"/>
+                <Schedule condition="dead == this" delay="0.0" event="Sink" priority="0">
+                    <Comment/>
+                    <EdgeParameter value="this"/>
+                </Schedule>
+            </Event>
+            <Event name="Sink">
+                <Comment/>
+                <Argument name="mover" type="diskit.Mover3D"/>
+                <LocalVariable name="statement" type="boolean" value="true; setDestination(getLocation()); stop()">
+                    <Comment/>
+                </LocalVariable>
+                <StateTransition state="tacticalMode">
+                    <Assignment value="diskit.TacticalMode.DEAD"/>
+                </StateTransition>
+            </Event>
+        </SimEntity>
+
+	]]>
+
+    </EventGraph>
+    
+    <SimEntity name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter type="boolean" value="true"/>
+        <TerminalParameter type="java.lang.String" value="239.255.5.8"/>
+        <TerminalParameter type="int" value="62040"/>
+        <TerminalParameter type="int" value="0"/>
+        <TerminalParameter type="int" value="1"/>
+    </SimEntity>
+    
+    <SimEntity name="Platform_0" type="diskit.Platform">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-800.0"/>
+            <TerminalParameter type="double" value="-1300.0"/>
+            <TerminalParameter type="double" value="0.01"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="0.00000001"/>
+        <TerminalParameter type="int" value="100"/>
+    </SimEntity>
+    
+    <SimEntity name="ExclusionZone" type="diskit.SphereCutterSensor">
+        <TerminalParameter type="diskit.Mover3D" value="Platform_0"/>
+        <TerminalParameter type="double" nameRef="exclusion_zone_0_radius" />
+    </SimEntity>
+    
+    <SimEntity name="Terrorist1" type="diskit.BasicTerrorist">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" nameRef="terrorist1_start_x" />
+            <TerminalParameter type="double" value="0.0"/>
+            <TerminalParameter type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="2.0"/>
+        <TerminalParameter type="int" value="111"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1000.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-800"/>
+                <TerminalParameter type="double" value="-1300"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter type="double" value="16.0"/>
+    </SimEntity>
+    
+    <SimEntity name="PatrolBoat" type="diskit.Defender">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-1200.05"/>
+            <TerminalParameter type="double" value="-1200.0"/>
+            <TerminalParameter type="double" value="00.00"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="10.0"/>
+        <TerminalParameter type="int" value="101"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1450.0"/>
+                <TerminalParameter type="double" value="-1750.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1550.0"/>
+                <TerminalParameter type="double" value="-1250.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1750.0"/>
+                <TerminalParameter type="double" value="-1250.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1750.0"/>
+                <TerminalParameter type="double" value="-1950.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+    </SimEntity>
+    
+    <SimEntity name="MachineGun" type="diskit.MachineGun">
+        <TerminalParameter type="int" value="6"/>
+        <TerminalParameter type="double" value="100.0"/>
+        <TerminalParameter type="double" value="5.0"/>
+    </SimEntity>
+    
+    <SimEntity name="Terrorist2" type="diskit.BasicTerrorist">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-1000.0"/>
+            <TerminalParameter type="double" value="100.01"/>
+            <TerminalParameter type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="5.0"/>
+        <TerminalParameter type="int" value="113"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1000.0"/>
+                <TerminalParameter type="double" value="100.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-800"/>
+                <TerminalParameter type="double" value="-1300.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter type="double" value="8.0"/>
+    </SimEntity>
+    
+    <SimEntity name="Terrorist3" type="diskit.BasicTerrorist">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-1300.01"/>
+            <TerminalParameter type="double" value="-1800.0"/>
+            <TerminalParameter type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="2.0"/>
+        <TerminalParameter type="int" value="112"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1700.0"/>
+                <TerminalParameter type="double" value="-1900.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-800"/>
+                <TerminalParameter type="double" value="-1300"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+        <TerminalParameter type="double" value="10.0"/>
+    </SimEntity>
+    
+    <SimEntity name="PatrolBoat2" type="diskit.Defender">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-1400.02"/>
+            <TerminalParameter type="double" value="-1200.0"/>
+            <TerminalParameter type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="10.0"/>
+        <TerminalParameter type="int" value="102"/>
+        <MultiParameter type="diskit.Vec3d[]">
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1400.0"/>
+                <TerminalParameter type="double" value="-1200.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1500.0"/>
+                <TerminalParameter type="double" value="-1900.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1700.0"/>
+                <TerminalParameter type="double" value="-1900.0"/>
+                <TerminalParameter type="double" value="00.0"/>
+            </MultiParameter>
+            <MultiParameter type="diskit.Vec3d">
+                <TerminalParameter type="double" value="-1700.0"/>
+                <TerminalParameter type="double" value="-600.0"/>
+                <TerminalParameter type="double" value="0.0"/>
+            </MultiParameter>
+        </MultiParameter>
+    </SimEntity>
+    
+    <SimEntity name="MachineGun2" type="diskit.MachineGun">
+        <TerminalParameter type="int" value="6"/>
+        <TerminalParameter type="double" nameRef="machinegun2_surefire_range" />
+        <TerminalParameter type="double" nameRef="machinegun2_impact_radius" />
+    </SimEntity>
+    <SimEntity name="BassMan" type="atfp.Fisherman">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-1000.0"/>
+            <TerminalParameter type="double" value="250.0"/>
+            <TerminalParameter type="double" value="0.0"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value="1.0"/>
+        <TerminalParameter type="int" value="121"/>
+    </SimEntity>
+    
+    <SimEntity name="BassTracker" type="diskit.RandomMoverManager">
+        <TerminalParameter type="diskit.Mover3D" value="BassMan"/>
+        <MultiParameter type="simkit.random.RandomVariate[]">
+            <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+                <TerminalParameter type="java.lang.String" value="NormalVariate"/>
+                <MultiParameter type="java.lang.Object[]">
+                    <TerminalParameter type="java.lang.Object" value="new Double(-1550.0)"/>
+                    <TerminalParameter type="java.lang.Object" value="new Double(500.0/1.035)"/>
+                </MultiParameter>
+                <TerminalParameter type="long" value="CongruentialSeeds.SEED[0]"/>
+            </FactoryParameter>
+	    <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+                <TerminalParameter type="java.lang.String" value="NormalVariate"/>
+                <MultiParameter type="java.lang.Object[]">
+                    <TerminalParameter type="java.lang.Object" value="new Double(-1200.0)"/>
+                    <TerminalParameter type="java.lang.Object" value="new Double(500.0/1.035)"/>
+                </MultiParameter>
+                <TerminalParameter type="long" value="CongruentialSeeds.SEED[2]"/>
+            </FactoryParameter>
+            <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+                <TerminalParameter type="java.lang.String" value="ConstantVariate"/>
+                <MultiParameter type="java.lang.Object[]">
+                    <TerminalParameter type="java.lang.Object" value="new Double(0.0)"/>
+                </MultiParameter>
+            </FactoryParameter>
+        </MultiParameter>
+    </SimEntity>
+    
+    <SimEntity name="Platform_1" type="diskit.Platform">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter type="double" value="-800.0"/>
+            <TerminalParameter type="double" nameRef="exclusion_zone_1_position_y"/>
+            <TerminalParameter type="double" value="0.01"/>
+        </MultiParameter>
+        <TerminalParameter type="double" value=".00001"/>
+        <TerminalParameter type="int" value="100"/>
+    </SimEntity>
+    
+    <SimEntity name="ExclusionZone1" type="diskit.SphereCutterSensor">
+        <TerminalParameter type="diskit.Mover3D" value="Platform_1"/>
+        <TerminalParameter type="double" value="700.0"/>
+    </SimEntity>
+    <PropertyChangeListener name="Platform_0_Status" type="diskit.stat.MarshaledSimpleStatsTally">
+        <TerminalParameter type="java.lang.String" value=""/>
+        <TerminalParameter type="java.lang.String" value=""/>
+    </PropertyChangeListener>
+    <SimEventListenerConnection listener="PatrolBoat" source="ExclusionZone"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PatrolBoat"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist1"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Terrorist3"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="PatrolBoat2"/>
+    <SimEventListenerConnection listener="MachineGun" source="PatrolBoat"/>
+    <SimEventListenerConnection listener="MachineGun2" source="PatrolBoat2"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform_0"/>
+    <SimEventListenerConnection listener="BassTracker" source="BassMan"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="BassMan"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="MachineGun"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="MachineGun2"/>
+    <SimEventListenerConnection listener="PatrolBoat" source="Platform_0"/>
+    <SimEventListenerConnection listener="ExclusionZone" source="Platform_0"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="Platform_1"/>
+    <SimEventListenerConnection listener="ExclusionZone1" source="Platform_1"/>
+    <SimEventListenerConnection listener="PatrolBoat2" source="ExclusionZone1"/>
+    <SimEventListenerConnection listener="PatrolBoat2" source="Platform_1"/>
+    <PropertyChangeListenerConnection listener="Platform_0_Status" property="alive" source="Platform_0"/>
+    <Output entity="ScenarioManager"/>
+    
+    <Schedule stopTime="500.0" verbose="false"/>
+
+    <Experiment type="latin-hypercube" totalSamples="10" runsPerDesignPoint="5" timeout="15000" debug="false" />
+    
+</SimkitAssembly>
+

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="Rick Goldberg" extend="simkit.SimEntityBase" name="DISMover3D" package="diskit.xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>This event graph is for documentation purposes, to outline the logic of the diskit package.</Comment>
+    <Parameter name="originalStartPosition" type="diskit.Vec3d">
+        <Comment>Must be anything but the first waypoint.</Comment>
+    </Parameter>
+    <Parameter name="maxSpeed" type="double">
+        <Comment/>
+    </Parameter>
+    <Parameter name="moverID" type="int">
+        <Comment/>
+    </Parameter>
+    <StateVariable name="velocity" type="diskit.Vec3d">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="destination" type="diskit.Vec3d">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="duration" type="double">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="movementState" type="simkit.smdx.MovementState">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="startPosition" type="diskit.Vec3d">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="lastVelocity" type="diskit.Vec3d">
+        <Comment/>
+    </StateVariable>
+    <StateVariable name="deltaTime" type="double">
+        <Comment>last checked time at start move</Comment>
+    </StateVariable>
+    <StateVariable name="cruisingSpeed" type="double">
+        <Comment>cruise speed</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <StateTransition state="startPosition">
+            <Operation method="set(getOriginalStartPosition())"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="set(0.0,0.0,0.0)"/>
+        </StateTransition>
+        <StateTransition state="destination">
+            <Operation method="set(startPosition)"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="0.0"/>
+        </StateTransition>
+        <StateTransition state="movementState">
+            <Assignment value="simkit.smdx.MovementState.STOPPED"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="Init" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Coordinate x="40" y="30"/>
+    </Event>
+    <Event name="Init">
+        <Comment>listened to by ScenarioManager and others</Comment>
+        <Argument name="mover" type="diskit.xml.DISMover3D"/>
+        <Coordinate x="220" y="30"/>
+    </Event>
+    <Event name="EndMove">
+        <Comment/>
+        <Argument name="mover" type="diskit.xml.DISMover3D"/>
+        <StateTransition state="startPosition">
+            <Operation method="set(getDestination())"/>
+        </StateTransition>
+        <Schedule event="Pause"/>
+        <Coordinate x="270" y="150"/>
+    </Event>
+    <Event name="Pause">
+        <Comment/>
+        <StateTransition state="movementState">
+            <Assignment value="simkit.smdx.MovementState.PAUSED"/>
+        </StateTransition>
+        <StateTransition state="lastVelocity">
+            <Operation method="set(getVelocity())"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="set(0.0,0.0,0.0)"/>
+        </StateTransition>
+        <Coordinate x="390" y="150"/>
+    </Event>
+    <Event name="StartMove">
+        <Comment/>
+        <LocalVariable name="v" type="diskit.Vec3d" value="new diskit.Vec3d(getDestination()); v.sub(getStartPosition())">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="r" type="diskit.Vec3d" value="new diskit.Vec3d(0.0,0.0,0.0)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="dur" type="double" value="(((v.length() != 0.0) &amp;&amp; (getCruisingSpeed() != 0.0) )?v.length()/getCruisingSpeed() : 0.0)">
+            <Comment/>
+        </LocalVariable>
+        <LocalVariable name="sc" type="double" value="((dur &gt; 0.0)?(1.0/dur):1.0); v.scale(sc)">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="velocity">
+            <Operation method="set(v)"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="dur"/>
+        </StateTransition>
+        <Schedule event="Cruise"/>
+        <Cancel condition="true" event="EndMove">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Cancel>
+        <Coordinate x="40" y="150"/>
+    </Event>
+    <Event name="Cruise">
+        <Comment/>
+        <StateTransition state="deltaTime">
+            <Assignment value="simkit.Schedule.getSimTime()"/>
+        </StateTransition>
+        <StateTransition state="movementState">
+            <Assignment value="simkit.smdx.MovementState.CRUISING"/>
+        </StateTransition>
+        <Schedule condition="true" delay="duration" event="EndMove" priority="0">
+            <Comment/>
+            <EdgeParameter value="this"/>
+        </Schedule>
+        <Coordinate x="160" y="190"/>
+    </Event>
+    <Event name="Stop">
+        <Comment/>
+        <StateTransition state="velocity">
+            <Operation method="set(0.0,0.0,0.0)"/>
+        </StateTransition>
+        <StateTransition state="movementState">
+            <Assignment value="simkit.smdx.MovementState.STOPPED"/>
+        </StateTransition>
+        <Coordinate x="380" y="30"/>
+    </Event>
+    <Event name="NextWaypoint">
+        <Comment/>
+        <Argument name="waypoint" type="diskit.Vec3d"/>
+        <Argument name="cruiseSpeed" type="double"/>
+        <LocalVariable name="tp" type="diskit.Vec3d" value="new diskit.Vec3d(getVelocity()); tp.scale(Schedule.getSimTime()-getDeltaTime());tp.add(getStartPosition()); if(tp.get(0) == Double.NaN) tp.set(getDestination());tp.sub(waypoint);tp.negate()">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="cruisingSpeed">
+            <Assignment value="(cruiseSpeed &gt; getMaxSpeed())?getMaxSpeed():cruiseSpeed"/>
+        </StateTransition>
+        <Schedule condition="getCruisingSpeed() &gt; 0.0" delay="0.0" event="Ahead" priority="0">
+            <Comment/>
+            <EdgeParameter value="tp"/>
+        </Schedule>
+        <Coordinate x="160" y="280"/>
+    </Event>
+    <Event name="Ahead">
+        <Comment>comment that the two velocity sets should somehow be collapsed</Comment>
+        <Argument name="newVelocity" type="diskit.Vec3d"/>
+        <Argument name="waypoint" type="diskit.Vec3d"/>
+        <LocalVariable name="oldDuration" type="double" value="getDuration()">
+            <Comment/>
+        </LocalVariable>
+        <StateTransition state="lastVelocity">
+            <Operation method="set(getVelocity())"/>
+        </StateTransition>
+        <StateTransition state="destination">
+            <Operation method="set(waypoint)"/>
+        </StateTransition>
+        <StateTransition state="duration">
+            <Assignment value="newVelocity.length()/getCruisingSpeed()"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="set(newVelocity)"/>
+        </StateTransition>
+        <StateTransition state="velocity">
+            <Operation method="scale(1.0/getDuration())"/>
+        </StateTransition>
+        <Schedule event="StartMove"/>
+        <Coordinate x="40" y="260"/>
+    </Event>
+</SimEntity>
+
