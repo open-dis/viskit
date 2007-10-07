@@ -43,7 +43,7 @@
     
     <property description="Examples directory" location="${dir.src}/examples" name="dir.examples"/>
     
-    <property description="Behavior Libraries Directory" location="${basedir}/../ViskitModelsFOUO/SavageDefenseTactics" name="behavior.lib" />
+    <property description="Behavior Libraries Directory" location="${dir.src}/BehaviorLibraries" name="behavior.lib" />
     
     <property description="DISKIT directory" location="${dir.src}/../DISKIT" name="dir.diskit"/>
               
@@ -59,7 +59,10 @@
     
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
     
-    <property description="images directory" location="${basedir}/images" name="dir.images"/>
+    <property name="analyst.reports" location="AnalystReports"/>
+    <property description="images directory" name="images" location="${analyst.reports}/images"/>
+    <property name="event.graphs" location="${images}/EventGraphs"/>
+    <property name="assemblies" location="${images}/Assemblies"/>
     
     <path id="runtime.extension.classes.path">
         <fileset dir="${dir.lib.ext}" includes="*.jar" id="runtime.extension.classes" />
@@ -175,7 +178,9 @@
         <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
         <mkdir dir="${dir.src.cli}"/>
-        <mkdir dir="${dir.lib.ext}"/>
+        <mkdir dir="${dir.lib.ext}"/>       
+        <mkdir dir="${event.graphs}"/>
+        <mkdir dir="${assemblies}"/>
     </target>
 
     <target depends="init" 
@@ -833,10 +838,9 @@
         </copy>
         <copy todir="${installer}/stage/sources/Simkit">
             <fileset dir="${basedir}/../Simkit/Simkit"/>
-        </copy>
-        
+        </copy>        
         <copy todir="${installer}/stage/images">
-            <fileset dir="${dir.images}"/>
+            <fileset dir="${images}"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
