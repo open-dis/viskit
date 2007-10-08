@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -56,9 +57,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class SettingsDialog extends JDialog
 {
+    static Logger log = Logger.getLogger(SettingsDialog.class);
   private static SettingsDialog dialog;
   private static boolean modified = false;
   private JFrame mother;
@@ -502,12 +506,26 @@ public class SettingsDialog extends JDialog
     }
   }
 
-  public static String[] getExtraClassPath()
-  {
-    if(vConfig==null)
-      initConfig();
-    VGlobals.instance().resetWorkClassLoader();
-    return vConfig.getStringArray(xClassPathKey +"[@value]");
+  /** @return a String array containing the extra classpaths to consider */
+  public static String[] getExtraClassPath() {
+      if(vConfig == null)
+          initConfig();
+      VGlobals.instance().resetWorkClassLoader();
+      return vConfig.getStringArray(xClassPathKey + "[@value]");
+  }
+  
+  /** @return a URL[] of the extra classpaths, to include a path to event graphs */
+  public static URL[] getExtraClassPathArraytoURLArray() {
+      String[] extClassPaths = getExtraClassPath();
+      URL[] extClassPathsUrls = new URL[extClassPaths.length];
+      int i = 0;
+      for (String path : extClassPaths) {
+          File extFile = new File(path);
+          try {
+              extClassPathsUrls[i++] = extFile.toURI().toURL();
+          } catch (MalformedURLException ex) {log.error(ex);}
+      }
+      return extClassPathsUrls;
   }
 
   public static boolean getVisibilitySense(String prop)

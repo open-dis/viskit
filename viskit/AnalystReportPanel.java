@@ -104,8 +104,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     switch (action) {
       case NEW_ASSY:
         currentAssyFile = (File) param;
-        if(arb != null)
+        if(arb != null) {
           arb.setAssemblyFile(currentAssyFile.getAbsolutePath());
+        }
         break;
 
       case CLOSE_ASSY:
@@ -128,7 +129,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
    */
   public void setReportXML(String path) {
    
-      log.debug("Path of temp AR: " + path);
+      log.debug("Path of temp Analyst Report: " + path);
       File srcFil = new File(path);
       
       File anDir = new File("./AnalystReports");
@@ -154,7 +155,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     AnalystReportBuilder arb = null;
     try {
       String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
-//      System.out.println("AnalystReportPanel.java:154 - Current Assembly file: " + assyFile);
+      log.debug("Current Assembly file: " + assyFile);
       arb = new AnalystReportBuilder(targetFile, assyFile);
     } catch (Exception e) {
       System.err.println("Error parsing analyst report: " + e.getMessage());
@@ -164,7 +165,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     reportFile = targetFile;
     dirty=false;
   }
-
+  
   public void setContent(AnalystReportBuilder arb) {
     if(arb != null && dirty) {
       int resp = JOptionPane.showConfirmDialog(this,"<html>The experiment has completed and the report is ready to be displayed.<br>"+
@@ -390,6 +391,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     simLocImgTF.setText(arb.getLocationImage());
     simChartImgTF.setText(arb.getChartImage());
   }
+  
   private void unFillSimulationLocation()
   {
     arb.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
@@ -478,7 +480,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     wantEntityTable.setSelected(arb.isPrintEntityTable());
 
-    String[][]sa = arb.getSimConfigEntityTable();
+    String[][] sa = arb.getSimConfigEntityTable();
     entityTable.setModel(new DefaultTableModel(sa,new String[]{"Entity Name","Behavior Type"}));
     entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
     entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
@@ -655,12 +657,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     List behaviorList = arb.getBehaviorList();
 
     behaviorTabs.removeAll();
-    for(Iterator itr=behaviorList.iterator(); itr.hasNext();) {
-      List   nextBehavior = (List)itr.next();
-      String behaviorName = (String)nextBehavior.get(0);
-      String behaviorDescription= (String)nextBehavior.get(1);
-      List   behaviorParameters = (List)nextBehavior.get(2);
-      List   behaviorStateVariables = (List)nextBehavior.get(3);
+    for(Iterator itr = behaviorList.iterator(); itr.hasNext();) {
+      List   nextBehavior = (List) itr.next();
+      String behaviorName = (String) nextBehavior.get(0);
+      String behaviorDescription= (String) nextBehavior.get(1);
+      List   behaviorParameters = (List) nextBehavior.get(2);
+      List   behaviorStateVariables = (List) nextBehavior.get(3);
       String behaviorImagePath = (String) nextBehavior.get(4);
 
       JPanel p = new JPanel();
@@ -1158,4 +1160,3 @@ class EntityParamTable extends ROTable implements TableCellRenderer
   }
 
 }
-

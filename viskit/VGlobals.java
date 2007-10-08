@@ -857,15 +857,8 @@ public class VGlobals
   {
     if(workLoader == null) {
       //workLoader = new SimpleDirectoryClassLoader(VGlobals.class.getClassLoader(),workDirectory);
-      String[] extraPaths = SettingsDialog.getExtraClassPath();
-      URL[] urls = new URL[extraPaths.length];
-      int index = 0;
-      for (String path:extraPaths) {
-          try {
-            urls[index++] = (new File(path)).toURI().toURL();   // URI encodes spaces
-          } catch (Exception e) {;} // Settings path dir gone?
-      }
-      LocalBootLoader loader = new LocalBootLoader(urls, Thread.currentThread().getContextClassLoader(), getWorkDirectory());
+      
+      LocalBootLoader loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), Thread.currentThread().getContextClassLoader(), getWorkDirectory());
       workLoader = loader.init(true);
       
     }

@@ -240,7 +240,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
   }
 
-
   public void setStopTime(double time)
   {
     if (time < 0.0) {
@@ -319,7 +318,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 Schedule.reset();
             } catch (java.util.ConcurrentModificationException cme) {
                 System.out.println("Maybe not finished in Event List "+Schedule.getDefaultEventList().getID());
-
             }
   }
 
@@ -356,9 +354,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     return printSummaryReport;
   }
 
-  /** @return the absolute path to the temporary analyst report if user enabled
-   *          only
-   */
+  /** @return the absolute path to the temporary analyst report if user enabled */
   public String getAnalystReport() {
      return (analystReportFile == null) ? null : analystReportFile.getAbsolutePath();
   }

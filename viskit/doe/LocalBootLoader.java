@@ -132,7 +132,7 @@ public class LocalBootLoader extends URLClassLoader {
         for (String path:classPath) {
             try {
                 // build up stage1 libs
-                stage1.addURL( new File(path).toURL() );
+                stage1.addURL( new File(path).toURI().toURL() );
                 //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
@@ -220,7 +220,7 @@ public class LocalBootLoader extends URLClassLoader {
             }
         }
         try {
-            stage1.addURL(jar.toURL());
+            stage1.addURL(jar.toURI().toURL());
             String[] tmp = new String[classPath.length+1];
             System.arraycopy(classPath,0,tmp,0,classPath.length);
             try {
@@ -247,7 +247,7 @@ public class LocalBootLoader extends URLClassLoader {
             newDir.deleteOnExit();
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
-            stage1.addURL(currentDir.toURL());
+            stage1.addURL(currentDir.toURI().toURL());
             // make a clean version of the dir in jar form
             // to be added to a newer stage1 (rebooted) instance.
             newJar = makeJarFileFromDir(currentDir,newDir);

@@ -851,19 +851,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
       try {
           if ( gridMode ) {
               doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()) );
-          } else {
-              String[] extClassPaths = SettingsDialog.getExtraClassPath();
-              URL[] extClassPathsUrls = new URL[extClassPaths.length];
-              int i = 0;
-              for (String path:extClassPaths) {
-                  File extFile = new File(path);
-                  try {
-                      extClassPathsUrls[i++] = extFile.toURL();
-                  } catch (MalformedURLException ex) {
-                      ex.printStackTrace();
-                  }
-              }
-              doe = new LocalDriverImpl(extClassPathsUrls,viskit.VGlobals.instance().getWorkDirectory());
+          } else {              
+              doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.VGlobals.instance().getWorkDirectory());
           }
           System.gc();
           qstatConsole.setDoe(doe);

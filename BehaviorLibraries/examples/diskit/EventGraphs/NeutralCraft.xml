@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- TODO:  fix broken calls to missing, or updated diskit functions which -->
+<!-- cause Viskit build errors (06 OCT 07 tdn) -->
 <SimEntity author="Patrick Sullivan" extend="diskit.DISMover3D" name="NeutralCraft" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>A Neutral Craft which will navigate through it's assigned zones. Most common use for this class is as traffic for a harbor or any other entity type that is neither a defender or an attacker.</Comment>
     <Parameter name="startPosition" type="diskit.Vec3d">

@@ -445,7 +445,7 @@
             debug="off"
             source="1.5"
             target="1.5">
-            <classpath>
+            <classpath id="jaxb.classapth">
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
             <src path="${dir.src.simevg}"/>
@@ -458,9 +458,7 @@
             debug="on"
             source="1.5"
             target="1.5">
-            <classpath>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-            </classpath>
+            <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}"/>
         </javac>
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
@@ -470,10 +468,8 @@
         <javac destdir="${dir.build.classes}"
             debug="on"
             source="1.5"
-            target="1.5">
-            <classpath>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-            </classpath>
+            target="1.5">            
+            <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}/stats"/>
         </javac>
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly/stats">
@@ -484,9 +480,7 @@
             debug="on"
             source="1.5"
             target="1.5">
-            <classpath>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-            </classpath>
+            <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.cli}"/>
         </javac>
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/cli">
@@ -498,9 +492,7 @@
         debug="on"
         source="1.5"
         target="1.5">
-        <classpath>
-        <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-        </classpath>
+        <classpath refid="jaxb.classapth"/>
         <src path="${dir.src.sge.qstat}"/>
         </javac>
         <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
@@ -519,7 +511,6 @@
                target="1.5">
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
-                <!-- <pathelement location="${dir.lib.xml}/jaxb-api.jar"/> -->
             </classpath>
             <src path="${dir.src.simevg.util}"/>
         </javac>
@@ -529,7 +520,6 @@
             source="1.5"
             target="1.5">
             <classpath>
-                <!-- <pathelement location="${dir.lib.xml}/jaxb-api.jar"/> -->
                 <pathelement location="${dir.lib}/log4j-1.2.14.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
             </classpath>
@@ -543,7 +533,6 @@
             source="1.5"
             target="1.5">
             <classpath>
-                <!-- <pathelement location="${dir.lib.xml}/jaxb-api.jar"/> -->
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>

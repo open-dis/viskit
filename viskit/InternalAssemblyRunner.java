@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -235,7 +235,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
       targetClass = Vstatics.classForName(targetClassName);
       if (targetClass == null) throw new ClassNotFoundException();
       targetObject = targetClass.newInstance();
-      assembly = (BasicAssembly)targetObject;
+      assembly = (BasicAssembly) targetObject;
       // in order to see BasicAssembly this thread has to have
       // the same loader as the one used since they don't
       // share the same simkit or viskit.
