@@ -784,7 +784,6 @@ public class AnalystReportBuilder {
      */
     private Document loadXML(String fileDir) throws Exception {
         SAXBuilder builder = new SAXBuilder();
-        log.info("fileDir is: " + fileDir);
         return builder.build(new File(fileDir));
     }
     
