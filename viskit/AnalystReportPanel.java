@@ -45,7 +45,7 @@ package viskit;
 
 import edu.nps.util.FileIO;
 import org.apache.log4j.Logger;
-import viskit.xsd.assembly.AnalystReportBuilder;
+import viskit.AnalystReportBuilder;
 import viskit.xsd.assembly.XsltUtility;
 
 import javax.swing.*;

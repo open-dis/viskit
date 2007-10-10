@@ -5,25 +5,26 @@
  *
  */
 
-package viskit.xsd.assembly;
+package viskit;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.text.DateFormat;
+
 import org.apache.log4j.Logger;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.text.DateFormat;
+import viskit.xsd.assembly.ChartDrawer;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -53,7 +54,7 @@ public class AnalystReportBuilder {
      */
     private LinkedList<String> eventGraphNames  = new LinkedList<String>();
     private LinkedList<String> eventGraphFiles  = new LinkedList<String>();
-    private LinkedList<String> eventGraphImages = new LinkedList<String>();
+    private LinkedList<String> eventGraphImagePaths = new LinkedList<String>();
     
     /**
      * The jdom.Document object that is used to build the report
@@ -75,18 +76,13 @@ public class AnalystReportBuilder {
     private Element entityParameters;
     private Element behaviorDescriptions;
     private Element statisticalResults;
-    private Element concRec;
-    
-    /** Storage for the extra class path URLs */
-    private URL[] extraClassPathURLs;
+    private Element concRec;    
     
     public static void main(String[] args) {
         AnalystReportBuilder ar = new AnalystReportBuilder();
     }
     
-    /**
-     * Build a default AnalystReport object.
-     */
+    /** Build a default AnalystReport object */
     public AnalystReportBuilder() {
         initDocument();
         setDefaultValues();
@@ -94,7 +90,8 @@ public class AnalystReportBuilder {
     
     /**
      * Build an analystReport object from an existing XML file
-     * @param xmlFile
+     * @param xmlFile an existing temp Analyst Report
+     * @param assyFile the current assembly file to process a report from
      */
     public AnalystReportBuilder(File xmlFile, String assyFile) throws Exception {
         parseXML(xmlFile);
@@ -106,9 +103,8 @@ public class AnalystReportBuilder {
      * Build an AnalystReport object from an existing statisticsReport document
      */
     public AnalystReportBuilder(String statisticsReportPath) {
-        SAXBuilder builder = new SAXBuilder();
         try {
-            Document doc = builder.build(new File(statisticsReportPath));
+            Document doc = loadXML(statisticsReportPath);
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
@@ -165,8 +161,7 @@ public class AnalystReportBuilder {
     }
     
     private void parseXML(File fil) throws Exception {
-        SAXBuilder builder = new SAXBuilder();
-        reportJdomDocument = builder.build(fil);
+        reportJdomDocument = loadXML(fil.getPath());
         rootElement = reportJdomDocument.getRootElement();
         execSummary = rootElement.getChild("ExecutiveSummary");
         simulationLocation = rootElement.getChild("SimulationLocation");
@@ -383,12 +378,7 @@ public class AnalystReportBuilder {
                 behavior.setAttribute("name", eventGraphNames.get(i));
                 
                 if (descript) {
-                    String egf = eventGraphFiles.get(i);
-                    String temp2 = "file:/";
-                    if (egf.contains(temp2)) {
-                        egf = egf.substring(temp2.length());
-                    }
-                    Document tmp = loadXML(egf);
+                    Document tmp = loadXML(eventGraphFiles.get(i));
                     rootElement = tmp.getRootElement();
                     
                     // prevent returning a null if there was no attribute value
@@ -425,7 +415,7 @@ public class AnalystReportBuilder {
                 }
                 if (image) {
                     Element evtGraphImage = new Element("EventGraphImage");
-                    evtGraphImage.setAttribute("dir", "file:///" + eventGraphImages.get(i));
+                    evtGraphImage.setAttribute("dir", "file:///" + eventGraphImagePaths.get(i));
                     behavior.addContent(evtGraphImage);
                 }
                 behaviorList.addContent(behavior);
@@ -603,7 +593,7 @@ public class AnalystReportBuilder {
         for(Iterator itr = lis.iterator(); itr.hasNext();) {
             Element e = (Element) itr.next();
             sa[i]  [0] = e.getAttributeValue("name");
-            sa[i++][1] = e.getAttributeValue("behaviorDefinition");
+            sa[i++][1] = e.getAttributeValue("fullyQualifiedName");
         }
         return sa;
     }
@@ -626,7 +616,7 @@ public class AnalystReportBuilder {
         // Extract XML based simEntities for entityParameters and event graph image
         // TODO: these are not used yet
         setEventGraphFiles(new LinkedList<String>());
-        setEventGraphImages(new LinkedList<String>());
+        setEventGraphImagePaths(new LinkedList<String>());
         setEventGraphNames(new LinkedList<String>());
         
         // Conduct a test for a diskit package which is native java
@@ -639,7 +629,7 @@ public class AnalystReportBuilder {
             if (!javaTest.equals(isJAVAfile)) {
                 Element tableEntry = new Element("SimEntity");
                 tableEntry.setAttribute("name", temp.getAttributeValue("name"));
-                tableEntry.setAttribute("behaviorDefinition", temp.getAttributeValue("type"));
+                tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
                 saveEventGraphReferences(temp.getAttributeValue("type"));
                 entityTable.addContent(tableEntry);
             }
@@ -668,7 +658,7 @@ public class AnalystReportBuilder {
         
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
         
-        /* TODO: Warning - this assumes that screen snapshot will be placed in
+        /* TODO: Warning - this assumes that screen snapshots will be placed in
          * this very path
          */
         String eventGraphImageDir = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
@@ -680,7 +670,7 @@ public class AnalystReportBuilder {
         String eventGraphPath = "";
         
         // Locate the URL of the event graph directory
-        for (URL eventGraphURL : getExtraClassPathURLsArray()) {
+        for (URL eventGraphURL : SettingsDialog.getExtraClassPathArraytoURLArray()) {
             eventGraphPath = eventGraphURL.toString();
             log.debug("Event Graph Path: " + eventGraphPath);
             
@@ -693,6 +683,12 @@ public class AnalystReportBuilder {
         }
         
         eventGraphDir = eventGraphDir.replaceAll("\\\\", "/");
+        
+        /* This is now a URL, so, we need to strip of the "file:/" header so 
+         * that the SAXBuilder won't append the base directory to the URL 
+         * causing a fnfe
+         */
+        eventGraphDir = eventGraphDir.replaceFirst("file:/", "");
         log.info("Event Graph Directory: " + eventGraphDir);
         
         String eventGraphFile = eventGraphDir + eventGraphName + ".xml";
@@ -700,16 +696,24 @@ public class AnalystReportBuilder {
         
         String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
-        log.info("Preceived image file location: " + imgFile);
+        log.info("Event Graph Image location: " + imgFile);
         
         // Get the absolute path to resolve the broken url problem
         
         if (!eventGraphFiles.contains(eventGraphFile)) {
             eventGraphFiles.add(eventGraphFile);
-            eventGraphImages.add(imgFile);
+            eventGraphImagePaths.add(imgFile);
             eventGraphNames.add(eventGraphName);
         }
-    }    
+    }
+    
+    /** Utility method used here to invoke the capability to capture all Event 
+     * Graph images of which are situated in a particular Assembly File.  These
+     * will be dropped into ./AnalystReports/images/EventGraphs </p>
+     */
+    private void captureEventGraphImages() {
+        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(getEventGraphFiles(), getEventGraphImagePaths());
+    }
 
     /**
      * This method re-shuffles the statistics report to a format that is handled
@@ -814,6 +818,7 @@ public class AnalystReportBuilder {
     private String unMakeImage(Element e, String imageID) {
         return _unMakeContent(e,imageID+"Image","dir");
     }
+    
     /**
      * Creates a standard 'Comments' element used by all sections of the report
      * to add comments
@@ -916,8 +921,7 @@ public class AnalystReportBuilder {
         setPrintParameterComments(true);
         setPrintParameterTable(true);
         setParameterDescription("***ENTER ENTITY PARAMETER DESCRIPTION HERE***");
-        setParameterConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
-        
+        setParameterConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");        
         
         //BehaviorParameter values
         setPrintBehaviorDefComments(true);
@@ -948,7 +952,7 @@ public class AnalystReportBuilder {
     public Element    getRootElement()           { return rootElement; }
     public String     getFileName()              { return fileName; }
     public LinkedList getEventGraphFiles()       { return eventGraphFiles; }
-    public LinkedList getEventGraphImages()      { return eventGraphImages; }
+    public LinkedList getEventGraphImagePaths()  { return eventGraphImagePaths; }
     public LinkedList getEventGraphNames()       { return eventGraphNames; }
     public String     getAssemblyFile()          { return assemblyFile; }
     
@@ -966,6 +970,11 @@ public class AnalystReportBuilder {
         } catch (Exception e) {log.error("Error processing assemblyFile " + e);}
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
+        
+        /* Appears to be the best place for this call as the behaviors should
+         * all be captured in the report by now
+         */
+        captureEventGraphImages();
     }
     
     public void setFileName          (String fileName)           { this.fileName = fileName; }
@@ -1081,40 +1090,7 @@ public class AnalystReportBuilder {
     
     // misc:
     public void setEventGraphFiles(LinkedList eventGraphFiles) {this.eventGraphFiles = eventGraphFiles;}
-    public void setEventGraphImages(LinkedList eventGraphImages) {this.eventGraphImages = eventGraphImages;}
-    public void setEventGraphNames(LinkedList eventGraphNames) {this.eventGraphNames = eventGraphNames;}
-    
-    public URL[] getExtraClassPathURLsArray() {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        log.debug("ClassLoader: " + loader);
-        try {            
-            Class clazz = loader.loadClass("viskit.SettingsDialog");                       
-            log.debug("Class Object: " + clazz);
-            Method getExtraClassPath = clazz.getMethod("getExtraClassPathArraytoURLArray");
-            log.debug("Method Object: " + getExtraClassPath);
-            extraClassPathURLs = (URL[]) getExtraClassPath.invoke(clazz);
-        } catch (SecurityException ex) {
-            log.error(ex);
-        } catch (NoSuchMethodException ex) {
-            log.error(ex);
-        } catch (IllegalAccessException ex) {
-            log.error(ex);
-        } catch (InvocationTargetException ex) {
-            log.error(ex);
-        } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
-        } 
-        log.debug("extraClassPathURLs length is: " + extraClassPathURLs.length);
-//        try {
-//            for (URL url : extraClassPathURLs) {
-//                log.info("extraClassPath: " + url);
-//            }
-//        } catch (Exception e) {
-//            log.error(e);
-//            e.printStackTrace();
-//        } // for troubleshooting null pointers
-        
-        return extraClassPathURLs;
-    }
-    
+    public void setEventGraphImagePaths(LinkedList eventGraphImagePaths) {this.eventGraphImagePaths = eventGraphImagePaths;}
+    public void setEventGraphNames(LinkedList eventGraphNames) {this.eventGraphNames = eventGraphNames;}    
+
 } // end class file AnalystReportBuilder.java

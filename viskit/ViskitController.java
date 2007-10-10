@@ -4,12 +4,14 @@ import edu.nps.util.DirectoryWatch;
 import viskit.model.*;
 
 import java.awt.*;
+import java.util.LinkedList;
 import java.util.Vector;
 
 /**
  * User: mike
  * Date: Mar 19, 2004
  * Time: 9:00:57 AM
+ * @version $Id$
  */
 
 public interface ViskitController
@@ -72,9 +74,11 @@ public interface ViskitController
   void deleteStateVariable(vStateVariable var);
 
   void eventList();
-  void generateJavaClass();
+  void generateJavaClass();  
+  
+  /** Provides a single screenshot capture capability */
   void captureWindow();
-
+  
   void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis);
   void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) ;
 }

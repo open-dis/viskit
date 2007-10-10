@@ -241,7 +241,7 @@
         <xsl:value-of select="@name"/>
       </td>
       <td>
-        <xsl:value-of select="@behaviorDefinition"/>
+        <xsl:value-of select="@fullyQualifiedName"/>
       </td>
     </tr>
   </xsl:template>

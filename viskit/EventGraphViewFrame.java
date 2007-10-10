@@ -139,6 +139,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
   {
     return quitMenuItem;
   }
+  
   /**
    * Returns the current mode--select, add, arc, cancelArc
    */
@@ -210,6 +211,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     VgraphComponentWrapper vcw = getCurrentVgcw();
     return vcw.drawingSplitPane.getLeftComponent();
   }
+  
   class TabSelectionHandler implements ChangeListener
   {
    /*

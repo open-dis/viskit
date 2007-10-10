@@ -1,17 +1,6 @@
 package viskit;
 
 import actions.ActionIntrospector;
-import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileIO;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
-import org.jgraph.graph.DefaultGraphCell;
-import viskit.model.*;
-import viskit.mvc.mvcAbstractController;
-import viskit.mvc.mvcModel;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +9,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileIO;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
+import org.jgraph.graph.DefaultGraphCell;
+import viskit.model.*;
+import viskit.mvc.mvcAbstractController;
+import viskit.mvc.mvcModel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -354,7 +355,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     return openV;
   }
 
-
   /* a component, e.g., model, wants to say something. */
   public void messageUser(int typ, String msg)    // typ is one of JOptionPane types
   {
@@ -548,6 +548,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     return false;
 
   }
+  
   public void paste()
   //-----------------
   {
@@ -637,6 +638,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
     return true;
   }
+  
   public void generateJavaClass()
   {
     File lastFile = ((ViskitModel)getModel()).getLastFile();
@@ -763,6 +765,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   }
   private String imgSaveCount= "";
   private int    imgSaveInt = -1;
+  
   public void captureWindow()
   //-------------------------
   {
@@ -771,51 +774,82 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (lastFile != null)
       fileName = lastFile.getName();
     
+    /* The Analyst Report generator only knows of Event Graph file names without
+     * a count in the path, so will need another way to get these
+     */
     File fil = ((ViskitView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false);
     
     if(fil == null)
       return;
 
-    final Timer tim = new Timer(100, new timerCallback(fil));
+    final Timer tim = new Timer(100, new timerCallback(fil, true));
     tim.setRepeats(false);
     tim.start();
 
     imgSaveCount = "" + (++imgSaveInt);
   }
+  
+  /** Provides an automatic capture of all Event Graphs images used in an 
+   * Assembly and stores them to a specified location for inclusion in the 
+   * generated Analyst Report
+   * 
+   * @param eventGraphs a list of Event Graph paths to image capture
+   * @param eventGraphImages a list of Event Graph image paths to write to
+   */
+  public void captureEventGraphImages(LinkedList<String> eventGraphs, LinkedList<String> eventGraphImages) {
+      
+      // Each Event Graph needs to be open first
+      for (String eventGraph : eventGraphs) {          
+          _doOpen(new File(eventGraph));
+          log.debug("eventGraph: " + eventGraph);
+      }
+      
+      for (String eventGraphImage : eventGraphImages) {
+          File eventGraphImageFile = new File(eventGraphImage);
+          
+          // Make sure we have a directory ready to receive these images
+          if (!eventGraphImageFile.getParentFile().isDirectory()) {
+              log.info("Made EventGraphs/examples directory");
+              eventGraphImageFile.getParentFile().mkdir();
+          }
+          final Timer tim = new Timer(100, new timerCallback(eventGraphImageFile, false));
+          tim.setRepeats(false);
+          tim.start();
+      }
+  }
 
-  class timerCallback implements ActionListener
-  {
+  class timerCallback implements ActionListener {
     File fil;
-    timerCallback(File f)
-    {
+    boolean display;
+    
+    timerCallback(File f, boolean b) {
       fil = f;
+      display = b;
     }
-    public void actionPerformed(ActionEvent ev)
-    {
+    
+    public void actionPerformed(ActionEvent ev) {
       // create and save the image
       //Component component = (Component) getView();
 
       // The next two sub for the above, which worked until we did the tabbed display.
-      EventGraphViewFrame egvf = (EventGraphViewFrame)getView();
+      EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
       //Component component = egvf.getContent();
 
       // Get only the jgraph part
       Component component = egvf.getCurrentJgraphComponent();
       if(component instanceof JScrollPane) {
-        component = ((JScrollPane)component).getViewport().getView();
+        component = ((JScrollPane) component).getViewport().getView();
       }
       Rectangle reg = component.getBounds();
-      BufferedImage image = new BufferedImage(reg.width,reg.height,BufferedImage.TYPE_3BYTE_BGR);
+      BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
       // Tell the jgraph component to draw into our memory
       component.paint(image.getGraphics());
       try {
         ImageIO.write(image,"png",fil);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         System.out.println("Controller Exception in capturing screen: "+e.getMessage());
         return;
       }
-
 
  /*   Point p = new Point(0, 0);
       SwingUtilities.convertPointToScreen(p, component);
@@ -832,16 +866,18 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       }
 */
       // display a scaled version
-      JFrame frame = new JFrame("Saved as " + fil.getName());
-      //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
-      // Nah...
-      ImageIcon ii = new ImageIcon(image);
-      JLabel lab = new JLabel(ii);
-      frame.getContentPane().setLayout(new BorderLayout());
-      frame.getContentPane().add(lab, BorderLayout.CENTER);
-      frame.pack();
-      frame.setLocationRelativeTo((Component) getView());
-      frame.setVisible(true);
+      if (display) {
+          JFrame frame = new JFrame("Saved as " + fil.getName());
+          //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
+          // Nah...
+          ImageIcon ii = new ImageIcon(image);
+          JLabel lab = new JLabel(ii);
+          frame.getContentPane().setLayout(new BorderLayout());
+          frame.getContentPane().add(lab, BorderLayout.CENTER);
+          frame.pack();
+          frame.setLocationRelativeTo((Component) getView());
+          frame.setVisible(true);
+      }
     }
   }
 

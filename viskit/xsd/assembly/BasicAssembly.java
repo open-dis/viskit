@@ -1,11 +1,20 @@
 package viskit.xsd.assembly;
 
-
+import java.beans.PropertyChangeListener;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.swing.JOptionPane;
+import java.text.DecimalFormat;
+import java.util.*;
+
+import org.apache.log4j.Logger;
 import simkit.BasicSimEntity;
 import simkit.Priority;
 import simkit.Schedule;
@@ -15,14 +24,6 @@ import simkit.random.RandomVariateFactory;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
-
-import java.beans.PropertyChangeListener;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.util.*;
 import viskit.xsd.assembly.GridletEventList;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
@@ -35,7 +36,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 {
-
+  static Logger log = Logger.getLogger(BasicAssembly.class);
   protected LinkedHashMap replicationData;
   protected SampleStatistics[] replicationStats;
   protected SampleStatistics[] designPointStats;
@@ -67,7 +68,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   private boolean enableAnalystReports = false;
   private boolean analystReplicationData = true;
   private boolean analystSummaryData = true;
-  private AnalystReportBuilder reportBuilder;
+//  private AnalystReportBuilder reportBuilder;
   /**
    * ***********************************************
    */
@@ -702,12 +703,36 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         initReportFile();
         //statsConfig.saveData();
         statsConfig.processSummaryReport(designPointStats);
-        reportBuilder = new AnalystReportBuilder(statsConfig.getReport());
+        
+        /* Invoke the AnalystReportBuilder via reflection.  Reflection is used 
+         * due to the sequential building of Viskit where this class file gets 
+         * compiled before the AnalystReportBuilder and therefore would throw a
+         * compile time error.
+         */
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
-            reportBuilder.writeToXMLFile(analystReportFile);
+            Class clazz = loader.loadClass("viskit.AnalystReportBuilder");
+            Constructor arbConstructor = clazz.getConstructor(String.class);
+            Object arbObject = arbConstructor.newInstance(statsConfig.getReport());
+            Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
+            writeToXMLFile.invoke(arbObject, analystReportFile);
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
         } catch (Exception e) {
-            System.err.println("BasicAssembly can't write analyst report XML to " + analystReportFile.getAbsolutePath());
-            System.err.println(e.getMessage());
+            log.error("BasicAssembly can't write analyst report XML to " + analystReportFile.getAbsolutePath());
+            log.error(e);
         }
     }
     System.runFinalization();
@@ -746,7 +771,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   {
     try {
       analystReportFile = File.createTempFile("ViskitAnalystReport", ".xml");
-//      analystReportFile.deleteOnExit();
     }
     catch (IOException e) {
       analystReportFile = null;
