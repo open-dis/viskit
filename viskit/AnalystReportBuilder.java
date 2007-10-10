@@ -658,9 +658,6 @@ public class AnalystReportBuilder {
         
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
         
-        /* TODO: Warning - this assumes that screen snapshots will be placed in
-         * this very path
-         */
         String eventGraphImageDir = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
         
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
@@ -705,14 +702,6 @@ public class AnalystReportBuilder {
             eventGraphImagePaths.add(imgFile);
             eventGraphNames.add(eventGraphName);
         }
-    }
-    
-    /** Utility method used here to invoke the capability to capture all Event 
-     * Graph images of which are situated in a particular Assembly File.  These
-     * will be dropped into ./AnalystReports/images/EventGraphs </p>
-     */
-    private void captureEventGraphImages() {
-        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(getEventGraphFiles(), getEventGraphImagePaths());
     }
 
     /**
@@ -807,7 +796,7 @@ public class AnalystReportBuilder {
      *
      * @param imageID a unique identifier for this XML Element
      * @param dir     the directory of the image
-     * @return image the Image url embedded in well formed XML
+     * @return the Image url embedded in well formed XML
      */
     private Element makeImage(String imageID, String dir) {
         Element image = new Element(imageID + "Image");
@@ -971,10 +960,31 @@ public class AnalystReportBuilder {
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
         
-        /* Appears to be the best place for this call as the behaviors should
-         * all be captured in the report by now
+        /* Appears to be the best place for these calls as all the behavior 
+         * the corresponding Assemby paths should be captured
          */
         captureEventGraphImages();
+        captureAssemblyImage();
+    } 
+    
+    /** Utility method used here to invoke the capability to capture all Event 
+     * Graph images of which are situated in a particular Assembly File.  These
+     * PNGs will be dropped into ./AnalystReports/images/EventGraphs </p>
+     */
+    private void captureEventGraphImages() {
+        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(getEventGraphFiles(), getEventGraphImagePaths());
+    }
+    
+    /** Utility method used here to invoke the capability to capture the Assemby
+     * image of the loaded Assembly File.  This PNG will be dropped into 
+     * ./AnalystReports/images/Assemblies </p>
+     */
+    private void captureAssemblyImage() {
+        String assemblyImageDir = System.getProperty("user.dir") + "/AnalystReports/images/Assemblies/";
+        assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
+        String assyFileName = new File(getAssemblyFile()).getName();
+        setAssemblyImageLocation(assemblyImageDir + assyFileName + ".png");
+        VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
     }
     
     public void setFileName          (String fileName)           { this.fileName = fileName; }

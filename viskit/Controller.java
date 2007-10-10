@@ -774,9 +774,6 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (lastFile != null)
       fileName = lastFile.getName();
     
-    /* The Analyst Report generator only knows of Event Graph file names without
-     * a count in the path, so will need another way to get these
-     */
     File fil = ((ViskitView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false);
     
     if(fil == null)
@@ -794,22 +791,23 @@ public class Controller extends mvcAbstractController implements ViskitControlle
    * generated Analyst Report
    * 
    * @param eventGraphs a list of Event Graph paths to image capture
-   * @param eventGraphImages a list of Event Graph image paths to write to
+   * @param eventGraphImages a list of Event Graph image paths to write .png files
    */
   public void captureEventGraphImages(LinkedList<String> eventGraphs, LinkedList<String> eventGraphImages) {
       
-      // Each Event Graph needs to be open first
+      // Each Event Graph needs to be opened first
       for (String eventGraph : eventGraphs) {          
           _doOpen(new File(eventGraph));
           log.debug("eventGraph: " + eventGraph);
       }
       
+      // Now capture and store the Event Graph images
       for (String eventGraphImage : eventGraphImages) {
           File eventGraphImageFile = new File(eventGraphImage);
           
           // Make sure we have a directory ready to receive these images
           if (!eventGraphImageFile.getParentFile().isDirectory()) {
-              log.info("Made EventGraphs/examples directory");
+              log.debug("Made EventGraphs/examples directory");
               eventGraphImageFile.getParentFile().mkdir();
           }
           final Timer tim = new Timer(100, new timerCallback(eventGraphImageFile, false));
@@ -817,7 +815,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
           tim.start();
       }
   }
-
+  
   class timerCallback implements ActionListener {
     File fil;
     boolean display;

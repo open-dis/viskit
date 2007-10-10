@@ -1352,47 +1352,58 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     if(fil == null)
       return;
 
-    final Timer tim = new Timer(100,new timerCallback(fil));
+    final Timer tim = new Timer(100,new timerCallback(fil, true));
     tim.setRepeats(false);
     tim.start();
 
     imgSaveCount = ""+ (++imgSaveInt);
   }
+    
+  /** Provides an automatic capture of the currently loaded Assembly and stores
+   * it to a specified location for inclusion in the generated Analyst Report
+   *
+   * @param assyImagePath an image path to write the .png
+   */
+  public void captureAssemblyImage(String assyImagePath) {      
+      final Timer tim = new Timer(100, new timerCallback(new File(assyImagePath), false));
+      tim.setRepeats(false);
+      tim.start();
+  }
 
-  class timerCallback implements ActionListener
-  {
-    File fil;
-    timerCallback(File f)
-    {
-      fil = f;
-    }
-    public void actionPerformed(ActionEvent ev)
-    {
-      // create and save the image
-      //Component component = (Component) getView();
-
-      // Similarly to Controller.java (EG editor controller), putting the views into tabs requires the following two
-      // to replace the one above.
-      AssemblyViewFrame avf = (AssemblyViewFrame)getView();
-      //Component component = avf.getContent();
-
-      // Get only the jgraph part
-      Component component = avf.getCurrentJgraphComponent();
-      if(component instanceof JScrollPane) {
-        component = ((JScrollPane)component).getViewport().getView();
+  class timerCallback implements ActionListener {
+      File fil;
+      boolean display;
+      
+      timerCallback(File f, boolean b) {
+          fil = f;
+          display = b;
       }
-      Rectangle reg = component.getBounds();
-      BufferedImage image = new BufferedImage(reg.width,reg.height,BufferedImage.TYPE_3BYTE_BGR);
-      // Tell the jgraph component to draw into our memory
-      component.paint(image.getGraphics());
-      try {
-        ImageIO.write(image,"png",fil);
-      }
-      catch (IOException e) {
-        System.out.println("AssemblyController Exception in capturing screen: "+e.getMessage());
-        return;
-      }
-
+      
+      public void actionPerformed(ActionEvent ev) {
+          // create and save the image
+          //Component component = (Component) getView();
+          
+          // Similarly to Controller.java (EG editor controller), putting the views into tabs requires the following two
+          // to replace the one above.
+          AssemblyViewFrame avf = (AssemblyViewFrame)getView();
+          //Component component = avf.getContent();
+          
+          // Get only the jgraph part
+          Component component = avf.getCurrentJgraphComponent();
+          if(component instanceof JScrollPane) {
+              component = ((JScrollPane)component).getViewport().getView();
+          }
+          Rectangle reg = component.getBounds();
+          BufferedImage image = new BufferedImage(reg.width,reg.height,BufferedImage.TYPE_3BYTE_BGR);
+          // Tell the jgraph component to draw into our memory
+          component.paint(image.getGraphics());
+          try {
+              ImageIO.write(image,"png",fil);
+          } catch (IOException e) {
+              System.out.println("AssemblyController Exception in capturing screen: "+e.getMessage());
+              return;
+          }
+          
 /*
       Point p = new Point(0, 0);
       SwingUtilities.convertPointToScreen(p, component);
@@ -1407,20 +1418,22 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
       catch (Exception e) {
         e.printStackTrace();
       }
-*/
-
-      // display a scaled version
-      JFrame frame = new JFrame("Saved as " + fil.getName());
-      //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
-      // Nah...
-      ImageIcon ii = new ImageIcon(image);
-      JLabel lab = new JLabel(ii);
-      frame.getContentPane().setLayout(new BorderLayout());
-      frame.getContentPane().add(lab, BorderLayout.CENTER);
-      frame.pack();
-      frame.setLocationRelativeTo((Component) getView());
-      frame.setVisible(true);
-    }
+ */
+          
+          // display a scaled version
+          if (display) {
+              JFrame frame = new JFrame("Saved as " + fil.getName());
+              //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
+              // Nah...
+              ImageIcon ii = new ImageIcon(image);
+              JLabel lab = new JLabel(ii);
+              frame.getContentPane().setLayout(new BorderLayout());
+              frame.getContentPane().add(lab, BorderLayout.CENTER);
+              frame.pack();
+              frame.setLocationRelativeTo((Component) getView());
+              frame.setVisible(true);
+          }
+      }
   }
 
   /** The default version of this.  Run assembly in external VM. */
