@@ -799,6 +799,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       ListIterator<String> itr = eventGraphImages.listIterator(0);
       String eventGraphImage;
       File eventGraphImageFile;
+      TimerCallback tcb;
       
       // Each Event Graph needs to be opened first
       for (String eventGraph : eventGraphs) {          
@@ -810,6 +811,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
               eventGraphImage = itr.next();
               eventGraphImageFile = new File(eventGraphImage);
               log.debug("eventGraphImage is: " + eventGraphImage);
+              tcb = new TimerCallback(eventGraphImageFile, false);
           
               // Make sure we have a directory ready to receive these images
               if (!eventGraphImageFile.getParentFile().isDirectory()) {
@@ -817,7 +819,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
               }
               
               // Fire this quickly as another Event Graph will immediately load
-              final Timer tim = new Timer(10, new TimerCallback(eventGraphImageFile, false));
+              final Timer tim = new Timer(0, tcb);
               tim.setRepeats(false);
               tim.start();
           }
