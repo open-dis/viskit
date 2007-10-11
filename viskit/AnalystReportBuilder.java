@@ -645,7 +645,7 @@ public class AnalystReportBuilder {
      * @param fileType the type of XML file being used to include package name
      */
     private void saveEventGraphReferences(String fileType) {
-        log.info("Parameter fileType: " + fileType);
+        log.debug("Parameter fileType: " + fileType);
         
         // find the package seperator
         char letter;
@@ -661,7 +661,7 @@ public class AnalystReportBuilder {
         String eventGraphImageDir = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
         
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
-        log.info("Event Graph Name: " + eventGraphName);
+        log.debug("Event Graph Name: " + eventGraphName);
         
         String eventGraphDir = "";
         String eventGraphPath = "";
@@ -686,14 +686,14 @@ public class AnalystReportBuilder {
          * causing a fnfe
          */
         eventGraphDir = eventGraphDir.replaceFirst("file:/", "");
-        log.info("Event Graph Directory: " + eventGraphDir);
+        log.debug("Event Graph Directory: " + eventGraphDir);
         
         String eventGraphFile = eventGraphDir + eventGraphName + ".xml";
-        log.info("Event Graph File: " + eventGraphFile);
+        log.debug("Event Graph File: " + eventGraphFile);
         
         String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
-        log.info("Event Graph Image location: " + imgFile);
+        log.debug("Event Graph Image location: " + imgFile);
         
         // Get the absolute path to resolve the broken url problem
         

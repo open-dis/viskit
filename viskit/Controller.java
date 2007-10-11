@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Vector;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -779,7 +780,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if(fil == null)
       return;
 
-    final Timer tim = new Timer(100, new timerCallback(fil, true));
+    final Timer tim = new Timer(100, new TimerCallback(fil, true));
     tim.setRepeats(false);
     tim.start();
 
@@ -795,32 +796,39 @@ public class Controller extends mvcAbstractController implements ViskitControlle
    */
   public void captureEventGraphImages(LinkedList<String> eventGraphs, LinkedList<String> eventGraphImages) {
       
+      ListIterator<String> itr = eventGraphImages.listIterator(0);
+      String eventGraphImage;
+      File eventGraphImageFile;
+      
       // Each Event Graph needs to be opened first
       for (String eventGraph : eventGraphs) {          
           _doOpen(new File(eventGraph));
           log.debug("eventGraph: " + eventGraph);
-      }
-      
-      // Now capture and store the Event Graph images
-      for (String eventGraphImage : eventGraphImages) {
-          File eventGraphImageFile = new File(eventGraphImage);
           
-          // Make sure we have a directory ready to receive these images
-          if (!eventGraphImageFile.getParentFile().isDirectory()) {
-              log.debug("Made EventGraphs/examples directory");
-              eventGraphImageFile.getParentFile().mkdir();
+          // Now capture and store the Event Graph images
+          if (itr.hasNext()) {
+              eventGraphImage = itr.next();
+              eventGraphImageFile = new File(eventGraphImage);
+              log.debug("eventGraphImage is: " + eventGraphImage);
+          
+              // Make sure we have a directory ready to receive these images
+              if (!eventGraphImageFile.getParentFile().isDirectory()) {
+                  eventGraphImageFile.getParentFile().mkdir();
+              }
+              
+              // Fire this quickly as another Event Graph will immediately load
+              final Timer tim = new Timer(10, new TimerCallback(eventGraphImageFile, false));
+              tim.setRepeats(false);
+              tim.start();
           }
-          final Timer tim = new Timer(100, new timerCallback(eventGraphImageFile, false));
-          tim.setRepeats(false);
-          tim.start();
       }
   }
   
-  class timerCallback implements ActionListener {
+  class TimerCallback implements ActionListener {
     File fil;
     boolean display;
     
-    timerCallback(File f, boolean b) {
+    TimerCallback(File f, boolean b) {
       fil = f;
       display = b;
     }
@@ -835,15 +843,18 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
       // Get only the jgraph part
       Component component = egvf.getCurrentJgraphComponent();
+      
       if(component instanceof JScrollPane) {
         component = ((JScrollPane) component).getViewport().getView();
+        log.debug("CurrentJgraphComponent is a JScrollPane: " + component);
       }
       Rectangle reg = component.getBounds();
       BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
+      
       // Tell the jgraph component to draw into our memory
       component.paint(image.getGraphics());
       try {
-        ImageIO.write(image,"png",fil);
+        ImageIO.write(image, "png", fil);
       } catch (IOException e) {
         System.out.println("Controller Exception in capturing screen: "+e.getMessage());
         return;
