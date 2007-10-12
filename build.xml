@@ -93,8 +93,7 @@
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="${dir.lib}/ext" id="runtime.lib.ext" >
-        
+    <fileset dir="${dir.lib}/ext" id="runtime.lib.ext" >        
         <include name="**/*.jar"/>
     </fileset>
     
@@ -265,11 +264,15 @@
         </copy>
     </target>
     <!--  === TARGET: jar === -->
-    <target depends="compile,javahelp" name="jar">
+    <target depends="compile,javahelp" name="jar">       
         <jar basedir="${dir.build.classes}" 
              compress="false" 
              jarfile="${dir.build.lib}/viskit.jar">
            <metainf file="${dir.src}/license/lgpl.txt"/>
+           <manifest>
+                <attribute name="Built-By" value="Viskit-- Ant build.xml"/>
+                <attribute name="Built-On" value="${TODAY} ${TSTAMP} hrs"/>              
+            </manifest>
         </jar>
     </target>
     
