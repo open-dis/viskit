@@ -50,25 +50,16 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicTextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
-import javax.swing.text.Highlighter;
-import javax.swing.text.JTextComponent;
-
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -324,9 +315,7 @@ public class RunnerPanel2 extends JPanel
         //} catch (InterruptedException ex) {
             //ex.printStackTrace();
         //}
-  }
-  
- 
+  } 
   
   class FileChaser extends SwingWorker<Void,Void> {
       private BlockingQueue<ByteBuffer> bq;
@@ -740,6 +729,7 @@ public class RunnerPanel2 extends JPanel
           return null;
       }
       
+      @Override
       public void process(java.util.List<ByteBuffer> cbufs) {
           for (ByteBuffer bb:cbufs) {
                 try {

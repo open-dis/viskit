@@ -48,7 +48,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 /*******************************************************************************/
 {
 
-  static  File lastFile;
+  static File lastFile;
   static Logger log = Logger.getLogger(Controller.class);
   
   public Controller()
@@ -59,9 +59,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     this._setFileLists();
   }
   
-  public static File getLastFile() {
-      return lastFile;
-  }
+  public static File getLastFile() {return lastFile;}
   
   public void begin()
   //-----------------
@@ -197,7 +195,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   }
 
   private static final int RECENTLISTSIZE = 15;
-  private ArrayList recentFileList;
+  private ArrayList<String> recentFileList;
 
   public void openRecent()
   {
@@ -299,12 +297,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     saveHistoryXML(recentFileList);
   }
 
-  private ArrayList openV;
+  private ArrayList<String> openV;
 
   private void _setFileLists()
   {
-    recentFileList = new ArrayList(RECENTLISTSIZE+1);
-    openV = new ArrayList(4);
+    recentFileList = new ArrayList<String>(RECENTLISTSIZE+1);
+    openV = new ArrayList<String>(4);
     String[] valueAr = historyConfig.getStringArray(egHistoryKey+"[@value]");
     for (int i = 0; i < valueAr.length; i++) {
       recentFileList.add(valueAr[i]);
@@ -419,12 +417,12 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //----------------
   {
     ViskitModel mod = (ViskitModel) getModel();
-    File lastFile = mod.getLastFile();
-    if(lastFile == null)
+    File localLastFile = mod.getLastFile();
+    if(localLastFile == null)
       saveAs();
     else {
-      ((ViskitModel) getModel()).saveModel(lastFile);
-      fileWatchSave(lastFile);
+      ((ViskitModel) getModel()).saveModel(localLastFile);
+      fileWatchSave(localLastFile);
     }
   }
 
@@ -437,9 +435,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
 
     File saveFile = view.saveFileAsk(gmd.name+".xml",false);
     if(saveFile != null) {
-      File lastFile = mod.getLastFile();
-      if(lastFile != null)
-        fileWatchClose(lastFile);
+      File localLastFile = mod.getLastFile();
+      if(localLastFile != null)
+        fileWatchClose(localLastFile);
 
       String n = saveFile.getName();
       if(n.endsWith(".xml") || n.endsWith(".XML"))
@@ -575,11 +573,11 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     if (selectionVector != null && selectionVector.size() > 0) {
       // first ask:
       String msg = "";
-      int nodeCount = 0;  // different msg for edge delete
+      int localNodeCount = 0;  // different msg for edge delete
       for (Iterator itr = selectionVector.iterator(); itr.hasNext();) {
         Object o = itr.next();
         if(o instanceof EventNode)
-          nodeCount++;
+          localNodeCount++;
         String s = o.toString();
         s = s.replace('\n', ' ');
         msg += ", \n" + s;
@@ -587,7 +585,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       if(msg.length()>3)
         msg = msg.substring(3);  // remove leading stuff
 
-      String specialNodeMsg = (nodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
+      String specialNodeMsg = (localNodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
       if (((ViskitView) getView()).genericAsk("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg)
        == JOptionPane.YES_OPTION) {
         // do edges first?
@@ -644,13 +642,13 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   
   public void generateJavaClass()
   {
-    File lastFile = ((ViskitModel)getModel()).getLastFile();
-    if(checkSave() == false || lastFile == null)
+    File localLastFile = ((ViskitModel)getModel()).getLastFile();
+    if(checkSave() == false || localLastFile == null)
       return;
     String source = ((ViskitModel)getModel()).buildJavaSource();
     if(source != null && source.length() > 0) {
         String className = ((ViskitModel)getModel()).getMetaData().packageName+"."+((ViskitModel)getModel()).getMetaData().name;
-      ((ViskitView)getView()).showAndSaveSource(className,source,lastFile.getName());
+      ((ViskitView)getView()).showAndSaveSource(className,source,localLastFile.getName());
     }
   }
 
@@ -773,9 +771,9 @@ public class Controller extends mvcAbstractController implements ViskitControlle
   //-------------------------
   {
     String fileName = "ViskitScreenCapture";
-    File lastFile = ((ViskitModel) getModel()).getLastFile();
-    if (lastFile != null)
-      fileName = lastFile.getName();
+    File localLastFile = ((ViskitModel) getModel()).getLastFile();
+    if (localLastFile != null)
+      fileName = localLastFile.getName();
     
     File fil = ((ViskitView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false);
     
@@ -803,6 +801,15 @@ public class Controller extends mvcAbstractController implements ViskitControlle
       File eventGraphImageFile;
       TimerCallback tcb;
       
+      /* If another run is to be performed with the intention of generating 
+       * an Analyst Report, prevent the last Event Graph open (from prior group
+       * if any open) from being the dominant (only) screen shot taken.  In 
+       * other words, if the prior group of Event Graphs were open on the same
+       * Assembly, then all of the screen shots would be of the last Event Graph
+       * that was opened either manually, or automatically by the below process.
+       */
+      closeAll();
+
       // Each Event Graph needs to be opened first
       for (String eventGraph : eventGraphs) {          
           _doOpen(new File(eventGraph));

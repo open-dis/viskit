@@ -9,11 +9,6 @@ package viskit;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.text.DateFormat;
@@ -303,6 +298,7 @@ public class AnalystReportBuilder {
         }
     }
     
+    /** TODO: Fix the generics here **/
     public List unMakeReplicationList(Element statisticalResults) {
         Vector v = new Vector();
         
@@ -335,7 +331,7 @@ public class AnalystReportBuilder {
     }
     
     public List unMakeStatsSummList(Element statisticalResults) {
-        Vector v = new Vector();
+        Vector<String[]> v = new Vector<String[]>();
         
         Element sumReports = statisticalResults.getChild("SummaryReport");
         List recs = sumReports.getChildren("SummaryRecord");
@@ -373,23 +369,23 @@ public class AnalystReportBuilder {
         if (eventGraphNames != null) {
             for (int i = 0; i < eventGraphNames.size(); i++) {
                 Element behavior = new Element("Behavior");
-                Element rootElement = null;
+                Element localRootElement = null;
                 String descriptText = "";
                 behavior.setAttribute("name", eventGraphNames.get(i));
                 
                 if (descript) {
                     Document tmp = loadXML(eventGraphFiles.get(i));
-                    rootElement = tmp.getRootElement();
+                    localRootElement = tmp.getRootElement();
                     
                     // prevent returning a null if there was no attribute value
-                    descriptText = (rootElement.getChildText("Comment") == null) ? "no comment provided" : rootElement.getChildText("Comment");
+                    descriptText = (localRootElement.getChildText("Comment") == null) ? "no comment provided" : localRootElement.getChildText("Comment");
                     
                     Element description = new Element("description");
                     description.setAttribute("text", descriptText);
                     behavior.addContent(description);
                     
                     if (details) {
-                        Iterator itr = rootElement.getChildren("Parameter").iterator();
+                        Iterator itr = localRootElement.getChildren("Parameter").iterator();
                         while (itr.hasNext()) {
                             Element temp = (Element) itr.next();
                             Element param = new Element("parameter");
@@ -400,7 +396,7 @@ public class AnalystReportBuilder {
                             param.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
                             behavior.addContent(param);
                         }
-                        Iterator itr2 = rootElement.getChildren("StateVariable").iterator();
+                        Iterator itr2 = localRootElement.getChildren("StateVariable").iterator();
                         while (itr2.hasNext()) {
                             Element temp = (Element) itr2.next();
                             Element stvar = new Element("stateVariable");
@@ -423,7 +419,8 @@ public class AnalystReportBuilder {
         }
         return behaviorList;
     }
-    
+
+    /** TODO: Fix the generics here **/
     List unMakeBehaviorList(Element localRoot) {
         Vector v = new Vector();
         
@@ -507,8 +504,8 @@ public class AnalystReportBuilder {
      */
     private Element makeParameterTables() {
         Element parameterTables = new Element("ParameterTables");
-        Element rootElement = assemblyDocument.getRootElement();
-        List simEntityList = rootElement.getChildren("SimEntity");
+        Element localRootElement = assemblyDocument.getRootElement();
+        List simEntityList = localRootElement.getChildren("SimEntity");
         Iterator itr = simEntityList.iterator();
         Element temp;
         String entityName;
@@ -609,8 +606,8 @@ public class AnalystReportBuilder {
         setAssemblyDocument(loadXML(assemblyFile));
         
         Element entityTable = new Element("EntityTable");
-        Element rootElement = assemblyDocument.getRootElement();
-        List simEntityList = rootElement.getChildren("SimEntity");
+        Element localRootElement = assemblyDocument.getRootElement();
+        List simEntityList = localRootElement.getChildren("SimEntity");
         Iterator itr = simEntityList.iterator();
         
         // Extract XML based simEntities for entityParameters and event graph image
@@ -940,9 +937,9 @@ public class AnalystReportBuilder {
     public Document   getStatsReport()           { return statsReport; }
     public Element    getRootElement()           { return rootElement; }
     public String     getFileName()              { return fileName; }
-    public LinkedList getEventGraphFiles()       { return eventGraphFiles; }
-    public LinkedList getEventGraphImagePaths()  { return eventGraphImagePaths; }
-    public LinkedList getEventGraphNames()       { return eventGraphNames; }
+    public LinkedList<String> getEventGraphFiles()       { return eventGraphFiles; }
+    public LinkedList<String> getEventGraphImagePaths()  { return eventGraphImagePaths; }
+    public LinkedList<String> getEventGraphNames()       { return eventGraphNames; }
     public String     getAssemblyFile()          { return assemblyFile; }
     
     public String     getAuthor()                { return rootElement.getAttributeValue("author"); }
@@ -1099,8 +1096,8 @@ public class AnalystReportBuilder {
     public List   getStastSummaryList()      { return unMakeStatsSummList(statisticalResults); }
     
     // misc:
-    public void setEventGraphFiles(LinkedList eventGraphFiles) {this.eventGraphFiles = eventGraphFiles;}
-    public void setEventGraphImagePaths(LinkedList eventGraphImagePaths) {this.eventGraphImagePaths = eventGraphImagePaths;}
-    public void setEventGraphNames(LinkedList eventGraphNames) {this.eventGraphNames = eventGraphNames;}    
+    public void setEventGraphFiles(LinkedList<String> eventGraphFiles) {this.eventGraphFiles = eventGraphFiles;}
+    public void setEventGraphImagePaths(LinkedList<String> eventGraphImagePaths) {this.eventGraphImagePaths = eventGraphImagePaths;}
+    public void setEventGraphNames(LinkedList<String> eventGraphNames) {this.eventGraphNames = eventGraphNames;}    
 
 } // end class file AnalystReportBuilder.java
