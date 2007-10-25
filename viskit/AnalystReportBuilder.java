@@ -196,10 +196,6 @@ public class AnalystReportBuilder {
         simulationLocation.setAttribute("images", "true");
         makeComments(simulationLocation,"SL", "");
         makeConclusions(simulationLocation,"SL", "");
-        
-        //simulationLocation.addContent(makeImage("Location", xchartImage));
-        //simulationLocation.addContent(makeImage("Location", xlocationImage));
-        
         rootElement.addContent(simulationLocation);
     }
     
@@ -211,7 +207,6 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("entityTable", "true");
         makeComments(simConfig,"SC", "");
         makeConclusions(simConfig,"SC", "");
-        //simConfig.addContent(makeImage("Assembly", xassemblyImageLocation));
         if(assemblyFile != null)
             try {
                 simConfig.addContent(makeEntityTable(assemblyFile));
@@ -891,7 +886,6 @@ public class AnalystReportBuilder {
         setPrintSimLocationImage(true);
         setSimLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
         setSimLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
-        //setLocationImage(""); // TODO:  generate image, set file location
         //setChartImage(""); // TODO:  generate image, set file location
         
         //Simulation Configuration Values
@@ -900,9 +894,7 @@ public class AnalystReportBuilder {
         setPrintEntityTable(true);
         setSimConfigurationDescription("***ENTER ASSEMBLY CONFIGURATION DESCRIPTION HERE***");
         setSimConfigurationConclusions("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
-        
-        //setAssemblyImageLocation(""); // TODO:  generate image, set file location
-        
+                
         //Entity Parameters values
         setPrintParameterComments(true);
         setPrintParameterTable(true);
@@ -957,11 +949,12 @@ public class AnalystReportBuilder {
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
         
-        /* Appears to be the best place for these calls as all the behavior 
+        /* Appears to be the best place for these calls as all the behaviors and
          * the corresponding Assemby paths should be captured
          */
         captureEventGraphImages();
         captureAssemblyImage();
+        captureLocationImage();
     } 
     
     /** Utility method used here to invoke the capability to capture all Event 
@@ -972,9 +965,9 @@ public class AnalystReportBuilder {
         VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(getEventGraphFiles(), getEventGraphImagePaths());
     }
     
-    /** Utility method used here to invoke the capability to capture the Assemby
-     * image of the loaded Assembly File.  This PNG will be dropped into 
-     * ./AnalystReports/images/Assemblies </p>
+    /** Utility method used here to invoke the capability to capture the 
+     * Assembly image of the loaded Assembly File.  This PNG will be dropped 
+     * into ./AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
         String assemblyImageDir = System.getProperty("user.dir") + "/AnalystReports/images/Assemblies/";
@@ -982,6 +975,24 @@ public class AnalystReportBuilder {
         String assyFileName = new File(getAssemblyFile()).getName();
         setAssemblyImageLocation(assemblyImageDir + assyFileName + ".png");
         VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
+    }
+    
+    /** If a 2D top town image was generated from SavageStudio, then point to 
+     *  this location
+     */
+    private void captureLocationImage() {
+        String assyFile = getAssemblyFile().replaceAll("\\\\", "/");
+        String baseName = assyFile.substring(assyFile.lastIndexOf("/"));
+        if (baseName.contains("_")) {
+            baseName = baseName.substring(0, baseName.lastIndexOf("_"));
+        }
+        String locationImagePath = System.getProperty("user.dir") + "/AnalystReports/images" + baseName + ".png";
+        locationImagePath = locationImagePath.replaceAll("\\\\", "/");
+        log.debug(locationImagePath);
+        if (new File(locationImagePath).exists()) {
+            setLocationImage(locationImagePath);
+        }
+        log.debug(getLocationImage());
     }
     
     public void setFileName          (String fileName)           { this.fileName = fileName; }

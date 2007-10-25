@@ -39,13 +39,13 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Jul 20, 2006
  * @since 2:47:03 PM
+ * @version $Id$
  */
 
 package viskit;
 
 import edu.nps.util.FileIO;
 import org.apache.log4j.Logger;
-import viskit.AnalystReportBuilder;
 import viskit.xsd.assembly.XsltUtility;
 
 import javax.swing.*;
@@ -67,7 +67,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.net.URL;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener
 {
@@ -398,10 +397,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimLocationDescription(locCommentsTA.getText());
     arb.setSimLocationConclusions(locConclusionsTA.getText());
     arb.setPrintSimLocationImage(wantLocationImages.isSelected());
-    String s = simLocImgTF.getText().trim();
+    String s = "file:///" + simLocImgTF.getText().trim();
     if(s != null & s.length() > 0)
       arb.setLocationImage(s);
-    s = simLocImgTF.getText().trim();
     if(s != null & s.length() > 0)
       arb.setChartImage(simChartImgTF.getText());
   }
@@ -1123,6 +1121,8 @@ class ROTable extends JTable
   {
     super(oa,cols);
   }
+  
+  @Override
   public boolean isCellEditable(int row, int column)
   {
     return false;
