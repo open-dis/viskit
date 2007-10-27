@@ -397,7 +397,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimLocationDescription(locCommentsTA.getText());
     arb.setSimLocationConclusions(locConclusionsTA.getText());
     arb.setPrintSimLocationImage(wantLocationImages.isSelected());
-    String s = "file:///" + simLocImgTF.getText().trim();
+    String s = simLocImgTF.getText().trim();
     if(s != null & s.length() > 0)
       arb.setLocationImage(s);
     if(s != null & s.length() > 0)
@@ -498,7 +498,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     arb.setSimConfigurationConclusions(simConfigConclusions.getText());
     arb.setPrintEntityTable(wantEntityTable.isSelected());
     arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
-    String s = "file:///" + configImgPathTF.getText();
+    String s = configImgPathTF.getText();
     if(s != null && s.length() > 0)
       arb.setAssemblyImageLocation(s);
   }

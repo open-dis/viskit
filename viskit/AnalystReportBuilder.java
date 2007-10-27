@@ -4,7 +4,6 @@
  * Created on July 18, 2006, 7:04 PM
  *
  */
-
 package viskit;
 
 import java.io.File;
@@ -406,7 +405,7 @@ public class AnalystReportBuilder {
                 }
                 if (image) {
                     Element evtGraphImage = new Element("EventGraphImage");
-                    evtGraphImage.setAttribute("dir", "file:///" + eventGraphImagePaths.get(i));
+                    evtGraphImage.setAttribute("dir", eventGraphImagePaths.get(i));
                     behavior.addContent(evtGraphImage);
                 }
                 behaviorList.addContent(behavior);
