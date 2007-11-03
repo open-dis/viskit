@@ -70,7 +70,7 @@ public class ViskitConfig
 
   /**
    * Rather screwy.  A decent design would allow the CompositeConfiguration obj
-   * do do the saving, but it won't.
+   * to do the saving, but it won't.
    *
    * @param key
    * @param val

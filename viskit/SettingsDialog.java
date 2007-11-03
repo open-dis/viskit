@@ -62,7 +62,7 @@ import java.net.URL;
 
 public class SettingsDialog extends JDialog
 {
-    static Logger log = Logger.getLogger(SettingsDialog.class);
+  static Logger log = Logger.getLogger(SettingsDialog.class);
   private static SettingsDialog dialog;
   private static boolean modified = false;
   private JFrame mother;
