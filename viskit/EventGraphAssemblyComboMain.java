@@ -39,54 +39,58 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Sep 22, 2005
  * @since 3:23:52 PM
+ * @version $Id$
  */
-
 package viskit;
 
+import org.apache.log4j.Logger;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 
 import javax.swing.*;
 
-public class EventGraphAssemblyComboMain
-{
-  public static void main(String[] args)
-  {
-    String initialFile = null;
+public class EventGraphAssemblyComboMain {
+    
+    static Logger log = Logger.getLogger(EventGraphAssemblyComboMain.class);
 
-    if (args.length > 0) {
-        initialFile = args[0];
+    public static void main(String[] args) {        
+                    
+        String initialFile = null;
+
+        if (args.length > 0) {
+            initialFile = args[0];
+        }
+
+        if (viskit.Vstatics.debug) {
+            System.out.println("***Inside EventGraphAssembly main: " + args.length);
+        }
+        setLandFandFonts();
+
+        // Leave tooltips on the screen until mouse movement causes removal
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+
+        JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
+        VGlobals.instance().setMainAppWindow(mainFrame);
+        mainFrame.setVisible(true);
     }
 
-    if (viskit.Vstatics.debug) System.out.println("***Inside EventGraphAssembly main: " + args.length);
-    setLandFandFonts();
-
-    // Leave tooltips on the screen until mouse movement causes removal
-    ToolTipManager ttm = ToolTipManager.sharedInstance();
-    ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
-
-    JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
-    VGlobals.instance().setMainAppWindow(mainFrame);
-    mainFrame.setVisible(true);
-  }
-  public static void setLandFandFonts()
-   {
-     LookAndFeel laf = new PlasticLookAndFeel();
-     Options.setUseNarrowButtons(true);
-     PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer()); //SkyBluerTahoma()); //SkyBluerTahoma()); //new DesertBlue()); //new ExperienceBlue());
+    public static void setLandFandFonts() {
+        LookAndFeel laf = new PlasticLookAndFeel();
+        Options.setUseNarrowButtons(true);
+        PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer()); //SkyBluerTahoma()); //SkyBluerTahoma()); //new DesertBlue()); //new ExperienceBlue());
      //PlasticLookAndFeel.setTabStyle(com.jgoodies.looks.plastic.Plastic3DLookAndFeel.TAB_STYLE_METAL_VALUE);
-     PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
+        PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
 
-     try {
-       UIManager.setLookAndFeel(laf);
-       ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
+        try {
+            UIManager.setLookAndFeel(laf);
+            ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
        //Wrapper.wrap(); //Force all widgets to go anti-aliased
-     }
-     catch (UnsupportedLookAndFeelException e) {
-       System.out.println("can't change l&f");
-     }
-     //setAllFonts();
+        } catch (UnsupportedLookAndFeelException e) {
+            System.out.println("can't change l&f");
+        }
+    //setAllFonts();
 /*
     //System.out.println(System.getProperty("java.class.path"));
     //System.out.println(System.getProperty("user.dir"));
@@ -120,6 +124,5 @@ public class EventGraphAssemblyComboMain
       System.err.println("Could not enable " + laf);
     }
     */
-   }
-
+    }
 }

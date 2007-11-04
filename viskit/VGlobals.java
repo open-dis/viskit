@@ -870,13 +870,13 @@ public class VGlobals {
 
         public void doSysExit(int status) {
 
-//      System.exit(status);
-            log.info("JVM is exiting with status: " + status);
+//            System.exit(status);
+            log.debug("Viskit is exiting with status: " + status);
 
-            /* If an application launched a JVM, and is still running, this 
-             * will only make Viskit disappear.  If Viskit is running 
-             * standalone, then then all JFrames created by Viskit will dispose,
-             * and the JVM will then cease.
+            /* If an application launched a JVM, and is still running, this will
+             * only make Viskit disappear.  If Viskit is running standalone, 
+             * then then all JFrames created by Viskit will dispose, and the JVM
+             * will then cease.
              * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
              * @see http://72.5.124.55/javase/6/docs/api/java/awt/doc-files/AWTThreadIssues.html
              */
@@ -884,10 +884,15 @@ public class VGlobals {
             int count = 0;
             for (Frame f : frames) {
                 log.debug("Frame count in Viskit: " + (++count));
-                if (f.isVisible()) {
-                    f.setVisible(false);
+                log.debug("Frame is: " + f);
+                
+                /* Prevent non-viskit components from disposing if launched from
+                 * another application
+                 */
+                if (f.toString().contains("viskit")) {
+                    f.dispose();
+                    f = null;
                 }
-                f.dispose();
             }
         }
     };

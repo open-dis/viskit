@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -39,11 +39,13 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Oct 28, 2005
  * @since 11:09:19 AM
+ * @version $Id$
  */
-
 package edu.nps.util;
 
-public interface SysExitHandler
-{
-  public void doSysExit(int status);
+/** Interface to handle JVM exiting */
+public interface SysExitHandler {
+
+    /** @param status the JVM exiting status integer */
+    public void doSysExit(int status);
 }
