@@ -59,8 +59,9 @@
     
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
     
-    <property name="analyst.reports" location="AnalystReports"/>
-    <property description="images directory" name="images" location="${analyst.reports}/images"/>
+    <property name="analyst.reports" value="AnalystReports"/>
+    <property name="analyst.reports.dir" location="${analyst.reports}"/>
+    <property name="images" location="${analyst.reports.dir}/images" description="images directory"/>
     <property name="event.graphs" location="${images}/EventGraphs"/>
     <property name="assemblies" location="${images}/Assemblies"/>
     
@@ -173,6 +174,7 @@
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
+        <mkdir dir="${dir.build.classes}/${analyst.reports}"/>
         <mkdir dir="${dir.build.doc}"/>
         <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
@@ -214,11 +216,13 @@
 
     <!--  === TARGET: compile === -->
     <target depends="build.init,compile.simxml.util" name="compile">
-        <javac verbose="no" destdir="${dir.build.classes}" excludes="xsd/**"
-            debug="true"
-            debugLevel="lines,vars,source"
-            source="1.5"
-            target="1.5">
+        <javac verbose="no" 
+               destdir="${dir.build.classes}" 
+               excludes="xsd/**"
+               debug="true"
+               debugLevel="lines,vars,source"
+               source="1.5"
+               target="1.5">
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -260,6 +264,7 @@
                 <include name="viskit/images/*.gif"/>
                 <include name="viskit/images/*.jpg"/>
                 <include name="log4j.properties"/>
+                <include name="${analyst.reports}/AnalystReportXMLtoHTML.xslt"/>
             </fileset>
         </copy>
     </target>

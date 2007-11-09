@@ -970,7 +970,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         outFile = outFile.substring(0,idx) + ".html";
         XsltUtility.runXslt(reportFile.getAbsolutePath(),
-            outFile, "./AnalystReports/AnalystReportXMLtoHTML.xslt");
+            outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
         
         // pop up the system html viewer, or send currently running browser to html page
         try {
@@ -1015,7 +1015,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         if(resp == JFileChooser.APPROVE_OPTION)
             XsltUtility.runXslt(reportFile.getAbsolutePath(),
                                 genChooser.getSelectedFile().getAbsolutePath(),
-                                "./AnalystReports/AnalystReportXMLtoHTML.xslt");
+                                "AnalystReports/AnalystReportXMLtoHTML.xslt");
         showHtmlViewer(genChooser.getSelectedFile());
 
       }

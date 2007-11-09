@@ -9,10 +9,7 @@
 *@author Duane Davis
 *@version $Id$
 */
-
 package viskit.xsd.assembly;
-
-
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
@@ -21,16 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+public class XsltUtility {
 
-public class XsltUtility
-{
-   
-    /** Creates a new instance of XmlUtilities */
-    public XsltUtility() {}
-
-
-
-   
     /**
      * Runs an XSL Transformation on an XML file and writes the result to another file
      *
@@ -40,37 +29,36 @@ public class XsltUtility
      *
      * @return the resulting transformed XML file
      */
-    public static boolean runXslt(String inFile, String outFile, String xslFile)
-    {
+    public static boolean runXslt(String inFile, String outFile, String xslFile) {
+        
         try // FileNotFoundException, TransformerConfigurationException, TransformerException
         {
             TransformerFactory factory = TransformerFactory.newInstance();
-            Templates template  = factory.newTemplates(new StreamSource(new FileInputStream(xslFile)));
+//            Templates template = factory.newTemplates(new StreamSource(new FileInputStream(xslFile)));
+            
+            // Look in the viskit.jar file for this XSLT
+            Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xslFile)));            
             Transformer xFormer = template.newTransformer();
             Source source = new StreamSource(new FileInputStream(inFile));
             Result result = new StreamResult(new FileOutputStream(outFile));
             xFormer.transform(source, result);
         } // try
-        catch (FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             System.out.println("Unable to load file for XSL Transformation\n" +
-                               "   Input file : " + inFile + "\n" +
-                               "   Output file: " + outFile + "\n" +
-                               "   XSLT file  : " + xslFile);
+                    "   Input file : " + inFile + "\n" +
+                    "   Output file: " + outFile + "\n" +
+                    "   XSLT file  : " + xslFile);
             return false;
         } // catch (FileNotFoundException e)
-        catch (TransformerConfigurationException e)
-        {
+        catch (TransformerConfigurationException e) {
             System.out.println("Unable to configure transformer for XSL Transformation");
             return false;
         } // catch (TransformerConfigurationException e)
-        catch (TransformerException e)
-        {
+        catch (TransformerException e) {
             System.out.println("Exception during XSL Transformation");
             return false;
         } // catch (TransformerException e)
-       
+
         return true;
-    } // runXslt   
-   
-} // XmlUtilities
+    }
+}
