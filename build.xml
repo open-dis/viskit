@@ -143,6 +143,8 @@
         <pathelement location="${dir.lib}/log4j-1.2.14.jar"/>
         <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
         <pathelement location="${dir.lib}/xercesImpl.jar"/>
+        <pathelement location="${dir.lib}/xalan.jar"/>
+        <pathelement location="${dir.lib}/serializer.jar"/>
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <path refid="jaxb.classes.path"/>
         <path refid="runtime.extension.classes.path"/>
@@ -568,7 +570,6 @@
             <include name="GridletEventList.java"/>
             <include name="ReportStatisticsConfig.java"/>
             <include name="ReportStatisticsDOM.java"/>
-            <include name="AnalystReportBuilder.java"/>
             <include name="XsltUtility.java"/>
             <include name="TempDir.java"/>
             <include name="DirDeleter.java"/>

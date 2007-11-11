@@ -68,8 +68,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener
-{
+public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
+    
   static Logger log = Logger.getLogger(AnalystReportPanel.class);  
   
   private AnalystReportBuilder arb;
@@ -151,16 +151,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
   }
   
   private void buildArb(File targetFile) {
-    AnalystReportBuilder arb = null;
+    AnalystReportBuilder arbLocal = null;
     try {
       String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
       log.debug("Current Assembly file: " + assyFile);
-      arb = new AnalystReportBuilder(targetFile, assyFile);
+      arbLocal = new AnalystReportBuilder(targetFile, assyFile);
     } catch (Exception e) {
       System.err.println("Error parsing analyst report: " + e.getMessage());
       return;
     }
-    setContent(arb);
+    setContent(arbLocal);
     reportFile = targetFile;
     dirty=false;
   }

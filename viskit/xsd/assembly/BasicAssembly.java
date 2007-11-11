@@ -67,8 +67,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   /** A checkbox is user enabled from the Analyst Report Panel */
   private boolean enableAnalystReports = false;
   private boolean analystReplicationData = true;
-  private boolean analystSummaryData = true;
-//  private AnalystReportBuilder reportBuilder;
+  
   /**
    * ***********************************************
    */
@@ -81,8 +80,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
   private DecimalFormat form;
 
   private LinkedList entitiesWithStats;
-
-  private ByteArrayOutputStream outputBuffer;
 
   private PrintWriter println;
 
@@ -116,7 +113,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     //TODO MIKE: instead of this.getName() We may not need to worry about the name of
     //the stats report file. Should discuss though.
     statsConfig = new ReportStatisticsConfig(this.getName());
-    outputBuffer = new ByteArrayOutputStream();
     println = new PrintWriter(System.out);
     //moved to run() to avoid beanshell upcall error
     //createObjects();

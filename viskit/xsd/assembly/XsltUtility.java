@@ -1,14 +1,8 @@
 /*
-* XsltUtility.java
-*
-* Created on March 11, 2004, 4:55 PM
-*
-* This class was written by CDR Duane Davis for work on the AUV Workbench.
-* It was copied to this application to perform XSLT conversions.
-*
-*@author Duane Davis
-*@version $Id$
-*/
+ * XsltUtility.java
+ *
+ * Created on March 11, 2004, 4:55 PM 
+ */
 package viskit.xsd.assembly;
 
 import javax.xml.transform.*;
@@ -18,6 +12,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+/** This class was written by CDR Duane Davis for work on the AUV Workbench.
+ * It was copied to this application to perform XSLT conversions.
+ *
+ * @author Duane Davis
+ * @version $Id$
+ */
 public class XsltUtility {
 
     /**
@@ -33,8 +33,9 @@ public class XsltUtility {
         
         try // FileNotFoundException, TransformerConfigurationException, TransformerException
         {
+            // Force Xalan for this TransformerFactory
+            System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
-//            Templates template = factory.newTemplates(new StreamSource(new FileInputStream(xslFile)));
             
             // Look in the viskit.jar file for this XSLT
             Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xslFile)));            

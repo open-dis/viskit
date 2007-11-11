@@ -4,12 +4,10 @@
  * Created on August 3, 2006, 12:09 PM
  *
  */
-
 package viskit.xsd.assembly;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  *
@@ -24,8 +22,8 @@ import java.util.Iterator;
 // here hooks on exit; no need to set deleteOnExit to any file in this directory
 
 public class TempDir {
-    private static DirDeleter deleterThread;
 
+    private static DirDeleter deleterThread;
     static {
         deleterThread = new DirDeleter();
         Runtime.getRuntime().addShutdownHook(deleterThread);
@@ -36,12 +34,14 @@ public class TempDir {
      * The directory (and all its content) will be destroyed on exit.
      */
     public static File createGeneratedName(String prefix, File directory)
-    throws IOException {
+            throws IOException {
         File tempFile = File.createTempFile(prefix, "", directory);
-        if (!tempFile.delete())
+        if (!tempFile.delete()) {
             throw new IOException();
-        if (!tempFile.mkdir())
+        }
+        if (!tempFile.mkdir()) {
             throw new IOException();
+        }
         deleterThread.add(tempFile);
         return tempFile;
     }
@@ -51,14 +51,12 @@ public class TempDir {
      * The directory (and all its content) will be destroyed on exit.
      */
     public static File createNamed(String name, File directory)
-    throws IOException {
+            throws IOException {
         File tempFile = new File(directory, name);
-        if (!tempFile.mkdir())
+        if (!tempFile.mkdir()) {
             throw new IOException();
+        }
         deleterThread.add(tempFile);
         return tempFile;
     }
-
-
 }
-

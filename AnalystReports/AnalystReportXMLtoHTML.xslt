@@ -6,23 +6,28 @@
    <meta name="created"     content="21 July 2006" />
    <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format>
    <meta name="version"     content="$Id$"/>
-  </head>
-  
+  </head>  
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:saxon="http://icl.com/saxon" saxon:trace="yes">
+<xsl:stylesheet version="1.0" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:xalan="http://xml.apache.org/xslt"
+                xmlns:java="http://xml.apache.org/xslt/java">
     <xsl:strip-space elements="*"/>
-    <xsl:output encoding="UTF-8" media-type="text/html" indent="yes" cdata-section-elements="Script"
-                omit-xml-declaration="no" method="xml"/>
+    <xsl:output method="xml"
+                encoding="UTF-8"
+                omit-xml-declaration="no"
+                doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+                doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+                cdata-section-elements="Script"
+                indent="yes"
+                media-type="text/html"
+                xalan:indent-amount="2"/>
     
+    <!-- Attempt to establish an incremental counter variable -->
+    <!-- From: http://osdir.com/ml/text.xml.xalan.java.user/2006-05/msg00014.html -->
+    <xsl:variable name="javaCounter" select="java:java.util.ArrayList.new()"/>    
     <xsl:template match="/">
-        <!-- TODO:  fix
-<xsl:text>
-<![CDATA[
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-]]>
-</xsl:text>
-        -->
         <html>
             <head>
                 <meta http-equiv="Content-Language" content="en-us"/>
@@ -135,10 +140,8 @@
         <p align="left">
             <b><a name="ExecutiveSummary">Executive Summary</a></b>
         </p>
-        <p align="left">
-            
-            <i>Analyst Executive Summary.</i>
-            
+        <p align="left">            
+            <i>Analyst Executive Summary.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -151,28 +154,23 @@
         <p align="left">
             <b><a name="SimulationLocation">Simulation Location</a></b>
         </p>
-        <p align="left">
-            
-            <i>Description of Location Features.</i>
-            
+        <p align="left">            
+            <i>Description of Location Features.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
     <xsl:template match="SLConclusions">
-        <p align="left">
-            
-            <i>Post-Experiment Analysis of Significant Location Features.</i>
-            
+        <p align="left">            
+            <i>Post-Experiment Analysis of Significant Location Features.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
-        <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     <xsl:template match="LocationImage">
-        <p align="center">
+        <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
                     <xsl:text disable-output-escaping="yes">file:///</xsl:text>
@@ -195,29 +193,66 @@
                     </xsl:attribute>
                 </xsl:element>
             </xsl:element>
-        </p>
+            
+            <!-- add an index to the array -->
+            <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: 2D Overview of Study Area</p>
+        </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
+    <xsl:template match="ChartImage">
+        
+        <!-- DNC views have to be manually screen captured.  Test for existence first -->
+        <xsl:if test="@dir != ''">
+            <p/>
+            <p/>
+            <div align="center">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
+                        <xsl:value-of select="@dir"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="style">
+                        <xsl:text>border:0</xsl:text>
+                    </xsl:attribute>
+                    <xsl:element name="img">
+                        <xsl:attribute name="border">
+                            <xsl:text>1</xsl:text>
+                        </xsl:attribute>
+                        <xsl:attribute name="src">
+                            <xsl:text disable-output-escaping="yes">file:///</xsl:text>
+                            <xsl:value-of select="@dir"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="description">
+                            <!-- TODO:  more info here -->
+                            <xsl:text>location</xsl:text>
+                        </xsl:attribute>
+                    </xsl:element>
+                </xsl:element>
+            
+                <!-- add an index to the array -->
+                <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Digital Nautical Chart View of Study Area</p>
+            </div>
+            <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
+        </xsl:if>
+    </xsl:template>
     
-    <!--SimulationConfiguration templates-->
+    <!-- SimulationConfiguration templates -->
     <xsl:template match="SCComments" mode="ConfigHeader">
         <p align="left">
             <b><a name="AssemblyConfiguration">Assembly Configuration for Viskit Simulation</a></b>
         </p>
-        <p align="left">
-            
-            <i>Assembly Design Considerations.</i>
-            
+        <p align="left">            
+            <i>Assembly Design Considerations.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
     <xsl:template match="SCConclusions" mode="ConfigHeader">
-        <p align="left">
-            
-            <i>Post-Experiment Analysis of Simulation Assembly Design.</i>
-            
+        <p align="left">            
+            <i>Post-Experiment Analysis of Simulation Assembly Design.</i>            
             <font color="#000099">
                 <xsl:value-of select="@text"/>
             </font>
@@ -228,15 +263,17 @@
         <div align="center">
             <table border="1">
                 <tr>
-                    <td bgcolor="#FFFFCC">Entity Name</td>
-                    <td bgcolor="#FFFFCC">Behavior Definition</td>
+                    <td bgcolor="#FFFFCC">Simulation Entity</td>
+                    <td bgcolor="#FFFFCC">Behavior Definitions</td>
                 </tr>
                 <xsl:apply-templates select="//SimulationConfiguration/EntityTable/SimEntity" mode="EntitiesTable"/>
             </table>
         </div>
+        <p/>
+        <p/>
     </xsl:template>
     <xsl:template match="AssemblyImage" mode="ConfigHeader">
-        <p align="center">
+        <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
                     <xsl:text disable-output-escaping="yes">file:///</xsl:text>
@@ -261,16 +298,34 @@
                     </xsl:attribute>
                 </xsl:element>
             </xsl:element>
-        </p>
+            
+            <!-- add an index to the array -->
+            <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Simulation Assembly</p>
+        </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>  
     <xsl:template match="SimEntity" mode="EntitiesTable">
         <tr>
             <td>
-                <xsl:value-of select="@name"/>
+                <!-- Now link to each Simulation Entity in this Table -->
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:text>#</xsl:text>
+                        <xsl:value-of select="@name"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="@name"/>
+                </xsl:element>
             </td>
-            <td>
-                <xsl:value-of select="@fullyQualifiedName"/>
+            <td>                
+                <!-- then link to each Behavior Definition -->
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:text>#</xsl:text>
+                        <xsl:value-of select="@fullyQualifiedName"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="@fullyQualifiedName"/>
+                </xsl:element>
             </td>
         </tr>
     </xsl:template>
@@ -280,22 +335,17 @@
         <p align="left">
             <b><a name="EntityParameters">Entity Parameters</a></b>
         </p>
-        <p align="left">
-            
-            <i>Entity Parameters Overview.</i>
-            
+        <p align="left">            
+            <i>Entity Parameters Overview.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
-        <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     <!-- not used
   <xsl:template match="EPConclusions" mode="ParamHeader">
-    <p align="left">
-      
-        <i>Post-Experiment Analysis of Entity Behaviors.</i>
-      
+    <p align="left">      
+        <i>Post-Experiment Analysis of Entity Behaviors.</i>      
       <font color="#00006C">
         <xsl:value-of select="@text"/>
       </font>
@@ -310,7 +360,12 @@
         <p/>
         <xsl:text>Simulation Parameters for </xsl:text>
         <b>
-            <xsl:value-of select="@name"/>
+            <a>
+                <xsl:attribute name="name">
+                    <xsl:value-of select="@name"/>
+                </xsl:attribute>
+                <xsl:value-of select="@name"/>
+            </a>
         </b>
         <!--  TODO:  add uniquely identifying information for this header -->
         <table border="1" width="75%" cellpadding="0" cellspacing="1">
@@ -440,6 +495,9 @@
                 </xsl:for-each>
             </xsl:for-each>
         </table>
+        <p/>
+        <p/>        
+        <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
     <!--Behavior Description templates-->
@@ -465,12 +523,19 @@
     
     <!-- Event Graph image and details -->
     <xsl:template match="Behavior">
-        <p/>
+        
+        <!-- Capture this Behavior's name for the Figure Caption -->
+        <xsl:variable name="behavior" select="@name"/>
         <p/>
         <p/>
         <p align="left">
             <b>Behavior: </b>
-            <xsl:value-of select="@name"/>
+            <xsl:element name="a">
+                <xsl:attribute name="name">
+                    <xsl:value-of select="@name"/>
+                </xsl:attribute>
+                <xsl:value-of select="@name"/>
+            </xsl:element>
         </p>
         
         <!--Add the description -->
@@ -481,9 +546,9 @@
             </p>
         </xsl:for-each>
         
-        <!--Add the image of the event graph -->
+        <!-- Add the image of the Event Ggraph -->
         <xsl:for-each select="EventGraphImage">
-            <p align="center">
+            <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:text disable-output-escaping="yes">file:///</xsl:text>
@@ -506,9 +571,13 @@
                         </xsl:attribute>
                     </xsl:element>
                 </xsl:element>
-            </p>
+               
+                <!-- add an index to the array -->
+                <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Event Graph for <xsl:value-of select="$behavior"/></p>
+            </div>
         </xsl:for-each>
-        <p align="center">
+        <div align="center">
             <table border="1">
                 <tr>
                     <td bgcolor="#FFFFCC">Parameter</td>
@@ -530,10 +599,10 @@
                     </tr>
                 </xsl:for-each>
             </table>
-        </p>
+        </div>
         <p/>
         <p/>
-        <p align="center">
+        <div align="center">
             <table border="1">
                 <tr>
                     <td bgcolor="#FFFFCC">State Variable</td>
@@ -554,7 +623,9 @@
                     </tr>
                 </xsl:for-each>
             </table>
-        </p>
+        </div>
+        <p/>
+        <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
@@ -563,31 +634,28 @@
         <p align="left">
             <b><a name="StatisticalResults">Statistical Results</a></b>
         </p>
-        <p align="left">
-            
-            <i>Description of Expected Results.</i>
-            
+        <p align="left">            
+            <i>Description of Expected Results.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
     <xsl:template match="SRConclusions" mode="StatsHeader">
-        <p align="left">
-            
-            <i>Analysis of Experimental Results.</i>
-            
+        <p align="left">            
+            <i>Analysis of Experimental Results.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
     <xsl:template match="SimEntity" mode="RepStats">
+                
+        <!-- Capture this Entity's name for the Figure Caption -->
+        <xsl:variable name="entityProperty" select="@property"/>
         <p/>
-        <p align="left">
-            
-            <b>Replication Report</b>
-            
+        <p align="left">            
+            <b>Replication Report</b>            
         </p>
         <p align="left">Entity:
             <xsl:value-of select="@name"/>
@@ -595,7 +663,7 @@
                 <xsl:value-of select="@property"/>
             </p>
             <xsl:for-each select="chartURL">
-                <p align="center">
+                <div align="center">
                     <xsl:element name="a">
                         <xsl:attribute name="href">
                             <xsl:value-of select="@dir"/>
@@ -616,9 +684,13 @@
                             </xsl:attribute>
                         </xsl:element>
                     </xsl:element>
-                </p>
+                    
+                    <!-- add an index to the array -->
+                    <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+                    <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replication Statistics for <xsl:value-of select="$entityProperty"/></p>
+                </div>
             </xsl:for-each>
-            <p align="center">
+            <div align="center">
                 <table border="1" width="60%">
                     <tr>
                         <td bgcolor="#FFFFCC">
@@ -669,73 +741,74 @@
                         </tr>
                     </xsl:for-each>
                 </table>
-            </p>
+            </div>
         </p>
+        <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     <xsl:template match="SummaryReport" mode="SumStats">
         <p/>
-        <p align="left">
-            
-            <b><a name="SummaryReport">Summary Report</a></b>
-            
+        <p align="left">            
+            <b><a name="SummaryReport">Summary Report</a></b>            
         </p>
-        <table border="1" width="80%">
-            <tr>
-                <td bgcolor="#FFFFCC">
-                    <b>Entity</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Property</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Count</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Min</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Max</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Mean</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>StdDev</b>
-                </td>
-                <td bgcolor="#FFFFCC">
-                    <b>Variance</b>
-                </td>
-            </tr>
-            <xsl:for-each select="SummaryRecord">
+        <div align="left">
+            <table border="1" width="80%">
                 <tr>
-                    <td>
-                        <xsl:value-of select="@entity"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Entity</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@property"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Property</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@count"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Count</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@minObs"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Min</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@maxObs"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Max</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@mean"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Mean</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@stdDeviation"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>StdDev</b>
                     </td>
-                    <td>
-                        <xsl:value-of select="@variance"/>
+                    <td bgcolor="#FFFFCC">
+                        <b>Variance</b>
                     </td>
                 </tr>
-            </xsl:for-each>
-        </table>
+                <xsl:for-each select="SummaryRecord">
+                    <tr>
+                        <td>
+                            <xsl:value-of select="@entity"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@property"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@count"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@minObs"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@maxObs"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@mean"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@stdDeviation"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@variance"/>
+                        </td>
+                    </tr>
+                </xsl:for-each>
+            </table>
+        </div>
         <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
@@ -745,25 +818,20 @@
         <p align="left">
             <b><a name="Conclusions">Conclusions and Recommendations</a></b>
         </p>
-        <p align="left">
-            
-            <i>Conclusions.</i>
-            
+        <p align="left">            
+            <i>Conclusions.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
     <xsl:template match="CRConclusions">
-        <p align="left">
-            
-            <i>Recommendations for Future Work.</i>
-            
+        <p align="left">            
+            <i>Recommendations for Future Work.</i>            
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
-    </xsl:template>
-    
+    </xsl:template>    
 </xsl:stylesheet>

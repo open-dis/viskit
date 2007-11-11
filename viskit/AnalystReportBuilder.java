@@ -2,7 +2,6 @@
  * AnalystReportBuilder.java
  *
  * Created on July 18, 2006, 7:04 PM
- *
  */
 package viskit;
 
@@ -73,7 +72,7 @@ public class AnalystReportBuilder {
     private Element concRec;    
     
     public static void main(String[] args) {
-        AnalystReportBuilder ar = new AnalystReportBuilder();
+        new AnalystReportBuilder();
     }
     
     /** Build a default AnalystReport object */
@@ -138,7 +137,7 @@ public class AnalystReportBuilder {
     }
     
     public File writeToXMLFile() throws Exception {
-        File fil = File.createTempFile("AnalystReport",".xml");
+        File fil = File.createTempFile("AnalystReport", ".xml");
         _writeCommon(fil);
         return fil;
     }
@@ -204,8 +203,8 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("comments", "true");
         simConfig.setAttribute("image", "true");
         simConfig.setAttribute("entityTable", "true");
-        makeComments(simConfig,"SC", "");
-        makeConclusions(simConfig,"SC", "");
+        makeComments(simConfig, "SC", "");
+        makeConclusions(simConfig, "SC", "");
         if(assemblyFile != null)
             try {
                 simConfig.addContent(makeEntityTable(assemblyFile));
@@ -357,7 +356,9 @@ public class AnalystReportBuilder {
         rootElement.addContent(concRec);
     }
     
-    /** Creates Behavior definition references in the analyst report template */
+    /** Creates Behavior definition references in the analyst report template 
+     * @return a table of scenario Event Graph Behaviors
+     */
     private Element processBehaviors(boolean descript, boolean image, boolean details) throws Exception {
         Element behaviorList = new Element("BehaviorList");
         if (eventGraphNames != null) {
@@ -603,13 +604,7 @@ public class AnalystReportBuilder {
         Element localRootElement = assemblyDocument.getRootElement();
         List simEntityList = localRootElement.getChildren("SimEntity");
         Iterator itr = simEntityList.iterator();
-        
-        // Extract XML based simEntities for entityParameters and event graph image
-        // TODO: these are not used yet
-        setEventGraphFiles(new LinkedList<String>());
-        setEventGraphImagePaths(new LinkedList<String>());
-        setEventGraphNames(new LinkedList<String>());
-        
+                
         // Conduct a test for a diskit package which is native java
         String isJAVAfile = "diskit";
         while (itr.hasNext()) {
@@ -633,7 +628,8 @@ public class AnalystReportBuilder {
      * adds it to the list of event graphs with the proper formatting of the file's
      * path
      *
-     * @param fileType the type of XML file being used to include package name
+     * @param fileType the type of XML file being used that includes a package 
+     * name
      */
     private void saveEventGraphReferences(String fileType) {
         log.debug("Parameter fileType: " + fileType);
@@ -663,7 +659,7 @@ public class AnalystReportBuilder {
             log.debug("Event Graph Path: " + eventGraphPath);
             
             /* TODO: Warning - this assumes that event graphs will be stored in
-             * a directory that has the name "Behavior" in it's parent path
+             * a directory that has the name "Behavior" in its parent path
              */
             if (eventGraphPath.contains("Behavior")) {
                 eventGraphDir = eventGraphPath + fileTypePackageToPath;
@@ -672,7 +668,7 @@ public class AnalystReportBuilder {
         
         eventGraphDir = eventGraphDir.replaceAll("\\\\", "/");
         
-        /* This is now a URL, so, we need to strip of the "file:/" header so 
+        /* This is now a URL, so, we need to strip out the "file:/" header so 
          * that the SAXBuilder won't append the base directory to the URL 
          * causing a fnfe
          */
@@ -685,13 +681,11 @@ public class AnalystReportBuilder {
         String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
         log.debug("Event Graph Image location: " + imgFile);
-        
-        // Get the absolute path to resolve the broken url problem
-        
+                
         if (!eventGraphFiles.contains(eventGraphFile)) {
             eventGraphFiles.add(eventGraphFile);
             eventGraphImagePaths.add(imgFile);
-            eventGraphNames.add(eventGraphName);
+            eventGraphNames.add(fileType);
         }
     }
 
@@ -1078,10 +1072,10 @@ public class AnalystReportBuilder {
     public String  getSimConfigComments()     { return unMakeComments(simConfig);}
     public String[][]  getSimConfigEntityTable()  { return unMakeEntityTable();}
     public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
-    public String  getAssemblyImageLocation() { return unMakeImage(simConfig,"Assembly");}
-    public void    setSimConfigurationDescription       (String s) { makeComments(simConfig,"SC", s); }
+    public String  getAssemblyImageLocation() { return unMakeImage(simConfig, "Assembly");}
+    public void    setSimConfigurationDescription       (String s) { makeComments(simConfig, "SC", s); }
     public void    setSimConfigEntityTable    (String s) { }; //todo
-    public void    setSimConfigurationConclusions       (String s) { makeConclusions(simConfig,"SC", s); }
+    public void    setSimConfigurationConclusions       (String s) { makeConclusions(simConfig, "SC", s); }
     public void    setAssemblyImageLocation   (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
     
     // stat results:
