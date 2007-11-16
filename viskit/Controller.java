@@ -155,44 +155,48 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     }
   }
 
-  public void open()
-  //----------------
-  {
-    File file = ((ViskitView)getView()).openFileAsk();
-    if (file != null) {
-      _doOpen(file);
-    }
-  }
-
-  public void _doOpen(File file)
-  {
-    Model mod = new Model(this);
-    mod.init();
-    // these may init to null on startup, check
-    // before doing any openAlready lookups
-    ((ViskitView) getView()).addTab(mod,false);
-    ViskitModel[] openAlready = null;
-    if ((ViskitView)getView() != null) {
-        openAlready = ((ViskitView )getView()).getOpenModels();
-    }
-    boolean isOpenAlready = false;
-    if ( openAlready != null ) for ( ViskitModel model:openAlready ) {
-        if ( model.getLastFile() != null ) {
-            String path = model.getLastFile().getAbsolutePath();
-            if ( path.equals(file.getAbsolutePath()) ) {
-                isOpenAlready = true;
+    public void open() //----------------
+    {
+        // Bug fix: 1249
+        File[] files = ((ViskitView) getView()).openFilesAsk();
+        if (files == null) {return;}
+        for (File file : files) {
+            if (file != null) {
+                _doOpen(file);
             }
         }
     }
-    if ( false == mod.newModel(file) || isOpenAlready ) {
-      ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
-      return;
+
+    public void _doOpen(File file) {
+        Model mod = new Model(this);
+        mod.init();
+        // these may init to null on startup, check
+        // before doing any openAlready lookups
+        ((ViskitView) getView()).addTab(mod, false);
+        ViskitModel[] openAlready = null;
+        if ((ViskitView) getView() != null) {
+            openAlready = ((ViskitView) getView()).getOpenModels();
+        }
+        boolean isOpenAlready = false;
+        if (openAlready != null) {
+            for (ViskitModel model : openAlready) {
+                if (model.getLastFile() != null) {
+                    String path = model.getLastFile().getAbsolutePath();
+                    if (path.equals(file.getAbsolutePath())) {
+                        isOpenAlready = true;
+                    }
+                }
+            }
+        }
+        if (false == mod.newModel(file) || isOpenAlready) {
+            ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
+            return;
+        }
+        ((ViskitView) getView()).setSelectedEventGraphName(mod.getMetaData().name);
+        adjustRecentList(file);
+
+        fileWatchOpen(file);
     }
-    ((ViskitView)getView()).setSelectedEventGraphName(mod.getMetaData().name);
-    adjustRecentList(file);
-    
-    fileWatchOpen(file);
-  }
 
   private static final int RECENTLISTSIZE = 15;
   private ArrayList<String> recentFileList;

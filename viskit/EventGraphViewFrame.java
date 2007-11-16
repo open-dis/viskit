@@ -13,10 +13,6 @@ import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
@@ -27,15 +23,21 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
- * www.nps.navy.mil
- * By:   Mike Bailey
- * Date: Mar 2, 2004
- * Time: 12:52:59 PM
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Mar 2, 2004
+ * @since 12:52:59 PM
+ * @version $Id$
  */
 
 /**
@@ -925,21 +927,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
   }
 
-  // ViskitView-required methods:
-  private JFileChooser jfc;
-  public File openFileAsk()
-  //-----------------------
-  {
-    if (jfc == null) {
-      jfc = new JFileChooser(System.getProperty("user.dir") +
-                             System.getProperty("file.separator") + "BehaviorLibraries");
-      jfc.setDialogTitle("Open Event Graph File");
+    // ViskitView-required methods:
+    private JFileChooser jfc;
+
+    public File[] openFilesAsk() //-----------------------
+    {
+        if (jfc == null) {
+            log.info("JFileChooser was null");
+            jfc = new JFileChooser(System.getProperty("user.dir") +
+                    System.getProperty("file.separator") + "BehaviorLibraries");
+            jfc.setDialogTitle("Open Event Graph Files");
+            jfc.addChoosableFileFilter(new FileNameExtensionFilter("XML file", "xml"));
+            
+            // Bug fix: 1249
+            jfc.setMultiSelectionEnabled(true);
+        }
+        
+        int retv = jfc.showOpenDialog(this);
+        return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
     }
-    int retv = jfc.showOpenDialog(this);
-    if (retv == JFileChooser.APPROVE_OPTION)
-      return jfc.getSelectedFile();
-    return null;
-  }
 
   private File getUniqueName(String suggName)
   {

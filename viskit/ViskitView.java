@@ -6,17 +6,15 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mike
- * Date: Mar 18, 2004
- * Time: 12:06:11 PM
- */
-
-/**
  * The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
  * chosen view only as much as is described by this interface.
+ * 
+ * Created by IntelliJ IDEA.
+ * @author Mike Bailey
+ * @since Mar 18, 2004
+ * @since 12:06:11 PM
+ * @version $Id$
  */
-
 public interface ViskitView
 {
   // permit user to edit existing entities
@@ -30,7 +28,7 @@ public interface ViskitView
   public void    genericErrorReport     ( String title, String message );
   public String  promptForStringOrCancel( String title, String message, String initval);
 
-  public File    openFileAsk();
+  public File[]  openFilesAsk();
   public File    openRecentFilesAsk(Collection lis);
   public File    saveFileAsk(String suggName,boolean showUniqueName);
 
