@@ -53,6 +53,8 @@ public interface ViskitController
   /* menu selections */
   void copy();
   void cut();        // to remove nodes and edges
+  
+  /** Opens selected files from a FileChooser */
   void open();
   void openRecent();
   void close();
