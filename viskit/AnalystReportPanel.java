@@ -41,7 +41,6 @@ POSSIBILITY OF SUCH DAMAGE.
  * @since 2:47:03 PM
  * @version $Id$
  */
-
 package viskit;
 
 import edu.nps.util.FileIO;
@@ -69,972 +68,955 @@ import java.util.List;
 import java.util.Vector;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
-    
-  static Logger log = Logger.getLogger(AnalystReportPanel.class);  
-  
-  private AnalystReportBuilder arb;
-  private File reportFile;
 
-  /** 
+    static Logger log = Logger.getLogger(AnalystReportPanel.class);
+    private AnalystReportBuilder arb;
+    private File reportFile;
+
+    /** 
    * TODO: rewire this functionality?
    * boolean to show that raw report has not been saved to AnalystReports 
    */
-  private boolean dirty = false;
-  private JMenuBar myMenuBar;
+    private boolean dirty = false;
+    private JMenuBar myMenuBar;
+    private JFileChooser locationImageFileChooser;
 
-  private JFileChooser locationImageFileChooser;
-  public AnalystReportPanel() {
-    setLayout();
-    setBackground(new Color(251,251,229)); // yellow
-    doMenus();
+    public AnalystReportPanel() {
+        setLayout();
+        setBackground(new Color(251, 251, 229)); // yellow
+        doMenus();
 
-    locationImageFileChooser = new JFileChooser("./images/");
-  }
+        locationImageFileChooser = new JFileChooser("./images/");
+    }
+    JTextField titleTF = new JTextField();
+    JTextField analystNameTF = new JTextField();
+    JComboBox classifiedTF = new JComboBox(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+    File currentAssyFile;
 
-  JTextField titleTF = new JTextField();
-  JTextField analystNameTF = new JTextField();
-  JComboBox classifiedTF = new JComboBox(new String[]{"UNCLASSIFIED","FOUO","CONFIDENTIAL","SECRET","TOP SECRET"});
-  JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+    /** Captures the name of the assembly file */
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        switch (action) {
+            case NEW_ASSY:
+                currentAssyFile = (File) param;
+                if (arb != null) {
+                    arb.setAssemblyFile(currentAssyFile.getAbsolutePath());
+                }
+                break;
 
-  File currentAssyFile;
-  
-  /** Captures the name of the assembly file */
-  public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
-    switch (action) {
-      case NEW_ASSY:
-        currentAssyFile = (File) param;
-        if(arb != null) {
-          arb.setAssemblyFile(currentAssyFile.getAbsolutePath());
+            case CLOSE_ASSY:
+            case PARAM_LOCALLY_EDITTED:
+            case JAXB_CHANGED:
+                break;
+
+            default:
+                System.err.println("Program error InternalAssemblyRunner.assyChanged");
         }
-        break;
-
-      case CLOSE_ASSY:
-      case PARAM_LOCALLY_EDITTED:
-      case JAXB_CHANGED:
-        break;
-
-      default:
-        System.err.println("Program error InternalAssemblyRunner.assyChanged");
     }
-  }
 
-  public String getHandle() {return "";}
-
-  public JMenuBar getMenus() {return myMenuBar;}
-
-  /** Called from the InternalAssemblyRunner when the temp Analysts report is
-   * filled out and ready to copy
-   * @param path the path to the temp Analyst Report that will be copied
-   */
-  public void setReportXML(String path) {
-   
-      log.debug("Path of temp Analyst Report: " + path);
-      File srcFil = new File(path);
-      
-      File anDir = new File("./AnalystReports");
-      if (!anDir.exists()) {anDir.mkdirs();}
-      
-      SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-      String output = formatter.format(new Date()); // today
-      
-      String usr = System.getProperty("user.name");
-      String outputFile = (usr + "AnalystReport_" + output + ".xml");
-      
-      File targetFile = new File(anDir, outputFile);
-      try {
-          FileIO.copyFile(srcFil, targetFile, true);
-          srcFil.deleteOnExit();
-      } catch (IOException ioe) {log.fatal(ioe);}
-      
-      doTitle(targetFile.getName());
-      buildArb(targetFile);
-  }
-  
-  private void buildArb(File targetFile) {
-    AnalystReportBuilder arbLocal = null;
-    try {
-      String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
-      log.debug("Current Assembly file: " + assyFile);
-      arbLocal = new AnalystReportBuilder(targetFile, assyFile);
-    } catch (Exception e) {
-      System.err.println("Error parsing analyst report: " + e.getMessage());
-      return;
+    public String getHandle() {
+        return "";
     }
-    setContent(arbLocal);
-    reportFile = targetFile;
-    dirty=false;
-  }
-  
-  public void setContent(AnalystReportBuilder arb) {
-    if(arb != null && dirty) {
-      int resp = JOptionPane.showConfirmDialog(this,"<html>The experiment has completed and the report is ready to be displayed.<br>"+
-                                                    "The current report data has not been saved. Save current report before continuing?",
-                                                    "Save Report",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-      if(resp == JOptionPane.YES_OPTION)
-        saveReport();
+
+    public JMenuBar getMenus() {
+        return myMenuBar;
     }
-    dirty=false;
 
-    this.arb = arb;
-    fillLayout();
-  }
+    /** Called from the InternalAssemblyRunner when the temp Analysts report is
+     * filled out and ready to copy
+     * @param path the path to the temp Analyst Report that will be copied
+     */
+    public void setReportXML(String path) {
 
-  private void fillLayout()
-  {
-    // We don't always come in on the swing thread.
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      public void run()
-      {
-        _fillLayout();
-      }
-    });
-  }
+        log.debug("Path of temp Analyst Report: " + path);
+        File srcFil = new File(path);
 
-  private void _fillLayout()
-  {
-    fillHeader();
-    fillExecSumm();
-    fillSimulationLocation();
-    fillSimulationConfiguration();
-    fillEntityParams();
-    fillBehaviors();
-    fillStatsPan();
-    fillConclusionsRecommendationsPanel();
-  }
-  
-  private void unFillLayout()
-  {
-    unFillHeader();
-    unFillExecSumm();
-    unFillSimulationLocation();
-    unFillSimulationConfiguration();
-    unFillEntityParams();
-    unFillBehaviors();
-    unFillStatsPan();
-    unFillConRecPan();
-  }
+        File anDir = new File("./AnalystReports");
+        if (!anDir.exists()) {
+            anDir.mkdirs();
+        }
 
-  private void fillHeader()
-  {
-    titleTF.setText(arb.getReportName());
-    analystNameTF.setText(arb.getAuthor());
-    String date = arb.getDateOfReport();
-    if(date != null && date.length()>0)
-      dateTF.setText(date);
-    else
-      dateTF.setText(DateFormat.getDateInstance().format(new Date())); //now
-    classifiedTF.setSelectedItem(arb.getClassification());
-  }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+        String output = formatter.format(new Date()); // today
 
-  private void unFillHeader()
-  {
-    arb.setReportName(titleTF.getText());
-    arb.setAuthor(analystNameTF.getText());
-    arb.setDateOfReport(dateTF.getText());
-    arb.setClassification((String)classifiedTF.getSelectedItem());
-  }
+        String usr = System.getProperty("user.name");
+        String outputFile = (usr + "AnalystReport_" + output + ".xml");
 
-  private void setLayout()
-  {
-    setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-    JTabbedPane tabs = new JTabbedPane();
+        File targetFile = new File(anDir, outputFile);
+        try {
+            FileIO.copyFile(srcFil, targetFile, true);
+            srcFil.deleteOnExit();
+        } catch (IOException ioe) {
+            log.fatal(ioe);
+        }
 
-    JPanel headerPanel = new JPanel(new SpringLayout());
-    headerPanel.add(new JLabel("Title"));
-    headerPanel.add(titleTF);
-    headerPanel.add(new JLabel("Author"));
-    headerPanel.add(analystNameTF);
-    headerPanel.add(new JLabel("Analysis Date"));
-    headerPanel.add(dateTF);
-    headerPanel.add(new JLabel("Report Classification"));
-    headerPanel.add(classifiedTF);
-    Dimension d = new Dimension(Integer.MAX_VALUE,titleTF.getPreferredSize().height);
-    titleTF.setMaximumSize(new Dimension(d));
-    analystNameTF.setMaximumSize(new Dimension(d));
-    dateTF.setMaximumSize(new Dimension(d));
-    classifiedTF.setMaximumSize(new Dimension(d));
-    SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
+        doTitle(targetFile.getName());
+        buildArb(targetFile);
+    }
 
-    headerPanel.setBorder(new EmptyBorder(10,10,10,10));
-    headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
-    headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,headerPanel.getPreferredSize().height));
+    private void buildArb(File targetFile) {
+        AnalystReportBuilder arbLocal = null;
+        try {
+            String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
+            log.debug("Current Assembly file: " + assyFile);
+            arbLocal = new AnalystReportBuilder(targetFile, assyFile);
+        } catch (Exception e) {
+            System.err.println("Error parsing analyst report: " + e.getMessage());
+            return;
+        }
+        setContent(arbLocal);
+        reportFile = targetFile;
+        dirty = false;
+    }
 
-    tabs.add("1 Header",headerPanel);
-    tabs.add("2 Executive Summary",makeExecutiveSummaryPanel());
-    tabs.add("3 Simulation Location",makeSimulationLocationPanel());
-    tabs.add("4 Assembly Configuration",makeAssemblyDesignPanel());
-    tabs.add("5 Entity Parameters",makeEntityParamsPanel());
-    tabs.add("6 Behavior Descriptions",makeBehaviorsPanel());
-    tabs.add("7 Statistical Results",makeStatisticsPanel());
-    tabs.add("8 Conclusions, Recommendations",makeConclusionsRecommendationsPanel());
+    public void setContent(AnalystReportBuilder arb) {
+        if (arb != null && dirty) {
+            int resp = JOptionPane.showConfirmDialog(this, "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
+                    "The current report data has not been saved. Save current report before continuing?</p></body></html>",
+                    "Save Report", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (resp == JOptionPane.YES_OPTION) {
+                saveReport();
+            }
+        }
+        dirty = false;
 
-    add(tabs);
+        this.arb = arb;
+        fillLayout();
+    }
+
+    private void fillLayout() {
+        // We don't always come in on the swing thread.
+        SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        _fillLayout();
+                    }
+                });
+    }
+
+    private void _fillLayout() {
+        fillHeader();
+        fillExecSumm();
+        fillSimulationLocation();
+        fillSimulationConfiguration();
+        fillEntityParams();
+        fillBehaviors();
+        fillStatsPan();
+        fillConclusionsRecommendationsPanel();
+    }
+
+    private void unFillLayout() {
+        unFillHeader();
+        unFillExecSumm();
+        unFillSimulationLocation();
+        unFillSimulationConfiguration();
+        unFillEntityParams();
+        unFillBehaviors();
+        unFillStatsPan();
+        unFillConRecPan();
+    }
+
+    private void fillHeader() {
+        titleTF.setText(arb.getReportName());
+        analystNameTF.setText(arb.getAuthor());
+        String date = arb.getDateOfReport();
+        if (date != null && date.length() > 0) {
+            dateTF.setText(date);
+        } else {
+            dateTF.setText(DateFormat.getDateInstance().format(new Date()));
+        } //now
+        classifiedTF.setSelectedItem(arb.getClassification());
+    }
+
+    private void unFillHeader() {
+        arb.setReportName(titleTF.getText());
+        arb.setAuthor(analystNameTF.getText());
+        arb.setDateOfReport(dateTF.getText());
+        arb.setClassification((String) classifiedTF.getSelectedItem());
+    }
+
+    private void setLayout() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        JTabbedPane tabs = new JTabbedPane();
+
+        JPanel headerPanel = new JPanel(new SpringLayout());
+        headerPanel.add(new JLabel("Title"));
+        headerPanel.add(titleTF);
+        headerPanel.add(new JLabel("Author"));
+        headerPanel.add(analystNameTF);
+        headerPanel.add(new JLabel("Analysis Date"));
+        headerPanel.add(dateTF);
+        headerPanel.add(new JLabel("Report Classification"));
+        headerPanel.add(classifiedTF);
+        Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
+        titleTF.setMaximumSize(new Dimension(d));
+        analystNameTF.setMaximumSize(new Dimension(d));
+        dateTF.setMaximumSize(new Dimension(d));
+        classifiedTF.setMaximumSize(new Dimension(d));
+        SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
+
+        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
+        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
+
+        tabs.add("1 Header", headerPanel);
+        tabs.add("2 Executive Summary", makeExecutiveSummaryPanel());
+        tabs.add("3 Simulation Location", makeSimulationLocationPanel());
+        tabs.add("4 Assembly Configuration", makeAssemblyDesignPanel());
+        tabs.add("5 Entity Parameters", makeEntityParamsPanel());
+        tabs.add("6 Behavior Descriptions", makeBehaviorsPanel());
+        tabs.add("7 Statistical Results", makeStatisticsPanel());
+        tabs.add("8 Conclusions, Recommendations", makeConclusionsRecommendationsPanel());
+
+        add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
-  }
+    }
+    JCheckBox wantExecutiveSummary;
+    JTextArea execSummTA;
 
-  JCheckBox wantExecutiveSummary;
-  JTextArea execSummTA;
-  private JPanel makeExecutiveSummaryPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantExecutiveSummary = new JCheckBox("Include executive summary", true);
-    wantExecutiveSummary.setToolTipText ("Include entries in output report");
-    wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantExecutiveSummary);
-    
-    JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp);
+    private JPanel makeExecutiveSummaryPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantExecutiveSummary = new JCheckBox("Include executive summary", true);
+        wantExecutiveSummary.setToolTipText("Include entries in output report");
+        wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantExecutiveSummary);
 
-    /*
+        JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(jsp);
+
+        /*
     execSummary = new Element("ExecutiveSummary");
     execSummary.setAttribute("comments", "true");
     execSummary.addContent(makeComments("ES", ""));
 
     */
-    execSummTA.setLineWrap(true);
-    execSummTA.setWrapStyleWord(true);
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    return p;
-  }
-  private void fillExecSumm()
-  {
-    wantExecutiveSummary.setSelected(arb.isExecutiveSummaryComments());
-    execSummTA.setText(arb.getExecutiveSummary());
-    execSummTA.setEnabled(wantExecutiveSummary.isSelected());
-  }
-  private void unFillExecSumm()
-  {
-    arb.setExecutiveSummaryComments(wantExecutiveSummary.isSelected());
-    arb.setExecutiveSummary(execSummTA.getText());
-  }
-  /************************/
-
-  JCheckBox wantLocationDescriptions;
-  JCheckBox wantLocationImages;
-  JTextArea locCommentsTA;
-  JTextArea locConclusionsTA;
-  JTextField simLocImgTF;
-  JButton    simLocImgButt;
-  JTextField simChartImgTF;
-  JButton    simChartImgButt;
-
-  private JPanel makeSimulationLocationPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
-    wantLocationDescriptions.setToolTipText ("Include entries in output report");
-    wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantLocationDescriptions);
-    
-    JScrollPane jsp = new JScrollPane(locCommentsTA = new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Description of Location Features"));
-    p.add(jsp);
-    
-    jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
-    p.add(jsp);
-    
-    wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
-    wantLocationImages.setToolTipText ("Include entries in output report");
-    wantLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantLocationImages);
-
-    JPanel imp = new JPanel();
-    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("Location image "));
-    imp.add(simLocImgTF=new JTextField(20));
-    imp.add(simLocImgButt=new JButton("..."));
-    simLocImgButt.addActionListener(new fileChoiceListener(simLocImgTF));
-    Dimension ps = simLocImgTF.getPreferredSize();
-    simLocImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
-    simLocImgTF.setEditable(false);
-    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(imp);
-
-    imp = new JPanel();
-    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("Chart image "));
-    imp.add(simChartImgTF=new JTextField(20));
-    imp.add(simChartImgButt=new JButton("..."));
-    simChartImgButt.addActionListener(new fileChoiceListener(simChartImgTF));
-    ps = simChartImgTF.getPreferredSize();
-    simChartImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
-    simChartImgTF.setEditable(false);
-    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(imp);
-
-    p.setBorder(new EmptyBorder(10,10,10,10));
-
-    return p;
-  }
-
-  private void fillSimulationLocation()
-  {
-    wantLocationDescriptions.setSelected(arb.isPrintSimLocationComments());
-    locCommentsTA.setText(arb.getSimLocationComments());
-    locCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
-    locConclusionsTA.setText(arb.getSimLocationConclusions());
-    locConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
-    wantLocationImages.setSelected(arb.isPrintSimLocationImage());
-    simLocImgTF.setEnabled(wantLocationImages.isSelected());
-    simLocImgButt.setEnabled(wantLocationImages.isSelected());
-    simChartImgTF.setEnabled(wantLocationImages.isSelected());
-    simChartImgButt.setEnabled(wantLocationImages.isSelected());
-    simLocImgTF.setText(arb.getLocationImage());
-    simChartImgTF.setText(arb.getChartImage());
-  }
-  
-  private void unFillSimulationLocation()
-  {
-    arb.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
-    arb.setSimLocationDescription(locCommentsTA.getText());
-    arb.setSimLocationConclusions(locConclusionsTA.getText());
-    arb.setPrintSimLocationImage(wantLocationImages.isSelected());
-    String s = simLocImgTF.getText().trim();
-    if(s != null & s.length() > 0)
-      arb.setLocationImage(s);
-    if(s != null & s.length() > 0)
-      arb.setChartImage(simChartImgTF.getText());
-  }
-
-  /************************/
-
-  JCheckBox wantAssemblyDesignAndAnalysis;
-  JTextArea assemblyDesignConsiderations;
-  JTextArea simConfigConclusions;
-  JCheckBox wantSimConfigImages;
-  JCheckBox wantEntityTable;
-  JTable    entityTable;
-  JTextField configImgPathTF;
-  JButton   configImgButt;
-
-  private JPanel makeAssemblyDesignPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantAssemblyDesignAndAnalysis = new JCheckBox("Include assembly-design considerations and post-experiment analysis", true);
-    wantAssemblyDesignAndAnalysis.setToolTipText ("Include entries in output report");
-    wantAssemblyDesignAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantAssemblyDesignAndAnalysis);
-    
-    JScrollPane jsp = new JScrollPane(assemblyDesignConsiderations = new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
-    p.add(jsp);
-    
-    jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
-    p.add(jsp);
-
-    wantEntityTable = new JCheckBox("Include entity definition table", true);
-    wantEntityTable.setToolTipText ("Include entries in output report");
-    wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantEntityTable);
-    
-    JPanel pp = new JPanel();
-    pp.setLayout(new BoxLayout(pp,BoxLayout.X_AXIS));
-    pp.add(Box.createHorizontalGlue());
-    pp.add(new JScrollPane(entityTable = new JTable()));
-    pp.add(Box.createHorizontalGlue());
-    pp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(pp);
-    //p.add(new JScrollPane(entityTable = new JTable()));
-    entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
-    
-    wantSimConfigImages = new JCheckBox("Include simulation configuration image", true);
-    wantSimConfigImages.setToolTipText ("Include entries in output report");
-    wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantSimConfigImages);
-    
-    JPanel imp = new JPanel();
-    imp.setLayout(new BoxLayout(imp,BoxLayout.X_AXIS));
-    imp.add(new JLabel("Configuration image: "));
-    imp.add(configImgPathTF=new JTextField(20));
-    imp.add(configImgButt=new JButton("..."));
-    configImgButt.addActionListener(new fileChoiceListener(configImgPathTF));
-    Dimension ps = configImgPathTF.getPreferredSize();
-    configImgPathTF.setMaximumSize(new Dimension(Integer.MAX_VALUE,ps.height));
-    configImgPathTF.setEditable(false);
-    imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(imp);
-
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    return p;
-  }
-
-  private void fillSimulationConfiguration()
-  {
-    wantAssemblyDesignAndAnalysis.setSelected(arb.isPrintSimConfigComments());
-    assemblyDesignConsiderations.setText(arb.getSimConfigComments());
-    assemblyDesignConsiderations.setEnabled(wantAssemblyDesignAndAnalysis.isSelected());
-
-    wantEntityTable.setSelected(arb.isPrintEntityTable());
-
-    String[][] sa = arb.getSimConfigEntityTable();
-    entityTable.setModel(new DefaultTableModel(sa,new String[]{"Entity Name","Behavior Type"}));
-    entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
-    entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
-
-    simConfigConclusions.setText(arb.getSimConfigConclusions());
-    simConfigConclusions.setEnabled(arb.isPrintSimConfigComments());
-
-    wantSimConfigImages.setSelected(arb.isPrintAssemblyImage());
-    configImgButt.setEnabled(wantSimConfigImages.isSelected());
-    configImgPathTF.setEnabled(wantSimConfigImages.isSelected());
-    configImgPathTF.setText(arb.getAssemblyImageLocation());
-  }
-
-  private void unFillSimulationConfiguration() {
-    arb.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
-    arb.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
-    arb.setSimConfigurationConclusions(simConfigConclusions.getText());
-    arb.setPrintEntityTable(wantEntityTable.isSelected());
-    arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
-    String s = configImgPathTF.getText();
-    if(s != null && s.length() > 0)
-      arb.setAssemblyImageLocation(s);
-  }
-
-  JCheckBox wantEntityParameterDescriptions;
-  JCheckBox wantEntityParameterTables;
-  JTabbedPane entityParamTabs;
-  JTextArea entityParamCommentsTA;
-  JScrollPane entityParamCommentsSP;
-
-  private JPanel makeEntityParamsPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantEntityParameterDescriptions = new JCheckBox("Include entity parameter descriptions", true);
-    wantEntityParameterDescriptions.setToolTipText ("Include entries in output report");
-    wantEntityParameterDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantEntityParameterDescriptions);
-
-    entityParamCommentsTA=new WrappingTextArea();
-    entityParamCommentsSP = new JScrollPane(entityParamCommentsTA);
-    entityParamCommentsSP.setBorder(new TitledBorder("Entity Parameters Overview"));
-    entityParamCommentsSP.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(entityParamCommentsSP);
-
-    wantEntityParameterTables = new JCheckBox("Include entity parameter tables", true);
-    wantEntityParameterTables.setToolTipText ("Include entries in output report");
-    wantEntityParameterTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantEntityParameterTables);
-    
-    // TODO: post-experiment
-    
-    entityParamTabs = new JTabbedPane(JTabbedPane.LEFT);
-    entityParamTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(entityParamTabs);
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    return p;
-  }
-
-  private void fillEntityParams()
-  {
-    wantEntityParameterDescriptions.setSelected(arb.isPrintParameterComments());
-    wantEntityParameterTables.setSelected(arb.isPrintParameterTable());
-
-    entityParamCommentsTA.setText(arb.getParameterComments());
-
-    Vector colNames = new Vector();
-    colNames.add("Category");
-    colNames.add("Name");
-    colNames.add("Description");
-
-    Vector v = arb.getParameterTables();
-
-    for(Iterator itr=v.iterator(); itr.hasNext();) {
-      Vector tableVector = new Vector();
-      Object[] oa = (Object[])itr.next();
-      String nm = (String)oa[0];
-      Vector v0 = (Vector)oa[1];
-      for(Iterator itr0=v0.iterator();itr0.hasNext();) {
-        // Rows here
-        Object[] oa0 = (Object[])itr0.next();
-        String nm0 = (String)oa0[0];
-        Vector rowVect = new Vector(3);
-        rowVect.add(nm0);
-        rowVect.add("");
-        rowVect.add("");
-        tableVector.add(rowVect);
-        Vector v1 = (Vector)oa0[1];
-        for(Iterator itr1=v1.iterator();itr1.hasNext();) {
-          rowVect = new Vector(3);
-          rowVect.add("");
-          String[] sa = (String[])itr1.next();
-          rowVect.add(sa[0]); // name
-          rowVect.add(sa[1]); // description
-          tableVector.add(rowVect);
-        }
-      }
-
-      entityParamTabs.add(nm,new JScrollPane(new EntityParamTable(tableVector,colNames)));
+        execSummTA.setLineWrap(true);
+        execSummTA.setWrapStyleWord(true);
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return p;
     }
-  }
 
-  private void unFillEntityParams()
-  {
-    arb.setPrintParameterComments(wantEntityParameterDescriptions.isSelected());
-    arb.setPrintParameterTable(wantEntityParameterTables.isSelected());
-    arb.setParameterDescription(entityParamCommentsTA.getText());
-  }
+    private void fillExecSumm() {
+        wantExecutiveSummary.setSelected(arb.isExecutiveSummaryComments());
+        execSummTA.setText(arb.getExecutiveSummary());
+        execSummTA.setEnabled(wantExecutiveSummary.isSelected());
+    }
 
-  JCheckBox doBehaviorDesignAnalysisDescriptions;
-  JCheckBox doBehaviorDescriptions;
-  JCheckBox doBehaviorImages;
-  JTextArea behaviorDescriptionTA;
-  JTextArea behaviorConclusionsTA;
-  JTabbedPane behaviorTabs;
+    private void unFillExecSumm() {
+        arb.setExecutiveSummaryComments(wantExecutiveSummary.isSelected());
+        arb.setExecutiveSummary(execSummTA.getText());
+    }
+    /************************/
+    JCheckBox wantLocationDescriptions;
+    JCheckBox wantLocationImages;
+    JTextArea locCommentsTA;
+    JTextArea locConclusionsTA;
+    JTextField simLocImgTF;
+    JButton simLocImgButt;
+    JTextField simChartImgTF;
+    JButton simChartImgButt;
 
-  private JPanel makeBehaviorsPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    doBehaviorDesignAnalysisDescriptions = new JCheckBox("Include behavior design and post-experiment analysis", true);
-    doBehaviorDesignAnalysisDescriptions.setToolTipText ("Include entries in output report");
-    doBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(doBehaviorDesignAnalysisDescriptions);
-    
-    JScrollPane jsp = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Behavior Design Descriptions"));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp);
-    
-    jsp = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Entity Behaviors"));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp);
-    
-    doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true);
-    doBehaviorDescriptions.setToolTipText ("Include entries in output report");
-    doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(doBehaviorDescriptions);
+    private JPanel makeSimulationLocationPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
+        wantLocationDescriptions.setToolTipText("Include entries in output report");
+        wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantLocationDescriptions);
 
-    doBehaviorImages = new JCheckBox("Include behavior images", true);
-    doBehaviorImages.setToolTipText ("Include entries in output report");
-    doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(doBehaviorImages);
+        JScrollPane jsp = new JScrollPane(locCommentsTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Description of Location Features"));
+        p.add(jsp);
 
-    behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
-    behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(behaviorTabs);
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    return p;
-  }
+        jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
+        p.add(jsp);
 
-  private void unFillBehaviors()
-  {
-    arb.setPrintBehaviorDefComments(doBehaviorDesignAnalysisDescriptions.isSelected());
-    arb.setBehaviorDescription(behaviorDescriptionTA.getText());
-    arb.setBehaviorConclusions(behaviorConclusionsTA.getText());
-    arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
-    arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
+        wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
+        wantLocationImages.setToolTipText("Include entries in output report");
+        wantLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantLocationImages);
+
+        JPanel imp = new JPanel();
+        imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
+        imp.add(new JLabel("Location image "));
+        imp.add(simLocImgTF = new JTextField(20));
+        imp.add(simLocImgButt = new JButton("..."));
+        simLocImgButt.addActionListener(new fileChoiceListener(simLocImgTF));
+        Dimension ps = simLocImgTF.getPreferredSize();
+        simLocImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
+        simLocImgTF.setEditable(false);
+        imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(imp);
+
+        imp = new JPanel();
+        imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
+        imp.add(new JLabel("Chart image "));
+        imp.add(simChartImgTF = new JTextField(20));
+        imp.add(simChartImgButt = new JButton("..."));
+        simChartImgButt.addActionListener(new fileChoiceListener(simChartImgTF));
+        ps = simChartImgTF.getPreferredSize();
+        simChartImgTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
+        simChartImgTF.setEditable(false);
+        imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(imp);
+
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        return p;
+    }
+
+    private void fillSimulationLocation() {
+        wantLocationDescriptions.setSelected(arb.isPrintSimLocationComments());
+        locCommentsTA.setText(arb.getSimLocationComments());
+        locCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
+        locConclusionsTA.setText(arb.getSimLocationConclusions());
+        locConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
+        wantLocationImages.setSelected(arb.isPrintSimLocationImage());
+        simLocImgTF.setEnabled(wantLocationImages.isSelected());
+        simLocImgButt.setEnabled(wantLocationImages.isSelected());
+        simChartImgTF.setEnabled(wantLocationImages.isSelected());
+        simChartImgButt.setEnabled(wantLocationImages.isSelected());
+        simLocImgTF.setText(arb.getLocationImage());
+        simChartImgTF.setText(arb.getChartImage());
+    }
+
+    private void unFillSimulationLocation() {
+        arb.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
+        arb.setSimLocationDescription(locCommentsTA.getText());
+        arb.setSimLocationConclusions(locConclusionsTA.getText());
+        arb.setPrintSimLocationImage(wantLocationImages.isSelected());
+        String s = simLocImgTF.getText().trim();
+        if (s != null & s.length() > 0) {
+            arb.setLocationImage(s);
+        }
+        if (s != null & s.length() > 0) {
+            arb.setChartImage(simChartImgTF.getText());
+        }
+    }
+
+    /************************/
+    JCheckBox wantAssemblyDesignAndAnalysis;
+    JTextArea assemblyDesignConsiderations;
+    JTextArea simConfigConclusions;
+    JCheckBox wantSimConfigImages;
+    JCheckBox wantEntityTable;
+    JTable entityTable;
+    JTextField configImgPathTF;
+    JButton configImgButt;
+
+    private JPanel makeAssemblyDesignPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantAssemblyDesignAndAnalysis = new JCheckBox("Include assembly-design considerations and post-experiment analysis", true);
+        wantAssemblyDesignAndAnalysis.setToolTipText("Include entries in output report");
+        wantAssemblyDesignAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantAssemblyDesignAndAnalysis);
+
+        JScrollPane jsp = new JScrollPane(assemblyDesignConsiderations = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
+        p.add(jsp);
+
+        jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
+        p.add(jsp);
+
+        wantEntityTable = new JCheckBox("Include entity definition table", true);
+        wantEntityTable.setToolTipText("Include entries in output report");
+        wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantEntityTable);
+
+        JPanel pp = new JPanel();
+        pp.setLayout(new BoxLayout(pp, BoxLayout.X_AXIS));
+        pp.add(Box.createHorizontalGlue());
+        pp.add(new JScrollPane(entityTable = new JTable()));
+        pp.add(Box.createHorizontalGlue());
+        pp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(pp);
+        //p.add(new JScrollPane(entityTable = new JTable()));
+        entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
+
+        wantSimConfigImages = new JCheckBox("Include simulation configuration image", true);
+        wantSimConfigImages.setToolTipText("Include entries in output report");
+        wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantSimConfigImages);
+
+        JPanel imp = new JPanel();
+        imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
+        imp.add(new JLabel("Configuration image: "));
+        imp.add(configImgPathTF = new JTextField(20));
+        imp.add(configImgButt = new JButton("..."));
+        configImgButt.addActionListener(new fileChoiceListener(configImgPathTF));
+        Dimension ps = configImgPathTF.getPreferredSize();
+        configImgPathTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
+        configImgPathTF.setEditable(false);
+        imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(imp);
+
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return p;
+    }
+
+    private void fillSimulationConfiguration() {
+        wantAssemblyDesignAndAnalysis.setSelected(arb.isPrintSimConfigComments());
+        assemblyDesignConsiderations.setText(arb.getSimConfigComments());
+        assemblyDesignConsiderations.setEnabled(wantAssemblyDesignAndAnalysis.isSelected());
+
+        wantEntityTable.setSelected(arb.isPrintEntityTable());
+
+        String[][] sa = arb.getSimConfigEntityTable();
+        entityTable.setModel(new DefaultTableModel(sa, new String[]{"Entity Name", "Behavior Type"}));
+        entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+
+        simConfigConclusions.setText(arb.getSimConfigConclusions());
+        simConfigConclusions.setEnabled(arb.isPrintSimConfigComments());
+
+        wantSimConfigImages.setSelected(arb.isPrintAssemblyImage());
+        configImgButt.setEnabled(wantSimConfigImages.isSelected());
+        configImgPathTF.setEnabled(wantSimConfigImages.isSelected());
+        configImgPathTF.setText(arb.getAssemblyImageLocation());
+    }
+
+    private void unFillSimulationConfiguration() {
+        arb.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
+        arb.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
+        arb.setSimConfigurationConclusions(simConfigConclusions.getText());
+        arb.setPrintEntityTable(wantEntityTable.isSelected());
+        arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
+        String s = configImgPathTF.getText();
+        if (s != null && s.length() > 0) {
+            arb.setAssemblyImageLocation(s);
+        }
+    }
+    JCheckBox wantEntityParameterDescriptions;
+    JCheckBox wantEntityParameterTables;
+    JTabbedPane entityParamTabs;
+    JTextArea entityParamCommentsTA;
+    JScrollPane entityParamCommentsSP;
+
+    private JPanel makeEntityParamsPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantEntityParameterDescriptions = new JCheckBox("Include entity parameter descriptions", true);
+        wantEntityParameterDescriptions.setToolTipText("Include entries in output report");
+        wantEntityParameterDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantEntityParameterDescriptions);
+
+        entityParamCommentsTA = new WrappingTextArea();
+        entityParamCommentsSP = new JScrollPane(entityParamCommentsTA);
+        entityParamCommentsSP.setBorder(new TitledBorder("Entity Parameters Overview"));
+        entityParamCommentsSP.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(entityParamCommentsSP);
+
+        wantEntityParameterTables = new JCheckBox("Include entity parameter tables", true);
+        wantEntityParameterTables.setToolTipText("Include entries in output report");
+        wantEntityParameterTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantEntityParameterTables);
+
+        // TODO: post-experiment
+
+        entityParamTabs = new JTabbedPane(JTabbedPane.LEFT);
+        entityParamTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(entityParamTabs);
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return p;
+    }
+
+    private void fillEntityParams() {
+        wantEntityParameterDescriptions.setSelected(arb.isPrintParameterComments());
+        wantEntityParameterTables.setSelected(arb.isPrintParameterTable());
+
+        entityParamCommentsTA.setText(arb.getParameterComments());
+
+        Vector colNames = new Vector();
+        colNames.add("Category");
+        colNames.add("Name");
+        colNames.add("Description");
+
+        Vector v = arb.getParameterTables();
+
+        for (Iterator itr = v.iterator(); itr.hasNext();) {
+            Vector tableVector = new Vector();
+            Object[] oa = (Object[]) itr.next();
+            String nm = (String) oa[0];
+            Vector v0 = (Vector) oa[1];
+            for (Iterator itr0 = v0.iterator(); itr0.hasNext();) {
+                // Rows here
+                Object[] oa0 = (Object[]) itr0.next();
+                String nm0 = (String) oa0[0];
+                Vector rowVect = new Vector(3);
+                rowVect.add(nm0);
+                rowVect.add("");
+                rowVect.add("");
+                tableVector.add(rowVect);
+                Vector v1 = (Vector) oa0[1];
+                for (Iterator itr1 = v1.iterator(); itr1.hasNext();) {
+                    rowVect = new Vector(3);
+                    rowVect.add("");
+                    String[] sa = (String[]) itr1.next();
+                    rowVect.add(sa[0]); // name
+                    rowVect.add(sa[1]); // description
+                    tableVector.add(rowVect);
+                }
+            }
+
+            entityParamTabs.add(nm, new JScrollPane(new EntityParamTable(tableVector, colNames)));
+        }
+    }
+
+    private void unFillEntityParams() {
+        arb.setPrintParameterComments(wantEntityParameterDescriptions.isSelected());
+        arb.setPrintParameterTable(wantEntityParameterTables.isSelected());
+        arb.setParameterDescription(entityParamCommentsTA.getText());
+    }
+    JCheckBox doBehaviorDesignAnalysisDescriptions;
+    JCheckBox doBehaviorDescriptions;
+    JCheckBox doBehaviorImages;
+    JTextArea behaviorDescriptionTA;
+    JTextArea behaviorConclusionsTA;
+    JTabbedPane behaviorTabs;
+
+    private JPanel makeBehaviorsPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        doBehaviorDesignAnalysisDescriptions = new JCheckBox("Include behavior design and post-experiment analysis", true);
+        doBehaviorDesignAnalysisDescriptions.setToolTipText("Include entries in output report");
+        doBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(doBehaviorDesignAnalysisDescriptions);
+
+        JScrollPane jsp = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
+        jsp.setBorder(new TitledBorder("Behavior Design Descriptions"));
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(jsp);
+
+        jsp = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
+        jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Entity Behaviors"));
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(jsp);
+
+        doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true);
+        doBehaviorDescriptions.setToolTipText("Include entries in output report");
+        doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(doBehaviorDescriptions);
+
+        doBehaviorImages = new JCheckBox("Include behavior images", true);
+        doBehaviorImages.setToolTipText("Include entries in output report");
+        doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(doBehaviorImages);
+
+        behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
+        behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(behaviorTabs);
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return p;
+    }
+
+    private void unFillBehaviors() {
+        arb.setPrintBehaviorDefComments(doBehaviorDesignAnalysisDescriptions.isSelected());
+        arb.setBehaviorDescription(behaviorDescriptionTA.getText());
+        arb.setBehaviorConclusions(behaviorConclusionsTA.getText());
+        arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
+        arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
 
     // tables are uneditable
-  }
-  private void fillBehaviors()
-  {
-    doBehaviorDesignAnalysisDescriptions.setSelected(arb.isPrintBehaviorDefComments());
-    behaviorDescriptionTA.setText(arb.getBehaviorComments());
-    behaviorDescriptionTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
-    behaviorConclusionsTA.setText(arb.getBehaviorConclusions());
-    behaviorConclusionsTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
-    doBehaviorImages.setEnabled(arb.isPrintEventGraphImages());
-    doBehaviorDescriptions.setSelected(arb.isPrintBehaviorDescriptions());
-    behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
-
-    List behaviorList = arb.getBehaviorList();
-
-    behaviorTabs.removeAll();
-    for(Iterator itr = behaviorList.iterator(); itr.hasNext();) {
-      List   nextBehavior = (List) itr.next();
-      String behaviorName = (String) nextBehavior.get(0);
-      String behaviorDescription= (String) nextBehavior.get(1);
-      List   behaviorParameters = (List) nextBehavior.get(2);
-      List   behaviorStateVariables = (List) nextBehavior.get(3);
-      String behaviorImagePath = (String) nextBehavior.get(4);
-
-      JPanel p = new JPanel();
-      p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-
-      JLabel lab = new JLabel("Description:  "+behaviorDescription);
-      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-      p.add(lab);
-
-      lab = new JLabel("Image location:  "+behaviorImagePath);
-      p.add(lab);
-
-      Vector cols = new Vector(3);
-      cols.add("name");cols.add("type");cols.add("description");
-
-      Vector data = new Vector(behaviorParameters.size());
-      for(int i=0;i<behaviorParameters.size();i++) {
-        String[] sa = (String[])behaviorParameters.get(i);
-        Vector row = new Vector(3);
-        row.add(sa[0]);row.add(sa[1]);row.add(sa[2]);
-        data.add(row);
-      }
-      JScrollPane jsp = new JScrollPane(new ROTable(data,cols));
-      jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-      jsp.setBorder(new TitledBorder("Parameters"));
-      p.add(jsp);
-
-      data = new Vector(behaviorStateVariables.size());
-      for(int i=0;i<behaviorStateVariables.size();i++) {
-        String[] sa = (String[])behaviorStateVariables.get(i);
-        Vector row = new Vector(3);
-        row.add(sa[0]);row.add(sa[1]);row.add(sa[2]);
-        data.add(row);
-      }
-      jsp=new JScrollPane(new ROTable(data,cols));
-      jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-      jsp.setBorder(new TitledBorder("State variables"));
-      p.add(jsp);
-
-      behaviorTabs.add(behaviorName,p);
     }
 
-  }
+    private void fillBehaviors() {
+        doBehaviorDesignAnalysisDescriptions.setSelected(arb.isPrintBehaviorDefComments());
+        behaviorDescriptionTA.setText(arb.getBehaviorComments());
+        behaviorDescriptionTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
+        behaviorConclusionsTA.setText(arb.getBehaviorConclusions());
+        behaviorConclusionsTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
+        doBehaviorImages.setEnabled(arb.isPrintEventGraphImages());
+        doBehaviorDescriptions.setSelected(arb.isPrintBehaviorDescriptions());
+        behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
 
-  JCheckBox wantStatisticsDescriptionAnalysis;
-  JCheckBox wantStatsReplications;
-  JCheckBox wantStatisticsSummary;
-  JTextArea statsComments;
-  JTextArea statsConclusions;
-  JPanel    statsSummaryPanel;
-  JPanel    statsRepPanel;
-  JScrollPane repsJsp;
-  JScrollPane summJsp;
+        List behaviorList = arb.getBehaviorList();
 
-  private JPanel makeStatisticsPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantStatisticsDescriptionAnalysis = new JCheckBox("Include statistical description and analysis", true);
-    wantStatisticsDescriptionAnalysis.setToolTipText ("Include entries in output report");
-    wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantStatisticsDescriptionAnalysis);
-    
-    JScrollPane jsp = new JScrollPane(statsComments=new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Description of Expected Results"));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp);
-    
-    jsp = new JScrollPane(statsConclusions= new WrappingTextArea());
-    jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(jsp);
+        behaviorTabs.removeAll();
+        for (Iterator itr = behaviorList.iterator(); itr.hasNext();) {
+            List nextBehavior = (List) itr.next();
+            String behaviorName = (String) nextBehavior.get(0);
+            String behaviorDescription = (String) nextBehavior.get(1);
+            List behaviorParameters = (List) nextBehavior.get(2);
+            List behaviorStateVariables = (List) nextBehavior.get(3);
+            String behaviorImagePath = (String) nextBehavior.get(4);
 
-    wantStatsReplications=new JCheckBox("Include replication statistics", true);
-    wantStatsReplications.setToolTipText ("Include entries in output report");
-    wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantStatsReplications);
+            JPanel p = new JPanel();
+            p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-    repsJsp = new JScrollPane(statsRepPanel = new JPanel());
-    repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    statsRepPanel.setLayout(new BoxLayout(statsRepPanel,BoxLayout.Y_AXIS));
-    p.add(repsJsp);
+            JLabel lab = new JLabel("Description:  " + behaviorDescription);
+            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            p.add(lab);
 
-    wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
-    wantStatisticsSummary.setToolTipText ("Include entries in output report");
-    wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantStatisticsSummary);
+            lab = new JLabel("Image location:  " + behaviorImagePath);
+            p.add(lab);
 
-    summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
-    summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel,BoxLayout.Y_AXIS));
-    p.add(summJsp);
+            Vector cols = new Vector(3);
+            cols.add("name");
+            cols.add("type");
+            cols.add("description");
 
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    return p;
-  }
+            Vector data = new Vector(behaviorParameters.size());
+            for (int i = 0; i < behaviorParameters.size(); i++) {
+                String[] sa = (String[]) behaviorParameters.get(i);
+                Vector row = new Vector(3);
+                row.add(sa[0]);
+                row.add(sa[1]);
+                row.add(sa[2]);
+                data.add(row);
+            }
+            JScrollPane jsp = new JScrollPane(new ROTable(data, cols));
+            jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            jsp.setBorder(new TitledBorder("Parameters"));
+            p.add(jsp);
 
-  private void fillStatsPan()
-  {
-    boolean bool = arb.isPrintStatsComments();
-    wantStatisticsDescriptionAnalysis.setSelected(bool);
-    statsComments.setText(arb.getStatsComments());
-    statsConclusions.setText(arb.getStatsConclusions());
-    statsComments.setEnabled(bool);
-    statsConclusions.setEnabled(bool);
+            data = new Vector(behaviorStateVariables.size());
+            for (int i = 0; i < behaviorStateVariables.size(); i++) {
+                String[] sa = (String[]) behaviorStateVariables.get(i);
+                Vector row = new Vector(3);
+                row.add(sa[0]);
+                row.add(sa[1]);
+                row.add(sa[2]);
+                data.add(row);
+            }
+            jsp = new JScrollPane(new ROTable(data, cols));
+            jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            jsp.setBorder(new TitledBorder("State variables"));
+            p.add(jsp);
 
-    bool = arb.isPrintReplicationStats();
-    wantStatsReplications.setSelected(bool);
-    bool = arb.isPrintSummaryStats();
-    wantStatisticsSummary.setSelected(bool);
-
-    List reps = arb.getStatsReplicationsList();
-    statsRepPanel.removeAll();
-    JLabel lab;
-    JScrollPane jsp;
-    JTable tab;
-
-    statsRepPanel.add(lab=new JLabel("Replication Reports"));
-    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    statsRepPanel.add(Box.createVerticalStrut(10));
-    String[] colNames = new String[]{"Run #","Count","Min","Max","Mean","Std Deviation","Variance"};
-
-    for(Iterator repItr = reps.iterator(); repItr.hasNext();) {
-      List r = (List)repItr.next();
-      String nm = (String)r.get(0);
-      String prop = (String)r.get(1);
-      statsRepPanel.add(lab=new JLabel("Entity: "+nm));
-      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-      statsRepPanel.add(lab=new JLabel("Property: "+prop));
-      lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-
-      List vals = (List)r.get(2);
-      String[][] saa = new String[vals.size()][];
-      int i=0;
-      for(Iterator r2=vals.iterator();r2.hasNext();) {
-        saa[i++]= (String[])r2.next();
-      }
-      statsRepPanel.add(jsp=new JScrollPane(tab=new ROTable(saa,colNames)));
-      tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
-      jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-      jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-
-      statsRepPanel.add(Box.createVerticalStrut(20));
-    }
-    List summs= arb.getStastSummaryList();
-
-    colNames = new String[]{"Entity","Property","Count","Min","Max","Mean","Std Deviation","Variance"};
-    String[][] saa = new String[summs.size()][];
-    int i=0;
-    for(Iterator sumItr = summs.iterator();sumItr.hasNext();) {
-      saa[i++] = (String[])sumItr.next();
-    }
-
-    statsSummaryPanel.removeAll();
-    statsSummaryPanel.add(lab = new JLabel("Summary Report"));
-    lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    statsSummaryPanel.add(Box.createVerticalStrut(10));
-
-    statsSummaryPanel.add(jsp = new JScrollPane(tab=new ROTable(saa,colNames)));
-    tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
-    jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-
-    repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
-    summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
-
-  }
-
-  private void unFillStatsPan()
-  {
-    arb.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
-    arb.setStatsDescription(statsComments.getText());
-    arb.setStatsConclusions(statsConclusions.getText());
-    arb.setPrintReplicationStats(wantStatsReplications.isSelected());
-    arb.setPrintSummaryStats(wantStatisticsSummary.isSelected());
-  }
-
-  JCheckBox wantConclusionsRecommendations;
-  JTextArea conRecConclusionsTA;
-  JTextArea conRecRecsTA;
-
-  private JPanel makeConclusionsRecommendationsPanel()
-  {
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-    wantConclusionsRecommendations = new JCheckBox("Include conclusions and recommendations", true);
-    wantConclusionsRecommendations.setToolTipText ("Include entries in output report");
-    wantConclusionsRecommendations.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    p.add(wantConclusionsRecommendations);
-    
-    JScrollPane jsp = new JScrollPane(conRecConclusionsTA=new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Conclusions"));
-    p.add(jsp);
-    
-    jsp = new JScrollPane(conRecRecsTA=new WrappingTextArea());
-    jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    jsp.setBorder(new TitledBorder("Recommendations for Future Work"));
-    p.setBorder(new EmptyBorder(10,10,10,10));
-    p.add(jsp);
-    return p;
-  }
-
-  private void fillConclusionsRecommendationsPanel()
-  {
-    boolean bool = arb.isPrintRecommendationsConclusions();
-    wantConclusionsRecommendations.setSelected(bool);
-    conRecConclusionsTA.setText(arb.getConclusions());
-    conRecConclusionsTA.setEnabled(bool);
-    conRecRecsTA.setText(arb.getRecommendations());
-    conRecRecsTA.setEnabled(bool);
-  }
-
-  private void unFillConRecPan()
-  {
-    arb.setPrintRecommendationsConclusions(wantConclusionsRecommendations.isSelected());
-    arb.setConclusions(conRecConclusionsTA.getText());
-    arb.setRecommendations(conRecRecsTA.getText());
-  }
-
-  private void saveReport()
-  {
-    saveReport(reportFile);
-  }
-
-  private void saveReport(File f)
-  {
-    try {
-      arb.writeToXMLFile(f);
-      dirty=false;
-    }
-    catch (Exception e) {
-      System.err.println("Error writing XML: "+e.getMessage());
-    }
-  }
-
-  private void doMenus()
-  {
-    myMenuBar = new JMenuBar();
-    JMenu fileMenu = new JMenu("File");
-    fileMenu.setMnemonic(KeyEvent.VK_F);
-    JMenuItem open  = new JMenuItem("Open analyst report XML");
-    open.setMnemonic(KeyEvent.VK_O);
-    JMenuItem view  = new JMenuItem("View analyst report XML");
-    view.setMnemonic(KeyEvent.VK_V);
-    view.setEnabled (false); // TODO:  implement listener and view functionality
-    JMenuItem save  = new JMenuItem("Save analyst report XML");
-    save.setMnemonic(KeyEvent.VK_S);
-    JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
-    generateViewHtml.setMnemonic(KeyEvent.VK_V);
-
-    fileMenu.add(open);
-    fileMenu.add(view);
-    fileMenu.add(save);
-    fileMenu.add(generateViewHtml);
-    myMenuBar.add(fileMenu);
-
-    open.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        if (dirty) {
-          int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
-              "Confirm", JOptionPane.WARNING_MESSAGE);
-          switch (result) {
-            case JOptionPane.YES_OPTION:
-              saveReport();
-              break;
-            case JOptionPane.CANCEL_OPTION:
-            case JOptionPane.NO_OPTION:
-            default:
-              break;
-          }
+            behaviorTabs.add(behaviorName, p);
         }
 
-        JFileChooser openChooser = new JFileChooser("./AnalystReports");
-        openChooser.setMultiSelectionEnabled(false);
-        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    }
+    JCheckBox wantStatisticsDescriptionAnalysis;
+    JCheckBox wantStatsReplications;
+    JCheckBox wantStatisticsSummary;
+    JTextArea statsComments;
+    JTextArea statsConclusions;
+    JPanel statsSummaryPanel;
+    JPanel statsRepPanel;
+    JScrollPane repsJsp;
+    JScrollPane summJsp;
 
-        int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
-        if (resp != JFileChooser.APPROVE_OPTION)
-          return;
+    private JPanel makeStatisticsPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantStatisticsDescriptionAnalysis = new JCheckBox("Include statistical description and analysis", true);
+        wantStatisticsDescriptionAnalysis.setToolTipText("Include entries in output report");
+        wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatisticsDescriptionAnalysis);
 
-        buildArb(openChooser.getSelectedFile());
-      }
-    });
+        JScrollPane jsp = new JScrollPane(statsComments = new WrappingTextArea());
+        jsp.setBorder(new TitledBorder("Description of Expected Results"));
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(jsp);
 
-    ActionListener saveAsLis = new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
-        saveChooser.setSelectedFile(reportFile);
-        saveChooser.setMultiSelectionEnabled(false);
-        saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jsp = new JScrollPane(statsConclusions = new WrappingTextArea());
+        jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(jsp);
 
-        int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
+        wantStatsReplications = new JCheckBox("Include replication statistics", true);
+        wantStatsReplications.setToolTipText("Include entries in output report");
+        wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatsReplications);
 
-        if(resp!=JFileChooser.APPROVE_OPTION)
-          return;
+        repsJsp = new JScrollPane(statsRepPanel = new JPanel());
+        repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statsRepPanel.setLayout(new BoxLayout(statsRepPanel, BoxLayout.Y_AXIS));
+        p.add(repsJsp);
 
-        unFillLayout();
+        wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
+        wantStatisticsSummary.setToolTipText("Include entries in output report");
+        wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatisticsSummary);
+
+        summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
+        summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel, BoxLayout.Y_AXIS));
+        p.add(summJsp);
+
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return p;
+    }
+
+    private void fillStatsPan() {
+        boolean bool = arb.isPrintStatsComments();
+        wantStatisticsDescriptionAnalysis.setSelected(bool);
+        statsComments.setText(arb.getStatsComments());
+        statsConclusions.setText(arb.getStatsConclusions());
+        statsComments.setEnabled(bool);
+        statsConclusions.setEnabled(bool);
+
+        bool = arb.isPrintReplicationStats();
+        wantStatsReplications.setSelected(bool);
+        bool = arb.isPrintSummaryStats();
+        wantStatisticsSummary.setSelected(bool);
+
+        List reps = arb.getStatsReplicationsList();
+        statsRepPanel.removeAll();
+        JLabel lab;
+        JScrollPane jsp;
+        JTable tab;
+
+        statsRepPanel.add(lab = new JLabel("Replication Reports"));
+        lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statsRepPanel.add(Box.createVerticalStrut(10));
+        String[] colNames = new String[]{"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+
+        for (Iterator repItr = reps.iterator(); repItr.hasNext();) {
+            List r = (List) repItr.next();
+            String nm = (String) r.get(0);
+            String prop = (String) r.get(1);
+            statsRepPanel.add(lab = new JLabel("Entity: " + nm));
+            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            statsRepPanel.add(lab = new JLabel("Property: " + prop));
+            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+            List vals = (List) r.get(2);
+            String[][] saa = new String[vals.size()][];
+            int i = 0;
+            for (Iterator r2 = vals.iterator(); r2.hasNext();) {
+                saa[i++] = (String[]) r2.next();
+            }
+            statsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+            tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
+            jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+            jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+            statsRepPanel.add(Box.createVerticalStrut(20));
+        }
+        List summs = arb.getStastSummaryList();
+
+        colNames = new String[]{"Entity", "Property", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+        String[][] saa = new String[summs.size()][];
+        int i = 0;
+        for (Iterator sumItr = summs.iterator(); sumItr.hasNext();) {
+            saa[i++] = (String[]) sumItr.next();
+        }
+
+        statsSummaryPanel.removeAll();
+        statsSummaryPanel.add(lab = new JLabel("Summary Report"));
+        lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statsSummaryPanel.add(Box.createVerticalStrut(10));
+
+        statsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+        tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
+        jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+
+        repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+
+    }
+
+    private void unFillStatsPan() {
+        arb.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
+        arb.setStatsDescription(statsComments.getText());
+        arb.setStatsConclusions(statsConclusions.getText());
+        arb.setPrintReplicationStats(wantStatsReplications.isSelected());
+        arb.setPrintSummaryStats(wantStatisticsSummary.isSelected());
+    }
+    JCheckBox wantConclusionsRecommendations;
+    JTextArea conRecConclusionsTA;
+    JTextArea conRecRecsTA;
+
+    private JPanel makeConclusionsRecommendationsPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        wantConclusionsRecommendations = new JCheckBox("Include conclusions and recommendations", true);
+        wantConclusionsRecommendations.setToolTipText("Include entries in output report");
+        wantConclusionsRecommendations.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantConclusionsRecommendations);
+
+        JScrollPane jsp = new JScrollPane(conRecConclusionsTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Conclusions"));
+        p.add(jsp);
+
+        jsp = new JScrollPane(conRecRecsTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Recommendations for Future Work"));
+        p.setBorder(new EmptyBorder(10, 10, 10, 10));
+        p.add(jsp);
+        return p;
+    }
+
+    private void fillConclusionsRecommendationsPanel() {
+        boolean bool = arb.isPrintRecommendationsConclusions();
+        wantConclusionsRecommendations.setSelected(bool);
+        conRecConclusionsTA.setText(arb.getConclusions());
+        conRecConclusionsTA.setEnabled(bool);
+        conRecRecsTA.setText(arb.getRecommendations());
+        conRecRecsTA.setEnabled(bool);
+    }
+
+    private void unFillConRecPan() {
+        arb.setPrintRecommendationsConclusions(wantConclusionsRecommendations.isSelected());
+        arb.setConclusions(conRecConclusionsTA.getText());
+        arb.setRecommendations(conRecRecsTA.getText());
+    }
+
+    private void saveReport() {
         saveReport(reportFile);
-        String outFile = reportFile.getAbsolutePath();
-        int idx = outFile.lastIndexOf(".");
+    }
 
-        outFile = outFile.substring(0,idx) + ".html";
-        XsltUtility.runXslt(reportFile.getAbsolutePath(),
-            outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
-        
+    private void saveReport(File f) {
+        try {
+            arb.writeToXMLFile(f);
+            dirty = false;
+        } catch (Exception e) {
+            log.error(e);
+        }
+    }
+
+    private void doMenus() {
+        myMenuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        JMenuItem open = new JMenuItem("Open analyst report XML");
+        open.setMnemonic(KeyEvent.VK_O);
+        JMenuItem view = new JMenuItem("View analyst report XML");
+        view.setMnemonic(KeyEvent.VK_V);
+        view.setEnabled(false); // TODO:  implement listener and view functionality
+        JMenuItem save = new JMenuItem("Save analyst report XML");
+        save.setMnemonic(KeyEvent.VK_S);
+        JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
+        generateViewHtml.setMnemonic(KeyEvent.VK_V);
+
+        fileMenu.add(open);
+        fileMenu.add(view);
+        fileMenu.add(save);
+        fileMenu.add(generateViewHtml);
+        myMenuBar.add(fileMenu);
+
+        open.addActionListener(new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        if (dirty) {
+                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
+                                    "Confirm", JOptionPane.WARNING_MESSAGE);
+                            switch (result) {
+                                case JOptionPane.YES_OPTION:
+                                    saveReport();
+                                    break;
+                                case JOptionPane.CANCEL_OPTION:
+                                case JOptionPane.NO_OPTION:
+                                default:
+                                    break;
+                            }
+                        }
+
+                        JFileChooser openChooser = new JFileChooser("./AnalystReports");
+                        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                        int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
+                        if (resp != JFileChooser.APPROVE_OPTION) {
+                            return;
+                        }
+
+                        buildArb(openChooser.getSelectedFile());
+                    }
+                });
+
+        ActionListener saveAsLis = new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
+                        saveChooser.setSelectedFile(reportFile);
+                        saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                        int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
+
+                        if (resp != JFileChooser.APPROVE_OPTION) {
+                            return;
+                        }
+
+                        unFillLayout();
+
+                        // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
+                        reportFile = saveChooser.getSelectedFile();
+                        saveReport(reportFile);
+                        String outFile = reportFile.getAbsolutePath();
+                        int idx = outFile.lastIndexOf(".");
+
+                        outFile = outFile.substring(0, idx) + ".html";
+                        XsltUtility.runXslt(reportFile.getAbsolutePath(),
+                                outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
+
+                        // pop up the system html viewer, or send currently running browser to html page
+                        try {
+                            viskit.util.BareBonesBrowserLaunch.openURL((new File(outFile)).toURI().toURL().toString());
+                        } catch (java.net.MalformedURLException mue) {
+                            log.error(mue);
+                        }
+                    }
+                };
+        save.addActionListener(saveAsLis);
+
+        ActionListener generateViewHtmlListener = new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        if (dirty) {
+                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
+                                    "Confirm", JOptionPane.WARNING_MESSAGE);
+                            switch (result) {
+                                case JOptionPane.YES_OPTION:
+                                    saveReport();
+                                    break;
+                                case JOptionPane.CANCEL_OPTION:
+                                case JOptionPane.NO_OPTION:
+                                default:
+                                    break;
+                            }
+                        }
+
+                        String outFile = reportFile.getAbsolutePath();
+                        int idx = outFile.lastIndexOf(".");
+
+                        outFile = outFile.substring(0, idx) + ".html";
+
+                        JFileChooser genChooser = new JFileChooser("./AnalystReports");
+                        genChooser.setSelectedFile(new File(outFile));
+                        genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
+
+                        if (resp == JFileChooser.APPROVE_OPTION) {
+                            XsltUtility.runXslt(reportFile.getAbsolutePath(),
+                                    genChooser.getSelectedFile().getAbsolutePath(),
+                                    "AnalystReports/AnalystReportXMLtoHTML.xslt");
+                        }
+                        showHtmlViewer(genChooser.getSelectedFile());
+
+                    }
+                };
+        generateViewHtml.addActionListener(generateViewHtmlListener);
+    }
+
+    private void showHtmlViewer(File f) {
+        String errMsg = null;
         // pop up the system html viewer, or send currently running browser to html page
         try {
-            viskit.util.BareBonesBrowserLaunch.openURL( (new File(outFile)).toURI().toURL().toString() );
+            viskit.util.BareBonesBrowserLaunch.openURL(f.toURI().toURL().toString());
         } catch (java.net.MalformedURLException mue) {
-            System.out.println(outFile + " : malformed path error.");
-        }
-      }
-    };
-    save.addActionListener(saveAsLis);
-
-    ActionListener generateViewHtmlListener = new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        if (dirty) {
-          int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
-              "Confirm", JOptionPane.WARNING_MESSAGE);
-          switch (result) {
-            case JOptionPane.YES_OPTION:
-              saveReport();
-              break;
-            case JOptionPane.CANCEL_OPTION:
-            case JOptionPane.NO_OPTION:
-            default:
-              break;
-          }
+            errMsg = f + " : malformed path error.";
         }
 
-        String outFile = reportFile.getAbsolutePath();
-        int idx = outFile.lastIndexOf(".");
-
-        outFile = outFile.substring(0,idx) + ".html";
-
-        JFileChooser genChooser = new JFileChooser("./AnalystReports");
-        genChooser.setSelectedFile(new File(outFile));
-        genChooser.setMultiSelectionEnabled(false);
-        genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
-
-        if(resp == JFileChooser.APPROVE_OPTION)
-            XsltUtility.runXslt(reportFile.getAbsolutePath(),
-                                genChooser.getSelectedFile().getAbsolutePath(),
-                                "AnalystReports/AnalystReportXMLtoHTML.xslt");
-        showHtmlViewer(genChooser.getSelectedFile());
-
-      }
-    };
-    generateViewHtml.addActionListener(generateViewHtmlListener);
-  }
-
-  private void showHtmlViewer(File f) {
-      String errMsg = null;
-      // pop up the system html viewer, or send currently running browser to html page
-      try {
-          viskit.util.BareBonesBrowserLaunch.openURL( f.toURI().toURL().toString() );
-      } catch (java.net.MalformedURLException mue) {
-          errMsg = f + " : malformed path error.";
-      }
-      
-      if(errMsg != null)
-          JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+errMsg,"Error",JOptionPane.ERROR_MESSAGE);
-/*
+        if (errMsg != null) {
+            JOptionPane.showMessageDialog(this, "<html><center>Error displaying HTML:<br>" + errMsg, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    /*
 
     JFrame fr = new JFrame("Analyst Report -- "+f.getPath());
     fr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1061,102 +1043,98 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
       JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
     }
 */
-  }
-
-  class fileChoiceListener implements ActionListener
-  {
-    JTextField tf;
-    fileChoiceListener(JTextField tf)
-    {
-      this.tf = tf;
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-      int resp = locationImageFileChooser.showOpenDialog(AnalystReportPanel.this);
-      if(resp == JFileChooser.APPROVE_OPTION) {
-         tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
-      }
+    class fileChoiceListener implements ActionListener {
+
+        JTextField tf;
+
+        fileChoiceListener(JTextField tf) {
+            this.tf = tf;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int resp = locationImageFileChooser.showOpenDialog(AnalystReportPanel.this);
+            if (resp == JFileChooser.APPROVE_OPTION) {
+                tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
+            }
+        }
     }
-  }
+    private TitleListener titlList;
+    private int titlkey;
 
-  private TitleListener titlList;
-  private int titlkey;
-  public void setTitleListener(TitleListener lis, int key)
-  {
-    titlList = lis;
-    titlkey = key;
-    doTitle(null);
-  }
+    public void setTitleListener(TitleListener lis, int key) {
+        titlList = lis;
+        titlkey = key;
+        doTitle(null);
+    }
+    private String namePrefix = "Viskit Analyst Report Editor";
+    private String currentTitle = namePrefix;
 
-  private String namePrefix = "Viskit Analyst Report Editor";
-  private String currentTitle = namePrefix;
-  private void doTitle(String nm)
-  {
-    if(nm != null && nm.length()>0)
-      currentTitle = namePrefix +": "+nm;
+    private void doTitle(String nm) {
+        if (nm != null && nm.length() > 0) {
+            currentTitle = namePrefix + ": " + nm;
+        }
 
-    if(titlList != null)
-      titlList.setTitle(currentTitle,titlkey);
-  }
+        if (titlList != null) {
+            titlList.setTitle(currentTitle, titlkey);
+        }
+    }
 }
 
-class WrappingTextArea extends JTextArea
-{
-  WrappingTextArea()
-  {
-    super(4,20);
-    setLineWrap(true);
-    setWrapStyleWord(true);
-  }
+class WrappingTextArea extends JTextArea {
+
+    WrappingTextArea() {
+        super(4, 20);
+        setLineWrap(true);
+        setWrapStyleWord(true);
+    }
 }
 
-class ROTable extends JTable
-{
-  ROTable(Vector v, Vector c)
-  {
-    super(v,c);
-  }
-  ROTable(Object[][]oa, Object[]cols)
-  {
-    super(oa,cols);
-  }
-  
-  @Override
-  public boolean isCellEditable(int row, int column)
-  {
-    return false;
-  }
+class ROTable extends JTable {
+
+    ROTable(Vector v, Vector c) {
+        super(v, c);
+    }
+
+    ROTable(Object[][] oa, Object[] cols) {
+        super(oa, cols);
+    }
+
+    @Override
+  public boolean isCellEditable(int row, int column) {
+        return false;
+    }
 }
 
-class EntityParamTable extends ROTable implements TableCellRenderer
-{
-  TableCellRenderer defRenderer;
-  EntityParamTable(Vector v, Vector c)
-  {
-    super(v,c);
-    defRenderer = new DefaultTableCellRenderer();
+class EntityParamTable extends ROTable implements TableCellRenderer {
 
-    TableColumn tc = getColumnModel().getColumn(0);
-    tc.setCellRenderer(this);
-  }
+    TableCellRenderer defRenderer;
 
-  Color grey = new Color(204,204,204);
-  Color origBkgd;
-  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-  {
-    Component c = defRenderer.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
-    if(origBkgd == null)
-      origBkgd = c.getBackground();
-    Object o0 = getValueAt(row,0);
-    Object o1 = getValueAt(row,1);
-    Object o2 = getValueAt(row,2);
+    EntityParamTable(Vector v, Vector c) {
+        super(v, c);
+        defRenderer = new DefaultTableCellRenderer();
 
-    if(o0 != null && (o1==null || ((String)o1).length()<=0) && ((o2 == null || ((String)o2).length()<=0)))
-      c.setBackground(grey);
-    else
-      c.setBackground(origBkgd);
-    return c;
-  }
+        TableColumn tc = getColumnModel().getColumn(0);
+        tc.setCellRenderer(this);
+    }
+    Color grey = new Color(204, 204, 204);
+    Color origBkgd;
 
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        Component c = defRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (origBkgd == null) {
+            origBkgd = c.getBackground();
+        }
+        Object o0 = getValueAt(row, 0);
+        Object o1 = getValueAt(row, 1);
+        Object o2 = getValueAt(row, 2);
+
+        if (o0 != null && (o1 == null || ((String) o1).length() <= 0) && ((o2 == null || ((String) o2).length() <= 0))) {
+            c.setBackground(grey);
+        } else {
+            c.setBackground(origBkgd);
+        }
+        return c;
+    }
 }
