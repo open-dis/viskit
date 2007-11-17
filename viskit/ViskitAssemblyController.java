@@ -58,6 +58,11 @@ public interface ViskitAssemblyController
   void quit();
   void save();
   void saveAs();
+  
+  // Bug fix: 1195
+  void close();
+  boolean preClose();
+  void postClose();     
 
   void settings();
 

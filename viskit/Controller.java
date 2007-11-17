@@ -383,30 +383,28 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitView)getView()).genericErrorReport(title,msg);
   }
 
-  public void close()
-  {
-    if(preClose())
-      postClose();
-  }
+    public void close() {
+        if (preClose()) {postClose();}
+    }
 
-  public boolean preClose()
-  {
-    Model mod = (Model)getModel();
-    if (mod.isDirty())
-      if(!askToSaveAndContinue())
-        return false;
-     return true;
-  }
+    public boolean preClose() {
+        Model mod = (Model) getModel();
+        if (mod == null) {return false;}
+        if (mod.isDirty()) {
+            if (!askToSaveAndContinue()) {return false;}
+        }
+        return true;
+    }
 
-  public void postClose()
-  {
-    Model mod = (Model)getModel();
+    public void postClose() {
+        Model mod = (Model) getModel();
 
-    ((ViskitView)getView()).delTab(mod);
+        ((ViskitView) getView()).delTab(mod);
 
-    if(mod.getLastFile() != null)
-      fileWatchClose(mod.getLastFile());
-  }
+        if (mod.getLastFile() != null) {
+            fileWatchClose(mod.getLastFile());
+        }
+    }
 
   public void closeAll()
   {
@@ -632,6 +630,7 @@ public class Controller extends mvcAbstractController implements ViskitControlle
     ((ViskitModel)getModel()).deleteStateVariable(var);
   }
 
+  // TODO: This will throw a null pointer if no Event Graph is loaded
   private boolean checkSave()
   {
     if(((ViskitModel)getModel()).isDirty() || ((ViskitModel)getModel()).getLastFile() == null) {
