@@ -27,16 +27,24 @@
     <!-- Attempt to establish an incremental counter variable -->
     <!-- From: http://osdir.com/ml/text.xml.xalan.java.user/2006-05/msg00014.html -->
     <xsl:variable name="javaCounter" select="java:java.util.ArrayList.new()"/>    
-    <xsl:template match="/">
+    <xsl:template match="/">               
         <html>
+            <xsl:comment>
+                <xsl:text>Generated using XSLT processor: </xsl:text>
+                <xsl:value-of select="system-property('xsl:vendor')"/>
+            </xsl:comment> 
             <head>
                 <meta http-equiv="Content-Language" content="en-us"/>
                 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
                 <title>Viskit Simulation Analysis Report</title>
+                <style type="text/css">
+                    <!-- Limit the width of the entire HTML page to be printer friendly -->
+                    body {width: 1024px} 
+                </style>
             </head>
             <body>
                 <!-- Link anchor for the top of the page -->
-                <a name="top"></a>
+                <a name="top"/>
                 <!--Title information-->
                 <xsl:apply-templates select="/AnalystReport"/>
                 <!-- Bookmarks for various sections of the report -->
@@ -54,7 +62,7 @@
                     </p>
                 </center>
                 <hr/>
-                <!--Executive Summary : NOTE: omitted if analyst did not include comments  -->
+                <!--Executive Summary: NOTE - omitted if analyst did not include comments  -->
                 <xsl:apply-templates select="//ExecutiveSummary"/>
                 <p/>
                 <p/>
@@ -223,6 +231,11 @@
                             <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
+                        
+                        <!-- Clamp the width of potentially big chart images -->
+                        <xsl:attribute name="width">
+                            <xsl:text>800px</xsl:text>
+                        </xsl:attribute>
                         <xsl:attribute name="description">
                             <!-- TODO:  more info here -->
                             <xsl:text>location</xsl:text>
@@ -353,12 +366,12 @@
   </xsl:template>
   -->
 
-    <!--Entity Parameter Tables-->
+    <!-- Entity Parameter Tables -->
     <xsl:template match="EntityParameterTable">
         <p/>
         <p/>
         <p/>
-        <xsl:text>Simulation Parameters for </xsl:text>
+        <xsl:text>Simulation Parameters for initializing </xsl:text>
         <b>
             <a>
                 <xsl:attribute name="name">
@@ -370,27 +383,24 @@
         <!--  TODO:  add uniquely identifying information for this header -->
         <table border="1" width="75%" cellpadding="0" cellspacing="1">
             
-            <!--Classification Values -->
+            <!-- Classification Values -->
             <xsl:for-each select="Classification">
                 <tr>
                     <td width="132" bgcolor="#CCCCCC">Classification</td>
-                    <td width="132"></td>
-                    <td width="190"></td>
-                    <!--
-              <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-              <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-          -->
+                    <td width="132" bgcolor="#CCCCCC"/>
+                    <td width="190" bgcolor="#CCCCCC"/>
+                    <td width="132" bgcolor="#CCCCCC">Candidate Factor</td>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"></td>
-                        <!--	<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
+                        <td width="132"/>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
                             <xsl:value-of select="@value"/>
                         </td>
+                        <td width="132"/>
                     </tr>
                 </xsl:for-each>
             </xsl:for-each>
@@ -399,23 +409,20 @@
             <xsl:for-each select="Identification">
                 <tr>
                     <td width="132" bgcolor="#CCCCCC">Identification</td>
-                    <td width="132"></td>
-                    <td width="190"></td>
-                    <!--
-              <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-              <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-          -->
+                    <td width="132" bgcolor="#CCCCCC"/>
+                    <td width="190" bgcolor="#CCCCCC"/>
+                    <td width="132" bgcolor="#CCCCCC"/>                    
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"></td>
-                        <!--<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
+                        <td width="132"/>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
                             <xsl:value-of select="@value"/>
                         </td>
+                        <td width="132"/>
                     </tr>
                 </xsl:for-each>
             </xsl:for-each>
@@ -424,48 +431,42 @@
             <xsl:for-each select="PhysicalConstraints">
                 <tr>
                     <td width="132" bgcolor="#CCCCCC">Physical Constraints</td>
-                    <td width="132"></td>
-                    <td width="190"></td>
-                    <!--
-              <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-              <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-          -->
+                    <td width="132" bgcolor="#CCCCCC"/>
+                    <td width="190" bgcolor="#CCCCCC"/>
+                    <td width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"></td>
-                        <!--	<td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>-->
+                        <td width="132"/>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
                             <xsl:value-of select="@value"/>
                         </td>
+                        <td width="132"/>
                     </tr>
                 </xsl:for-each>
             </xsl:for-each>
             
-            <!--Dynamic Response Constraints -->
+            <!-- Dynamic Response Constraints -->
             <xsl:for-each select="DynamicResponseConstraints">
                 <tr>
                     <td width="132" bgcolor="#CCCCCC">Dynamic Response Constraints</td>
-                    <td width="132"></td>
-                    <td width="190"></td>
-                    <!--
-              <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-              <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-          -->
+                    <td width="132" bgcolor="#CCCCCC"/>
+                    <td width="190" bgcolor="#CCCCCC"/>
+                    <td width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
                         <td width="132"></td>
-                        <!--td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td-->
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
                             <xsl:value-of select="@value"/>
                         </td>
+                        <td width="132"></td>
                     </tr>
                 </xsl:for-each>
             </xsl:for-each>
@@ -474,23 +475,20 @@
             <xsl:for-each select="TacticalConstraints">
                 <tr>
                     <td width="132" bgcolor="#CCCCCC">Tactical Constraints</td>
-                    <td width="132"></td>
-                    <td width="190"></td>
-                    <!--
-              <td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-              <td width="190"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td>
-          -->
+                    <td width="132" bgcolor="#CCCCCC"/>
+                    <td width="190" bgcolor="#CCCCCC"/>
+                    <td width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
                         <td width="132"></td>
-                        <!--td width="132"><xsl:text disable-output-escaping="yes">&nbsp;</xsl:text></td-->
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
                             <xsl:value-of select="@value"/>
                         </td>
+                        <td width="132"></td>
                     </tr>
                 </xsl:for-each>
             </xsl:for-each>
@@ -629,7 +627,7 @@
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
-    <!--Statistical Results -->
+    <!-- Statistical Results -->
     <xsl:template match="SRComments" mode="StatsHeader">
         <p align="left">
             <b><a name="StatisticalResults">Statistical Results</a></b>
@@ -651,7 +649,7 @@
     </xsl:template>
     <xsl:template match="SimEntity" mode="RepStats">
                 
-        <!-- Capture this Entity's name for the Figure Caption -->
+        <!-- Capture this Entity's name for its Figure Caption -->
         <xsl:variable name="entityProperty" select="@property"/>
         <p/>
         <p align="left">            
