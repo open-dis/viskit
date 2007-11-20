@@ -870,7 +870,6 @@ public class VGlobals {
 
         public void doSysExit(int status) {
 
-//            System.exit(status);
             log.debug("Viskit is exiting with status: " + status);
 
             /* If an application launched a JVM, and is still running, this will

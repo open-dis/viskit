@@ -10,14 +10,9 @@
 
 package viskit.doe;
 
-import viskit.doe.DoeRunDriver;
-import viskit.doe.DoeSessionDriver;
-
 /**
  *
  * @author Rick Goldberg
  *
  */
-public interface DoeDriver extends DoeSessionDriver, DoeRunDriver {
-    
-}
+public interface DoeDriver extends DoeSessionDriver, DoeRunDriver {}

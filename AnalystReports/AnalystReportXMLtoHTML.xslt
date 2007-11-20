@@ -245,7 +245,7 @@
             
                 <!-- add an index to the array -->
                 <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Digital Nautical Chart View of Study Area</p>
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Digital Nautical Chart (DNC) View of Study Area</p>
             </div>
             <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
         </xsl:if>
