@@ -130,7 +130,6 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case EXIT_APP:
                 if (preQuit()) {
                     postQuit();
-                    VGlobals.instance().sysExit(0);
                 }
                 break;
 
@@ -142,11 +141,10 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     public boolean preQuit() {
         return (checkDirty() != JOptionPane.CANCEL_OPTION);
-
     }
 
     public void postQuit() {
-    //VGlobals.instance().sysExit(0); //System.exit(0);
+        VGlobals.instance().sysExit(0);
     }
 
     private int checkDirty() {
