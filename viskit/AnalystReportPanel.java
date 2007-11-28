@@ -122,7 +122,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         return myMenuBar;
     }
 
-    /** Called from the InternalAssemblyRunner when the temp Analysts report is
+    /** Called from the InternalAssemblyRunner when the temp Analyst report is
      * filled out and ready to copy
      * @param path the path to the temp Analyst Report that will be copied
      */
@@ -131,9 +131,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         log.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File anDir = new File("./AnalystReports");
-        if (!anDir.exists()) {
-            anDir.mkdirs();
+        File aRDir = new File("./AnalystReports");
+        if (!aRDir.exists()) {
+            aRDir.mkdirs();
         }
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
@@ -142,7 +142,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         String usr = System.getProperty("user.name");
         String outputFile = (usr + "AnalystReport_" + output + ".xml");
 
-        File targetFile = new File(anDir, outputFile);
+        File targetFile = new File(aRDir, outputFile);
         try {
             FileIO.copyFile(srcFil, targetFile, true);
             srcFil.deleteOnExit();

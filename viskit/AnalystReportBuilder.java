@@ -97,8 +97,10 @@ public class AnalystReportBuilder {
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
         this.aRPanel = aRPanel;
         parseXML(xmlFile);
-        if(assyFile != null)
+        if(assyFile != null) {
             setAssemblyFile(assyFile);
+            postProcessing();
+        }
     }
     
     /** Build an AnalystReport object from an existing statisticsReport document
@@ -955,25 +957,27 @@ public class AnalystReportBuilder {
         } catch (Exception e) {log.error("Error processing assemblyFile " + e);}
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
-
-        // TODO: move these routines to a "post generation" method
+    } 
+    
+    /** Post Analyst Report processing steps to take */
+    public void postProcessing() {
         JProgressBar jpb = new JProgressBar();
         jpb.setIndeterminate(true);
         jpb.setString("Analyst Report now generating");
         jpb.setStringPainted(true);
+
         aRPanel.add(jpb);
         aRPanel.validate();
 
-        /* Appears to be the best place for these calls as all the behaviors and
-         * the corresponding Assemby and image paths should be captured
-         */
         captureEventGraphImages();
         captureAssemblyImage();
         captureLocationImage();
+        
         jpb.setIndeterminate(false);
         jpb.setStringPainted(false);
+        
         announceReportReadyToView();
-    } 
+    }
     
     /** Utility method used here to invoke the capability to capture all Event 
      * Graph images of which are situated in a particular Assembly File.  These
