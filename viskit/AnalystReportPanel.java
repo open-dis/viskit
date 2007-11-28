@@ -74,9 +74,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     private File reportFile;
 
     /** 
-   * TODO: rewire this functionality?
-   * boolean to show that raw report has not been saved to AnalystReports 
-   */
+     * TODO: rewire this functionality?
+     * boolean to show that raw report has not been saved to AnalystReports 
+     */
     private boolean dirty = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
@@ -110,7 +110,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 break;
 
             default:
-                System.err.println("Program error InternalAssemblyRunner.assyChanged");
+                log.error("Program error InternalAssemblyRunner.assyChanged");
         }
     }
 
@@ -159,7 +159,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         try {
             String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
             log.debug("Current Assembly file: " + assyFile);
-            arbLocal = new AnalystReportBuilder(targetFile, assyFile);
+            arbLocal = new AnalystReportBuilder(this, targetFile, assyFile);
         } catch (Exception e) {
             System.err.println("Error parsing analyst report: " + e.getMessage());
             return;
@@ -1015,34 +1015,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         if (errMsg != null) {
             JOptionPane.showMessageDialog(this, "<html><center>Error displaying HTML:<br>" + errMsg, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    /*
-
-    JFrame fr = new JFrame("Analyst Report -- "+f.getPath());
-    fr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    //fr.setSize(640,480);
-
-    Container con = fr.getContentPane();
-    con.setLayout(new BorderLayout());
-
-    JEditorPane jtp = new JEditorPane();
-    jtp.setEditable(false);
-    try {
-      URL url = new URL("file","localhost",f.getAbsolutePath());
-      jtp.setPage(url);
-
-      JScrollPane jsp = new JScrollPane(jtp);
-      jsp.setMinimumSize(new Dimension(10,10));
-      jsp.setPreferredSize(new Dimension(640,480));
-      con.add(jsp,BorderLayout.CENTER);
-      fr.pack();
-      fr.setLocation(300,300);
-      fr.setVisible(true);
-    }
-    catch (IOException e) {
-      JOptionPane.showMessageDialog(this,"<html><center>Error displaying HTML:<br>"+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-    }
-*/
+        }    
     }
 
     class fileChoiceListener implements ActionListener {

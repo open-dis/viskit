@@ -11,6 +11,10 @@ import java.net.URL;
 import java.util.*;
 import java.text.DateFormat;
 
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+
 import org.apache.log4j.Logger;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
@@ -69,7 +73,10 @@ public class AnalystReportBuilder {
     private Element entityParameters;
     private Element behaviorDescriptions;
     private Element statisticalResults;
-    private Element concRec;    
+    private Element concRec;
+
+    /** Reference to the Analyst Report JPanel for JProgressBar */
+    private JPanel aRPanel;
     
     public static void main(String[] args) {
         new AnalystReportBuilder();
@@ -83,17 +90,20 @@ public class AnalystReportBuilder {
     
     /**
      * Build an analystReport object from an existing XML file
+     * @param aRPanel a reference to the Analyst Report JPanel
      * @param xmlFile an existing temp Analyst Report
      * @param assyFile the current assembly file to process a report from
      */
-    public AnalystReportBuilder(File xmlFile, String assyFile) throws Exception {
+    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
+        this.aRPanel = aRPanel;
         parseXML(xmlFile);
         if(assyFile != null)
             setAssemblyFile(assyFile);
     }
     
-    /**
-     * Build an AnalystReport object from an existing statisticsReport document
+    /** Build an AnalystReport object from an existing statisticsReport document
+     * @param statisticsReportPath the path to the statistics generated report
+     *        used by this Analyst Report 
      */
     public AnalystReportBuilder(String statisticsReportPath) {
         try {
@@ -101,12 +111,12 @@ public class AnalystReportBuilder {
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
-            System.err.println("Exception reading "+statisticsReportPath + " : "+e.getMessage());
+            log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         initDocument();
         setDefaultValues();
     }
-    
+
     private void initDocument() {
         reportJdomDocument = new Document();
         rootElement = new Element("AnalystReport");
@@ -242,7 +252,6 @@ public class AnalystReportBuilder {
             behaviorDescriptions.addContent(processBehaviors(true, true, true));
         } catch (Exception e) {
             log.error(e);
-            e.printStackTrace();
         }
         
         rootElement.removeChild("BehaviorDescriptions");
@@ -356,7 +365,10 @@ public class AnalystReportBuilder {
         rootElement.addContent(concRec);
     }
     
-    /** Creates Behavior definition references in the analyst report template 
+    /** Creates Behavior definition references in the analyst report template
+     * @param descript if true, show description text
+     * @param image if true, show all images
+     * @param details if true, show all details text
      * @return a table of scenario Event Graph Behaviors
      */
     private Element processBehaviors(boolean descript, boolean image, boolean details) throws Exception {
@@ -932,7 +944,9 @@ public class AnalystReportBuilder {
     public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
     public String     getReportName()            { return rootElement.getAttributeValue("name"); }
     
-    public void setAssemblyDocument  (Document assemblyDocument) { this.assemblyDocument = assemblyDocument; }
+    public void setAssemblyDocument(Document assemblyDocument) {
+        this.assemblyDocument = assemblyDocument;
+    }
     
     public void setAssemblyFile(String assyFile) {
         assemblyFile = assyFile;
@@ -941,13 +955,24 @@ public class AnalystReportBuilder {
         } catch (Exception e) {log.error("Error processing assemblyFile " + e);}
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
-        
+
+        // TODO: moves these routines to a "post generation" method
+        JProgressBar jpb = new JProgressBar();
+        jpb.setIndeterminate(true);
+        jpb.setString("Analyst Report now generating");
+        jpb.setStringPainted(true);
+        aRPanel.add(jpb);
+        aRPanel.validate();
+
         /* Appears to be the best place for these calls as all the behaviors and
-         * the corresponding Assemby paths should be captured
+         * the corresponding Assemby and image paths should be captured
          */
         captureEventGraphImages();
         captureAssemblyImage();
         captureLocationImage();
+        jpb.setIndeterminate(false);
+        jpb.setStringPainted(false);
+        announceReportReadyToView();
     } 
     
     /** Utility method used here to invoke the capability to capture all Event 
@@ -970,6 +995,15 @@ public class AnalystReportBuilder {
         VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
     }
     
+    private void announceReportReadyToView() {
+        JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
+                "The Analyst Report has been generated/loaded and is now " +
+                "ready to be displayed.<br>To view in HTML, select File -> " +
+                "Save analyst report XML -> rename if desired -> Save" +
+                "</p></body></html>", "Analyst Report Ready to View", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
     /** If a 2D top town image was generated from SavageStudio, then point to 
      *  this location
      */
@@ -989,8 +1023,6 @@ public class AnalystReportBuilder {
     }
     
     public void setFileName          (String fileName)           { this.fileName = fileName; }
-    //public void setReportJdomDocument(Document doc)              { this.reportJdomDocument = doc; }
-    //public void setRootElement       (Element el)                { this.rootElement = el; }
     public void setStatsReport       (Document statsReport)      { this.statsReport = statsReport; }
     public void setStatsReportPath   (String filename)           { this.statsReportPath = filename; }
     public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
