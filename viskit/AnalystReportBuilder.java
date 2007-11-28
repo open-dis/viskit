@@ -956,7 +956,7 @@ public class AnalystReportBuilder {
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
 
-        // TODO: moves these routines to a "post generation" method
+        // TODO: move these routines to a "post generation" method
         JProgressBar jpb = new JProgressBar();
         jpb.setIndeterminate(true);
         jpb.setString("Analyst Report now generating");
