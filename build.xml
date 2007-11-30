@@ -271,6 +271,7 @@
             </fileset>
         </copy>
     </target>
+    
     <!--  === TARGET: jar === -->
     <target depends="compile,javahelp" name="jar">       
         <jar basedir="${dir.build.classes}" 
@@ -589,7 +590,9 @@
         <ant dir="${dir.diskit}" target="dist"/>
         <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
-    </target>    
+    </target>
+    
+    <target depends="jar,examples" description="Build viskit and diskit jars" name="build.examples"/>
 
     <!-- TARGET: Run -->
     <target depends="splashy, jar, examples, checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, display Splash" name="build-run">
