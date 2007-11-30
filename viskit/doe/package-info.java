@@ -3,4 +3,4 @@
  * external cluster to run a structured series of experiments against a
  * simkit assembly.
  */
-package environmental;
+package viskit.doe;
