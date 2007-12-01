@@ -894,7 +894,7 @@ public class VGlobals {
             }
             
             /* The SwingWorker Thread is active when the assembly runner is
-             * running and will subsequently block a JVM exit due to it's "wait"
+             * running and will subsequently block a JVM exit due to its "wait"
              * state.  Must interrupt it in order to cause the JVM to exit
              * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
              */
