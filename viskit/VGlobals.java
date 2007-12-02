@@ -903,7 +903,7 @@ public class VGlobals {
             Thread[] threads = new Thread[Thread.activeCount()];
             Thread.enumerate(threads);
             for (Thread t : threads) {
-                log.info("Thread is: " + t);
+                log.debug("Thread is: " + t);
                 if (t.getName().contains("SwingWorker")) {
                     t.interrupt();                    
                 }
