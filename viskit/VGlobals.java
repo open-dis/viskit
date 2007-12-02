@@ -44,9 +44,11 @@ public class VGlobals {
     private DefaultComboBoxModel cbMod;
     private JPopupMenu popup;
     private myTypeListener myListener;
-    private LocalBootLoader lbl;
     private JFrame mainAppWindow;
 
+    /** Flag to denote called sysExit only once */
+    private boolean sysExitCalled = false;
+    
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -900,8 +902,8 @@ public class VGlobals {
              */
             Thread[] threads = new Thread[Thread.activeCount()];
             Thread.enumerate(threads);
-            for (Thread t : threads) {                
-                log.debug("Thread is: " + t);
+            for (Thread t : threads) {
+                log.info("Thread is: " + t);
                 if (t.getName().contains("SwingWorker")) {
                     t.interrupt();                    
                 }
@@ -917,8 +919,16 @@ public class VGlobals {
         return sysexithandler;
     }
 
+    /** Called to perform proper thread shutdown without calling System.exit(0)
+     * 
+     * @param status the status of JVM shutdown
+     */
     public void sysExit(int status) {
-        sysexithandler.doSysExit(status);
+        
+        if (!sysExitCalled) {
+            sysexithandler.doSysExit(status);
+            sysExitCalled = true;
+        }
     }
 
     public JFrame getMainAppWindow() {
