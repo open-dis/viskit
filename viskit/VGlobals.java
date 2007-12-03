@@ -48,7 +48,7 @@ public class VGlobals {
 
     /** Flag to denote called sysExit only once */
     private boolean sysExitCalled = false;
-    
+
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -70,7 +70,7 @@ public class VGlobals {
     AssemblyController acont;
     AssemblyModel amod;
     boolean assyFirstRun = false;
-    
+
     /**
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
@@ -589,10 +589,10 @@ public class VGlobals {
     }
 
     /**
-   * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
-   * around to see if we've already got it covered.  If not, we add it to the end of the list.
-   * @param ty
-   */
+     * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
+     * around to see if we've already got it covered.  If not, we add it to the end of the list.
+     * @param ty
+     */
     public String typeChosen(String ty) {
         ty = ty.replaceAll("\\s", "");              // every whitespace removed
         for (int i = 0; i < cbMod.getSize(); i++) {
@@ -693,11 +693,11 @@ public class VGlobals {
     }
     Vector existingNames = new Vector();
     Vector existingAssemblyNames = new Vector();
+    
     /**
-   * Returns true if the data is valid, eg we have a valid parameter name
-   * and a valid type.
-   */
-
+     * @return true if the data is valid, eg we have a valid parameter name
+     * and a valid type.
+     */
     private boolean checkLegalJavaName(String nm) {
 
         String javaVariableNameRegExp;
@@ -754,11 +754,11 @@ public class VGlobals {
     public void assemblyReset() {
         existingAssemblyNames.clear();
     }
+    
     /**
-   * Small class to hold on to the fully-qualified class name, while displaying only the
-   * un-qualified name;
-   */
-
+     * Small class to hold on to the fully-qualified class name, while displaying only the
+     * un-qualified name;
+     */
     class MyJMenuItem extends JMenuItem {
 
         private String fullName;
@@ -889,7 +889,7 @@ public class VGlobals {
             for (Frame f : frames) {
                 log.debug("Frame count in Viskit: " + (++count));
                 log.debug("Frame is: " + f);
-                
+
                 /* Prevent non-viskit components from disposing if launched from
                  * another application
                  */
@@ -897,7 +897,7 @@ public class VGlobals {
                     f.dispose();
                 }
             }
-            
+
             /* The SwingWorker Thread is active when the assembly runner is
              * running and will subsequently block a JVM exit due to its "wait"
              * state.  Must interrupt it in order to cause the JVM to exit
@@ -908,7 +908,7 @@ public class VGlobals {
             for (Thread t : threads) {
                 log.debug("Thread is: " + t);
                 if (t.getName().contains("SwingWorker")) {
-                    t.interrupt();                    
+                    t.interrupt();
                 }
             }
         }
@@ -927,7 +927,7 @@ public class VGlobals {
      * @param status the status of JVM shutdown
      */
     public void sysExit(int status) {
-        
+
         if (!sysExitCalled) {
             sysexithandler.doSysExit(status);
             sysExitCalled = true;
