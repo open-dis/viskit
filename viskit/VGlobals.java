@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
- * www.nps.navy.mil
+ * www.nps.edu
  * @author Mike Bailey
  * @since Apr 5, 2004
  * @since 3:20:33 PM
@@ -70,11 +70,11 @@ public class VGlobals {
     AssemblyController acont;
     AssemblyModel amod;
     boolean assyFirstRun = false;
+    
     /**
-   * Get a reference to the assembly editor view.
-   * @return a reference to the assembly editor view or null if yet unbuilt.
-   */
-
+     * Get a reference to the assembly editor view.
+     * @return a reference to the assembly editor view or null if yet unbuilt.
+     */
     public AssemblyViewFrame getAssemblyEditor() {
         return avf;
     }
@@ -802,6 +802,9 @@ public class VGlobals {
             workDirectory.mkdir();
             workDirectory.deleteOnExit();
 
+            /* TODO: nothing really seems to ever go in here, but it deletes on
+             * JVM exit anyway
+             */
             File nf = new File(workDirectory, "simkit");     // most go here
             nf.mkdir();
             nf.deleteOnExit();
