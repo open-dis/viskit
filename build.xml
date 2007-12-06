@@ -5,6 +5,11 @@
         jar files are not compiled from source here, but they are copied as
         necessary for the Viskit distribution.
     </description>
+    
+    <!-- External properties file.  This contains properties that vary from developer       -->
+    <!-- to developer.  Also, any properties in this file will override the properties set  -->
+    <!-- in this build.xml file, so, be careful.                                            -->
+    <property file="build.properties"/>
 
     <!-- magic properties, do not change or delete -->
 
@@ -205,16 +210,6 @@
             <fileset dir="${javahelp}"/>
         </copy>
 
-    </target>
-
-    <!--  === TARGET: clean === -->
-    <target depends="init" description="Deletes build directory, javadoc directory and dist directory" name="clean">
-        <delete dir="${dir.src.simevg}"/>
-        <delete dir="${dir.src.simasm}"/>
-        <delete dir="${dir.src.cli}"/>
-        <delete dir="${dir.build}"/>
-        <delete dir="${dir.dist}"/>
-        <delete file="${dir.lib.ext}/diskit.jar"/>
     </target>
 
     <!--  === TARGET: compile === -->
@@ -965,5 +960,25 @@
         <delete file="${user.home}/launch4j.*"/>
         <delete file="${installer}/build/${winJre}"/>
     </target>
+    
+    <!--  === TARGET: clean === -->
+    <target depends="init" description="Deletes build directory, javadoc and dist directories, and lib/ext/diskit.jar" name="clean">
+        <delete dir="${dir.src.simevg}"/>
+        <delete dir="${dir.src.simasm}"/>
+        <delete dir="${dir.src.cli}"/>
+        <delete dir="${dir.build}"/>
+        <delete dir="${dir.dist}"/>
+        <delete file="${dir.lib.ext}/diskit.jar"/>
+    </target>
+    
+    <target name="delete.temps.and.hx" depends="init">
+        <echo file="deleteTempsAndHx.bat" append="false">@echo off
+            @rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
+        ${delete.temp.and.hx}</echo>
+        <exec executable="deleteTempsAndHx.bat" resolveexecutable="true"/>
+    </target>
+    
+    <!-- Clean everything, including Viskit generated temp files -->
+    <target name="clean.all" depends="delete.temps.and.hx,clean"/>
     
 </project>
