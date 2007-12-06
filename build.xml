@@ -999,8 +999,8 @@
     
     <target name="delete.temps.and.hx" depends="init">
         <echo file="deleteTempsAndHx.bat" append="false">@echo off
-            @rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
-        ${delete.temp.and.hx}</echo>
+@rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
+${delete.temp.and.hx}</echo>
         <exec executable="deleteTempsAndHx.bat" resolveexecutable="true"/>
     </target>
     
