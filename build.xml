@@ -221,6 +221,9 @@
                debugLevel="lines,vars,source"
                source="1.5"
                target="1.5">
+                   
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -452,6 +455,9 @@
             debug="off"
             source="1.5"
             target="1.5">
+                
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath id="jaxb.classapth">
                 <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
@@ -465,6 +471,9 @@
             debug="on"
             source="1.5"
             target="1.5">
+            
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}"/>
         </javac>
@@ -475,7 +484,10 @@
         <javac destdir="${dir.build.classes}"
             debug="on"
             source="1.5"
-            target="1.5">            
+            target="1.5">
+            
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}/stats"/>
         </javac>
@@ -487,6 +499,9 @@
             debug="on"
             source="1.5"
             target="1.5">
+            
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.cli}"/>
         </javac>
@@ -499,6 +514,8 @@
         debug="on"
         source="1.5"
         target="1.5">
+        
+        <compilerarg value="${javac.Xlint}"/>
         <classpath refid="jaxb.classapth"/>
         <src path="${dir.src.sge.qstat}"/>
         </javac>
@@ -516,6 +533,9 @@
                debug="off"
                source="1.5"
                target="1.5">
+                   
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
             </classpath>
@@ -526,6 +546,9 @@
             debug="on"
             source="1.5"
             target="1.5">
+                
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath>
                 <pathelement location="${dir.lib}/log4j-1.2.14.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -539,6 +562,9 @@
             debug="on"
             source="1.5"
             target="1.5">
+                
+            <!-- Reveals generics warings -->
+            <compilerarg value="${javac.Xlint}"/>
             <classpath>
                 <pathelement location="${dir.lib}/visxml.jar"/>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
