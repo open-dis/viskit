@@ -1005,6 +1005,10 @@
     </target>
     
     <!-- Clean everything, including Viskit generated temp files -->
-    <target name="clean.all" depends="delete.temps.and.hx,clean"/>
+    <target name="clean.all" 
+            depends="delete.temps.and.hx,clean"
+            description="Invokes the delete.temps.and.hx target to clean Viskit 
+            created temp files and the .viskit_history.xml when switching back 
+            and forth from SavageStuido Viskit to basic Viskit"/>
     
 </project>
