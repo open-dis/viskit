@@ -76,7 +76,7 @@ public class Version {
     protected static Date parseDateString(String dateString) {
         GregorianCalendar calendar = null;
         try {
-            String[] data = dateString.split("[: $/]");
+            String[] data = dateString.split("[: $-]");
             int year = Integer.parseInt(data[3]);
             int month = Integer.parseInt(data[4]);
             int day = Integer.parseInt(data[5]);
