@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="Communications" package="diskit" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="channel" type="int">
+        <Comment/>
+    </Parameter>
+    <StateVariable name="message" type="String">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Code/>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="CommsOrderIDContact">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Argument name="originator" type="diskit.Mover3D"/>
+        <Schedule condition="true" delay="0.0" event="IDContact" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+            <EdgeParameter value="sensor"/>
+        </Schedule>
+        <Schedule condition="true" delay="0.0" event="DisplayComms" priority="0">
+            <Comment/>
+            <EdgeParameter value="contact"/>
+            <EdgeParameter value="originator"/>
+        </Schedule>
+        <Code/>
+        <Coordinate x="30" y="120"/>
+    </Event>
+    <Event name="IDContact">
+        <Comment/>
+        <Argument name="contact" type="diskit.Mover3D"/>
+        <Argument name="sensor" type="diskit.Sensor"/>
+        <Code/>
+        <Coordinate x="120" y="120"/>
+    </Event>
+    <Event name="DisplayComms">
+        <Comment/>
+        <Argument name="contact" type="diskit.DISMover3D"/>
+        <Argument name="originator" type="diskit.DISMover3D"/>
+        <Code>System.out.println("[Bridge to Bridge Radio CH: " + channel + "]    Patrol Craft, this is HVU# " + originator.getMoverID() + ", I have an unkown contact # " +contact.getMoverID() + " in the exclusion zone, Over.\n");</Code>
+        <Coordinate x="30" y="210"/>
+    </Event>
+</SimEntity>
+

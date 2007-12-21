@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="pjsulliv" extend="SimEntityBase" name="RandomVariatePlotter" package="RandomVariateGeneration" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>This simple event graph can be used to generate histograms based on diskit.random distributions.  This is just an example implementation to check the distribution of random variates being created</Comment>
+    <Parameter name="histogram" type="diskit.random.Histogram">
+        <Comment>Creates a histogram based on the distribution that is provided</Comment>
+    </Parameter>
+    <StateVariable name="histogramWindow" type="diskit.random.Histogram">
+        <Comment>The local copy of the histogram/distribution</Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Schedule event="PlotHistogram"/>
+        <Code/>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="PlotHistogram">
+        <Comment>Calls the drawHistogram method of diskit.random.Histogram and plots a histogram based on the distribution parameters provided</Comment>
+        <StateTransition state="histogramWindow">
+            <Assignment value="histogram"/>
+        </StateTransition>
+        <StateTransition state="histogramWindow">
+            <Operation method="drawHistogram()"/>
+        </StateTransition>
+        <Code/>
+        <Coordinate x="130" y="30"/>
+    </Event>
+</SimEntity>
+

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>Viskit</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
+                </source-folder>
+                <source-folder>
+                    <label>test</label>
+                    <type>java</type>
+                    <location>test</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build.examples</target>
+                </action>
+                <action name="clean">
+                    <target>clean.all</target>
+                </action>
+                <action name="javadoc">
+                    <target>doc</target>
+                </action>
+                <action name="run">
+                    <target>quick-run</target>
+                </action>
+                <action name="test">
+                    <target>test-code-format</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean.all</target>
+                    <target>build.examples</target>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-Viskit</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>.</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>                
+                <action name="compile.single">                    
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>compile-selected-files-in-src</target>
+                    <context>
+                        <property>files</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>relative-path</format>
+                        <arity>
+                            <separated-files>,</separated-files>
+                        </arity>
+                    </context>                    
+                </action>
+            </ide-actions>
+            <export>
+                <type>folder</type>
+                <location>build/classes</location>
+                <build-target>build.examples</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>src</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test</label>
+                        <location>test</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="run"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
+            <compilation-unit>
+                <package-root>src</package-root>
+                <classpath mode="compile">lib/ext/dis.jar;lib/ext/diskit.jar;lib/jaxb-2.1/endorsed/jaxb-api.jar;lib/jaxb-2.1/activation.jar;lib/jaxb-2.1/codemodel.jar;lib/jaxb-2.1/dtd-parser-1.0.jar;lib/jaxb-2.1/isorelax.jar;lib/jaxb-2.1/istack-commons-runtime.jar;lib/jaxb-2.1/istack-commons-tools.jar;lib/jaxb-2.1/jaxb-impl.jar;lib/jaxb-2.1/jaxb-xjc.jar;lib/jaxb-2.1/jsr173_1.0_api.jar;lib/jaxb-2.1/msv.jar;lib/jaxb-2.1/relaxngDatatype.jar;lib/jaxb-2.1/resolver.jar;lib/jaxb-2.1/rngom.jar;lib/jaxb-2.1/txw2.jar;lib/jaxb-2.1/xsdlib.jar;lib/jaxb-2.1/xsom.jar;lib/actions.jar;lib/bsh-2.0b4.jar;lib/commons-beanutils-1.7.0.jar;lib/commons-codec-1.3.jar;lib/commons-collections-3.1.jar;lib/commons-configuration-1.2.jar;lib/commons-digester-1.6.jar;lib/commons-lang-2.0.jar;lib/commons-logging-1.1.jar;lib/jcommon-1.0.0.jar;lib/jdom.jar;lib/jedit.jar;lib/jfreechart-1.0.1.jar;lib/jgraph.jar;lib/jhall.jar;lib/junit.jar;lib/log4j.jar;lib/looks-1.3.1.jar;lib/serializer.jar;lib/simkit.jar;lib/tools.jar;lib/trang.jar;lib/trangtask.jar;lib/xalan.jar;lib/xercesImpl.jar;lib/xmlrpc-2.0.jar</classpath>
+                <built-to>build/classes</built-to>
+                <javadoc-built-to>doc/api</javadoc-built-to>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

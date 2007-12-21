@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity author="$author$" extend="SimEntityBase" name="ArrayTester" package="examples" version="$Id: ArrayTester.xml 1590 2007-10-07 05:41:19Z tdnorbra $" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <StateVariable name="sinus" type="double[180]">
+        <Comment/>
+    </StateVariable>
+    <Event name="Run">
+        <Comment/>
+        <LocalVariable name="_idxvar_0" type="int" value="0">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition index="_idxvar_0" state="sinus">
+            <Assignment value="Math.sin(2.0*Math.PI*((double)_idxvar_0)/((double)180))"/>
+        </StateTransition>
+        <Schedule condition="true" delay="0.0" event="DumpArrayElement" priority="0">
+            <Comment/>
+            <EdgeParameter value="0"/>
+        </Schedule>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="DumpArrayElement">
+        <Comment/>
+        <Argument name="i" type="int"/>
+        <LocalVariable name="code" type="boolean" value="true; System.out.println(getSinus(i))">
+            <Comment/>
+        </LocalVariable>
+        <Schedule condition="i&lt;180" delay="0.0" event="DumpArrayElement" priority="0">
+            <Comment/>
+            <EdgeParameter value="i++"/>
+        </Schedule>
+        <Coordinate x="220" y="90"/>
+    </Event>
+</SimEntity>
+

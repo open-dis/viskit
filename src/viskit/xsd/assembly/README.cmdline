@@ -1,0 +1,9 @@
+To use the Assembly XML 2 Java compiler from the command line, have viskit.xsd.assembly.SimkitAssemblyXML2Java in your classpath, and a file to translate that adheres to either assembly.dtd or assembly.xsd in the path as well.
+
+From the command line:
+
+%java viskit.xsd.assembly.SimkitAssemblyXML2Java myFile.xml
+
+note: the file extension is ignored, so it could be a myFile.abc etc.
+
+There are 2 tags within assembly.dtd that provide for useful output, one is the Output tag, which causes a named SimEntity to print itself to stdout, the other is the Schedule tag, which sets the stopTime of the Scheduler, doing so will cause the simulation to execute.

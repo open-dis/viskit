@@ -1,0 +1,58 @@
+body {
+	font-family: arial, helvetica, sans serif;
+	font-size: 12pt;
+	font-weight: normal;
+	color: black;
+}
+
+h1 {
+	font-size: 140%;
+	font-weight: bold;
+}
+
+h2 {
+	font-size: 120%;
+	font-weight: bold;
+}
+
+h3 {
+	font-size: 100%;
+	font-weight: bold;
+}
+
+p {
+}
+
+.code {
+	font-family: times new roman, serif;
+	font-size: 12pt;
+	font-weight: bold;
+	color: black;
+}
+
+.menuItem {
+	color: blue;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.menu {
+	font-family: times new roman, serif;
+	font-weight: bold;
+	color: #009900;
+}
+
+.caption {
+	font-style: italic;
+	margin-bottom: 2em;
+}
+
+.note {
+	font-weight: bold;
+	color: red;
+}
+
+.done {
+	font-size: 67%;
+}
+

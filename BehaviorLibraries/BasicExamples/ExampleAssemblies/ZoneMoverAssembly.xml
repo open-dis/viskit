@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly name="ZoneMoverAssembly" package="ExampleAssemblies" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" name="DISPinger" type="diskit.DISPinger">
+        <TerminalParameter name="isActive" type="boolean" value="true"/>
+        <TerminalParameter name="duration" type="double" value=".2"/>
+        <TerminalParameter name="simTimePerMilSec" type="long" value="200"/>
+        <Coordinate x="280" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="ScenarioManager" type="diskit.ScenarioManager">
+        <TerminalParameter name="speedScale" type="double" value=".5"/>
+        <TerminalParameter name="clearOnReset" type="boolean" value="true"/>
+        <TerminalParameter name="mulicastIPAddress" type="java.lang.String" value="239.255.5.8"/>
+        <TerminalParameter name="port" type="int" value="62040"/>
+        <TerminalParameter name="siteID" type="int" value="0"/>
+        <TerminalParameter name="appID" type="int" value="1"/>
+        <Coordinate x="390" y="220"/>
+    </SimEntity>
+    <SimEntity description="" name="ZoneMover" type="examples.ZoneMover">
+        <MultiParameter type="diskit.Vec3d">
+            <TerminalParameter name="x" type="double" value="0"/>
+            <TerminalParameter name="y" type="double" value="0"/>
+            <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+        </MultiParameter>
+        <TerminalParameter name="maximumSpeed" type="double" value="20"/>
+        <TerminalParameter name="moverID" type="int" value="101"/>
+        <MultiParameter type="diskit.ProbabilityZoneGeometry[]">
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="101"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-1337.14"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                    <TerminalParameter name="Z" type="double" value="-1575.58"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="500"/>
+                <TerminalParameter name="width" type="double" value="300"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+            <MultiParameter type="diskit.ProbabilityZoneGeometry">
+                <TerminalParameter name="entityID" type="int" value="101"/>
+                <TerminalParameter name="probability" type="double" value=".5"/>
+                <MultiParameter type="diskit.X3DCoordinate">
+                    <TerminalParameter name="X" type="double" value="-1152.41"/>
+                    <TerminalParameter name="Y (+Y is up)" type="double" value="0"/>
+                    <TerminalParameter name="Z" type="double" value="218.51"/>
+                </MultiParameter>
+                <TerminalParameter name="length" type="double" value="500"/>
+                <TerminalParameter name="width" type="double" value="500"/>
+                <TerminalParameter name="height" type="double" value="0"/>
+                <MultiParameter type="diskit.Vec4d">
+                    <TerminalParameter name="x" type="double" value="0"/>
+                    <TerminalParameter name="y" type="double" value="0"/>
+                    <TerminalParameter name="z (-Z is up)" type="double" value="0"/>
+                    <TerminalParameter name="radianRotation" type="double" value="0"/>
+                </MultiParameter>
+            </MultiParameter>
+        </MultiParameter>
+        <Coordinate x="480" y="220"/>
+    </SimEntity>
+    <SimEventListenerConnection listener="ScenarioManager" source="DISPinger"/>
+    <SimEventListenerConnection listener="ScenarioManager" source="ZoneMover"/>
+    <Schedule stopTime="1000" verbose="false"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+

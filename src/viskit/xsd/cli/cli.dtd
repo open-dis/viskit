@@ -1,0 +1,22 @@
+<!ELEMENT Config ( Assembly,EventGraph*,ExtensionJar* )>
+
+<!ELEMENT Assembly EMPTY >
+<!ATTLIST Assembly
+    fileName         CDATA   #REQUIRED
+    className   CDATA   #REQUIRED
+>
+
+<!ELEMENT EventGraph EMPTY >
+<!ATTLIST EventGraph
+    fileName         CDATA   #REQUIRED
+>
+
+<!ELEMENT ExtensionJar EMPTY >
+<!ATTLIST ExtensionJar
+    fileName         CDATA   #REQUIRED
+>
+
+
+
+
+

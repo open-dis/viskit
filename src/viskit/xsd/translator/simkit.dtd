@@ -1,0 +1,106 @@
+<!ELEMENT SimEntity ( head?, Comment*, Parameter*, StateVariable*, Event*, Code? ) >
+
+<!ELEMENT head (meta*) >
+
+<!ELEMENT meta EMPTY >
+<!ATTLIST meta
+	name CDATA #REQUIRED
+	content CDATA #IMPLIED
+>
+
+<!ATTLIST SimEntity
+        name            CDATA   #REQUIRED
+        package         CDATA   "examples"
+        version         CDATA	  "1.0"
+        author          CDATA   #IMPLIED
+        extend          CDATA   "SimEntityBase"
+        implement       CDATA   #IMPLIED
+        description     CDATA   #IMPLIED
+>
+
+<!ELEMENT Comment ( #PCDATA ) >
+
+<!ELEMENT StateVariable  ( Comment*, Code* ) >
+<!ATTLIST StateVariable
+	type        CDATA	#REQUIRED
+	name        ID  	#REQUIRED
+        description CDATA       #IMPLIED
+>
+
+<!ELEMENT Argument ( Comment )* >
+<!ATTLIST Argument
+	type	    CDATA	#REQUIRED
+        name        ID          #REQUIRED
+        description CDATA       #IMPLIED
+>
+
+<!ELEMENT Parameter ( Comment )* >
+<!ATTLIST Parameter
+	type        CDATA	#REQUIRED
+	name        ID  	#REQUIRED
+        description CDATA       #IMPLIED
+>
+
+<!ELEMENT LocalVariable ( Comment*, Code* ) >
+<!ATTLIST LocalVariable
+        type        CDATA       #REQUIRED
+        name        ID          #REQUIRED
+        value       CDATA       #IMPLIED
+        description CDATA       #IMPLIED
+>
+
+
+<!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) >
+<!ATTLIST Event
+	name		ID	#REQUIRED
+        description     CDATA   #IMPLIED
+>
+
+<!ELEMENT Code (#PCDATA) >
+
+<!ELEMENT Coordinate EMPTY >
+<!ATTLIST Coordinate
+	x	CDATA	#REQUIRED
+	y	CDATA	#REQUIRED
+>
+
+<!ELEMENT Operation EMPTY >
+<!ATTLIST Operation
+        method  CDATA   #REQUIRED
+        description CDATA   #IMPLIED
+>
+
+<!ELEMENT Assignment EMPTY >
+<!ATTLIST Assignment
+        value   CDATA   #REQUIRED
+        description CDATA   #IMPLIED
+>
+
+<!ELEMENT StateTransition (( Assignment|Operation ),Code*) >
+<!ATTLIST StateTransition
+        state           IDREF   #REQUIRED
+	index		IDREF	#IMPLIED
+        description CDATA   #IMPLIED
+>
+
+<!ELEMENT EdgeParameter EMPTY >
+<!ATTLIST EdgeParameter
+        value   CDATA	#REQUIRED
+        description CDATA   #IMPLIED
+>
+
+<!ELEMENT Schedule (Code*,Comment*,EdgeParameter*) >
+<!ATTLIST Schedule
+	delay	CDATA	"0.0"
+	event	IDREF	#REQUIRED
+	condition CDATA	#IMPLIED
+        priority  (HIGHEST|HIGHER|HIGH|DEFAULT|LOW|LOWER|LOWEST) "DEFAULT"
+        description CDATA   #IMPLIED
+>
+
+<!ELEMENT Cancel (Code*,Comment*,EdgeParameter*) >
+<!ATTLIST Cancel
+	event	IDREF	#REQUIRED
+	condition CDATA	#IMPLIED
+        description CDATA   #IMPLIED
+>

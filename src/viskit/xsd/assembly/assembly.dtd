@@ -1,0 +1,197 @@
+<!-- CVS ID: $Id: assembly.dtd 1662 2007-12-16 19:44:04Z tdnorbra $ -->
+<!ENTITY % DesignParameters "TerminalParameter">
+<!ENTITY % ValueRange "DoubleRange | IntegerRange">
+<!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter">
+<!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics">
+
+<!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, EventGraph*, SimEntity*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment?)>
+<!ATTLIST SimkitAssembly
+	name 	ID      #REQUIRED
+	version	CDATA	"1.0"
+	package CDATA   #REQUIRED
+        extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
+>
+
+<!ELEMENT head (meta*)>
+
+<!ELEMENT meta EMPTY>
+<!ATTLIST meta
+    name CDATA #REQUIRED
+    content CDATA #IMPLIED
+>
+
+<!ELEMENT TerminalParameter (%ValueRange;)?>
+<!ATTLIST TerminalParameter
+    name    CDATA #IMPLIED
+    linkRef IDREF #IMPLIED
+    link    ID    #IMPLIED
+    value   CDATA #IMPLIED
+    type    CDATA #REQUIRED
+>
+
+<!ELEMENT DoubleRange EMPTY>
+<!ATTLIST DoubleRange
+    lowValue    CDATA #IMPLIED
+    highValue   CDATA #IMPLIED
+>
+
+<!ELEMENT IntegerRange EMPTY>
+<!ATTLIST IntegerRange
+    lowValue    CDATA #IMPLIED
+    highValue   CDATA #IMPLIED
+>
+
+<!ELEMENT MultiParameter (%Parameters;)*>
+<!ATTLIST MultiParameter
+    name  CDATA #IMPLIED
+    type  CDATA #REQUIRED
+>
+
+<!ELEMENT FactoryParameter (%Parameters;)*>
+<!ATTLIST FactoryParameter
+    name    CDATA #IMPLIED
+    factory CDATA #REQUIRED
+    method  CDATA "getInstance"
+    type    CDATA #REQUIRED
+>
+
+<!ELEMENT Coordinate EMPTY>
+<!ATTLIST Coordinate
+        x       CDATA   #REQUIRED
+        y       CDATA   #REQUIRED
+>
+
+<!ELEMENT SimEntity ((%Parameters;)*, (Coordinate?))>
+<!ATTLIST SimEntity
+    type CDATA #REQUIRED
+    name ID    #REQUIRED
+    url  CDATA #IMPLIED
+    description CDATA #IMPLIED
+>
+
+<!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?))>
+<!ATTLIST PropertyChangeListener
+    type CDATA #REQUIRED
+    name ID    #REQUIRED
+    mode (replicationStat|designPointStat|listener) "listener"
+    description CDATA #IMPLIED
+>
+
+<!ELEMENT SimEventListenerConnection EMPTY>
+<!ATTLIST SimEventListenerConnection
+    listener IDREF #REQUIRED
+    source   IDREF #REQUIRED
+    description CDATA #IMPLIED
+>
+
+<!ELEMENT PropertyChangeListenerConnection EMPTY>
+<!ATTLIST PropertyChangeListenerConnection
+    property CDATA #IMPLIED
+    listener IDREF #REQUIRED
+    source   IDREF #REQUIRED
+    description CDATA #IMPLIED
+>
+
+<!ELEMENT Output EMPTY>
+<!ATTLIST Output
+    entity   IDREF #REQUIRED
+>
+
+<!ELEMENT Schedule EMPTY>
+<!ATTLIST Schedule
+    stopTime CDATA "0.0"
+    verbose  (true|false) "true"
+    numberReplications CDATA "2"
+    printReplicationReports     (true|false) "true"
+    printSummaryReport  (true|false) "true"
+    saveReplicationData (true|false) "true"
+>
+
+<!ELEMENT Adapter (Coordinate?)>
+<!ATTLIST Adapter
+    name    CDATA    #REQUIRED
+    eventHeard CDATA #REQUIRED
+    eventSent  CDATA #REQUIRED
+    from    IDREF    #REQUIRED
+    to      IDREF    #REQUIRED
+    description CDATA #IMPLIED
+>
+
+<!ELEMENT Log (#PCDATA)>
+
+<!ELEMENT Errors (#PCDATA)>
+
+<!ELEMENT PropertyChange (%Statistics;)*>
+<!ATTLIST PropertyChange
+    listenerName CDATA #REQUIRED
+    property CDATA #IMPLIED
+>
+
+<!ELEMENT SampleStatistics EMPTY>
+<!ATTLIST SampleStatistics
+    mean CDATA "0.0"
+    variance CDATA "0.0"
+    standardDeviation CDATA "0.0"
+    count CDATA "0"
+    minObs CDATA "0.0"
+    maxObs CDATA "0.0"
+    samplingType (TALLY|TIME_VARYING|LINEAR) "TALLY"
+    name CDATA #IMPLIED
+>
+
+<!ELEMENT IndexedSampleStatistics (SampleStatistics)*>
+<!ATTLIST IndexedSampleStatistics
+    name CDATA #IMPLIED
+>
+
+<!ELEMENT Results ( Log | PropertyChange | Errors )*>
+<!ATTLIST Results
+    sample CDATA #REQUIRED
+    designPoint  CDATA #REQUIRED
+    index   CDATA #IMPLIED
+    job     CDATA #IMPLIED
+>
+
+<!ELEMENT DesignPoint (TerminalParameter*,Script?,Replication*,Results?,(%Statistics;)*)>
+<!ATTLIST DesignPoint
+    index CDATA #IMPLIED
+>
+
+<!ELEMENT Replication ((%Statistics;)*)>
+<!ATTLIST Replication
+    index CDATA #IMPLIED
+>
+
+<!ELEMENT Script (#PCDATA)>
+
+<!ELEMENT Sample (DesignPoint)*>
+<!ATTLIST Sample
+    index CDATA #IMPLIED
+>
+
+<!ELEMENT Experiment (Script?,Sample*)>
+<!ATTLIST Experiment
+    jobID CDATA #IMPLIED
+    type (latin-hypercube | full-factorial)  "latin-hypercube"
+    replicationsPerDesignPoint CDATA "1"
+    totalSamples CDATA "1"
+    jitter ( true | false ) "true"
+    timeout CDATA "0"
+    debug ( true | false ) "false"
+>
+
+<!ELEMENT EventGraph (#PCDATA)>
+<!ATTLIST EventGraph
+    fileName CDATA #IMPLIED
+>
+
+<!ELEMENT PasswordFile ( User* )>
+<!ATTLIST PasswordFile
+    name CDATA "/tmp/passwd.xml"
+>
+
+<!ELEMENT User EMPTY>
+<!ATTLIST User
+        name    ID   #REQUIRED
+        password CDATA  #REQUIRED
+>
