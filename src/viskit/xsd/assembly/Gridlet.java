@@ -97,7 +97,6 @@ public class Gridlet extends Thread {
     String pwd;
     File expFile;
     
-    
     public Gridlet(int taskID, int jobID, int numTasks, String frontHost, int port, String usid, URL expFile ) {
         try {
             xmlrpc = new XmlRpcClientLite(frontHost, port);
@@ -105,6 +104,7 @@ public class Gridlet extends Thread {
             murle.printStackTrace();
         }
     }
+    
     // not used
     public Gridlet(int taskID, int jobID, int numTasks, GridRunner gridRunner, File expFile) throws DoeException {
         this.taskID = taskID;
@@ -346,7 +346,6 @@ public class Gridlet extends Thread {
             cmdLine.add(classPath);
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());
-            
             
             // Now add the Assembly
             

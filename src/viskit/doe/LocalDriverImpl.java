@@ -74,9 +74,6 @@ public class LocalDriverImpl implements DoeRunDriver {
             ex.printStackTrace();
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            
-            
-            
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -233,6 +230,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.addEventGraph(eventGraph);
     }
+    
     // tbd, project jars? ie with XML
     public void addJar(File jarFile) throws DoeException {
         try {
@@ -245,7 +243,6 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
     
     public void run() throws DoeException {
-        Boolean ret = true;
         try {
             Method runMethod = ((Method)methods.get("run"));
             runMethod.invoke(runner,(Object[])null);
@@ -254,6 +251,5 @@ public class LocalDriverImpl implements DoeRunDriver {
             throw new DoeException(ex.getMessage());
         }
         //runner.run();
-    }
-    
+    }    
 }
