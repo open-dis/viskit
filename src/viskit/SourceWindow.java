@@ -44,7 +44,7 @@ public class SourceWindow extends JFrame {
     private Action againAct;
 
     public SourceWindow(JFrame main, String className, String source) {
-        this.className = className;
+        SourceWindow.className = className;
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
@@ -179,14 +179,11 @@ public class SourceWindow extends JFrame {
                         "-classpath",
                         classPaths.toString(),
                         "-d",
-                        workDirPath
+                        workDirPath,
+                        "-Xlint:unchecked",
+                        "-Xlint:deprecation"
                     };
                     java.util.List<String> optionsList = Arrays.asList(options);
-
-                    String[] classes = {
-                        "viskit.ParameterMap"
-                    };
-                    java.util.List<String> clNameList = Arrays.asList(classes);
 
                     compiler.getTask(
                             new BufferedWriter(new OutputStreamWriter(baosOut)),
@@ -216,12 +213,9 @@ public class SourceWindow extends JFrame {
                         SourceWindow.this.jta.setCaretPosition(startOffset);
                     }
 
-
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
-
             }
         });
 
