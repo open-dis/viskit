@@ -62,7 +62,7 @@
         <StateTransition state="numberServed">
             <Assignment value="numberServed+1"/>
         </StateTransition>
-        <Schedule priority="1.0" event="StartService" condition="queue.size() &gt; 0"/>
+        <Schedule priority="HIGH" event="StartService" condition="queue.size() &gt; 0"/>
         <Coordinate x="300" y="100"/>
     </Event>
     <Event name="Renege">

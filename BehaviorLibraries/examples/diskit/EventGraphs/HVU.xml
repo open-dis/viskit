@@ -33,7 +33,7 @@
         <Comment/>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Argument name="contact" type="diskit.Mover3D"/>
-        <Schedule condition="!friendlyForces.contains(new Integer(contact.getMoverID()))" delay="0.0" event="CommsOrderIDContact" priority="0">
+        <Schedule condition="!friendlyForces.contains(new Integer(contact.getMoverID()))" delay="0.0" event="CommsOrderIDContact" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>
@@ -56,11 +56,11 @@
         <StateTransition state="exclusionZone">
             <Assignment value="new diskit.SphereCutterSensor(this,exclusionBounds)"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterSensor" priority="0">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterSensor" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="exclusionZone"/>
         </Schedule>

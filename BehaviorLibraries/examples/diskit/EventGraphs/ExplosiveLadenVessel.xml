@@ -190,11 +190,11 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="obstacleQueue">
             <Assignment value="new diskit.ObstacleQueue(getLocation())"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Register" priority="0.0">
+        <Schedule condition="true" delay="0.0" event="Register" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="zoneMoverManager == null" delay="0.0" event="Init" priority="10.0">
+        <Schedule condition="zoneMoverManager == null" delay="0.0" event="Init" priority="HIGHEST">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -231,14 +231,14 @@ TODO: Add booleans to the constructor for attack Friendly, attack HVU</Comment>
         <StateTransition state="zoneMoverManager">
             <Operation method="setMover(this)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="0.0">
+        <Schedule condition="true" delay="0.0" event="RegisterTarget" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="init == this" delay="0.0" event="CreateSensors" priority="0.0">
+        <Schedule condition="init == this" delay="0.0" event="CreateSensors" priority="DEFAULT">
             <Comment/>
         </Schedule>
-        <Schedule condition="init == this &amp;&amp; plasticExplosives != null" delay="0.0" event="RegisterMunition" priority="0.0">
+        <Schedule condition="init == this &amp;&amp; plasticExplosives != null" delay="0.0" event="RegisterMunition" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="plasticExplosives"/>
         </Schedule>
@@ -269,21 +269,21 @@ sensors[2] = getCollisionSensor();</Code>
         <LocalVariable name="contactType" type="java.lang.String" value="contact.getEntityType()">
             <Comment>Checks the entity type of the contact</Comment>
         </LocalVariable>
-        <Schedule condition="!contactType.equals(primaryTarget) &amp;&amp; sensor == getCollisionSensor()" delay="0.0" event="AssessObstacle" priority="0.0">
+        <Schedule condition="!contactType.equals(primaryTarget) &amp;&amp; sensor == getCollisionSensor()" delay="0.0" event="AssessObstacle" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
         <Schedule condition="( sensor == visualPerception &amp;&amp; contactType.endsWith(primaryTarget) &amp;&amp;  arrivedAtGoal &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING )
 ||
-( sensor == detonateProximity &amp;&amp; contactType.endsWith(primaryTarget) &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING )" delay="0.0" event="Attack" priority="0.0">
+( sensor == detonateProximity &amp;&amp; contactType.endsWith(primaryTarget) &amp;&amp;  currentTacticalMode != diskit.TacticalMode.ATTACKING )" delay="0.0" event="Attack" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="sensor == visualPerception &amp;&amp;  contactType.equals(primaryTarget) &amp;&amp;   !arrivedAtGoal &amp;&amp;   currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="TargetSpotted" priority="0">
+        <Schedule condition="sensor == visualPerception &amp;&amp;  contactType.equals(primaryTarget) &amp;&amp;   !arrivedAtGoal &amp;&amp;   currentTacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="TargetSpotted" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
-        <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="0">
+        <Schedule condition="!isHostileForce" delay="0.0" event="SpottedByEnemy" priority="DEFAULT">
             <Comment/>
         </Schedule>
         <Code>//System.out.println("Contact type "+contact.getEntityType());</Code>
@@ -332,18 +332,18 @@ sensors[2] = getCollisionSensor();</Code>
         <StateTransition state="plasticExplosives">
             <Operation method="setNextWaypoint(attackDestination,getEntityDefinition().getMaximumSpeed())"/>
         </StateTransition>
-        <Schedule condition="true   " delay="detonateTime" event="PrepareRadioMessage" priority="0.0">
+        <Schedule condition="true   " delay="detonateTime" event="PrepareRadioMessage" priority="DEFAULT">
             <Comment>This message is sent right before the terrorist blows up</Comment>
             <EdgeParameter value="&quot;DestroyedTarget&quot;"/>
             <EdgeParameter value="target"/>
             <EdgeParameter value="attackReport"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0.0">
+        <Schedule condition="target.getEntityType().equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
-        <Schedule condition="true" delay="detonateTime" event="Succeeded" priority="0.0">
+        <Schedule condition="true" delay="detonateTime" event="Succeeded" priority="DEFAULT">
             <Comment/>
         </Schedule>
         <Code>//setStartPosition(getLocation());
@@ -384,7 +384,7 @@ System.out.println(getName()+" Attacking: " + target.getName());
         <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[numOfSensors]">
             <Comment>Array to add all sensors</Comment>
         </LocalVariable>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0.0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="sensors"/>
         </Schedule>
@@ -427,7 +427,7 @@ sensors[2] = collisionAvoidance;</Code>
         <Comment>Recieves the harbor chart information from the terrorist cell planner</Comment>
         <Argument name="recipient" type="simkit.SimEntity"/>
         <Argument name="chart" type="diskit.AStarZoneMap"/>
-        <Schedule condition="recipient == this" delay="0.0" event="SetNavigableMap" priority="0.0">
+        <Schedule condition="recipient == this" delay="0.0" event="SetNavigableMap" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="chart"/>
         </Schedule>
@@ -480,7 +480,7 @@ sensors[2] = collisionAvoidance;</Code>
         <LocalVariable name="tacticCopy" type="diskit.Tactic" value="tactic">
             <Comment>Local copy of order information in case the order is for this terrorist</Comment>
         </LocalVariable>
-        <Schedule condition="terroristID == moverID" delay="0.0" event="BeginAttackPlanning" priority="0">
+        <Schedule condition="terroristID == moverID" delay="0.0" event="BeginAttackPlanning" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="start"/>
             <EdgeParameter value="goal"/>
@@ -524,7 +524,7 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="targetQueue">
             <Operation method="setRelativePoint(orderedGoal.getLocation())"/>
         </StateTransition>
-        <Schedule condition="harborChart != null" delay="0.0" event="PickStartPosition" priority="0.0">
+        <Schedule condition="harborChart != null" delay="0.0" event="PickStartPosition" priority="DEFAULT">
             <Comment/>
         </Schedule>
         <Code/>
@@ -588,7 +588,7 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="attackAuthorized">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule condition="planFinalized" delay="0.1" event="StartMove" priority="0.0">
+        <Schedule condition="planFinalized" delay="0.1" event="StartMove" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -623,7 +623,7 @@ sensors[2] = collisionAvoidance;</Code>
         <StateTransition state="self">
             <Operation method="setDestination(waypointCreator.createWaypoint());"/>
         </StateTransition>
-        <Schedule condition="inoperative == moverID" delay="0.0" event="HideAway" priority="0.0">
+        <Schedule condition="inoperative == moverID" delay="0.0" event="HideAway" priority="DEFAULT">
             <Comment/>
         </Schedule>
         <Code>/* all of the ExplosiveLadenVessels will get this event once with the current planner's orders. At this point in the initialization, the waypointCreator has been set to the "hidden zone", so go and hide until waypointCreator gets swapped out for the attack plan's waypoints.
@@ -662,11 +662,11 @@ setCruiseSpeed(0.0);
         <StateTransition state="arrivedAtGoal">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="0.0">
+        <Schedule condition="targetChoice != null &amp;&amp; tacticalMode != diskit.TacticalMode.ATTACKING" delay="0.0" event="PickFromTargets" priority="DEFAULT">
             <Comment>If there is a target to attack, attack it, otherwise loiter until one arrives</Comment>
             <EdgeParameter value="targetChoice"/>
         </Schedule>
-        <Schedule condition="targetChoice == null" delay="0.0" event="Loiter" priority="0.0">
+        <Schedule condition="targetChoice == null" delay="0.0" event="Loiter" priority="DEFAULT">
             <Comment/>
         </Schedule>
         <Code>//System.out.println(getName() + ": I have arrived at " + //goalZone.getName());</Code>
@@ -680,7 +680,7 @@ setCruiseSpeed(0.0);
         <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getEntityDefinition().getWidth() )">
             <Comment>Determines if this target can be intercepted</Comment>
         </LocalVariable>
-        <Schedule condition="canIntercept" delay="0.0" event="Attack" priority="0">
+        <Schedule condition="canIntercept" delay="0.0" event="Attack" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>
@@ -707,18 +707,18 @@ setCruiseSpeed(0.0);
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.DETONATING"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="0">
+        <Schedule condition="true" delay="0.0" event="PrepareRadioMessage" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="&quot;FailedAttack&quot;"/>
             <EdgeParameter value="mover"/>
             <EdgeParameter value="failedReport"/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="0">
+        <Schedule condition="entityType.equals(&quot;Barrier&quot;)" delay="0.0" event="BarrierTargeted" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="mover"/>
         </Schedule>
-        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="0.0">
+        <Schedule condition="true" delay="detonateTime" event="Detonate" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
@@ -755,7 +755,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="obstacleQueue">
             <Operation method="add(obstacle)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="0.0">
+        <Schedule condition="true" delay="0.0" event="AvoidObstacle" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
@@ -776,7 +776,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="avoidanceMoverManager">
             <Operation method="avoid(obstacle,getActiveMoverManager())"/>
         </StateTransition>
-        <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="0.0">
+        <Schedule condition="!obstacleQueue.isEmpty()" delay="getAvoidanceMoverManager().getTimeToOffset()" event="AvoidObstacle" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="obstacleQueue.closest()"/>
         </Schedule>
@@ -799,7 +799,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="tacticalMode">
             <Assignment value="diskit.TacticalMode.DEAD"/>
         </StateTransition>
-        <Schedule condition="mover == this" delay="0.0" event="AttackComplete" priority="0.0">
+        <Schedule condition="mover == this" delay="0.0" event="AttackComplete" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="attackSuccess"/>
             <EdgeParameter value="destroyedTarget"/>
@@ -849,7 +849,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <LocalVariable name="msgSender" type="diskit.Mover3D" value="msg.getSender()">
             <Comment>The person who sent this message</Comment>
         </LocalVariable>
-        <Schedule condition="msgType.equals(&quot;DestroyedTarget&quot;) &amp;&amp; targetQueue.contains(msgContext) &amp;&amp; msgSender != this" delay="0.0" event="UpdateTargetQueue" priority="0">
+        <Schedule condition="msgType.equals(&quot;DestroyedTarget&quot;) &amp;&amp; targetQueue.contains(msgContext) &amp;&amp; msgSender != this" delay="0.0" event="UpdateTargetQueue" priority="DEFAULT">
             <Comment>If this is a destruction report and we have this target on our list, remove it</Comment>
             <EdgeParameter value="msgContext"/>
         </Schedule>
@@ -870,7 +870,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="targetQueue">
             <Operation method="remove(target)"/>
         </StateTransition>
-        <Schedule condition="true" delay="5" event="PrepareRadioMessage" priority="0">
+        <Schedule condition="true" delay="5" event="PrepareRadioMessage" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="&quot;UpdateReport&quot;"/>
             <EdgeParameter value="target"/>
@@ -903,7 +903,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="radioMsg">
             <Operation method="setMessage(msgText)"/>
         </StateTransition>
-        <Schedule condition="true" delay="0" event="SendRadioMessage" priority="0">
+        <Schedule condition="true" delay="0" event="SendRadioMessage" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="radioMsg"/>
         </Schedule>
@@ -1036,7 +1036,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <StateTransition state="attackSuccess">
             <Assignment value="&quot;Succeeded&quot;"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Detonate" priority="0.0">
+        <Schedule condition="true" delay="0.0" event="Detonate" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="this"/>
             <EdgeParameter value="plasticExplosives"/>
@@ -1048,7 +1048,7 @@ setNextWaypoint(p,getEntityDefinition().getMaximumSpeed());</Code>
         <Comment/>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Argument name="contact" type="diskit.Mover3D"/>
-        <Schedule condition="sensor == getCollisionSensor() &amp;&amp; obstacleQueue.contains(contact)" delay="0.0" event="ObstacleClear" priority="0.0">
+        <Schedule condition="sensor == getCollisionSensor() &amp;&amp; obstacleQueue.contains(contact)" delay="0.0" event="ObstacleClear" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="contact"/>
         </Schedule>
