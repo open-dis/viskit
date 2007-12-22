@@ -22,13 +22,16 @@
  */
 package viskit.xsd.assembly;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -47,11 +50,20 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.doe.DoeException;
-import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.bindings.eventgraph.*;
+import viskit.xsd.bindings.assembly.DesignPoint;
+import viskit.xsd.bindings.assembly.EventGraph;
+import viskit.xsd.bindings.assembly.Experiment;
+import viskit.xsd.bindings.assembly.IndexedSampleStatistics;
+import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.Sample;
+import viskit.xsd.bindings.assembly.SampleStatistics;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.bindings.assembly.TerminalParameter;
 import viskit.xsd.cli.Boot;
+import viskit.xsd.translator.SimkitXML2Java;
 
 /**
  *
@@ -78,8 +90,8 @@ import viskit.xsd.cli.Boot;
  *
  * @version $Id: Gridlet.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-
 public class Gridlet extends Thread {
+    
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
     // The gridRunner really is a GridRunner, however this instance came from 
@@ -225,19 +237,19 @@ public class Gridlet extends Thread {
         
         Experiment exp = root.getExperiment();
         int replicationsPerDesignPoint = Integer.parseInt(exp.getReplicationsPerDesignPoint());
-        List samples = exp.getSample();
+        List<Sample> samples = exp.getSample();
         
-        List designParams = root.getDesignParameters();
+        List<TerminalParameter> designParams = root.getDesignParameters();
         int sampleIndex = (taskID-1) / designParams.size();
         int designPtIndex = (taskID-1) % designParams.size();
         
-        Sample sample = (Sample) samples.get(sampleIndex);
-        List designPoints = sample.getDesignPoint();
+        Sample sample = samples.get(sampleIndex);
+        List<DesignPoint> designPoints = sample.getDesignPoint();
         
-        DesignPoint designPoint = (DesignPoint)(designPoints.get(designPtIndex));
-        List designArgs = designPoint.getTerminalParameter();
-        Iterator itd = designParams.iterator();
-        Iterator itp = designArgs.iterator();        
+        DesignPoint designPoint = designPoints.get(designPtIndex);
+        List<TerminalParameter> designArgs = designPoint.getTerminalParameter();
+        Iterator<TerminalParameter> itd = designParams.iterator();
+        Iterator<TerminalParameter> itp = designArgs.iterator();        
         
         boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
         debug_io = false;
@@ -245,8 +257,8 @@ public class Gridlet extends Thread {
         
         //pass design args into design params
         while ( itd.hasNext() && itp.hasNext() ) {
-            TerminalParameter arg = (TerminalParameter)(itp.next());
-            TerminalParameter designParam = (TerminalParameter)(itd.next());
+            TerminalParameter arg = itp.next();
+            TerminalParameter designParam = itd.next();
             designParam.setValue(arg.getValue());
         }
         
@@ -256,11 +268,11 @@ public class Gridlet extends Thread {
             //SGE_O_HOST at socket in raw XML
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream log = new PrintStream(baos);
-            java.io.OutputStream oldOut = System.out;
+            OutputStream oldOut = System.out;
             
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
             PrintStream err = new PrintStream(baos2);
-            java.io.OutputStream oldErr = System.err;
+            OutputStream oldErr = System.err;
             
             // disconnect io
             
@@ -291,19 +303,16 @@ public class Gridlet extends Thread {
                 Object loader = getContextClassLoader();
                 Class<?> loaderz = loader.getClass();
                 String[] classPaths = (String[]) (loaderz.getMethod("getClassPath",new Class<?>[]{})).invoke(loader,new Object[]{});
-                for (String path:classPaths) {
+                for (String path : classPaths) {
                     classPath += path + File.pathSeparator;
                 }
             }
             
-            List depends = root.getEventGraph();
-            Iterator di = depends.iterator();
+            List<EventGraph> depends = root.getEventGraph();
             ArrayList<File> javaFiles = new ArrayList<File>();
             
             // submit all EventGraphs
-            while ( di.hasNext() ) {
-                
-                EventGraph d = (EventGraph)(di.next());
+            for (EventGraph d : depends) {
                 ByteArrayInputStream bais;
                 String content = d.getContent();
                 
@@ -311,8 +320,7 @@ public class Gridlet extends Thread {
                 
                 // generate java for the eventGraph and evaluate a loaded
                 // class
-                viskit.xsd.translator.SimkitXML2Java sx2j = 
-                        new viskit.xsd.translator.SimkitXML2Java(bais);
+                SimkitXML2Java sx2j = new SimkitXML2Java(bais);
                 // first convert XML to java source
                 sx2j.unmarshal();
                 
@@ -330,27 +338,26 @@ public class Gridlet extends Thread {
                 // since there may be some kind of event-graph interdependency, compile
                 // all .java's "at once"; javac should be able to resolve these if given
                 // on the command line all at once.
-                javaFiles.add(eventGraphJavaFile);
-                
+                javaFiles.add(eventGraphJavaFile);                
             }
             
             // compile eventGraphJavaFiles and deposit the .classes in the appropriate
             // direcory under tempDir
             
-            String[] cmd;
-            Iterator it = javaFiles.iterator();
             List<String> cmdLine = new ArrayList<String>();
             
+            cmdLine.add("-Xlint:unchecked");
+            cmdLine.add("-Xlint:deprecation");
             cmdLine.add("-verbose");
             cmdLine.add("-classpath");
             cmdLine.add(classPath);
             cmdLine.add("-d");
-            cmdLine.add(tempDir.getCanonicalPath());
+            cmdLine.add(tempDir.getCanonicalPath());            
             
             // Now add the Assembly
             
             String assemblyJava = sax2j.translate();
-            File assemblyJavaFile = new File(tempDir,sax2j.getRoot().getName()+".java");
+            File assemblyJavaFile = new File(tempDir, root.getName()+".java");
             FileWriter writer = new FileWriter(assemblyJavaFile);
             writer.write(assemblyJava);
             writer.flush();
@@ -362,7 +369,6 @@ public class Gridlet extends Thread {
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics,null,null);
             Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(javaFiles);
             compiler.getTask(null, fileManager, null, cmdLine, null, compilationUnits).call();
-
             
             if (/*debug_io*/true) {
                 System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
@@ -385,15 +391,14 @@ public class Gridlet extends Thread {
                         System.out.format("%s: %s%n", kind,
                                 diagnostic.getMessage(null));
                     }
-                }
-                
+                }                
             }
              
             ClassLoader cloader = getContextClassLoader();
             System.out.println(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
             
             if(cloader instanceof Boot) {
-                ((Boot)cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+                ((Boot) cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
             } else if (cloader.getClass().getName().equals("viskit.doe.LocalBootLoader")) {
                 System.out.println("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
                 Method doAddURL = cloader.getClass().getMethod("doAddURL",java.net.URL.class);
@@ -403,7 +408,7 @@ public class Gridlet extends Thread {
           
             Class asmz = cloader.loadClass(sax2j.root.getPackage()+"."+sax2j.root.getName());
             Constructor asmc = asmz.getConstructors()[0];
-            ViskitAssembly sim = (ViskitAssembly)(asmc.newInstance(new Object[] {} ));
+            ViskitAssembly sim = (ViskitAssembly) (asmc.newInstance(new Object[] {} ));
             sim.setEnableAnalystReports(false); // not needed in cluster mode, and threadly
             Thread runner = new Thread(sim);
            
@@ -421,8 +426,7 @@ public class Gridlet extends Thread {
             
             // go through and copy in the statistics
             
-            viskit.xsd.bindings.assembly.ObjectFactory of = 
-                    new viskit.xsd.bindings.assembly.ObjectFactory();
+            ObjectFactory of = new ObjectFactory();
             String statXml;
             
             // first get designPoint stats
@@ -432,21 +436,19 @@ public class Gridlet extends Thread {
                     
                     if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics ) { // tbd handle this for local case too
                         
-                        viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = 
-                                of.createIndexedSampleStatistics();
+                        IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
                         iss.setName(designPointStats[i].getName());
                         
                         List<SampleStatistics> args = iss.getSampleStatistics();
                         simkit.stat.SampleStatistics[] allStat = 
-                                ((simkit.stat.IndexedSampleStatistics)designPointStats[i]).getAllSampleStat();
+                                ((simkit.stat.IndexedSampleStatistics) designPointStats[i]).getAllSampleStat();
                         
                         for ( int j = 0; j < allStat.length; j++) {                            
                             args.add(statForStat(allStat[j]));
                         }
                         statXml = sax2j.marshalFragmentToString(iss);
                     } else {
-                        statXml = sax2j.marshalFragmentToString(statForStat(designPointStats[i]));
-                        
+                        statXml = sax2j.marshalFragmentToString(statForStat(designPointStats[i]));                        
                     }
                     
                     if (debug_io)
@@ -483,13 +485,12 @@ public class Gridlet extends Thread {
                         if (replicationStat != null) {
                             try {
                                 if (replicationStat instanceof simkit.stat.IndexedSampleStatistics ) {
-                                    viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = 
-                                            of.createIndexedSampleStatistics();
+                                    IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
                                     iss.setName(replicationStat.getName());
                                     
                                     List<SampleStatistics> arg = iss.getSampleStatistics();
                                     simkit.stat.SampleStatistics[] allStat =
-                                            ((simkit.stat.IndexedSampleStatistics)replicationStat).getAllSampleStat();
+                                            ((simkit.stat.IndexedSampleStatistics) replicationStat).getAllSampleStat();
                                     for ( int k = 0; k < allStat.length; k++) {                                        
                                         arg.add(statForStat(allStat[j]));                                        
                                     }
@@ -522,11 +523,9 @@ public class Gridlet extends Thread {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                        }
-                        
+                        }                        
                     }
-                }
-                
+                }                
             } catch (Exception e) { e.printStackTrace(); }
             else System.out.println("No DesignPointStats");
             
@@ -546,11 +545,11 @@ public class Gridlet extends Thread {
             // it is really LogMessages, results themselves
             // end up as SampleStatistics as above.
             
-            java.io.StringReader sr = new java.io.StringReader(baos.toString());
-            java.io.BufferedReader br = new java.io.BufferedReader(sr);
+            StringReader sr = new java.io.StringReader(baos.toString());
+            BufferedReader br = new java.io.BufferedReader(sr);
             
-            java.io.StringReader esr = new java.io.StringReader(baos.toString());
-            java.io.BufferedReader ebr = new java.io.BufferedReader(esr);
+            StringReader esr = new java.io.StringReader(baos.toString());
+            BufferedReader ebr = new java.io.BufferedReader(esr);
             
             // TBD: The following only works correctly in grid mode, due to multithreaded mode's shared
             // access to System.out. Either each thread synchronizes on System.out at the
@@ -583,8 +582,7 @@ public class Gridlet extends Thread {
                             if ( ( line = br.readLine() ) != null ) {
                                 propertyChanges.add(line);
                             }
-                        }
-                        
+                        }                        
                     }
                 }
                 while( (line = ebr.readLine()) != null ) {
@@ -592,30 +590,24 @@ public class Gridlet extends Thread {
                 }
                 out.println("<Log>");
                 out.println("<![CDATA[");
-                it = logs.iterator();
-                while (it.hasNext()) {
-                    out.println((String)(it.next()));
+                for (String lg : logs) {
+                    out.println(lg);
                 }
                 out.println("]]>");
                 out.println("</Log>");
-                it = propertyChanges.iterator();
-                while (it.hasNext()) {
-                    out.println((String)(it.next()));
+                for (String pCh : propertyChanges) {
+                    out.println(pCh);
                 }
                 
                 out.println("<Errors>");
                 out.println("<![CDATA[");
-                it = errs.iterator();
-                while (it.hasNext()) {
-                    
-                    out.println((String)(it.next()));
-                    
+                for (String error : errs) {
+                    out.println(error);
                 }
                 out.println("]]>");
                 out.println("</Errors>");
                 out.println("</Results>");
-                out.println();
-                
+                out.println();                
                 
                 if ( gridRunner != null ) {
                     Class<?> gridRunnerz = gridRunner.getClass();
@@ -656,9 +648,9 @@ public class Gridlet extends Thread {
         } 
     }
     
-    private viskit.xsd.bindings.assembly.SampleStatistics statForStat(simkit.stat.SampleStatistics stat) throws Exception {
-        viskit.xsd.bindings.assembly.ObjectFactory of = new viskit.xsd.bindings.assembly.ObjectFactory();
-        viskit.xsd.bindings.assembly.SampleStatistics sampleStat = of.createSampleStatistics();
+    private SampleStatistics statForStat(simkit.stat.SampleStatistics stat) throws Exception {
+        ObjectFactory of = new ObjectFactory();
+        SampleStatistics sampleStat = of.createSampleStatistics();
         sampleStat.setCount(""+stat.getCount());
         sampleStat.setMaxObs(""+stat.getMaxObs());
         sampleStat.setMean(""+stat.getMean());

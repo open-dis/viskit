@@ -1,17 +1,5 @@
 package viskit;
 
-import actions.ActionIntrospector;
-import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileIO;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
-import org.jgraph.graph.DefaultGraphCell;
-import viskit.model.*;
-import viskit.mvc.mvcAbstractController;
-import viskit.xsd.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.translator.SimkitXML2Java;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -23,6 +11,18 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import actions.ActionIntrospector;
+import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileIO;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
+import org.jgraph.graph.DefaultGraphCell;
+import viskit.model.*;
+import viskit.mvc.mvcAbstractController;
+import viskit.xsd.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.translator.SimkitXML2Java;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -987,8 +987,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             e.printStackTrace();
             return -1;
         }
-        //    return com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
-        return com.sun.tools.javac.Main.compile(new String[]{"-classpath", cp, "-d", f.getParent(), canPath});
+        //    return com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
+        return com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-classpath", cp, "-d", f.getParent(), canPath});
     }
 
     private static File makeFile(String src) {
@@ -1078,9 +1078,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             String cp = getCustomClassPath();
 
-            //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+            //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
             System.out.println("Compiling " + f.getCanonicalPath());
-            int reti = com.sun.tools.javac.Main.compile(new String[]{"-classpath", cp, "-d", f.getParent(), f.getCanonicalPath()});
+            int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-classpath", cp, "-d", f.getParent(), f.getCanonicalPath()});
 
             if (reti == 0 || completeOnBadCompile) {
                 return new File(f.getParentFile().getAbsoluteFile(), packagePath + baseName + ".class");

@@ -5,7 +5,9 @@
  */
 package viskit.xsd.translator;
 
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -56,22 +58,23 @@ public class SimkitXML2Java {
      * with a String for the name of the xmlFile
      */
     public SimkitXML2Java(String xmlFile) {
-        fileBaseName = baseNameOf(xmlFile);
         try {
+            fileBaseName = baseNameOf(xmlFile);
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            log.error(ex);
+        } catch (JAXBException ex) {
+            log.error(ex);
         }
-
     }
 
     public SimkitXML2Java(InputStream stream) {
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             fileInputStream = stream;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JAXBException ex) {
+            log.error(ex);
         }
     }
 
@@ -86,8 +89,8 @@ public class SimkitXML2Java {
         try {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimEntity) u.unmarshal(fileInputStream);
-        } catch (Exception e) {
-            System.err.println("Error unmarshalling " + fileBaseName + ": " + e.getMessage());
+        } catch (JAXBException ex) {
+            log.error(ex);
         }
     }
 
@@ -95,11 +98,11 @@ public class SimkitXML2Java {
 
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
-        StringWriter tail = new StringWriter();
         StringWriter vars = new StringWriter();
         StringWriter runBlock = new StringWriter();
         StringWriter eventBlock = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
+        StringWriter tail = new StringWriter();
 
         buildHead(head);
         buildVars(vars, accessorBlock);
@@ -243,7 +246,6 @@ public class SimkitXML2Java {
             d++;
             t = t.substring(s + 1);
         }
-
         return d;
     }
 
@@ -253,7 +255,6 @@ public class SimkitXML2Java {
         for (int k = 0; k < dims; k++) {
             inds += "int" + sp + "i" + k + cm + sp;
         }
-
         return inds;
     }
 
@@ -270,7 +271,6 @@ public class SimkitXML2Java {
         for (int k = 0; k < dims; k++) {
             inds += lb + "i" + k + rb;
         }
-
         return inds;
     }
 
@@ -413,6 +413,7 @@ public class SimkitXML2Java {
         pw.println(sp4 + cb);
         pw.println();
         pw.println(sp4 + "/** Set initial values of all state variables */");
+        pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void reset() {");
 
         List<LocalVariable> liLocalV = run.getLocalVariable();
@@ -458,7 +459,6 @@ public class SimkitXML2Java {
 
         pw.println(sp4 + cb);
         pw.println();
-
         pw.println(sp4 + "public void doRun() {");
 
         if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
@@ -912,7 +912,7 @@ public class SimkitXML2Java {
             e.printStackTrace();
         }
         return (com.sun.tools.javac.Main.compile(
-                new String[]{"-verbose", "-sourcepath", path, "-d", pd, path + File.separator + fileName}) == 0);
+                new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, path + File.separator + fileName}) == 0);
     }
 
     private String indexFrom(StateTransition st) {

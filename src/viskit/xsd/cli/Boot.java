@@ -114,11 +114,8 @@ public class Boot extends URLClassLoader implements Runnable {
     @Override
     public void addURL(URL jarURL) {
         URLConnection urlc;
-        URL u;
         JarEntry je;
-        JarFile jf;
         JarInputStream jis;
-        String rev = getJavaRev();
         try {
             urlc = jarURL.openConnection();
             jis = new JarInputStream(urlc.getInputStream());
@@ -148,7 +145,6 @@ public class Boot extends URLClassLoader implements Runnable {
                     
                     if ( name.endsWith("jar") ) {
                         if (debug) System.out.println("Found internal jar externalizing "+name);
-                        String tmpDir = System.getProperty("java.io.tmpdir");
                         File extJar;
                         extJar = File.createTempFile(name,".jar");
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
@@ -169,11 +165,8 @@ public class Boot extends URLClassLoader implements Runnable {
                         if (debug) System.out.println("Added jar "+extJar.toURI().toURL().toString());
                         String systemClassPath = System.getProperty("java.class.path");
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
-                        if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));
-                        
+                        if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));                        
                     }
-                    
-
                 }
             }
         } catch (Exception e) {

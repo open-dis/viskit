@@ -4,7 +4,6 @@
  * Created on April 1, 2004, 10:09 AM
  *
  */
-
 package viskit.xsd.assembly;
 
 import java.lang.reflect.Method;
@@ -87,9 +86,7 @@ public class SimkitAssemblyXML2Java {
      * Creates a new instance of SimkitAssemblyXML2Java
      * when used from another class, instance this
      * with a String for the name of the xmlFile.
-     *
-     */
-    
+     */    
     public SimkitAssemblyXML2Java(String xmlFile) {
         this.fileBaseName = baseNameOf(xmlFile);
         try {
@@ -206,8 +203,7 @@ public class SimkitAssemblyXML2Java {
             s = sw.toString();
         } catch (Exception e) { e.printStackTrace(); }
         return s;
-    }
-    
+    }    
     
     public void marshal(File f) {
         FileOutputStream fos;
@@ -235,11 +231,10 @@ public class SimkitAssemblyXML2Java {
         
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
-        StringWriter tail = new StringWriter();
         StringWriter entities = new StringWriter();
         StringWriter listeners = new StringWriter();
-        StringWriter connectors = new StringWriter();
         StringWriter output = new StringWriter();
+        StringWriter tail = new StringWriter();
         
         buildHead(head);
         buildEntities(entities);
@@ -736,14 +731,10 @@ public class SimkitAssemblyXML2Java {
             pw.println();
         }
         
-        
-        
         pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
         
         pw.println(sp4 + cb);
-        pw.println();
-        
-        
+        pw.println();        
     }
 
     String nameAsm() {
@@ -820,7 +811,7 @@ public class SimkitAssemblyXML2Java {
         } catch (Exception e) { e.printStackTrace(); }
         return (
                 com.sun.tools.javac.Main.compile(
-                new String[] {"-verbose","-sourcepath",path,"-d",pd,path+File.separator+fileName}
+                new String[] {"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, path + File.separator + fileName}
         ) == 0
                 );
     }

@@ -175,13 +175,13 @@ public class SourceWindow extends JFrame {
                         classPaths.append(cPath + File.pathSeparator);
                     }
 
-                    String[] options = {
+                    String[] options = {                        
+                        "-Xlint:unchecked",
+                        "-Xlint:deprecation",
                         "-classpath",
                         classPaths.toString(),
                         "-d",
-                        workDirPath,
-                        "-Xlint:unchecked",
-                        "-Xlint:deprecation"
+                        workDirPath
                     };
                     java.util.List<String> optionsList = Arrays.asList(options);
 
