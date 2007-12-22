@@ -18,7 +18,7 @@
         <StateTransition state="obstacleSensorRange">
             <Assignment value="20"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="RefereeRegister" priority="0">
+        <Schedule condition="true" delay="0.0" event="RefereeRegister" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="obstacles"/>
             <EdgeParameter value="numOfObstacles"/>
@@ -41,7 +41,7 @@
         <LocalVariable name="sensors" type="diskit.Sensor[]" value="new diskit.Sensor[arraySize]">
             <Comment>Array for sensors for each obstacle</Comment>
         </LocalVariable>
-        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterSensors" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="sensors"/>
             <EdgeParameter value="targets"/>
@@ -54,7 +54,7 @@
         <Argument name="newObstacles" type="diskit.DISMover3D[]">
             <Comment>Passed from the constructor</Comment>
         </Argument>
-        <Schedule condition="true" delay="0.0" event="RegisterTargets" priority="0">
+        <Schedule condition="true" delay="0.0" event="RegisterTargets" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="newObstacles"/>
         </Schedule>
@@ -92,23 +92,23 @@
         <LocalVariable name="arraySize" type="int" value="numOfObst">
             <Comment/>
         </LocalVariable>
-        <Schedule condition="done" delay="0.0" event="CreateTargets" priority="0">
+        <Schedule condition="done" delay="0.0" event="CreateTargets" priority="DEFAULT">
             <Comment>Check to make sure that that all movers are registered with the referee and then proceed</Comment>
             <EdgeParameter value="newMovers"/>
         </Schedule>
-        <Schedule condition="done" delay="0.0" event="CreateSensors" priority="0">
+        <Schedule condition="done" delay="0.0" event="CreateSensors" priority="DEFAULT">
             <Comment>Check to make sure all movers have been registered and then proceed</Comment>
             <EdgeParameter value="numOfObst"/>
             <EdgeParameter value="newMovers"/>
             <EdgeParameter value="range"/>
         </Schedule>
-        <Schedule condition="!done" delay="0.0" event="RefereeRegister" priority="0">
+        <Schedule condition="!done" delay="0.0" event="RefereeRegister" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="newMovers"/>
             <EdgeParameter value="numOfObst"/>
             <EdgeParameter value="range"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="Init" priority="0">
+        <Schedule condition="true" delay="0.0" event="Init" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="newMovers[idx]"/>
         </Schedule>

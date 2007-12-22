@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerAssembly" package="examples" version="1.0">
+<SimkitAssembly name="ServerAssembly" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <TerminalParameter name="exponential" type="double" value="1.95">
 	  
 	    Double[] exponential() {
@@ -104,7 +104,7 @@
             <TerminalParameter type="java.lang.String" value="Exponential"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter nameRef="exponential" type="double"/>
+                    <TerminalParameter name="exponential" type="double"/>
                 </MultiParameter>
             </MultiParameter>
             <TerminalParameter type="long" value="CongruentialSeeds.SEED[0]"/>
@@ -116,10 +116,10 @@
             <TerminalParameter type="java.lang.String" value="Gamma"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter nameRef="gamma1" type="double"/>
+                    <TerminalParameter name="gamma1" type="double"/>
                 </MultiParameter>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter nameRef="gamma2" type="double"/>
+                    <TerminalParameter name="gamma2" type="double"/>
                 </MultiParameter>
             </MultiParameter>
             <TerminalParameter type="long" value="CongruentialSeeds.SEED[1]"/>
@@ -143,7 +143,7 @@
     <Output entity="numAvailServersStat"/>
     <Output entity="numInQueueStat"/>
     <Schedule stopTime="1000.0" verbose="false"/>
-    <Experiment runID="ServerAssembly: Thu Mar 24 14:44:45 PST 2005">
+    <Experiment jobID="ServerAssembly: Thu Mar 24 14:44:45 PST 2005">
         <DesignPoint>
             <TerminalParameter type="double" value="1.0"/>
             <TerminalParameter type="double" value="1.0"/>

@@ -23,7 +23,7 @@
         <StateTransition state="pathMoverManager">
             <Assignment value="null"/>
         </StateTransition>
-        <Schedule condition="waypoints.length &gt; 0" delay="0.0" event="ProcessWaypoints" priority="0">
+        <Schedule condition="waypoints.length &gt; 0" delay="0.0" event="ProcessWaypoints" priority="DEFAULT">
             <Comment>Only proceed if this mover has waypoints to process, otherwise do nothing</Comment>
         </Schedule>
         <Code/>
@@ -34,7 +34,7 @@
         <Argument name="entity" type="simkit.SimEntity">
             <Comment>The entity being called by it's super class</Comment>
         </Argument>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="DEFAULT">
             <Comment>Only register this mover if the super class called this entity</Comment>
             <EdgeParameter value="this"/>
         </Schedule>

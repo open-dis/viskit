@@ -677,7 +677,7 @@ setCruiseSpeed(0.0);
         <Argument name="target" type="diskit.Mover3D">
             <Comment>The target to attack</Comment>
         </Argument>
-        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getEntityDefinition().getWidth() )">
+        <LocalVariable name="canIntercept" type="boolean" value="canIntercept(target, target.getEntityDefinition().getWidth())">
             <Comment>Determines if this target can be intercepted</Comment>
         </LocalVariable>
         <Schedule condition="canIntercept" delay="0.0" event="Attack" priority="DEFAULT">

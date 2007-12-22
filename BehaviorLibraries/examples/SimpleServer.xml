@@ -17,7 +17,7 @@
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue + 1"/>
         </StateTransition>
-        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="0">
+        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="DEFAULT">
             <Comment/>
             <EdgeParameter value="numberAvailableServers"/>
         </Schedule>
@@ -40,7 +40,7 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
         </StateTransition>
-        <Schedule condition="numberInQueue &gt; 0" delay="0.0" event="StartService" priority="1.0"/>
+        <Schedule condition="numberInQueue &gt; 0" delay="0.0" event="StartService" priority="HIGH"/>
         <Coordinate x="320" y="100"/>
     </Event>
 </SimEntity>

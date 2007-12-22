@@ -493,6 +493,6 @@
     <SimEventListenerConnection listener="X3DCreateZoneGeometry" source="SceneZoneCreator"/>
     <Output entity="ScenarioManager"/>
     <Schedule stopTime="10000.0" verbose="false"/>
-    <Experiment runsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
 
