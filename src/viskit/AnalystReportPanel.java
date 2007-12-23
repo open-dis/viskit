@@ -50,6 +50,7 @@ import viskit.xsd.assembly.XsltUtility;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellRenderer;
@@ -904,32 +905,34 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         open.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        if (dirty) {
-                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
-                                    "Confirm", JOptionPane.WARNING_MESSAGE);
-                            switch (result) {
-                                case JOptionPane.YES_OPTION:
-                                    saveReport();
-                                    break;
-                                case JOptionPane.CANCEL_OPTION:
-                                case JOptionPane.NO_OPTION:
-                                default:
-                                    break;
-                            }
+                public void actionPerformed(ActionEvent e) {
+                    if (dirty) {
+                        int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
+                                "Confirm", JOptionPane.WARNING_MESSAGE);
+                        switch (result) {
+                            case JOptionPane.YES_OPTION:
+                                saveReport();
+                                break;
+                            case JOptionPane.CANCEL_OPTION:
+                            case JOptionPane.NO_OPTION:
+                            default:
+                                break;
                         }
-
-                        JFileChooser openChooser = new JFileChooser("./AnalystReports");
-                        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-                        int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
-                        if (resp != JFileChooser.APPROVE_OPTION) {
-                            return;
-                        }
-
-                        buildArb(openChooser.getSelectedFile());
                     }
-                });
+
+                    JFileChooser openChooser = new JFileChooser("./AnalystReports");
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
+                    openChooser.setFileFilter(filter);
+                    openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                    int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
+                    if (resp != JFileChooser.APPROVE_OPTION) {
+                        return;
+                    }
+
+                    buildArb(openChooser.getSelectedFile());
+                }
+            });
 
         ActionListener saveAsLis = new ActionListener() {
 
