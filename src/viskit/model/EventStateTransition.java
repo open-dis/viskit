@@ -11,16 +11,19 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class EventStateTransition extends ViskitElement {
+    
     private ArrayList<String> descriptionArray = new ArrayList<String>();
     private String type;
     private String name;
-
+    private String arrayType;
     private String stateVarName = "";
     private String stateVarType = "";
     private String operationOrAssignment = "";
     private boolean isOperation = false;
     private ArrayList<String> comments = new ArrayList<String>();
     private String indexingExpression = "";
+    private String value;
+    private String comment;
 
     @Override
     public String toString() {
@@ -122,5 +125,20 @@ public class EventStateTransition extends ViskitElement {
     @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
+    }
+
+    @Override
+    public String getArrayType() {
+        return arrayType;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
     }
 }

@@ -1,11 +1,12 @@
 package viskit.model;
 
-import viskit.FileBasedAssyNode;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-
 import java.awt.*;
 import java.io.File;
 import java.util.Vector;
+
+import viskit.FileBasedAssyNode;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
+
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -16,9 +17,8 @@ import java.util.Vector;
  * Date: May 17, 2004
  * Time: 9:16:26 AM
  */
-
-public interface ViskitAssemblyModel
-{
+public interface ViskitAssemblyModel {
+    
   public void newEventGraph(String widgetName, String className, Point p);
   public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p);
 
@@ -60,6 +60,6 @@ public interface ViskitAssemblyModel
   //public String buildJavaAssemblySource();
   //public File   compileJavaClass(String src);
 
-  public Vector getVerboseEntityNames();
-  public void externalClassesChanged(Vector v);
+  public Vector<String> getVerboseEntityNames();
+  public void externalClassesChanged(Vector<String> v);
 }

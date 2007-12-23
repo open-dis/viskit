@@ -1,5 +1,22 @@
 package viskit.model;
 
+import java.awt.Point;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Vector;
+
+import javax.swing.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import edu.nps.util.FileIO;
 import viskit.ModelEvent;
 import viskit.VGlobals;
@@ -8,17 +25,6 @@ import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.bindings.eventgraph.Event;
 import viskit.xsd.translator.SimkitXML2Java;
-
-import javax.swing.*;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.awt.Point;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * This is the "master" model of an event graph.  It should hold the node, edge and assembly
@@ -44,7 +50,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     HashMap<Event, EventNode> evNodeCache = new HashMap<Event, EventNode>();
     HashMap<Object, Object> edgeCache = new HashMap<Object, Object>();
     Vector<ViskitElement> stateVariables = new Vector<ViskitElement>();
-    Vector<vParameter> simParameters = new Vector<vParameter>();
+    Vector<ViskitElement> simParameters = new Vector<ViskitElement>();
     private String privateIdxVarPrefix = "_idxvar_";
     private String privateLocVarPrefix = "locvar_";
     private String stateVarPrefix = "state_";
@@ -75,6 +81,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     public boolean isDirty() {
         return modelDirty;
     }
+    
     private boolean modelDirty = false;
 
     /**
@@ -125,10 +132,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();
                 mymetaData.extendsPackageName = jaxbRoot.getExtend();
-                List lis = jaxbRoot.getComment();
+                List<String> lis = jaxbRoot.getComment();
                 StringBuffer sb = new StringBuffer("");
-                for (Iterator itr = lis.iterator(); itr.hasNext();) {
-                    sb.append((String) itr.next());
+                for (String comment : lis) {
+                    sb.append(comment);
                     sb.append(" ");
                 }
                 mymetaData.description = sb.toString().trim();
@@ -208,8 +215,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             List<String> clis = jaxbRoot.getComment();
             clis.clear();
             String cmt = nIe(metaData.description);
-            if (cmt != null) // TODO: Fix generics
-            {
+            if (cmt != null) {
                 clis.add(cmt.trim());
             }
 
@@ -271,10 +277,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         return en;
     }
 
-    private String concatStrings(List lis) {
+    private String concatStrings(List<String> lis) {
         StringBuffer sb = new StringBuffer();
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            sb.append(((String) itr.next()));
+        for (String s : lis) {
+            sb.append(s);
             if (sb.length() > 0 && sb.charAt(sb.length() - 1) != ' ') {
                 sb.append(' ');
             }
@@ -336,14 +342,13 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     private boolean stateVarParamNameCheck() {
         HashSet<String> hs = new HashSet<String>(10);
-        for (ViskitElement vsv : stateVariables) {
-            if (!hs.add(vsv.getName())) {
+        for (ViskitElement sv : stateVariables) {
+            if (!hs.add(sv.getName())) {
                 return false;
             }
         }
-        for (Iterator itr = simParameters.iterator(); itr.hasNext();) {
-            vParameter vp = (vParameter) itr.next();
-            if (!hs.add(vp.getName())) {
+        for (ViskitElement sp : simParameters) {
+            if (!hs.add(sp.getName())) {
                 return false;
             }
         }
@@ -449,11 +454,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         se.conditional = ed.getCondition();
         se.priority = ed.getPriority();
 
-        List cmt = ed.getComment();
+        List<String> cmt = ed.getComment();
         if (!cmt.isEmpty()) {
             StringBuffer sb = new StringBuffer();
-            for (Iterator itr = cmt.iterator(); itr.hasNext();) {
-                sb.append((String) itr.next());
+            for (String comment : cmt) {
+                sb.append(comment);
                 sb.append("  ");
             }
             se.conditionalDescription = sb.toString().trim();
@@ -475,11 +480,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         ce.opaqueModelObject = ed;
         ce.conditional = ed.getCondition();
 
-        List cmt = ed.getComment();
+        List<String> cmt = ed.getComment();
         if (!cmt.isEmpty()) {
             StringBuffer sb = new StringBuffer();
-            for (Iterator itr = cmt.iterator(); itr.hasNext();) {
-                sb.append((String) itr.next());
+            for (String comment : cmt) {
+                sb.append(comment);
                 sb.append("  ");
             }
             ce.conditionalDescription = sb.toString().trim();
@@ -504,7 +509,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private ArrayList<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
         ArrayList<ViskitElement> alis = new ArrayList<ViskitElement>(3);
         for (EdgeParameter ep : lis) {
-            vEdgeParameter vep = new vEdgeParameter((String) ep.getValue()); //,ep.getType());
+            vEdgeParameter vep = new vEdgeParameter(ep.getValue()); //,ep.getType());
             alis.add(vep);
         }
         return alis;
@@ -520,8 +525,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         for (StateVariable var : lis) {
             List<String> varCom = var.getComment();
             String c = " ";
-            for (Iterator ii = varCom.iterator(); ii.hasNext();) {
-                c += (String) ii.next();
+            for (String comment : varCom) {
+                c += comment;
                 c += " ";
             }
             vStateVariable v = new vStateVariable(var.getName(), var.getType(), c.trim());
@@ -543,8 +548,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         for (Parameter p : lis) {
             List<String> pCom = p.getComment();
             String c = " ";
-            for (Iterator ii = pCom.iterator(); ii.hasNext();) {
-                c += (String) ii.next();
+            for (String comment : pCom) {
+                c += comment;
                 c += " ";
             }
             vParameter vp = new vParameter(p.getName(), p.getType(), c.trim());
@@ -561,16 +566,20 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
-    public Vector getAllNodes() {
-        return new Vector<EventNode>(evNodeCache.values());
+    public Vector<ViskitElement> getAllNodes() {
+        return new Vector<ViskitElement>(evNodeCache.values());
+    }
+    
+    // TODO: Known unchecked cast to ViskitElement
+    @SuppressWarnings("unchecked")
+    public Vector<ViskitElement> getStateVariables() {
+        return (Vector<ViskitElement>) stateVariables.clone();
     }
 
-    public Vector getStateVariables() {
-        return (Vector) stateVariables.clone();
-    }
-
-    public Vector getSimParameters() {
-        return (Vector) simParameters.clone();
+    // TODO: Known unchecked cast to ViskitElement
+    @SuppressWarnings("unchecked")
+    public Vector<ViskitElement> getSimParameters() {
+        return (Vector<ViskitElement>) simParameters.clone();
     }
 
     // Source building
@@ -585,7 +594,6 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
         return null;
     }
-
 
     // parameter mods
     // --------------
@@ -749,11 +757,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private StateVariable findStateVariable(String nm) {
-        List lis = jaxbRoot.getStateVariable();
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            StateVariable st = (StateVariable) itr.next();
-            if (st.getName().equals(nm)) {
-                return st;
+        List<StateVariable> lis = jaxbRoot.getStateVariable();
+        for (StateVariable sv : lis) {
+            if (sv.getName().equals(nm)) {
+                return sv;
             }
         }
         return null;
@@ -787,17 +794,14 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private boolean isUniqueLVorIdxVname(String nm) {
-        for (Iterator itr = evNodeCache.values().iterator(); itr.hasNext();) {
-            EventNode event = (EventNode) itr.next();
-            for (Iterator itt = event.getLocalVariables().iterator(); itt.hasNext();) {
-                EventLocalVariable lv = (EventLocalVariable) itt.next();
+        for (EventNode event : evNodeCache.values()) {
+            for (ViskitElement lv : event.getLocalVariables()) {
                 if (lv.getName().equals(nm)) {
                     return false;
                 }
             }
-            for (Iterator it2 = event.getTransitions().iterator(); it2.hasNext();) {
-                EventStateTransition est = (EventStateTransition) it2.next();
-                String ie = est.getIndexingExpression();
+            for (ViskitElement transition : event.getTransitions()) {
+                String ie = transition.getIndexingExpression();
                 if (ie != null && ie.equals(nm)) {
                     return false;
                 }
@@ -807,8 +811,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private boolean isUniqueSVname(String nm) {
-        for (Iterator itr = stateVariables.iterator(); itr.hasNext();) {
-            vStateVariable sv = (vStateVariable) itr.next();
+        for (ViskitElement sv : stateVariables) {
             if (sv.getName().equals(nm)) {
                 return false;
             }
@@ -830,19 +833,17 @@ public class Model extends mvcAbstractModel implements ViskitModel {
      * @param targ
      * @param local
      */
-    private void cloneTransitions(List<StateTransition> targ, ArrayList local, List<LocalVariable> locVarList) {
+    private void cloneTransitions(List<StateTransition> targ, ArrayList<ViskitElement> local, List<LocalVariable> locVarList) {
         targ.clear();
-        for (Iterator itr = local.iterator(); itr.hasNext();) {
-            EventStateTransition est = (EventStateTransition) itr.next();
+        for (ViskitElement transition : local) {
             StateTransition st = oFactory.createStateTransition();
-            StateVariable sv = findStateVariable(est.getStateVarName());
+            StateVariable sv = findStateVariable(transition.getStateVarName());
             st.setState(sv);
             if (sv.getType() != null && sv.getType().indexOf('[') != -1) {
                 // build a local variable
-
                 LocalVariable lvar = oFactory.createLocalVariable();
 
-                lvar.setName(est.getIndexingExpression());
+                lvar.setName(transition.getIndexingExpression());
                 lvar.setType("int");
                 lvar.setValue("0");
                 lvar.getComment().clear();
@@ -851,20 +852,19 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
                 st.setIndex(lvar);
             }
-            if (est.isOperation()) {
+            if (transition.isOperation()) {
                 Operation o = oFactory.createOperation();
-                o.setMethod(est.getOperationOrAssignment());
+                o.setMethod(transition.getOperationOrAssignment());
                 st.setOperation(o);
             } else {
                 Assignment a = oFactory.createAssignment();
-                a.setValue(est.getOperationOrAssignment());
+                a.setValue(transition.getOperationOrAssignment());
                 st.setAssignment(a);
             }
 
-            est.opaqueModelObject = st; //replace
+            transition.opaqueModelObject = st; //replace
             targ.add(st);
         }
-
     }
 
     private void cloneComments(List<String> targ, ArrayList<String> local) {
@@ -874,28 +874,27 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     private void cloneArguments(List<Argument> targ, ArrayList<ViskitElement> local) {
         targ.clear();
-        for (ViskitElement ve : local) {
+        for (ViskitElement eventArguments : local) {
             Argument arg = oFactory.createArgument();
-            arg.setName(nIe(ve.getName()));
-            arg.setType(nIe(ve.getType()));
+            arg.setName(nIe(eventArguments.getName()));
+            arg.setType(nIe(eventArguments.getType()));
             arg.getComment().clear();
-            arg.getComment().addAll(ve.getDescriptionArray());
-            ve.opaqueModelObject = arg; // replace
+            arg.getComment().addAll(eventArguments.getDescriptionArray());
+            eventArguments.opaqueModelObject = arg; // replace
             targ.add(arg);
         }
     }
 
-    private void cloneLocalVariables(List<LocalVariable> targ, Vector local) {
+    private void cloneLocalVariables(List<LocalVariable> targ, Vector<ViskitElement> local) {
         targ.clear();
-        for (Iterator itr = local.iterator(); itr.hasNext();) {
-            EventLocalVariable elv = (EventLocalVariable) itr.next();
+        for (ViskitElement eventLocalVariables : local) {
             LocalVariable lvar = oFactory.createLocalVariable();
-            lvar.setName(nIe(elv.getName()));
-            lvar.setType(nIe(elv.getType()));
-            lvar.setValue(nIe(elv.getValue()));
+            lvar.setName(nIe(eventLocalVariables.getName()));
+            lvar.setType(nIe(eventLocalVariables.getType()));
+            lvar.setValue(nIe(eventLocalVariables.getValue()));
             lvar.getComment().clear();
-            lvar.getComment().add(elv.getComment());
-            elv.opaqueModelObject = lvar; //replace
+            lvar.getComment().add(eventLocalVariables.getComment());
+            eventLocalVariables.opaqueModelObject = lvar; //replace
             targ.add(lvar);
         }
     }
@@ -958,11 +957,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         ArrayList<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            ArrayList<ViskitElement> eps = new ArrayList<ViskitElement>(args.size());
+            ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
             for (int i = 0; i < args.size(); i++) {
-                eps.add(new vEdgeParameter(""));
+                edgeParameters.add(new vEdgeParameter(""));
             }
-            se.parameters = eps;
+            se.parameters = edgeParameters;
         }
 
         se.priority = "" + simkit.Priority.DEFAULT.getPriority();  // set default
@@ -991,11 +990,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         ArrayList<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            ArrayList<ViskitElement> eps = new ArrayList<ViskitElement>(args.size());
+            ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
             for (int i = 0; i < args.size(); i++) {
-                eps.add(new vEdgeParameter(""));
+                edgeParameters.add(new vEdgeParameter(""));
             }
-            ce.parameters = eps;
+            ce.parameters = edgeParameters;
         }
 
         this.edgeCache.put(can, ce);
@@ -1014,10 +1013,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private void _commonEdgeDelete(Edge edg) {
         Object jaxbEdge = edg.opaqueModelObject;
 
-        List nodes = jaxbRoot.getEvent();
-        for (Iterator itr = nodes.iterator(); itr.hasNext();) {
-            Event ev = (Event) itr.next();
-            List edges = ev.getScheduleOrCancel();
+        List<Event> nodes = jaxbRoot.getEvent();
+        for (Event ev : nodes) {
+            List<Object> edges = ev.getScheduleOrCancel();
             edges.remove(jaxbEdge);
         }
 
@@ -1041,12 +1039,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         sch.setEvent((Event) e.to.opaqueModelObject);
         sch.setPriority(e.priority);
         sch.getEdgeParameter().clear();
-        for (Iterator itr = e.parameters.iterator(); itr.hasNext();) {
-            vEdgeParameter vp = (vEdgeParameter) itr.next();
+        for (ViskitElement edgeParameter : e.parameters) {
             EdgeParameter p = oFactory.createEdgeParameter();
-
-            //p.setType(vp.getType());
-            p.setValue(nIe(vp.getValue()));
+            p.setValue(nIe(edgeParameter.getValue()));
             sch.getEdgeParameter().add(p);
         }
 
@@ -1062,15 +1057,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         can.getComment().add(e.conditionalDescription);
 
         can.getEdgeParameter().clear();
-        for (Iterator itr = e.parameters.iterator(); itr.hasNext();) {
-            vEdgeParameter vp = (vEdgeParameter) itr.next();
+        for (ViskitElement edgeParameter : e.parameters) {
             EdgeParameter p = oFactory.createEdgeParameter();
-
-            //p.setType(vp.getType());
-            p.setValue(nIe(vp.getValue()));
+            p.setValue(nIe(edgeParameter.getValue()));
             can.getEdgeParameter().add(p);
         }
-
 
         setDirty(true);
         this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELLINGEDGECHANGED, "Cancelling edge changed"));

@@ -495,7 +495,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             } else {
                 lTree.addContentRoot(new File(path), true);
             }
-
         }
 
         LegosPanel lPan = new LegosPanel(lTree);

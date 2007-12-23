@@ -1100,10 +1100,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         } catch (Exception e) {
             System.err.println("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
             FileBasedClassManager.inst().addCacheMiss(xmlFile);
-        //     ((ViskitAssemblyView)getView()).removeFromEventGraphPallette(xmlFile);
         }
         return null;
-
     }
 
     PkgAndFile createEventGraphClass(File xmlFile) {
@@ -1293,9 +1291,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         v.add("" + ((ViskitAssemblyModel) getModel()).getMetaData().verbose);    // 8
         v.add(((ViskitAssemblyModel) getModel()).getMetaData().stopTime);      // 9
 
-        Vector vec = ((ViskitAssemblyModel) getModel()).getVerboseEntityNames();
-        for (Iterator itr = vec.iterator(); itr.hasNext();) {
-            v.add((String) itr.next());                                                  // 10+
+        Vector<String> vec = ((ViskitAssemblyModel) getModel()).getVerboseEntityNames();
+        for (String s : vec) {
+            v.add(s);                                                  // 10+
         }
 
         String[] ra = new String[v.size()];

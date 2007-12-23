@@ -104,8 +104,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @Override
     public void reset() {
         super.reset();
-        for (int i = 0; i < replicationStats.length; ++i) {
-            replicationStats[i].reset();
+        for (SampleStatistics sampleStats : replicationStats) {
+            sampleStats.reset();
         }
         startRepNumber = 0;
     }
@@ -152,20 +152,22 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * ReportStatistics config uses the underscore to extract the entity name
      * from the key values of the LinkedHashMap.
      * <p/>
-     * TODO: Remove the naming convention requirement and has the SimEntityName be
+     * TODO: Remove the naming convention requirement and have the SimEntityName be
      * an automated key value
      */
     protected void setStatisticsKeyValues(LinkedHashMap repStatistics) {
         Iterator itr = repStatistics.entrySet().iterator();
         entitiesWithStats = new LinkedList<String>();
+        log.info("Inside setStatisticsKeyValues()");
         while (itr.hasNext()) {
             Map.Entry entry = (Map.Entry) itr.next();
-            entitiesWithStats.add(entry.getKey().toString());
-            println.println(entry.getKey().toString());
+            String ent = entry.getKey().toString();
+            log.info("Entry is: " + entry);
+            entitiesWithStats.add(ent);
+            println.println(ent);
             println.flush();
         }
         statsConfig.setEntityIndex(entitiesWithStats);
-
     }
 
     protected abstract void createSimEntities();
@@ -203,8 +205,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Set up all outer stats propertyChangeListeners
      */
     protected void hookupDesignPointListeners() {
-        for (int i = 0; i < designPointStats.length; ++i) {
-            this.addPropertyChangeListener(designPointStats[i]);
+        for (SampleStatistics designPointStat : designPointStats) {
+            this.addPropertyChangeListener(designPointStat);
         }
     }
 
@@ -441,9 +443,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         StringBuffer buf = new StringBuffer("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());
-        for (int i = 0; i < designPointStats.length; ++i) {
+        for (SampleStatistics designPointStat : designPointStats) {
             buf.append(System.getProperty("line.separator"));
-            buf.append(designPointStats[i]);
+            buf.append(designPointStat);
         }
         return buf.toString();
     }
@@ -583,7 +585,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
-                    JOptionPane.showMessageDialog(null, "Viskit has detected a possible error condition in the simulation entities. \nIt is possible that one of the entities is instancing a SimEntity type unsafely, \nplease check that any internally created entities are handled appropriately. \nYou'll probably have to restart Viskit, however Viskit will now try to swap in\n a new EventList for debugging purposes only.");
+                    JOptionPane.showMessageDialog(null, "Viskit has detected " +
+                            "a possible error condition in the simulation " +
+                            "entities. \nIt is possible that one of the " +
+                            "entities is instancing a SimEntity type unsafely," +
+                            " \nplease check that any internally created " +
+                            "entities are handled appropriately. \nYou'll " +
+                            "probably have to restart Viskit, however Viskit " +
+                            "will now try to swap in\n a new EventList for " +
+                            "debugging purposes only.");
                     int newEventListId = Schedule.addNewEventList();
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
                     for (SimEntity entity : simEntity) {
@@ -600,7 +610,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 }
 
                 Schedule.startSimulation();
-
 
                 for (int i = 0; i < replicationStats.length; ++i) {
                     fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
@@ -636,9 +645,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 } catch (NoSuchMethodException ex) {
                     ex.printStackTrace();
                 }
-            //scenarioManager.waitDelay("Stop",0.0);
             }
-        } // for
+        }
 
         if (isPrintSummaryReport()) {
             println.println(getSummaryReport());
@@ -649,7 +657,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Creates the temp file only when user required
             initReportFile();
-            //statsConfig.saveData();
             statsConfig.processSummaryReport(designPointStats);
 
             /* Invoke the AnalystReportBuilder via reflection.  Reflection is used 
@@ -698,8 +705,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     // this is getting called by the Assembly Runner stop
     // button, which may get called on startup.
     public void stop() {
-        //Schedule.stopSimulation();
-        //Schedule.reset(); //?
         stopRun = true;
     }
 

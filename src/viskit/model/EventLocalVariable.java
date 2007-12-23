@@ -20,6 +20,10 @@ public class EventLocalVariable extends ViskitElement {
     private String arrayType;
     private String[] arraySize;
     private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private String indexingExpression;
+    private String stateVarName;
+    private boolean operation;
+    private String operationOrAssignment;
 
     public EventLocalVariable(String name, String type, String value) {
         this.name = name;
@@ -77,5 +81,25 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
+    }
+
+   @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
+
+    @Override
+    public String getStateVarName() {
+        return stateVarName;
+    }
+
+    @Override
+    public String getOperationOrAssignment() {
+        return operationOrAssignment;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return operation;
     }
 }

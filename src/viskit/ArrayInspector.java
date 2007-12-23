@@ -120,7 +120,7 @@ public class ArrayInspector  extends JDialog
 
   public VInstantiator.Array getData()
   {
-    return new VInstantiator.Array(typeTF.getText().trim(),olp.getData());
+    return new VInstantiator.Array(typeTF.getText().trim(), olp.getData());
   }
   class sizeListener implements ActionListener
   {

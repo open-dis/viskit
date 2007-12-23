@@ -20,6 +20,10 @@ public class vParameter extends ViskitElement {
     private String arrayType;
     private String[] arraySize;
     private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private boolean operation;
+    private String operationOrAssignment;
+    private String indexingExpression;
+    private String stateVarName;
 
     vParameter(String pName, String pType) //package-accessible
     {
@@ -83,5 +87,25 @@ public class vParameter extends ViskitElement {
     @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
+    }
+
+    @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
+
+    @Override
+    public String getStateVarName() {
+        return stateVarName;
+    }
+
+    @Override
+    public String getOperationOrAssignment() {
+        return operationOrAssignment;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return operation;
     }
 }

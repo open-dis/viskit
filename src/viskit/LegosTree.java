@@ -268,8 +268,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
           }
         }
         File[] fa = f.listFiles(new MyClassTypeFilter(true));
-        for (int i = 0; i < fa.length; i++)
-          addContentRoot(fa[i], recurse, rootVector);
+        for (File file : fa) {
+            addContentRoot(file, recurse, rootVector);
+        }
       }   // recurse = true
     }     // is directory
 

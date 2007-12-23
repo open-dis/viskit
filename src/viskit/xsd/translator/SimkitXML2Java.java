@@ -5,11 +5,14 @@
  */
 package viskit.xsd.translator;
 
-import java.util.logging.Level;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,6 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 // Application specific imports
 import viskit.xsd.bindings.eventgraph.*;
@@ -175,7 +181,7 @@ public class SimkitXML2Java {
             }
 
             if (c != null) {
-                java.lang.reflect.Constructor cst = null;
+                Constructor cst = null;
 
                 try {
                     cst = c.getConstructor(new Class<?>[]{});
@@ -307,7 +313,7 @@ public class SimkitXML2Java {
     }
 
     void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
-
+       
         List<Event> events = this.root.getEvent();
         boolean didRun = false;
 
@@ -328,7 +334,7 @@ public class SimkitXML2Java {
     }
 
     void doRunBlock(Event run, StringWriter runBlock) {
-
+        
         PrintWriter pw = new PrintWriter(runBlock);
         List<Object> liSchedCanc = run.getScheduleOrCancel();
         List<Parameter> superPList = new ArrayList<Parameter>();
@@ -466,11 +472,11 @@ public class SimkitXML2Java {
             Method doRun = null;
             try {
                 Class<?> sup = Class.forName(this.root.getExtend());
-                doRun = sup.getDeclaredMethod("doRun", new Class<?>[]{});
+                doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
             } catch (ClassNotFoundException cnfe) {
-//                log.error(cnfe);
+                log.error(cnfe);
             } catch (NoSuchMethodException cnfe) {
-//                log.error(cnfe);
+                log.error(cnfe);
             }
             if (doRun != null) {
                 pw.println(sp8 + "super.doRun();");
@@ -989,7 +995,7 @@ public class SimkitXML2Java {
      */
     public static void main(String[] args) {
 
-        System.out.println("Generating Java Source...");
+        log.info("Generating Java Source...");
 
         SimkitXML2Java sx2j = new SimkitXML2Java(args[0]);
         sx2j.unmarshal();
@@ -999,21 +1005,20 @@ public class SimkitXML2Java {
             sx2j.writeOut(dotJava, System.out);
         }
 
-        System.out.println("Done.");
+        log.info("Done.");
 
         // also write out the .java to a file and compile it
         // to a .class
-        System.out.println("Generating Java Bytecode...");
+        log.info("Generating Java Bytecode...");
         try {
             String fileName = sx2j.fileBaseName + ".java";
-            FileOutputStream fout =
-                    new FileOutputStream(fileName);
+            FileOutputStream fout = new FileOutputStream(fileName);
             PrintStream ps = new PrintStream(fout, true);
             sx2j.writeOut(dotJava, ps);
             if (!sx2j.compileCode(fileName)) {
                 sx2j.error("Compile error " + fileName);
             } else {
-                System.out.println("Done.");
+                log.info("Done.");
             }
         } catch (FileNotFoundException fnfe) {
             sx2j.error("Bad filename " + sx2j.fileBaseName);

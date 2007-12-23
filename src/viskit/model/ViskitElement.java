@@ -31,7 +31,7 @@ abstract public class ViskitElement
 
   // every node or edge has a unique key
   private static int seqID = 0;
-  private Object modelKey = ""+seqID++;
+  private Object modelKey = "" + (seqID++);
 
   public Object getModelKey()
   {
@@ -46,7 +46,21 @@ abstract public class ViskitElement
   
   public abstract void setType(String type);
   
+  public abstract String getArrayType();
+  
+  public abstract String getIndexingExpression();
+  
+  public abstract String getStateVarName();
+  
+  public abstract String getValue();
+  
+  public abstract String getComment();
+  
   public abstract ArrayList<String> getDescriptionArray();
 
   public abstract void setDescriptionArray(ArrayList<String> descriptionArray);
+  
+  public abstract String getOperationOrAssignment();
+  
+  public abstract boolean isOperation();
 }

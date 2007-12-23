@@ -520,11 +520,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         factMethodTF.setEnabled(true);
         factMethodLab.setEnabled(true);
         factMethodButt.setEnabled(true);
-        Class[] pc = m.getParameterTypes();
+        Class<?>[] pc = m.getParameterTypes();
         Vector<VInstantiator> vc = new Vector<VInstantiator>();
-        for(int i=0;i<pc.length;i++) {
+        for(int i = 0; i < pc.length; i++) {
           if(pc[i].isArray())
-            vc.add(new VInstantiator.Array(Vstatics.convertClassName(pc[i].getName()),new ArrayList()));
+            vc.add(new VInstantiator.Array(Vstatics.convertClassName(pc[i].getName()),new ArrayList<Object>()));
           else
             vc.add(new VInstantiator.FreeF(Vstatics.convertClassName(pc[i].getName()),""));
         }

@@ -16,6 +16,13 @@ public class EventArgument extends ViskitElement {
     private String type;
     private String name;
     private ArrayList<String> comments = new ArrayList<String>();
+    private boolean operation;
+    private String operationOrAssignment;
+    private String arrayType;
+    private String indexingExpression;
+    private String stateVarName;
+    private String value;
+    private String comment;
 
     public ArrayList<String> getDescription() {
         return comments;
@@ -53,5 +60,40 @@ public class EventArgument extends ViskitElement {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getArrayType() {
+        return arrayType;
+    }
+
+    @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
+
+    @Override
+    public String getStateVarName() {
+        return stateVarName;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public String getOperationOrAssignment() {
+        return operationOrAssignment;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return operation;
     }
 }

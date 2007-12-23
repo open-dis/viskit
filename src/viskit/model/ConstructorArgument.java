@@ -14,10 +14,15 @@ import java.util.ArrayList;
 public class ConstructorArgument extends ViskitElement {
     private ArrayList<String> descriptionArray = new ArrayList<String>();
     private String name;
-
+    private boolean operation;
+    private String operationOrAssignment;
+    private String arrayType;
+    private String indexingExpression;
+    private String stateVarName;
     private String type;
     private String value;
     private ArrayList<String> comments = new ArrayList<String>();
+    private String comment;
 
     public ArrayList getComments() {
         return comments;
@@ -61,5 +66,35 @@ public class ConstructorArgument extends ViskitElement {
     @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
+    }
+
+    @Override
+    public String getArrayType() {
+        return arrayType;
+    }
+
+    @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
+
+    @Override
+    public String getStateVarName() {
+        return stateVarName;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public String getOperationOrAssignment() {
+        return operationOrAssignment;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return operation;
     }
 }

@@ -1,6 +1,6 @@
 package viskit.model;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.File;
 import java.util.Vector;
 
@@ -14,9 +14,8 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id: ViskitModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-
-public interface ViskitModel
-{
+public interface ViskitModel {
+    
   /**
    * Separate initialization from object construction.
    */
@@ -27,41 +26,42 @@ public interface ViskitModel
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
    * @return for good open
    */
-  public boolean newModel      (File f);
+  public boolean newModel(File f);
 
   /**
    * Save existing model to specified file.  If null, save to last file.  If no last file, error.
    * @param f File to save to.
    */
-  public void saveModel     (File f);
+  public void saveModel(File f);
 
   /**
    * @return A File object representing the last one passed to the two methods above.
    */
   public File getLastFile();
+  
   /**
    *  Reports saved state of model.  Becomes "clean" after a save.
    */
-  public boolean isDirty       ();
+  public boolean isDirty();
 
   /**
    * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
    * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
    * @return Vector of EventNodes.
    */
-  public Vector    getAllNodes ();
+  public Vector<ViskitElement> getAllNodes();
 
   /**
    * Messaged by controller to inst all defined StateVariables.
    * @return Vector of StateVariables.
    */
-  public Vector    getStateVariables();
+  public Vector<ViskitElement> getStateVariables();
   
   /**
    * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
    * @return Vector of vParameter objects.
    */
-  public Vector getSimParameters();
+  public Vector<ViskitElement> getSimParameters();
 
 
   /**
@@ -69,7 +69,6 @@ public interface ViskitModel
    * @return The generated source as a String, or null if error.
    */
   public String buildJavaSource();
-
 
   // todo further comments...
   public void    newEvent      (String nodeName, Point p);

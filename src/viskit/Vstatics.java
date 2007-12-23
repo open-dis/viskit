@@ -27,15 +27,14 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:27:07 AM
  * @version $Id: Vstatics.java 1666 2007-12-17 05:24:41Z tdnorbra $
  */
-public class Vstatics
-{
+public class Vstatics {
+    
   /**
    * Convert a class name to human readable form.  (See Class.getName());
    * @param s from Class.getName()
    * @return readable version
    */
-  public static String convertClassName(String s)
-  {
+  public static String convertClassName(String s) {
     if(s.charAt(0) != '[')
       return s;
 
@@ -294,14 +293,14 @@ public class Vstatics
     else
       return null;
   }
-  static Class tryPrimsAndArrays(String s, ClassLoader cLdr) {
+  static Class<?> tryPrimsAndArrays(String s, ClassLoader cLdr) {
     String[] spl = s.split("\\[");
     boolean isArray = spl.length > 1;
     char prefix = ' ';
     String name = "";
     char suffix = ' ';
     retrnChar rc = new retrnChar();
-    Class c = tryPrimitive(spl[0],rc);
+    Class<?> c = tryPrimitive(spl[0],rc);
 
     if(c != null) {   // primitive
       if(isArray)
@@ -319,7 +318,7 @@ public class Vstatics
     }
     StringBuffer sb = new StringBuffer();
     if(isArray)
-      for(int i=0;i<spl.length-1;i++)
+      for(int i = 0; i < (spl.length - 1); i++)
         sb.append('[');
 
     sb.append(prefix);
@@ -328,7 +327,7 @@ public class Vstatics
     String ns = sb.toString().trim();
 
     try {
-      c = Class.forName(ns,false,cLdr); //Vstatics.class.getClassLoader());
+      c = Class.forName(ns, false, cLdr);
       return c;
     }
     catch (ClassNotFoundException e) {
@@ -359,7 +358,9 @@ public class Vstatics
   
   static public List<Object>[] resolveParameters(String type) {
       List<Object>[] resolved = parameterMap.get(type);
-      if (debug) if (resolved != null) System.out.println("parameters already resolved");
+      if (debug) 
+          if (resolved != null) 
+              System.out.println("parameters already resolved");
       if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
           Class c = classForName(type);
           if(c == null) {
@@ -384,7 +385,8 @@ public class Vstatics
               ;
           }
           if (f != null) { // these would be base classes not arrays
-              if(debug)System.out.println(f+" is a parameterMap");
+              if(debug) 
+                  System.out.println(f + " is a parameterMap");
               try {
                   // parameters are in the following order
                   // {
@@ -392,7 +394,7 @@ public class Vstatics
                   //  { "type0","name0", ... }
                   //  ...
                   // }
-                  String[][] parameterMap = (String[][])(f.get(new String[0][0]));
+                  String[][] parameterMap = (String[][]) (f.get(new String[0][0]));
                   int numConstrs = parameterMap.length;
                   
                   for (int n = 0; n < numConstrs; n++) {

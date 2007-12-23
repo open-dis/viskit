@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.Vector;
 import java.util.ArrayList;
-import java.awt.*;
+import java.awt.Point;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -14,9 +14,7 @@ import java.awt.*;
  * @since 9:47:55 AM
  * @version $Id: AssemblyNode.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-
-abstract public class AssemblyNode extends ViskitElement
-{
+public abstract class AssemblyNode extends ViskitElement {
   private String name;
   private String type;
 

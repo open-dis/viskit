@@ -1,16 +1,5 @@
 package viskit;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.NameSpace;
-import edu.nps.util.FileIO;
-import edu.nps.util.SysExitHandler;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
-import static edu.nps.util.GenericConversion.toArray;
-import viskit.doe.LocalBootLoader;
-import viskit.model.*;
-
 import javax.swing.*;
 import java.awt.Component;
 import java.awt.Frame;
@@ -23,11 +12,24 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.NameSpace;
+import edu.nps.util.FileIO;
+import edu.nps.util.SysExitHandler;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
+import static edu.nps.util.GenericConversion.toArray;
+import viskit.doe.LocalBootLoader;
+import viskit.model.AssemblyModel;
+import viskit.model.EventNode;
+import viskit.model.ViskitElement;
+import viskit.model.ViskitModel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -234,11 +236,11 @@ public class VGlobals {
         }
     }
 
-    private Vector getStateVarsList() {
+    private Vector<ViskitElement> getStateVarsList() {
         return getActiveEventGraphModel().getStateVariables();
     }
 
-    private Vector getSimParmsList() {
+    private Vector<ViskitElement> getSimParmsList() {
         return getActiveEventGraphModel().getSimParameters();
     }
 
@@ -255,11 +257,11 @@ public class VGlobals {
 
         String[] extraCP = Vstatics.getExtraClassPathArray();
         if (extraCP != null && extraCP.length > 0) {
-            for (int i = 0; i < extraCP.length; i++) {
+            for (String path : extraCP) {
                 try {
-                    interpreter.getClassManager().addClassPath(new URL("file", "localhost", extraCP[i]));
+                    interpreter.getClassManager().addClassPath(new URL("file", "localhost", path));
                 } catch (IOException e) {
-                    System.err.println("bad extra classpath: " + extraCP[i]);
+                    System.err.println("bad extra classpath: " + path);
                 }
             }
         }
@@ -287,23 +289,21 @@ public class VGlobals {
         s = s.replace('\n', ' ');
 
         // state variables
-        for (Iterator itr = getStateVarsList().iterator(); itr.hasNext();) {
-            vStateVariable sv = (vStateVariable) itr.next();
+        for (ViskitElement stateVariable : getStateVarsList()) {
             String result;
-            if (sv.getType().indexOf('[') != -1) {
-                result = handleNameType(sv.getName(), sv.getArrayType(), false);
+            if (stateVariable.getType().indexOf('[') != -1) {
+                result = handleNameType(stateVariable.getName(), stateVariable.getArrayType(), false);
             } else {
-                result = handleNameType(sv.getName(), sv.getType(), false);
+                result = handleNameType(stateVariable.getName(), stateVariable.getType(), false);
             }
             if (result != null) {
                 clearNamespace();
                 return bshErr + "\n" + result;
             }
-            nsSets.add(sv.getName());
+            nsSets.add(stateVariable.getName());
         }
         // Sim parameters
-        for (Iterator itr = getSimParmsList().iterator(); itr.hasNext();) {
-            vParameter par = (vParameter) itr.next();
+        for (ViskitElement par : getSimParmsList()) {
             String result;
             if (par.getType().indexOf('[') != -1) {
                 result = handleNameType(par.getName(), par.getArrayType(), false);
@@ -318,23 +318,21 @@ public class VGlobals {
         }
         // Event local variables
         if (node != null) {
-            for (Iterator itr = node.getLocalVariables().iterator(); itr.hasNext();) {
-                EventLocalVariable elv = (EventLocalVariable) itr.next();
+            for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
                 String result;
-                if (elv.getType().indexOf('[') != -1) {
-                    result = handleNameType(elv.getName(), elv.getArrayType(), false);
+                if (eventLocalVariable.getType().indexOf('[') != -1) {
+                    result = handleNameType(eventLocalVariable.getName(), eventLocalVariable.getArrayType(), false);
                 } else {
-                    result = handleNameType(elv.getName(), elv.getType(), false);
+                    result = handleNameType(eventLocalVariable.getName(), eventLocalVariable.getType(), false);
                 }
                 if (result != null) {
                     clearNamespace();
                     return bshErr + "\n" + result;
                 }
-                nsSets.add(elv.getName());
+                nsSets.add(eventLocalVariable.getName());
             }
             // Event arguments
-            for (Iterator itr = node.getArguments().iterator(); itr.hasNext();) {
-                EventArgument ea = (EventArgument) itr.next();
+            for (ViskitElement ea : node.getArguments()) {
                 String result = handleNameType(ea.getName(), ea.getType(), false);
                 if (result != null) {
                     clearNamespace();
@@ -359,11 +357,11 @@ public class VGlobals {
     }
 
     private void clearNamespace() {
-        for (Iterator itr = nsSets.iterator(); itr.hasNext();) {
+        for (String ns : nsSets) {
             try {
-                interpreter.unset((String) itr.next());
+                interpreter.unset(ns);
             } catch (EvalError evalError) {
-            //System.out.println(evalError.getMessage());
+//                log.error(evalError);
             }
         }
         nsSets.clear();
@@ -622,14 +620,7 @@ public class VGlobals {
         popup = new JPopupMenu();
         JMenu m;
         JMenuItem mi;
-        /*
-    for(Iterator itr = VsimkitObjects.hashmap.keySet().iterator(); itr.hasNext();) {
-      String s = (String)itr.next();
-      mi = new JMenuItem(s);
-      mi.addActionListener(myListener);
-      popup.add(mi);
-    }
-*/
+       
         for (int i = 0; i < morePackages.length; i++) {
             if (moreClasses[i].length <= 0) {           // if no classes, make the "package selectable
                 mi = new MyJMenuItem(morePackages[i], null);
@@ -706,12 +697,12 @@ public class VGlobals {
         String javaVariableNameRegExp;
 
         // Do a REGEXP to confirm that the variable name fits the criteria for
-    // a Java variable. We don't want to allow something like "2f", which
-    // Java will misinterpret as a number literal rather than a variable. This regexp
-    // is slightly more restrictive in that it demands that the variable name
-    // start with a lower case letter (which is not demanded by Java but is
-    // a strong convention) and disallows the underscore. "^" means it
-    // has to start with a lower case letter in the leftmost position.
+        // a Java variable. We don't want to allow something like "2f", which
+        // Java will misinterpret as a number literal rather than a variable. This regexp
+        // is slightly more restrictive in that it demands that the variable name
+        // start with a lower case letter (which is not demanded by Java but is
+        // a strong convention) and disallows the underscore. "^" means it
+        // has to start with a lower case letter in the leftmost position.
 
         javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
         if (!Pattern.matches(javaVariableNameRegExp, nm)) {
@@ -723,7 +714,7 @@ public class VGlobals {
         }
 
         // Check to make sure the name the user specified isn't already used by a state variable
-    // or parameter.
+        // or parameter.
 
         for (int idx = 0; idx < existingNames.size(); idx++) {
             if (nm.equals(existingNames.get(idx))) {
@@ -829,11 +820,9 @@ public class VGlobals {
     private ClassLoader workLoader;
 
     public ClassLoader getWorkClassLoader() {
-        if (workLoader == null) {;
-
+        if (workLoader == null) {
             LocalBootLoader loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), Thread.currentThread().getContextClassLoader(), getWorkDirectory());
             workLoader = loader.init(true);
-
         }
         return workLoader;
     }

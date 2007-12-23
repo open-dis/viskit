@@ -139,7 +139,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
     }
 
     public void externalClassesChanged(Vector v) {
@@ -248,7 +247,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         modelDirty = true;
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
-
     }
 
     public void newPropChangeListener(String widgetName, String className, Point p) {
@@ -285,14 +283,13 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         newPropChangeListener(widgetName, node.loadedClass, p);
     }
 
-    public AdapterEdge newAdapterEdge(String adName, AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target)
+    public AdapterEdge newAdapterEdge(String adName, AssemblyNode src, AssemblyNode target)
     {
         AdapterEdge ae = new AdapterEdge();
         ae.setFrom(src);
         ae.setTo(target);
         ae.setName(adName);
 
-        // TODO: update with generic JWSDP
         src.getConnections().add(ae);
         target.getConnections().add(ae);
 
@@ -343,7 +340,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         sele.setFrom(src);
         sele.setTo(target);
 
-        // TODO: fix generics
         src.getConnections().add(sele);
         target.getConnections().add(sele);
 
@@ -413,7 +409,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     public void changePclEdge(PropChangeEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
-        //pclc.setListener(targ.opaqueModelObject);  never changes
         pclc.setProperty(pclEdge.getProperty());
         pclc.setDescription(pclEdge.getDescriptionString());
 
@@ -456,12 +451,13 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     public boolean changePclNode(PropChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate name detected: " + pclNode.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE, 
+                    "Duplicate name detected: " + pclNode.getName() +
                     "\nUnique name substituted.");
             manglePCLName(pclNode);
             retcode = false;
         }
-        viskit.xsd.bindings.assembly.PropertyChangeListener jaxBPcl = (viskit.xsd.bindings.assembly.PropertyChangeListener) pclNode.opaqueModelObject;
+        PropertyChangeListener jaxBPcl = (PropertyChangeListener) pclNode.opaqueModelObject;
         jaxBPcl.setName(pclNode.getName());
         jaxBPcl.setType(pclNode.getType());
         jaxBPcl.setDescription(pclNode.getDescriptionString());
@@ -474,7 +470,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             }
         }
 
-        viskit.xsd.bindings.assembly.Coordinate coor = oFactory.createCoordinate();
+        Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
         int x = ((pclNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
@@ -490,12 +486,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         VInstantiator inst = pclNode.getInstantiator();
 
         List<Object> jlistt = getJaxbParamList(inst);
-        /*
-        for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
-        Object o = itr.next();
-        lis.add(o);
-        }
-         */
+        
         // this will be a list of one...a MultiParameter....get its list, but throw away the
         // object itself.  This is because the PropertyChangeListener object serves as "its own" MultiParameter,
         if (jlistt.size() != 1) {
@@ -527,7 +518,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         jaxbSE.setType(evNode.getType());
         jaxbSE.setDescription(evNode.getDescriptionString());
 
-        viskit.xsd.bindings.assembly.Coordinate coor = oFactory.createCoordinate();
+        Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
         int x = ((evNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
@@ -543,12 +534,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         VInstantiator inst = evNode.getInstantiator();
 
         List<Object> jlistt = getJaxbParamList(inst);
-        /*
-        for (Iterator itr = jlistt.iterator(); itr.hasNext();) {
-        Object o = itr.next();
-        lis.add(o);
-        }
-         */
+        
         // this will be a list of one...a MultiParameter....get its list, but throw away the
         // object itself.  This is because the SimEntity object serves as "its own" MultiParameter,
         if (jlistt.size() != 1) {
@@ -573,9 +559,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     private void removeFromOutputList(SimEntity se) {
-        List outTL = jaxbRoot.getOutput();
-        for (Iterator itr = outTL.iterator(); itr.hasNext();) {
-            Output o = (Output) itr.next();
+        List<Output> outTL = jaxbRoot.getOutput();
+        for (Output o : outTL) {
             if (o.getEntity() == se) {
                 outTL.remove(o);
                 return;
@@ -597,7 +582,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         outTL.add(op);
     }
 
-    public Vector getVerboseEntityNames() {
+    public Vector<String> getVerboseEntityNames() {
         Vector<String> v = new Vector<String>();
         for (Output ot : jaxbRoot.getOutput()) {
             Object entity = ot.getEntity();
@@ -639,18 +624,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         if (o instanceof MultiParameter) {           // used for both arrays and Constr arg lists
             MultiParameter mu = (MultiParameter) o;
-            if (mu.getType().indexOf('[') != -1) {
-                return buildArrayFromMultiParameter(mu);
-            } else {
-                return buildConstrFromMultiParameter(mu);
-            }
+            return (mu.getType().indexOf('[') != -1) ? buildArrayFromMultiParameter(mu) : buildConstrFromMultiParameter(mu);
         }
-        if (o instanceof FactoryParameter) {
-            return buildFactoryInstFromFactoryParameter((FactoryParameter) o);
-        } else //assert false: "bad object, buildInstantiatorFromJaxbParameter
-        {
-            return null;
-        }
+        return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
     private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
@@ -698,8 +674,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }       // MultiParam
 
         //assert false : AssemblyModel.buildJaxbParameter() received null;
-        return null; //
-
+        return null;
     }
 
     private TerminalParameter buildParmFromFreeF(VInstantiator.FreeF viff) {
@@ -750,10 +725,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         mp.setType(viarr.getType());
 
-        for (Iterator itr = viarr.getInstantiators().iterator(); itr.hasNext();) {
-            VInstantiator vi = (VInstantiator) itr.next();
-
-            // TODO: Fix generics
+        for (Object vi : viarr.getInstantiators()) {
             mp.getParameters().add(buildParam(vi));
         }
         return mp;
@@ -794,14 +766,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     }
                     mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
-                /*        List lis = jaxbRoot.getComment();
-                StringBuffer sb = new StringBuffer("");
-                for(Iterator itr = lis.iterator(); itr.hasNext();) {
-                sb.append((String)itr.next());
-                sb.append(" ");
-                }
-                metaData.comment = sb.toString().trim();
-                 */
+                
                 VGlobals.instance().assemblyReset();
                 nodeCache.clear();
                 assEdgeCache.clear();
@@ -995,7 +960,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(en, ModelEvent.EVENTGRAPHADDED, "Event added"));
 
         return en;
-
     }
 
     /**

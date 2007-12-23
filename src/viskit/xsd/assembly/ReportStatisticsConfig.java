@@ -2,14 +2,8 @@
  * ReportStatisticsConfig.java
  *
  * Created on July 15, 2006, 3:38 PM
- *
  */
 package viskit.xsd.assembly;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import simkit.stat.SampleStatistics;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,7 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import simkit.stat.SampleStatistics;
 
 /** 
  * This class serves as the intermediate step between viskit.xsd.BasicAssembly and
@@ -34,7 +33,7 @@ import org.jdom.output.Format;
  * the name of each SimEntity for each PropChangeListener.  These names are used to index output 
  * from the simulation.
  *
- * TODO: Remove the naming convention requiriment and index the statistics object in either the
+ * TODO: Remove the naming convention requirement and index the statistics object in either the
  *       BasicAssembly or ViskitAssembly classes.
  *
  * @author Patrick Sullivan
@@ -87,20 +86,18 @@ public class ReportStatisticsConfig {
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
      */
-    public void setEntityIndex(LinkedList keyValues) {
+    public void setEntityIndex(LinkedList<String> keyValues) {
         System.out.println("\n\nAnalyst Report Selected for the following:");
         System.out.println("         Entity Name Data Point");
-        //System.out.printf("%-20s %s",new Object[]{"Entity Name", "Data Point\n"});
         System.out.println("-----------------------------------------");
-        Iterator itr = keyValues.iterator();
         entityIndex = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
         int seperator = 0;
         int idx = 0;
-        while (itr.hasNext()) {
-            String key = (String) itr.next();
+        for (String key : keyValues) {
             seperator = findUnderscore(key);
-// TODO:  verify this logic works with/without underscores present
+            
+            // TODO:  verify this logic works with/without underscores present
             entityIndex[idx] = key.substring(0, seperator);
             if (seperator > 0) {
                 propertyIndex[idx] = key.substring(seperator + 1, key.length());
@@ -108,7 +105,6 @@ public class ReportStatisticsConfig {
                 propertyIndex[idx] = key.substring(seperator, key.length());
             }
 
-            //System.out.printf("%-20s %s",new Object[]{ entityIndex[idx], (propertyIndex[idx] +"\n")});
             System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
             idx++;
         }
@@ -139,8 +135,8 @@ public class ReportStatisticsConfig {
      */
     public void processReplicationReport(int repNumber, SampleStatistics[] rep) {
         //System.out.println("\n\nProcessRepReports in RepStatsConfig");
-        for (int j = 0; j < rep.length; j++) {
-            System.out.println(rep[j].getName());
+        for (SampleStatistics sampleStat : rep) {
+            System.out.println(sampleStat.getName());
         }
         Element[] replicationUpdate = new Element[rep.length];
 
@@ -216,7 +212,8 @@ public class ReportStatisticsConfig {
             XMLOutputter outputter = new XMLOutputter();
             Format fmt = Format.getPrettyFormat();
             outputter.setFormat(fmt);
-            //Create a unique file name for each DTG/Location Pair
+            
+            // Create a unique file name for each DTG/Location Pair
             File anStatDir = new File("./AnalystReports/statistics");
             anStatDir.mkdirs();
 

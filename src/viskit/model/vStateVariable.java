@@ -24,6 +24,11 @@ public class vStateVariable extends ViskitElement {
     private Object currentValue;
     private String comment = "";
     private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private boolean operation;
+    private String operationOrAssignment;
+    private String indexingExpression;
+    private String stateVarName;
+    private String value;
 
     @Override
     public String toString() {
@@ -33,8 +38,7 @@ public class vStateVariable extends ViskitElement {
     /**
      * Constructor
      */
-    vStateVariable(String pVariableName, // package-accessible
-            String pVariableType) {
+    vStateVariable(String pVariableName, String pVariableType) {
         variableName = pVariableName;
         setType(pVariableType);
         currentValue = null;
@@ -125,5 +129,30 @@ public class vStateVariable extends ViskitElement {
     @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
+    }
+
+    @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
+
+    @Override
+    public String getStateVarName() {
+        return stateVarName;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String getOperationOrAssignment() {
+        return operationOrAssignment;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return operation;
     }
 }

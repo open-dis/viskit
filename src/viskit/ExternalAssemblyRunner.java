@@ -33,17 +33,17 @@ public class ExternalAssemblyRunner extends JFrame {
     Object targetObject;
     boolean defaultVerbose;
     double defaultStopTime;
-    List outputs;
+    List<String> outputs;
     RunnerPanel runPanel;
     ActionListener closer, saver;
     static String lineSep = System.getProperty("line.separator");
     JMenuBar myMenuBar;
 
-    public ExternalAssemblyRunner(String className, boolean verbose, double stopTime, List outputEntities) {
+    public ExternalAssemblyRunner(String className, boolean verbose, double stopTime, List<String> outputEntities) {
         this(false, className, verbose, stopTime, outputEntities);
     }
 
-    public ExternalAssemblyRunner(boolean contentOnly, String className, boolean verbose, double stopTime, List outputEntities) {
+    public ExternalAssemblyRunner(boolean contentOnly, String className, boolean verbose, double stopTime, List<String> outputEntities) {
         this.targetClassName = className;
         this.defaultVerbose = verbose;
         this.defaultStopTime = stopTime;
@@ -129,9 +129,9 @@ public class ExternalAssemblyRunner extends JFrame {
 
         System.out.println("\n" + borderString);
         boolean first = true;
-        for (Iterator itr = outputs.iterator(); itr.hasNext();) {
+        for (String fieldName : outputs) {
             try {
-                Field fld = targetObject.getClass().getField((String) itr.next());
+                Field fld = targetObject.getClass().getField(fieldName);
                 if (first) {
                     first = false;
                 } else {
@@ -396,7 +396,7 @@ public class ExternalAssemblyRunner extends JFrame {
      * @param args
      */
     public static void main(String[] args) {
-        Vector v = null;
+        Vector<String> v = null;
         try {
             v = _mainCommon(args);
         } catch (Exception e) {
@@ -410,7 +410,7 @@ public class ExternalAssemblyRunner extends JFrame {
     }
     private static String errMsg = "Wrong number of parameters to ExternalAssemblyRunner.main().";
 
-    private static Vector _mainCommon(String[] args) throws Exception {
+    private static Vector<String> _mainCommon(String[] args) throws Exception {
         if (args.length < 2) {
             JOptionPane.showMessageDialog(null, errMsg,
                     "Internal Error", JOptionPane.ERROR_MESSAGE);
@@ -420,8 +420,8 @@ public class ExternalAssemblyRunner extends JFrame {
         Vector<String> v = null;
         if (args.length > 3) {
             v = new Vector<String>();
-            for (int i = 3; i < args.length; i++) {
-                v.add(args[i]);
+            for (String arg : args) {
+                v.add(arg);
             }
         }
 
@@ -430,7 +430,7 @@ public class ExternalAssemblyRunner extends JFrame {
 
     /** An alternate entry point which doesn't assume we're to run in a different vm. */
     public static ExternalAssemblyRunner main2(String[] args) {
-        Vector v = null;
+        Vector<String> v = null;
         try {
             v = _mainCommon(args);
         } catch (Exception e) {
