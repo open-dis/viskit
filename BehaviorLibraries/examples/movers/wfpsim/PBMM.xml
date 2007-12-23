@@ -31,7 +31,7 @@
         <StateTransition state="patrolling">
             <Assignment value="true"/>
         </StateTransition>
-        <Schedule delay="0.0" event="NextWayPt" priority="DEFAULT" condition="patrolling">
+        <Schedule delay="0.0" event="NextWayPt" priority="0" condition="patrolling">
             <Comment/>
         </Schedule>
         <Coordinate x="48" y="175"/>
@@ -41,7 +41,7 @@
         <StateTransition state="patrolBoat">
             <Operation method="moveTo(path[wayPoint])"/>
         </StateTransition>
-        <Schedule delay="0.0" event="StartMove" priority="DEFAULT" condition="true">
+        <Schedule delay="0.0" event="StartMove" priority="0" condition="true">
             <Comment/>
             <EdgeParameter value="getPatrolBoat()"/>
         </Schedule>
@@ -53,7 +53,7 @@
         <LocalVariable type="simkit.smdx.UniformLinearMover" value="m" name="tgt">
             <Comment/>
         </LocalVariable>
-        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="DEFAULT" condition="true">
+        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="0" condition="true">
             <Comment/>
             <EdgeParameter value="tgt"/>
         </Schedule>
@@ -66,7 +66,7 @@
             <Assignment value="wayPoint + ((wayPoint &gt;= (path.length-1))?1:-wayPoint)"/>
         </StateTransition>
         <Schedule event="NextWayPt"/>
-        <Schedule delay="0.0" event="EndIntercept" priority="DEFAULT" condition="(!patrolling) &amp;&amp; (tgt != null)">
+        <Schedule delay="0.0" event="EndIntercept" priority="0" condition="(!patrolling) &amp;&amp; (tgt != null)">
             <Comment/>
             <EdgeParameter value="tgt"/>
         </Schedule>
@@ -83,7 +83,7 @@
             <Assignment value="false"/>
         </StateTransition>
         <Cancel event="EndMove"/>
-        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="DEFAULT" condition="true">
+        <Schedule delay="patrolBoat.getMoveTime()" event="EndMove" priority="0" condition="true">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>

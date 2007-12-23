@@ -51,7 +51,7 @@
         <StateTransition state="movementState">
             <Assignment value="simkit.smdx.MovementState.STOPPED"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="Init" priority="DEFAULT">
+        <Schedule condition="true" delay="0.0" event="Init" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -59,12 +59,12 @@
     </Event>
     <Event name="Init">
         <Comment>listened to by ScenarioManager and others</Comment>
-        <Argument name="mover" type="diskit.DISMover3D"/>
+        <Argument name="mover" type="diskit.xml.DISMover3D"/>
         <Coordinate x="220" y="30"/>
     </Event>
     <Event name="EndMove">
         <Comment/>
-        <Argument name="mover" type="diskit.DISMover3D"/>
+        <Argument name="mover" type="diskit.xml.DISMover3D"/>
         <StateTransition state="startPosition">
             <Operation method="set(getDestination())"/>
         </StateTransition>
@@ -119,7 +119,7 @@
         <StateTransition state="movementState">
             <Assignment value="simkit.smdx.MovementState.CRUISING"/>
         </StateTransition>
-        <Schedule condition="true" delay="duration" event="EndMove" priority="DEFAULT">
+        <Schedule condition="true" delay="duration" event="EndMove" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
@@ -145,7 +145,7 @@
         <StateTransition state="cruisingSpeed">
             <Assignment value="(cruiseSpeed &gt; getMaxSpeed())?getMaxSpeed():cruiseSpeed"/>
         </StateTransition>
-        <Schedule condition="getCruisingSpeed() &gt; 0.0" delay="0.0" event="Ahead" priority="DEFAULT">
+        <Schedule condition="getCruisingSpeed() &gt; 0.0" delay="0.0" event="Ahead" priority="0">
             <Comment/>
             <EdgeParameter value="tp"/>
         </Schedule>

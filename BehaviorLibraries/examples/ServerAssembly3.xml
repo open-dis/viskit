@@ -35,11 +35,11 @@
         <TerminalParameter name="totalNumberServers" type="int" value="2"/>
         <Coordinate x="280" y="90"/>
     </SimEntity>
-    <PropertyChangeListener mode="replicationStat" name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="replicationStats" name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberInQueue"/>
         <Coordinate x="210" y="230"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="replicationStats" name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
         <Coordinate x="350" y="230"/>
     </PropertyChangeListener>

@@ -61,23 +61,23 @@
         </FactoryParameter>
         <Coordinate x="350" y="140"/>
     </SimEntity>
-    <PropertyChangeListener mode="replicationStat" name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats">
+    <PropertyChangeListener mode="replicationStats" name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats">
         <TerminalParameter type="java.lang.String" value="queue"/>
         <Coordinate x="230" y="260"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally">
+    <PropertyChangeListener mode="replicationStats" name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
         <Coordinate x="320" y="260"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="replicationStats" name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberServed"/>
         <Coordinate x="410" y="260"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="replicationStats" name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberReneges"/>
         <Coordinate x="510" y="260"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying">
+    <PropertyChangeListener mode="replicationStats" name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberArrivals"/>
         <Coordinate x="40" y="260"/>
     </PropertyChangeListener>

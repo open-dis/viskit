@@ -6,8 +6,7 @@
     </Parameter>
     <Parameter type="java.awt.geom.Point2D" name="location">
         <Comment/>
-    </Parameter>    
-    <Parameter type="double" name="maxSpeed">
+    </Parameter>    <Parameter type="double" name="maxSpeed">
         <Comment/>
     </Parameter>
     <Event name="Run">

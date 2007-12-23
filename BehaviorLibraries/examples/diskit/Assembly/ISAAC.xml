@@ -747,6 +747,6 @@
     <SimEventListenerConnection listener="ScenarioManager" source="Blue10"/>
     <Output entity="ScenarioManager"/>
     <Schedule stopTime="10000.0" verbose="false"/>
-    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+    <Experiment runsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
 </SimkitAssembly>
 

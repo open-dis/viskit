@@ -110,7 +110,7 @@
         <LocalVariable name="m" type="boolean" value="true; setStartPosition(getLocation())">
             <Comment/>
         </LocalVariable>
-        <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="Patrol" priority="DEFAULT">
+        <Schedule condition="tacticalMode == diskit.TacticalMode.ESCORTED" delay="0.0" event="Patrol" priority="0">
             <Comment/>
         </Schedule>
         <Code/>
@@ -122,11 +122,11 @@
         <StateTransition state="reach">
             <Assignment value="new diskit.SphereCutterSensor(this,visualRange)"/>
         </StateTransition>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="DEFAULT">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment/>
             <EdgeParameter value="this"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="DEFAULT">
+        <Schedule condition="true" delay="0.0" event="RegisterSensor" priority="0">
             <Comment/>
             <EdgeParameter value="reach"/>
         </Schedule>
@@ -155,11 +155,11 @@
             <Operation method="add(newTarget)"/>
         </StateTransition>
         <Cancel event="EndPatrol"/>
-        <Schedule condition="!obstacleQueue.contains(newTarget)" delay="0.0" event="AssessObstacle" priority="DEFAULT">
+        <Schedule condition="!obstacleQueue.contains(newTarget)" delay="0.0" event="AssessObstacle" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
-        <Schedule condition="7 &lt; 3" delay="0.0" event="SecurityAlert" priority="DEFAULT">
+        <Schedule condition="7 &lt; 3" delay="0.0" event="SecurityAlert" priority="0">
             <Comment>if target is not an obstacle or friend</Comment>
         </Schedule>
         <Cancel event="StandOff"/>
@@ -184,7 +184,7 @@
         <StateTransition state="obstacleQueue">
             <Operation method="add(newTarget)"/>
         </StateTransition>
-        <Schedule condition="( times[0] &gt; 0.0 ) &amp;&amp; (  times[0] &lt; Double.POSITIVE_INFINITY )" delay="0.0" event="AvoidObstacle" priority="DEFAULT">
+        <Schedule condition="( times[0] &gt; 0.0 ) &amp;&amp; (  times[0] &lt; Double.POSITIVE_INFINITY )" delay="0.0" event="AvoidObstacle" priority="0">
             <Comment/>
             <EdgeParameter value="newTarget"/>
         </Schedule>
@@ -277,10 +277,10 @@
         <StateTransition state="canIntercept">
             <Assignment value="interceptMoverManager.interceptToOffset(target,2.0*avoidanceRange)"/>
         </StateTransition>
-        <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="DEFAULT">
+        <Schedule condition="!canIntercept" delay="0.0" event="StandOff" priority="0">
             <Comment/>
         </Schedule>
-        <Schedule condition="this.getLocation() == interceptMoverManager.getInterceptPoint() " delay="0.0" event="ClearExclusionZone" priority="DEFAULT">
+        <Schedule condition="this.getLocation() == interceptMoverManager.getInterceptPoint() " delay="0.0" event="ClearExclusionZone" priority="0">
             <Comment/>
             <EdgeParameter value="target"/>
         </Schedule>

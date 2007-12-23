@@ -6,14 +6,14 @@
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>
         </StateTransition>
-        <Schedule priority="DEFAULT" delay="interarrivalTime.generate()" event="Arrival"/>
+        <Schedule priority="0.0" delay="interarrivalTime.generate()" event="Arrival"/>
         <Coordinate y="60" x="40"/>
     </Event>
     <Event name="Arrival">
         <StateTransition state="numberArrivals">
             <Assignment value="numberArrivals + 1"/>
         </StateTransition>
-        <Schedule priority="DEFAULT" delay="interarrivalTime.generate()" event="Arrival"/>
+        <Schedule priority="0.0" delay="interarrivalTime.generate()" event="Arrival"/>
         <Coordinate y="60" x="250"/>
     </Event>
 </SimEntity>

@@ -15,12 +15,12 @@
         <Argument name="contact" type="diskit.Mover3D"/>
         <Argument name="sensor" type="diskit.Sensor"/>
         <Argument name="originator" type="diskit.Mover3D"/>
-        <Schedule condition="true" delay="0.0" event="IDContact" priority="DEFAULT">
+        <Schedule condition="true" delay="0.0" event="IDContact" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="sensor"/>
         </Schedule>
-        <Schedule condition="true" delay="0.0" event="DisplayComms" priority="DEFAULT">
+        <Schedule condition="true" delay="0.0" event="DisplayComms" priority="0">
             <Comment/>
             <EdgeParameter value="contact"/>
             <EdgeParameter value="originator"/>

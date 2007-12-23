@@ -35,7 +35,7 @@
         <StateTransition state="queue">
             <Operation method="add(customer)"/>
         </StateTransition>
-        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="HIGHEST">
+        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="10.0">
             <Comment/>
         </Schedule>
         <Code>customer.stampTime();</Code>
@@ -52,7 +52,7 @@
         <StateTransition state="delayInQueue">
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
-        <Schedule condition="true" delay="serviceTimeGenerator.generate()" event="EndService" priority="DEFAULT">
+        <Schedule condition="true" delay="serviceTimeGenerator.generate()" event="EndService" priority="0.0">
             <Comment/>
             <EdgeParameter value="customer"/>
         </Schedule>
@@ -68,7 +68,7 @@
         <StateTransition state="timeInSystem">
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
-        <Schedule condition="queue.size() &gt; 0" delay="0.0" event="StartService" priority="HIGHEST">
+        <Schedule condition="queue.size() &gt; 0" delay="0.0" event="StartService" priority="10.0">
             <Comment/>
         </Schedule>
         <Code/>

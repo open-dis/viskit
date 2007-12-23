@@ -8,7 +8,7 @@
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
         </StateTransition>
-        <Schedule condition="true" delay="0.0" event="CustomerArrival" priority="DEFAULT">
+        <Schedule condition="true" delay="0.0" event="CustomerArrival" priority="0">
             <Comment/>
             <EdgeParameter value="new Integer(nextID)"/>
         </Schedule>

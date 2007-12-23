@@ -26,7 +26,7 @@
         <StateTransition state="zoneMoverManager">
             <Assignment value="null"/>
         </StateTransition>
-        <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="DEFAULT">
+        <Schedule condition="zones.length &gt; 0" delay="0.0" event="ProcessZones" priority="0">
             <Comment>Only proceed if this mover has zones to process, otherwise do nothing</Comment>
         </Schedule>
         <Code/>
@@ -37,7 +37,7 @@
         <Argument name="entity" type="simkit.SimEntity">
             <Comment>The entity being called by it's super class</Comment>
         </Argument>
-        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="DEFAULT">
+        <Schedule condition="entity == this" delay="0.0" event="RegisterTarget" priority="0">
             <Comment>Only register this mover if the super class called this entity</Comment>
             <EdgeParameter value="this"/>
         </Schedule>
