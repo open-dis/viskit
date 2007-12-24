@@ -325,8 +325,6 @@ public class SimkitXML2Java {
             pw.println(sp4 + cb);
             pw.println();
         }
-
-        pw.println();
     }
 
     void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
@@ -358,8 +356,6 @@ public class SimkitXML2Java {
         List<Parameter> pList = this.root.getParameter();
 
         pw.println();
-        pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
-        pw.println();
         pw.println(sp4 + "@viskit.ParameterMap" + sp + lp);
         pw.print(sp8 + "names =" + sp + ob);
         for (Parameter pt : pList) {
@@ -382,6 +378,8 @@ public class SimkitXML2Java {
         }
         pw.println(cb);
         pw.println(sp4 + rp);
+        pw.println();
+        pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
         pw.print(sp4 + "public " + this.root.getName() + lp);
 
         for (Parameter pt : pList) {
@@ -398,7 +396,6 @@ public class SimkitXML2Java {
         }
 
         pw.println(rp + sp + ob);
-        pw.println();
 
         if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
 
@@ -445,11 +442,9 @@ public class SimkitXML2Java {
             pw.println(sp8 + local.getType() + sp + local.getName() + sc);
         }
 
-        pw.println();
         pw.println(sp8 + "super.reset()" + sc);
         pw.println();
-        pw.println(sp8 + "/** StateTransitions for the Run Event */");
-        pw.println();
+        pw.println(sp8 + "/* StateTransitions for the Run Event */");
 
         List<StateTransition> liStateT = run.getStateTransition();
 
@@ -481,8 +476,7 @@ public class SimkitXML2Java {
         }
 
         pw.println(sp4 + cb);
-        pw.println();
-        pw.println(sp4 + "public void doRun() {");
+        pw.println();        
 
         if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
             // check if super has a doRun()
@@ -496,8 +490,12 @@ public class SimkitXML2Java {
                 log.error(cnfe);
             }
             if (doRun != null) {
+                pw.println(sp4 + "@Override");
+                pw.println(sp4 + "public void doRun() {");
                 pw.println(sp8 + "super.doRun();");
             }
+        } else {
+            pw.println(sp4 + "public void doRun() {");            
         }
 
         liStateT = run.getStateTransition();
@@ -772,7 +770,6 @@ public class SimkitXML2Java {
         if (c.getCondition() != null) {
             pw.println(sp8 + cb);
         }
-
     }
 
     void buildTail(StringWriter t) {
@@ -781,12 +778,11 @@ public class SimkitXML2Java {
         if (code != null) {
             pw.println(sp4 + "/* Inserted code for " + this.root.getName() + " */");
             String[] lines = code.split("\\n");
-            for (int i = 0; i < lines.length; i++) {
-                pw.println(sp4 + lines[i]);
+            for (String codeLines : lines) {
+                pw.println(sp4 + codeLines);
             }
             pw.println(sp4 + "/* End inserted code */");
         }
-        pw.println();
         pw.println(cb);
     }
 
@@ -912,12 +908,11 @@ public class SimkitXML2Java {
         String path = this.root.getPackage();
         File fDest;
         char[] pchars;
-        int j;
         // this doesn't work! : path.replaceAll(pd,File.separator);
         pchars = path.toCharArray();
-        for (j = 0; j < pchars.length; j++) {
-            if (pchars[j] == '.') {
-                pchars[j] = File.separatorChar;
+        for (char character : pchars) {
+            if (character == '.') {
+                character = File.separatorChar;
             }
         }
         path = new String(pchars);
@@ -931,8 +926,8 @@ public class SimkitXML2Java {
             e.printStackTrace();
         }
         return (com.sun.tools.javac.Main.compile(new String[] {"-Xlint:unchecked", 
-        "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, 
-        path + File.separator + fileName}) == 0);
+            "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, 
+            path + File.separator + fileName}) == 0);
     }
 
     private String indexFrom(StateTransition st) {
