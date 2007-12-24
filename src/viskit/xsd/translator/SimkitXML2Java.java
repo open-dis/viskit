@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -38,7 +39,7 @@ public class SimkitXML2Java {
     static Logger log = Logger.getLogger(SimkitXML2Java.class);
     private SimEntity root;
     InputStream fileInputStream;
-    String fileBaseName;
+    private String fileBaseName;
     JAXBContext jaxbCtx;
 
     /* convenience Strings for formatting */
@@ -118,6 +119,22 @@ public class SimkitXML2Java {
         buildSource(source, head, vars, runBlock, eventBlock, accessorBlock, tail);
 
         return source.toString();
+    }
+    
+    public String getFileBaseName() {
+        return fileBaseName;
+    }
+
+    public void setFileBaseName(String fileBaseName) {
+        this.fileBaseName = fileBaseName;
+    }
+    
+    public void writeOut(String data, PrintStream out) {
+        out.println(data);
+    }
+    
+    public SimEntity getRoot() {
+        return root;
     }
 
     void buildHead(StringWriter head) {
@@ -780,10 +797,6 @@ public class SimkitXML2Java {
         source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer()).append(tail.getBuffer());
     }
 
-    public void writeOut(String data, java.io.PrintStream out) {
-        out.println(data);
-    }
-
     private String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
@@ -917,8 +930,9 @@ public class SimkitXML2Java {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return (com.sun.tools.javac.Main.compile(
-                new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, path + File.separator + fileName}) == 0);
+        return (com.sun.tools.javac.Main.compile(new String[] {"-Xlint:unchecked", 
+        "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, 
+        path + File.separator + fileName}) == 0);
     }
 
     private String indexFrom(StateTransition st) {
@@ -983,10 +997,6 @@ public class SimkitXML2Java {
         System.exit(1);
     }
 
-    public SimEntity getRoot() {
-        return root;
-    }
-
     /**
      * @param args the command line arguments
      * args[0] - XML file to translate
@@ -995,12 +1005,24 @@ public class SimkitXML2Java {
      */
     public static void main(String[] args) {
 
+        log.info("XML file is: " + args[0]);
         log.info("Generating Java Source...");
+        
+        InputStream is = null;
+        try {
+            is = new FileInputStream(args[0]);
+        } catch (FileNotFoundException fnfe) {log.error(fnfe);}
 
-        SimkitXML2Java sx2j = new SimkitXML2Java(args[0]);
+//        SimkitXML2Java sx2j = new SimkitXML2Java(args[0]);
+        SimkitXML2Java sx2j = new SimkitXML2Java(is);
+        File baseName = new File(sx2j.baseNameOf(args[0]));
+        log.info("baseName: " + baseName.getAbsolutePath());
+        sx2j.setFileBaseName(baseName.getName());
         sx2j.unmarshal();
 
         String dotJava = sx2j.translate();
+        
+        // Print to console if given args < 1
         if (args.length > 1) {
             sx2j.writeOut(dotJava, System.out);
         }
@@ -1011,17 +1033,18 @@ public class SimkitXML2Java {
         // to a .class
         log.info("Generating Java Bytecode...");
         try {
-            String fileName = sx2j.fileBaseName + ".java";
+            File fileName = new File(sx2j.getRoot().getPackage() + "/" + sx2j.getFileBaseName() + ".java");
+            fileName.getParentFile().mkdir();
             FileOutputStream fout = new FileOutputStream(fileName);
             PrintStream ps = new PrintStream(fout, true);
             sx2j.writeOut(dotJava, ps);
-            if (!sx2j.compileCode(fileName)) {
+            if (!sx2j.compileCode(fileName.getAbsolutePath())) {
                 sx2j.error("Compile error " + fileName);
             } else {
                 log.info("Done.");
             }
-        } catch (FileNotFoundException fnfe) {
-            sx2j.error("Bad filename " + sx2j.fileBaseName);
+        } catch (IOException ioe) {
+            log.error(ioe);
         }
-    }
+    }   
 }
