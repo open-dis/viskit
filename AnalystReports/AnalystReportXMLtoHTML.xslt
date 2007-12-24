@@ -33,10 +33,11 @@
                 <xsl:text>Generated using XSLT processor: </xsl:text>
                 <xsl:value-of select="system-property('xsl:vendor')"/>
             </xsl:comment> 
-            <head>
+            <head>                
+                <title>Viskit Simulation Analysis Report</title>
                 <meta http-equiv="Content-Language" content="en-us"/>
                 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
-                <title>Viskit Simulation Analysis Report</title>
+                <link rel="shortcut icon" href="Viskit.ico" type="image/x-icon"/>
                 <style type="text/css">
                     <!-- Limit the width of the entire HTML page to be printer friendly -->
                     body {width: 1024px} 
