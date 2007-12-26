@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="build-run-default" name="Viskit">
+<project basedir="." default="build-run-default-plain" name="Viskit">
     <description>
         Ant build file for the NPS Viskit and associated libraries. Third-party
         jar files are not compiled from source here, but they are copied as
@@ -101,37 +101,37 @@
     
     <path id="runtime.classpath">
     
-    <!-- use local JDK for tools.jar -->
-    <!-- remember to override your environment variable for -->
-    <!-- JAVA_HOME to point to the JDK version you are building -->
-    <!-- against. Netbeans sets this in the NETBEANS_HOME/etc/netbeans.conf file -->
-    <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-    <pathelement location="${dist.jar}"/>
-    <pathelement location="${dir.lib}/simkit.jar"/>
-    <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
-    <pathelement location="${dir.lib}/jgraph.jar"/>
-    <pathelement location="${dir.lib}/actions.jar"/>
-    <pathelement location="${dir.lib}/jhall.jar"/>
-    <pathelement location="${dir.lib}/jdom.jar"/>
-    <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
-    <pathelement location="${dir.lib}/jcommon-1.0.0.jar"/>
-    <pathelement location="${dir.lib}/jedit.jar"/>
-    <pathelement location="${dir.lib}/junit.jar"/>
-    <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
-    <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-    <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
-    <pathelement location="${dir.lib}/commons-configuration-1.2.jar"/>
-    <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
-    <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
-    <pathelement location="${dir.lib}/commons-logging-1.1.jar"/>
-    <pathelement location="${log4j.jar}"/>
-    <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
-    <pathelement location="${dir.lib}/xercesImpl.jar"/>
-    <pathelement location="${dir.lib}/xalan.jar"/>
-    <pathelement location="${dir.lib}/serializer.jar"/>        
-    <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
-    <path refid="jaxb.classes.path"/>
-    <path refid="runtime.extension.classes.path"/>
+        <!-- use local JDK for tools.jar -->
+        <!-- remember to override your environment variable for -->
+        <!-- JAVA_HOME to point to the JDK version you are building -->
+        <!-- against. Netbeans sets this in the NETBEANS_HOME/etc/netbeans.conf file -->
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="${dist.jar}"/>
+        <pathelement location="${dir.lib}/simkit.jar"/>
+        <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
+        <pathelement location="${dir.lib}/jgraph.jar"/>
+        <pathelement location="${dir.lib}/actions.jar"/>
+        <pathelement location="${dir.lib}/jhall.jar"/>
+        <pathelement location="${dir.lib}/jdom.jar"/>
+        <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
+        <pathelement location="${dir.lib}/jcommon-1.0.0.jar"/>
+        <pathelement location="${dir.lib}/jedit.jar"/>
+        <pathelement location="${dir.lib}/junit.jar"/>
+        <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
+        <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
+        <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration-1.2.jar"/>
+        <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
+        <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
+        <pathelement location="${dir.lib}/commons-logging-1.1.jar"/>
+        <pathelement location="${log4j.jar}"/>
+        <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
+        <pathelement location="${dir.lib}/xercesImpl.jar"/>
+        <pathelement location="${dir.lib}/xalan.jar"/>
+        <pathelement location="${dir.lib}/serializer.jar"/>        
+        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
+        <path refid="jaxb.classes.path"/>
+        <path refid="runtime.extension.classes.path"/>
     </path>
     
     <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
@@ -315,9 +315,10 @@
               jarfile="${dir.build.lib}/visxml.jar"/>        
     </target>
     
-    <target name="splashy">
+    <target name="splashy" description="@deprecated">
         <splash imageurl="file:${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
     </target>
+    
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
             depends="build.init,compile" 
@@ -668,64 +669,75 @@
     
     <target depends="jar,examples" description="Build viskit and diskit jars" name="build.examples"/>
     
-    <!-- TARGET: Run -->
-    <target depends="splashy, jar, examples, checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, display Splash" name="build-run">
-        <java classname="viskit.EventGraphAssemblyComboMain" 
-              classpathref="runtime.classpath" 
-              fork="true">
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    <target depends="splashy, jar" description="Build and Run Viskit only, no module dependencies, display Splash" name="build-run-orig">
-        <java classname="viskit.Main" 
-              classpathref="runtime.classpath" 
-              fork="true">
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    
-    <!-- TARGET: Run - no ant splash -->
-    <target depends="jar, examples, checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, no Splash" name="build-run-default">
+    <!-- TARGET: Run w/Viskit custom splash -->
+    <target depends="build.examples,checkJAVA_HOME" description="Build and Run Viskit extended, include example modules, Viskit custom Splash" name="build-run-default-extended">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
-            <!--<jvmarg value="-Dswing.aatext=true"/>-->
             <jvmarg value="-XX:MaxPermSize=160m"/>
             <jvmarg value="-Xmx256m"/>
-            <jvmarg value="-client"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target depends="jar" description="Build and Run Viskit only, no module dependencies, no Splash" name="build-run-default-orig">
+    <target depends="jar" description="Build and Run Viskit only, no module dependencies, Viskit custom Splash" name="build-run-default-plain">
+        <java classname="viskit.Splash2" 
+              classpathref="runtime.classpath" 
+              fork="true">
+            <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <jvmarg value="-XX:MaxPermSize=160m"/>
+            <jvmarg value="-Xmx256m"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+        </java>
+    </target>
+    <target depends="jar" description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated" name="build-run-default-orig">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
             <arg value="viskit.Main"/>
+            <!-- Font anti-aliasing -->
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
     
-    <!-- TARGET: Quick Run, don't check deps, TBD ant should be able to not rebuild if not needed -->
+    <!-- TARGET: Run w/Ant Splash @deprecated-->
+    <target depends="splashy,build.examples,checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, display Ant Splash @deprecated" name="build-run">
+        <java classname="viskit.EventGraphAssemblyComboMain" 
+              classpathref="runtime.classpath" 
+              fork="true">
+            <jvmarg value="-XX:MaxPermSize=160m"/>
+            <jvmarg value="-Xmx256m"/>            
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+        </java>
+    </target>
+    <target depends="splashy,jar" description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated" name="build-run-orig">
+        <java classname="viskit.Main" 
+              classpathref="runtime.classpath" 
+              fork="true">
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+        </java>
+    </target>    
+    
+    <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
     <target description="Run Viskit, don't check dependencies" name="quick-run">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
-            <!-- <jvmarg value="-Dswing.aatext=true"/> -->
-            <jvmarg value="-XX:MaxPermSize=512m"/>
-            <jvmarg value="-Xmx768m"/>
-            <jvmarg value="-client"/>
+            <jvmarg value="-XX:MaxPermSize=160m"/>
+            <jvmarg value="-Xmx256m"/>            
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target description="Run Viskit, don't check dependencies" name="quick-run-orig">
+    <target description="Run Viskit (original L and F), don't check dependencies @deprecated" name="quick-run-orig">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
             <arg value="viskit.Main"/>
+            <!-- Font anti-aliasing -->
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
@@ -1068,6 +1080,7 @@
         <delete dir="${dir.build}"/>
         <delete dir="${dir.api.doc}"/>
         <delete dir="${dir.dist}"/>
+        <delete file="${dir.lib.ext}/dis.jar"/>
         <delete file="${dir.lib.ext}/diskit.jar"/>
     </target>
     
