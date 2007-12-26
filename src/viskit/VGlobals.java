@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -525,9 +526,9 @@ public class VGlobals {
         return false;
     }
 
-    /*
-    Dynamic variable type list processing.  Build Type combo boxes and manage user-typed object types.
-  */
+    /* Dynamic variable type list processing.  Build Type combo boxes and manage
+     * user-typed object types.
+     */
     private String moreTypesString = "more...";
     private String[] defaultTypeStrings = {"int",
             "double",
@@ -538,8 +539,6 @@ public class VGlobals {
     private String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
     private final int primitivesIndex = 0; // for above array
 
-    private final int packagesStart = 1;
-    private final int packagesEnd = 3;
     private String[][] moreClasses =
             {{"boolean", "char", "byte", "short", "int", "long", "float", "double"},
             {"Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double", "String", "StringBuffer"},
@@ -726,17 +725,6 @@ public class VGlobals {
             }
         }
 
-        /*
-    // Check to make sure the class or type exists
-    if(!ClassUtility.classExists(typeLabel.getSelectedItem().toString()))
-    {
-      JOptionPane.showMessageDialog(null,
-                                    "The class name " + typeLabel.getSelectedItem().toString() + "  does not exist on the classpath",
-                                    "alert",
-                                    JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-*/
         existingNames.add(nm);
         return true;
     }
@@ -880,13 +868,15 @@ public class VGlobals {
                 log.debug("Frame is: " + f);
 
                 /* Prevent non-viskit components from disposing if launched from
-                 * another application
+                 * another application.  SwingUtilities is a little "ify" though
+                 * as it's not Viskit specific.  Viskit, however, spawns a lot
+                 * of anonymous Runnables with SwingUtilities
                  */
-                if (f.toString().contains("viskit")) {
+                if (f.toString().contains("viskit") || f.toString().contains("SwingUtilities")) {
                     f.dispose();
                 }
             }
-
+            
             /* The SwingWorker Thread is active when the assembly runner is
              * running and will subsequently block a JVM exit due to its "wait"
              * state.  Must interrupt it in order to cause the JVM to exit
@@ -916,7 +906,6 @@ public class VGlobals {
      * @param status the status of JVM shutdown
      */
     public void sysExit(int status) {
-
         if (!sysExitCalled) {
             sysexithandler.doSysExit(status);
             sysExitCalled = true;
