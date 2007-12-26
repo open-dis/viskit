@@ -69,8 +69,8 @@ public class SimkitXML2Java {
             fileBaseName = baseNameOf(xmlFile);
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
-        } catch (ClassNotFoundException ex) {
-            log.error(ex);
+        } catch (ClassNotFoundException cnfe) {
+            log.error(cnfe);
         } catch (JAXBException ex) {
             log.error(ex);
         }
@@ -102,7 +102,7 @@ public class SimkitXML2Java {
     }
 
     public String translate() {
-
+        
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
         StringWriter vars = new StringWriter();
@@ -484,8 +484,12 @@ public class SimkitXML2Java {
             try {
                 Class<?> sup = Class.forName(this.root.getExtend());
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
-            } catch (ClassNotFoundException cnfe) {
-                log.error(cnfe);
+            } catch (ClassNotFoundException cnfe) {                
+                
+                // If using plain Vanilla Viskit, don't report on diskit extended EGs
+                if (!cnfe.getMessage().contains("diskit")) {
+                    log.error(cnfe);
+                }
             } catch (NoSuchMethodException cnfe) {
                 log.error(cnfe);
             }
@@ -853,7 +857,7 @@ public class SimkitXML2Java {
         } catch (java.lang.ClassNotFoundException cnfe) {
             String extend = this.root.getExtend();
             if (extend.equals("simkit.SimEntityBase")) {
-                System.out.println(extend + " not in classpath ");
+                log.error(extend + " not in classpath ");
             }
         }
         return superParams;

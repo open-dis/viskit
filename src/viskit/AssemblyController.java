@@ -1092,18 +1092,27 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     static PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
+        PkgAndFile paf;
         try {
             String src = buildJavaEventGraphSource(xmlFile);
-            PkgAndFile paf = compileJavaClassAndSetPackage(src);
+            
+            // If using plain Vanilla Viskit, don't compile diskit extended EGs
+            // as diskit.jar won't be available
+            if (src.contains("diskit") && !new File("lib/ext/diskit.jar").exists()) {
+                FileBasedClassManager.inst().addCacheMiss(xmlFile);
+                return null;
+            }
+            paf = compileJavaClassAndSetPackage(src);
             FileBasedClassManager.inst().addCache(xmlFile, paf.f);
             return paf;
         } catch (Exception e) {
-            System.err.println("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
+            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
             FileBasedClassManager.inst().addCacheMiss(xmlFile);
         }
         return null;
     }
 
+    /** Not currently used */
     PkgAndFile createEventGraphClass(File xmlFile) {
         try {
             String src = buildJavaEventGraphSource(xmlFile);
@@ -1111,28 +1120,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             FileBasedClassManager.inst().addCache(xmlFile, paf.f);
             return paf;
         } catch (Exception e) {
-            System.err.println("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
+            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
             FileBasedClassManager.inst().addCacheMiss(xmlFile);
-        //((ViskitAssemblyView)getView()).removeFromEventGraphPallette(xmlFile);
         }
         return null;
-
     }
 
-    /*
-  private static void dumpFile(File f)
-  {
-    try {
-      BufferedReader br = new BufferedReader(new FileReader(f));
-      while(br.ready()) {
-        System.out.println(br.readLine());
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-*/
     static PkgAndFile compileJavaClassAndSetPackage(String source) {
         return compileJavaClassAndSetPackage(source, false);
     }

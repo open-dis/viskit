@@ -71,16 +71,18 @@ public class EventGraphController extends mvcAbstractController implements Viski
             // If EventGraphs were already open without a corresponding Assembly
             // file open, then open them upon Viskit starting, else, let the
             // Assembly file tell which EGs to open
-            ArrayList<String> al = VGlobals.instance().getAssemblyController().getOpenFileList(false);
-            if (al.size() == 0) {
-                log.debug("In begin() (else) of EventGraphController");
-                for (String s : lis) {
-                    File f = new File(s);
-                    if (f.exists()) {
-                        _doOpen(f);
+            if (VGlobals.instance().getAssemblyController() != null) {
+                ArrayList<String> al = VGlobals.instance().getAssemblyController().getOpenFileList(false);
+                if (al.size() == 0) {
+                    log.debug("In begin() (else) of EventGraphController");
+                    for (String s : lis) {
+                        File f = new File(s);
+                        if (f.exists()) {
+                            _doOpen(f);
+                        }
                     }
                 }
-            }
+            } else {return;}            
         }
     }
 

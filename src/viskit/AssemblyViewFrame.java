@@ -489,9 +489,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
+        // Decouple diskit from vanilla Viskit operation
+        File diskitJar = new File("lib/ext/diskit.jar");
         for (String path : SettingsDialog.getExtraClassPath()) { // tbd same for pcls
             if (path.endsWith(".jar")) {
-                lTree.addContentRoot(new File(path));
+                if (diskitJar.getName().contains(new File(path).getName())) {
+                    continue;
+                } else {
+                    lTree.addContentRoot(new File(path));
+                }
             } else {
                 lTree.addContentRoot(new File(path), true);
             }
@@ -504,7 +510,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // todo get from project
         pclTree.addContentRoot(new File("lib/simkit.jar"));
-        pclTree.addContentRoot(new File("lib/ext/diskit.jar"));
+        
+        // If we built diskit.jar, then include it
+        if (diskitJar.exists()) {
+            pclTree.addContentRoot(diskitJar);
+        }
+        diskitJar = null;
 
         PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree);
 
@@ -860,10 +871,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         closeButt.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        jf.setVisible(false);
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                jf.setVisible(false);
+            }
+        });
     }
 
     void clampHeight(JComponent comp) {
