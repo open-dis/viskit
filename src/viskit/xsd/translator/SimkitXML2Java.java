@@ -488,18 +488,20 @@ public class SimkitXML2Java {
                 
                 // If using plain Vanilla Viskit, don't report on diskit extended EGs
                 if (!cnfe.getMessage().contains("diskit")) {
-                    log.error(cnfe);
+//                    log.error(cnfe);
                 }
             } catch (NoSuchMethodException cnfe) {
-                log.error(cnfe);
+//                log.error(cnfe);
             }
             if (doRun != null) {
                 pw.println(sp4 + "@Override");
                 pw.println(sp4 + "public void doRun() {");
                 pw.println(sp8 + "super.doRun();");
+            } else {
+                pw.println(sp4 + "public void doRun() {");
             }
         } else {
-            pw.println(sp4 + "public void doRun() {");            
+            pw.println(sp4 + "public void doRun() {");
         }
 
         liStateT = run.getStateTransition();
