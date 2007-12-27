@@ -830,7 +830,7 @@ public class AnalystReportBuilder {
     public void postProcessing() {
         JProgressBar jpb = new JProgressBar();
         jpb.setIndeterminate(true);
-        jpb.setString("Analyst Report now generating");
+        jpb.setString("Analyst Report now generating...");
         jpb.setStringPainted(true);
 
         aRPanel.add(jpb);
@@ -873,11 +873,9 @@ public class AnalystReportBuilder {
     
     private void announceReportReadyToView() {
         JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
-                "The Analyst Report has been generated/loaded and is now " +
-                "ready to be displayed.<br>To view in HTML, select the " +
-                "Analyst Report tab -> File -> Save analyst report XML -> " +
-                "rename if desired -> Save</p></body></html>", "Analyst " +
-                "Report Ready to View", JOptionPane.INFORMATION_MESSAGE);
+                "Analyst Report is loaded and ready for display.</p></body></html>", 
+                "Analyst Report Ready", JOptionPane.INFORMATION_MESSAGE);
+        // TODO consider inserting loaded filename into message above as a user confirmation
     }
     
     /** If a 2D top town image was generated from SavageStudio, then point to 

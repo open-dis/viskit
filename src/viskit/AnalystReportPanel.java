@@ -887,15 +887,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         myMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        JMenuItem open = new JMenuItem("Open analyst report XML");
+        JMenuItem open = new JMenuItem("Open another analyst report XML");
         open.setMnemonic(KeyEvent.VK_O);
         JMenuItem view = new JMenuItem("View analyst report XML");
         view.setMnemonic(KeyEvent.VK_V);
         view.setEnabled(false); // TODO:  implement listener and view functionality
         JMenuItem save = new JMenuItem("Save analyst report XML");
         save.setMnemonic(KeyEvent.VK_S);
-        JMenuItem generateViewHtml = new JMenuItem("View generated report HTML");
-        generateViewHtml.setMnemonic(KeyEvent.VK_V);
+        JMenuItem generateViewHtml = new JMenuItem("Display analyst report HTML");
+        generateViewHtml.setMnemonic(KeyEvent.VK_D);
 
         fileMenu.add(open);
         fileMenu.add(view);
@@ -907,10 +907,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
                 public void actionPerformed(ActionEvent e) {
                     if (dirty) {
-                        int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
+                        int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current simulation data and analyst report annotations?",
                                 "Confirm", JOptionPane.WARNING_MESSAGE);
                         switch (result) {
-                            case JOptionPane.YES_OPTION:
+                            case JOptionPane.OK_OPTION:
                                 saveReport();
                                 break;
                             case JOptionPane.CANCEL_OPTION:
@@ -959,12 +959,13 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                         XsltUtility.runXslt(reportFile.getAbsolutePath(),
                                 outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
 
-                        // pop up the system html viewer, or send currently running browser to html page
-                        try {
-                            viskit.util.BareBonesBrowserLaunch.openURL((new File(outFile)).toURI().toURL().toString());
-                        } catch (java.net.MalformedURLException mue) {
-                            log.error(mue);
-                        }
+// don't need to display when simply saving
+//                        // pop up the system html viewer, or send currently running browser to html page
+//                        try {
+//                            viskit.util.BareBonesBrowserLaunch.openURL((new File(outFile)).toURI().toURL().toString());
+//                        } catch (java.net.MalformedURLException mue) {
+//                            log.error(mue);
+//                        }
                     }
                 };
         save.addActionListener(saveAsLis);
@@ -972,20 +973,26 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         ActionListener generateViewHtmlListener = new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
-                        if (dirty) {
-                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current analyst report data?",
-                                    "Confirm", JOptionPane.WARNING_MESSAGE);
-                            switch (result) {
-                                case JOptionPane.YES_OPTION:
-                                    saveReport();
-                                    break;
-                                case JOptionPane.CANCEL_OPTION:
-                                case JOptionPane.NO_OPTION:
-                                default:
-                                    break;
-                            }
-                        }
 
+                        unFillLayout(); // wondering why this is needed?
+                        saveReport(reportFile);
+                        
+//                        // TODO:  change XML input to temp file, rather than final file, if possible
+//                        if (true) { // TODO:  check if analyst report data is 'dirty' to avoid unnecessary saves
+//                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
+//                                    "Save current analyst report data?",
+//                                    "Confirm", JOptionPane.WARNING_MESSAGE);
+//                            switch (result) {
+//                                case JOptionPane.YES_OPTION:
+//                                    log.info ("saving analyst report data from generateViewHtmlListener()...");
+//                                    saveReport();
+//                                    break;
+//                                case JOptionPane.CANCEL_OPTION:
+//                                case JOptionPane.NO_OPTION:
+//                                default:
+//                                    break; // skip viewing analyst report, must save all data first
+//                            }
+//                        }
                         String outFile = reportFile.getAbsolutePath();
                         int idx = outFile.lastIndexOf(".");
 
@@ -995,13 +1002,28 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                         genChooser.setSelectedFile(new File(outFile));
                         genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
-
-                        if (resp == JFileChooser.APPROVE_OPTION) {
-                            XsltUtility.runXslt(reportFile.getAbsolutePath(),
-                                    genChooser.getSelectedFile().getAbsolutePath(),
-                                    "AnalystReports/AnalystReportXMLtoHTML.xslt");
+                        if (JOptionPane.YES_OPTION ==
+                            JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
+                            "Rename analyst report output?",
+                            "Confirm", JOptionPane.WARNING_MESSAGE))
+                        {
+                            genChooser.showSaveDialog(AnalystReportPanel.this);
                         }
+//                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
+//
+//                        if (resp == JFileChooser.APPROVE_OPTION) {
+//                        XsltUtility.runXslt(reportFile.getAbsolutePath(),
+//                                genChooser.getSelectedFile().getAbsolutePath(),
+//                                "AnalystReports/AnalystReportXMLtoHTML.xslt");
+//                        }
+                        
+                        // always generate new report before display, regardless of old or new name
+                        // TODO:  change XML input to temp file, rather than final file, if possible
+                        XsltUtility.runXslt(reportFile.getAbsolutePath(),       // XML  input
+                                genChooser.getSelectedFile().getAbsolutePath(), // HTML output
+                                "AnalystReports/AnalystReportXMLtoHTML.xslt");  // stylesheet
+                        
+                        // always show latest report, they asked for it
                         showHtmlViewer(genChooser.getSelectedFile());
 
                     }
