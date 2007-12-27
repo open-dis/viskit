@@ -249,7 +249,7 @@ public class ViskitAssembly extends BasicAssembly {
     // TODO: fix generics: SampleStatistics vs PropertyChangeListener
     @SuppressWarnings("unchecked")
     public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
-        log.info("Adding to replicationStatistics " + listenerName + " " + pcl);
+        log.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
         replicationStatistics.put(listenerName, pcl);
     }
     

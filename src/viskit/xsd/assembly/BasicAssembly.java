@@ -158,11 +158,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected void setStatisticsKeyValues(LinkedHashMap repStatistics) {
         Iterator itr = repStatistics.entrySet().iterator();
         entitiesWithStats = new LinkedList<String>();
-        log.info("Inside setStatisticsKeyValues()");
+        log.debug("Inside setStatisticsKeyValues()");
         while (itr.hasNext()) {
             Map.Entry entry = (Map.Entry) itr.next();
             String ent = entry.getKey().toString();
-            log.info("Entry is: " + entry);
+            log.debug("Entry is: " + entry);
             entitiesWithStats.add(ent);
             println.println(ent);
             println.flush();
