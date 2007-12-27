@@ -167,9 +167,10 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(vars);
 
         List<Parameter> liParam = this.root.getParameter();
-        List superParams = resolveSuperParams(this.root.getParameter());
+        List<Parameter> superParams = resolveSuperParams(this.root.getParameter());
         boolean extend = (this.root.getExtend().indexOf("SimEntityBase") < 0);
 
+        pw.println(sp4 + "/* Simulation Parameters */");
         for (Parameter p : liParam) {
 
             if (!superParams.contains(p)) {
@@ -189,6 +190,7 @@ public class SimkitXML2Java {
 
         List<StateVariable> liStateV = this.root.getStateVariable();
 
+        pw.println(sp4 + "/* Simulation State Variables */");
         for (StateVariable s : liStateV) {
             Class<?> c = null;
             try {
@@ -201,7 +203,7 @@ public class SimkitXML2Java {
                 Constructor cst = null;
 
                 try {
-                    cst = c.getConstructor(new Class<?>[]{});
+                    cst = c.getConstructor(new Class<?>[] {});
                 } catch (NoSuchMethodException nsme) {
 //                    log.error(nsme);
                 }
@@ -557,7 +559,7 @@ public class SimkitXML2Java {
                 lines = value.split("\\;");
             }
             pw.print(sp8 + local.getType() + sp + local.getName() + sp + eq);
-            pw.println(sp + lp + local.getType() + rp + lines[0].trim() + sc);
+            pw.println(sp + lp + local.getType() + rp + sp + lines[0].trim() + sc);
             for (int i = 1; i < lines.length; i++) {
                 pw.println(sp8 + lines[i].trim() + sc);
             }
@@ -884,7 +886,7 @@ public class SimkitXML2Java {
     // or 0 for an oddball constructor. typically constructor
     // list size should be at minimum the same set as the super.
     // unused?
-    private List paramsInSuper(Constructor c, List<Parameter> params) {
+    private List<Parameter> paramsInSuper(Constructor c, List<Parameter> params) {
         Class<?>[] cTypes = c.getParameterTypes();
         Vector<String> pTypes = new Vector<String>();
         Vector<String> superPTypes = new Vector<String>();
