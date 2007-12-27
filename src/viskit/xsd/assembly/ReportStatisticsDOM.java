@@ -65,18 +65,14 @@ public class ReportStatisticsDOM {
         this.entityNames = simEntities;
         this.properties = properties;
 
-        // Create SimEntityRecords
-        OuterLoop:
-        for (String property : properties) {
-            for (String simEntity : entityNames) {
-                if (!entities.containsKey(simEntity)) {
-                    record = new SimEntityRecord(simEntity);
-                    entities.put(simEntity, record);
-                }
-                SimEntityRecord rec = entities.get(simEntity);
-                rec.addDataPoint(property);
-                continue OuterLoop;
+        // Create SimEntityRecords        
+        for (int i = 0; i < simEntities.length; i++) {
+            if (!entities.containsKey(simEntities[i])) {
+                record = new SimEntityRecord(simEntities[i]);
+                entities.put(simEntities[i], record);
             }
+            SimEntityRecord rec = entities.get(simEntities[i]);
+            rec.addDataPoint(properties[i]);
         }
     }
 
