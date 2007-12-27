@@ -33,7 +33,7 @@ public class ViskitAssembly extends BasicAssembly {
     protected LinkedHashMap<String, LinkedList<PropertyConnector>> replicationStatsListenerConnections;
     protected LinkedHashMap<String, LinkedList<String>> simEventListenerConnections;
     protected LinkedHashMap<String, Adapter> adapters;
-    private static boolean debug = true;
+    private static boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
