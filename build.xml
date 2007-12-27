@@ -1087,8 +1087,8 @@
     <target name="delete.temps.and.hx" depends="init">
         <!-- create the batch file to delete temp files -->
         <echo file="deleteTempsAndHx.bat" append="false">@echo on
-            @rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
-        ${delete.temp.and.hx}</echo>
+@rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
+${delete.temp.and.hx}</echo>
         <exec executable="deleteTempsAndHx.bat" resolveexecutable="true"/>
     </target>
     
