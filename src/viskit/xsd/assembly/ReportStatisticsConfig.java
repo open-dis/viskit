@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.jdom.Document;
@@ -115,7 +114,7 @@ public class ReportStatisticsConfig {
      * Performs simple string parsing to find the underscore separating the 
      * EntityName and the Property Name
      *
-     *@param str the string entry for the name of a property change listener
+     * @param str the string entry for the name of a property change listener
      */
     private int findUnderscore(String str) {
         char letter;
@@ -163,7 +162,7 @@ public class ReportStatisticsConfig {
      * output from Viskit (statistics output ordered in the order that the PCLs were added
      * to the Assembly.
      *
-     *@param sum the summary statistics provided from Viskit
+     * @param sum the summary statistics provided from Viskit
      */
     public void processSummaryReport(SampleStatistics[] sum) {
 
@@ -188,7 +187,7 @@ public class ReportStatisticsConfig {
     }
 
     /**
-     *Returns stats report in jdom.Document format; Naw...filename
+     * @return a stats report in jdom.Document format; Naw...filename
      */
     public String getReport() {
         Document report = reportStats.getReport();
