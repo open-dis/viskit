@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="TypedBasicMover" package="movers.wpfsim" author="rmgoldbe" version="1.0" extend="simkit.smdx.UniformLinearMover" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="TypedBasicMover" package="wfpsim" author="rmgoldbe" version="1.0" extend="simkit.smdx.UniformLinearMover" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Base Class for PatrolBoat, SmartBadGuy, DumbBadGuy,Loiterer,PassserBy</Comment>
     <Parameter type="String" name="basicMoverType">
         <Comment/>

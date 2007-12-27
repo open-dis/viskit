@@ -4,7 +4,7 @@
     <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
     <Parameter name="renegeTime" type="simkit.random.RandomVariate"/>
     <StateVariable name="numberAvailableServers" type="int"/>
-    <StateVariable name="queue" type="java.util.LinkedList"/>
+    <StateVariable name="queue" type="java.util.LinkedList&lt;Integer&gt;"/>
     <StateVariable name="numberServed" type="int"/>
     <StateVariable name="numberReneges" type="int">
         <Comment>this state variable stores the number of reneges</Comment>

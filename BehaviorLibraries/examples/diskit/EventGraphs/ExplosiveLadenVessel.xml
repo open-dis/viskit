@@ -503,7 +503,7 @@ sensors[2] = collisionAvoidance;</Code>
         <LocalVariable name="tacticToImplement" type="diskit.Tactic" value="orderedTactic">
             <Comment>Copy of the tactic that has been ordered</Comment>
         </LocalVariable>
-        <LocalVariable name="aStarZones" type="java.util.LinkedList" value="new java.util.LinkedList(); aStarZones.add(orderedStart);aStarZones.add(orderedGoal)">
+        <LocalVariable name="aStarZones" type="java.util.LinkedList&lt;diskit.AStarZoneGeometry&gt;" value="new java.util.LinkedList&lt;diskit.AStarZoneGeometry&gt;(); aStarZones.add(orderedStart);aStarZones.add(orderedGoal)">
             <Comment>set up waypointCreator</Comment>
         </LocalVariable>
         <StateTransition state="startZone">

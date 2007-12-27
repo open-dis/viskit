@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Rick Goldberg" extend="simkit.SimEntityBase" name="DISMover3D" package="diskit.xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Rick Goldberg" extend="simkit.SimEntityBase" name="DISMover3D" package="xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This event graph is for documentation purposes, to outline the logic of the diskit package.</Comment>
     <Parameter name="originalStartPosition" type="diskit.Vec3d">
         <Comment>Must be anything but the first waypoint.</Comment>
@@ -59,12 +59,12 @@
     </Event>
     <Event name="Init">
         <Comment>listened to by ScenarioManager and others</Comment>
-        <Argument name="mover" type="diskit.xml.DISMover3D"/>
+        <Argument name="mover" type="xml.DISMover3D"/>
         <Coordinate x="220" y="30"/>
     </Event>
     <Event name="EndMove">
         <Comment/>
-        <Argument name="mover" type="diskit.xml.DISMover3D"/>
+        <Argument name="mover" type="xml.DISMover3D"/>
         <StateTransition state="startPosition">
             <Operation method="set(getDestination())"/>
         </StateTransition>

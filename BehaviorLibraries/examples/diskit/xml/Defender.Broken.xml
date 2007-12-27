@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="Rick Goldberg" extend="diskit.FriendlyForce" name="Defender" package="diskit.xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity author="Rick Goldberg" extend="diskit.FriendlyForce" name="Defender" package="xml" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>This event graph is for documentation purposes, to outline the logic of the diskit package. It does not attempt to be functional.</Comment>
     <Parameter name="startPosition" type="diskit.Vec3d">
         <Comment>Must be anything but the first waypoint.</Comment>
