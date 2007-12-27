@@ -5,15 +5,11 @@
  */
 package viskit.xsd.assembly;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import java.io.*;
-import java.util.*;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.jdom.*;
-import org.jdom.transform.*;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /** 
  *
