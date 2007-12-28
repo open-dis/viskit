@@ -316,7 +316,7 @@
     </target>
     
     <target name="splashy" description="@deprecated">
-        <splash imageurl="file:${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
+        <splash imageurl="file:///${basedir}/${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
     </target>
     
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
