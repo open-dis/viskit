@@ -192,11 +192,21 @@ public class SimkitXML2Java {
 
         pw.println(sp4 + "/* Simulation State Variables */");
         for (StateVariable s : liStateV) {
+            
             Class<?> c = null;
-            try {
-                c = Class.forName(s.getType());
-            } catch (ClassNotFoundException cnfe) {
-                pw.println(sp4 + "protected" + sp + stripLength(s.getType()) + sp + s.getName() + sc);
+            
+            // TODO: use better checking for primitive types i.e. Class.isPrimitive()
+            
+            // Determine if encountering generics
+            if (s.getType().contains("<")) {
+                pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
+            } else {
+                try {
+                    c = Class.forName(s.getType());
+                } catch (ClassNotFoundException cnfe) {
+//                log.error(cnfe);
+                    pw.println(sp4 + "protected" + sp + stripLength(s.getType()) + sp + s.getName() + sc);
+                }
             }
 
             if (c != null) {
@@ -214,7 +224,6 @@ public class SimkitXML2Java {
                     pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "null" + sc);
                 }
             }
-
             buildStateVariableAccessor(s, accessorBlock);
         }
     }
