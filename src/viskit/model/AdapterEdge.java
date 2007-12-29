@@ -26,6 +26,7 @@ public class AdapterEdge extends AssemblyEdge {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     AdapterEdge() // package-limited
     {
@@ -110,5 +111,10 @@ public class AdapterEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

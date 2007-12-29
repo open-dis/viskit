@@ -29,6 +29,7 @@ public class vStateVariable extends ViskitElement {
     private String indexingExpression;
     private String stateVarName;
     private String value;
+    private String stateVarType;
 
     @Override
     public String toString() {
@@ -154,5 +155,10 @@ public class vStateVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

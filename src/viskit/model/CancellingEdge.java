@@ -23,6 +23,7 @@ public class CancellingEdge extends Edge {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     CancellingEdge() //package-limited
     {
@@ -103,5 +104,10 @@ public class CancellingEdge extends Edge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

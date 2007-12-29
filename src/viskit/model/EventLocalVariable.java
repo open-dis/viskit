@@ -24,6 +24,7 @@ public class EventLocalVariable extends ViskitElement {
     private String stateVarName;
     private boolean operation;
     private String operationOrAssignment;
+    private String stateVarType;
 
     public EventLocalVariable(String name, String type, String value) {
         this.name = name;
@@ -101,5 +102,10 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

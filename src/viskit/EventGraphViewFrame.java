@@ -903,8 +903,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // ViskitView-required methods:
     private JFileChooser jfc;
 
-    public File[] openFilesAsk() //-----------------------
-    {
+    public File[] openFilesAsk() {
         if (jfc == null) {
             jfc = new JFileChooser(System.getProperty("user.dir") +
                     System.getProperty("file.separator") + "BehaviorLibraries");
@@ -967,7 +966,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return null;
     }
 
-    public File openRecentFilesAsk(Collection lis) {
+    public File openRecentFilesAsk(Collection<String> lis) {
         String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, lis);
         if (fn != null) {
             File f = new File(fn);

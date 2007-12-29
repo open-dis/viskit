@@ -25,6 +25,7 @@ public class PropChangeEdge extends AssemblyEdge {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     PropChangeEdge() // package-limited
     {
@@ -101,5 +102,10 @@ public class PropChangeEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

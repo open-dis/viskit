@@ -27,6 +27,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     PropChangeListenerNode(String name, String type) // package access on constructor
     {
@@ -111,5 +112,10 @@ public class PropChangeListenerNode extends AssemblyNode {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

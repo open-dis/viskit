@@ -138,7 +138,6 @@ public class SettingsDialog extends JDialog {
 
         // post process anything
         Vstatics.debug = isVerboseDebug();
-
     }
 
     private void setParams() {
@@ -293,8 +292,8 @@ public class SettingsDialog extends JDialog {
     private void saveClassPathEntries(String[] lis) {
         clearClassPathEntries();
 
-        for (int i = 0; i < lis.length; i++) {
-            vConfig.setProperty(xClassPathKey + "(" + i + ")[@value]", lis[i]);
+        for (String s : lis) {
+            vConfig.setProperty(xClassPathKey + "(" + s + ")[@value]", s);
         }
 
         progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -435,7 +434,6 @@ public class SettingsDialog extends JDialog {
     }
 
     private void installClassPathIntoConfig() {
-        Object m = classPathJlist.getModel();
         Object[] oa = ((DefaultListModel) classPathJlist.getModel()).toArray();
         String[] sa = new String[oa.length];
         for (int j = 0; j < oa.length; j++) {

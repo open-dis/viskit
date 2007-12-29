@@ -198,7 +198,7 @@ public class SimkitXML2Java {
             // TODO: use better checking for primitive types i.e. Class.isPrimitive()
             
             // Determine if encountering generics
-            if (s.getType().contains("<")) {
+            if (isGeneric(s.getType())) {
                 pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
             } else {
                 try {
@@ -812,6 +812,10 @@ public class SimkitXML2Java {
 
     private String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    private boolean isGeneric(String type) {
+        return (type.contains("<") && type.contains(">"));
     }
 
     private String stripLength(String s) {

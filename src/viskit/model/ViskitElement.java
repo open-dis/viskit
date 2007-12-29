@@ -63,4 +63,6 @@ abstract public class ViskitElement
   public abstract String getOperationOrAssignment();
   
   public abstract boolean isOperation();
+  
+  public abstract String getStateVarType();
 }

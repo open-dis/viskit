@@ -118,7 +118,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
     public void postQuit() {
         ((ViskitView) getView()).prepareToQuit();
         VGlobals.instance().quitEventGraphEditor();
-
     }
 
     public void newEventGraph() //-------------------------

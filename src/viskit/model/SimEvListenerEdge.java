@@ -23,6 +23,7 @@ public class SimEvListenerEdge extends AssemblyEdge {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     SimEvListenerEdge() // package-limited
     {
@@ -91,6 +92,11 @@ public class SimEvListenerEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
     
     /*

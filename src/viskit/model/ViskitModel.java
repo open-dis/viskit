@@ -49,19 +49,19 @@ public interface ViskitModel {
    * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
    * @return Vector of EventNodes.
    */
-  public Vector<ViskitElement> getAllNodes();
+  public Vector<? extends ViskitElement> getAllNodes();
 
   /**
    * Messaged by controller to inst all defined StateVariables.
    * @return Vector of StateVariables.
    */
-  public Vector<ViskitElement> getStateVariables();
+  public Vector<? extends ViskitElement> getStateVariables();
   
   /**
    * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
    * @return Vector of vParameter objects.
    */
-  public Vector<ViskitElement> getSimParameters();
+  public Vector<? extends ViskitElement> getSimParameters();
 
 
   /**

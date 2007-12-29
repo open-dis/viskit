@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class EventArgument extends ViskitElement {
+    private String stateVarType;
     private ArrayList<String> descriptionArray = new ArrayList<String>();
 
     private String type;
@@ -95,5 +96,10 @@ public class EventArgument extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

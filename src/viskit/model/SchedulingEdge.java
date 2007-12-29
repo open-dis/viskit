@@ -25,6 +25,7 @@ public class SchedulingEdge extends Edge {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     SchedulingEdge() // package-limited
     {
@@ -107,5 +108,10 @@ public class SchedulingEdge extends Edge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

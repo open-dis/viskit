@@ -37,6 +37,7 @@ public class EventNode extends ViskitElement {
     private String stateVarName;
     private String value;
     private String comment;
+    private String stateVarType;
 
     EventNode(String name) // package access on constructor
     {
@@ -73,7 +74,6 @@ public class EventNode extends ViskitElement {
         if (this.opaqueModelObject != null) {
             ((Event) opaqueModelObject).setName(s);
         }
-
         this.name = s;
     }
 
@@ -153,7 +153,7 @@ public class EventNode extends ViskitElement {
         this.descriptionArray = descriptionArray;
     }
 
-@Override
+    @Override
     public String getArrayType() {
         return arrayType;
     }
@@ -186,5 +186,10 @@ public class EventNode extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

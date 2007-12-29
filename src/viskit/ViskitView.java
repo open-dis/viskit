@@ -29,7 +29,7 @@ public interface ViskitView
   public String  promptForStringOrCancel( String title, String message, String initval);
 
   public File[]  openFilesAsk();
-  public File    openRecentFilesAsk(Collection lis);
+  public File    openRecentFilesAsk(Collection<String> lis);
   public File    saveFileAsk(String suggName,boolean showUniqueName);
 
   public void    setSelectedEventGraphName(String s);    // informative, tells view what we're working on //todo make sure this is called with each addTab

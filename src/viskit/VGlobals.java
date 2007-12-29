@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -135,29 +134,29 @@ public class VGlobals {
 
         SwingUtilities.invokeLater(new Runnable() {
 
-                    public void run() {
-                        if (assyFirstRun) {
-                            return;
-                        }
+            public void run() {
+                if (assyFirstRun) {
+                    return;
+                }
 
-                        assyFirstRun = true;
-                        acont.newAssembly();
-                    }
-                });
+                assyFirstRun = true;
+                acont.newAssembly();
+            }
+        });
 
     }
     ActionListener defaultAssyQuitHandler = new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    if (avf != null) {
-                        avf.setVisible(false);
-                    }
-                    if (egvf != null && egvf.isVisible()) {
-                        return;
-                    }
-                    sysExit(0);
-                }
-            };
+        public void actionPerformed(ActionEvent e) {
+            if (avf != null) {
+                avf.setVisible(false);
+            }
+            if (egvf != null && egvf.isVisible()) {
+                return;
+            }
+            sysExit(0);
+        }
+     };
     ActionListener assyQuitHandler = defaultAssyQuitHandler;
 
     public void quitAssemblyEditor() {
@@ -200,16 +199,16 @@ public class VGlobals {
     }
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    if (egvf != null) {
-                        egvf.setVisible(false);
-                    }
-                    if (avf != null && avf.isVisible()) {
-                        return;
-                    }
-                    sysExit(0);
-                }
-            };
+        public void actionPerformed(ActionEvent e) {
+            if (egvf != null) {
+                egvf.setVisible(false);
+            }
+            if (avf != null && avf.isVisible()) {
+                return;
+            }
+            sysExit(0);
+        }
+    };
     ActionListener eventGraphQuitHandler = defaultEventGraphQuitHandler;
 
     public void quitEventGraphEditor() {
@@ -237,11 +236,11 @@ public class VGlobals {
         }
     }
 
-    private Vector<ViskitElement> getStateVarsList() {
+    private Vector<? extends ViskitElement> getStateVarsList() {
         return getActiveEventGraphModel().getStateVariables();
     }
 
-    private Vector<ViskitElement> getSimParmsList() {
+    private Vector<? extends ViskitElement> getSimParmsList() {
         return getActiveEventGraphModel().getSimParameters();
     }
 
@@ -283,8 +282,8 @@ public class VGlobals {
     public String parseCode(EventNode node, String s) {
         initBeanShell();
         // Load the interpreter with the state variables and the sim parameters
-    // Load up the local variables and event parameters for this particular node
-    // Then do the parse.
+        // Load up the local variables and event parameters for this particular node
+        // Then do the parse.
 
         // Lose the new lines
         s = s.replace('\n', ' ');
@@ -299,7 +298,7 @@ public class VGlobals {
             }
             if (result != null) {
                 clearNamespace();
-                return bshErr + "\n" + result;
+                return bshErr + "\n" + result;                
             }
             nsSets.add(stateVariable.getName());
         }
@@ -343,7 +342,7 @@ public class VGlobals {
         }
 
         // see if we can parse it.  We've initted all arrays to size = 1, so ignore
-    // outofbounds exceptions
+        // outofbounds exceptions
         try {
             String noCRs = s.replace('\n', ' ');
             Object o = interpreter.eval(noCRs);
@@ -369,9 +368,9 @@ public class VGlobals {
     }
 
     private String handleNameType(String name, String typ, boolean doInstantiate) // I don't think the instant part
-    {                                                                                  // is or should be used here
+    {                                                                                 // is or should be used here
         if (!handlePrimitive(name, typ)) {
-            if (!doInstantiate) {
+            if (!doInstantiate) {                
                 return (findType(name, typ));
             }
 
@@ -391,8 +390,9 @@ public class VGlobals {
     }
 
     private String findType(String name, String typ) {
+        if (isGeneric(typ)) {return null;}
         try {
-            Class c = Vstatics.classForName(typ);
+            Class<?> c = Vstatics.classForName(typ);
             interpreter.eval(typ + " " + name + ";");
         } //catch (Exception e) {
         catch (Throwable e) {
@@ -400,6 +400,10 @@ public class VGlobals {
             return e.getMessage();
         }
         return null;
+    }
+    
+    private boolean isGeneric(String typ) {
+        return (typ.contains("<") && typ.contains(">"));
     }
 
     private Object instantiateType(String typ) throws Exception {
@@ -410,7 +414,7 @@ public class VGlobals {
             isArr = true;
         }
         try {
-            Class c = Vstatics.classForName(typ);
+            Class<?> c = Vstatics.classForName(typ);
             if (c == null) {
                 throw new Exception("Class not found: " + typ);
             }
@@ -419,7 +423,7 @@ public class VGlobals {
             } else {
                 o = c.newInstance();
             }
-        } catch (Exception e) {
+        } catch (Exception e) {            
             o = null;
         }
         if (o != null) {
@@ -518,9 +522,8 @@ public class VGlobals {
                 return true;
             }
         } catch (EvalError evalError) {
-            //assert false:"BeanShell eval error ";
             System.err.println(bshErr);
-            evalError.printStackTrace();
+            evalError.printStackTrace();            
             return false;
         }
         return false;
@@ -542,13 +545,11 @@ public class VGlobals {
     private String[][] moreClasses =
             {{"boolean", "char", "byte", "short", "int", "long", "float", "double"},
             {"Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double", "String", "StringBuffer"},
-            {"HashMap", "HashSet", "LinkedList", "Properties", "Random", "TreeMap", "TreeSet", "Vector"},
-            {"RandomNumber", "RandomVariate"},
-            
-
-    {}
-  };
-  public boolean isPrimitive(String ty) {
+            {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
+            {"RandomNumber", "RandomVariate"}, {}
+    };
+    
+    public boolean isPrimitive(String ty) {
         for (int i = 0; i < moreClasses[primitivesIndex].length; i++) {
             if (ty.equals(moreClasses[primitivesIndex][i])) {
                 return true;
@@ -715,8 +716,8 @@ public class VGlobals {
         // Check to make sure the name the user specified isn't already used by a state variable
         // or parameter.
 
-        for (int idx = 0; idx < existingNames.size(); idx++) {
-            if (nm.equals(existingNames.get(idx))) {
+        for (String existingName : existingNames) {
+            if (nm.equals(existingName)) {
                 JOptionPane.showMessageDialog(null,
                         "variable names must be unique and not match any existing parameter or state variable name",
                         "alert",
@@ -873,6 +874,10 @@ public class VGlobals {
                  * of anonymous Runnables with SwingUtilities
                  */
                 if (f.toString().contains("viskit") || f.toString().contains("SwingUtilities")) {
+                    f.dispose();
+                }
+                // Case for XMLTree JFrames
+                if (f.getTitle().contains("xml")) {
                     f.dispose();
                 }
             }

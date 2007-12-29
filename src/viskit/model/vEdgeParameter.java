@@ -23,10 +23,10 @@ public class vEdgeParameter extends ViskitElement {
     private String indexingExpression;
     private String stateVarName;
     private String comment;
+    private String stateVarType;
     
-    public vEdgeParameter(String value)//, String type)
+    public vEdgeParameter(String value)
     {
-        //this.type = type;
         this.value = value;
     }
     
@@ -96,5 +96,10 @@ public class vEdgeParameter extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }

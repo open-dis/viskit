@@ -24,6 +24,7 @@ public class vParameter extends ViskitElement {
     private String operationOrAssignment;
     private String indexingExpression;
     private String stateVarName;
+    private String stateVarType;
 
     vParameter(String pName, String pType) //package-accessible
     {
@@ -107,5 +108,10 @@ public class vParameter extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+    
+    @Override
+    public String getStateVarType() {
+        return stateVarType;
     }
 }
