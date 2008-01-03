@@ -58,11 +58,14 @@ public class SimkitXML2Java {
     private final String qu = "\"";
     private final String lb = "[";
     private final String rb = "]";
+    
+    private String extend = "";
+    private String className = "";
 
     /**
      * Creates a new instance of SimkitXML2Java
      * when used from another class, instance this
-     * with a String for the name of the xmlFile
+     * with a String for the className of the xmlFile
      */
     public SimkitXML2Java(String xmlFile) {
         try {
@@ -140,9 +143,9 @@ public class SimkitXML2Java {
     void buildHead(StringWriter head) {
 
         PrintWriter pw = new PrintWriter(head);
-        String name = this.root.getName();
+        className = this.root.getName();
         String pkg = this.root.getPackage();
-        String extend = this.root.getExtend();
+        extend = this.root.getExtend();
         String implement = this.root.getImplement();
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
@@ -154,11 +157,15 @@ public class SimkitXML2Java {
 
         pw.println("package " + pkg + sc);
         pw.println();
-        pw.println("import simkit.*;");
-        pw.println("import simkit.random.*;");
+        pw.println("// Standard library imports");
         pw.println("import java.util.*;");
         pw.println();
-        pw.println("public class " + name + sp + "extends" + sp + extend + sp + ob);
+        pw.println("// Application specific imports");
+        pw.println("import org.apache.log4j.Logger;");
+        pw.println("import simkit.*;");
+        pw.println("import simkit.random.*;");
+        pw.println();
+        pw.println("public class " + className + sp + "extends" + sp + extend + sp + ob);
         pw.println();
     }
 
@@ -168,8 +175,11 @@ public class SimkitXML2Java {
 
         List<Parameter> liParam = this.root.getParameter();
         List<Parameter> superParams = resolveSuperParams(this.root.getParameter());
-        boolean extend = (this.root.getExtend().indexOf("SimEntityBase") < 0);
 
+        // Logger instantiation
+        pw.println(sp4 + "static Logger log " + eq + " Logger" + pd + 
+                "getLogger" + lp + className + pd + "class" + rp + sc);
+        pw.println();
         pw.println(sp4 + "/* Simulation Parameters */");
         for (Parameter p : liParam) {
 
@@ -179,7 +189,7 @@ public class SimkitXML2Java {
                 pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
             }
 
-            if (!extend) {
+            if (!(extend.indexOf("SimEntityBase") < 0)) {
                 buildParameterAccessor(p, accessorBlock);
             } else if (!superParams.contains(p)) {
                 buildParameterAccessor(p, accessorBlock);
@@ -408,7 +418,7 @@ public class SimkitXML2Java {
 
         pw.println(rp + sp + ob);
 
-        if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
+        if (extend.indexOf("SimEntityBase") < 0) {
 
             pList = this.root.getParameter();
             superPList = resolveSuperParams(pList);
@@ -489,11 +499,12 @@ public class SimkitXML2Java {
         pw.println(sp4 + cb);
         pw.println();        
 
-        if (this.root.getExtend().indexOf("SimEntityBase") < 0) {
-            // check if super has a doRun()
+        // check if super has a doRun()
+        if (extend.indexOf("SimEntityBase") < 0) {
+            
             Method doRun = null;
             try {
-                Class<?> sup = Class.forName(this.root.getExtend());
+                Class<?> sup = Class.forName(extend);
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
             } catch (ClassNotFoundException cnfe) {                
                 
@@ -506,20 +517,20 @@ public class SimkitXML2Java {
             }
             if (doRun != null) {
                 pw.println(sp4 + "@Override");
-                pw.println(sp4 + "public void doRun() {");
-                pw.println(sp8 + "super.doRun();");
+                pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
+                pw.println(sp8 + "super.doRun" + lp + rp + sc);
             } else {
-                pw.println(sp4 + "public void doRun() {");
+                pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
             }
         } else {
-            pw.println(sp4 + "public void doRun() {");
+            pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
         }
 
         liStateT = run.getStateTransition();
 
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
-            pw.print(sp8 + "firePropertyChange(" + qu + sv.getName() + qu);
+            pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
             pw.println(cm + sv.getName() + rp + sc);
         }
 
@@ -535,7 +546,7 @@ public class SimkitXML2Java {
         if (run.getCode() != null) {
             x = run.getCode();
         }
-        pw.println(sp4 + x);
+        pw.println(sp8 + x);
         pw.println(sp4 + cb);
         pw.println();
     }
@@ -547,7 +558,7 @@ public class SimkitXML2Java {
         List<Argument> liArgs = e.getArgument();
         List<LocalVariable> liLocalV = e.getLocalVariable();
         List<Object> liSchedCanc = e.getScheduleOrCancel();
-
+                
         pw.print(sp4 + "public void do" + e.getName() + lp);
 
         for (Argument a : liArgs) {
@@ -648,7 +659,7 @@ public class SimkitXML2Java {
             }
             pw.println();
         }
-        pw.println();
+        
         // waitDelay/interrupt
         for (Object o : liSchedCanc) {
             if (o instanceof Schedule) {
@@ -834,8 +845,7 @@ public class SimkitXML2Java {
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> superParams = new ArrayList<Parameter>();
-        if (this.root.getExtend().equals("simkit.SimEntityBase") ||
-                this.root.getExtend().equals("simkit.BasicSimEntity")) {
+        if (extend.equals("simkit.SimEntityBase") || extend.equals("simkit.BasicSimEntity")) {
             return superParams;
         }
 
@@ -843,7 +853,7 @@ public class SimkitXML2Java {
             // the extend field may also contain an implemnts
             // tail.
 
-            Class<?> c = Class.forName(this.root.getExtend().split("\\s")[0]);
+            Class<?> c = Class.forName(extend.split("\\s")[0]);
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
@@ -872,7 +882,6 @@ public class SimkitXML2Java {
             superParams = Arrays.asList(parray);
 
         } catch (java.lang.ClassNotFoundException cnfe) {
-            String extend = this.root.getExtend();
             if (extend.equals("simkit.SimEntityBase")) {
                 log.error(extend + " not in classpath ");
             }
