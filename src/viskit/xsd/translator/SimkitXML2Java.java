@@ -596,6 +596,7 @@ public class SimkitXML2Java {
                 pw.println(sp8 + lines[i]);
             }
             pw.println(sp8 + "/* End Code insertion */");
+            pw.println();
         }
 
         LinkedList<String> decls = new LinkedList<String>();
