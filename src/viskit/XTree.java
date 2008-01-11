@@ -68,7 +68,7 @@ public class XTree extends JTree {
 
         //   collapseRow(1);
 
-        setToolTipText("mama");  // needs to be done first to enable tt below
+        setToolTipText("XML Tree View");  // needs to be done first to enable tt below
         setRootVisible(true);
         setShowsRootHandles(true);
         setVisibleRowCount(100);    // means always fill a normal size panel

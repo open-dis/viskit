@@ -39,7 +39,7 @@ public class ConstructorPanel extends JPanel {
         selectButtPan.add(Box.createHorizontalGlue());
     }
 
-    public void setData(List args) // of VInstantiators
+    public void setData(List<Object> args) // of VInstantiators
     {
         this.removeAll();
         add(Box.createVerticalGlue());
@@ -172,7 +172,7 @@ public class ConstructorPanel extends JPanel {
     }
 
     /**
-     * @param clazz Class[] array, tyoically from constructor signature
+     * @param clazz Class[] array, typically from constructor signature
      * @return String identifying Class's signature
      */
     public static String getSignature(Class[] clazz) {
