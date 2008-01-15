@@ -647,12 +647,15 @@
                 <xsl:value-of select="@text"/>
             </font>
         </p>
+        <p align="left">            
+            <b><u>Summary Statistics section</u>: Primary Measures of Effectiveness (MOEs) / Measures of Performance (MOPs) and corresponding statistical plots</b>            
+        </p>
     </xsl:template>
     <xsl:template match="SimEntity" mode="RepStats">
                 
         <!-- Capture this Entity's name for its Figure Caption -->
         <xsl:variable name="entityProperty" select="@property"/>
-        <p/>
+        <p/>        
         <p align="left">            
             <b>Replication Report</b>            
         </p>
