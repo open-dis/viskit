@@ -315,7 +315,7 @@
             
             <!-- add an index to the array -->
             <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Simulation Assembly</p>
+            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Simulation Assembly Combining all Simulation Entities for this Scenario Experiment</p>
         </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>  
@@ -347,7 +347,7 @@
     <!--EntityParameter templates-->
     <xsl:template match="EPComments" mode="ParamHeader">
         <p align="left">
-            <b><a name="EntityParameters">Entity Parameters</a></b>
+            <b><a name="EntityParameters">Entity Initialization Parameters for this Simulation Assembly</a></b>
         </p>
         <p align="left">            
             <i>Entity Parameters Overview.</i>            
@@ -372,7 +372,7 @@
         <p/>
         <p/>
         <p/>
-        <xsl:text>Simulation Parameters for initializing </xsl:text>
+        <xsl:text>Initialization Parameters for Simulation Entity </xsl:text>
         <b>
             <a>
                 <xsl:attribute name="name">
@@ -390,7 +390,7 @@
                     <td width="132" bgcolor="#CCCCCC">Classification</td>
                     <td width="132" bgcolor="#CCCCCC"/>
                     <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" bgcolor="#CCCCCC">Candidate Factor</td>
+                    <td width="132" align="center" bgcolor="#CCCCCC">Candidate Factor</td>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
