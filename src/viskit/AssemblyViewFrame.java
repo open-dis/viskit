@@ -770,7 +770,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
-    public File openRecentFilesAsk(Collection lis) {
+    public File openRecentFilesAsk(Collection<String> lis) {
         String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), lis);
         if (fn != null) {
             File f = new File(fn);
