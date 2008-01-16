@@ -1472,6 +1472,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         String[] valueAr = historyConfig.getStringArray(assyHistoryKey + "[@value]");
         log.debug("_setFileLists() valueAr size is: " + valueAr.length);
         for (int i = 0; i < valueAr.length; i++) {
+            
+            // Attempt to prevent dupicate entries
+            if (recentFileList.contains(valueAr[i])) {continue;}
             recentFileList.add(valueAr[i]);
             String op = historyConfig.getString(assyHistoryKey + "(" + i + ")[@open]");
 

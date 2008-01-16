@@ -308,6 +308,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
         openV = new ArrayList<String>(4);
         String[] valueAr = historyConfig.getStringArray(egHistoryKey + "[@value]");
         for (int i = 0; i < valueAr.length; i++) {
+            
+            // Attempt to prevent dupicate entries
+            if (recentFileList.contains(valueAr[i])) {continue;}
             recentFileList.add(valueAr[i]);
             String op = historyConfig.getString(egHistoryKey + "(" + i + ")[@open]");
             if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
