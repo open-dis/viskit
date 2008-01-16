@@ -8,7 +8,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
- * @author   Mike Bailey
+ * @author Mike Bailey
  * @since Apr 12, 2004
  * @since 3:50:28 PM
  * @version $Id: GraphMetaData.java 1662 2007-12-16 19:44:04Z tdnorbra $
@@ -32,7 +32,6 @@ public class GraphMetaData {
                 new viskit.xsd.bindings.eventgraph.ObjectFactory();
         SimEntity tmp = of.createSimEntity();
         extendsPackageName = tmp.getExtend();
-
     }
 
     public GraphMetaData(Object caller) {
@@ -51,7 +50,6 @@ public class GraphMetaData {
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tmp = of.createSimEntity();
             extendsPackageName = tmp.getExtend();
-
         }
     }
 

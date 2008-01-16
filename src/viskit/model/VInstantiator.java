@@ -454,7 +454,6 @@ public abstract class VInstantiator {
                         }                        
                     }
                     found = match;
-                    log.info("found is: " + found);
                     if (found) {
                         indx = ix;
 //                        ix = parameters.length;

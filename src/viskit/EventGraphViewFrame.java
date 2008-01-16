@@ -286,7 +286,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
-        parametersPanel.add(descriptionTextArea); // TODO descriptionScrollPane not working?
+        parametersPanel.add(descriptionTextArea); // TODO: descriptionScrollPane not working?
         parametersPanel.add(Box.createVerticalStrut(5));
 
         parametersPanel.setMinimumSize(new Dimension(20, 20));
