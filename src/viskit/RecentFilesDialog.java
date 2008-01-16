@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -39,6 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Sep 19, 2005
  * @since 2:00:51 PM
+ * @version $Id:$
  */
 package viskit;
 
@@ -58,154 +59,148 @@ import java.util.Collection;
  *
  * @author DMcG
  */
+public class RecentFilesDialog extends JDialog {
 
-public class RecentFilesDialog extends JDialog
-{
-  private static RecentFilesDialog dialog;
+    private static RecentFilesDialog dialog;
+    private Collection<String> lis;
+    private JList jlist;
+    private JButton closeButt;
+    private Color defaultColor;
+    private MouseListener myRollOverHandler = new mHandler();
 
-  private Collection lis;
-  private JList jlist;
-  private JButton closeButt;
-  private Color defaultColor;
-  private MouseListener myRollOverHandler = new mHandler();
-  
-  public static String showDialog(JFrame f, Component comp, Collection lis)
-  {
-    if(dialog == null)
-      dialog = new RecentFilesDialog(f,comp,lis);
-    else
-      dialog.setParams(comp,lis);
+    public static String showDialog(JFrame f, Component comp, Collection<String> lis) {
+        if (dialog == null) {
+            dialog = new RecentFilesDialog(f, comp, lis);
+        } else {
+            dialog.setParams(comp, lis);
+        }
 
-    dialog.selection=null;
-    dialog.setVisible(true); // blocks here
-    return dialog.selection;
-  }
-
-  String selection;
-  private RecentFilesDialog(JFrame parent, Component comp, Collection lis)
-  {
-    super(parent, "Recent files", true);
-    this.lis = lis;
-    setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-    setUndecorated(true);
-
-    JPanel cont = new JPanel();
-    setContentPane(cont);
-    cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
-    closeButt = new JButton("X");
-    defaultColor = closeButt.getForeground();
-    closeButt.setFocusable(false);
-    closeButt.setBorder(new EmptyBorder(2,2,2,2)); //null); //new LineBorder(Color.gray,1));
-    closeButt.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        RecentFilesDialog.this.setVisible(false);
-      }
-    });
-    closeButt.addMouseListener(myRollOverHandler);
-    JButton clearButt = new JButton("clear");
-    clearButt.setFocusable(false);
-    clearButt.setBorder(new EmptyBorder(2,2,2,2));
-    clearButt.addActionListener(myClearer=new clearAction(lis));
-    clearButt.addMouseListener(myRollOverHandler);
-    
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-    p.add(new JLabel("Recent Event Graphs"));
-    p.add(Box.createHorizontalGlue());
-    p.add(clearButt);
-    p.add(Box.createHorizontalStrut(5));
-    p.add(closeButt);
-    cont.add(p);
-
-    jlist = new JList();
-    jlist.setBorder(new EmptyBorder(0,3,0,3));
-    jlist.addMouseListener(new myMM());
-    cont.add(jlist);
-    cont.setBorder(new LineBorder(Color.black,1));
-    setParams(comp,lis);
-  }
-  
-  clearAction myClearer;
-  class clearAction implements ActionListener
-  {
-    Collection nlis;
-    clearAction(Collection lis)
-    {
-      this.nlis = lis;
+        dialog.selection = null;
+        dialog.setVisible(true); // blocks here
+        return dialog.selection;
     }
-    public void actionPerformed(ActionEvent e)
-    {
-      nlis.clear();
-      closeButt.doClick();
-    }    
-  }
-  public void setParams(Component c, Collection lis)
-  {
-    this.lis = lis;
-    myClearer.nlis = lis;
+    String selection;
 
-    fillWidgets();
+    private RecentFilesDialog(JFrame parent, Component comp, Collection<String> lis) {
+        super(parent, "Recent files", true);
+        this.lis = lis;
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setUndecorated(true);
 
-    this.setLocationRelativeTo(c);
-  }
+        JPanel cont = new JPanel();
+        setContentPane(cont);
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        closeButt = new JButton("X");
+        defaultColor = closeButt.getForeground();
+        closeButt.setFocusable(false);
+        closeButt.setBorder(new EmptyBorder(2, 2, 2, 2)); //null); //new LineBorder(Color.gray,1));
+        closeButt.addActionListener(new ActionListener() {
 
-  private void fillWidgets()
-  {
-    jlist.removeAll();
-    jlist.setListData(lis.toArray());
-    jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    jlist.clearSelection();
-    jlist.requestFocus();
-    pack();
-  }
+            public void actionPerformed(ActionEvent e) {
+                RecentFilesDialog.this.setVisible(false);
+            }
+        });
+        closeButt.addMouseListener(myRollOverHandler);
+        JButton clearButt = new JButton("clear");
+        clearButt.setFocusable(false);
+        clearButt.setBorder(new EmptyBorder(2, 2, 2, 2));
+        clearButt.addActionListener(myClearer = new clearAction(lis));
+        clearButt.addMouseListener(myRollOverHandler);
 
-  class myMM extends MouseAdapter
-  {
-    public void mouseClicked(MouseEvent e)
-    {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+        p.add(new JLabel("Recently Opened File(s)"));
+        p.add(Box.createHorizontalGlue());
+        p.add(clearButt);
+        p.add(Box.createHorizontalStrut(5));
+        p.add(closeButt);
+        cont.add(p);
 
-      if(jlist.getSelectedIndex() != -1)
-        selection = (String)jlist.getSelectedValue();
-      else
-        selection = null;
-      if(e.getClickCount() > 1) {
-        RecentFilesDialog.this.setVisible(false);
-      }
+        jlist = new JList();
+        jlist.setBorder(new EmptyBorder(0, 3, 0, 3));
+        jlist.addMouseListener(new myMM());
+        cont.add(jlist);
+        cont.setBorder(new LineBorder(Color.black, 1));
+        setParams(comp, lis);
     }
-  }
-  class OneLinePanel extends JPanel
-  {
-    OneLinePanel(JLabel lab, int w, JComponent comp)
-    {
-      setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
-      add(Box.createHorizontalStrut(5));
-      add(Box.createHorizontalStrut(w-lab.getPreferredSize().width));
-      add(lab);
-      add(Box.createHorizontalStrut(5));
-      add(comp);
+    clearAction myClearer;
 
-      Dimension d = getPreferredSize();
-      d.width = Integer.MAX_VALUE;
-      setMaximumSize(d);
-    }
-  }
+    class clearAction implements ActionListener {
 
-  class mHandler extends MouseAdapter
-  {
-    public void mouseExited(MouseEvent e) {
-      JButton butt = (JButton)e.getSource();
-      butt.setForeground(defaultColor);
+        Collection<String> nlis;
+
+        clearAction(Collection<String> lis) {
+            this.nlis = lis;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            nlis.clear();
+            closeButt.doClick();
+        }
     }
 
-    public void mouseEntered(MouseEvent e) {
-     JButton butt = (JButton)e.getSource();
-      butt.setForeground(Color.red);
- 
+    public void setParams(Component c, Collection<String> lis) {
+        this.lis = lis;
+        myClearer.nlis = lis;
+
+        fillWidgets();
+
+        this.setLocationRelativeTo(c);
     }
-    
-  }
+
+    private void fillWidgets() {
+        jlist.removeAll();
+        jlist.setListData(lis.toArray());
+        jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jlist.clearSelection();
+        jlist.requestFocus();
+        pack();
+    }
+
+    class myMM extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+            if (jlist.getSelectedIndex() != -1) {
+                selection = (String) jlist.getSelectedValue();
+            } else {
+                selection = null;
+            }
+            if (e.getClickCount() > 1) {
+                RecentFilesDialog.this.setVisible(false);
+            }
+        }
+    }
+
+    class OneLinePanel extends JPanel {
+
+        OneLinePanel(JLabel lab, int w, JComponent comp) {
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            add(Box.createHorizontalStrut(5));
+            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
+            add(lab);
+            add(Box.createHorizontalStrut(5));
+            add(comp);
+
+            Dimension d = getPreferredSize();
+            d.width = Integer.MAX_VALUE;
+            setMaximumSize(d);
+        }
+    }
+
+    class mHandler extends MouseAdapter {
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            JButton butt = (JButton) e.getSource();
+            butt.setForeground(defaultColor);
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            JButton butt = (JButton) e.getSource();
+            butt.setForeground(Color.red);
+        }
+    }
 }
-
-
