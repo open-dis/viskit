@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.util.*;
 import java.text.DateFormat;
 
-import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
