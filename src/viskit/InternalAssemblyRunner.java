@@ -567,7 +567,6 @@ System.out.println("Inside IAR run");
     return runPanel.vcrVerbose.isSelected();
   }
 
-
   public static final int START = 0;
   public static final int STOP = 1;
   public static final int STEP = 2;

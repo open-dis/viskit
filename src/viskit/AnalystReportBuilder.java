@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.util.*;
 import java.text.DateFormat;
 
+import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -76,25 +77,8 @@ public class AnalystReportBuilder {
         setDefaultValues();
     }
     
-    /**
-     * Build an analystReport object from an existing XML file
-     * @param aRPanel a reference to the Analyst Report JPanel
-     * @param xmlFile an existing temp Analyst Report
-     * @param assyFile the current assembly file to process a report from
-     */
-    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
-        this.aRPanel = aRPanel;
-        parseXML(xmlFile);
-        log.debug("Successful parseXML");
-        if(assyFile != null) {
-            setAssemblyFile(assyFile);
-            log.debug("Successful setting of assembly file");
-            postProcessing();
-            log.debug("Successful post processing of Analyst Report");
-        }
-    }
-    
-    /** Build an AnalystReport object from an existing statisticsReport document
+    /** Build an AnalystReport object from an existing statisticsReport 
+     * document.  This is done from viskit.BasicAssembly.</p>
      * @param statisticsReportPath the path to the statistics generated report
      *        used by this Analyst Report 
      */
@@ -110,6 +94,39 @@ public class AnalystReportBuilder {
         setDefaultValues();
     }
 
+    /**
+     * Build an analystReport object from an existing partial Analyst Report.  
+     * This done after the statistic report is incorporated into the basic 
+     * Analyst Report and further annotations are to be written by the analyst
+     * to finalize the report.</p>
+     * @param aRPanel a reference to the Analyst Report JPanel
+     * @param xmlFile an existing temp Analyst Report
+     * @param assyFile the current assembly file to process a report from
+     */
+    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
+        this.aRPanel = aRPanel;
+        parseXML(xmlFile);
+        log.debug("Successful parseXML");
+        if (assyFile != null) {
+            setAssemblyFile(assyFile);
+            log.debug("Successful setting of assembly file");
+            postProcessing();
+            log.debug("Successful post processing of Analyst Report");
+        }
+    }
+    
+    /** This constructor for opening a fully annotated report for further 
+     * annotations, or as required from the analyst/user.
+     * @param fullReport an exisiting fully annotated report to reopen
+     */
+    public AnalystReportBuilder(File fullReport) {
+        try {
+            parseXML(fullReport);
+        } catch (Exception ex) {
+            log.error(ex);
+        }
+    }
+    
     private void initDocument() {
         reportJdomDocument = new Document();
         rootElement = new Element("AnalystReport");
@@ -135,13 +152,13 @@ public class AnalystReportBuilder {
      * @return the initial temp file to saveed for further post-processing
      */
     public File writeToXMLFile(File fil) throws Exception {
-        if(fil == null)
-            return writeToXMLFile();
+        if (fil == null) {return writeToXMLFile();}
+        
         _writeCommon(fil);
         return fil;
     }
     
-    /** @return the initial temp file to saveed for further post-processing */
+    /** @return the initial temp file to saved for further post-processing */
     public File writeToXMLFile() throws Exception {
         File fil = File.createTempFile("AnalystReport", ".xml");
         _writeCommon(fil);

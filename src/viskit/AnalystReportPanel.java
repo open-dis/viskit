@@ -172,6 +172,13 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         reportFile = targetFile;
         dirty = false;
     }
+    
+    private void openAnalystReport(File selectedFile) {
+          AnalystReportBuilder arbLocal = new AnalystReportBuilder(selectedFile);
+          setContent(arbLocal);
+          reportFile = selectedFile;
+          dirty = false;
+    }
 
     public void setContent(AnalystReportBuilder arb) {
         if (arb != null && dirty) {
@@ -290,12 +297,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        /*
-    execSummary = new Element("ExecutiveSummary");
-    execSummary.setAttribute("comments", "true");
-    execSummary.addContent(makeComments("ES", ""));
-
-    */
         execSummTA.setLineWrap(true);
         execSummTA.setWrapStyleWord(true);
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -642,6 +643,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         doBehaviorDescriptions.setSelected(arb.isPrintBehaviorDescriptions());
         behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
 
+        // TODO: JDOM v1.1 does not yet support generics
         List behaviorList = arb.getBehaviorList();
 
         behaviorTabs.removeAll();
@@ -905,59 +907,59 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         open.addActionListener(new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    if (dirty) {
-                        int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current simulation data and analyst report annotations?",
-                                "Confirm", JOptionPane.WARNING_MESSAGE);
-                        switch (result) {
-                            case JOptionPane.OK_OPTION:
-                                saveReport();
-                                break;
-                            case JOptionPane.CANCEL_OPTION:
-                            case JOptionPane.NO_OPTION:
-                            default:
-                                break;
-                        }
+            public void actionPerformed(ActionEvent e) {
+                if (dirty) {
+                    int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current simulation data and analyst report annotations?",
+                            "Confirm", JOptionPane.WARNING_MESSAGE);
+                    switch (result) {
+                        case JOptionPane.OK_OPTION:
+                            saveReport();
+                            break;
+                        case JOptionPane.CANCEL_OPTION:
+                        case JOptionPane.NO_OPTION:
+                        default:
+                            break;
                     }
-
-                    JFileChooser openChooser = new JFileChooser("./AnalystReports");
-                    FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
-                    openChooser.setFileFilter(filter);
-                    openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-                    int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
-                    if (resp != JFileChooser.APPROVE_OPTION) {
-                        return;
-                    }
-
-                    buildArb(openChooser.getSelectedFile());
                 }
-            });
+
+                JFileChooser openChooser = new JFileChooser("./AnalystReports");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
+                openChooser.setFileFilter(filter);
+                openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
+                if (resp != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+
+                openAnalystReport(openChooser.getSelectedFile());
+            }            
+        });
 
         ActionListener saveAsLis = new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
-                        saveChooser.setSelectedFile(reportFile);
-                        saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
+                saveChooser.setSelectedFile(reportFile);
+                saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-                        int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
+                int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
 
-                        if (resp != JFileChooser.APPROVE_OPTION) {
-                            return;
-                        }
+                if (resp != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
 
-                        unFillLayout();
+                unFillLayout();
 
-                        // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
-                        reportFile = saveChooser.getSelectedFile();
-                        saveReport(reportFile);
-                        String outFile = reportFile.getAbsolutePath();
-                        int idx = outFile.lastIndexOf(".");
+                // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
+                reportFile = saveChooser.getSelectedFile();
+                saveReport(reportFile);
+                String outFile = reportFile.getAbsolutePath();
+                int idx = outFile.lastIndexOf(".");
 
-                        outFile = outFile.substring(0, idx) + ".html";
-                        XsltUtility.runXslt(reportFile.getAbsolutePath(),
-                                outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
+                outFile = outFile.substring(0, idx) + ".html";
+                XsltUtility.runXslt(reportFile.getAbsolutePath(),
+                        outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
 
 // don't need to display when simply saving
 //                        // pop up the system html viewer, or send currently running browser to html page
@@ -966,17 +968,17 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 //                        } catch (java.net.MalformedURLException mue) {
 //                            log.error(mue);
 //                        }
-                    }
-                };
+            }
+        };
         save.addActionListener(saveAsLis);
 
         ActionListener generateViewHtmlListener = new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
 
-                        unFillLayout(); // wondering why this is needed?
-                        saveReport(reportFile);
-                        
+                unFillLayout(); // wondering why this is needed?
+                saveReport(reportFile);
+
 //                        // TODO:  change XML input to temp file, rather than final file, if possible
 //                        if (true) { // TODO:  check if analyst report data is 'dirty' to avoid unnecessary saves
 //                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
@@ -993,22 +995,22 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 //                                    break; // skip viewing analyst report, must save all data first
 //                            }
 //                        }
-                        String outFile = reportFile.getAbsolutePath();
-                        int idx = outFile.lastIndexOf(".");
+                String outFile = reportFile.getAbsolutePath();
+                int idx = outFile.lastIndexOf(".");
 
-                        outFile = outFile.substring(0, idx) + ".html";
+                outFile = outFile.substring(0, idx) + ".html";
 
-                        JFileChooser genChooser = new JFileChooser("./AnalystReports");
-                        genChooser.setSelectedFile(new File(outFile));
-                        genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                JFileChooser genChooser = new JFileChooser("./AnalystReports");
+                genChooser.setSelectedFile(new File(outFile));
+                genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-                        if (JOptionPane.YES_OPTION ==
-                            JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
-                            "Rename analyst report output?",
-                            "Confirm", JOptionPane.WARNING_MESSAGE))
-                        {
-                            genChooser.showSaveDialog(AnalystReportPanel.this);
-                        }
+                if (JOptionPane.YES_OPTION ==
+                    JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
+                    "Rename analyst report output?",
+                    "Confirm", JOptionPane.WARNING_MESSAGE))
+                {
+                    genChooser.showSaveDialog(AnalystReportPanel.this);
+                }
 //                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
 //
 //                        if (resp == JFileChooser.APPROVE_OPTION) {
@@ -1016,18 +1018,18 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 //                                genChooser.getSelectedFile().getAbsolutePath(),
 //                                "AnalystReports/AnalystReportXMLtoHTML.xslt");
 //                        }
-                        
-                        // always generate new report before display, regardless of old or new name
-                        // TODO:  change XML input to temp file, rather than final file, if possible
-                        XsltUtility.runXslt(reportFile.getAbsolutePath(),       // XML  input
-                                genChooser.getSelectedFile().getAbsolutePath(), // HTML output
-                                "AnalystReports/AnalystReportXMLtoHTML.xslt");  // stylesheet
-                        
-                        // always show latest report, they asked for it
-                        showHtmlViewer(genChooser.getSelectedFile());
 
-                    }
-                };
+                // always generate new report before display, regardless of old or new name
+                // TODO:  change XML input to temp file, rather than final file, if possible
+                XsltUtility.runXslt(reportFile.getAbsolutePath(),       // XML  input
+                        genChooser.getSelectedFile().getAbsolutePath(), // HTML output
+                        "AnalystReports/AnalystReportXMLtoHTML.xslt");  // stylesheet
+
+                // always show latest report, they asked for it
+                showHtmlViewer(genChooser.getSelectedFile());
+
+            }
+        };
         generateViewHtml.addActionListener(generateViewHtmlListener);
     }
 
@@ -1102,7 +1104,7 @@ class ROTable extends JTable {
     }
 
     @Override
-  public boolean isCellEditable(int row, int column) {
+    public boolean isCellEditable(int row, int column) {
         return false;
     }
 }
