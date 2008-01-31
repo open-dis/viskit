@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileIO;
+//import edu.nps.util.FileIO;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -231,40 +231,40 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private HashSet<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<OpenAssembly.AssyChangeListener>();
     OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
 
-                public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
-                    switch (action) {
-                        case JAXB_CHANGED:
-                            isLocalDirty.remove(source);
-                            if (isLocalDirty.isEmpty()) {
-                                localDirty = false;
-                            }
-
-                            ((ViskitAssemblyModel) getModel()).setDirty(true);
-                            break;
-
-                        case NEW_ASSY:
-                            isLocalDirty.clear();
-                            localDirty = false;
-                            break;
-
-                        case PARAM_LOCALLY_EDITTED:
-                            // This gets hit when you type something in the last three tabs
-                            isLocalDirty.add(source);
-                            localDirty = true;
-                            break;
-
-                        case CLOSE_ASSY:
-                            break;
-
-                        default:
-                            System.err.println("Program error AssemblyController.assyChanged");
+        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+            switch (action) {
+                case JAXB_CHANGED:
+                    isLocalDirty.remove(source);
+                    if (isLocalDirty.isEmpty()) {
+                        localDirty = false;
                     }
-                }
 
-                public String getHandle() {
-                    return "Assembly Controller";
-                }
-            };
+                    ((ViskitAssemblyModel) getModel()).setDirty(true);
+                    break;
+
+                case NEW_ASSY:
+                    isLocalDirty.clear();
+                    localDirty = false;
+                    break;
+
+                case PARAM_LOCALLY_EDITTED:
+                    // This gets hit when you type something in the last three tabs
+                    isLocalDirty.add(source);
+                    localDirty = true;
+                    break;
+
+                case CLOSE_ASSY:
+                    break;
+
+                default:
+                    System.err.println("Program error AssemblyController.assyChanged");
+            }
+        }
+
+        public String getHandle() {
+            return "Assembly Controller";
+        }
+    };
 
     public String getHandle() {
         return assyChgListener.getHandle();
@@ -294,20 +294,25 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             e.printStackTrace();
         }
     }
+    
+    // TODO: Currently, the only thing these two functions do is place an extra
+    // assembly file in the build directory since watchDir never gets an initial
+    // value.  The original assembly file will get saved out as well if modified
 
-    private void fileWatchSave(File f) {
-        fileWatchOpen(f);
-    }
-
-    private void fileWatchOpen(File f) {
-        String nm = f.getName();
-        File ofile = new File(watchDir, nm);
-        try {
-            FileIO.copyFile(f, ofile, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void fileWatchSave(File f) {
+//        fileWatchOpen(f);
+//    }
+//
+//    private void fileWatchOpen(File f) {
+//        String nm = f.getName();
+//        log.info("watchDir is: " + watchDir);
+//        File ofile = new File(watchDir, nm);
+//        try {
+//            FileIO.copyFile(f, ofile, true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void fileWatchClose(File f) {
         String nm = f.getName();
@@ -346,7 +351,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         } else {
             updateGMD();
             ((ViskitAssemblyModel) getModel()).saveModel(lastFile);
-            fileWatchSave(lastFile);
+//            fileWatchSave(lastFile);
         }
     }
 
@@ -373,17 +378,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             model.saveModel(lastFile);
             view.fileName(lastFile.getName());
 
-            fileWatchOpen(lastFile);
+//            fileWatchOpen(lastFile);
             adjustRecentList(saveFile);
         }
     }
 
     private void updateGMD() {
         GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
-        //gmd.stopTime = ((ViskitAssemblyView)getView()).getStopTime();
-    //gmd.verbose = ((ViskitAssemblyView)getView()).getVerbose();
         ((ViskitAssemblyModel) getModel()).changeMetaData(gmd);
-
     }
 
     public void newAssembly() {
