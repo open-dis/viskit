@@ -105,6 +105,9 @@ public class TransitionsPanel extends JPanel {
                 if (event.getClickCount() == 2) {
                     if (myMouseLis != null) {
                         int idx = lis.getSelectedIndex();
+                        
+                        // Don't fail on ArrayIndexOutOfBoundsException
+                        if (idx == -1) return;
                         ViskitElement est = arLis.get(idx);
                         event.setSource(est);
                         myMouseLis.mouseClicked(event);
