@@ -1,2 +1,2 @@
 @REM Builds, then launches Viskit with module dependencies, i.e. Diskit
-ant build-run-default
+ant build-run-default-extended
