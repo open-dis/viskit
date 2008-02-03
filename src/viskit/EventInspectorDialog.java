@@ -42,9 +42,9 @@ public class EventInspectorDialog extends JDialog {
     private ArgumentsPanel arguments;
     private LocalVariablesPanel localVariables;
     private CodeBlockPanel codeBlock;
-    private JButton cancelButton,  okButton;
-    private JButton addDescriptionButton,  addArgumentsButton,  addLocalsButton,  addCodeBlockButton,  addStateTransitionsButton;
-
+    private JButton cancelButton, okButton;
+    private JButton addDescriptionButton, addArgumentsButton, addLocalsButton, addCodeBlockButton, addStateTransitionsButton;
+    
     /**
      * Set up and show the dialog.  The first Component argument
      * determines which frame the dialog depends on; it should be
@@ -70,9 +70,7 @@ public class EventInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventInspectorDialog(JFrame frame,
-            Component locationComp,
-            EventNode node) {
+    private EventInspectorDialog(JFrame frame, Component locationComp, EventNode node) {
         super(frame, "Event Inspector: " + node.getName(), true);
         this.fr = frame;
         this.node = node;
@@ -191,7 +189,6 @@ public class EventInspectorDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-
         addHideButtListener hideList = new addHideButtListener();
         addDescriptionButton.addActionListener(hideList);
         addArgumentsButton.addActionListener(hideList);
@@ -209,7 +206,7 @@ public class EventInspectorDialog extends JDialog {
         arguments.addPlusListener(myChangeListener);
         arguments.addMinusListener(myChangeListener);
         arguments.addDoubleClickedListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
                 boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
@@ -223,20 +220,12 @@ public class EventInspectorDialog extends JDialog {
         transitions.addMinusListener(myChangeListener);
         transitions.addDoubleClickedListener(new MouseAdapter() {
 
+            // bug fix 1183
             @Override
             public void mouseClicked(MouseEvent e) {
                 EventStateTransition est = (EventStateTransition) e.getSource();
-                boolean modified = EventTransitionDialog.showDialog(EventInspectorDialog.this, locationComponent, est);
+                boolean modified = EventTransitionDialog.showDialog(EventInspectorDialog.this, locationComponent, est, arguments);
                 if (modified) {
-                    /*
-                    // experiment
-                    EventLocalVariable nuts = new EventLocalVariable("__01","int",est.getIndexingExpression());
-                    localVariables.addRow(nuts);
-                    est.setIndexingExpression(nuts.getName());
-                    // works...
-                    // //todo resolve how to sync
-                     */
-
                     transitions.updateTransition(est);
                     okButton.setEnabled(true);
                     EventInspectorDialog.modified = true;
@@ -259,7 +248,7 @@ public class EventInspectorDialog extends JDialog {
             }
         });
     }
-
+   
     private void sizeAndPosition() {
         pack();     // do this prior to next
         // little check to add some extra space to always include the node name in title bar w/out dotdotdots
@@ -289,7 +278,6 @@ public class EventInspectorDialog extends JDialog {
         description.setCaretPosition(0);
         description.setPreferredSize(d);
 
-//    hideShowDescription(true); // always show
         hideShowDescription(s != null && s.length() > 0);
 
         s = node.getCodeBlock();
@@ -326,13 +314,13 @@ public class EventInspectorDialog extends JDialog {
         }
     }
 
-    private String fillString(ArrayList lis) {
+    private String fillString(ArrayList<String> lis) {
         if (lis == null) {
             return "";
         }
         StringBuffer sb = new StringBuffer();
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            sb.append((String) itr.next());
+        for (String str : lis) {
+            sb.append(str);
             sb.append(" ");
         }
         return sb.toString().trim();
@@ -342,7 +330,9 @@ public class EventInspectorDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;
-            VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();  // To start numbering over next time
+            
+            // To start numbering over next time
+            VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
             setVisible(false);
         }
     }
@@ -378,13 +368,7 @@ public class EventInspectorDialog extends JDialog {
                         if (!ret) // don't ignore
                         {
                             return;
-                        }
-                    /*
-                    int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Java language error:\n" + parseResults + "\nIgnore and continue?",
-                    "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if (ret != JOptionPane.YES_OPTION)
-                    return;
-                     */
+                        }                   
                     }
                 }
                 unloadWidgets(node);

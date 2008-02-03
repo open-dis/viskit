@@ -14,49 +14,46 @@ import viskit.model.ViskitElement;
  * @since 8:49:21 AM
  * @version $Id: ArgumentsPanel.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class ArgumentsPanel extends ViskitTablePanel
-{
-  private String[] mytitles = {"name","type","description"};
-  private static int count=0;
+public class ArgumentsPanel extends ViskitTablePanel {
 
-  ArgumentsPanel(int wid)
-  {
-    this(wid,0);
-  }
-  ArgumentsPanel(int wid, int numRows)
-  {
-    super(wid,numRows);
-    init(true);                       // separate constructor from initialization
-  }
-  public String[] getColumnTitles()
-  {
-    return mytitles;
-  }
+    private String[] mytitles = {"name", "type", "description"};
+    private static int count = 0;
 
-  public String[] getFields(Object o, int rowNum)
-  {
-    String[] sa = new String[3];
-    sa[0] = ((EventArgument)o).getName();
-    sa[1] = ((EventArgument)o).getType();
-    ArrayList  ar = ((EventArgument)o).getDescription();
-    if(ar.size() > 0)
-      sa[2] = (String)((EventArgument)o).getDescription().get(0);
-    else
-      sa[2] = "";
-    return sa;
-  }
+    ArgumentsPanel(int wid) {
+        this(wid, 0);
+    }
 
-  @Override
-  public ViskitElement newRowObject()
-  {
-    EventArgument ea = new EventArgument();
-    ea.setName("arg_"+count++);
-    ea.setType("int");
-    return ea;
-  }
+    ArgumentsPanel(int wid, int numRows) {
+        super(wid, numRows);
+        init(true);                       // separate constructor from initialization
+    }
 
-  public int getNumVisibleRows()
-  {
-    return 3;
-  }
+    public String[] getColumnTitles() {
+        return mytitles;
+    }
+
+    public String[] getFields(Object o, int rowNum) {
+        String[] sa = new String[3];
+        sa[0] = ((EventArgument) o).getName();
+        sa[1] = ((EventArgument) o).getType();
+        ArrayList ar = ((EventArgument) o).getDescription();
+        if (ar.size() > 0) {
+            sa[2] = (String) ((EventArgument) o).getDescription().get(0);
+        } else {
+            sa[2] = "";
+        }
+        return sa;
+    }
+
+    @Override
+    public ViskitElement newRowObject() {
+        EventArgument ea = new EventArgument();
+        ea.setName("arg_" + count++);
+        ea.setType("int");
+        return ea;
+    }
+
+    public int getNumVisibleRows() {
+        return 3;
+    }
 }

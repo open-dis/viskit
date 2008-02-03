@@ -176,14 +176,14 @@ public class StateVariableDialog extends ViskitSmallDialog {
             stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
             arraySizeField.setText(getArraySize(ty));
             commentField.setText(stVar.getComment());
-            boolean isArray = stVar.getType().indexOf('[') != -1;
+            boolean isArray = isArray(stVar.getType());
             arraySizeField.setEditable(isArray);   // grays background if false
             arraySizeField.setEnabled(isArray);
             arrSizeLab.setEnabled(isArray);
         } else {
             stateVarNameField.setText(((ViskitModel) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             String ty = (String) stateVarTypeCombo.getSelectedItem();
-            boolean isArray = ty.indexOf('[') != -1;
+            boolean isArray = isArray(ty);
             commentField.setText("");
             arraySizeField.setText("");
             arraySizeField.setEditable(isArray); // grays out background

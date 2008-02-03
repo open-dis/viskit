@@ -21,245 +21,227 @@ import java.awt.event.WindowEvent;
  *
  * @author DMcG
  */
+public class EventArgumentDialog extends JDialog {
 
-public class EventArgumentDialog extends JDialog
-{
-  private JTextField nameField;    // Text field that holds the parameter name
-  private JTextField descriptionField;          // Text field that holds the description
-  private JComboBox  parameterTypeCombo;    // Editable combo box that lets us select a type
+    private JTextField nameField;    // Text field that holds the parameter name
+    private JTextField descriptionField;          // Text field that holds the description
+    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
+    private static EventArgumentDialog dialog;
+    private static boolean modified = false;
+    private EventArgument myEA;
+    private Component locationComp;
+    private JButton okButt,  canButt;
+    public static String newName,  newType,  newDescription;
 
-  private static EventArgumentDialog dialog;
-  private static boolean modified = false;
-  private EventArgument myEA;
-  private Component locationComp;
-  private JButton okButt, canButt;
+    public static boolean showDialog(JFrame f, Component comp, EventArgument parm) {
+        if (dialog == null) {
+            dialog = new EventArgumentDialog(f, comp, parm);
+        } else {
+            dialog.setParams(comp, parm);
+        }
 
-  public static String newName, newType, newDescription;
+        dialog.setVisible(true);
+        // above call blocks
+        return modified;
+    }
 
-  public static boolean showDialog(JFrame f, Component comp, EventArgument parm)
-  {
-    if(dialog == null)
-      dialog = new EventArgumentDialog(f,comp,parm);
-    else
-      dialog.setParams(comp,parm);
+    private EventArgumentDialog(JFrame parent, Component comp, EventArgument param) {
+        super(parent, "Event Argument", true);
+        this.myEA = param;
+        this.locationComp = comp;
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new myCloseListener());
 
-    dialog.setVisible(true);
-      // above call blocks
-    return modified;
-  }
+        Container cont = getContentPane();
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
-  private EventArgumentDialog(JFrame parent, Component comp, EventArgument param)
-  {
-    super(parent, "Event Argument", true);
-    this.myEA = param;
-    this.locationComp = comp;
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    this.addWindowListener(new myCloseListener());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-    Container cont = getContentPane();
-    cont.setLayout(new BoxLayout(cont,BoxLayout.Y_AXIS));
-
-     JPanel panel = new JPanel();
-     panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
-     panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-
-      panel.add(Box.createVerticalStrut(5));
-      JPanel fieldsPanel = new JPanel();
-        fieldsPanel.setLayout(new BoxLayout(fieldsPanel,BoxLayout.Y_AXIS));
+        panel.add(Box.createVerticalStrut(5));
+        JPanel fieldsPanel = new JPanel();
+        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
         JLabel descriptionLabel = new JLabel("description");
-        int w = maxWidth(new JComponent[]{nameLab,initLab,typeLab,descriptionLabel});
+        int w = maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
-        nameField = new JTextField(15);   
+        nameField = new JTextField(15);
         setMaxHeight(nameField);
-        descriptionField = new JTextField(25);   
+        descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
-        //parameterTypeCombo = new JComboBox();
-        //parameterTypeCombo.setModel(VGlobals.instance().getTypeCBModel(parameterTypeCombo));
-        //                                       setMaxHeight(parameterTypeCombo);
-        //parameterTypeCombo.setBackground(Color.white);
-       // parameterTypeCombo.setEditable(true);
-        parameterTypeCombo = VGlobals.instance().getTypeCB(); 
+        parameterTypeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
 
+        fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
+        fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
+        panel.add(fieldsPanel);
+        panel.add(Box.createVerticalStrut(5));
 
-        fieldsPanel.add(new OneLinePanel(nameLab,w,nameField));
-        fieldsPanel.add(new OneLinePanel(typeLab,w,parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(descriptionLabel,w,descriptionField));
-       panel.add(fieldsPanel);
-       panel.add(Box.createVerticalStrut(5));
-
-       JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttPan.add(canButt);
         buttPan.add(okButt);
-       panel.add(buttPan);
-       panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-      cont.add(panel);
+        panel.add(buttPan);
+        panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        cont.add(panel);
 
-    fillWidgets();     // put the data into the widgets
+        fillWidgets();     // put the data into the widgets
 
-    modified        = (param==null?true:false);     // if it's a new myEA, they can always accept defaults with no typing
-    okButt.setEnabled((param==null?true:false));
+        modified = (param == null);     // if it's a new myEA, they can always accept defaults with no typing
+        okButt.setEnabled(param == null);
 
-    getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(canButt);
 
-    pack();     // do this prior to next
-    this.setLocationRelativeTo(locationComp);
+        pack();     // do this prior to next
+        this.setLocationRelativeTo(locationComp);
 
-    // attach listeners
-    canButt.addActionListener(new cancelButtonListener());
-    okButt .addActionListener(new applyButtonListener());
+        // attach listeners
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
-    enableApplyButtonListener listener = new enableApplyButtonListener();
-    this.nameField.addCaretListener(listener);
-    this.descriptionField.addCaretListener(listener);
-    this.parameterTypeCombo.addActionListener(listener);
-  }
-
-  private int maxWidth(JComponent[] c)
-  {
-    int tmpw=0,maxw=0;
-    for(int j=0; j<c.length; j++) {
-      tmpw = c[j].getPreferredSize().width;
-      if(tmpw > maxw)
-        maxw = tmpw;
-    }
-    return maxw;
-  }
-  private void setMaxHeight(JComponent c)
-  {
-    Dimension d = c.getPreferredSize();
-    d.width = Integer.MAX_VALUE;
-    c.setMaximumSize(d);
-  }
-  public void setParams(Component c, EventArgument p)
-  {
-    myEA = p;
-    locationComp = c;
-
-    fillWidgets();
-
-    modified        = (p==null?true:false);
-    okButt.setEnabled((p==null?true:false));
-
-    getRootPane().setDefaultButton(canButt);
-
-    this.setLocationRelativeTo(c);
-  }
-
-  private void fillWidgets()
-  {
-    if(myEA != null) {
-      nameField.setText(myEA.getName());
-      parameterTypeCombo.setSelectedItem(myEA.getType());
-      if(myEA.getDescription().size() > 0)
-        descriptionField.setText((String)myEA.getDescription().get(0));
-      else
-        descriptionField.setText("");
-    }
-    else {
-      nameField.setText("");
-      descriptionField.setText("");
-    }
-  }
-
-  private void unloadWidgets()
-  {
-    String ty = (String)parameterTypeCombo.getSelectedItem();
-    ty = VGlobals.instance().typeChosen(ty);
-    String nm = nameField.getText();
-    nm = nm.replaceAll("\\s","");
-
-    if(myEA != null) {
-      myEA.setName(nm);
-      myEA.setType(ty);
-      myEA.getDescription().clear();
-      String cs = descriptionField.getText().trim();
-      if(cs.length() > 0)
-        myEA.getDescription().add(0,cs);
-    }
-    else {
-      newName    = nm;
-      newType    = ty;
-      newDescription = descriptionField.getText().trim();
-    }
-  }
-
-  class cancelButtonListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent event)
-    {
-      modified = false;    // for the caller
-      setVisible(false);
-    }
-  }
-
-  class applyButtonListener implements ActionListener
-  {
-    public void actionPerformed(ActionEvent event)
-    {
-      if(modified)
-        unloadWidgets();
-      setVisible(false);
-    }
-  }
-
-  class enableApplyButtonListener implements CaretListener,ActionListener
-  {
-    public void caretUpdate(CaretEvent event)
-    {
-      modified = true;
-      okButt.setEnabled(true);
-      getRootPane().setDefaultButton(okButt);
+        enableApplyButtonListener listener = new enableApplyButtonListener();
+        this.nameField.addCaretListener(listener);
+        this.descriptionField.addCaretListener(listener);
+        this.parameterTypeCombo.addActionListener(listener);
     }
 
-    public void actionPerformed(ActionEvent event)
-    {
-      caretUpdate(null);
-    }
-  }
-
-  class OneLinePanel extends JPanel
-  {
-    OneLinePanel(JLabel lab, int w, JComponent comp)
-    {
-      setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
-      add(Box.createHorizontalStrut(5));
-      add(Box.createHorizontalStrut(w-lab.getPreferredSize().width));
-      add(lab);
-      add(Box.createHorizontalStrut(5));
-      add(comp);
-
-      Dimension d = getPreferredSize();
-      d.width = Integer.MAX_VALUE;
-      setMaximumSize(d);
-    }
-  }
-
-  class myCloseListener extends WindowAdapter
-  {
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-      if(modified == true) {
-        int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this,"Apply changes?",
-            "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-        if(ret == JOptionPane.YES_OPTION)
-          okButt.doClick();
-        else
-          canButt.doClick();
+    private int maxWidth(JComponent[] c) {
+        int tmpw = 0, maxw = 0;
+        for (JComponent jc : c) {
+            tmpw = jc.getPreferredSize().width;
+            if (tmpw > maxw) {
+                maxw = tmpw;
+            }
         }
-      else
-        canButt.doClick();
+        return maxw;
     }
-  }
+
+    private void setMaxHeight(JComponent c) {
+        Dimension d = c.getPreferredSize();
+        d.width = Integer.MAX_VALUE;
+        c.setMaximumSize(d);
+    }
+
+    public void setParams(Component c, EventArgument p) {
+        myEA = p;
+        locationComp = c;
+
+        fillWidgets();
+
+        modified = (p == null);
+        okButt.setEnabled(p == null);
+
+        getRootPane().setDefaultButton(canButt);
+
+        this.setLocationRelativeTo(c);
+    }
+
+    private void fillWidgets() {
+        if (myEA != null) {
+            nameField.setText(myEA.getName());
+            parameterTypeCombo.setSelectedItem(myEA.getType());
+            if (myEA.getDescription().size() > 0) {
+                descriptionField.setText((String) myEA.getDescription().get(0));
+            } else {
+                descriptionField.setText("");
+            }
+        } else {
+            nameField.setText("");
+            descriptionField.setText("");
+        }
+    }
+
+    private void unloadWidgets() {
+        String ty = (String) parameterTypeCombo.getSelectedItem();
+        ty = VGlobals.instance().typeChosen(ty);
+        String nm = nameField.getText();
+        nm = nm.replaceAll("\\s", "");
+
+        if (myEA != null) {
+            myEA.setName(nm);
+            myEA.setType(ty);
+            myEA.getDescription().clear();
+            String cs = descriptionField.getText().trim();
+            if (cs.length() > 0) {
+                myEA.getDescription().add(0, cs);
+            }
+        } else {
+            newName = nm;
+            newType = ty;
+            newDescription = descriptionField.getText().trim();
+        }
+    }
+
+    class cancelButtonListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent event) {
+            modified = false;    // for the caller
+            setVisible(false);
+        }
+    }
+
+    class applyButtonListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent event) {
+            if (modified) {
+                unloadWidgets();
+            }
+            setVisible(false);
+        }
+    }
+
+    class enableApplyButtonListener implements CaretListener, ActionListener {
+
+        public void caretUpdate(CaretEvent event) {
+            modified = true;
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
+        }
+
+        public void actionPerformed(ActionEvent event) {
+            caretUpdate(null);
+        }
+    }
+
+    class OneLinePanel extends JPanel {
+
+        OneLinePanel(JLabel lab, int w, JComponent comp) {
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            add(Box.createHorizontalStrut(5));
+            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
+            add(lab);
+            add(Box.createHorizontalStrut(5));
+            add(comp);
+
+            Dimension d = getPreferredSize();
+            d.width = Integer.MAX_VALUE;
+            setMaximumSize(d);
+        }
+    }
+
+    class myCloseListener extends WindowAdapter {
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            if (modified == true) {
+                int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this, "Apply changes?",
+                        "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
+                } else {
+                    canButt.doClick();
+                }
+            } else {
+                canButt.doClick();
+            }
+        }
+    }
 }
-
-

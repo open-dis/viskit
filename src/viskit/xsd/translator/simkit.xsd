@@ -113,6 +113,7 @@
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
+  <!-- bux fix 1183 -->
   <xs:element name="StateTransition">
     <xs:complexType>
       <xs:sequence>
@@ -123,7 +124,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
       </xs:sequence>
       <xs:attribute name="state" use="required" type="xs:IDREF"/>
-      <xs:attribute name="index" type="xs:IDREF"/>
+      <xs:attribute name="index"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>

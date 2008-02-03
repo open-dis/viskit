@@ -116,7 +116,9 @@ public class TransitionsPanel extends JPanel {
             }
         });
     }
-    ArrayList<ViskitElement> arLis = new ArrayList<ViskitElement>(); //todo combine with list model
+    
+    // TODO: combine with list model
+    ArrayList<ViskitElement> arLis = new ArrayList<ViskitElement>();
 
     public void setTransitions(List<? extends ViskitElement> tLis) {
         clearTransitions();
@@ -230,7 +232,6 @@ public class TransitionsPanel extends JPanel {
                     minusButt.getActionListeners()[0].actionPerformed(ae);
                 }
             }
-
         }
     }
 

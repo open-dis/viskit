@@ -961,18 +961,9 @@ public class SimkitXML2Java {
             path + File.separator + fileName}) == 0);
     }
 
+    // bug fix 1183
     private String indexFrom(StateTransition st) {
-        String index = "i"; // fallback guess
-
-        if (st.getIndex() instanceof LocalVariable) {
-            index = ((LocalVariable) st.getIndex()).getName();
-        } else if (st.getIndex() instanceof Argument) {
-            index = ((Argument) st.getIndex()).getName();
-        } else if (st.getIndex() instanceof Parameter) {
-            index = ((Parameter) st.getIndex()).getName();
-        }
-
-        return index;
+        return st.getIndex();
     }
 
     private String shortinate(String s) {

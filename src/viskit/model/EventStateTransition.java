@@ -8,7 +8,6 @@ import java.util.ArrayList;
  * @since Apr 1, 2004
  * @since 4:00:29 PM
  * @version $Id: EventStateTransition.java 1662 2007-12-16 19:44:04Z tdnorbra $
- * To change this template use File | Settings | File Templates.
  */
 public class EventStateTransition extends ViskitElement {
     

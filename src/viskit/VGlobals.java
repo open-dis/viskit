@@ -197,6 +197,7 @@ public class VGlobals {
     public ViskitModel getActiveEventGraphModel() {
         return (ViskitModel) egvf.getModel();
     }
+    
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
@@ -302,6 +303,7 @@ public class VGlobals {
             }
             nsSets.add(stateVariable.getName());
         }
+        
         // Sim parameters
         for (ViskitElement par : getSimParmsList()) {
             String result;
@@ -316,6 +318,7 @@ public class VGlobals {
             }
             nsSets.add(par.getName());
         }
+        
         // Event local variables
         if (node != null) {
             for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
@@ -331,8 +334,9 @@ public class VGlobals {
                 }
                 nsSets.add(eventLocalVariable.getName());
             }
+            
             // Event arguments
-            for (ViskitElement ea : node.getArguments()) {
+            for (ViskitElement ea : node.getArguments()) {                
                 String result = handleNameType(ea.getName(), ea.getType(), false);
                 if (result != null) {
                     clearNamespace();
@@ -341,13 +345,16 @@ public class VGlobals {
             }
         }
 
-        // see if we can parse it.  We've initted all arrays to size = 1, so ignore
-        // outofbounds exceptions
+        /* see if we can parse it.  We've initted all arrays to size = 1, so 
+         * ignore outofbounds exceptions, bugfix 1183
+         */
         try {
+            
+            // This was done at the top of the method, but, oh well, can't hurt
             String noCRs = s.replace('\n', ' ');
             Object o = interpreter.eval(noCRs);
         } catch (EvalError evalError) {
-            if (evalError.getMessage().indexOf("java.lang.ArrayIndexOutOfBoundsException") == -1) {
+            if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
                 clearNamespace();
                 return bshErr + "\n" + evalError.getMessage();
             } // else fall through the catch
@@ -379,7 +386,6 @@ public class VGlobals {
                 if (o == null) {
                     throw new Exception("Class not found: " + typ);
                 }
-                //interpreter.set(name,o);      // the 2nd param will be null if nogo and cause exc
                 interpreter.eval(typ + " " + name + " = " + o);
             } catch (Exception ex) {
                 clearNamespace();
@@ -448,7 +454,6 @@ public class VGlobals {
             }
             if (typ.equals("int[]")) {
                 interpreter.eval("int[] " + name + " = new int[0]");
-                //interpreter.set(name,new int[0]);
                 return true;
             }
             if (typ.equals("boolean")) {
@@ -523,7 +528,7 @@ public class VGlobals {
             }
         } catch (EvalError evalError) {
             System.err.println(bshErr);
-            evalError.printStackTrace();            
+            evalError.printStackTrace();
             return false;
         }
         return false;

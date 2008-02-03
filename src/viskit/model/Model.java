@@ -401,18 +401,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             est.setStateVarName(sv.getName());
             est.setStateVarType(sv.getType());
 
+            // bug fix 1183
             if (sv.getType().indexOf('[') != -1) {
-                Object o = st.getIndex();
-                if (o instanceof LocalVariable) {
-                    est.setIndexingExpression(((LocalVariable) o).getName());
-                } // todo confirm the following
-                else if (o instanceof Parameter) {
-                    est.setIndexingExpression(((Parameter) o).getName());
-                } else if (o instanceof Argument) {
-                    est.setIndexingExpression(((Argument) o).getName());
-                } else if (o instanceof StateVariable) {
-                    est.setIndexingExpression(((StateVariable) o).getName());
-                }
+                String idx = st.getIndex();
+                est.setIndexingExpression(idx);
             }
 
             est.setOperation(st.getOperation() != null);
@@ -833,24 +825,17 @@ public class Model extends mvcAbstractModel implements ViskitModel {
      * @param targ
      * @param local
      */
-    private void cloneTransitions(List<StateTransition> targ, ArrayList<ViskitElement> local, List<LocalVariable> locVarList) {
+    private void cloneTransitions(List<StateTransition> targ, ArrayList<ViskitElement> local) {
         targ.clear();
         for (ViskitElement transition : local) {
             StateTransition st = oFactory.createStateTransition();
             StateVariable sv = findStateVariable(transition.getStateVarName());
-            st.setState(sv);
+            st.setState(sv);            
+            
             if (sv.getType() != null && sv.getType().indexOf('[') != -1) {
-                // build a local variable
-                LocalVariable lvar = oFactory.createLocalVariable();
-
-                lvar.setName(transition.getIndexingExpression());
-                lvar.setType("int");
-                lvar.setValue("0");
-                lvar.getComment().clear();
-                lvar.getComment().add("used internally");
-                locVarList.add(lvar);
-
-                st.setIndex(lvar);
+                               
+                // Match the state transition's index to the given index
+                st.setIndex(transition.getIndexingExpression());
             }
             if (transition.isOperation()) {
                 Operation o = oFactory.createOperation();
@@ -927,7 +912,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         cloneArguments(jaxbEv.getArgument(), node.getArguments());
         cloneLocalVariables(jaxbEv.getLocalVariable(), node.getLocalVariables());
         // following must follow above
-        cloneTransitions(jaxbEv.getStateTransition(), node.getTransitions(), jaxbEv.getLocalVariable());
+        cloneTransitions(jaxbEv.getStateTransition(), node.getTransitions());
 
         jaxbEv.setCode(node.getCodeBlock());
 
