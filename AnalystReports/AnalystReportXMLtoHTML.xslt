@@ -457,7 +457,21 @@
                             <xsl:value-of select="@name"/>
                         </td>
                         <td>
-                            <xsl:value-of select="@value"/>
+                            <!-- URL-ize if @value contains http:// -->
+                            <xsl:choose>
+                                <xsl:when test="contains(@value, 'http://')">
+                                    <!-- http:// found -->
+                                    <xsl:element name="a">
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="@value"/>
+                                        </xsl:attribute>
+                                        <xsl:value-of select="@value"/>
+                                    </xsl:element>                              
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="@value"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </td>
                         <td width="132"/>
                     </tr>
