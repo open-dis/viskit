@@ -208,9 +208,9 @@ public class AnalystReportBuilder {
         simulationLocation = new Element("Location");
         simulationLocation.setAttribute("comments", "true");
         simulationLocation.setAttribute("images", "true");
-        makeComments(simulationLocation, "SL", "");
-        makeConclusions(simulationLocation, "SL", "");
+        makeComments(simulationLocation, "SL", "");        
         makeProductionNotes(simulationLocation, "SL", "");
+        makeConclusions(simulationLocation, "SL", "");
         rootElement.addContent(simulationLocation);
     }
     
@@ -221,8 +221,8 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("image", "true");
         simConfig.setAttribute("entityTable", "true");
         makeComments(simConfig, "SC", "");
-        makeConclusions(simConfig, "SC", "");
         makeProductionNotes(simConfig, "SC", "");
+        makeConclusions(simConfig, "SC", "");
         if(assemblyFile != null) {
             try {
                 simConfig.addContent(EventGraphCache.makeEntityTable(assemblyFile));
