@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  <head>
-   <meta name="filename"    content="AnalystReportXMLtoHTML.xslt" />
-   <meta name="author"      content="Patrick Sullivan" />
-   <meta name="created"     content="21 July 2006" />
-   <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format>
-   <meta name="version"     content="$Id: AnalystReportXMLtoHTML.xslt 1620 2007-11-20 07:23:43Z tdnorbra $"/>
-  </head>  
+<head>
+    <meta name="filename"    content="AnalystReportXMLtoHTML.xslt"/>
+    <meta name="author"      content="Patrick Sullivan"/>
+    <meta name="created"     content="21 July 2006"/>
+    <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format"/>
+    <meta name="version"     content="$Id: AnalystReportXMLtoHTML.xslt 1620 2007-11-20 07:23:43Z tdnorbra $"/>
+</head>  
 -->
 <xsl:stylesheet version="1.0" 
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -46,58 +46,58 @@
             <body>
                 <!-- Link anchor for the top of the page -->
                 <a name="top"/>
-                <!--Title information-->
+                <!-- Title information -->
                 <xsl:apply-templates select="/AnalystReport"/>
                 <!-- Bookmarks for various sections of the report -->
                 <center>
                     <p>
                         <font size="-1">
-                            <a href="#ExecutiveSummary">Executive Summary</a> |
-                            <a href="#SimulationLocation">Simulation Location</a> |
-                            <a href="#AssemblyConfiguration">Assembly Configuration for Viskit Simulation</a> |
-                            <a href="#EntityParameters">Entity Parameters</a> |
-                            <a href="#BehaviorDescriptions">Behavior Descriptions</a> |
-                            <a href="#StatisticalResults">Statistical Results</a> |
-                            <a href="#Conclusions">Conclusions and Recommendations</a>
+                            <a href="#ExecutiveSummary">Executive<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Summary</a> |
+                            <a href="#Location">Location</a> |
+                            <a href="#SimulationConfiguration">Simulation<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Configuration</a> |
+                            <a href="#EntityParameters">Entity<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Parameters</a> |
+                            <a href="#BehaviorDescriptions">Behavior<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Descriptions</a> |
+                            <a href="#StatisticalResults">Statistical<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Results</a> |
+                            <a href="#ConclusionsRecommendations">Conclusions<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>and<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Recommendations</a>
                         </font>
                     </p>
                 </center>
                 <hr/>
-                <!--Executive Summary: NOTE - omitted if analyst did not include comments  -->
+                <!-- Executive Summary: NOTE - omitted if analyst did not include comments -->
                 <xsl:apply-templates select="//ExecutiveSummary"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Simulation Location-->
-                <xsl:apply-templates select="//SimulationLocation"/>
+                <!-- Simulation Location -->
+                <xsl:apply-templates select="//Location"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Simulation Configuration-->
+                <!-- Simulation Configuration -->
                 <xsl:apply-templates select="//SimulationConfiguration" mode="ConfigHeader"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Entity Parameters -->
+                <!-- Entity Parameters -->
                 <xsl:apply-templates select="//EntityParameters" mode="ParamHeader"/>
                 <xsl:apply-templates select="//EntityParameters/ParameterTables/EntityParameterTable"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Behavior Descriptions -->
+                <!-- Behavior Descriptions -->
                 <xsl:apply-templates select="//BehaviorDescriptions" mode="BehaviorHeader"/>
                 <xsl:apply-templates select="//BehaviorDescriptions/BehaviorList"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Statistical Reports-->
+                <!-- Statistical Reports -->
                 <xsl:apply-templates select="//StatisticalResults" mode="StatsHeader"/>
                 <xsl:apply-templates select="//StatisticalResults/ReplicationReports/SimEntity" mode="RepStats"/>
                 <xsl:apply-templates select="//StatisticalResults/SummaryReport" mode="SumStats"/>
                 <p/>
                 <p/>
                 <hr/>
-                <!--Conclusions Recommendations -->
+                <!-- Conclusions Recommendations -->
                 <xsl:apply-templates select="//ConclusionsRecommendations"/>
                 <!-- add Viskit/Simkit credit footer -->
                 <p/>
@@ -113,7 +113,7 @@
         </html>
     </xsl:template>
     
-    <!--Title information template-->
+    <!-- Title information template -->
     <xsl:template match="AnalystReport">
         <p align="center">
             <font size="2">
@@ -132,11 +132,20 @@
                 <xsl:value-of select="@name"/>
             </font>
         </p>
-        <p align="center">Analyst:
-            <b>
-                <xsl:value-of select="@author"/>
-            </b>
-        </p>
+        <xsl:if test="contains(@author, ',')">
+            <p align="center">Analysts:
+                <b>
+                    <xsl:value-of select="@author"/>
+                </b>
+            </p>
+        </xsl:if>
+        <xsl:if test="not(contains(@author, ','))">
+            <p align="center">Analyst:
+                <b>
+                    <xsl:value-of select="@author"/>
+                </b>
+            </p>
+        </xsl:if>
         <p align="center">Analysis date:
             <b>
                 <xsl:value-of select="@date"/>
@@ -144,13 +153,15 @@
         </p>        
     </xsl:template>
     
-    <!--Executive Summary template -->
+    <!-- Executive Summary template -->
     <xsl:template match="ESComments">
         <p align="left">
-            <b><a name="ExecutiveSummary">Executive Summary</a></b>
+            <font size="4">
+                <b><a name="ExecutiveSummary">Executive Summary</a></b>
+            </font>
         </p>
         <p align="left">            
-            <i>Analyst Executive Summary.</i>            
+            <i>Assessment Overview</i><br/>           
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -158,21 +169,30 @@
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
-    <!--Simulation Location templates -->
+    <!-- Simulation Location templates -->
     <xsl:template match="SLComments">
         <p align="left">
-            <b><a name="SimulationLocation">Simulation Location</a></b>
+            <font size="4">
+                <b><a name="Location">Location of Simulation</a></b>
+            </font>
         </p>
         <p align="left">            
-            <i>Description of Location Features.</i>            
+            <i>Description of Location Features</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
+        <!-- Place holder for when the AR GUI can be updated to accept text -->
+        <!--p align="left">            
+            <i>Production Notes</i>            
+            <font color="#00006C">
+                <xsl:value-of select="@text"/>
+            </font>
+        </p-->
     </xsl:template>
     <xsl:template match="SLConclusions">
         <p align="left">            
-            <i>Post-Experiment Analysis of Significant Location Features.</i>            
+            <i>Post-Experiment Analysis of Significant Location Features</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -205,7 +225,7 @@
             
             <!-- add an index to the array -->
             <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: 2D Overview of Study Area</p>
+            <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: 2D Overview of Simulation Study Area</p>
         </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
@@ -246,19 +266,31 @@
             
                 <!-- add an index to the array -->
                 <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Digital Nautical Chart (DNC) View of Study Area</p>
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Digital Chart View of Study Area</p>
             </div>
             <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
         </xsl:if>
     </xsl:template>
     
-    <!-- SimulationConfiguration templates -->
+    <!-- Simulation Configuration templates -->
     <xsl:template match="SCComments" mode="ConfigHeader">
         <p align="left">
-            <b><a name="AssemblyConfiguration">Assembly Configuration for Viskit Simulation</a></b>
+            <font size="4">
+                <b>
+                    <a name="SimulationConfiguration">Simulation Configuration: Viskit Assembly</a>
+                </b>
+                <br/>
+            </font>
+        </p>
+        <p align="left">
+            The simulation is defined by the Viskit Assembly which collects, 
+            lists, initializes and connects all participating entitiy models 
+            within a single scenario.  The assembly is then ready for repeated 
+            simulation replications, either for visual validation of behavior 
+            or statistical analysis of measures of effectiveness (MoE).
         </p>
         <p align="left">            
-            <i>Assembly Design Considerations.</i>            
+            <i>Assembly Design Considerations</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -266,7 +298,7 @@
     </xsl:template>
     <xsl:template match="SCConclusions" mode="ConfigHeader">
         <p align="left">            
-            <i>Post-Experiment Analysis of Simulation Assembly Design.</i>            
+            <i>Post-Experiment Analysis of Simulation Assembly Design</i><br/>
             <font color="#000099">
                 <xsl:value-of select="@text"/>
             </font>
@@ -277,8 +309,8 @@
         <div align="center">
             <table border="1">
                 <tr>
-                    <td bgcolor="#FFFFCC">Simulation Entity</td>
-                    <td bgcolor="#FFFFCC">Behavior Definitions</td>
+                    <th bgcolor="#FFFFCC">Simulation Entity</th>
+                    <th bgcolor="#FFFFCC">Behavior Definitions</th>
                 </tr>
                 <xsl:apply-templates select="//SimulationConfiguration/EntityTable/SimEntity" mode="EntitiesTable"/>
             </table>
@@ -344,28 +376,35 @@
         </tr>
     </xsl:template>
     
-    <!--EntityParameter templates-->
+    <!-- EntityParameter templates -->
     <xsl:template match="EPComments" mode="ParamHeader">
         <p align="left">
-            <b><a name="EntityParameters">Entity Initialization Parameters for this Simulation Assembly</a></b>
+            <font size="4">
+                <b>
+                    <a name="EntityParameters">Entity Initialization Parameters for this Simulation Assembly</a>
+                </b>
+                <br/>
+            </font>
         </p>
         <p align="left">            
-            <i>Entity Parameters Overview.</i>            
+            Initialization parameters are applied to individualize generic 
+            behavior models.  These parameters customize the event-graph models.
+        </p>
+        <p align="left">            
+            <i>Entity Parameters Overview</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <!-- not used
-  <xsl:template match="EPConclusions" mode="ParamHeader">
-    <p align="left">      
-        <i>Post-Experiment Analysis of Entity Behaviors.</i>      
-      <font color="#00006C">
-        <xsl:value-of select="@text"/>
-      </font>
-    </p>
-  </xsl:template>
-  -->
+    <!-- xsl:template match="EPConclusions" mode="ParamHeader">
+        <p align="left">      
+            <i>Post-Experiment Analysis of Entity Behaviors</i><br/>      
+            <font color="#00006C">
+              <xsl:value-of select="@text"/>
+            </font>
+        </p>
+    </xsl:template-->
 
     <!-- Entity Parameter Tables -->
     <xsl:template match="EntityParameterTable">
@@ -387,14 +426,11 @@
             <!-- Classification Values -->
             <xsl:for-each select="Classification">
                 <tr>
-                    <td width="132" bgcolor="#CCCCCC">Classification</td>
-                    <td width="132" bgcolor="#CCCCCC"/>
-                    <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" align="center" bgcolor="#CCCCCC">Candidate Factor</td>
+                    <th colspan="2" bgcolor="#CCCCCC">Classification</th>
+                    <th colspan="1" width="132" align="center" bgcolor="#CCCCCC">Candidate Factor</th>
                 </tr>
                 <xsl:for-each select="parameter">
-                    <tr>
-                        <td width="132"/>
+                    <tr colspan="4">
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
@@ -406,17 +442,14 @@
                 </xsl:for-each>
             </xsl:for-each>
             
-            <!--Identification Values -->
+            <!-- Identification Values -->
             <xsl:for-each select="Identification">
                 <tr>
-                    <td width="132" bgcolor="#CCCCCC">Identification</td>
-                    <td width="132" bgcolor="#CCCCCC"/>
-                    <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" bgcolor="#CCCCCC"/>                    
+                    <th colspan="2" bgcolor="#CCCCCC">Identification</th>
+                    <th width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"/>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
@@ -428,17 +461,14 @@
                 </xsl:for-each>
             </xsl:for-each>
             
-            <!--Physical Constraints -->
+            <!-- Physical Constraints -->
             <xsl:for-each select="PhysicalConstraints">
                 <tr>
-                    <td width="132" bgcolor="#CCCCCC">Physical Constraints</td>
-                    <td width="132" bgcolor="#CCCCCC"/>
-                    <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" bgcolor="#CCCCCC"/>
+                    <th colspan="2" bgcolor="#CCCCCC">Physical Constraints</th>
+                    <th width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"/>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
@@ -453,14 +483,11 @@
             <!-- Dynamic Response Constraints -->
             <xsl:for-each select="DynamicResponseConstraints">
                 <tr>
-                    <td width="132" bgcolor="#CCCCCC">Dynamic Response Constraints</td>
-                    <td width="132" bgcolor="#CCCCCC"/>
-                    <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" bgcolor="#CCCCCC"/>
+                    <th colspan="2" bgcolor="#CCCCCC">Dynamic Response Constraints</th>
+                    <th width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"></td>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
@@ -472,17 +499,14 @@
                 </xsl:for-each>
             </xsl:for-each>
             
-            <!--Tactical Constraints -->
+            <!-- Tactical Constraints -->
             <xsl:for-each select="TacticalConstraints">
                 <tr>
-                    <td width="132" bgcolor="#CCCCCC">Tactical Constraints</td>
-                    <td width="132" bgcolor="#CCCCCC"/>
-                    <td width="190" bgcolor="#CCCCCC"/>
-                    <td width="132" bgcolor="#CCCCCC"/>
+                    <th colspan="2" width="132" bgcolor="#CCCCCC">Tactical Constraints</th>
+                    <th width="132" bgcolor="#CCCCCC"/>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr>
-                        <td width="132"></td>
                         <td width="190">
                             <xsl:value-of select="@name"/>
                         </td>
@@ -499,13 +523,15 @@
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
-    <!--Behavior Description templates-->
+    <!-- Behavior Description templates -->
     <xsl:template match="BDComments" mode="BehaviorHeader">
         <p align="left">
-            <b><a name="BehaviorDescriptions">Behavior Descriptions</a></b>
+            <font size="4">
+                <b><a name="BehaviorDescriptions">Behavior Descriptions</a></b>
+            </font>
         </p>
         <p align="left">
-            <i>Description of Behavior Design.</i>
+            <i>Description of Behavior Design</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -513,7 +539,7 @@
     </xsl:template>
     <xsl:template match="BDConclusions" mode="BehaviorHeader">
         <p align="left">
-            <i>Post-Experiment Analysis of Entity Behaviors.</i>
+            <i>Post-Experiment Analysis of Entity Behaviors</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -537,7 +563,7 @@
             </xsl:element>
         </p>
         
-        <!--Add the description -->
+        <!-- Add the description -->
         <xsl:for-each select="description">
             <p align="left">
                 <b>Description: </b>
@@ -579,11 +605,11 @@
         <div align="center">
             <table border="1">
                 <tr>
-                    <td bgcolor="#FFFFCC">Parameter</td>
-                    <td bgcolor="#FFFFCC">Parameter Type</td>
-                    <td bgcolor="#FFFFCC">Description</td>
+                    <th bgcolor="#FFFFCC">Initialization Parameter</th>
+                    <th bgcolor="#FFFFCC">Parameter Type</th>
+                    <th bgcolor="#FFFFCC">Description</th>
                 </tr>
-                <!--Add parameter and state variable table for each event graph-->
+                <!-- Add parameter and state variable table for each event graph -->
                 <xsl:for-each select="parameter">
                     <tr>
                         <td>
@@ -601,28 +627,30 @@
         </div>
         <p/>
         <p/>
-        <div align="center">
-            <table border="1">
-                <tr>
-                    <td bgcolor="#FFFFCC">State Variable</td>
-                    <td bgcolor="#FFFFCC">Variable Type</td>
-                    <td bgcolor="#FFFFCC">Description</td>
-                </tr>
-                <xsl:for-each select="stateVariable">
+        <xsl:if test="stateVariable">
+            <div align="center">
+                <table border="1">
                     <tr>
-                        <td>
-                            <xsl:value-of select="@name"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="@type"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="@description"/>
-                        </td>
+                        <th bgcolor="#FFFFCC">State Variable</th>
+                        <th bgcolor="#FFFFCC">Variable Type</th>
+                        <th bgcolor="#FFFFCC">Description</th>
                     </tr>
-                </xsl:for-each>
-            </table>
-        </div>
+                    <xsl:for-each select="stateVariable">
+                        <tr>
+                            <td>
+                                <xsl:value-of select="@name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@type"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@description"/>
+                            </td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
+            </div>
+        </xsl:if>
         <p/>
         <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
@@ -630,11 +658,15 @@
     
     <!-- Statistical Results -->
     <xsl:template match="SRComments" mode="StatsHeader">
-        <p align="left">
-            <b><a name="StatisticalResults">Statistical Results</a></b>
-        </p>
+        <font size="4">
+            <p align="left">
+                <font size="4">
+                    <b><a name="StatisticalResults">Statistical Results</a></b>
+                </font>
+            </p>
+        </font>
         <p align="left">            
-            <i>Description of Expected Results.</i>            
+            <i>Description of Expected Results</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -642,13 +674,13 @@
     </xsl:template>
     <xsl:template match="SRConclusions" mode="StatsHeader">
         <p align="left">            
-            <i>Analysis of Experimental Results.</i>            
+            <i>Analysis of Experimental Results</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
         <p align="left">            
-            <b><u>Summary Statistics section</u>: Primary Measures of Effectiveness (MOEs) / Measures of Performance (MOPs) and corresponding statistical plots</b>            
+            <b><u>Summary Statistics section</u>: Primary Measures of Effectiveness (MoEs) / Measures of Performance (MoPs) and corresponding statistical plots</b>            
         </p>
     </xsl:template>
     <xsl:template match="SimEntity" mode="RepStats">
@@ -658,6 +690,9 @@
         <p/>        
         <p align="left">            
             <b>Replication Report</b>            
+        </p>
+        <p align="left">            
+            <b>Measure of Effectiveness (MoE)</b>            
         </p>
         <p align="left">Entity:
             <xsl:value-of select="@name"/>
@@ -695,27 +730,27 @@
             <div align="center">
                 <table border="1" width="60%">
                     <tr>
-                        <td bgcolor="#FFFFCC">
+                        <th bgcolor="#FFFFCC">
                             <b>Run#</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>Count</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>Min</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>Max</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>Mean</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>StdDev</b>
-                        </td>
-                        <td bgcolor="#FFFFCC">
+                        </th>
+                        <th bgcolor="#FFFFCC">
                             <b>Variance</b>
-                        </td>
+                        </th>
                     </tr>
                     <xsl:for-each select="Replication">
                         <tr>
@@ -750,36 +785,38 @@
     </xsl:template>
     <xsl:template match="SummaryReport" mode="SumStats">
         <p/>
-        <p align="left">            
-            <b><a name="SummaryReport">Summary Report</a></b>            
+        <p align="left">
+            <font size="4">
+                <b><a name="SummaryReport">Summary Report</a></b>
+            </font>
         </p>
-        <div align="left">
+        <div align="center">
             <table border="1" width="80%">
                 <tr>
-                    <td bgcolor="#FFFFCC">
+                    <th bgcolor="#FFFFCC">
                         <b>Entity</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Property</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Count</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Min</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Max</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Mean</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>StdDev</b>
-                    </td>
-                    <td bgcolor="#FFFFCC">
+                    </th>
+                    <th bgcolor="#FFFFCC">
                         <b>Variance</b>
-                    </td>
+                    </th>
                 </tr>
                 <xsl:for-each select="SummaryRecord">
                     <tr>
@@ -815,13 +852,15 @@
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
     
-    <!--Conclusions Recommendations -->
+    <!-- Conclusions and Recommendations -->
     <xsl:template match="CRComments">
         <p align="left">
-            <b><a name="Conclusions">Conclusions and Recommendations</a></b>
+            <font size="4">
+                <b><a name="ConclusionsRecommendations">Conclusions and Recommendations</a></b>
+            </font>
         </p>
         <p align="left">            
-            <i>Conclusions.</i>            
+            <i>Conclusions</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -829,7 +868,7 @@
     </xsl:template>
     <xsl:template match="CRConclusions">
         <p align="left">            
-            <i>Recommendations for Future Work.</i>            
+            <i>Recommendations for Future Work</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>

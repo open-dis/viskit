@@ -7,15 +7,18 @@ package viskit;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.*;
 import java.text.DateFormat;
-
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import org.apache.log4j.Logger;
-import org.jdom.*;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
@@ -41,19 +44,13 @@ public class AnalystReportBuilder {
     private Document statsReport;
     private String   statsReportPath;
         
-    /**
-     * The jdom.Document object that is used to build the report
-     */
+    /** The jdom.Document object that is used to build the report */
     private Document reportJdomDocument;
     
-    /**
-     * The file name selected by the user from "SAVE AS" menu option
-     */
+    /** The file name selected by the user from "SAVE AS" menu option */
     private String fileName;
     
-    /**
-     * The root element of the report xml document
-     */
+    /** The root element of the report xml document */
     private Element rootElement;
     private Element execSummary;
     private Element simulationLocation;
@@ -65,10 +62,6 @@ public class AnalystReportBuilder {
 
     /** Reference to the Analyst Report JPanel for JProgressBar */
     private JPanel aRPanel;
-    
-    public static void main(String[] args) {
-        new AnalystReportBuilder();
-    }
     
     /** Build a default AnalystReport object */
     public AnalystReportBuilder() {
@@ -101,6 +94,7 @@ public class AnalystReportBuilder {
      * @param aRPanel a reference to the Analyst Report JPanel
      * @param xmlFile an existing temp Analyst Report
      * @param assyFile the current assembly file to process a report from
+     * @throws java.lang.Exception 
      */
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
         this.aRPanel = aRPanel;
@@ -149,6 +143,7 @@ public class AnalystReportBuilder {
      * File I/O that saves the report in XML format
      * @param fil the initial temp file to save for further post-processing
      * @return the initial temp file to saveed for further post-processing
+     * @throws java.lang.Exception 
      */
     public File writeToXMLFile(File fil) throws Exception {
         if (fil == null) {return writeToXMLFile();}
@@ -157,7 +152,9 @@ public class AnalystReportBuilder {
         return fil;
     }
     
-    /** @return the initial temp file to saved for further post-processing */
+    /** @return the initial temp file to saved for further post-processing
+     * @throws java.lang.Exception 
+     */
     public File writeToXMLFile() throws Exception {
         File fil = File.createTempFile("AnalystReport", ".xml");
         _writeCommon(fil);
@@ -178,7 +175,7 @@ public class AnalystReportBuilder {
         reportJdomDocument = EventGraphCache.loadXML(fil.getPath());
         rootElement = reportJdomDocument.getRootElement();
         execSummary = rootElement.getChild("ExecutiveSummary");
-        simulationLocation = rootElement.getChild("SimulationLocation");
+        simulationLocation = rootElement.getChild("Location");
         simConfig = rootElement.getChild("SimulationConfiguration");
         entityParameters = rootElement.getChild("EntityParameters");
         behaviorDescriptions = rootElement.getChild("BehaviorDescriptions");
@@ -206,15 +203,14 @@ public class AnalystReportBuilder {
         rootElement.addContent(execSummary);
     }
     
-    /**
-     * Creates the SimulationLocation portion of the analyst report XML
-     */
+    /** Creates the SimulationLocation portion of the analyst report XML */
     public void createSimulationLocation() {
-        simulationLocation = new Element("SimulationLocation");
+        simulationLocation = new Element("Location");
         simulationLocation.setAttribute("comments", "true");
         simulationLocation.setAttribute("images", "true");
-        makeComments(simulationLocation,"SL", "");
-        makeConclusions(simulationLocation,"SL", "");
+        makeComments(simulationLocation, "SL", "");
+        makeConclusions(simulationLocation, "SL", "");
+        makeProductionNotes(simulationLocation, "SL", "");
         rootElement.addContent(simulationLocation);
     }
     
@@ -226,12 +222,14 @@ public class AnalystReportBuilder {
         simConfig.setAttribute("entityTable", "true");
         makeComments(simConfig, "SC", "");
         makeConclusions(simConfig, "SC", "");
-        if(assemblyFile != null)
+        makeProductionNotes(simConfig, "SC", "");
+        if(assemblyFile != null) {
             try {
                 simConfig.addContent(EventGraphCache.makeEntityTable(assemblyFile));
             } catch (Exception e) {
                 log.error("Error reading assembly file: " + e.getMessage());
             }
+        }
         
         rootElement.addContent(simConfig);
     }
@@ -243,8 +241,9 @@ public class AnalystReportBuilder {
         entityParameters.setAttribute("parameterTables", "true");
         makeComments(entityParameters, "EP", "");
         makeConclusions(entityParameters, "EP", "");
-        if(assemblyFile != null)
+        if(assemblyFile != null) {
             entityParameters.addContent(makeParameterTables());
+        }
         
         rootElement.addContent(entityParameters);
     }
@@ -554,18 +553,24 @@ public class AnalystReportBuilder {
         while (itr.hasNext()) {
             Element temp = itr.next();
             String category = temp.getAttributeValue("type");
-            if (category.equals("diskit.SMAL.Classification"))
+            if (category.equals("diskit.SMAL.Classification")) {
                 table.addContent(makeTableEntry("Classification", temp));
-            if (category.equals("diskit.SMAL.IdentificationParameters"))
+            }
+            if (category.equals("diskit.SMAL.IdentificationParameters")) {
                 table.addContent(makeTableEntry("Identification", temp));
-            if (category.equals("diskit.SMAL.PhysicalConstraints"))
+            }
+            if (category.equals("diskit.SMAL.PhysicalConstraints")) {
                 table.addContent(makeTableEntry("PhysicalConstraints", temp));
-            if (category.equals("diskit.SMAL.DynamicResponseConstraints"))
+            }
+            if (category.equals("diskit.SMAL.DynamicResponseConstraints")) {
                 table.addContent(makeTableEntry("DynamicResponseConstraints", temp));
-            if (category.equals("diskit.SMAL.TacticalConstraints"))
+            }
+            if (category.equals("diskit.SMAL.TacticalConstraints")) {
                 table.addContent(makeTableEntry("TacticalConstraints", temp));
+            }
         }        
-        return table;    }
+        return table;    
+    }
     
     /**
      * Processes parameters
@@ -612,6 +617,7 @@ public class AnalystReportBuilder {
      * by the xslt for the analyst report.  The mis-match of formatting was discovered
      * after all classes were written. This should be cleaned up or the XML formatted
      * more uniformly.
+     * @return the replication report
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
@@ -697,33 +703,35 @@ public class AnalystReportBuilder {
     }
     
     private String unMakeImage(Element e, String imageID) {
-        return _unMakeContent(e,imageID+"Image","dir");
+        return _unMakeContent(e, imageID + "Image", "dir");
     }
     
     /**
      * Creates a standard 'Comments' element used by all sections of the report
      * to add comments
      *
+     * @param parent 
      * @param commentTag  the tag used to identify unique Comments (used by XSLT)
      * @param commentText the text comments
      */
     public void makeComments(Element parent, String commentTag, String commentText) {
-        replaceChild(parent, _makeContent(commentTag,"Comments",commentText));
+        replaceChild(parent, _makeContent(commentTag, "Comments", commentText));
     }
     
-    public Element xmakeComments(String commentTag,String commentText) {
-        return _makeContent(commentTag,"Comments",commentText);
+    /**
+     * 
+     * @param commentTag
+     * @param commentText
+     * @return
+     */
+    public Element xmakeComments(String commentTag, String commentText) {
+        return _makeContent(commentTag, "Comments", commentText);
     }
     
     private String unMakeComments(Element e) {
-        return _unMakeContent(e,"Comments");
+        return _unMakeContent(e, "Comments");
     }
-    
-    private void replaceChild(Element parent, Element child) {
-        parent.removeChildren(child.getName());
-        parent.addContent(child);
-    }
-    
+        
     /**
      * Creates a standard 'Conclusions' element used by all sections of the report
      * to add conclusions
@@ -740,8 +748,41 @@ public class AnalystReportBuilder {
         replaceChild(parent,_makeContent(commentTag,"Conclusions",conclusionText));
     }
     
+    /**
+     * 
+     * @param e
+     * @return
+     */
     public String unMakeConclusions(Element e) {
         return _unMakeContent(e,"Conclusions");
+    }
+    
+    /**
+     * Creates a standard 'Production Notes' element used by all sections of the report
+     * to add conclusions
+     *
+     * @param productionNotesTag the tag used to identify unique Production Notes (used by XSLT)
+     * @param productionNotesText
+     * @return 
+     */
+    public Element xmakeProductionNotes(String productionNotesTag, String productionNotesText) {
+        return _makeContent(productionNotesTag, "ProductionNotes", productionNotesText);
+    }
+    
+    /**
+     * Creates a standard 'Production Notes' element used by all sections of the
+     * report to add production notes
+     *
+     * @param parent the parent element to add content too
+     * @param productionNotesTag the tag used to identify unique production notes (used by XSLT)
+     * @param productionNotesText 
+     */
+    public void makeProductionNotes(Element parent, String productionNotesTag, String productionNotesText) {
+        replaceChild(parent, _makeContent(productionNotesTag, "ProductionNotes", productionNotesText));
+    }
+    
+    public String unMakeProductionNotes(Element e) {
+        return _unMakeContent(e, "ProductionNotes");
     }
     
     private Element _makeContent(String commentTag, String suffix, String commentText) {
@@ -755,16 +796,24 @@ public class AnalystReportBuilder {
     }
     
     private String _unMakeContent(Element e, String suffix, String attrName) {
+        if (e == null) {return "";}
         List content = e.getContent();
-        for(Iterator itr = content.iterator(); itr.hasNext();) {
+        for (Iterator itr = content.iterator(); itr.hasNext();) {
             Object o = itr.next();
-            if(!(o instanceof Element))
+            if (!(o instanceof Element)) {
                 continue;
+            }
             Element celem = (Element) o;
-            if(celem.getName().endsWith(suffix))
+            if (celem.getName().endsWith(suffix)) {
                 return celem.getAttributeValue(attrName);
+            }
         }
         return "";
+    }
+    
+    private void replaceChild(Element parent, Element child) {
+        parent.removeChildren(child.getName());
+        parent.addContent(child);
     }
     
     /**
@@ -786,6 +835,7 @@ public class AnalystReportBuilder {
         setPrintSimLocationImage(true);
         setSimLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
         setSimLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
+        setSimLocationProductionNotes("***ENTER SIMULATION PRODUCTION NOTES HERE***");
         //setChartImage(""); // TODO:  generate image, set file location
         
         //Simulation Configuration Values
@@ -794,6 +844,7 @@ public class AnalystReportBuilder {
         setPrintEntityTable(true);
         setSimConfigurationDescription("***ENTER ASSEMBLY CONFIGURATION DESCRIPTION HERE***");
         setSimConfigurationConclusions("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
+        setSimConfigationProductionNotes("***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***");
                 
         //Entity Parameters values
         setPrintParameterComments(true);
@@ -931,26 +982,28 @@ public class AnalystReportBuilder {
     // exec summary:
     // good
     public boolean isExecutiveSummaryComments() { return stringToBoolean(execSummary.getAttributeValue("comments"));}
-    public void   setExecutiveSummaryComments   (boolean bool) { execSummary.setAttribute("comments", booleanToString(bool));}
+    public void    setExecutiveSummaryComments  (boolean bool) {execSummary.setAttribute("comments", booleanToString(bool));}
     public String  getExecutiveSummary() { return unMakeComments(execSummary);}
     public void    setExecutiveSummary   (String s) { makeComments(execSummary,"ES", s);}
     
     // sim-location:
     // good
-    public boolean isPrintSimLocationComments() { return stringToBoolean(simulationLocation.getAttributeValue("comments"));}
-    public void    setPrintSimLocationComments(boolean bool){ simulationLocation.setAttribute("comments", booleanToString(bool));}
-    public boolean isPrintSimLocationImage()    { return stringToBoolean(simulationLocation.getAttributeValue("images"));}
-    public void    setPrintSimLocationImage   (boolean bool){ simulationLocation.setAttribute("images", booleanToString(bool)) ;}
+    public boolean isPrintSimLocationComments() {return stringToBoolean(simulationLocation.getAttributeValue("comments"));}
+    public void    setPrintSimLocationComments  (boolean bool) {simulationLocation.setAttribute("comments", booleanToString(bool));}
+    public boolean isPrintSimLocationImage()    {return stringToBoolean(simulationLocation.getAttributeValue("images"));}
+    public void    setPrintSimLocationImage     (boolean bool) {simulationLocation.setAttribute("images", booleanToString(bool));}
     
-    public String  getSimLocationComments()          { return unMakeComments(simulationLocation);}
-    public String  getSimLocationConclusions()       { return unMakeConclusions(simulationLocation);}
-    public String  getLocationImage()           { return unMakeImage(simulationLocation,"Location");}
-    public String  getChartImage()              { return unMakeImage(simulationLocation,"Chart"); }
+    public String  getSimLocationComments()        {return unMakeComments(simulationLocation);}
+    public String  getSimLocationConclusions()     {return unMakeConclusions(simulationLocation);}
+    public String  getSimLocationProductionNotes() {return unMakeProductionNotes(simulationLocation);}
+    public String  getLocationImage()              {return unMakeImage(simulationLocation, "Location");}
+    public String  getChartImage()                 {return unMakeImage(simulationLocation, "Chart");}
     
-    public void setSimLocationDescription          (String s)    { makeComments(simulationLocation,"SL", s);}
-    public void setSimLocationConclusions       (String s)    { makeConclusions(simulationLocation,"SL", s);}
-    public void setLocationImage           (String s)    { replaceChild(simulationLocation,makeImage("Location", s)); }
-    public void setChartImage              (String s)    { replaceChild(simulationLocation,makeImage("Chart", s)); }
+    public void setSimLocationDescription  (String s)    {makeComments(simulationLocation, "SL", s);}
+    public void setSimLocationConclusions  (String s)    {makeConclusions(simulationLocation, "SL", s);}
+    public void setSimLocationProductionNotes(String s)  {makeProductionNotes(simulationLocation, "SL", s);}
+    public void setLocationImage           (String s)    {replaceChild(simulationLocation, makeImage("Location", s)); }
+    public void setChartImage              (String s)    {replaceChild(simulationLocation, makeImage("Chart", s)); }
     
     // entity-parameters
     //good
@@ -991,13 +1044,16 @@ public class AnalystReportBuilder {
     public void    setPrintEntityTable        (boolean bool) { simConfig.setAttribute("entityTable", booleanToString(bool)); }
     public void    setPrintAssemblyImage      (boolean bool) { simConfig.setAttribute("image", booleanToString(bool)); }
     
-    public String  getSimConfigComments()     { return unMakeComments(simConfig);}
+    public String  getSimConfigComments()        {return unMakeComments(simConfig);}
     public String[][]  getSimConfigEntityTable() {return unMakeEntityTable();}
-    public String  getSimConfigConclusions()  { return unMakeConclusions(simConfig);}
-    public String  getAssemblyImageLocation() { return unMakeImage(simConfig, "Assembly");}
+    public String  getSimConfigConclusions()     {return unMakeConclusions(simConfig);}    
+    public String  getSimConfigProductionNotes() {return unMakeProductionNotes(simConfig);}
+    public String  getAssemblyImageLocation()    {return unMakeImage(simConfig, "Assembly");}
+    
     public void    setSimConfigurationDescription       (String s) { makeComments(simConfig, "SC", s); }
     public void    setSimConfigEntityTable    (String s) { }; //todo
     public void    setSimConfigurationConclusions       (String s) { makeConclusions(simConfig, "SC", s); }
+    public void    setSimConfigationProductionNotes(String s) {makeProductionNotes(simConfig, "SC", s);}
     public void    setAssemblyImageLocation   (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
     
     // stat results:
@@ -1019,6 +1075,14 @@ public class AnalystReportBuilder {
     public void setStatsConclusions          (String s) { makeConclusions(statisticalResults,"SR", s); }
     public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
     public List<Object> getStatsReplicationsList() {return unMakeReplicationList(statisticalResults);}
-    public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults); }
+    public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults);}
+    
+    /** Command line entry point
+     * 
+     * @param args command line arguments if any (not used)
+     */
+    public static void main(String[] args) {
+        new AnalystReportBuilder();
+    }
     
 } // end class file AnalystReportBuilder.java

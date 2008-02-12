@@ -44,18 +44,12 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.FileIO;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import org.apache.log4j.Logger;
 import viskit.xsd.assembly.XsltUtility;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -67,6 +61,33 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
 
@@ -95,7 +116,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
-    /** Captures the name of the assembly file */
+    /** Captures the name of the assembly file
+     * @param action
+     * @param source
+     * @param param 
+     */
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
@@ -316,8 +341,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     /************************/
     JCheckBox wantLocationDescriptions;
     JCheckBox wantLocationImages;
-    JTextArea locCommentsTA;
-    JTextArea locConclusionsTA;
+    JTextArea locCommentsTA, locConclusionsTA, locProductionNotesTA;    
     JTextField simLocImgTF;
     JButton simLocImgButt;
     JTextField simChartImgTF;
@@ -339,6 +363,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
+        p.add(jsp);
+        
+        jsp = new JScrollPane(locProductionNotesTA = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Production Notes"));
         p.add(jsp);
 
         wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
@@ -381,6 +410,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         locCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
         locConclusionsTA.setText(arb.getSimLocationConclusions());
         locConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
+        locProductionNotesTA.setText(arb.getSimLocationProductionNotes());
+        locProductionNotesTA.setEnabled(wantLocationDescriptions.isSelected());
         wantLocationImages.setSelected(arb.isPrintSimLocationImage());
         simLocImgTF.setEnabled(wantLocationImages.isSelected());
         simLocImgButt.setEnabled(wantLocationImages.isSelected());
@@ -394,6 +425,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         arb.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
         arb.setSimLocationDescription(locCommentsTA.getText());
         arb.setSimLocationConclusions(locConclusionsTA.getText());
+        arb.setSimLocationProductionNotes(locProductionNotesTA.getText());
         arb.setPrintSimLocationImage(wantLocationImages.isSelected());
         String s = simLocImgTF.getText().trim();
         if (s != null & s.length() > 0) {
@@ -406,8 +438,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     /************************/
     JCheckBox wantAssemblyDesignAndAnalysis;
-    JTextArea assemblyDesignConsiderations;
-    JTextArea simConfigConclusions;
+    JTextArea assemblyDesignConsiderations, simConfigConclusions, simProductionNotes;
     JCheckBox wantSimConfigImages;
     JCheckBox wantEntityTable;
     JTable entityTable;
@@ -430,6 +461,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
+        p.add(jsp);
+        
+        jsp = new JScrollPane(simProductionNotes = new WrappingTextArea());
+        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Production Notes"));
         p.add(jsp);
 
         wantEntityTable = new JCheckBox("Include entity definition table", true);
@@ -476,12 +512,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         wantEntityTable.setSelected(arb.isPrintEntityTable());
 
         String[][] sa = arb.getSimConfigEntityTable();
-        entityTable.setModel(new DefaultTableModel(sa, new String[]{"Entity Name", "Behavior Type"}));
+        entityTable.setModel(new DefaultTableModel(sa, new String[] {"Entity Name", "Behavior Type"}));
         entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
         simConfigConclusions.setText(arb.getSimConfigConclusions());
         simConfigConclusions.setEnabled(arb.isPrintSimConfigComments());
+        
+        simProductionNotes.setText(arb.getSimConfigProductionNotes());
+        simProductionNotes.setEnabled(arb.isPrintSimConfigComments());
 
         wantSimConfigImages.setSelected(arb.isPrintAssemblyImage());
         configImgButt.setEnabled(wantSimConfigImages.isSelected());
@@ -493,6 +532,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         arb.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
         arb.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
         arb.setSimConfigurationConclusions(simConfigConclusions.getText());
+        arb.setSimConfigationProductionNotes(simProductionNotes.getText());
         arb.setPrintEntityTable(wantEntityTable.isSelected());
         arb.setPrintAssemblyImage(wantSimConfigImages.isSelected());
         String s = configImgPathTF.getText();
