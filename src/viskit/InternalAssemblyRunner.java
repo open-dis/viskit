@@ -31,8 +31,30 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+package viskit;
 
-/**
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
+import javax.swing.*;
+
+import simkit.Schedule;
+import simkit.random.RandomVariateFactory;
+import org.apache.log4j.Logger;
+import viskit.xsd.assembly.BasicAssembly;
+import viskit.doe.LocalBootLoader;
+
+/** Handles RunnerPanel2
+ * 
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
@@ -40,31 +62,6 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Rick Goldberg
  * @since Sep 26, 2005
  * @since 3:43:51 PM
- */
-package viskit;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import simkit.Schedule;
-import simkit.random.RandomVariateFactory;
-import viskit.xsd.assembly.BasicAssembly;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
-import org.apache.log4j.Logger;
-import viskit.doe.LocalBootLoader;
-
-/**
- *
- * Handles RunnerPanel2
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
 
