@@ -132,20 +132,30 @@
                 <xsl:value-of select="@name"/>
             </font>
         </p>
-        <xsl:if test="contains(@author, ',')">
-            <p align="center">Analysts:
-                <b>
-                    <xsl:value-of select="@author"/>
-                </b>
-            </p>
-        </xsl:if>
-        <xsl:if test="not(contains(@author, ','))">
-            <p align="center">Analyst:
-                <b>
-                    <xsl:value-of select="@author"/>
-                </b>
-            </p>
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="contains(@author, ',')">
+                <xsl:element name="p">
+                    <xsl:attribute name="align">
+                        <xsl:text>center</xsl:text>
+                    </xsl:attribute>
+                    <xsl:text>Analysts: </xsl:text>
+                    <xsl:element name="b">
+                       <xsl:value-of select="@author"/>
+                    </xsl:element>
+                </xsl:element>
+            </xsl:when>        
+            <xsl:otherwise>
+                <xsl:element name="p">
+                    <xsl:attribute name="align">
+                        <xsl:text>center</xsl:text>
+                    </xsl:attribute>
+                    <xsl:text>Analyst: </xsl:text>
+                    <xsl:element name="b">
+                       <xsl:value-of select="@author"/>
+                    </xsl:element>
+                </xsl:element>
+            </xsl:otherwise>
+        </xsl:choose>
         <p align="center">Analysis date:
             <b>
                 <xsl:value-of select="@date"/>
@@ -498,60 +508,66 @@
             </xsl:for-each>
             
             <!-- Physical Constraints -->
-            <xsl:for-each select="PhysicalConstraints">
-                <tr>
-                    <th colspan="2" bgcolor="#CCCCCC">Physical Constraints</th>
-                    <th width="132" bgcolor="#CCCCCC"/>
-                </tr>
-                <xsl:for-each select="parameter">
+            <xsl:for-each select="PhysicalConstraints">                
+                <xsl:if test="parameter/@name">
                     <tr>
-                        <td width="190">
-                            <xsl:value-of select="@name"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="@value"/>
-                        </td>
-                        <td width="132"/>
+                        <th colspan="2" bgcolor="#CCCCCC">Physical Constraints</th>
+                        <th width="132" bgcolor="#CCCCCC"/>
                     </tr>
-                </xsl:for-each>
+                    <xsl:for-each select="parameter">
+                        <tr>
+                            <td width="190">
+                                <xsl:value-of select="@name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@value"/>
+                            </td>
+                            <td width="132"/>
+                        </tr>
+                    </xsl:for-each>
+                </xsl:if>
             </xsl:for-each>
             
             <!-- Dynamic Response Constraints -->
             <xsl:for-each select="DynamicResponseConstraints">
-                <tr>
-                    <th colspan="2" bgcolor="#CCCCCC">Dynamic Response Constraints</th>
-                    <th width="132" bgcolor="#CCCCCC"/>
-                </tr>
-                <xsl:for-each select="parameter">
+                <xsl:if test="parameter/@name">
                     <tr>
-                        <td width="190">
-                            <xsl:value-of select="@name"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="@value"/>
-                        </td>
-                        <td width="132"></td>
+                        <th colspan="2" bgcolor="#CCCCCC">Dynamic Response Constraints</th>
+                        <th width="132" bgcolor="#CCCCCC"/>
                     </tr>
-                </xsl:for-each>
+                    <xsl:for-each select="parameter">
+                        <tr>
+                            <td width="190">
+                                <xsl:value-of select="@name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@value"/>
+                            </td>
+                            <td width="132"></td>
+                        </tr>
+                    </xsl:for-each>
+                </xsl:if>
             </xsl:for-each>
             
             <!-- Tactical Constraints -->
             <xsl:for-each select="TacticalConstraints">
-                <tr>
-                    <th colspan="2" width="132" bgcolor="#CCCCCC">Tactical Constraints</th>
-                    <th width="132" bgcolor="#CCCCCC"/>
-                </tr>
-                <xsl:for-each select="parameter">
+                <xsl:if test="parameter/@name">                    
                     <tr>
-                        <td width="190">
-                            <xsl:value-of select="@name"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="@value"/>
-                        </td>
-                        <td width="132"></td>
+                        <th colspan="2" width="132" bgcolor="#CCCCCC">Tactical Constraints</th>
+                        <th width="132" bgcolor="#CCCCCC"/>
                     </tr>
-                </xsl:for-each>
+                    <xsl:for-each select="parameter">
+                        <tr>
+                            <td width="190">
+                                <xsl:value-of select="@name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@value"/>
+                            </td>
+                            <td width="132"></td>
+                        </tr>
+                    </xsl:for-each>
+                </xsl:if>
             </xsl:for-each>
         </table>
         <p/>
