@@ -195,10 +195,8 @@
     </xsl:template>
     <xsl:template match="SLProductionNotes">
         <p align="left">            
-            <i>Production Notes</i>
-            <p align="left">
-                All units are meters and degrees unless otherwise noted.
-            </p><br/>
+            <i>Production Notes</i>            
+            <p>All units are meters and degrees unless otherwise noted.</p>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -313,9 +311,7 @@
     <xsl:template match="SCProductionNotes" mode="ConfigHeader">
         <p align="left">            
             <i>Production Notes</i>
-            <p align="left">
-                All units are meters and degrees unless otherwise noted.
-            </p><br/>        
+            <p>All units are meters and degrees unless otherwise noted.</p>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
