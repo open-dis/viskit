@@ -192,20 +192,13 @@
                 <xsl:value-of select="@text"/>
             </font>
         </p>
-        <!-- Place holder for when the AR GUI can be updated to accept text -->
-        <!--p align="left">            
-            <i>Production Notes</i>            
-            <font color="#00006C">
-                <xsl:value-of select="@text"/>
-            </font>
-        </p-->
     </xsl:template>
     <xsl:template match="SLProductionNotes">
-        <p align="left">
-            All units are meters and degrees unless otherwise noted.
-        </p>
         <p align="left">            
-            <i>Production Notes</i><br/>
+            <i>Production Notes</i>
+            <p align="left">
+                All units are meters and degrees unless otherwise noted.
+            </p><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -318,11 +311,11 @@
         </p>
     </xsl:template>
     <xsl:template match="SCProductionNotes" mode="ConfigHeader">
-        <p align="left">
-            All units are meters and degrees unless otherwise noted.
-        </p>
         <p align="left">            
-            <i>Production Notes</i><br/>
+            <i>Production Notes</i>
+            <p align="left">
+                All units are meters and degrees unless otherwise noted.
+            </p><br/>        
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
