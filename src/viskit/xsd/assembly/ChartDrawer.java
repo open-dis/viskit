@@ -1,9 +1,8 @@
-/*
- * ChartDrawer.java
- *
- * Created on August 3, 2006, 10:21 AM
- */
 package viskit.xsd.assembly;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.*;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -12,9 +11,6 @@ import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.chart.ChartUtilities;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.*;
 
 /**
  *
@@ -22,6 +18,7 @@ import java.io.*;
  *
  * @author Patrick Sullivan
  * @version $Id: ChartDrawer.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @since August 3, 2006, 10:21 AM
  */
 public class ChartDrawer {
 
@@ -32,9 +29,11 @@ public class ChartDrawer {
     /**
      * Creates a histogram image in PNG format based on the parameters provided.
      *
-     *@param data an array of doubles that are to be plotted
-     *@param fileName the name of the file to save the image out to
-     *@return the path name of the created object
+     * @param title 
+     * @param label 
+     * @param data an array of doubles that are to be plotted
+     * @param fileName the name of the file to save the image out to
+     * @return the path name of the created object
      */
     public String createHistogram(String title, String label, double[] data, String fileName) {
         String fileLocation = "./AnalystReports/charts/" + fileName + ".png";
@@ -51,6 +50,9 @@ public class ChartDrawer {
 
     /**
      * Creates a data set that is used for making the histogram
+     * @param label
+     * @param data
+     * @return 
      */
     private IntervalXYDataset createIntervalXYDataset(String label, double[] data) {
 
@@ -63,6 +65,10 @@ public class ChartDrawer {
 
     /**
      * Creates the histogram chart
+     * @param dataset
+     * @param title
+     * @param label
+     * @return 
      */
     private JFreeChart createChart(IntervalXYDataset dataset, String title, String label) {
         final JFreeChart chart = ChartFactory.createHistogram(title,
@@ -80,6 +86,10 @@ public class ChartDrawer {
 
     /**
      * Saves a chart to PNG format
+     * @param chart
+     * @param path
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException 
      */
     private void saveChart(JFreeChart chart, String path) throws FileNotFoundException, IOException {
 

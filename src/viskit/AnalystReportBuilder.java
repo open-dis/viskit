@@ -597,7 +597,7 @@ public class AnalystReportBuilder {
         return tableEntry;
     }
     
-    // TODO: This version JDOM does not support generics
+    // TODO: Version 1.1 JDOM does not yet support generics
     @SuppressWarnings("unchecked")
     public String[][] unMakeEntityTable() {
         Element elm = simConfig.getChild("EntityTable");

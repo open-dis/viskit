@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -32,17 +32,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Jul 18, 2006
- * @since 2:50:08 PM
- * @version $Id: JobLauncherTab2.java 1662 2007-12-16 19:44:04Z tdnorbra $
- */
 package viskit.doe;
-
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -77,6 +67,15 @@ import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.Schedule;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
+/**
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Jul 18, 2006
+ * @since 2:50:08 PM
+ * @version $Id: JobLauncherTab2.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ */
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
 
     DoeRunDriver doe;
@@ -214,9 +213,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         buttPan.setBorder(new EmptyBorder(5, 10, 10, 10));
         buttPan.add(Box.createHorizontalGlue());
-        JButton canButt = new JButton("Cancel");
+        JButton cancelButt = new JButton("Cancel");
         JButton okButt = new JButton("Apply changes");
-        buttPan.add(canButt);
+        buttPan.add(cancelButt);
         buttPan.add(okButt);
 
         JPanel allPan = new JPanel();
@@ -224,7 +223,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         allPan.add(clusPan);
         allPan.add(buttPan);
 
-        canButt.addActionListener(new ActionListener() {
+        cancelButt.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 clusterConfigReturn = new Boolean(false);
@@ -451,7 +450,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     };
 
     private void getParams() {
-        Experiment exp = (Experiment) jaxbRoot.getExperiment();    // todo cast requirement jaxb error?
+        Experiment exp = jaxbRoot.getExperiment();    // todo cast requirement jaxb error?
         if (exp != null) {
             //designPts = exp.getDesignPoint().size();
             int numDesignPts = jaxbRoot.getDesignParameters().size();
@@ -509,7 +508,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Experiment exp = jaxbRoot.getExperiment();
         Schedule sch = jaxbRoot.getSchedule();
         if (exp == null) {
-            exp = (Experiment) OpenAssembly.inst().jaxbFactory.createExperiment();
+            exp = OpenAssembly.inst().jaxbFactory.createExperiment();
         }
         if (sch == null) {
             sch = OpenAssembly.inst().jaxbFactory.createSchedule();
@@ -615,7 +614,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             return;
         }
         // put the local stuff in place
-        saveExp((Experiment) jaxbRoot.getExperiment());
+        saveExp(jaxbRoot.getExperiment());
         saveParamsToJaxbNoNotify();
 
         filteredFile = cntlr.doTempFileMarshall();
@@ -892,7 +891,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @SuppressWarnings("unchecked")
         private void processResults() {
             Hashtable ret;
-            Experiment exp = (Experiment) jaxbRoot.getExperiment();
+            Experiment exp = jaxbRoot.getExperiment();
             int samples = Integer.parseInt(exp.getTotalSamples());
             int designPoints = jaxbRoot.getDesignParameters().size();
 
@@ -987,7 +986,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             chartter = new JobResults(null, title);
         }
         synchronized (outputList) {
-            Object[] oa = (Object[]) outputList.get(idx);
+            Object[] oa = outputList.get(idx);
             Gresults res = getSingleResult(oa);
             chartter.addPoint(res);
             if (!res.resultsValid) {

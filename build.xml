@@ -113,8 +113,8 @@
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/jhall.jar"/>
         <pathelement location="${dir.lib}/jdom.jar"/>
-        <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
-        <pathelement location="${dir.lib}/jcommon-1.0.0.jar"/>
+        <pathelement location="${jfreechart.jar}"/>
+        <pathelement location="${jcommon.jar}"/>
         <pathelement location="${dir.lib}/jedit.jar"/>
         <pathelement location="${dir.lib}/junit.jar"/>
         <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
@@ -218,8 +218,8 @@
                 <pathelement location="${dir.lib}/trang.jar"/>
                 <pathelement location="${dir.lib}/trangtask.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
-                <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
-                <pathelement location="${dir.lib}/jcommon-1.0.0.jar"/>
+                <pathelement location="${jfreechart.jar}"/>
+                <pathelement location="${jcommon.jar}"/>
                 <pathelement location="${dir.lib}/jedit.jar"/>
                 <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
                 <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
@@ -620,7 +620,8 @@
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
                 <pathelement location="${dir.lib}/xercesImpl.jar"/>
-                <pathelement location="${dir.lib}/jfreechart-1.0.1.jar"/>
+                <pathelement location="${jfreechart.jar}"/>
+                <pathelement location="${jcommon.jar}"/>
                 <pathelement location="${log4j.jar}"/>
             </classpath>
             <src path="${dir.src}/viskit/doe"/>

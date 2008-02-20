@@ -429,6 +429,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 //todo other postQuits here if needed
 
                 thisClassCleanup();
+                
+                // TODO: What is setting this true when it's false?
                 if (viskit.Vstatics.debug) {
                     System.out.println("in actionPerformed of exit");
                 }

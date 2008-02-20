@@ -66,18 +66,19 @@ public class Splash2 extends JFrame {
 
         this.addWindowListener(new WindowAdapter() {
 
-                    public void windowActivated(WindowEvent e) {
-                        if (userActivate) {
-                            userActivate = false;
-                            Splash2.this.setVisible(false);
-                            createScreenImage();
-                            resetUnderImg();
-                            Splash2.this.setVisible(true);
-                        } else {
-                            userActivate = true;
-                        }
-                    }
-                });
+            @Override
+            public void windowActivated(WindowEvent e) {
+                if (userActivate) {
+                    userActivate = false;
+                    Splash2.this.setVisible(false);
+                    createScreenImage();
+                    resetUnderImg();
+                    Splash2.this.setVisible(true);
+                } else {
+                    userActivate = true;
+                }
+            }
+        });
     }
 
     protected void createScreenImage() {
@@ -193,10 +194,12 @@ class MyPanel extends JPanel {
         setOpaque(true);
     }
 
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(underFrameImg, paintX, paintY, null);
