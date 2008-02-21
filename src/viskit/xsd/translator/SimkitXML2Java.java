@@ -66,6 +66,7 @@ public class SimkitXML2Java {
      * Creates a new instance of SimkitXML2Java
      * when used from another class, instance this
      * with a String for the className of the xmlFile
+     * @param xmlFile 
      */
     public SimkitXML2Java(String xmlFile) {
         try {
@@ -207,7 +208,7 @@ public class SimkitXML2Java {
             
             // TODO: use better checking for primitive types i.e. Class.isPrimitive()
             
-            // Determine if encountering generics
+            // TODO: Determine if encountering generics that contain array types
             if (isGeneric(s.getType())) {
                 pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
             } else {
@@ -551,7 +552,10 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    /** these Events should now not be any Run event */
+    /** these Events should now not be any Run event
+     * @param e
+     * @param eventBlock 
+     */
     void doEventBlock(Event e, StringWriter eventBlock) {
         PrintWriter pw = new PrintWriter(eventBlock);
         List<StateTransition> liStateT = e.getStateTransition();
