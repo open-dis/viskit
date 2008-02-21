@@ -286,14 +286,16 @@ public class SettingsDialog extends JDialog {
     private void clearClassPathEntries() {
         vConfig.clearTree(xClassPathClearKey);
     }
+    
     JDialog progressDialog = new JDialog(this);
     JProgressBar progress = new JProgressBar(0, 100);
 
     private void saveClassPathEntries(String[] lis) {
         clearClassPathEntries();
-
-        for (String s : lis) {
-            vConfig.setProperty(xClassPathKey + "(" + s + ")[@value]", s);
+        
+        for (int ix = 0; ix < lis.length; ix++) {
+            log.info("lis[" + ix + "]: " + lis[ix]);
+            vConfig.setProperty(xClassPathKey + "(" + ix + ")[@value]", lis[ix]);
         }
 
         progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
