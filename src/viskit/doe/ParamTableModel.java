@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,16 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Jul 20, 2005
- * @since 4:13:25 PM
- * @version $Id: ParamTableModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
- */
-
 package viskit.doe;
 
 import bsh.Interpreter;
@@ -54,314 +44,312 @@ import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
 
-public class ParamTableModel extends DefaultTableModel implements TableModelListener
-{
-  public static final int NUM_COLS = 6;
+/**
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Jul 20, 2005
+ * @since 4:13:25 PM
+ * @version $Id: ParamTableModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ */
+public class ParamTableModel extends DefaultTableModel implements TableModelListener {
 
-  public static String[] columnNames = {
-      "SimEntity/Parameter name",
-      "Type",
-      "Value",
-      "Is factor?",
-      "Min",
-      "Max"
-  };
-  public static final int NAME_COL = 0;
-  public static final int TYPE_COL = 1;
-  public static final int VALUE_COL = 2;
-  public static final int FACTOR_COL = 3;
-  public static final int MIN_COL = 4;
-  public static final int MAX_COL = 5;
+    public static final int NUM_COLS = 6;
+    public static String[] columnNames = {
+        "SimEntity/Parameter name",
+        "Type",
+        "Value",
+        "Is factor?",
+        "Min",
+        "Max"
+    };
+    public static final int NAME_COL = 0;
+    public static final int TYPE_COL = 1;
+    public static final int VALUE_COL = 2;
+    public static final int FACTOR_COL = 3;
+    public static final int MIN_COL = 4;
+    public static final int MAX_COL = 5;
+    Object[][] mydata = new Object[0][0];
+    Vector<Object[]> rows;
+    public HashSet<Integer> noEditRows = new HashSet<Integer>();
+    public HashSet<Integer> multiRows = new HashSet<Integer>();
+    public boolean dirty = false;
 
-  Object[][] mydata = new Object[0][0];
-  Vector<Object[]> rows;
-  public HashSet<Integer> noEditRows = new HashSet<Integer>();
-  public HashSet<Integer> multiRows = new HashSet<Integer>();
-  public boolean dirty = false;
+    /**
+     * 
+     * @param simEntitiesJaxb
+     * @param designParamsJaxb
+     */
+    public ParamTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParamsJaxb) {
+        super(0, 0);
 
-  public ParamTableModel(List simEntitiesJaxb, List designParamsJaxb)
-  {
-    super(0, 0);
+        initBeanShell();
+        rows = new Vector<Object[]>();
 
-    initBeanShell();
-    rows = new Vector<Object[]>();
-
-    int i=0;
-    for (Iterator itr = simEntitiesJaxb.iterator(); itr.hasNext();) {
-      Object o = itr.next();
-      if(!(o instanceof SimEntity))
-        System.err.println("Error ParamTableModel(), element not SimEntity");
-      processRow(o,"SimEntity_"+i++);
+        int i = 0;
+        for (SimEntity se : simEntitiesJaxb) {
+            if (!(se instanceof SimEntity)) {
+                System.err.println("Error ParamTableModel(), element not SimEntity");
+            }
+            processRow(se, "SimEntity_" + i++);
+        }
+        mydata = rows.toArray(mydata);
+        if (designParamsJaxb != null) {
+            for (TerminalParameter tp : designParamsJaxb) {
+                if (!(tp instanceof TerminalParameter)) {
+                    System.err.println("Error ParamTableModel(), element not TerminalParameter");
+                }
+                processDesignParam(tp);
+            }
+        }
+        dirty = false;
+        this.addTableModelListener(this);
     }
-    mydata = (Object[][]) rows.toArray(mydata);
-    if(designParamsJaxb != null) {
-      for (Iterator itr = designParamsJaxb.iterator(); itr.hasNext();) {
-        Object o = itr.next();
-        if(!(o instanceof TerminalParameter))
-          System.err.println("Error ParamTableModel(), element not TerminalParameter");
-        processDesignParam(o);
-      }
+
+    public void tableChanged(TableModelEvent e) {
+        if (viskit.Vstatics.debug) {
+            System.out.println("Sending paramlocally editted from ParamTableModel");
+        }
+        OpenAssembly.inst().doParamLocallyEditted(dummyListener);
     }
-    dirty=false;
-    this.addTableModelListener(this);
-  }
 
-  public void tableChanged(TableModelEvent e)
-  {
-    if (viskit.Vstatics.debug) System.out.println("Sending paramlocally editted from ParamTableModel");
-    OpenAssembly.inst().doParamLocallyEditted(dummyListener);
-  }
+    private void processDesignParam(TerminalParameter tp) {
+        String typ = tp.getType();
+        typ = (typ == null ? "" : typ);
 
-  private void processDesignParam(Object o)
-  {
-    TerminalParameter tp = (TerminalParameter)o;
-    String typ = tp.getType();
-    typ = (typ==null?"":typ);
+        String nm = tp.getName();
+        if (nm.length() <= 0) {
+            System.err.println("Terminal param w/out name ref!");
+        }
 
-    String nm = tp.getName();
-    if(nm.length()<=0)
-      System.err.println("Terminal param w/out name ref!");
+        int row = termHashMap.get(nm).intValue();
+
+        String val = tp.getValue();
+        val = (val == null) ? "" : val;
+        setValueAt(val, row, VALUE_COL);
+
+        JAXBElement<ValueRange> vr = tp.getValueRange();
+
+        setValueAt(vr.getValue().getLowValue(), row, MIN_COL);
+        setValueAt(vr.getValue().getHighValue(), row, MAX_COL);
+
+        setValueAt(new Boolean(true), row, FACTOR_COL); //cb
+    }
     
-    int row = ((Integer)termHashMap.get(nm)).intValue();
+    Interpreter interpreter;
 
-    String val = tp.getValue();
-    val = (val==null?"":val);
-    setValueAt(val,row,VALUE_COL);
-
-    JAXBElement<ValueRange> vr =  tp.getValueRange();
-
-    setValueAt(vr.getValue().getLowValue(), row, MIN_COL);
-    setValueAt(vr.getValue().getHighValue(), row, MAX_COL);
-
-    setValueAt(new Boolean(true), row, FACTOR_COL); //cb
-  }
-
-  Interpreter interpreter;
-  private void initBeanShell()
-  {
-    interpreter = new Interpreter();
-    interpreter.setStrictJava(true);       // no loose typeing
-    NameSpace ns = interpreter.getNameSpace();
-    ns.importPackage("simkit.*");
-    ns.importPackage("simkit.examples.*");
-    ns.importPackage("simkit.random.*");
-    ns.importPackage("simkit.smdx.*");
-    ns.importPackage("simkit.stat.*");
-    ns.importPackage("simkit.util.*");
-    ns.importPackage("diskit.*");         // 17 Nov 2004
-  }
-
-  HashMap<String, Integer> termHashMap = new HashMap<String, Integer>();
-  ArrayList<Object> elementsByRow = new ArrayList<Object>();
-
-  private void processRow(Object obj, String defaultName)
-  {
-    Object[] oa = new Object[6];
-
-    if (obj instanceof SimEntity) {
-      SimEntity se = (SimEntity)obj;
-      String SEname = se.getName();
-      if(SEname == null || SEname.length()<=0)
-        SEname = defaultName;
-
-      oa[NAME_COL] = "<html><b>"+SEname;
-
-      String typ = se.getType();
-      typ = (typ == null ? "" : typ);
-      oa[TYPE_COL] = "<html><b>"+loseDots(typ);
-      oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-      oa[FACTOR_COL] = new Boolean(false);
-      rows.add(oa);
-      elementsByRow.add(obj);
-
-      noEditRows.add(new Integer(rows.size()-1));
-
-      List children = se.getParameters();
-      int i=1;
-      for (Iterator itr = children.iterator(); itr.hasNext();) {
-        processRow(itr.next(), SEname+"_"+i++);
-      }
+    private void initBeanShell() {
+        interpreter = new Interpreter();
+        interpreter.setStrictJava(true);       // no loose typeing
+        NameSpace ns = interpreter.getNameSpace();
+        ns.importPackage("simkit.*");
+        ns.importPackage("simkit.examples.*");
+        ns.importPackage("simkit.random.*");
+        ns.importPackage("simkit.smdx.*");
+        ns.importPackage("simkit.stat.*");
+        ns.importPackage("simkit.util.*");
+        ns.importPackage("diskit.*");         // 17 Nov 2004
     }
-    else if (obj instanceof TerminalParameter) {
-      TerminalParameter tp = (TerminalParameter)obj;
-      Object nameRefObj = tp.getLinkRef();
-      String tpname = defaultName;
-      if(nameRefObj != null) {
-        if(nameRefObj instanceof String)
-          tpname = (String)nameRefObj;
-        else if(nameRefObj instanceof TerminalParameter)
-          tpname = ((TerminalParameter)nameRefObj).getName();
-      }
-      else if(tp.getName() != null && tp.getName().length() >0) {
-        tpname = tp.getName();
-      }
-      if(tpname == null)
-        tpname = defaultName;
+    HashMap<String, Integer> termHashMap = new HashMap<String, Integer>();
+    ArrayList<Object> elementsByRow = new ArrayList<Object>();
 
-      oa[NAME_COL] = tpname;
-      String typ = tp.getType();
-      typ = (typ == null ? "" : typ);
-      oa[TYPE_COL] = loseDots(typ);
-      String value = tp.getValue();
-      oa[VALUE_COL] = (value == null ? "" : value);
-      oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
-      oa[FACTOR_COL] = new Boolean(false);
-      rows.add(oa);
-      elementsByRow.add(obj);
+    private void processRow(Object obj, String defaultName) {
+        Object[] oa = new Object[6];
 
-      termHashMap.put(tpname,new Integer(rows.size()-1));
-    }
-    else if(obj instanceof MultiParameter) {
-      MultiParameter mp = (MultiParameter)obj;
-      String MPname = mp.getName();
-      if(MPname == null || MPname.length()<=0)
-        MPname = defaultName;
-      oa[NAME_COL] = MPname;
-      String typ = mp.getType();
-      oa[TYPE_COL] = loseDots(typ == null ? "" : typ);
-      oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-      oa[FACTOR_COL] = new Boolean(false);
-      rows.add(oa);
-      elementsByRow.add(obj);
+        if (obj instanceof SimEntity) {
+            SimEntity se = (SimEntity) obj;
+            String SEname = se.getName();
+            if (SEname == null || SEname.length() <= 0) {
+                SEname = defaultName;
+            }
 
-      multiRows.add(new Integer(rows.size()-1));
-      List children = mp.getParameters();
-      int i=1;
-      for (Iterator itr = children.iterator(); itr.hasNext();) {
-        processRow(itr.next(),MPname+"_"+i++);
-      }
-    }
-    else if(obj instanceof FactoryParameter) {
-      FactoryParameter fp = (FactoryParameter)obj;
-      String FPname = fp.getName();
-      if(FPname == null || FPname.length()<=0)
-        FPname = defaultName;
+            oa[NAME_COL] = "<html><b>" + SEname;
 
-      oa[NAME_COL] = FPname;
-      String typ = fp.getType();
-      oa[TYPE_COL] = typ; //loseDots(typ)
-      oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-      oa[FACTOR_COL] = new Boolean(false);
-      rows.add(oa);
-      elementsByRow.add(obj);
+            String typ = se.getType();
+            typ = (typ == null ? "" : typ);
+            oa[TYPE_COL] = "<html><b>" + loseDots(typ);
+            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
+            oa[FACTOR_COL] = new Boolean(false);
+            rows.add(oa);
+            elementsByRow.add(obj);
 
-      multiRows.add(new Integer(rows.size()-1));
+            noEditRows.add(new Integer(rows.size() - 1));
 
-      List children = fp.getParameters();
-      int i=1;
-      for(Iterator itr = children.iterator(); itr.hasNext();) {
-        processRow(itr.next(),FPname+"_"+i++);
-      }
-    }
-    else if(obj instanceof Coordinate)
-      ;
-    else
-      System.err.println("Error ParamTableModel.processRow, unknown type: "+obj);
+            List<Object> children = se.getParameters();
+            int i = 1;
+            for (Object o : children) {
+                processRow(o, SEname + "_" + i++);
+            }
+        } else if (obj instanceof TerminalParameter) {
+            TerminalParameter tp = (TerminalParameter) obj;
+            Object nameRefObj = tp.getLinkRef();
+            String tpname = defaultName;
+            if (nameRefObj != null) {
+                if (nameRefObj instanceof String) {
+                    tpname = (String) nameRefObj;
+                } else if (nameRefObj instanceof TerminalParameter) {
+                    tpname = ((TerminalParameter) nameRefObj).getName();
+                }
+            } else if (tp.getName() != null && tp.getName().length() > 0) {
+                tpname = tp.getName();
+            }
+            if (tpname == null) {
+                tpname = defaultName;
+            }
 
-  }
+            oa[NAME_COL] = tpname;
+            String typ = tp.getType();
+            typ = (typ == null ? "" : typ);
+            oa[TYPE_COL] = loseDots(typ);
+            String value = tp.getValue();
+            oa[VALUE_COL] = (value == null ? "" : value);
+            oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
+            oa[FACTOR_COL] = new Boolean(false);
+            rows.add(oa);
+            elementsByRow.add(obj);
 
-  public Object getElementAtRow(int r)
-  {
-    return elementsByRow.get(r);
-  }
+            termHashMap.put(tpname, new Integer(rows.size() - 1));
+        } else if (obj instanceof MultiParameter) {
+            MultiParameter mp = (MultiParameter) obj;
+            String MPname = mp.getName();
+            if (MPname == null || MPname.length() <= 0) {
+                MPname = defaultName;
+            }
+            oa[NAME_COL] = MPname;
+            String typ = mp.getType();
+            oa[TYPE_COL] = loseDots(typ == null ? "" : typ);
+            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
+            oa[FACTOR_COL] = new Boolean(false);
+            rows.add(oa);
+            elementsByRow.add(obj);
 
-  public Object[] getRowData(int r)
-  {
-    return mydata[r];
-  }
+            multiRows.add(new Integer(rows.size() - 1));
+            List<Object> children = mp.getParameters();
+            int i = 1;
+            for (Object o : children) {
+                processRow(o, MPname + "_" + i++);
+            }
+        } else if (obj instanceof FactoryParameter) {
+            FactoryParameter fp = (FactoryParameter) obj;
+            String FPname = fp.getName();
+            if (FPname == null || FPname.length() <= 0) {
+                FPname = defaultName;
+            }
 
-  private String loseDots(String typ)
-  {
-    int dot = typ.lastIndexOf('.');
-    if(dot != -1)
-      typ = typ.substring(dot+1);
-    return typ;
-  }
+            oa[NAME_COL] = FPname;
+            String typ = fp.getType();
+            oa[TYPE_COL] = typ; //loseDots(typ)
+            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
+            oa[FACTOR_COL] = new Boolean(false);
+            rows.add(oa);
+            elementsByRow.add(obj);
 
-  @Override
-  public int getColumnCount()
-  {
-    return columnNames.length;
-  }
+            multiRows.add(new Integer(rows.size() - 1));
 
-  @Override
-  public int getRowCount()
-  {
-    return mydata == null ? 0 : mydata.length;
-  }
-
-  @Override
-  public String getColumnName(int col)
-  {
-    return columnNames[col];
-  }
-
-  @Override
-  public Object getValueAt(int row, int col)
-  {
-    return mydata[row][col];
-  }
-
-  @Override
-  public Class getColumnClass(int c)
-  {
-    //return getValueAt(0, c).getClass();
-    switch (c) {
-      case NAME_COL:
-      case TYPE_COL:
-      case VALUE_COL:
-      case MIN_COL:
-      case MAX_COL:
-        return String.class;
-      case FACTOR_COL:
-        return Boolean.class;
-      default:
-        //assert false:"Column error in ParamTableModel";
-        System.err.println("Column error in ParamTableModel");
-    }
-    return null;
-  }
-
-  /*
-   * Don't need to implement this method unless your table's
-   * editable.
-   */
-  @Override
-  public boolean isCellEditable(int row, int col)
-  {
-    if (col == TYPE_COL)
-      return false;
-    Integer rowKey = new Integer(row);
-    if(noEditRows.contains(rowKey))
-      return false;
-    if(col > TYPE_COL && multiRows.contains(rowKey))
-      return false;
-    return true;
-  }
-
-  /*
-   * Don't need to implement this method unless your table's
-   * data can change.
-   */
-  @Override
-  public void setValueAt(Object value, int row, int col)
-  {
-    mydata[row][col] = value;
-    dirty=true;
-
-    fireTableCellUpdated(row, col);
-  }
-
-  OpenAssembly.AssyChangeListener dummyListener = new OpenAssembly.AssyChangeListener()
-  {
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param)
-    {
+            List<Object> children = fp.getParameters();
+            int i = 1;
+            for (Object o : children) {
+                processRow(o, FPname + "_" + i++);
+            }
+        } else if (obj instanceof Coordinate) {
+            ;
+        } else {
+            System.err.println("Error ParamTableModel.processRow, unknown type: " + obj);
+        }
     }
 
-    public String getHandle()
-    {
-      return "Design of Experiments";
+    public Object getElementAtRow(int r) {
+        return elementsByRow.get(r);
     }
-  };
 
+    public Object[] getRowData(int r) {
+        return mydata[r];
+    }
+
+    private String loseDots(String typ) {
+        int dot = typ.lastIndexOf('.');
+        if (dot != -1) {
+            typ = typ.substring(dot + 1);
+        }
+        return typ;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    public int getRowCount() {
+        return mydata == null ? 0 : mydata.length;
+    }
+
+    @Override
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+
+    @Override
+    public Object getValueAt(int row, int col) {
+        return mydata[row][col];
+    }
+
+    @Override
+    public Class getColumnClass(int c) {
+        //return getValueAt(0, c).getClass();
+        switch (c) {
+            case NAME_COL:
+            case TYPE_COL:
+            case VALUE_COL:
+            case MIN_COL:
+            case MAX_COL:
+                return String.class;
+            case FACTOR_COL:
+                return Boolean.class;
+            default:
+                //assert false:"Column error in ParamTableModel";
+                System.err.println("Column error in ParamTableModel");
+        }
+        return null;
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * editable.
+     */
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        if (col == TYPE_COL) {
+            return false;
+        }
+        Integer rowKey = new Integer(row);
+        if (noEditRows.contains(rowKey)) {
+            return false;
+        }
+        if (col > TYPE_COL && multiRows.contains(rowKey)) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * data can change.
+     */
+    @Override
+    public void setValueAt(Object value, int row, int col) {
+        mydata[row][col] = value;
+        dirty = true;
+
+        fireTableCellUpdated(row, col);
+    }
+    OpenAssembly.AssyChangeListener dummyListener = new OpenAssembly.AssyChangeListener() {
+
+        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        }
+
+        public String getHandle() {
+            return "Design of Experiments";
+        }
+    };
 }

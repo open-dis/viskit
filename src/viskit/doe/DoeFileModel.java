@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
@@ -12,7 +12,7 @@ are met:
        distribution.
      * Neither the names of the Naval Postgraduate School (NPS)
        Modeling Virtual Environments and Simulation (MOVES) Institute
-       (http://www.nps.edu and http://www.MovesInstitute.org)
+       (http://www.nps.edu and http://www.movesinstitute.org)
        nor the names of its contributors may be used to endorse or
        promote products derived from this software without specific
        prior written permission.
@@ -32,7 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
- * Autonomous Underwater Vehicle Workbench
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
  * @author Mike Bailey
@@ -51,7 +50,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
@@ -60,12 +58,12 @@ public class DoeFileModel {
 
     public File userFile;
     public ParamTable paramTable;
-    public List designParms;
+    public List<TerminalParameter> designParms;
     public Document jdomDocument;
     public boolean dirty = false;
-    public HashMap seTerminalParamsHM;
+    public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
     
-    private List simEntities;
+    private List<SimEntity> simEntities;
     private Map<String, Integer> nameSpace = new HashMap<String, Integer>();
     
     public File marshallJaxb() throws Exception {
@@ -78,13 +76,12 @@ public class DoeFileModel {
         return f;
     }
 
-    public void saveEventGraphsToJaxb(Collection evGraphs) {
+    public void saveEventGraphsToJaxb(Collection<File> evGraphs) {
         SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
         List<EventGraph> lis = assy.getEventGraph();
         lis.clear();
 
-        for (Iterator itr = evGraphs.iterator(); itr.hasNext();) {
-            File f = (File) itr.next();
+        for (File f : evGraphs) {
             try {
 
                 FileReader fr = new FileReader(f);
@@ -117,10 +114,10 @@ public class DoeFileModel {
         SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
         ObjectFactory factory = OpenAssembly.inst().jaxbFactory;
 
-        List<TerminalParameter> designParms = assy.getDesignParameters();
+        List<TerminalParameter> designParameters = assy.getDesignParameters();
 
         // Throw away existing design points
-        designParms.clear();
+        designParameters.clear();
 
         // Go down rows, update the nameRef and value fields (type, content aren't changed)
         // For each row that's a factor (design point) add a design point TP at top
@@ -188,22 +185,23 @@ public class DoeFileModel {
                 dr.setHighValue(highRange);
                 newTP.setValueRange(jevr);
 
-                designParms.add(dpCount++, newTP);
+                designParameters.add(dpCount++, newTP);
 
                 tp.setLinkRef(newTP);
-
             }
         }
-
     }
 
-    public List getSimEntities() {
+    /**
+     * 
+     * @return
+     */
+    public List<SimEntity> getSimEntities() {
         return simEntities;
     }
 
-    public void setSimEntities(List se) {
+    public void setSimEntities(List<SimEntity> se) {
         simEntities = se;   //jdom
-        seTerminalParamsHM = new HashMap(se.size());
-
+        seTerminalParamsHM = new HashMap<SimEntity, TerminalParameter>(se.size());
     }
 }

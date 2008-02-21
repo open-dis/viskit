@@ -323,7 +323,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     };
 
     private void getParams() {
-        Experiment exp = (Experiment) jaxbRoot.getExperiment();    // todo cast requirement jaxb error?
+        Experiment exp = jaxbRoot.getExperiment();    // todo cast requirement jaxb error?
         if (exp != null) {
             //designPts = exp.getDesignPoint().size();
             int numDesignPts = jaxbRoot.getDesignParameters().size();
@@ -377,7 +377,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         // Put the params from the GUI into the jaxbRoot
         Experiment exp = null;
         Schedule sch = null;
-        exp = (Experiment) OpenAssembly.inst().jaxbFactory.createExperiment();
+        exp = OpenAssembly.inst().jaxbFactory.createExperiment();
         sch = OpenAssembly.inst().jaxbFactory.createSchedule();
 
 
@@ -477,12 +477,12 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             return;
         }
         // put the local stuff in place
-        saveExp((Experiment) jaxbRoot.getExperiment());
+        saveExp(jaxbRoot.getExperiment());
         saveParamsToJaxbNoNotify();
 
         filteredFile = cntlr.doTempFileMarshall();
 
-        restoreExp((Experiment) jaxbRoot.getExperiment());
+        restoreExp(jaxbRoot.getExperiment());
         cntlr.restorePrepRun();
 
         thread = new Thread(JobLauncherTab.this);
@@ -749,7 +749,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     private void processResultsNew() {
         Vector args = new Vector(5);
         Object ret;
-        Experiment exp = (Experiment) jaxbRoot.getExperiment();
+        Experiment exp = jaxbRoot.getExperiment();
         int designPoints = jaxbRoot.getDesignParameters().size();
         // synchronous single threaded results, uses
         // a status buffer that locks until results are
@@ -849,7 +849,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             chartter = new JobResults(null, title);
         }
         synchronized (outputList) {
-            Object[] oa = (Object[]) outputList.get(idx);
+            Object[] oa = outputList.get(idx);
             Gresults res = getSingleResult(oa);
             chartter.addPoint(res);
             if (!res.resultsValid) {
@@ -1193,6 +1193,12 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         vConfig.setProperty(recentClusterKey + "[@password]", pwordCfg);
     }
 
+    /**
+     * 
+     * @param ret
+     * @param d
+     * @param s
+     */
     private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s) {
         if (viskit.Vstatics.debug) {
             System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint " + d + " sample " + s);
