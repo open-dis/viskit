@@ -294,7 +294,7 @@ public class SettingsDialog extends JDialog {
         clearClassPathEntries();
         
         for (int ix = 0; ix < lis.length; ix++) {
-            log.info("lis[" + ix + "]: " + lis[ix]);
+            log.debug("lis[" + ix + "]: " + lis[ix]);
             vConfig.setProperty(xClassPathKey + "(" + ix + ")[@value]", lis[ix]);
         }
 
