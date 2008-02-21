@@ -239,6 +239,7 @@ public class SimkitXML2Java {
         }
     }
 
+    // TODO: May have to check for generic containers of array types
     void buildParameterAccessor(Parameter p, StringWriter sw) {
 
         PrintWriter pw = new PrintWriter(sw);
@@ -326,10 +327,14 @@ public class SimkitXML2Java {
         String tyStr = "";
 
         // check for cloneable
-
         if (isCloneable(s.getType())) {
             clStr = ".clone()";
             tyStr = lp + stripLength(s.getType()) + rp;
+         
+            // Supress warning call to unchecked cast
+            if (isGeneric(s.getType())) {
+                pw.println(sp4 + "@SuppressWarnings(\"unchecked\")");
+            }
         }
 
         pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()));
@@ -338,7 +343,8 @@ public class SimkitXML2Java {
         pw.println(sp4 + cb);
         pw.println();
 
-        if (isArray(s.getType())) {
+        // Prevent creating accessor for generic containers of array types
+        if (isArray(s.getType()) && !isGeneric(s.getType())) {
             int d = dims(s.getType());
             pw.print(sp4 + "public" + sp + baseOf(s.getType()) + sp + "get");
             pw.print(capitalize(s.getName()) + lp + indxncm(d));
@@ -446,8 +452,11 @@ public class SimkitXML2Java {
         // is consistent
         List<StateVariable> liStateV = this.root.getStateVariable();
 
+        /* Prevent generic containers of arrays from getting instantiated twice.
+         * Already done in the state variable declarations
+         */
         for (StateVariable st : liStateV) {
-            if (isArray(st.getType())) {
+            if (isArray(st.getType()) && !isGeneric(st.getType())) {
                 pw.println(sp8 + st.getName() + sp + eq + sp + "new" + sp + st.getType() + sc);
             }
         }
@@ -474,7 +483,11 @@ public class SimkitXML2Java {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
-            boolean isar = isArray(sv.getType());
+            
+            /* Prevent generic containers of arrays from getting initialized as
+             * array types.
+             */
+            boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
             String spn = isar ? sp12 : sp8;
             String in = indexFrom(st);
 
@@ -620,7 +633,9 @@ public class SimkitXML2Java {
             if (!decls.contains(oldName)) {
                 olds = sv.getType();
                 decls.add(oldName);
-                if (isArray(olds)) {
+                
+                // Prevent calling a generic container of arrays with an index
+                if (isArray(olds) && !isGeneric(olds)) {
                     String[] baseName;
                     baseName = olds.split("\\[");
                     olds = baseName[0];
@@ -636,14 +651,16 @@ public class SimkitXML2Java {
             } else {
                 olds += getter;
             }
+            
+            // Prevent accessing an array index for generic containers of array types
             // check need _idxvar_from(st)
-            if (isArray(sv.getType())) {
+            if (isArray(sv.getType()) && !isGeneric(olds)) {
                 olds += indexFrom(st);
             }
             olds += rp + sc;
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
-            olds += sv.getName() + (isArray(sv.getType()) ? lb + indexFrom(st) + rb : "") + change;
+            olds += sv.getName() + ((isArray(sv.getType()) && !isGeneric(sv.getType())) ? lb + indexFrom(st) + rb : "") + change;
             String[] lines = olds.split("\\;");
             // format it
             for (int i = 0; i < lines.length; i++) {
@@ -654,7 +671,7 @@ public class SimkitXML2Java {
                 }
                 pw.println(sp8 + lines[i] + sc);
             }
-            if (isArray(sv.getType())) {
+            if (isArray(sv.getType()) && !isGeneric(sv.getType())) {
                 pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
                 pw.print(cm + sp + qu + sv.getName() + qu + cm);
                 pw.println(oldName + cm + sp + "get" + oldName.substring(5) + lp + indexFrom(st) + rp + rp + sc);
