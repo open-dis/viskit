@@ -245,9 +245,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
                 // If not, put me in under the root
-                myNode = (DefaultMutableTreeNode) directoryRoots.get(f.getPath());
+                myNode = directoryRoots.get(f.getPath());
                 if (myNode == null) {
-                    myNode = (DefaultMutableTreeNode) directoryRoots.get(f.getParent());
+                    myNode = directoryRoots.get(f.getParent());
                     if (myNode != null) {
                         DefaultMutableTreeNode parent = myNode;
                         myNode = new DefaultMutableTreeNode(f.getName());
@@ -275,10 +275,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             FileBasedAssyNode fban;
             try {
                 fban = FileBasedClassManager.inst().loadFile(f);
+                
+                // If an Assembly was encountered by the FBCM, just return
                 if (fban == null) {
                     return;
                 }
-                // Check here for duplicates of the classes which have been loaded on the classpath (simkit.jar);
+                
+                // Check here for duplicates of the classes which have been 
+                // loaded on the classpath (simkit.jar);
                 // No dups accepted, should throw exception upon success
                 try {
                     Class.forName(fban.loadedClass);
@@ -298,7 +302,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 return;
             }
             myNode = new DefaultMutableTreeNode(fban);
-            DefaultMutableTreeNode par = (DefaultMutableTreeNode) directoryRoots.get(f.getParent());
+            DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
             if (par != null) {
                 par.add(myNode);
                 int idx = par.getIndex(myNode);
@@ -323,7 +327,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     DefaultMutableTreeNode getParent(String pkg, DefaultMutableTreeNode lroot) {
-        DefaultMutableTreeNode parent = (DefaultMutableTreeNode) packagesHM.get(pkg);
+        DefaultMutableTreeNode parent = packagesHM.get(pkg);
 
         if (parent == null) {
             if (pkg.indexOf('.') == -1) {
@@ -384,8 +388,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
                 // possible that a class inherited a parameterMap, check if annotated first
                 if (param != null) {
-                    String[] names = ((ParameterMap) param).names();
-                    String[] types = ((ParameterMap) param).types();
+                    String[] names = param.names();
+                    String[] types = param.types();
                     if (names.length != types.length) {
                         throw new RuntimeException("ParameterMap names and types length mismatch");
                     }

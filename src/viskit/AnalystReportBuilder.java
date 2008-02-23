@@ -291,7 +291,7 @@ public class AnalystReportBuilder {
                     Element summaryRecord = new Element("SummaryRecord");
                     summaryRecord.setAttribute("entity", entity.getAttributeValue("name"));
                     summaryRecord.setAttribute("property", temp2.getAttributeValue("property"));
-                    summaryRecord.setAttribute("count", temp2.getAttributeValue("count"));
+                    summaryRecord.setAttribute("numRuns", temp2.getAttributeValue("numRuns"));
                     summaryRecord.setAttribute("minObs", temp2.getAttributeValue("minObs"));
                     summaryRecord.setAttribute("maxObs", temp2.getAttributeValue("maxObs"));
                     summaryRecord.setAttribute("mean", temp2.getAttributeValue("mean"));
@@ -349,7 +349,7 @@ public class AnalystReportBuilder {
             String[] sa = new String[8];
             sa[0] = rec.getAttributeValue("entity");
             sa[1] = rec.getAttributeValue("property");
-            sa[2] = rec.getAttributeValue("count");
+            sa[2] = rec.getAttributeValue("numRuns");
             sa[3] = rec.getAttributeValue("minObs");
             sa[4] = rec.getAttributeValue("maxObs");
             sa[5] = rec.getAttributeValue("mean");
@@ -664,12 +664,12 @@ public class AnalystReportBuilder {
                         
                         //Add the mean of this replication to the chart
                         data[idx] = Double.parseDouble(temp2.getAttributeValue("mean"));
-                        idx++;
-                        
+                        idx++;                        
                     }
+                    
                     Element chartDir = new Element("chartURL");
                     String filename = axisLabel;
-                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));
+                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename, idx));
                     entity.addContent(chartDir);
                     repReports.addContent(entity);
                 }

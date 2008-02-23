@@ -13,7 +13,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -95,6 +94,11 @@ public class FileBasedClassManager implements Runnable {
             if (!isCached(f)) {
                 if (!isCacheMiss(f)) {
                     PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
+                    
+                    // Tried to compile an Assembly as an EventGraph, so just return here
+                    if (paf == null) {
+                        return null;
+                    }
                     ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
                     // since we're here, cache the parameter names
                     JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
@@ -461,8 +465,8 @@ public class FileBasedClassManager implements Runnable {
         return l;
     }
 
-    public Collection getFileLoadedClasses() {
-        Collection c;
+    public Collection<FileBasedAssyNode> getFileLoadedClasses() {
+        Collection<FileBasedAssyNode> c;
         synchronized (fileMap) {
             c = fileMap.values();
         }
@@ -479,8 +483,7 @@ public class FileBasedClassManager implements Runnable {
         while (true) { // forever
             v.clear();
             synchronized (fileMap) {
-                for (Iterator itr = fileMap.values().iterator(); itr.hasNext();) {
-                    FileBasedAssyNode fban = (FileBasedAssyNode) itr.next();
+                for (FileBasedAssyNode fban : fileMap.values()) {
                     File f = fban.isXML ? fban.xmlSource : fban.classFile;
                     if (f.lastModified() != fban.lastModified) {
                         v.add(fban.loadedClass);

@@ -38,6 +38,8 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Constructor
+     * @param pVariableName
+     * @param pVariableType 
      */
     vStateVariable(String pVariableName, String pVariableType) {
         variableName = pVariableName;
@@ -102,6 +104,7 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Returns an object that represents the current value of the object.
+     * @return 
      */
     public Object getCurrentValue() {
         return currentValue;
@@ -109,6 +112,7 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Sets the current value of the state variable
+     * @param pCurrentValue 
      */
     public void setCurrentValue(Object pCurrentValue) {
         currentValue = pCurrentValue;

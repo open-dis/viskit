@@ -772,7 +772,7 @@
                 <table border="1" width="60%">
                     <tr>
                         <th bgcolor="#FFFFCC">
-                            <b>Run#</b>
+                            <b>Run #</b>
                         </th>
                         <th bgcolor="#FFFFCC">
                             <b>Count</b>
@@ -841,7 +841,7 @@
                         <b>Property</b>
                     </th>
                     <th bgcolor="#FFFFCC">
-                        <b>Count</b>
+                        <b># Runs</b>
                     </th>
                     <th bgcolor="#FFFFCC">
                         <b>Min</b>
@@ -868,7 +868,7 @@
                             <xsl:value-of select="@property"/>
                         </td>
                         <td>
-                            <xsl:value-of select="@count"/>
+                            <xsl:value-of select="@numRuns"/>
                         </td>
                         <td>
                             <xsl:value-of select="@minObs"/>

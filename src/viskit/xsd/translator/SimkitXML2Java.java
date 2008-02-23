@@ -41,6 +41,8 @@ public class SimkitXML2Java {
     InputStream fileInputStream;
     private String fileBaseName;
     JAXBContext jaxbCtx;
+    private Unmarshaller unMarshaller;
+    private Object unMarshalledObject;
 
     /* convenience Strings for formatting */
     private final String sp = " ";
@@ -95,16 +97,38 @@ public class SimkitXML2Java {
         fileInputStream = new FileInputStream(f);
     }
 
-    public void unmarshal() {
-        Unmarshaller u;
+    public void unmarshal() {        
         try {
-            u = jaxbCtx.createUnmarshaller();
-            this.root = (SimEntity) u.unmarshal(fileInputStream);
+            setUnMarshaller(jaxbCtx.createUnmarshaller());
+            setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
+            this.root = (SimEntity) getUnMarshalledObject();
         } catch (JAXBException ex) {
-            log.error(ex);
+            
+            // Silence attempting to unmarshal an Assembly here
+            log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
         }
     }
+    
+    public Unmarshaller getUnMarshaller() {
+        return unMarshaller;
+    }
 
+    public void setUnMarshaller(Unmarshaller unMarshaller) {
+        this.unMarshaller = unMarshaller;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Object getUnMarshalledObject() {
+        return unMarshalledObject;
+    }
+
+    public void setUnMarshalledObject(Object unMarshalledObject) {
+        this.unMarshalledObject = unMarshalledObject;
+    }
+    
     public String translate() {
         
         StringBuffer source = new StringBuffer();
@@ -125,18 +149,35 @@ public class SimkitXML2Java {
         return source.toString();
     }
     
+    /**
+     * 
+     * @return
+     */
     public String getFileBaseName() {
         return fileBaseName;
     }
 
+    /**
+     * 
+     * @param fileBaseName
+     */
     public void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
     }
     
+    /**
+     * 
+     * @param data
+     * @param out
+     */
     public void writeOut(String data, PrintStream out) {
         out.println(data);
     }
     
+    /**
+     * 
+     * @return
+     */
     public SimEntity getRoot() {
         return root;
     }

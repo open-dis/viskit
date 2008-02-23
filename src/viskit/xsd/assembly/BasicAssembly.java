@@ -154,6 +154,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * <p/>
      * TODO: Remove the naming convention requirement and have the SimEntityName be
      * an automated key value
+     * @param repStatistics 
      */
     protected void setStatisticsKeyValues(LinkedHashMap repStatistics) {
         Iterator itr = repStatistics.entrySet().iterator();
@@ -333,18 +334,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * Empty, needed to implement SimEntity
+     * @param simEvent 
      */
     public void handleSimEvent(SimEvent simEvent) {
     }
 
     /**
      * Empty, needed to implement SimEntity
+     * @param simEvent 
      */
     public void processSimEvent(SimEvent simEvent) {
     }
 
     public SampleStatistics[] getDesignPointStats() {
-        return (SampleStatistics[]) designPointStats.clone();
+        return designPointStats.clone();
     }
 
     // TODO: fix generics: SampleStatistics vs SavedStats
@@ -402,6 +405,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * standard deviation.  This can be done generically.
      *
      * @param rep The replication number for this report
+     * @return 
      */
     protected String getReplicationReport(int rep) {
         StringBuffer buf = new StringBuffer("Output Report for Replication #");
@@ -438,6 +442,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /**
      * For each outer stats, print name, count, min, max, mean, variance, and
      * standard deviation.  This can be done generically.
+     * @return 
      */
     protected String getSummaryReport() {
         StringBuffer buf = new StringBuffer("Summary Output Report:");
@@ -457,7 +462,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * @return the SimEntities in this scenario in a copy of the array.
      */
     public SimEntity[] getSimEntities() {
-        return (SimEntity[]) simEntity.clone();
+        return simEntity.clone();
     }
 
     public void setOutputStream(OutputStream os) {

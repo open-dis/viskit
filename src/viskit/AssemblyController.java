@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-//import edu.nps.util.FileIO;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -948,16 +947,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return null;
     }
 
-    public static String buildJavaEventGraphSource(File f) {
-        try {
-            SimkitXML2Java x2j = new SimkitXML2Java(f);
-            x2j.unmarshal();
+    public static String buildJavaEventGraphSource(SimkitXML2Java x2j) {
+        try {            
             return x2j.translate();
         } catch (Exception e) {
             if (viskit.Vstatics.debug) {
                 e.printStackTrace();
             }
-            System.err.println("Error building Java from " + f.getName() + ": " + e.getMessage() + ", erroneous event-graph xml found");
+            log.error("Error building Java from " + x2j.getFileBaseName() + ": " + e.getMessage() + ", erroneous event-graph xml found");
         }
         return null;
     }
@@ -1093,10 +1090,23 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return null;
     }
 
-    static PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
-        PkgAndFile paf;
+    /**
+     * 
+     * @param xmlFile
+     * @return
+     */
+    static PkgAndFile createTemporaryEventGraphClass(File xmlFile) {        
         try {
-            String src = buildJavaEventGraphSource(xmlFile);
+            SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
+            x2j.unmarshal();            
+            
+            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
+            if (!isEventGraph) {
+                log.debug("Is an Assembly: " + !isEventGraph);
+                return null;
+            }
+            
+            String src = buildJavaEventGraphSource(x2j);
             
             // If using plain Vanilla Viskit, don't compile diskit extended EGs
             // as diskit.jar won't be available
@@ -1104,20 +1114,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 FileBasedClassManager.inst().addCacheMiss(xmlFile);
                 return null;
             }
-            paf = compileJavaClassAndSetPackage(src);
-            FileBasedClassManager.inst().addCache(xmlFile, paf.f);
-            return paf;
-        } catch (Exception e) {
-            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
-            FileBasedClassManager.inst().addCacheMiss(xmlFile);
-        }
-        return null;
-    }
-
-    /** Not currently used */
-    PkgAndFile createEventGraphClass(File xmlFile) {
-        try {
-            String src = buildJavaEventGraphSource(xmlFile);
             PkgAndFile paf = compileJavaClassAndSetPackage(src);
             FileBasedClassManager.inst().addCache(xmlFile, paf.f);
             return paf;
@@ -1127,7 +1123,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
         return null;
     }
-
+   
     static PkgAndFile compileJavaClassAndSetPackage(String source) {
         return compileJavaClassAndSetPackage(source, false);
     }
@@ -1204,9 +1200,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     private static void handleFileBasedClasses() {
-        Collection fileClasses = FileBasedClassManager.inst().getFileLoadedClasses();
-        for (Iterator itr = fileClasses.iterator(); itr.hasNext();) {
-            FileBasedAssyNode fbn = (FileBasedAssyNode) itr.next();
+        Collection<FileBasedAssyNode> fileClasses = FileBasedClassManager.inst().getFileLoadedClasses();
+        for (FileBasedAssyNode fbn : fileClasses) {
             if (fbn.isXML) {
                 createTemporaryEventGraphClass(fbn.xmlSource);
             } else {
@@ -1292,8 +1287,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
 
         String[] ra = new String[v.size()];
-        return (String[]) v.toArray(ra);
+        return v.toArray(ra);
     }
+    
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 

@@ -259,7 +259,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
             e.printStackTrace();
         }
         ViskitAssemblyView view = (ViskitAssemblyView) AssemblyController.inst.getView();
-        Object paf = AssemblyController.createTemporaryEventGraphClass(f); // not temporary, but use static method
+        
+        // not temporary, but use static method anyway
+        Object paf = AssemblyController.createTemporaryEventGraphClass(f);
         if (paf != null) {
             view.addToEventGraphPallette(f);
         } else {

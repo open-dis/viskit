@@ -33,12 +33,13 @@ public class ChartDrawer {
      * @param label 
      * @param data an array of doubles that are to be plotted
      * @param fileName the name of the file to save the image out to
+     * @param binNum the number of replications in the experiment
      * @return the path name of the created object
      */
-    public String createHistogram(String title, String label, double[] data, String fileName) {
+    public String createHistogram(String title, String label, double[] data, String fileName, int binNum) {
         String fileLocation = "./AnalystReports/charts/" + fileName + ".png";
         String url = "./charts/" + fileName + ".png";
-        IntervalXYDataset dataset = createIntervalXYDataset(label, data);
+        IntervalXYDataset dataset = createIntervalXYDataset(label, data, binNum);
         try {
             saveChart(createChart(dataset, title, label), fileLocation);
         } catch (java.io.IOException e) {
@@ -52,13 +53,16 @@ public class ChartDrawer {
      * Creates a data set that is used for making the histogram
      * @param label
      * @param data
-     * @return 
+     * @param binNum the number of replications in the experiment
+     * @return
      */
-    private IntervalXYDataset createIntervalXYDataset(String label, double[] data) {
+    private IntervalXYDataset createIntervalXYDataset(String label, double[] data, int binNum) {
 
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-        dataset.addSeries(label, data, 15);
+        
+        // Bin size = the number of experiment replications
+        dataset.addSeries(label, data, binNum);
 
         return dataset;
     }

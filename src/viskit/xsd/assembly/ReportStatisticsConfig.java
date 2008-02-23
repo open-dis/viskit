@@ -68,7 +68,9 @@ public class ReportStatisticsConfig {
      */
     private String assemblyName;
 
-    /** Creates a new instance of ReportStatisticsConfig */
+    /** Creates a new instance of ReportStatisticsConfig
+     * @param assemblyName 
+     */
     public ReportStatisticsConfig(String assemblyName) {
         this.assemblyName = assemblyName;
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -84,6 +86,7 @@ public class ReportStatisticsConfig {
     /**
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
+     * @param keyValues 
      */
     public void setEntityIndex(LinkedList<String> keyValues) {
         System.out.println("\n\nAnalyst Report Selected for the following:");
@@ -115,6 +118,7 @@ public class ReportStatisticsConfig {
      * EntityName and the Property Name
      *
      * @param str the string entry for the name of a property change listener
+     * @return 
      */
     private int findUnderscore(String str) {
         char letter;
@@ -131,6 +135,8 @@ public class ReportStatisticsConfig {
     /**
      * Creates a replication record for each SampleStatistics object after each
      * run.
+     * @param repNumber
+     * @param rep 
      */
     public void processReplicationReport(int repNumber, SampleStatistics[] rep) {
         //System.out.println("\n\nProcessRepReports in RepStatsConfig");
@@ -173,7 +179,7 @@ public class ReportStatisticsConfig {
             Element summary = new Element("Summary");
 
             summary.setAttribute("property", propertyIndex[i]);
-            summary.setAttribute("count", form.format(sum[i].getCount()));
+            summary.setAttribute("numRuns", form.format(sum[i].getCount()));
             summary.setAttribute("minObs", form.format(sum[i].getMinObs()));
             summary.setAttribute("maxObs", form.format(sum[i].getMaxObs()));
             summary.setAttribute("mean", form.format(sum[i].getMean()));
@@ -196,6 +202,8 @@ public class ReportStatisticsConfig {
 
     /**
      * File I/O that saves the report in XML format
+     * @param report
+     * @return 
      */
     public String saveData(Document report) {
 

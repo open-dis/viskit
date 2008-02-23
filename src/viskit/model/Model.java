@@ -708,6 +708,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     // -----------------
     /**
      * Add a new event to the graph with the given label, at the given point
+     * @param nodeName
+     * @param p 
      */
     public void newEvent(String nodeName, Point p) {
         EventNode node = new EventNode(nodeName);
@@ -1053,7 +1055,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     /**
-     *   "nullIfEmpty" Return the passed string if non-zero length, else null
+     * "nullIfEmpty" Return the passed string if non-zero length, else null
+     * @param s
+     * @return 
      */
     private String nIe(String s) {
         if (s != null) {

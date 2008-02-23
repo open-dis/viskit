@@ -105,8 +105,8 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
         fillWidgets();     // put the data into the widgets
 
-        modified = (param == null ? true : false);     // if it's a new stVar, they can always accept defaults with no typing
-        okButt.setEnabled((param == null ? true : false));
+        modified = (param == null);     // if it's a new stVar, they can always accept defaults with no typing
+        okButt.setEnabled(param == null);
         if (okButt.isEnabled()) {
             getRootPane().setDefaultButton(okButt);
         } else {
@@ -141,8 +141,8 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
         fillWidgets();
 
-        modified = (p == null ? true : false);
-        okButt.setEnabled((p == null ? true : false));
+        modified = (p == null);
+        okButt.setEnabled(p == null);
         if (p == null) {
             getRootPane().setDefaultButton(okButt);
         } else {

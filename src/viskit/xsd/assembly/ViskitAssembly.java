@@ -147,16 +147,20 @@ public class ViskitAssembly extends BasicAssembly {
         } else {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
         }
-        if ( debug ) log.info("connecting entity " + pc.source + " to " + listener + " property " + pc.property );        
+        if ( debug ) {
+            log.info("connecting entity " + pc.source + " to " + listener + " property " + pc.property);
+        }        
     }
     
     void connectReplicationStats(String listener, PropertyConnector pc) {
         if ( "null".equals(pc.property) ) {
             pc.property = "";
         }
-        if ( debug ) log.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property );
+        if ( debug ) {
+            log.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
+        }
         if ( "".equals(pc.property) ) {
-            pc.property = ((SampleStatistics) (getReplicationStatsByName(listener))).getName().trim();
+            pc.property = getReplicationStatsByName(listener).getName().trim();
             if ( debug ) {
                 log.info("Property unspecified, attempting with lookup " + pc.property);
             }
@@ -180,7 +184,7 @@ public class ViskitAssembly extends BasicAssembly {
             pc.property = "";
         }
         if ( "".equals(pc.property) ) {
-            pc.property = ((SampleStatistics) (getDesignPointStatsByName(listener))).getName();
+            pc.property = getDesignPointStatsByName(listener).getName();
         }
         
         if ( "".equals(pc.property) ) {
@@ -193,9 +197,11 @@ public class ViskitAssembly extends BasicAssembly {
     /** to be called after all entities have been added as a super() */
     /*  note not using template version of ArrayList... */
     protected void createSimEntities() {
-        if (entities != null) 
-            if (entities.values() != null)
+        if (entities != null) {
+            if (entities.values() != null) {
                 simEntity = toArray(entities.values(), new SimEntity[0]);
+            }
+        }
     }
     
     @Override
@@ -317,7 +323,9 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     public SimEntity getSimEntityByName(String name) {
-        if (debug) log.info("getSimEntityByName for "+name+" "+entities.get(name));
+        if (debug) {
+            log.info("getSimEntityByName for " + name + " " + entities.get(name));
+        }
         return entities.get(name);
     }
     
