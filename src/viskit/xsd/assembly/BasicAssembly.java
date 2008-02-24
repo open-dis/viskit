@@ -346,6 +346,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void processSimEvent(SimEvent simEvent) {
     }
 
+    /**
+     * 
+     * @return
+     */
     public SampleStatistics[] getDesignPointStats() {
         return designPointStats.clone();
     }
@@ -388,7 +392,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * Save all replicationStats for a given iteration.  This assumes that the
-     * replicationData map has been instntaied and initialized.
+     * replicationData map has been instantiated and initialized.
      */
     // TODO: fix generics: SampleStatistics vs SavedStats
     @SuppressWarnings("unchecked")
@@ -401,8 +405,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * For each inner stats, print name, count, min, max, mean, variance, and
-     * standard deviation.  This can be done generically.
+     * For each inner stats, print name, count, min, max, mean, standard 
+     * deviation and variance.  This can be done generically.
      *
      * @param rep The replication number for this report
      * @return 
@@ -429,11 +433,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             buf.append('\t');
             buf.append(form.format(replicationStats[i].getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getMean()));
-            buf.append('\t');
-            buf.append(form.format(replicationStats[i].getVariance()));
+            buf.append(form.format(replicationStats[i].getMean()));            
             buf.append('\t');
             buf.append(form.format(replicationStats[i].getStandardDeviation()));
+            buf.append('\t');
+            buf.append(form.format(replicationStats[i].getVariance()));
             replicationStats[i].reset();
         }
         return buf.toString();

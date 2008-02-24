@@ -1,8 +1,3 @@
-/*
- * AnalystReportBuilder.java
- *
- * Created on July 18, 2006, 7:04 PM
- */
 package viskit;
 
 import java.io.File;
@@ -30,6 +25,7 @@ import viskit.xsd.assembly.ChartDrawer;
  * comments) to construct a report that is saved in XML and html formats.
  *
  * @author Patrick Sullivan
+ * @since July 18, 2006, 7:04 PM
  * @version $Id: AnalystReportBuilder.java 1670 2007-12-20 00:23:36Z tdnorbra $
  */
 public class AnalystReportBuilder {
@@ -662,14 +658,14 @@ public class AnalystReportBuilder {
                         repRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
                         entity.addContent(repRecord);
                         
-                        //Add the mean of this replication to the chart
-                        data[idx] = Double.parseDouble(temp2.getAttributeValue("mean"));
+                        // Add the count of this replication to the chart
+                        data[idx] = Double.parseDouble(temp2.getAttributeValue("count"));
                         idx++;                        
                     }
                     
                     Element chartDir = new Element("chartURL");
                     String filename = axisLabel;
-                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename, idx));
+                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));
                     entity.addContent(chartDir);
                     repReports.addContent(entity);
                 }

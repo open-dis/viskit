@@ -735,92 +735,96 @@
         <p align="left">            
             <b>Measure of Effectiveness (MoE)</b>            
         </p>
-        <p align="left">Entity:
-            <xsl:value-of select="@name"/>
-            <p align="left">Property:
-                <xsl:value-of select="@property"/>
+        <xsl:if test="@name != ''">
+            <p align="left">Entity:
+                <xsl:value-of select="@name"/>
             </p>
-            <xsl:for-each select="chartURL">
-                <div align="center">
-                    <xsl:element name="a">
-                        <xsl:attribute name="href">
+        </xsl:if>
+        <p align="left">Property:
+            <xsl:value-of select="@property"/>
+        </p>
+        <xsl:for-each select="chartURL">
+            <div align="center">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="@dir"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="style">
+                        <xsl:text>border:0</xsl:text>
+                    </xsl:attribute>
+                    <xsl:element name="img">
+                        <xsl:attribute name="border">
+                            <xsl:text>1</xsl:text>
+                        </xsl:attribute>
+                        <xsl:attribute name="src">
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
-                        <xsl:attribute name="style">
-                            <xsl:text>border:0</xsl:text>
+                        <xsl:attribute name="description">
+                            <!-- TODO:  better description -->
+                            <xsl:text>statistical output</xsl:text>
                         </xsl:attribute>
-                        <xsl:element name="img">
-                            <xsl:attribute name="border">
-                                <xsl:text>1</xsl:text>
-                            </xsl:attribute>
-                            <xsl:attribute name="src">
-                                <xsl:value-of select="@dir"/>
-                            </xsl:attribute>
-                            <xsl:attribute name="description">
-                                <!-- TODO:  better description -->
-                                <xsl:text>statistical output</xsl:text>
-                            </xsl:attribute>
-                        </xsl:element>
                     </xsl:element>
-                    
-                    <!-- add an index to the array -->
-                    <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-                    <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replication Statistics for <xsl:value-of select="$entityProperty"/></p>
-                </div>
-            </xsl:for-each>
-            <div align="center">
-                <table border="1" width="60%">
-                    <tr>
-                        <th bgcolor="#FFFFCC">
-                            <b>Run #</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>Count</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>Min</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>Max</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>Mean</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>StdDev</b>
-                        </th>
-                        <th bgcolor="#FFFFCC">
-                            <b>Variance</b>
-                        </th>
-                    </tr>
-                    <xsl:for-each select="Replication">
-                        <tr>
-                            <td>
-                                <xsl:value-of select="@number"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@count"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@minObs"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@maxObs"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@mean"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@stdDeviation"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="@variance"/>
-                            </td>
-                        </tr>
-                    </xsl:for-each>
-                </table>
+                </xsl:element>
+
+                <!-- add an index to the array -->
+                <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replication Statistics for <xsl:value-of select="$entityProperty"/></p>
             </div>
-        </p>
+        </xsl:for-each>
+        <div align="center">
+            <table border="1" width="60%">
+                <tr>
+                    <th bgcolor="#FFFFCC">
+                        <b>Run #</b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>
+                            <xsl:value-of select="@property"/>
+                        </b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>Min</b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>Max</b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>Mean</b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>StdDev</b>
+                    </th>
+                    <th bgcolor="#FFFFCC">
+                        <b>Variance</b>
+                    </th>
+                </tr>
+                <xsl:for-each select="Replication">
+                    <tr>
+                        <td>
+                            <xsl:value-of select="@number"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@count"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@minObs"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@maxObs"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@mean"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@stdDeviation"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="@variance"/>
+                        </td>
+                    </tr>
+                </xsl:for-each>
+            </table>
+        </div>
         <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
@@ -834,9 +838,11 @@
         <div align="center">
             <table border="1" width="80%">
                 <tr>
-                    <th bgcolor="#FFFFCC">
-                        <b>Entity</b>
-                    </th>
+                    <xsl:if test="@entity != ''">
+                        <th bgcolor="#FFFFCC">
+                            <b>Entity</b>
+                        </th>
+                    </xsl:if>
                     <th bgcolor="#FFFFCC">
                         <b>Property</b>
                     </th>
@@ -861,9 +867,11 @@
                 </tr>
                 <xsl:for-each select="SummaryRecord">
                     <tr>
-                        <td>
-                            <xsl:value-of select="@entity"/>
-                        </td>
+                        <xsl:if test="@entity != ''">
+                            <td>
+                                <xsl:value-of select="@entity"/>
+                            </td>
+                        </xsl:if>
                         <td>
                             <xsl:value-of select="@property"/>
                         </td>

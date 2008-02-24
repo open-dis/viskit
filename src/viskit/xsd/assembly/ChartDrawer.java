@@ -3,7 +3,9 @@ package viskit.xsd.assembly;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.*;
+import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -14,7 +16,7 @@ import org.jfree.chart.ChartUtilities;
 
 /**
  *
- * This class creates chart objects using the JFreeChart package.  
+ * This class creates chart objects using the JFreeChart package
  *
  * @author Patrick Sullivan
  * @version $Id: ChartDrawer.java 1662 2007-12-16 19:44:04Z tdnorbra $
@@ -22,6 +24,8 @@ import org.jfree.chart.ChartUtilities;
  */
 public class ChartDrawer {
 
+    static Logger log = Logger.getLogger(ChartDrawer.class);
+    
     /** Creates a new instance of ChartDrawer */
     public ChartDrawer() {
     }
@@ -33,13 +37,12 @@ public class ChartDrawer {
      * @param label 
      * @param data an array of doubles that are to be plotted
      * @param fileName the name of the file to save the image out to
-     * @param binNum the number of replications in the experiment
      * @return the path name of the created object
      */
-    public String createHistogram(String title, String label, double[] data, String fileName, int binNum) {
+    public String createHistogram(String title, String label, double[] data, String fileName) {
         String fileLocation = "./AnalystReports/charts/" + fileName + ".png";
         String url = "./charts/" + fileName + ".png";
-        IntervalXYDataset dataset = createIntervalXYDataset(label, data, binNum);
+        IntervalXYDataset dataset = createIntervalXYDataset(label, data);
         try {
             saveChart(createChart(dataset, title, label), fileLocation);
         } catch (java.io.IOException e) {
@@ -50,34 +53,42 @@ public class ChartDrawer {
     }
 
     /**
-     * Creates a data set that is used for making the histogram
+     * Creates a data set that is used for making a relative frequency histogram
      * @param label
      * @param data
-     * @param binNum the number of replications in the experiment
      * @return
      */
-    private IntervalXYDataset createIntervalXYDataset(String label, double[] data, int binNum) {
+    private IntervalXYDataset createIntervalXYDataset(String label, double[] data) {
 
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
         
-        // Bin size = the number of experiment replications
-        dataset.addSeries(label, data, binNum);
+        double[] dataCopy = data.clone();
+        Arrays.sort(dataCopy);
+        double max = dataCopy[dataCopy.length - 1];
+        double min = dataCopy[0];
+        
+        // From: http://www.isixsigma.com/library/forum/c031022_number_bins_histogram.asp
+        double result = 1 + (3.3 * Math.log((double) dataCopy.length));
+        int binNum = (int) Math.rint(result);
+                       
+        dataset.addSeries(label, data, binNum, min, max);
 
         return dataset;
     }
 
     /**
-     * Creates the histogram chart
+     * Creates the relative frequency histogram chart
      * @param dataset
      * @param title
      * @param label
      * @return 
      */
     private JFreeChart createChart(IntervalXYDataset dataset, String title, String label) {
-        final JFreeChart chart = ChartFactory.createHistogram(title,
+        final JFreeChart chart = ChartFactory.createHistogram(
+                title,
                 label,
-                "",
+                "Percentage of Frequency",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true,

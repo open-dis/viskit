@@ -166,23 +166,26 @@ public class Gridlet extends Thread {
                 v.add(usid);
                 
                 // TODO: Fix generics
-                v = (Vector)xmlrpc.execute("gridkit.getJars",v);
+                v = (Vector) xmlrpc.execute("gridkit.getJars",v);
                 Enumeration e = v.elements();
                 ClassLoader boot = Thread.currentThread().getContextClassLoader();
-                if (boot instanceof Boot) while ( e.hasMoreElements() ) {
-                    ((Boot)boot).addJar(new URL((String)e.nextElement()));
+                if (boot instanceof Boot) {
+                    while (e.hasMoreElements()) {
+                        ((Boot) boot).addJar(new URL((String) e.nextElement()));
+                    }
                 } else {
-                    if (!v.isEmpty())
-                        throw 
-                            new RuntimeException("You should really be using viskit.xsd.cli.Boot loader to launch Gridlets!");
+                    if (!v.isEmpty()) {
+                        throw new RuntimeException("You should really be using viskit.xsd.cli.Boot loader to launch Gridlets!");
+                    }
                 }
                 
             } else {
                 // check if LocalBootLoader mode, otherwise throw exception
                 Object loaderO = Thread.currentThread().getContextClassLoader();
                 Class loaderz = loaderO.getClass();
-                if ( !( loaderz.getName().equals("viskit.doe.LocalBootLoader") ) )
+                if ( !( loaderz.getName().equals("viskit.doe.LocalBootLoader") ) ) {
                     throw new RuntimeException("Not running as SGE job or local mode?");
+                }
                 usid = "LOCAL-RUN";
             }
         } catch (Exception e) {
@@ -381,12 +384,12 @@ public class Gridlet extends Thread {
                     if (source != null) {
                         long line = diagnostic.getLineNumber();
                         URI name = cwd.relativize(source.toUri());
-                        if (line != Diagnostic.NOPOS)
-                            System.out.format("%s:%s: %s: %s%n", name, line, kind,
-                                    diagnostic.getMessage(null));
-                        else
-                            System.out.format("%s:1: %s: %s%n", name, kind,
-                                    diagnostic.getMessage(null));
+                        if (line != Diagnostic.NOPOS) {
+                            System.out.format("%s:%s: %s: %s%n", name, line, kind, diagnostic.getMessage(null));
+                        }
+                        else {
+                            System.out.format("%s:1: %s: %s%n", name, kind, diagnostic.getMessage(null));
+                        }
                     } else {
                         System.out.format("%s: %s%n", kind,
                                 diagnostic.getMessage(null));
@@ -430,104 +433,108 @@ public class Gridlet extends Thread {
             String statXml;
             
             // first get designPoint stats
-            if (designPointStats != null ) try {
-                
-                for ( int i = 0; i < designPointStats.length; i++) {
-                    
-                    if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics ) { // tbd handle this for local case too
-                        
-                        IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
-                        iss.setName(designPointStats[i].getName());
-                        
-                        List<SampleStatistics> args = iss.getSampleStatistics();
-                        simkit.stat.SampleStatistics[] allStat = 
-                                ((simkit.stat.IndexedSampleStatistics) designPointStats[i]).getAllSampleStat();
-                        
-                        for ( int j = 0; j < allStat.length; j++) {                            
-                            args.add(statForStat(allStat[j]));
+            if (designPointStats != null ) {
+                try {
+
+                    for (int i = 0; i < designPointStats.length; i++) {
+
+                        if (designPointStats[i] instanceof simkit.stat.IndexedSampleStatistics) {
+                            // tbd handle this for local case too
+                            IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
+                            iss.setName(designPointStats[i].getName());
+
+                            List<SampleStatistics> args = iss.getSampleStatistics();
+                            simkit.stat.SampleStatistics[] allStat = ((simkit.stat.IndexedSampleStatistics) designPointStats[i]).getAllSampleStat();
+
+                            for (int j = 0; j < allStat.length; j++) {
+                                args.add(statForStat(allStat[j]));
+                            }
+                            statXml = sax2j.marshalFragmentToString(iss);
+                        } else {
+                            statXml = sax2j.marshalFragmentToString(statForStat(designPointStats[i]));
                         }
-                        statXml = sax2j.marshalFragmentToString(iss);
-                    } else {
-                        statXml = sax2j.marshalFragmentToString(statForStat(designPointStats[i]));                        
-                    }
-                    
-                    if (debug_io)
-                        System.out.println(statXml);
-                    
-                    if (gridRunner != null) { // local gridRunner
-                        
-                        Class<?> gridRunnerz = gridRunner.getClass();
-                        Method mthd = gridRunnerz.getMethod("addDesignPointStat",int.class,int.class,int.class,String.class);
-                        mthd.invoke(gridRunner,sampleIndex,designPtIndex,designPointStats.length,statXml);
-                        
-                        //gridRunner.addDesignPointStat(sampleIndex,designPtIndex,designPointStats.length,statXml);
-                    } else {
-                        
-                        Vector<Object> args = new Vector<Object>();
-                        args.add(usid);
-                        args.add(new Integer(sampleIndex));
-                        args.add(new Integer(designPtIndex));
-                        args.add(new Integer(designPointStats.length));
-                        args.add(statXml);
+
                         if (debug_io) {
-                            System.out.println("sending DesignPointStat "+sampleIndex+" "+designPtIndex);
                             System.out.println(statXml);
                         }
-                        xmlrpc.execute("gridkit.addDesignPointStat", args);
-                    }
-                    // replication stats similarly
-                    
-                    String repName = designPointStats[i].getName();
-                    repName = repName.substring(0, repName.length()-5);  // strip off ".mean"
-                    
-                    for ( int j = 0 ; j < replicationsPerDesignPoint ; j++ ) {
-                        replicationStat = sim.getReplicationStat(repName,j);
-                        if (replicationStat != null) {
-                            try {
-                                if (replicationStat instanceof simkit.stat.IndexedSampleStatistics ) {
-                                    IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
-                                    iss.setName(replicationStat.getName());
-                                    
-                                    List<SampleStatistics> arg = iss.getSampleStatistics();
-                                    simkit.stat.SampleStatistics[] allStat =
-                                            ((simkit.stat.IndexedSampleStatistics) replicationStat).getAllSampleStat();
-                                    for ( int k = 0; k < allStat.length; k++) {                                        
-                                        arg.add(statForStat(allStat[j]));                                        
+                        if (gridRunner != null) {
+                            // local gridRunner
+                            Class<?> gridRunnerz = gridRunner.getClass();
+                            Method mthd = gridRunnerz.getMethod("addDesignPointStat", int.class, int.class, int.class, String.class);
+                            mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStats.length, statXml);                            
+                        } else {
+
+                            Vector<Object> args = new Vector<Object>();
+                            args.add(usid);
+                            args.add(new Integer(sampleIndex));
+                            args.add(new Integer(designPtIndex));
+                            args.add(new Integer(designPointStats.length));
+                            args.add(statXml);
+                            if (debug_io) {
+                                System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
+                                System.out.println(statXml);
+                            }
+                            xmlrpc.execute("gridkit.addDesignPointStat", args);
+                        }
+                        // replication stats similarly
+                        String repName = designPointStats[i].getName();
+                        repName = repName.substring(0, repName.length() - 5); // strip off ".mean"
+                        for (int j = 0; j < replicationsPerDesignPoint; j++) {
+                            replicationStat = sim.getReplicationStat(repName, j);
+                            if (replicationStat != null) {
+                                try {
+                                    if (replicationStat instanceof simkit.stat.IndexedSampleStatistics) {
+                                        IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
+                                        iss.setName(replicationStat.getName());
+
+                                        List<SampleStatistics> arg = iss.getSampleStatistics();
+                                        simkit.stat.SampleStatistics[] allStat = ((simkit.stat.IndexedSampleStatistics) replicationStat).getAllSampleStat();
+                                        for (int k = 0; k < allStat.length; k++) {
+                                            arg.add(statForStat(allStat[j]));
+                                        }
+                                        statXml = sax2j.marshalToString(iss);
+                                    } else {
+                                        statXml = sax2j.marshalToString(statForStat(replicationStat));
                                     }
-                                    statXml = sax2j.marshalToString(iss);
-                                } else {
-                                    statXml = sax2j.marshalToString(statForStat(replicationStat));
-                                    
-                                }
-                                if (debug_io)
-                                    System.out.println(statXml);
-                                if (gridRunner != null) { // local is a local gridRunner
-                                    Class<?> gridRunnerz = gridRunner.getClass();
-                                    Method mthd = gridRunnerz.getMethod("addReplicationStat",int.class,int.class,int.class,String.class);
-                                    mthd.invoke(gridRunner,sampleIndex,designPtIndex,j,statXml);
-                                    //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
-                                } else {// use rpc to runner on grid
-                                    
-                                    Vector<Object> args = new Vector<Object>();
-                                    args.add(usid);
-                                    args.add(new Integer(sampleIndex));
-                                    args.add(new Integer(designPtIndex));
-                                    args.add(new Integer(j));
-                                    args.add(statXml);
                                     if (debug_io) {
-                                        System.out.println("sending ReplicationStat"+sampleIndex+" "+designPtIndex+" "+j);
                                         System.out.println(statXml);
                                     }
-                                    xmlrpc.execute("gridkit.addReplicationStat", args);
+                                    if (gridRunner != null) {
+                                        // local is a local gridRunner
+                                        Class<?> gridRunnerz = gridRunner.getClass();
+                                        Method mthd = gridRunnerz.getMethod("addReplicationStat", int.class, int.class, int.class, String.class);
+                                        mthd.invoke(gridRunner, sampleIndex, designPtIndex, j, statXml);
+                                        //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
+                                    } else {
+                                        // use rpc to runner on grid
+                                        Vector<Object> args = new Vector<Object>();
+                                        args.add(usid);
+                                        args.add(new Integer(sampleIndex));
+                                        args.add(new Integer(designPtIndex));
+                                        args.add(new Integer(j));
+                                        args.add(statXml);
+                                        if (debug_io) {
+                                            System.out.println("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
+                                            System.out.println(statXml);
+                                        }
+                                        xmlrpc.execute("gridkit.addReplicationStat", args);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
-                        }                        
+                        }
                     }
-                }                
-            } catch (Exception e) { e.printStackTrace(); }
-            else System.out.println("No DesignPointStats");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                System.out.println("No DesignPointStats");
+
+
+                // reconnect io
+            }
             
             
             // reconnect io
