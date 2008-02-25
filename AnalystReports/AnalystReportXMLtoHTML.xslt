@@ -838,11 +838,9 @@
         <div align="center">
             <table border="1" width="80%">
                 <tr>
-                    <xsl:if test="@entity != ''">
-                        <th bgcolor="#FFFFCC">
-                            <b>Entity</b>
-                        </th>
-                    </xsl:if>
+                    <th bgcolor="#FFFFCC">
+                        <b>Entity</b>
+                    </th>
                     <th bgcolor="#FFFFCC">
                         <b>Property</b>
                     </th>
@@ -867,11 +865,9 @@
                 </tr>
                 <xsl:for-each select="SummaryRecord">
                     <tr>
-                        <xsl:if test="@entity != ''">
-                            <td>
-                                <xsl:value-of select="@entity"/>
-                            </td>
-                        </xsl:if>
+                        <td>
+                            <xsl:value-of select="@entity"/>
+                        </td>
                         <td>
                             <xsl:value-of select="@property"/>
                         </td>
