@@ -237,7 +237,7 @@ public class ViskitAssembly extends BasicAssembly {
     public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name, entity);
-        log.debug("ViskitAssembly addSimEntity " + entity);
+//        log.debug("ViskitAssembly addSimEntity " + entity);
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
