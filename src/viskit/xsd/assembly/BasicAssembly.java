@@ -411,7 +411,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         SampleStatistics[] clonedReplicationStats = getReplicationStats();
         
         // Outputs raw replication statistics to XML report
-        statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
+        if (isSaveReplicationData()) {
+            statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
+        }
 
         StringBuffer buf = new StringBuffer("Output Report for Replication #");
         buf.append(rep + 1);
@@ -450,7 +452,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected String getSummaryReport() {
         
         // Outputs raw summary statistics to XML report
-        statsConfig.processSummaryReport(getDesignPointStats());
+        if (isSaveReplicationData()) {
+            statsConfig.processSummaryReport(getDesignPointStats());
+        }
         
         StringBuffer buf = new StringBuffer("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
