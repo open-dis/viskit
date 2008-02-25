@@ -288,7 +288,7 @@ public class BshGridlet extends Thread {
 
                         // replication stats similarly
                         String repName = designPointStats[i].getName();
-                        repName = repName.substring(0, repName.length() - 5); // strip off ".mean"
+                        repName = repName.substring(0, repName.length() - 6); // strip off ".count"
                         for (int j = 0; j < replicationsPerDesignPoint; j++) {
                             replicationStat = sim.getReplicationStat(repName, j);
                             if (replicationStat != null) {

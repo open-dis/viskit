@@ -18,7 +18,7 @@ public class FindClassesForInterface {
      * @param implementing
      * @return Class object
      */
-    public static Class classFromFile(File f, Class<?> implementing) {
+    public static Class<?> classFromFile(File f, Class<?> implementing) {
         Class<?> c = null;
         try {
             c = classFromFile(f);
@@ -37,6 +37,7 @@ public class FindClassesForInterface {
      * Added by Mike Bailey.  Same test as above.
      * @param questionable
      * @param target
+     * @return 
      */
     public static boolean matchClass(Class<?> questionable, Class<?> target) {
         return (!questionable.isInterface() && target.isAssignableFrom(questionable) && isConcrete(questionable));
@@ -44,9 +45,11 @@ public class FindClassesForInterface {
 
     /**
      * Simple method to try to load a .class file
+     * @param f
+     * @return
+     * @throws java.lang.Throwable 
      */
-    public static Class classFromFile(File f) throws java.lang.Throwable {
-
+    public static Class<?> classFromFile(File f) throws java.lang.Throwable {
         return new MyClassLoader().buildIt(f);
     }
 
@@ -58,13 +61,13 @@ public class FindClassesForInterface {
         private File f;
         private Hashtable<String, Class<?>> found = new Hashtable<String, Class<?>>();
 
-        Class buildIt(File fil) throws java.lang.Throwable {
+        Class<?> buildIt(File fil) throws java.lang.Throwable {
             f = fil;
             return loadClass(f.getName());
         }
 
         @Override
-        protected Class findClass(String name) throws ClassNotFoundException {
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
             if (found.get(name) != null) {
                 return (Class) found.get(name);
             }
@@ -90,7 +93,7 @@ public class FindClassesForInterface {
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();
-                return (Class) null;
+                return (Class<?>) null;
             }
         }
     }
@@ -134,6 +137,7 @@ public class FindClassesForInterface {
 
     /**
      * @param args the command line arguments
+     * @throws java.lang.Throwable 
      */
     public static void main(String[] args) throws Throwable {
         String jarFileName = args.length > 0 ? args[0] : "/R:/Simkit/simkit.jar";

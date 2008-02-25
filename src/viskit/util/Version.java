@@ -16,7 +16,6 @@ import java.util.logging.Logger;
  * $Date: 2007-12-16 11:44:04 -0800 (Sun, 16 Dec 2007) $
  * </pre>
  *
- *
  * @version $Id: Version.java 1662 2007-12-16 19:44:04Z tdnorbra $
  * @author ahbuss
  */

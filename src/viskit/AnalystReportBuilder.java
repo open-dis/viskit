@@ -636,14 +636,14 @@ public class AnalystReportBuilder {
                 Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
                 
                 // Chart title and label
-                chartTitle = (tempEntity.getAttributeValue("name"));
-                axisLabel  = (temp.getAttributeValue("property")) ;
+                chartTitle = tempEntity.getAttributeValue("name");
+                axisLabel  = temp.getAttributeValue("property") ;
                 
                 while (itr2.hasNext()) {
                     Element temp3 = (Element) itr2.next();
                     Iterator itr3 = temp3.getChildren("Replication").iterator();
                     
-                    //Create a data set instance and chart for each replication report
+                    // Create a data set instance and chart for each replication report
                     double[] data = new double[temp3.getChildren().size()];
                     int idx = 0;
                     while (itr3.hasNext()) {

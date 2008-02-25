@@ -5,15 +5,15 @@
  */
 package viskit.xsd.assembly;
 
-import simkit.Adapter;
-import simkit.SimEntity;
-import simkit.stat.SampleStatistics;
-import static edu.nps.util.GenericConversion.toArray;
-
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+
+import simkit.Adapter;
+import simkit.SimEntity;
+import simkit.stat.SampleStatistics;
+import static edu.nps.util.GenericConversion.toArray;
 
 /** BasicAssembly doesn't provide Viskit users with ability to 
  * reference a known SimEntity within a constructor. This class 
@@ -211,9 +211,7 @@ public class ViskitAssembly extends BasicAssembly {
         // the super. 
         
         for (SampleStatistics sampleStats : designPointStats) {
-            if ( debug ) {
-                log.info(sampleStats.getName() + " designPointStat created");
-            }
+            log.debug(sampleStats.getName() + " designPointStat created");
             designPointStatistics.put(sampleStats.getName(), sampleStats);
         }
     }
@@ -223,29 +221,23 @@ public class ViskitAssembly extends BasicAssembly {
     @SuppressWarnings("unchecked")
     protected void createReplicationStats() {
         replicationStats = toArray((Collection<SampleStatistics>) replicationStatistics.values(), new SampleStatistics[0]);
-        if (debug) {
-            for (SampleStatistics sampleStats : replicationStats) {
-                log.info(sampleStats.getName() + " replicationStat created");
-            }
+        for (SampleStatistics sampleStats : replicationStats) {
+            log.debug(sampleStats.getName() + " replicationStat created");
         }
     }
     
     @Override
     protected void createPropertyChangeListeners() {
         propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
-        if (debug) {
-            for (PropertyChangeListener pcl : propertyChangeListener) {
-                log.info(pcl + " propertyChangeListener created");
-            }
+        for (PropertyChangeListener pcl : propertyChangeListener) {
+            log.debug(pcl + " propertyChangeListener created");
         }
     }
     
     public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name, entity);
-        if (debug) {
-            log.info("ViskitAssembly addSimEntity " + entity);
-        }
+        log.debug("ViskitAssembly addSimEntity " + entity);
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {

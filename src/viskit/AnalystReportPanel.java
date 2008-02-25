@@ -818,7 +818,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         statsRepPanel.add(lab = new JLabel("Replication Reports"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         statsRepPanel.add(Box.createVerticalStrut(10));
-        String[] colNames = new String[]{"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+        String[] colNames = new String[] {"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
 
         for (Iterator repItr = reps.iterator(); repItr.hasNext();) {
             List r = (List) repItr.next();
@@ -844,7 +844,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
         List summs = arb.getStastSummaryList();
 
-        colNames = new String[]{"Entity", "Property", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+        colNames = new String[] {"Entity", "Property", "# Runs", "Min", "Max", "Mean", "Std Deviation", "Variance"};
         String[][] saa = new String[summs.size()][];
         int i = 0;
         for (Iterator sumItr = summs.iterator(); sumItr.hasNext();) {
@@ -863,7 +863,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
         summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
-
     }
 
     private void unFillStatsPan() {

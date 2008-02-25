@@ -53,7 +53,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = false;
-    private boolean analystReplicationData = true;
+    
     /**
      * ***********************************************
      */
@@ -187,15 +187,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /**
      * The default behavior is to create a <code>SimplStatsTally</code>
      * instance for each element in <code>replicationStats</code> with the
-     * corresponding name + "mean".
+     * corresponding name + ".count"
      */
     protected void createDesignPointStats() {
-        designPointStats = new SampleStatistics[replicationStats.length];
-        for (int i = 0; i < designPointStats.length; ++i) {
-            designPointStats[i] = new SimpleStatsTally(replicationStats[i].getName() + ".mean");
+        designPointStats = new SampleStatistics[getReplicationStats().length];
+        for (int i = 0; i < designPointStats.length; i++) {
+            designPointStats[i] = new SimpleStatsTally(getReplicationStats()[i].getName() + ".count");
         }
     }
 
+    // Overridden in ViskitAssembly
     protected void createReplicationStats() {
     }
 
@@ -353,6 +354,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public SampleStatistics[] getDesignPointStats() {
         return designPointStats.clone();
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public SampleStatistics[] getReplicationStats() {
+        return replicationStats.clone();
+    }
 
     // TODO: fix generics: SampleStatistics vs SavedStats
     @SuppressWarnings("unchecked")
@@ -377,8 +386,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getIDforReplicationStateName(String state) {
         int id = -1;
-        for (int i = 0; i < replicationStats.length; ++i) {
-            if (replicationStats[i].getName().equals(state)) {
+        for (int i = 0; i < getReplicationStats().length; i++) {
+            if (getReplicationStats()[i].getName().equals(state)) {
                 id = i;
                 break;
             }
@@ -386,73 +395,67 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-    public Map getReplicationData() {
+    public Map<Integer, ArrayList> getReplicationData() {
         return new LinkedHashMap<Integer, ArrayList>(replicationData);
     }
 
     /**
-     * Save all replicationStats for a given iteration.  This assumes that the
-     * replicationData map has been instantiated and initialized.
-     */
-    // TODO: fix generics: SampleStatistics vs SavedStats
-    @SuppressWarnings("unchecked")
-    protected void saveReplicationStats() {
-        for (int i = 0; i < replicationStats.length; ++i) {
-
-            ArrayList<SavedStats> reps = replicationData.get(new Integer(i));
-            reps.add(new SavedStats(replicationStats[i]));
-        }
-    }
-
-    /**
-     * For each inner stats, print name, count, min, max, mean, standard 
-     * deviation and variance.  This can be done generically.
+     * For each inner stats, print to console name, count, min, max, mean, 
+     * standard deviation and variance.  This can be done generically.
      *
      * @param rep The replication number for this report
-     * @return 
+     * @return a replication report
      */
     protected String getReplicationReport(int rep) {
+        
+        SampleStatistics[] clonedReplicationStats = getReplicationStats();
+        
+        // Outputs raw replication statistics to XML report
+        statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
+
         StringBuffer buf = new StringBuffer("Output Report for Replication #");
         buf.append(rep + 1);
-
-        //TODO MIKE: outputs replication data on the fly not best location but it works
-        if (analystReplicationData) {
-            statsConfig.processReplicationReport(rep + 1, replicationStats);
-        }
-
-        for (int i = 0; i < replicationStats.length; ++i) {
+       
+        for (int i = 0; i < clonedReplicationStats.length; i++) {
             buf.append(System.getProperty("line.separator"));
-            buf.append(replicationStats[i].getName());
-            buf.append('[');
-            buf.append(i);
-            buf.append(']');
+            buf.append(clonedReplicationStats[i].getName());
+//            buf.append('[');
+//            buf.append(i);
+//            buf.append(']');
+            if (!(clonedReplicationStats[i].getName().length() > 20)) {
+                buf.append('\t');
+            }
             buf.append('\t');
-            buf.append(replicationStats[i].getCount());
+            buf.append(clonedReplicationStats[i].getCount());
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getMinObs()));
+            buf.append(form.format(clonedReplicationStats[i].getMinObs()));
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getMaxObs()));
+            buf.append(form.format(clonedReplicationStats[i].getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getMean()));            
+            buf.append(form.format(clonedReplicationStats[i].getMean()));            
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getStandardDeviation()));
+            buf.append(form.format(clonedReplicationStats[i].getStandardDeviation()));
             buf.append('\t');
-            buf.append(form.format(replicationStats[i].getVariance()));
+            buf.append(form.format(clonedReplicationStats[i].getVariance()));
             replicationStats[i].reset();
         }
         return buf.toString();
     }
 
     /**
-     * For each outer stats, print name, count, min, max, mean, variance, and
-     * standard deviation.  This can be done generically.
-     * @return 
+     * For each outer stats, print to console output name, count, min, max, 
+     * mean, standard deviation and fvariance.  This can be done generically.
+     * @return the summary report
      */
     protected String getSummaryReport() {
+        
+        // Outputs raw summary statistics to XML report
+        statsConfig.processSummaryReport(getDesignPointStats());
+        
         StringBuffer buf = new StringBuffer("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());
-        for (SampleStatistics designPointStat : designPointStats) {
+        for (SampleStatistics designPointStat : getDesignPointStats()) {
             buf.append(System.getProperty("line.separator"));
             buf.append(designPointStat);
         }
@@ -512,7 +515,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
         if (isSaveReplicationData()) {
             replicationData.clear();
-            for (int i = 0; i < replicationStats.length; ++i) {
+            for (int i = 0; i < getReplicationStats().length; i++) {
                 replicationData.put(new Integer(i), new ArrayList<SavedStats>());
             }
         }
@@ -581,7 +584,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             }
             if (stopRun) {
-                System.out.println("Stopped in Replication# " + replication + 1);
+                System.out.println("Stopped in Replication # " + replication + 1);
 
                 break;
             } else {
@@ -590,7 +593,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
-                System.out.println("Starting Replication #" + (replication + 1) + " with random seed " + seed);
+                System.out.println("Starting Replication #" + (replication + 1) + " with random seed " + seed + " for:");
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
@@ -620,19 +623,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 Schedule.startSimulation();
 
-                for (int i = 0; i < replicationStats.length; ++i) {
-                    fireIndexedPropertyChange(i, replicationStats[i].getName(), replicationStats[i]);
-                    fireIndexedPropertyChange(i, replicationStats[i].getName() + ".mean", replicationStats[i].getMean());
+                for (int i = 0; i < getReplicationStats().length; i++) {
+                    fireIndexedPropertyChange(i, getReplicationStats()[i].getName(), getReplicationStats()[i].getName());
+                    fireIndexedPropertyChange(i, getReplicationStats()[i].getName() + ".count", getReplicationStats()[i].getCount());
                 }
+                
                 if (isPrintReplicationReports()) {
                     println.println(getReplicationReport(replication));
                     println.flush();
                 }
-                if (isSaveReplicationData()) {
-                    saveReplicationStats();
-                }
-
-                //Schedule.stopSimulation();
+                                
+//                Schedule.stopSimulation();
                 System.runFinalization();
                 System.gc();
             }
@@ -666,7 +667,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Creates the temp file only when user required
             initReportFile();
-            statsConfig.processSummaryReport(designPointStats);
 
             /* Invoke the AnalystReportBuilder via reflection.  Reflection is used 
              * due to the sequential building of Viskit where this class file gets 

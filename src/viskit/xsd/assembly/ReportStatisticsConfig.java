@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -41,6 +42,8 @@ import simkit.stat.SampleStatistics;
  */
 public class ReportStatisticsConfig {
 
+    static Logger log = Logger.getLogger(ReportStatisticsConfig.class);
+
     /**
      * The ordered list of Entities in the simulation that have property change
      * listeners
@@ -67,7 +70,7 @@ public class ReportStatisticsConfig {
      * Assembly name
      */
     private String assemblyName;
-
+    
     /** Creates a new instance of ReportStatisticsConfig
      * @param assemblyName 
      */
@@ -99,7 +102,7 @@ public class ReportStatisticsConfig {
         for (String key : keyValues) {
             seperator = findUnderscore(key);
             
-            // TODO:  verify this logic works with/without underscores present
+            // TODO: verify this logic works with/without underscores present
             entityIndex[idx] = key.substring(0, seperator);
             if (seperator > 0) {
                 propertyIndex[idx] = key.substring(seperator + 1, key.length());
@@ -139,10 +142,8 @@ public class ReportStatisticsConfig {
      * @param rep 
      */
     public void processReplicationReport(int repNumber, SampleStatistics[] rep) {
-        //System.out.println("\n\nProcessRepReports in RepStatsConfig");
-        for (SampleStatistics sampleStat : rep) {
-            System.out.println(sampleStat.getName());
-        }
+        log.debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+
         Element[] replicationUpdate = new Element[rep.length];
 
         for (int i = 0; i < rep.length; i++) {
@@ -157,7 +158,6 @@ public class ReportStatisticsConfig {
             replication.setAttribute("stdDeviation", form.format(rep[i].getStandardDeviation()));
             replication.setAttribute("variance", form.format(rep[i].getVariance()));
 
-            //replication.addContent(statRecord);
             replicationUpdate[i] = replication;
         }
         reportStats.storeReplicationData(replicationUpdate);
@@ -186,7 +186,6 @@ public class ReportStatisticsConfig {
             summary.setAttribute("stdDeviation", form.format(sum[i].getStandardDeviation()));
             summary.setAttribute("variance", form.format(sum[i].getVariance()));
 
-            //replication.addContent(statRecord);
             summaryUpdate[i] = summary;
         }
         reportStats.storeSummaryData(summaryUpdate);
