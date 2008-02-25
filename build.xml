@@ -247,7 +247,7 @@
             </fileset>
             <fileset dir="${basedir}">
                 <include name="log4j.properties"/>
-                <include name="${analyst.reports.dir}/AnalystReportXMLtoHTML.xslt"/>
+                <include name="${analyst.reports.stylesheet}"/>
             </fileset>
         </copy>
     </target>
