@@ -32,7 +32,11 @@
     <!-- (more info: http://www.netbeans.org/kb/41/freeform-config.html#compilesingle) -->
     <target name="update-viskit-jar-with-AnalystReportXMLtoHTML-xslt">
         <echo message="${analyst.reports.stylesheet}"/>
-        <copy file="${analyst.reports.stylesheet}" todir="${dir.build.classes}"/>
+        <copy todir="${dir.build.classes}">
+            <fileset dir="${basedir}">
+                <include name="${analyst.reports.stylesheet}"/>
+            </fileset>
+        </copy>
         <jar basedir="${dir.build.classes}" 
              compress="false"
              destfile="${dist.jar}"
