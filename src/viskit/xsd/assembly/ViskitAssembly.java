@@ -1,12 +1,6 @@
-/*
- * ViskitAssembly.java
- *
- * Created on September 25, 2005, 1:44 PM
- */
 package viskit.xsd.assembly;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -21,11 +15,12 @@ import static edu.nps.util.GenericConversion.toArray;
  * to instances within the design tool. 
  * @version $Id: ViskitAssembly.java 1666 2007-12-17 05:24:41Z tdnorbra $
  * @author Rick Goldberg
+ * @since September 25, 2005, 1:44 PM
  */
 public class ViskitAssembly extends BasicAssembly { 
     
     protected LinkedHashMap<String, SimEntity> entities;
-    protected LinkedHashMap replicationStatistics;
+    protected LinkedHashMap<String, PropertyChangeListener> replicationStatistics;
     protected LinkedHashMap<String, PropertyChangeListener> designPointStatistics;
     protected LinkedHashMap<String, PropertyChangeListener> propertyChangeListeners;
     protected LinkedHashMap<String, LinkedList<PropertyConnector>> propertyChangeListenerConnections;
@@ -43,7 +38,7 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     public void createObjects() {
         entities = new LinkedHashMap<String, SimEntity>();
-        replicationStatistics = new LinkedHashMap();
+        replicationStatistics = new LinkedHashMap<String, PropertyChangeListener>();
         designPointStatistics = new LinkedHashMap<String, PropertyChangeListener>();
         propertyChangeListeners = new LinkedHashMap<String, PropertyChangeListener>();
         propertyChangeListenerConnections = new LinkedHashMap<String, LinkedList<PropertyConnector>>();
@@ -217,12 +212,10 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
     @Override
-    // TODO: fix generics: SampleStatistics vs PropertyChangeListener
-    @SuppressWarnings("unchecked")
     protected void createReplicationStats() {
-        replicationStats = toArray((Collection<SampleStatistics>) replicationStatistics.values(), new SampleStatistics[0]);
-        for (SampleStatistics sampleStats : replicationStats) {
-            log.debug(sampleStats.getName() + " replicationStat created");
+        replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener sampleStats : replicationStats) {
+            log.debug(((SampleStatistics) sampleStats).getName() + " replicationStat created");
         }
     }
     
@@ -244,8 +237,6 @@ public class ViskitAssembly extends BasicAssembly {
         designPointStatistics.put(listenerName,pcl);
     }
    
-    // TODO: fix generics: SampleStatistics vs PropertyChangeListener
-    @SuppressWarnings("unchecked")
     public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
         log.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
         replicationStatistics.put(listenerName, pcl);

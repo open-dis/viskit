@@ -5,6 +5,7 @@
  */
 package viskit.xsd.assembly;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
@@ -139,24 +140,24 @@ public class ReportStatisticsConfig {
      * Creates a replication record for each SampleStatistics object after each
      * run.
      * @param repNumber
-     * @param rep 
+     * @param repStats 
      */
-    public void processReplicationReport(int repNumber, SampleStatistics[] rep) {
+    public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
         log.debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
-        Element[] replicationUpdate = new Element[rep.length];
+        Element[] replicationUpdate = new Element[repStats.length];
 
-        for (int i = 0; i < rep.length; i++) {
+        for (int i = 0; i < repStats.length; i++) {
 
             Element replication = new Element("Replication");
 
             replication.setAttribute("number", Integer.toString(repNumber));
-            replication.setAttribute("count", form.format(rep[i].getCount()));
-            replication.setAttribute("minObs", form.format(rep[i].getMinObs()));
-            replication.setAttribute("maxObs", form.format(rep[i].getMaxObs()));
-            replication.setAttribute("mean", form.format(rep[i].getMean()));
-            replication.setAttribute("stdDeviation", form.format(rep[i].getStandardDeviation()));
-            replication.setAttribute("variance", form.format(rep[i].getVariance()));
+            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) repStats[i]).getCount()));
+            replication.setAttribute("minObs", form.format(((SampleStatistics) repStats[i]).getMinObs()));
+            replication.setAttribute("maxObs", form.format(((SampleStatistics) repStats[i]).getMaxObs()));
+            replication.setAttribute("mean", form.format(((SampleStatistics) repStats[i]).getMean()));
+            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
+            replication.setAttribute("variance", form.format(((SampleStatistics) repStats[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }

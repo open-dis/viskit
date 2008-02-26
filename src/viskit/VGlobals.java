@@ -598,6 +598,7 @@ public class VGlobals {
      * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
      * around to see if we've already got it covered.  If not, we add it to the end of the list.
      * @param ty
+     * @return 
      */
     public String typeChosen(String ty) {
         ty = ty.replaceAll("\\s", "");              // every whitespace removed
@@ -694,6 +695,7 @@ public class VGlobals {
     Vector existingAssemblyNames = new Vector();
     
     /**
+     * @param nm 
      * @return true if the data is valid, eg we have a valid parameter name
      * and a valid type.
      */

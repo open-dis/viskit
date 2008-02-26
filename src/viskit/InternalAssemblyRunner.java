@@ -461,6 +461,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
     }
 
+    /**
+     * 
+     */
     class verboseListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {

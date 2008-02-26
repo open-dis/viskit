@@ -34,7 +34,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     static Logger log = Logger.getLogger(BasicAssembly.class);
     protected LinkedHashMap<Integer, ArrayList> replicationData;
-    protected SampleStatistics[] replicationStats;
+    protected PropertyChangeListener[] replicationStats;
     protected SampleStatistics[] designPointStats;
     protected SimEntity[] simEntity;
     protected PropertyChangeListener[] propertyChangeListener;
@@ -80,7 +80,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         setPrintSummaryReport(true);
         replicationData = new LinkedHashMap<Integer, ArrayList>();
         simEntity = new SimEntity[0];
-        replicationStats = new SampleStatistics[0];
+        replicationStats = new PropertyChangeListener[0];
         designPointStats = new SampleStatistics[0];
         propertyChangeListener = new PropertyChangeListener[0];
         setNumberReplications(1);
@@ -104,8 +104,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @Override
     public void reset() {
         super.reset();
-        for (SampleStatistics sampleStats : replicationStats) {
-            sampleStats.reset();
+        for (PropertyChangeListener sampleStats : replicationStats) {
+            ((SampleStatistics) sampleStats).reset();
         }
         startRepNumber = 0;
     }
@@ -192,7 +192,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected void createDesignPointStats() {
         designPointStats = new SampleStatistics[getReplicationStats().length];
         for (int i = 0; i < designPointStats.length; i++) {
-            designPointStats[i] = new SimpleStatsTally(getReplicationStats()[i].getName() + ".count");
+            designPointStats[i] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[i]).getName() + ".count");
         }
     }
 
@@ -359,7 +359,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * 
      * @return
      */
-    public SampleStatistics[] getReplicationStats() {
+    public PropertyChangeListener[] getReplicationStats() {
         return replicationStats.clone();
     }
 
@@ -387,7 +387,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public int getIDforReplicationStateName(String state) {
         int id = -1;
         for (int i = 0; i < getReplicationStats().length; i++) {
-            if (getReplicationStats()[i].getName().equals(state)) {
+            if (((SampleStatistics) getReplicationStats()[i]).getName().equals(state)) {
                 id = i;
                 break;
             }
@@ -408,7 +408,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     protected String getReplicationReport(int rep) {
         
-        SampleStatistics[] clonedReplicationStats = getReplicationStats();
+        PropertyChangeListener[] clonedReplicationStats = getReplicationStats();
         
         // Outputs raw replication statistics to XML report
         if (isSaveReplicationData()) {
@@ -420,26 +420,26 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
        
         for (int i = 0; i < clonedReplicationStats.length; i++) {
             buf.append(System.getProperty("line.separator"));
-            buf.append(clonedReplicationStats[i].getName());
+            buf.append(((SampleStatistics) clonedReplicationStats[i]).getName());
 //            buf.append('[');
 //            buf.append(i);
 //            buf.append(']');
-            if (!(clonedReplicationStats[i].getName().length() > 20)) {
+            if (!(((SampleStatistics) clonedReplicationStats[i]).getName().length() > 20)) {
                 buf.append('\t');
             }
             buf.append('\t');
-            buf.append(clonedReplicationStats[i].getCount());
+            buf.append(((SampleStatistics) clonedReplicationStats[i]).getCount());
             buf.append('\t');
-            buf.append(form.format(clonedReplicationStats[i].getMinObs()));
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMinObs()));
             buf.append('\t');
-            buf.append(form.format(clonedReplicationStats[i].getMaxObs()));
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(clonedReplicationStats[i].getMean()));            
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMean()));            
             buf.append('\t');
-            buf.append(form.format(clonedReplicationStats[i].getStandardDeviation()));
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getStandardDeviation()));
             buf.append('\t');
-            buf.append(form.format(clonedReplicationStats[i].getVariance()));
-            replicationStats[i].reset();
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getVariance()));
+            ((SampleStatistics) replicationStats[i]).reset();
         }
         return buf.toString();
     }
@@ -628,8 +628,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Schedule.startSimulation();
 
                 for (int i = 0; i < getReplicationStats().length; i++) {
-                    fireIndexedPropertyChange(i, getReplicationStats()[i].getName(), getReplicationStats()[i].getName());
-                    fireIndexedPropertyChange(i, getReplicationStats()[i].getName() + ".count", getReplicationStats()[i].getCount());
+                    fireIndexedPropertyChange(i, ((SampleStatistics) getReplicationStats()[i]).getName(), ((SampleStatistics) getReplicationStats()[i]).getName());
+                    fireIndexedPropertyChange(i, ((SampleStatistics) getReplicationStats()[i]).getName() + ".count", ((SampleStatistics) getReplicationStats()[i]).getCount());
                 }
                 
                 if (isPrintReplicationReports()) {
