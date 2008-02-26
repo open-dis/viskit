@@ -93,6 +93,7 @@ public class RunnerPanel2 extends JPanel {
     public JScrollBar bar;
     private JLabel titl;
     public JTextField verboseRepNumberTF;
+    public JLabel npsLabel;
 
     public RunnerPanel2(boolean verbose, boolean skipCloseButt) {
         this(null, skipCloseButt);
@@ -134,9 +135,16 @@ public class RunnerPanel2 extends JPanel {
         rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, jsp, jspErr);
 
         JComponent vcrPanel = makeVCRPanel(skipCloseButt);
-
-        leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel),
-                new JLabel(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"))));
+        
+        Icon npsIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
+        String npsString = "";
+        
+        npsLabel = new JLabel(npsString, npsIcon, JLabel.CENTER);
+        npsLabel.setVerticalTextPosition(JLabel.TOP);
+        npsLabel.setHorizontalTextPosition(JLabel.CENTER);
+        npsLabel.setIconTextGap(50);
+                
+        leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
 
         leftRightSplit.setLeftComponent(leftSplit);
         leftRightSplit.setRightComponent(rightSplit);
@@ -176,15 +184,15 @@ public class RunnerPanel2 extends JPanel {
 
         numRepsTF = new JTextField(10);
         numRepsTF.addActionListener(
-                new ActionListener() {
+            new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        int numReps = Integer.parseInt(numRepsTF.getText().trim());
-                        if (numReps < 1) {
-                            numRepsTF.setText("1");
-                        }
+                public void actionPerformed(ActionEvent e) {
+                    int numReps = Integer.parseInt(numRepsTF.getText().trim());
+                    if (numReps < 1) {
+                        numRepsTF.setText("1");
                     }
-                });
+                }
+            });
         Vstatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
         JLabel numRepsLab = new JLabel("# replications:");
         labTF = new JPanel();
@@ -213,7 +221,7 @@ public class RunnerPanel2 extends JPanel {
         flowPan.add(saveRepDataCB);
         printRepReportsCB = new JCheckBox("Print replication reports");
         flowPan.add(printRepReportsCB);
-        printSummReportsCB = new JCheckBox("Print summary reports       ");
+        printSummReportsCB = new JCheckBox("Print summary reports");
         flowPan.add(printSummReportsCB);
         analystReportCB = new JCheckBox("Enable Analyst Reports");
         flowPan.add(analystReportCB);
@@ -222,8 +230,7 @@ public class RunnerPanel2 extends JPanel {
         searchB = new JButton("Search...");
         searchKey = new JTextField();
         flowPan.add(searchB);
-        searchB.addActionListener(
-                new Searcher(this));
+        searchB.addActionListener(new Searcher(this));
 
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -481,7 +488,6 @@ public class RunnerPanel2 extends JPanel {
     }
 
     private String getPage(long pageSize) {
-        int mark = -1;
         String page = null;
         byte[] chbuf = new byte[(int) PAGESIZE];
 

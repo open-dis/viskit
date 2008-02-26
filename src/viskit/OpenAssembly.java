@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -42,7 +42,6 @@ import java.util.HashSet;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 
-
 /**
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -53,112 +52,108 @@ import viskit.xsd.bindings.assembly.ObjectFactory;
  *
  * This is a singleton class to coordinate opening of Assembly files
  */
-public class OpenAssembly
-{
-  private static OpenAssembly instance;
-  private static Object syncer = new Object();
-  public static OpenAssembly inst()
-  {
-    if(instance != null)
-      return instance;
+public class OpenAssembly {
 
-    synchronized (syncer) {
-      if(instance == null)
-        instance = new OpenAssembly();
-      return instance;
+    private static OpenAssembly instance;
+    private static Object syncer = new Object();
+
+    public static OpenAssembly inst() {
+        if (instance != null) {
+            return instance;
+        }
+
+        synchronized (syncer) {
+            if (instance == null) {
+                instance = new OpenAssembly();
+            }
+            return instance;
+        }
     }
-  }
+    public File file;
+    public Document jdomDoc;
+    public SimkitAssembly jaxbRoot;
+    public ObjectFactory jaxbFactory;
 
-  public File file;
-  public Document jdomDoc;
-  public SimkitAssembly jaxbRoot;
-  public ObjectFactory jaxbFactory;
-
-  private OpenAssembly() {}
-
-  public void setFile(File f, SimkitAssembly jaxb) throws Exception
-  {
-    if(file != null)
-      doSendCloseAssy();
-
-    file = f;
-    jaxbRoot = jaxb;
-    jaxbFactory = new ObjectFactory();
-
-    SAXBuilder builder;
-    try {
-      builder = new SAXBuilder();
-      jdomDoc = builder.build(f);
-    }
-    catch (Exception e) {
-      jdomDoc = null;
-      throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
+    private OpenAssembly() {
     }
 
-    doSendNewAssy(f);
-  }
+    public void setFile(File f, SimkitAssembly jaxb) throws Exception {
+        if (file != null) {
+            doSendCloseAssy();
+        }
 
-  private HashSet<AssyChangeListener> listeners = new HashSet<AssyChangeListener>();
+        file = f;
+        jaxbRoot = jaxb;
+        jaxbFactory = new ObjectFactory();
 
-  /**
-   * @param lis
-   * @return true if was not already registered
-   */
-  public boolean addListener(AssyChangeListener lis)
-  {
-    return listeners.add(lis);
-  }
+        SAXBuilder builder;
+        try {
+            builder = new SAXBuilder();
+            jdomDoc = builder.build(f);
+        } catch (Exception e) {
+            jdomDoc = null;
+            throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
+        }
 
-  /**
-   * @param lis
-   * @return true if it had been registered
-   */
-  public boolean removeListener(AssyChangeListener lis)
-  {
-    return listeners.remove(lis);
-  }
+        doSendNewAssy(f);
+    }
+    private HashSet<AssyChangeListener> listeners = new HashSet<AssyChangeListener>();
 
-  public void doParamLocallyEditted( AssyChangeListener source )
-  {
-    fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED,source,null);
-  }
-/*
-  public void doSendAssyJdomChanged(AssyChangeListener source)
-  {
+    /**
+     * @param lis
+     * @return true if was not already registered
+     */
+    public boolean addListener(AssyChangeListener lis) {
+        return listeners.add(lis);
+    }
+
+    /**
+     * @param lis
+     * @return true if it had been registered
+     */
+    public boolean removeListener(AssyChangeListener lis) {
+        return listeners.remove(lis);
+    }
+
+    public void doParamLocallyEditted(AssyChangeListener source) {
+        fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
+    }
+    /*
+    public void doSendAssyJdomChanged(AssyChangeListener source)
+    {
     fireAction(AssyChangeListener.JDOM_CHANGED,source);
-  }
-*/
-  public void doSendAssyJaxbChanged(AssyChangeListener source)
-  {
-    fireAction(AssyChangeListener.JAXB_CHANGED,source,null);
-  }
-
-  public void doSendNewAssy(File f)
-  {
-    fireAction(AssyChangeListener.NEW_ASSY,null,f);
-  }
-  public void doSendCloseAssy()
-  {
-    fireAction(AssyChangeListener.CLOSE_ASSY,null,null);
-  }
-  private void fireAction(int action, AssyChangeListener source, Object param)
-  {
-    for(AssyChangeListener lis : listeners) {
-      if(lis != source) {
-            lis.assyChanged(action, source, param);
-      }
     }
-  }
+     */
 
-  static public interface AssyChangeListener
-  {
-   // public final static int JDOM_CHANGED = 0;
-    public final static int JAXB_CHANGED = 1;
-    public final static int NEW_ASSY = 2;
-    public final static int CLOSE_ASSY = 3;
-    public final static int PARAM_LOCALLY_EDITTED = 4;
+    public void doSendAssyJaxbChanged(AssyChangeListener source) {
+        fireAction(AssyChangeListener.JAXB_CHANGED, source, null);
+    }
 
-    public void assyChanged(int action, AssyChangeListener source, Object param);
-    public String getHandle();
-  }
+    public void doSendNewAssy(File f) {
+        fireAction(AssyChangeListener.NEW_ASSY, null, f);
+    }
+
+    public void doSendCloseAssy() {
+        fireAction(AssyChangeListener.CLOSE_ASSY, null, null);
+    }
+
+    private void fireAction(int action, AssyChangeListener source, Object param) {
+        for (AssyChangeListener lis : listeners) {
+            if (lis != source) {
+                lis.assyChanged(action, source, param);
+            }
+        }
+    }
+
+    static public interface AssyChangeListener {
+        // public final static int JDOM_CHANGED = 0;
+        public final static int JAXB_CHANGED = 1;
+        public final static int NEW_ASSY = 2;
+        public final static int CLOSE_ASSY = 3;
+        public final static int PARAM_LOCALLY_EDITTED = 4;
+
+        public void assyChanged(int action, AssyChangeListener source, Object param);
+
+        public String getHandle();
+    }
 }

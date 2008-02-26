@@ -79,16 +79,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     PipedOutputStream pos;
     PipedInputStream pis;
     BasicAssembly assembly;
-    private String analystReportTempFile = null; // external runner saves a file
+    
+    /** external runner saves a file */
+    private String analystReportTempFile = null;
     FileOutputStream fos;
     FileInputStream fis;
     LocalBootLoader loader;
-    Class<?> basicAssembly, targetClass;
+    Class<?> targetClass;
     Object assemblyObj;
     private static int mutex = 0;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
     long seed;
+    private int numReps;
 
 //  private SimulationStateListener simListener;
     private boolean inRegressionMode;
@@ -290,7 +293,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
-
+            
             Method setOutputStream = targetClass.getMethod("setOutputStream", OutputStream.class);
             Method setNumberReplications = targetClass.getMethod("setNumberReplications", int.class);
             Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData", boolean.class);
@@ -300,15 +303,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
             Method setStopTime = targetClass.getMethod("setStopTime", double.class);
             Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);
+            Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
             Class<?> RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
             Class<?> RNClass = loader.loadClass("simkit.random.RandomNumber");
             Method setSeed = RNClass.getMethod("setSeed", long.class);
-
-            setSeed.invoke(rn, seed);
-            basicAssembly = loader.loadClass("viskit.xsd.assembly.BasicAssembly");
-            Method addPropertyChangeListener = basicAssembly.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            
+            setSeed.invoke(rn, seed);            
             setOutputStream.invoke(assemblyObj, fos);
             setNumberReplications.invoke(assemblyObj, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
             setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
@@ -320,8 +322,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
             setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
             addPropertyChangeListener.invoke(assemblyObj, this);
-            assemblyRunnable = (Runnable) assemblyObj;
-
+            assemblyRunnable = (Runnable) assemblyObj;              
+            
             runPanel.wakeUpTextUpdater(fis);
             simRunner = new Thread(assemblyRunnable);
             (new SimThreadMonitor(simRunner)).start();
@@ -355,7 +357,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
             // Grab the temp analyst report and signal the AnalystPeportPanel
             try {
-                Method getAnalystReport = basicAssembly.getMethod("getAnalystReport");
+                Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
             } catch (SecurityException ex) {
                 log.fatal(ex);
@@ -374,6 +376,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         public void end() {
 
             System.out.println("Simulation ended");
+            runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             if (resetSeeds) {
                 try {
                     Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
@@ -712,9 +715,23 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         doTitle(null);
     }
 
+    String text = "<html><body>\n" + "<p><b>Now Running Replication 1 of X</b>\n" + "</p></body></html>\n";
+                
+    StringBuilder npsString = new StringBuilder("<html><body>\n" + "<p><b>Now Running Replication ");
+    
     public void propertyChange(PropertyChangeEvent evt) {
+        log.debug(evt.getPropertyName());
         if (evt.getPropertyName().equals("seed")) {
             seeds.add((Long) evt.getNewValue());
+        }
+        if (evt.getPropertyName().equals("replicationNumber")) {
+            int beginLength = npsString.length();
+            npsString.append(evt.getNewValue() + " of " + Integer.parseInt(runPanel.numRepsTF.getText()) + "</b>\n");
+            npsString.append("</p></body></html>\n");
+            runPanel.npsLabel.setText(npsString.toString());
+            
+            // reset for the next replication output
+            npsString.delete(beginLength, npsString.length());
         }
     }
 }
