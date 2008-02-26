@@ -237,11 +237,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     ClassLoader lastLoader;
     boolean resetSeeds;
 
-//  protected void initRun(SimulationStateListener listener, boolean regression) {
-//    simListener = listener;
-//    setRegressionMode(regression);
-//    initRun();
-//  }
     protected void initRun() {
         mutex++;
         if (mutex > 1) {
@@ -469,7 +464,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     class verboseListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-
+            if (assembly == null) {return;}
             assembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
         }
     }
@@ -477,6 +472,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     class analystReportListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            if (assembly == null) {return;}
             assembly.setEnableAnalystReports(((JCheckBox) e.getSource()).isSelected());
         }
     }
