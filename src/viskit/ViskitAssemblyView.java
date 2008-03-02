@@ -57,10 +57,7 @@ public interface ViskitAssemblyView {
     public File saveFileAsk(String suggName, boolean suggUniqueName);
 
     public void fileName(String s);    // informative, tells view what we're working on
-    //public void    setStopTime(String s);
-    //public void    setVerbose(boolean v);
-    //public String  getStopTime();
-    //public boolean getVerbose();
+    
     public void showAndSaveSource(String className, String s);
 
     public void displayXML(File f);

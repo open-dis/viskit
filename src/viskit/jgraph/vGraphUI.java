@@ -81,6 +81,9 @@ public class vGraphUI extends BasicGraphUI {
      * is messaged with stopEditing, if messageCancel is true the
      * editor is messaged with cancelEditing. If messageGraph is true
      * the graphModel is messaged with valueForCellChanged.
+     * @param messageStop
+     * @param messageCancel
+     * @param messageGraph 
      */
     @Override
     protected void completeEditing(boolean messageStop,

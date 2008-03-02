@@ -78,7 +78,7 @@
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="${dir.lib}/ext" id="runtime.lib.ext" >        
+    <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >        
         <include name="**/*.jar"/>
     </fileset>
     
@@ -133,10 +133,17 @@
         <path refid="jaxb.classes.path"/>
         <path refid="runtime.extension.classes.path"/>
     </path>
+   
+    <!-- TaskDefs -->    
+    <taskdef classname="com.sun.tools.xjc.XJCTask" 
+             name="xjc"
+             classpathref="jaxb.classes.path"/>
     
-    <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
-        <echo message="warning:  JAVA_HOME not set!"/>
-    </target>
+    <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
+        <classpath>
+            <fileset dir="${dir.lib}" includes="trang*.jar"/>
+        </classpath>
+    </taskdef>
     
     <!--  === TARGET: help === -->
     <target name="help">
@@ -175,26 +182,160 @@
         <mkdir dir="${charts}"/>
     </target>
     
-    <target depends="init" 
-            description="build the help search database" 
-            name="javahelp">
-        <java classname="com.sun.java.help.search.Indexer"
-              fork="true">            
-            
-            <!-- turn this on to make sure it's working -->
-            <!--arg value="-verbose"/-->
-            <arg value="-db"/>
-            <arg value="${build.javahelp}/JavaHelpSearch"/>
-            <arg value="${javahelp}/Pages"/>
-            <classpath>
-                <pathelement location="${dir.lib}/jhall.jar"/>
-            </classpath>
-        </java>
-        <copy todir="${build.javahelp}">
-            <fileset dir="${javahelp}"/>
-        </copy>
-        
+    <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
+        <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <!-- useful for autogenerating stats schema and adding type validator
+        <trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd" /> 
+        -->
+        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
+    
+    <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
+        
+        <xjc extension="true" 
+             package="viskit.xsd.bindings.eventgraph" 
+             schema="${dir.src.simevg.util}/simkit.xsd" 
+             destdir="${dir.src}">
+            <produces dir="${dir.src.simevg}"/>
+        </xjc>
+        <xjc extension="true" 
+             package="viskit.xsd.bindings.assembly" 
+             schema="${dir.src.simasm.util}/assembly.xsd" 
+             destdir="${dir.src}">
+            <produces dir="${dir.src.simasm}"/>
+        </xjc>
+        <xjc extension="true" 
+             package="viskit.xsd.bindings.assembly.stats" 
+             schema="${dir.src.simasm.util}/statistics.xsd" 
+             destdir="${dir.src}">
+            <produces dir="${dir.src.simasm}/stats"/>
+        </xjc>       
+        <xjc extension="true" 
+             package="viskit.xsd.bindings.cli" 
+             schema="${dir.src.cli.util}/cli.xsd" 
+             destdir="${dir.src}">
+            <produces dir="${dir.src.cli}"/>
+        </xjc>
+        <!--
+        <xjc extension="true" package="viskit.xsd.bindings.sge.qstat" schema="${dir.src.sge.util}/qstat/qstat.xsd" destdir="${dir.src}">
+        <produces dir="${dir.src.sge.qstat}" includes="* impl/* impl/runtime/*" />
+        </xjc>
+        -->
+    </target>    
+    
+    <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
+        <javac destdir="${dir.build.classes}"
+               debug="off"
+               source="1.5"
+               target="1.5">
+            
+            <!-- Reveals generics and deprecation warings -->
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <classpath id="jaxb.classapth">
+                <fileset refid="jaxb.classes"/>
+            </classpath>
+            <src path="${dir.src.simevg}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/eventgraph">
+            <fileset dir="${dir.bindings}/eventgraph" includes="jaxb.properties"/>
+            <fileset dir="${dir.bindings}/eventgraph" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}"
+               debug="on"
+               source="1.5"
+               target="1.5">
+            
+            <!-- Reveals generics and deprecation warins -->
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <classpath refid="jaxb.classapth"/>
+            <src path="${dir.src.simasm}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
+            <fileset dir="${dir.bindings}/assembly" includes="jaxb.properties"/>
+            <fileset dir="${dir.bindings}/assembly" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}"
+               debug="on"
+               source="1.5"
+               target="1.5">
+            
+            <!-- Reveals generics and deprecation warings -->
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <classpath refid="jaxb.classapth"/>
+            <src path="${dir.src.simasm}/stats"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly/stats">
+            <fileset dir="${dir.bindings}/assembly/stats" includes="jaxb.properties"/>
+            <fileset dir="${dir.bindings}/assembly/stats" includes="bgm.ser"/>
+        </copy>
+        <javac destdir="${dir.build.classes}"
+               debug="on"
+               source="1.5"
+               target="1.5">
+            
+            <!-- Reveals generics and deprecation warings -->
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <classpath refid="jaxb.classapth"/>
+            <src path="${dir.src.cli}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/cli">
+            <fileset dir="${dir.bindings}/cli" includes="jaxb.properties"/>
+            <fileset dir="${dir.bindings}/cli" includes="bgm.ser"/>
+        </copy>
+        <!--javac destdir="${dir.build.classes}"
+            debug="on"
+            source="1.5"
+            target="1.5">
+
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <src path="${dir.src.sge.qstat}"/>
+        </javac>
+        <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
+            <fileset dir="${dir.bindings}/sge/qstat" includes="jaxb.properties"/>
+            <fileset dir="${dir.bindings}/sge/qstat" includes="bgm.ser"/>
+        </copy-->
+    </target>
+    
+    <target depends="compile.bindings" name="jar-stage1">
+         <jar basedir="${dir.build.classes}" 
+              compress="false" 
+              excludes="*/test/*" 
+              jarfile="${dir.build.lib}/visxml.jar"/>        
+    </target>
+    
+    <!-- depends on create stage 1 visxml.jar which later includes stuff from this compile to make ${dist.jar} -->
+    <target name="compile.simxml.util"
+            depends="jar-stage1" 
+            description="Build xml2java utils">
+
+        <javac destdir="${dir.build.classes}"
+               debug="off"
+               source="1.5"
+               target="1.5">
+            
+            <!-- Reveals generics and deprecation warings -->
+            <compilerarg value="${javac.unchecked}"/>
+            <compilerarg value="${javac.deprecation}"/>
+            <classpath>
+                <pathelement location="${log4j.jar}"/>
+                <pathelement location="${dir.lib}/visxml.jar"/>
+            </classpath>            
+            <src path="${dir.src}/edu/"/>
+            <src path="${dir.src.simevg.util}"/>
+        </javac>        
+        
+        <jar update="yes" 
+             jarfile="${dir.build.lib}/visxml.jar" 
+             basedir="${dir.build.classes}" 
+             compress="false" />
+    </target>    
     
     <!--  === TARGET: compile === -->
     <target name="compile" depends="build.init,compile.simxml.util">
@@ -215,26 +356,18 @@
                 <pathelement location="${dir.lib}/jgraph.jar"/>
                 <pathelement location="${dir.lib}/actions.jar"/>
                 <pathelement location="${dir.lib}/simkit.jar"/>
-                <pathelement location="${dir.lib}/trang.jar"/>
-                <pathelement location="${dir.lib}/trangtask.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
                 <pathelement location="${jfreechart.jar}"/>
-                <pathelement location="${jcommon.jar}"/>
                 <pathelement location="${dir.lib}/jedit.jar"/>
-                <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
-                <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
                 <pathelement location="${dir.lib}/commons-configuration-1.2.jar"/>
-                <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
                 <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
-                <pathelement location="${dir.lib}/commons-logging-1.1.jar"/>
-                <pathelement location="${dir.lib}/cli.jar"/>
                 <pathelement location="${log4j.jar}"/>
                 <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
-                <pathelement location="${dir.lib}/xercesImpl.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
                 <pathelement location="${dir.build.classes}"/>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
             </classpath>
+            <src path="${dir.src.simasm.util}"/>            
+            <src path="${dir.src.cli.util}"/>
             <src path="${dir.src}/viskit"/>
         </javac>
         <copy todir="${dir.build.classes}">
@@ -250,6 +383,26 @@
                 <include name="${analyst.reports.stylesheet}"/>
             </fileset>
         </copy>
+    </target>
+    
+    <target depends="init" 
+            description="build the help search database" 
+            name="javahelp">
+        <java classname="com.sun.java.help.search.Indexer"
+              fork="true">            
+            
+            <!-- turn this on to make sure it's working -->
+            <!--arg value="-verbose"/-->
+            <arg value="-db"/>
+            <arg value="${build.javahelp}/JavaHelpSearch"/>
+            <arg value="${javahelp}/Pages"/>
+            <classpath>
+                <pathelement location="${dir.lib}/jhall.jar"/>
+            </classpath>
+        </java>
+        <copy todir="${build.javahelp}">
+            <fileset dir="${javahelp}"/>
+        </copy>        
     </target>
     
     <!--  === TARGET: jar === -->
@@ -293,6 +446,20 @@
         </jar>
     </target>
     
+    <target name="fresh-diskit" description="diskit module">
+        <echo message="Building Diskit:"/>
+        <ant dir="${dir.diskit}" target="jar" inheritAll="false"/>
+        <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
+        <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
+    </target>
+    
+    <!-- just add new modules to the depends variable here -->
+    <target name="examples"
+            depends="fresh-diskit" 
+            description="compile application specific modules, like diskit"/>    
+    
+    <target depends="jar,examples" description="Build viskit and diskit jars" name="build.examples"/>
+    
     <target depends="compile" name="jar-executable">
         <pathconvert targetos="windows" pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
             <map from="${dir.lib}" to=".\lib" />
@@ -304,20 +471,8 @@
                 <attribute name="Main-Class" value="viskit.Splash2$DefaultEntry" />
                 <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
             </manifest>
-        </jar>
-        
-    </target>
-    
-    <target depends="compile.bindings" name="jar-stage1">
-         <jar basedir="${dir.build.classes}" 
-              compress="false" 
-              excludes="*/test/*" 
-              jarfile="${dir.build.lib}/visxml.jar"/>        
-    </target>
-    
-    <target name="splashy" description="@deprecated">
-        <splash imageurl="file:///${basedir}/${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
-    </target>
+        </jar>        
+    </target>   
     
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
@@ -333,7 +488,7 @@
             <!-- Include all the jar files in the lib directory; this prevents some
             javadoc warnings about classes not being found. -->
             <classpath>
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
+                <fileset refid="jaxb.classes"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
             </classpath>
             <package name="viskit"/>
@@ -403,11 +558,7 @@
                 <include name="diskit.jar"/>
                 <include name="dis.jar"/>
             </fileset>
-            <!--  <fileset dir="${dir.lib.xml}">
-                <include name="jaxb-api.jar"/>
-                <include name="jaxb-impl.jar"/>
-                <include name="jaxb-libs.jar"/> 
-            </fileset>-->
+            <!--fileset refid="jaxb.classes"/-->
             <fileset dir="${env.JAVA_HOME}/lib">
                 <include name="tools.jar"/>
             </fileset>
@@ -433,242 +584,10 @@
              manifest="${dir.src.cli.util}/manif.txt" />
         
     </target>
-    
-    <taskdef classname="com.sun.tools.xjc.XJCTask" 
-             name="xjc"
-             classpathref="jaxb.classes.path"/>
-    
-    <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
-        <classpath>
-            <fileset dir="${dir.lib}" includes="trang*.jar"/>
-        </classpath>
-    </taskdef>   
-    
-    <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
-        
-        <xjc extension="true" 
-             package="viskit.xsd.bindings.eventgraph" 
-             schema="${dir.src.simevg.util}/simkit.xsd" 
-             destdir="${dir.src}">
-            <produces dir="${dir.src.simevg}"/>
-        </xjc>
-        <xjc extension="true" 
-             package="viskit.xsd.bindings.assembly" 
-             schema="${dir.src.simasm.util}/assembly.xsd" 
-             destdir="${dir.src}">
-            <produces dir="${dir.src.simasm}"/>
-        </xjc>
-        <xjc extension="true" 
-             package="viskit.xsd.bindings.assembly.stats" 
-             schema="${dir.src.simasm.util}/statistics.xsd" 
-             destdir="${dir.src}">
-            <produces dir="${dir.src.simasm}/stats"/>
-        </xjc>       
-        <xjc extension="true" 
-             package="viskit.xsd.bindings.cli" 
-             schema="${dir.src.cli.util}/cli.xsd" 
-             destdir="${dir.src}">
-            <produces dir="${dir.src.cli}"/>
-        </xjc>
-        <!--
-        <xjc extension="true" package="viskit.xsd.bindings.sge.qstat" schema="${dir.src.sge.util}/qstat/qstat.xsd" destdir="${dir.src}">
-        <produces dir="${dir.src.sge.qstat}" includes="* impl/* impl/runtime/*" />
-        </xjc>
-        -->
+     
+    <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
+        <echo message="warning:  JAVA_HOME not set!"/>
     </target>
-    
-    <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
-        <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <!-- useful for autogenerating stats schema and adding type validator
-        <trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd" /> 
-        -->
-        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
-    </target>
-    
-    <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
-        <javac destdir="${dir.build.classes}"
-               debug="off"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <!--compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/-->
-            <classpath id="jaxb.classapth">
-                <fileset dir="${dir.lib.xml}" includes="*.jar"/>
-            </classpath>
-            <src path="${dir.src.simevg}"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/eventgraph">
-            <fileset dir="${dir.bindings}/eventgraph" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/eventgraph" includes="bgm.ser"/>
-        </copy>
-        <javac destdir="${dir.build.classes}"
-               debug="on"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warins -->
-            <!--compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/-->
-            <classpath refid="jaxb.classapth"/>
-            <src path="${dir.src.simasm}"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
-            <fileset dir="${dir.bindings}/assembly" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/assembly" includes="bgm.ser"/>
-        </copy>
-        <javac destdir="${dir.build.classes}"
-               debug="on"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <!--compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/-->
-            <classpath refid="jaxb.classapth"/>
-            <src path="${dir.src.simasm}/stats"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly/stats">
-            <fileset dir="${dir.bindings}/assembly/stats" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/assembly/stats" includes="bgm.ser"/>
-        </copy>
-        <javac destdir="${dir.build.classes}"
-               debug="on"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <!--compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/-->
-            <classpath refid="jaxb.classapth"/>
-            <src path="${dir.src.cli}"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/cli">
-            <fileset dir="${dir.bindings}/cli" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/cli" includes="bgm.ser"/>
-        </copy>
-        <!--
-        <javac destdir="${dir.build.classes}"
-            debug="on"
-            source="1.5"
-            target="1.5">
-
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-            <src path="${dir.src.sge.qstat}"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
-            <fileset dir="${dir.bindings}/sge/qstat" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/sge/qstat" includes="bgm.ser"/>
-        </copy>
-        -->
-    </target>
-    
-    <!-- depend create stage 1 visxml.jar which later includes stuff from this compile to make ${dist.jar} -->
-    <target name="compile.simxml.util"
-            depends="jar-stage1" 
-            description="Build xml2java utils">
-
-        <javac destdir="${dir.build.classes}"
-               debug="off"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-            <classpath>
-                <pathelement location="${log4j.jar}"/>
-                <pathelement location="${dir.lib}/visxml.jar"/>
-            </classpath>            
-            <src path="${dir.src}/edu/"/>
-            <src path="${dir.src.simevg.util}"/>
-        </javac>
-        
-        <javac destdir="${dir.build.classes}"
-               debug="on"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-            <classpath>
-                <pathelement location="${log4j.jar}"/>
-                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
-            </classpath>
-            <src path="${dir.src.cli.util}"/>
-            <include name="Launcher.java"/>
-            <include name="Boot.java"/>
-        </javac>        
-        
-        <javac destdir="${dir.build.classes}"
-               debug="on"
-               source="1.5"
-               target="1.5">
-            
-            <!-- Reveals generics and deprecation warings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-            <classpath>
-                <pathelement location="${dir.lib}/visxml.jar"/>
-                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
-                <pathelement location="${dir.lib}/simkit.jar"/>
-                <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
-                <pathelement location="${dir.lib}/jdom.jar"/>
-                <pathelement location="${dir.lib}/xercesImpl.jar"/>
-                <pathelement location="${jfreechart.jar}"/>
-                <pathelement location="${jcommon.jar}"/>
-                <pathelement location="${log4j.jar}"/>
-            </classpath>
-            <src path="${dir.src}/viskit/doe"/>
-            <src path="${dir.src.simasm.util}"/>
-            <include name="LocalBootLoader.java"/>
-            <include name="LocalTaskQueue.java"/>
-            <include name="DoeException.java"/>
-            <include name="GenericConversion.java"/>
-            <include name="SimkitAssemblyXML2Java.java"/>
-            <include name="ViskitAssembly.java"/>
-            <include name="BasicAssembly.java"/>
-            <include name="LatinPermutator.java"/>
-            <include name="SessionManager.java"/>
-            <include name="AssemblyServer.java"/>
-            <include name="SecureAssemblyServer.java"/>
-            <include name="AssemblyHandler.java"/>
-            <include name="GridRunner.java"/>
-            <include name="Gridlet.java"/>
-            <include name="GridletEventList.java"/>
-            <include name="ReportStatisticsConfig.java"/>
-            <include name="ReportStatisticsDOM.java"/>
-            <include name="XsltUtility.java"/>
-            <include name="TempDir.java"/>
-            <include name="DirDeleter.java"/>
-            <include name="BshGridlet.java"/>
-            <include name="ChartDrawer.java"/>
-        </javac>        
-        
-        <jar update="yes" 
-             jarfile="${dir.build.lib}/visxml.jar" 
-             basedir="${dir.build.classes}" 
-             compress="false" />
-    </target>   
-    
-    <!-- just add new modules to the depends variable here -->
-    <target name="examples"
-            depends="fresh-diskit" 
-            description="compile application specific modules, like diskit"/>
-    
-    <target name="fresh-diskit" description="diskit module">
-        <echo message="Building Diskit:"/>
-        <ant dir="${dir.diskit}" target="jar" inheritAll="false"/>
-        <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
-        <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/> 
-    </target>
-    
-    <target depends="jar,examples" description="Build viskit and diskit jars" name="build.examples"/>
     
     <!-- TARGET: Run w/Viskit custom splash -->
     <target depends="build.examples,checkJAVA_HOME" description="Build and Run Viskit extended, include example modules, Viskit custom Splash" name="build-run-default-extended">
@@ -702,6 +621,10 @@
         </java>
     </target>
     
+     <target name="splashy" description="@deprecated">
+        <splash imageurl="file:///${basedir}/${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
+    </target>
+       
     <!-- TARGET: Run w/Ant Splash @deprecated-->
     <target depends="splashy,build.examples,checkJAVA_HOME" description="Build and Run Viskit, include example modules if any, display Ant Splash @deprecated" name="build-run">
         <java classname="viskit.EventGraphAssemblyComboMain" 

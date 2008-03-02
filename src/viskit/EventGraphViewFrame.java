@@ -83,6 +83,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Constructor; lays out initial GUI objects
+     * @param contentOnly
+     * @param ctrl 
      */
     public EventGraphViewFrame(boolean contentOnly, EventGraphController ctrl) //====================================================
     {
@@ -129,6 +131,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Returns the current mode--select, add, arc, cancelArc
+     * @return 
      */
     public int getCurrentMode() {
         // Use the button's selected status to figure out what mode
@@ -153,6 +156,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Initialize the MCV connections
+     * @param ctrl 
      */
     private void initMVC(EventGraphController ctrl) {
         //setModel(mod);
@@ -161,6 +165,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Initialize the user interface
+     * @param contentOnly 
      */
     private void initUI(boolean contentOnly) {
         // Layout menus
@@ -464,6 +469,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * run the add parameter dialog
+     * @return 
      */
     public String addParameterDialog() {
 
@@ -489,8 +495,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * Do menu layout work here.  These menus, and the toggle buttons which follow, make use of the "actions"
-     * package, which
+     * Do menu layout work here.  These menus, and the toggle buttons which 
+     * follow, make use of the "actions" package, which
+     * @param mod 
      */
     private void adjustMenus(ViskitModel mod) {
     //todo
@@ -1096,9 +1103,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * Called by the controller after source has been generated.  Show to the user and provide him with the option
-     * to save.
+     * Called by the controller after source has been generated.  
+     * Show to the user and provide him with the option to save.
+     * @param className 
      * @param s Java source
+     * @param filename 
      */
     public void showAndSaveSource(String className, String s, String filename) {
         JFrame f = new SourceWindow(this, className, s);

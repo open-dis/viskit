@@ -35,16 +35,6 @@ public class EvGraphNode extends AssemblyNode {
         super(name, type);
     }
 
-    /*
-    public EvGraphNode shallowCopy()
-    {
-    EvGraphNode en   = (EvGraphNode)super.shallowCopy(new EvGraphNode(name+"-copy",type));
-    en.connections = connections;
-    en.comments    = comments;
-    en.connections = connections;
-    return en;
-    }
-     */
     public boolean isOutputMarked() {
         return outputMarked;
     }
@@ -55,12 +45,7 @@ public class EvGraphNode extends AssemblyNode {
 
     @Override
     public String getName() {
-        /*
-        if(this.opaqueModelObject != null)
-        return ((Event)opaqueModelObject).getName();
-        else
-         */
-        return super.getName();
+       return super.getName();
     }
 
     @Override

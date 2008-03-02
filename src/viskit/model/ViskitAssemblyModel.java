@@ -7,7 +7,6 @@ import java.util.Vector;
 import viskit.FileBasedAssyNode;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -24,14 +23,17 @@ public interface ViskitAssemblyModel {
 
   public void newPropChangeListener(String widgetName, String className, Point p);
   public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
+  
   /**
-    *  Reports saved state of model.  Becomes "clean" after a save.
-    */
+   *  Reports saved state of model.  Becomes "clean" after a save.
+   * @return 
+   */
   public boolean isDirty       ();
   public void    setDirty      (boolean tf);  // to force save
   /**
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
+   * @return 
    */
   public boolean newModel      (File f);
   public void    saveModel     (File f);
@@ -56,9 +58,6 @@ public interface ViskitAssemblyModel {
   public void deleteAdapterEdge   (AdapterEdge ae);
   public void deletePropChangeEdge(PropChangeEdge pce);
   public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
-
-  //public String buildJavaAssemblySource();
-  //public File   compileJavaClass(String src);
 
   public Vector<String> getVerboseEntityNames();
   public void externalClassesChanged(Vector<String> v);

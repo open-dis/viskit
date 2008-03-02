@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerWithRenegesAssembly" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <TerminalParameter link="arrivalProcess_1_1_1" name="arrivalProcess_1_1_1" type="java.lang.String" value="Exponential">
+<SimkitAssembly package="examples" version="1.0" name="ServerWithRenegesAssembly" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <TerminalParameter type="java.lang.String" value="Exponential" link="arrivalProcess_1_1_1" name="arrivalProcess_1_1_1">
         <DoubleRange highValue="Exponential" lowValue="Exponential"/>
     </TerminalParameter>
-    <TerminalParameter link="arrivalProcess_1_2_1_1_1" name="arrivalProcess_1_2_1_1_1" type="double" value="1.5">
+    <TerminalParameter type="double" value="1.5" link="arrivalProcess_1_2_1_1_1" name="arrivalProcess_1_2_1_1_1">
         <DoubleRange highValue="1.5" lowValue="1.5"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_1_1" name="serverWithReneges_1_1" type="int" value="2">
+    <TerminalParameter type="int" value="2" link="serverWithReneges_1_1" name="serverWithReneges_1_1">
         <DoubleRange highValue="2" lowValue="2"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_2_1_1" name="serverWithReneges_2_1_1" type="java.lang.String" value="Gamma">
+    <TerminalParameter type="java.lang.String" value="Gamma" link="serverWithReneges_2_1_1" name="serverWithReneges_2_1_1">
         <DoubleRange highValue="Gamma" lowValue="Gamma"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_2_2_1_1" name="serverWithReneges_2_2_1_1" type="java.lang.Object" value="new Double(2.5)">
+    <TerminalParameter type="java.lang.Object" value="new Double(2.5)" link="serverWithReneges_2_2_1_1" name="serverWithReneges_2_2_1_1">
         <DoubleRange highValue="new Double(2.5)" lowValue="new Double(2.5)"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_2_2_2_1_1" name="serverWithReneges_2_2_2_1_1" type="double" value="1.2">
+    <TerminalParameter type="double" value="1.2" link="serverWithReneges_2_2_2_1_1" name="serverWithReneges_2_2_2_1_1">
         <DoubleRange highValue="1.2" lowValue="1.2"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_3_1_1" name="serverWithReneges_3_1_1" type="java.lang.String" value="Uniform">
+    <TerminalParameter type="java.lang.String" value="Uniform" link="serverWithReneges_3_1_1" name="serverWithReneges_3_1_1">
         <DoubleRange highValue="Uniform" lowValue="Uniform"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_3_2_1_1" name="serverWithReneges_3_2_1_1" type="java.lang.Object" value="new Integer(4)">
+    <TerminalParameter type="java.lang.Object" value="new Integer(4)" link="serverWithReneges_3_2_1_1" name="serverWithReneges_3_2_1_1">
         <DoubleRange highValue="new Integer(4)" lowValue="new Integer(4)"/>
     </TerminalParameter>
-    <TerminalParameter link="serverWithReneges_3_2_2_1" name="serverWithReneges_3_2_2_1" type="java.lang.Object" value="new Integer(6)">
+    <TerminalParameter type="java.lang.Object" value="new Integer(6)" link="serverWithReneges_3_2_2_1" name="serverWithReneges_3_2_2_1">
         <DoubleRange highValue="new Integer(6)" lowValue="new Integer(6)"/>
     </TerminalParameter>
     <SimEntity name="arrivalProcess" type="examples.ArrivalProcess">
-        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter linkRef="arrivalProcess_1_1_1" name="arrivalProcess_1_1_1" type="java.lang.String" value="Exponential"/>
+        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
+            <TerminalParameter type="java.lang.String" value="Exponential" linkRef="arrivalProcess_1_1_1" name="arrivalProcess_1_1_1"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter linkRef="arrivalProcess_1_2_1_1_1" name="arrivalProcess_1_2_1_1_1" type="double" value="1.5"/>
+                    <TerminalParameter type="double" value="1.5" linkRef="arrivalProcess_1_2_1_1_1" name="arrivalProcess_1_2_1_1_1"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="40" y="140"/>
+        <Coordinate y="140" x="40"/>
     </SimEntity>
     <SimEntity name="creator" type="examples.Creator">
-        <Coordinate x="190" y="140"/>
+        <Coordinate y="140" x="190"/>
     </SimEntity>
     <SimEntity name="serverWithReneges" type="examples.ServerWithReneges">
-        <TerminalParameter linkRef="serverWithReneges_1_1" name="serverWithReneges_1_1" type="int" value="2"/>
-        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter linkRef="serverWithReneges_2_1_1" name="serverWithReneges_2_1_1" type="java.lang.String" value="Gamma"/>
+        <TerminalParameter type="int" value="2" linkRef="serverWithReneges_1_1" name="serverWithReneges_1_1"/>
+        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
+            <TerminalParameter type="java.lang.String" value="Gamma" linkRef="serverWithReneges_2_1_1" name="serverWithReneges_2_1_1"/>
             <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter linkRef="serverWithReneges_2_2_1_1" name="serverWithReneges_2_2_1_1" type="java.lang.Object" value="new Double(2.5)"/>
+                <TerminalParameter type="java.lang.Object" value="new Double(2.5)" linkRef="serverWithReneges_2_2_1_1" name="serverWithReneges_2_2_1_1"/>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter linkRef="serverWithReneges_2_2_2_1_1" name="serverWithReneges_2_2_2_1_1" type="double" value="1.2"/>
+                    <TerminalParameter type="double" value="1.2" linkRef="serverWithReneges_2_2_2_1_1" name="serverWithReneges_2_2_2_1_1"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter linkRef="serverWithReneges_3_1_1" name="serverWithReneges_3_1_1" type="java.lang.String" value="Uniform"/>
+        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
+            <TerminalParameter type="java.lang.String" value="Uniform" linkRef="serverWithReneges_3_1_1" name="serverWithReneges_3_1_1"/>
             <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter linkRef="serverWithReneges_3_2_1_1" name="serverWithReneges_3_2_1_1" type="java.lang.Object" value="new Integer(4)"/>
-                <TerminalParameter linkRef="serverWithReneges_3_2_2_1" name="serverWithReneges_3_2_2_1" type="java.lang.Object" value="new Integer(6)"/>
+                <TerminalParameter type="java.lang.Object" value="new Integer(4)" linkRef="serverWithReneges_3_2_1_1" name="serverWithReneges_3_2_1_1"/>
+                <TerminalParameter type="java.lang.Object" value="new Integer(6)" linkRef="serverWithReneges_3_2_2_1" name="serverWithReneges_3_2_2_1"/>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="350" y="140"/>
+        <Coordinate y="140" x="350"/>
     </SimEntity>
     <PropertyChangeListener mode="replicationStats" name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats">
         <TerminalParameter type="java.lang.String" value="queue"/>
-        <Coordinate x="230" y="260"/>
+        <Coordinate y="260" x="230"/>
     </PropertyChangeListener>
     <PropertyChangeListener mode="replicationStats" name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally">
         <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
-        <Coordinate x="320" y="260"/>
+        <Coordinate y="260" x="320"/>
     </PropertyChangeListener>
     <PropertyChangeListener mode="replicationStats" name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberServed"/>
-        <Coordinate x="410" y="260"/>
+        <Coordinate y="260" x="410"/>
     </PropertyChangeListener>
     <PropertyChangeListener mode="replicationStats" name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberReneges"/>
-        <Coordinate x="510" y="260"/>
+        <Coordinate y="260" x="510"/>
     </PropertyChangeListener>
     <PropertyChangeListener mode="replicationStats" name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying">
         <TerminalParameter type="java.lang.String" value="numberArrivals"/>
-        <Coordinate x="40" y="260"/>
+        <Coordinate y="260" x="40"/>
     </PropertyChangeListener>
-    <SimEventListenerConnection listener="creator" source="arrivalProcess"/>
-    <PropertyChangeListenerConnection listener="numberInQueueStat" property="queue" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection listener="numberAvailableServersStat" property="numberAvailableServers" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection listener="numberServedStat" property="numberServed" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection listener="numberRenegesStat" property="numberReneges" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection listener="numberArrivalsStat" property="numberArrivals" source="arrivalProcess"/>
-    <Adapter eventHeard="CustomerArrival" eventSent="Arrival" from="creator" name="adptr_3" to="serverWithReneges"/>
+    <SimEventListenerConnection source="arrivalProcess" listener="creator"/>
+    <PropertyChangeListenerConnection source="serverWithReneges" listener="numberInQueueStat" property="queue"/>
+    <PropertyChangeListenerConnection source="serverWithReneges" listener="numberAvailableServersStat" property="numberAvailableServers"/>
+    <PropertyChangeListenerConnection source="serverWithReneges" listener="numberServedStat" property="numberServed"/>
+    <PropertyChangeListenerConnection source="serverWithReneges" listener="numberRenegesStat" property="numberReneges"/>
+    <PropertyChangeListenerConnection source="arrivalProcess" listener="numberArrivalsStat" property="numberArrivals"/>
+    <Adapter to="serverWithReneges" from="creator" eventSent="Arrival" eventHeard="CustomerArrival" name="adptr_3"/>
     <Output entity="creator"/>
     <Output entity="arrivalProcess"/>
     <Output entity="serverWithReneges"/>
-    <Schedule stopTime="10000.0" verbose="true"/>
-    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+    <Schedule verbose="true" stopTime="10000.0"/>
+    <Experiment timeout="5000" totalSamples="1" replicationsPerDesignPoint="1"/>
 </SimkitAssembly>

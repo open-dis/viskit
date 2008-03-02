@@ -185,9 +185,9 @@ public class LocalBootLoader extends URLClassLoader {
     // create a context with viskit's libs along with
     // the generated eventgraphs, takes two stages
     // the returned LocalBootLoader can be used
-    // as an isolated context, ie, where static methods
+    // as an isolated context, i.e., where static methods
     // and variables from one class don't interfere with
-    // one another or between LocalBootLoader's, here
+    // one another or between LocalBootLoaders, here
     // done by setting threads' contextClassLoaders to
     // their own LocalBootLoaders
     public LocalBootLoader init(boolean allowAssembly) {

@@ -86,7 +86,8 @@ public class SimkitAssemblyXML2Java {
      * Creates a new instance of SimkitAssemblyXML2Java
      * when used from another class, instance this
      * with a String for the name of the xmlFile.
-     */    
+     * @param xmlFile 
+     */
     public SimkitAssemblyXML2Java(String xmlFile) {
         this.fileBaseName = baseNameOf(xmlFile);
         try {
@@ -97,7 +98,10 @@ public class SimkitAssemblyXML2Java {
         }   
     }
 
-    /** Used by Viskit */
+    /** Used by Viskit
+     * @param f
+     * @throws java.lang.Exception 
+     */
     public SimkitAssemblyXML2Java(File f) throws Exception {
         this.fileBaseName = baseNameOf(f.getName());
         this.inputFile = f;
@@ -342,10 +346,12 @@ public class SimkitAssemblyXML2Java {
     
     String stripBrackets(String type) {
         int brindex = type.indexOf('[');
-        if (brindex > 0)
+        if (brindex > 0) {
             return new String(type.substring(0, brindex));
-        else 
+        }
+        else {
             return type;
+        }
     }
     
     void traverseForImports(Object branch, TreeSet<String> tlist) {
@@ -421,14 +427,11 @@ public class SimkitAssemblyXML2Java {
     
     void buildEntities(StringWriter entities) {
         PrintWriter pw = new PrintWriter(entities);
-        ListIterator li = this.root.getSimEntity().listIterator();
         
         pw.println(sp4+"protected void createSimEntities"+ lp + rp + sp + ob);
         
-        while ( li.hasNext() ) {
-            
-            SimEntity se = (SimEntity) li.next();
-            List pl = se.getParameters();
+        for (SimEntity se : this.root.getSimEntity()) {
+            List<Object> pl = se.getParameters();
             ListIterator pli = pl.listIterator();
             
             pw.println();
@@ -441,29 +444,27 @@ public class SimkitAssemblyXML2Java {
                     doParameter(pl, pli.next(), sp16, pw);
                 }
                 pw.println(sp12 + rp);
-            } else pw.println(rp);
+            } else {
+                pw.println(rp);
+            }
             
             pw.println(sp8 + rp + sc);
         }
-        
-        li = this.root.getSimEventListenerConnection().listIterator();
-        
-        if ( this.root.getSimEventListenerConnection().size() > 0 )
+       
+        if ( this.root.getSimEventListenerConnection().size() > 0 ) {
             pw.println();
+        }
         
-        while(li.hasNext()) {
-            SimEventListenerConnection sect = (SimEventListenerConnection)li.next();
+        for (SimEventListenerConnection sect : this.root.getSimEventListenerConnection()) {
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity)(sect.getListener())).getName() + qu);
             pw.println(cm + qu + ((SimEntity)(sect.getSource())).getName() + qu + rp + sc);
         }
         
-        li = this.root.getAdapter().listIterator();
-        
-        if ( this.root.getAdapter().size() > 0 ) 
+        if ( this.root.getAdapter().size() > 0 ) {
             pw.println();
+        }
         
-        while ( li.hasNext() ) {
-            Adapter a = (Adapter) li.next();
+        for (Adapter a : this.root.getAdapter()) {
             pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm );
             pw.print(sp + qu + a.getEventHeard() + qu + cm );
             pw.print(sp + qu + a.getEventSent() + qu + cm );
@@ -560,31 +561,34 @@ public class SimkitAssemblyXML2Java {
     }
     
     boolean isPrimitive(String type) {
-        if (
-                type.equals("boolean") |
-                type.equals("char") |
-                type.equals("double") |
-                type.equals("float") |
-                type.equals("int") |
-                type.equals("long") |
-                type.equals("short")
-                ) return true;
-        else return false;
+        if (type.equals("boolean") |
+            type.equals("char") |
+            type.equals("double") |
+            type.equals("float") |
+            type.equals("int") |
+            type.equals("long") |
+            type.equals("short")) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     boolean isString(String type) {
-        if (
-                type.equals("String") |
-                type.equals("java.lang.String")
-                ) return true;
-        else return false;
+        if (type.equals("String") |
+            type.equals("java.lang.String")) {
+            return true;
+        } else { 
+            return false;
+        }
     }
     
     boolean isArray(String type) {
-        if (
-                type.endsWith("]")
-                ) return true;
-        else return false;
+        if (type.endsWith("]")) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     void doMultiParameter(MultiParameter p, String indent, PrintWriter pw) {
@@ -612,7 +616,9 @@ public class SimkitAssemblyXML2Java {
     void maybeComma(List params, Object param, PrintWriter pw) {
         if ( params.size() > 1 && params.indexOf(param) < params.size() - 1 ) {
             pw.println(cm);
-        } else pw.println();
+        } else {
+            pw.println();
+        }
     }
     
     void buildListeners(StringWriter listeners) {
@@ -622,10 +628,8 @@ public class SimkitAssemblyXML2Java {
         LinkedHashMap<String, PropertyChangeListener> designPointStats = new LinkedHashMap<String, PropertyChangeListener>();
         LinkedHashMap<String, PropertyChangeListener> propertyChangeListeners = new LinkedHashMap<String, PropertyChangeListener>();
         LinkedHashMap<String, PropertyChangeListenerConnection> propertyChangeListenerConnections = new LinkedHashMap<String, PropertyChangeListenerConnection>();
-        ListIterator li = this.root.getPropertyChangeListener().listIterator();
         
-        while ( li.hasNext() ) {
-            PropertyChangeListener pcl = (PropertyChangeListener) li.next();
+        for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
             
             if ( "replicationStats".equals(pclMode) ) {
@@ -636,11 +640,8 @@ public class SimkitAssemblyXML2Java {
                 propertyChangeListeners.put(pcl.getName(), pcl);
             }
         }
-        
-        li = this.root.getPropertyChangeListenerConnection().listIterator();
-        
-        while ( li.hasNext() ) {
-            PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) li.next();
+                
+        for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
             propertyChangeListenerConnections.put(((PropertyChangeListener)pclc.getListener()).getName(),pclc);
         }
         
@@ -648,11 +649,10 @@ public class SimkitAssemblyXML2Java {
         
         String[] pcls = toArray(propertyChangeListeners.keySet(), new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
-            PropertyChangeListener pcl = (PropertyChangeListener) propertyChangeListeners.get(pcls[i]);
+            PropertyChangeListener pcl = propertyChangeListeners.get(pcls[i]);
             List pl = pcl.getParameters();
             ListIterator pli = pl.listIterator();
-            PropertyChangeListenerConnection pclc =
-                    (PropertyChangeListenerConnection) propertyChangeListenerConnections.get(pcls[i]);
+            PropertyChangeListenerConnection pclc = propertyChangeListenerConnections.get(pcls[i]);
             pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcls[i] + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
             
@@ -662,7 +662,9 @@ public class SimkitAssemblyXML2Java {
                     doParameter(pl, pli.next(), sp16, pw);
                 }
                 pw.println(sp12 + rp);
-            } else pw.println(rp);
+            } else {
+                pw.println(rp);
+            }
             pw.println(sp8 + rp + sc);
             pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + pcls[i] + qu + cm + qu + pclc.getProperty() + qu + cm);
             pw.println(qu + ((SimEntity)pclc.getSource()).getName() + qu + rp + sc);
@@ -675,13 +677,12 @@ public class SimkitAssemblyXML2Java {
         
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
         
-        pcls = (String[]) replicationStats.keySet().toArray(new String[0]);
+        pcls = replicationStats.keySet().toArray(new String[0]);
         for ( int i = 0; i < pcls.length; i++ ) {
-            PropertyChangeListener pcl = (PropertyChangeListener) replicationStats.get(pcls[i]);
+            PropertyChangeListener pcl = replicationStats.get(pcls[i]);
             List pl = pcl.getParameters();
             ListIterator pli = pl.listIterator();
-            PropertyChangeListenerConnection pclc =
-                    (PropertyChangeListenerConnection) propertyChangeListenerConnections.get(pcls[i]);
+            PropertyChangeListenerConnection pclc = propertyChangeListenerConnections.get(pcls[i]);
             pw.println(sp8 + "addReplicationStats" + lp + qu + pcls[i] + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
             
@@ -691,7 +692,9 @@ public class SimkitAssemblyXML2Java {
                     doParameter(pl, pli.next(), sp16, pw);
                 }
                 pw.println(sp12 + rp);
-            } else pw.println(rp);
+            } else {
+                pw.println(rp);
+            }
             
             pw.println(sp8 + rp + sc);
             pw.println();
@@ -705,14 +708,13 @@ public class SimkitAssemblyXML2Java {
         
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
         
-        pcls = (String[]) designPointStats.keySet().toArray(new String[0]);
+        pcls = designPointStats.keySet().toArray(new String[0]);
         
         for ( int i = 0; i < pcls.length; i++ ) {
-            PropertyChangeListener pcl = (PropertyChangeListener) designPointStats.get(pcls[i]);
+            PropertyChangeListener pcl = designPointStats.get(pcls[i]);
             List pl = pcl.getParameters();
             ListIterator pli = pl.listIterator();
-            PropertyChangeListenerConnection pclc =
-                    (PropertyChangeListenerConnection) propertyChangeListenerConnections.get(pcls[i]);
+            PropertyChangeListenerConnection pclc = propertyChangeListenerConnections.get(pcls[i]);
             pw.println(sp8 + "addDesignPointStats" + lp + qu + pcls[i] + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
             
@@ -722,7 +724,9 @@ public class SimkitAssemblyXML2Java {
                     doParameter(pl, pli.next(), sp16, pw);
                 }
                 pw.println(sp12 + rp);
-            } else pw.println(rp);
+            } else {
+                pw.println(rp);
+            }
             
             pw.println(sp8 + rp + sc);
             pw.println();
@@ -799,7 +803,9 @@ public class SimkitAssemblyXML2Java {
         int j;
         pchars = path.toCharArray();
         for (j = 0; j<pchars.length; j++) {
-            if ( pchars[j] == '.' ) pchars[j] = File.separatorChar;
+            if ( pchars[j] == '.' ) {
+                pchars[j] = File.separatorChar;
+            }
         }
         path = new String(pchars);
         try {
@@ -890,8 +896,7 @@ public class SimkitAssemblyXML2Java {
                 sax2j = new SimkitAssemblyXML2Java(fileName); 
 
             }
-        }
-        
+        }        
     }
     
     static void usage() {

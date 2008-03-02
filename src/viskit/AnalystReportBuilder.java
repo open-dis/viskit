@@ -2,10 +2,12 @@ package viskit;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +19,7 @@ import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
+import viskit.model.AssemblyNode;
 import viskit.xsd.assembly.ChartDrawer;
 
 /** This class constructs and exports an analyst report based on the parameters
@@ -59,6 +62,9 @@ public class AnalystReportBuilder {
     /** Reference to the Analyst Report JPanel for JProgressBar */
     private JPanel aRPanel;
     
+    /** Must have the order of the PCL as input from AssemblyModel */
+    private Map<Object, AssemblyNode> pclNodeCache;
+    
     /** Build a default AnalystReport object */
     public AnalystReportBuilder() {
         initDocument();
@@ -66,18 +72,20 @@ public class AnalystReportBuilder {
     }
     
     /** Build an AnalystReport object from an existing statisticsReport 
-     * document.  This is done from viskit.BasicAssembly.</p>
+     * document.  This is done from viskit.BasicAssembly via reflection.</p>
      * @param statisticsReportPath the path to the statistics generated report
      *        used by this Analyst Report 
+     * @param map the set of PCLs that have specific properties set for type statistic desired
      */
-    public AnalystReportBuilder(String statisticsReportPath) {
+    public AnalystReportBuilder(String statisticsReportPath, Map<Object, AssemblyNode> map) {
         try {
             Document doc = EventGraphCache.loadXML(statisticsReportPath);
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
             log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
-        }
+        }        
+        setPclNodeCache(map);
         initDocument();
         setDefaultValues();
     }
@@ -90,7 +98,7 @@ public class AnalystReportBuilder {
      * @param aRPanel a reference to the Analyst Report JPanel
      * @param xmlFile an existing temp Analyst Report
      * @param assyFile the current assembly file to process a report from
-     * @throws java.lang.Exception 
+     * @throws java.lang.Exception
      */
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
         this.aRPanel = aRPanel;
@@ -619,53 +627,77 @@ public class AnalystReportBuilder {
     @SuppressWarnings("unchecked")
     private Element makeReplicationReport() {
         Element repReports = new Element("ReplicationReports");
-        List<Element> mainItr = (List<Element>) statsReport.getRootElement().getChildren("SimEntity");
+        List<Element> simEntities = (List<Element>) statsReport.getRootElement().getChildren("SimEntity");
         
         // variables for JFreeChart construction
         ChartDrawer chart = new ChartDrawer();
         String chartTitle = "";
         String axisLabel  = "";
-        
-        for (Element tempEntity : mainItr) {
-            Iterator itr = tempEntity.getChildren("DataPoint").iterator();
-            while (itr.hasNext()) {
-                Element temp = (Element) itr.next();
+        String typeStat = "";
+        boolean isCount = false;
+        for (Element simEntity : simEntities) {
+            List<Element> dataPoints = simEntity.getChildren("DataPoint");
+            for (Element dataPoint : dataPoints) {
+                String dataPointProperty = dataPoint.getAttributeValue("property");
+                for (Object node : getPclNodeCache().keySet()) {
+                    if (node.toString().contains("PropertyChangeListener")) {
+                        Object obj = getPclNodeCache().get(node);
+                            if (obj.toString().contains(dataPointProperty)) {
+                            try {
+                                log.debug("AR obj is: " + obj);
+                                isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                                typeStat = isCount ? "count" : "mean";
+                                log.debug("AR typeStat is: " + typeStat);
+                                break;
+                            } catch (IllegalAccessException ex) {
+                                log.error(ex);
+                            } catch (IllegalArgumentException ex) {
+                                log.error(ex);
+                            } catch (InvocationTargetException ex) {
+                                log.error(ex);
+                            } catch (NoSuchMethodException ex) {
+                                log.error(ex);
+                            } catch (SecurityException ex) {
+                                log.error(ex);
+                            }
+                        }
+                    }
+                }
                 Element entity = new Element("SimEntity");
-                entity.setAttribute("name", tempEntity.getAttributeValue("name"));
-                entity.setAttribute("property", temp.getAttributeValue("property"));
-                Iterator itr2 = temp.getChildren("ReplicationReport").iterator();
+                entity.setAttribute("name", simEntity.getAttributeValue("name"));
+                entity.setAttribute("property", dataPointProperty);
+                List<Element> replicationReports = dataPoint.getChildren("ReplicationReport");
                 
                 // Chart title and label
-                chartTitle = tempEntity.getAttributeValue("name");
-                axisLabel  = temp.getAttributeValue("property") ;
+                chartTitle = simEntity.getAttributeValue("name");
+                axisLabel  = dataPoint.getAttributeValue("property") ;
                 
-                while (itr2.hasNext()) {
-                    Element temp3 = (Element) itr2.next();
-                    Iterator itr3 = temp3.getChildren("Replication").iterator();
+                for (Element replicationReport : replicationReports) {
+                    List<Element> replications = replicationReport.getChildren("Replication");
                     
                     // Create a data set instance and chart for each replication report
-                    double[] data = new double[temp3.getChildren().size()];
+                    double[] data = new double[replicationReport.getChildren().size()];
                     int idx = 0;
-                    while (itr3.hasNext()) {
-                        Element temp2 = (Element) itr3.next();
+                    for (Element replication : replications) {
                         Element repRecord = new Element("Replication");
-                        repRecord.setAttribute("number", temp2.getAttributeValue("number"));
-                        repRecord.setAttribute("count", temp2.getAttributeValue("count"));
-                        repRecord.setAttribute("minObs", temp2.getAttributeValue("minObs"));
-                        repRecord.setAttribute("maxObs", temp2.getAttributeValue("maxObs"));
-                        repRecord.setAttribute("mean", temp2.getAttributeValue("mean"));
-                        repRecord.setAttribute("stdDeviation", temp2.getAttributeValue("stdDeviation"));
-                        repRecord.setAttribute("variance", temp2.getAttributeValue("variance"));
+                        repRecord.setAttribute("number", replication.getAttributeValue("number"));
+                        repRecord.setAttribute("count", replication.getAttributeValue("count"));
+                        repRecord.setAttribute("minObs", replication.getAttributeValue("minObs"));
+                        repRecord.setAttribute("maxObs", replication.getAttributeValue("maxObs"));
+                        repRecord.setAttribute("mean", replication.getAttributeValue("mean"));
+                        repRecord.setAttribute("stdDeviation", replication.getAttributeValue("stdDeviation"));
+                        repRecord.setAttribute("variance", replication.getAttributeValue("variance"));
                         entity.addContent(repRecord);
                         
-                        // Add the count of this replication to the chart
-                        data[idx] = Double.parseDouble(temp2.getAttributeValue("count"));
+                        // Add the raw count, or mean of replication data to the chart
+                        log.debug(replication.getAttributeValue(typeStat));
+                        data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
                         idx++;                        
                     }
                     
                     Element chartDir = new Element("chartURL");
                     String filename = axisLabel;
-                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));
+                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));                    
                     entity.addContent(chartDir);
                     repReports.addContent(entity);
                 }
@@ -1072,6 +1104,14 @@ public class AnalystReportBuilder {
     public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
     public List<Object> getStatsReplicationsList() {return unMakeReplicationList(statisticalResults);}
     public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults);}
+    
+    public Map<Object, AssemblyNode> getPclNodeCache() {
+        return pclNodeCache;
+    }
+
+    public void setPclNodeCache(Map<Object, AssemblyNode> pclNodeCache) {
+        this.pclNodeCache = pclNodeCache;
+    }
     
     /** Command line entry point
      * 

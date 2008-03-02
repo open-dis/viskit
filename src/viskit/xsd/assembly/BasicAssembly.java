@@ -44,7 +44,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.swing.JOptionPane;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import simkit.BasicSimEntity;
@@ -54,6 +58,7 @@ import simkit.SimEvent;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
+import viskit.model.AssemblyNode;
 import static edu.nps.util.GenericConversion.toArray;
 
 /**
@@ -82,7 +87,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
-    private File analystReportFile;     // where file gets written
+    
+    /** Ordering is essential for this collection */
+    private Map<Object, AssemblyNode> pclNodeCache;
+    
+    /** where file gets written */
+    private File analystReportFile;
     
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = false;
@@ -125,9 +135,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         //the stats report file. Should discuss though.
         statsConfig = new ReportStatisticsConfig(this.getName());
         println = new PrintWriter(System.out);
-    //moved to run() to avoid beanshell upcall error
-    //createObjects();
-    //performHookups();
     }
 
     /**
@@ -189,13 +196,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * an automated key value
      * @param repStatistics 
      */
-    protected void setStatisticsKeyValues(LinkedHashMap repStatistics) {
-        Iterator itr = repStatistics.entrySet().iterator();
+    protected void setStatisticsKeyValues(LinkedHashMap<String, PropertyChangeListener> repStatistics) {
+        Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
         entitiesWithStats = new LinkedList<String>();
-        log.debug("Inside setStatisticsKeyValues()");
-        while (itr.hasNext()) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            String ent = entry.getKey().toString();
+        for (Map.Entry<String, PropertyChangeListener> entry : entrySet) {
+            String ent = entry.getKey();
             log.debug("Entry is: " + entry);
             entitiesWithStats.add(ent);
             println.println(ent);
@@ -220,12 +225,44 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /**
      * The default behavior is to create a <code>SimplStatsTally</code>
      * instance for each element in <code>replicationStats</code> with the
-     * corresponding name + ".count"
+     * corresponding name + ".count," or ".mean"
      */
     protected void createDesignPointStats() {
         designPointStats = new SampleStatistics[getReplicationStats().length];
-        for (int i = 0; i < designPointStats.length; i++) {
-            designPointStats[i] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[i]).getName() + ".count");
+        String typeStat = "";
+        int ix = 0; 
+        boolean isCount = false;
+        for (Object node : getPclNodeCache().keySet()) {        
+            if (node.toString().contains("PropertyChangeListener")) {
+                try {
+                    
+                    /* in order to see PropChangeListenerNode, this thread has 
+                     * to work via reflection since an instance from a different
+                     * ClassLoader was sent to this class via reflection in the
+                     * first place
+                     */
+                    Object obj = getPclNodeCache().get(node);
+                    log.debug("Reflected object is: " + obj);
+                    isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                    log.debug("isGetCount: " + isCount);
+                    typeStat = isCount ? ".count" : ".mean";
+                    log.debug("AssemblyNode key: " + node);
+                    log.debug("typeStat is: " + typeStat);
+                    designPointStats[ix] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[ix]).getName() + typeStat);
+                    log.debug(designPointStats[ix]);
+                    ix++;
+                } catch (NoSuchMethodException ex) {
+                    log.error(ex);
+                } catch (SecurityException ex) {
+                    log.error(ex);
+                } catch (IllegalAccessException ex) {
+                    log.error(ex);
+                } catch (IllegalArgumentException ex) {
+                    log.error(ex);
+                } catch (InvocationTargetException ex) {
+                    log.error(ex);
+                }
+            }
         }
     }
 
@@ -262,6 +299,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         verbose = b;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public boolean isVerbose() {
         return verbose;
@@ -277,7 +318,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public void setStopRun(boolean wh) {
         stopRun = wh; //?
-        if (stopRun == true) {
+        if (stopRun) {
             Schedule.stopSimulation();
         }
     }
@@ -419,7 +460,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getIDforReplicationStateName(String state) {
         int id = -1;
-        for (int i = 0; i < getReplicationStats().length; i++) {
+        int repStatsLength = getReplicationStats().length;
+        for (int i = 0; i < repStatsLength; i++) {
             if (((SampleStatistics) getReplicationStats()[i]).getName().equals(state)) {
                 id = i;
                 break;
@@ -437,7 +479,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * standard deviation and variance.  This can be done generically.
      *
      * @param rep The replication number for this report
-     * @return a replication report
+     * @return a replication report section of the analyst report
      */
     protected String getReplicationReport(int rep) {
         
@@ -480,7 +522,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /**
      * For each outer stats, print to console output name, count, min, max, 
      * mean, standard deviation and fvariance.  This can be done generically.
-     * @return the summary report
+     * @return the summary report section of the analyst report
      */
     protected String getSummaryReport() {
         
@@ -543,7 +585,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (!hookupsCalled) {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
-        System.out.println("Stopping at " + getStopTime());
+        System.out.println("\nStopping at " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
         Schedule.setVerbose(isVerbose());
@@ -552,7 +594,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
         if (isSaveReplicationData()) {
             replicationData.clear();
-            for (int i = 0; i < getReplicationStats().length; i++) {
+            int repStatsLength = getReplicationStats().length;
+            for (int i = 0; i < repStatsLength; i++) {
                 replicationData.put(new Integer(i), new ArrayList<SavedStats>());
             }
         }
@@ -661,11 +704,45 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 Schedule.startSimulation();
 
-                for (int i = 0; i < getReplicationStats().length; i++) {
-                    fireIndexedPropertyChange(i, ((SampleStatistics) getReplicationStats()[i]).getName(), ((SampleStatistics) getReplicationStats()[i]).getName());
-                    fireIndexedPropertyChange(i, ((SampleStatistics) getReplicationStats()[i]).getName() + ".count", ((SampleStatistics) getReplicationStats()[i]).getCount());
-                }
+                String typeStat = "";
+                int ix = 0;
+                boolean isCount = false;
                 
+                // # of PropertyChangeListenerNodes is == to ReplicationStats.length
+                for (Object node : getPclNodeCache().keySet()) {        
+                    if (node.toString().contains("PropertyChangeListener")) {
+                        try {
+
+                            /* in order to see PropChangeListenerNode, this thread has 
+                             * to work via reflection since an instance from a different
+                             * ClassLoader was sent to this class via reflection in the
+                             * first place
+                             */
+                            Object obj = getPclNodeCache().get(node);
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                            typeStat = isCount ? ".count" : ".mean";
+                            SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
+                            fireIndexedPropertyChange(ix, ss.getName(), ss);
+                            if (isCount) {
+                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
+                            } else {
+                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());                            
+                            }
+                            ix++;
+                        } catch (NoSuchMethodException ex) {
+                            log.error(ex);
+                        } catch (SecurityException ex) {
+                            log.error(ex);
+                        } catch (IllegalAccessException ex) {
+                            log.error(ex);
+                        } catch (IllegalArgumentException ex) {
+                            log.error(ex);
+                        } catch (InvocationTargetException ex) {
+                            log.error(ex);
+                        }
+                    }
+                }           
+
                 if (isPrintReplicationReports()) {
                     println.println(getReplicationReport(replication));
                     println.flush();
@@ -701,7 +778,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             println.flush();
         }
 
-        if (enableAnalystReports) {
+        if (isEnableAnalystReports()) {
 
             // Creates the temp file only when user required
             initReportFile();
@@ -711,11 +788,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
              * compiled before the AnalystReportBuilder and therefore would throw a
              * compile time error.
              */
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            ClassLoader localLoader = Thread.currentThread().getContextClassLoader();
             try {
-                Class<?> clazz = loader.loadClass("viskit.AnalystReportBuilder");
-                Constructor arbConstructor = clazz.getConstructor(String.class);
-                Object arbObject = arbConstructor.newInstance(statsConfig.getReport());
+                Class<?> clazz = localLoader.loadClass("viskit.AnalystReportBuilder");
+                Constructor arbConstructor = clazz.getConstructor(String.class, Map.class);
+                Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), getPclNodeCache());
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);
             } catch (ClassNotFoundException ex) {
@@ -749,8 +826,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         Schedule.startSimulation();
     }
 
-    // this is getting called by the Assembly Runner stop
-    // button, which may get called on startup.
+    /** this is getting called by the Assembly Runner stop
+     * button, which may get called on startup.
+     */
     public void stop() {
         stopRun = true;
     }
@@ -758,6 +836,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void setEnableAnalystReports(boolean enable) {
         enableAnalystReports = enable;
     }
+    
+    public boolean isEnableAnalystReports() {return enableAnalystReports;}
 
     /**
      * This gets called at the top of every run.  It builds a tempFile and saves the path.  That path is what
@@ -779,5 +859,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getVerboseReplication() {
         return verboseReplicationNumber;
+    }
+
+    public Map<Object, AssemblyNode> getPclNodeCache() {
+        return pclNodeCache;
+    }
+
+    public void setPclNodeCache(Map<Object, AssemblyNode> pclNodeCache) {
+        this.pclNodeCache = pclNodeCache;
     }
 }

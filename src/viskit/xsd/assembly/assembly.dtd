@@ -74,6 +74,8 @@
     type CDATA #REQUIRED
     name ID    #REQUIRED
     mode (replicationStat|designPointStat|listener) "listener"
+    meanStatistics (true|false) "false"
+    countStatistics (true|false) "true"
     description CDATA #IMPLIED
 >
 

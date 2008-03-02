@@ -302,10 +302,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             }
 
             getJMenuBar().remove(hmen);
-            JMenuBar newMB = (JMenuBar) menus.get(i);
+            JMenuBar newMB = menus.get(i);
             newMB.add(hmen);
             setJMenuBar(newMB);
-            setTitle((String) titles[i]);
+            setTitle(titles[i]);
         }
     }
     
@@ -467,6 +467,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
 
+        /**
+         * 
+         * @param execStrings
+         */
         public void exec(String[] execStrings) {
     
             /* The default version of this does a RuntimeExex("java"....) to 

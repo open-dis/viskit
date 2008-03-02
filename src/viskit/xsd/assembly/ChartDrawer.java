@@ -1,5 +1,6 @@
 package viskit.xsd.assembly;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.*;
@@ -13,6 +14,8 @@ import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 
 /**
  *
@@ -95,7 +98,21 @@ public class ChartDrawer {
                 false,
                 false);
 
-        chart.getXYPlot().setForegroundAlpha(0.75f);
+        // NOW DO SOME OPTIONAL CUSTOMIZATION OF THE CHART...
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+        
+        renderer.setDrawBarOutline(true);
+        renderer.setSeriesOutlinePaint(0, Color.red);
+        plot.setForegroundAlpha(0.75f);
+
+        // set the background color for the chart...
+        plot.setBackgroundPaint(Color.lightGray);
+        plot.setDomainGridlinePaint(Color.white);
+        plot.setDomainGridlinesVisible(true);
+        plot.setRangeGridlinePaint(Color.white);
+        // OPTIONAL CUSTOMIZATION COMPLETED.
+        
         return chart;
     }
 

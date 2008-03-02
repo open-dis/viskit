@@ -180,7 +180,7 @@ public class ReportStatisticsConfig {
             Element summary = new Element("Summary");
 
             summary.setAttribute("property", propertyIndex[i]);
-            summary.setAttribute("numRuns", form.format(sum[i].getCount()));
+            summary.setAttribute("numRuns", new DecimalFormat("0").format(sum[i].getCount()));
             summary.setAttribute("minObs", form.format(sum[i].getMinObs()));
             summary.setAttribute("maxObs", form.format(sum[i].getMaxObs()));
             summary.setAttribute("mean", form.format(sum[i].getMean()));

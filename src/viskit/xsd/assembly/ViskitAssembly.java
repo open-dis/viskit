@@ -201,10 +201,10 @@ public class ViskitAssembly extends BasicAssembly {
     
     @Override
     protected void createDesignPointStats() {
+       
         super.createDesignPointStats();
-        // to be consistent; should be getting the designPointStats from 
-        // the super. 
-        
+
+        // the super.
         for (SampleStatistics sampleStats : designPointStats) {
             log.debug(sampleStats.getName() + " designPointStat created");
             designPointStatistics.put(sampleStats.getName(), sampleStats);
@@ -230,13 +230,17 @@ public class ViskitAssembly extends BasicAssembly {
     public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name, entity);
-//        log.debug("ViskitAssembly addSimEntity " + entity);
+        log.debug("ViskitAssembly addSimEntity " + entity);
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
         designPointStatistics.put(listenerName,pcl);
     }
    
+    /** Called from the generated Assembly adding PCLs in order of calling
+     * @param listenerName the given name of the PropertyChangeListener
+     * @param pcl type of PropertyChangeListener
+     */
     public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
         log.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
         replicationStatistics.put(listenerName, pcl);

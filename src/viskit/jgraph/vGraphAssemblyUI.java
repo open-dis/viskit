@@ -47,7 +47,6 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
     protected void createEditDialog(Object c, MouseEvent event) {
         final Object cell = c;
-        //MouseEvent ev = event;
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -59,21 +58,9 @@ public class vGraphAssemblyUI extends BasicGraphUI {
                         cntl.adapterEdgeEdit((AdapterEdge) edgeObj);
                     } else if (edgeObj instanceof PropChangeEdge) {
                         cntl.pcListenerEdgeEdit((PropChangeEdge) edgeObj);
-                    } else //if (edgeObj instanceof SimEvListenerEdge)
-                    {
+                    } else {
                         cntl.simEvListenerEdgeEdit((SimEvListenerEdge) edgeObj);
                     }
-
-//          Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
-//          if (e instanceof SchedulingEdge)
-//            cntl.arcEdit((SchedulingEdge)e);
-//          else //if(e instanceof CancellingEdge)
-//            cntl.canArcEdit((CancellingEdge)e);
-//        }
-//        else if (cell instanceof CircleCell) {
-//          EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
-//          cntl.nodeEdit(en);
-//        }
                 } else if (cell instanceof AssemblyCircleCell) {
                     Object nodeObj = ((AssemblyCircleCell) cell).getUserObject();
                     cntl.evGraphEdit((EvGraphNode) nodeObj);
@@ -90,17 +77,16 @@ public class vGraphAssemblyUI extends BasicGraphUI {
      * is messaged with stopEditing, if messageCancel is true the
      * editor is messaged with cancelEditing. If messageGraph is true
      * the graphModel is messaged with valueForCellChanged.
+     * @param messageStop
+     * @param messageCancel
+     * @param messageGraph 
      */
     @Override
-    protected void completeEditing(boolean messageStop,
-            boolean messageCancel,
-            boolean messageGraph) {
+    protected void completeEditing(boolean messageStop, boolean messageCancel, boolean messageGraph) {
         if (stopEditingInCompleteEditing && editingComponent != null && editDialog != null) {
-            Component oldComponent = editingComponent;
             Object oldCell = editingCell;
             GraphCellEditor oldEditor = cellEditor;
             Object newValue = oldEditor.getCellEditorValue();
-            Rectangle editingBounds = graph.getCellBounds(editingCell);
             boolean requestFocus =
                     (graph != null && (graph.hasFocus() || editingComponent.hasFocus()));
             editingCell = null;

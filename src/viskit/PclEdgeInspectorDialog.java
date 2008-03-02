@@ -277,7 +277,6 @@ public class PclEdgeInspectorDialog extends JDialog {
                 System.out.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
                 System.out.println(System.getProperty("java.class.path"));
             }
-
         }
     }
 

@@ -467,8 +467,6 @@ public class RunnerPanel2 extends JPanel {
                             }
                         }
                     }
-
-
                 }
             }
             try {

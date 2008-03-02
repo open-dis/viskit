@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -45,6 +45,7 @@ import java.lang.reflect.Method;
 import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.swing.*;
 
 import simkit.Schedule;
@@ -62,6 +63,7 @@ import viskit.doe.LocalBootLoader;
  * @author Rick Goldberg
  * @since Sep 26, 2005
  * @since 3:43:51 PM
+ * @version $Id:$
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
 
@@ -86,15 +88,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     FileInputStream fis;
     LocalBootLoader loader;
     Class<?> targetClass;
-    Object assemblyObj;
+    Object assemblyObj, targetObject;
     private static int mutex = 0;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
     long seed;
-    private int numReps;
-
-//  private SimulationStateListener simListener;
     private boolean inRegressionMode;
+    AnalystReportPanel reportPanel;
 
     public InternalAssemblyRunner() {
         inRegressionMode = false;
@@ -145,7 +145,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     public String getHandle() {
         return "";
     }
-    AnalystReportPanel reportPanel;
 
     public void setAnalystReportGUI(AnalystReportPanel pan) {
         reportPanel = pan;
@@ -169,7 +168,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 System.err.println("Program error InternalAssemblyRunner.assyChanged");
         }
     }
-    private String[] myCmdLine;
 
     /**
      * Get param indices from AssemblyController statics
@@ -177,7 +175,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
      */
     public void initParams(String[] parms) {
         parms[AssemblyController.EXEC_RUNNER_CLASS_NAME] = "viskit.InternalAssemblyRunner$ExternalSimRunner"; // no longer used
-        myCmdLine = parms;
 
         targetClassName = parms[AssemblyController.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
@@ -201,22 +198,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         twiddleButtons(InternalAssemblyRunner.REWIND);
 
     }
-    Object targetObject;
 
     private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
         // Assembly has been compiled by now
-        VGlobals.instance().resetWorkClassLoader();
-        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
+        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
         targetClass = Vstatics.classForName(targetClassName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }
         targetObject = targetClass.newInstance();
+                
+        /* in order to see BasicAssembly this thread has to have
+         * the same loader as the one used since they don't
+         * share the same simkit or viskit.
+         */
         assembly = (BasicAssembly) targetObject;
-        // in order to see BasicAssembly this thread has to have
-        // the same loader as the one used since they don't
-        // share the same simkit or viskit.
 
         Method getNumberReplications = targetClass.getMethod("getNumberReplications");
         Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
@@ -304,6 +301,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Method setStopTime = targetClass.getMethod("setStopTime", double.class);
             Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);
             Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);
             Class<?> RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
@@ -316,12 +314,12 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyObj, runPanel.printRepReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyObj, runPanel.printSummReportsCB.isSelected());
-
             setEnableAnalystReports.invoke(assemblyObj, runPanel.analystReportCB.isSelected());
             setStopTime.invoke(assemblyObj, getStopTime());
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
             setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
             addPropertyChangeListener.invoke(assemblyObj, this);
+            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
             assemblyRunnable = (Runnable) assemblyObj;              
             
             runPanel.wakeUpTextUpdater(fis);
@@ -330,8 +328,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             simRunner.join();
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException ex) {
+            log.error(ex);
+        } catch (IllegalAccessException ex) {
+            log.error(ex);
+        } catch (IllegalArgumentException ex) {
+            log.error(ex);
+        } catch (InvocationTargetException ex) {
+            log.error(ex);
+        } catch (NoSuchMethodException ex) {
+            log.error(ex);
+        } catch (SecurityException ex) {
+            log.error(ex);
+        } catch (InstantiationException ex) {
+           log.error(ex);
+        } catch (ClassNotFoundException ex) {
+            log.error(ex);
         }
     }
 
@@ -444,7 +456,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         public void actionPerformed(ActionEvent e) {
             twiddleButtons(InternalAssemblyRunner.STEP);
-        //initRun();
         }
     }
 
@@ -474,14 +485,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             assembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
         }
     }
-
-    class analystReportListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            if (assembly == null) {return;}
-            assembly.setEnableAnalystReports(((JCheckBox) e.getSource()).isSelected());
-        }
-    }
+   
     private JFileChooser saveChooser;
 
     class saveListener implements ActionListener {
@@ -714,8 +718,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         titlkey = key;
         doTitle(null);
     }
-
-    String text = "<html><body>\n" + "<p><b>Now Running Replication 1 of X</b>\n" + "</p></body></html>\n";
                 
     StringBuilder npsString = new StringBuilder("<html><body>\n" + "<p><b>Now Running Replication ");
     

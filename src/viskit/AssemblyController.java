@@ -58,9 +58,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void runAssembly(String initialFile) {
-        if (viskit.Vstatics.debug) {
-            System.out.println("Running assembly: " + initialFile);
-        }
+        log.debug("Running assembly: " + initialFile);
         File f = new File(initialFile); 
         _doOpen(f);
         runAssembly();
@@ -70,9 +68,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         
         File f;
         if (initialFile != null) {
-            if (viskit.Vstatics.debug) {
-                System.out.println("Loading initial file: " + initialFile);
-            }
+            log.debug("Loading initial file: " + initialFile);
             f = new File(initialFile);
             _doOpen(f);
             runAssembly();
@@ -114,10 +110,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (lastFile != null) {
             markConfigOpen(lastFile);
         }
-
-        //    if (((AssemblyModel)getModel()).isDirty())
-//      return askToSaveAndContinue();
-//    return true;
         return checkSaveIfDirty();
     }
 
@@ -397,7 +389,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             lastFile = null;
         }  
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-        vmod.newModel(null);
+        vmod.newModel(null);    
         editGraphMetaData();
         ((ViskitAssemblyView) getView()).fileName(vmod.getMetaData().name);
     }
@@ -417,6 +409,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void postClose() {        
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();        
         vmod.newModel(null);
+        
         if (lastFile != null) {
             fileWatchClose(lastFile);
             lastFile = null;
@@ -695,8 +688,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return obArr;
     }
 
-    public void pcListenerEdit(PropChangeListenerNode pclNode) //---------------------------------------
-    {
+    public void pcListenerEdit(PropChangeListenerNode pclNode) {
         boolean done;
         do {
             done = true;
@@ -1253,11 +1245,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public static final int APP_FIRST_ENTITY_NAME = 3;
 
     /**
-   * Maintain the above statics to match the order below.
-   * @param className
-   * @param classPath
-   * @return os exec array
-   */
+     * Maintain the above statics to match the order below.
+     * @param className
+     * @param classPath
+     * @return os exec array
+     */
     private String[] buildExecStrings(String className, String classPath) {
         Vector<String> v = new Vector<String>();
         String fsep = Vstatics.getFileSeparator();
@@ -1417,7 +1409,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         } else {
             File file = ((ViskitAssemblyView) getView()).openRecentFilesAsk(v);
             if (file != null) {
-                _doOpen(file); 
+                _doOpen(file);
             }
         }
 

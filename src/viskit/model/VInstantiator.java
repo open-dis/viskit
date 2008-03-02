@@ -233,7 +233,9 @@ public abstract class VInstantiator {
             return sb.toString();
         }
 
-        /** @return a List of VInstantiators given a List of Assembly Parameters */
+        /**
+         * @param assemblyParameters 
+         * @return a List of VInstantiators given a List of Assembly Parameters */
         List<Object> buildInstantiators(List<Object> assemblyParameters) {
 
             ArrayList<Object> instr = new ArrayList<Object>();
@@ -403,10 +405,12 @@ public abstract class VInstantiator {
             if (indexOfArgNames(type, args) < 0) {
                 log.info(type + " not loaded?");
             }
-        //findArgNamesFromBeanStuff(type,args);
         }
 
-        /** @return the index into the found matching constructor **/
+        /**
+         * @param type 
+         * @param args 
+         * @return the index into the found matching constructor **/
         public int indexOfArgNames(String type, List<Object> args) {
             List<Object>[] parameters = Vstatics.resolveParameters(type);
             if (parameters == null) {
@@ -491,7 +495,7 @@ public abstract class VInstantiator {
 
                 Class<?>[] argArr = new Class<?>[args.size()];
                 for (int i = 0; i < args.size(); i++) {
-                    argArr[i] = Vstatics.classForName((String) ((VInstantiator) args.get(i)).getType());
+                    argArr[i] = Vstatics.classForName(((VInstantiator) args.get(i)).getType());
                 }
 
                 //Introspector.flushCaches();

@@ -15,104 +15,84 @@ import java.awt.Point;
  * @version $Id: AssemblyNode.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
 public abstract class AssemblyNode extends ViskitElement {
-  private String name;
-  private String type;
 
-  private Vector<AssemblyEdge> connections = new Vector<AssemblyEdge>();
-  private ArrayList comments = new ArrayList();
-  private Point     position = new Point(0,0);
-  private VInstantiator instantiator;
-  private String    descriptionString = "";  // instance information
+    private String name;
+    private String type;
+    private Vector<AssemblyEdge> connections = new Vector<AssemblyEdge>();
+    private ArrayList<String> comments = new ArrayList<String>();
+    private Point position = new Point(0, 0);
+    private VInstantiator instantiator;
+    private String descriptionString = "";  // instance information
 
-  AssemblyNode(String name, String type)      // package access on constructor
-  {
-    this.name = name;
-    this.type = type;
-    instantiator = new VInstantiator.FreeF(type,"");
-  }
-  
-  @Override
-  public String toString()
-  {
-    return name;
-  }
-  
-  @Override
-  public String getName()
-  {
-    return name;
-  }
-  
-  @Override
-  public void setName(String s)
-  {
-    this.name = s;
-  }
-  
-  @Override
-  public String getType()
-  {
-    return type;
-  }
-  
-  @Override
-  public void setType(String typ)
-  {
-   //todo if(this.opaqueModelObject != null)
-   //   ((Event)opaqueModelObject).setName(s);
+    AssemblyNode(String name, String type) // package access on constructor
+    {
+        this.name = name;
+        this.type = type;
+        instantiator = new VInstantiator.FreeF(type, "");
+    }
 
-    this.type = typ;
+    @Override
+    public String toString() {
+        return name;
+    }
 
-  }
+    @Override
+    public String getName() {
+        return name;
+    }
 
-  public ArrayList getComments()
-  {
-    return comments;
-  }
+    @Override
+    public void setName(String s) {
+        this.name = s;
+    }
 
-  public void setComments(ArrayList comments)
-  {
-    this.comments = comments;
-  }
+    @Override
+    public String getType() {
+        return type;
+    }
 
-  public Vector<AssemblyEdge> getConnections()
-  {
-    return connections;
-  }
+    @Override
+    public void setType(String typ) {
+        this.type = typ;
+    }
 
-  public void setConnections(Vector<AssemblyEdge> connections)
-  {
-    this.connections = connections;
-  }
+    public ArrayList<String> getComments() {
+        return comments;
+    }
 
-  public Point getPosition()
-  {
-    return position;
-  }
+    public void setComments(ArrayList<String> comments) {
+        this.comments = comments;
+    }
 
-  public void setPosition(Point position)
-  {
-    this.position = position;
-  }
+    public Vector<AssemblyEdge> getConnections() {
+        return connections;
+    }
 
-  public VInstantiator getInstantiator()
-  {
-    return instantiator;
-  }
+    public void setConnections(Vector<AssemblyEdge> connections) {
+        this.connections = connections;
+    }
 
-  public void setInstantiator(VInstantiator instantiator)
-  {
-    this.instantiator = instantiator;
-  }
+    public Point getPosition() {
+        return position;
+    }
 
-  public String getDescriptionString()
-  {
-    return descriptionString;
-  }
+    public void setPosition(Point position) {
+        this.position = position;
+    }
 
-  public void setDescriptionString(String description)
-  {
-    this.descriptionString = description;
-  }
+    public VInstantiator getInstantiator() {
+        return instantiator;
+    }
 
+    public void setInstantiator(VInstantiator instantiator) {
+        this.instantiator = instantiator;
+    }
+
+    public String getDescriptionString() {
+        return descriptionString;
+    }
+
+    public void setDescriptionString(String description) {
+        this.descriptionString = description;
+    }
 }

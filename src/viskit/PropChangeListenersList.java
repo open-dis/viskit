@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.jar.JarFile;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -67,29 +66,16 @@ public class PropChangeListenersList extends JList implements DragGestureListene
         }
         List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, java.beans.PropertyChangeListener.class);
         Vector<Class> v = new Vector<Class>();
-        for (Iterator itr = list.iterator(); itr.hasNext();) {
-            Class c = (Class) itr.next();
+        for (Class<?> c : list) {
             v.add(c);
         }
-        Class[] ca = new Class[v.size()];
-        ca = (Class[]) v.toArray(ca);
+        Class<?>[] ca = new Class[v.size()];
+        ca = v.toArray(ca);
         Arrays.sort(ca, new MyClassSorter());
-        for (int i = 0; i < ca.length; i++) {
-            mod.addElement(ca[i]);
+        for (Class<?> c : ca) {
+            mod.addElement(c);
         }
-        //   String nm = c.getName();
-        //   v.add(nm.substring(nm.lastIndexOf('.')+1));
-        //mod.addElement(c);
-        //   }
-
-        /*
-        String[] sa = new String[v.size()];
-        sa = (String[])v.toArray(sa);
-        Arrays.sort(sa);
-        for(int i=0;i<sa.length;i++)
-        mod.addElement(sa[i]);
-         */
-
+       
         return mod;
     }
 
@@ -116,7 +102,6 @@ public class PropChangeListenersList extends JList implements DragGestureListene
         private Color background = new Color(0xFB, 0xFB, 0xE5);
 
         public PCLRenderer() {
-            //icon = new ImageIcon(ClassLoader.getSystemResource("viskit/images/propchangelistener.png"));
             icon = new PropChangListIcon(20, 20);
             myIconImage = icon.getImage();
             lab = new JLabel(icon);
@@ -140,7 +125,7 @@ public class PropChangeListenersList extends JList implements DragGestureListene
         }
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            String nm = ((Class) value).getName();
+            String nm = ((Class<?>) value).getName();
             txt.setText(nm.substring(nm.lastIndexOf('.') + 1));
             if (isSelected) {
                 txt.setOpaque(true);
@@ -157,7 +142,7 @@ public class PropChangeListenersList extends JList implements DragGestureListene
     public String getToolTipText(MouseEvent e) {
         int index = locationToIndex(e.getPoint());
         if (index > -1) {
-            Class c = (Class) model.getElementAt(index);
+            Class<?> c = (Class<?>) model.getElementAt(index);
             return c.getName(); //getPackage().getName();
         } else {
             return null;
@@ -199,14 +184,9 @@ public class PropChangeListenersList extends JList implements DragGestureListene
     }
 
     public String getClassName() {
-        Object o = PropChangeListenersList.this.getSelectedValue();
-        /*
-        TreePath path = getLeadSelectionPath();
-        DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object o = dmtn.getUserObject();
-         */
+        Object o = PropChangeListenersList.this.getSelectedValue();       
         if (o != null && o instanceof Class) {
-            return ((Class) o).getName();
+            return ((Class<?>) o).getName();
         }
         return null;
     }

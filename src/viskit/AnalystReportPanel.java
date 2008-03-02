@@ -43,13 +43,9 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit;
 
-import edu.nps.util.FileIO;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import org.apache.log4j.Logger;
-import viskit.xsd.assembly.XsltUtility;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -89,6 +85,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import edu.nps.util.FileIO;
+import org.apache.log4j.Logger;
+import viskit.xsd.assembly.XsltUtility;
+
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
 
     static Logger log = Logger.getLogger(AnalystReportPanel.class);
@@ -102,7 +102,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     private boolean dirty = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
-
+    
     public AnalystReportPanel() {
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
@@ -1123,7 +1123,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
     }
 }
-
 class WrappingTextArea extends JTextArea {
 
     WrappingTextArea() {

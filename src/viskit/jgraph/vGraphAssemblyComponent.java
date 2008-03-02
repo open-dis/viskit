@@ -231,7 +231,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 if (ch[i] instanceof AssemblyCircleCell) {
                     AssemblyCircleCell cc = (AssemblyCircleCell) ch[i];
                     Map<String, Rectangle> m = cc.getAttributes();
-                    Rectangle r = (Rectangle) m.get("bounds");
+                    Rectangle r = m.get("bounds");
                     if (r != null) {
                         EvGraphNode en = (EvGraphNode) cc.getUserObject();
                         en.setPosition(new Point(r.x, r.y));
@@ -242,7 +242,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 } else if (ch[i] instanceof AssemblyPropListCell) {
                     AssemblyPropListCell plc = (AssemblyPropListCell) ch[i];
                     Map<String, Rectangle> m = plc.getAttributes();
-                    Rectangle r = (Rectangle) m.get("bounds");
+                    Rectangle r = m.get("bounds");
                     if (r != null) {
                         PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point(r.x, r.y));
@@ -385,36 +385,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             if (en instanceof EvGraphNode) {
                 return ((EvGraphNode) en).getName();
             }    // label name is actually gotten in paintComponent
-        }
-        /*
-        else if (view instanceof vAssemblyEdgeView) {
-        vAssemblyEdgeCell aec = (vAssemblyEdgeCell)view.getCell();
-        Object e = aec.getUserObject();
-        if( e instanceof PropChangeEdge) {
-        return "PropChangeEdge"; // temp
-        }
-        else if ( e instanceof SimEvListenerEdge ) {
-        return "SimEvListenerEdge"; // temp
-        }
-        else if ( e instanceof AdapterEdge ) {
-        return " AdapterEdge";
-        }
-        }
-         */
-        /*         old
-        else if (view instanceof vEdgeView) {
-        vEdgeCell cc = (vEdgeCell) view.getCell();
-        Object e = cc.getUserObject();
-        if (e instanceof SchedulingEdge) {
-        SchedulingEdge se = (SchedulingEdge) e;
-        if (se.conditional == null || se.conditional.length() <= 0)   // put S only for conditional edges
-        return null;
-        return "S";
-        }
-        else if (e instanceof CancellingEdge) // should always be one of these 2 except for proto examples
-        return null;
-        }
-         */
+        }        
         return null;
     }
 
@@ -492,7 +463,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         // Holds the First and the Current Port
         protected PortView port,  firstPort;
 
-        /** Override to Gain Control (for PopupMenu and ConnectMode) */
+        /** Override to Gain Control (for PopupMenu and ConnectMode)
+         * @param e
+         * @return 
+         */
         @Override
         public boolean isForceMarqueeEvent(MouseEvent e) {
             // If Right Mouse Button we want to Display the PopupMenu
@@ -510,7 +484,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             return super.isForceMarqueeEvent(e);
         }
 
-        /** Display PopupMenu or Remember Start Location and First Port */
+        /** Display PopupMenu or Remember Start Location and First Port
+         * @param e 
+         */
         @Override
         public void mousePressed(final MouseEvent e) {
             // If Right Mouse Button
@@ -540,7 +516,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             }
         }
 
-        /** Find Port under Mouse and Repaint Connector */
+        /** Find Port under Mouse and Repaint Connector
+         * @param e 
+         */
         @Override
         public void mouseDragged(MouseEvent e) {
             // If remembered Start Point is Valid
@@ -594,7 +572,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             return getSourcePortAt(point);
         }
 
-        /** Connect the First Port and the Current Port in the Graph or Repaint */
+        /** Connect the First Port and the Current Port in the Graph or Repaint
+         * @param e 
+         */
         @Override
         public void mouseReleased(MouseEvent e) {
             // If Valid Event, Current and First Port

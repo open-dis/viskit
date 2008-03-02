@@ -91,8 +91,8 @@ public class ViskitConfig {
     }
 
     public XMLConfiguration getIndividualXMLConfig(String f) throws Exception {
-        XMLConfiguration config = new XMLConfiguration(f);
-        config.setAutoSave(true);
-        return config;
+        XMLConfiguration xmlConfig = new XMLConfiguration(f);
+        xmlConfig.setAutoSave(true);
+        return xmlConfig;
     }
 }

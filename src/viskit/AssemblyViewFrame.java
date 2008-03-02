@@ -113,16 +113,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /**
-   * Initialize the MCV connections
-   */
+     * Initialize the MCV connections
+     * @param mod
+     * @param ctrl 
+     */
     private void initMVC(AssemblyModel mod, AssemblyController ctrl) {
         setModel(mod);
         setController(ctrl);
     }
 
     /**
-   * Initialize the user interface
-   */
+     * Initialize the user interface
+     * @param contentOnly 
+     */
     private void initUI(boolean contentOnly) {
         buildMenus(contentOnly);
         buildToolbar(contentOnly);
@@ -281,7 +284,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /**
-     * Returns the current mode--select, add, arc, cancelArc
+     * @return the current mode--select, add, arc, cancelArc
      */
     public int getCurrentMode() {
         // Use the button's selected status to figure out what mode
@@ -299,8 +302,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         if (propChangeListenerMode.isSelected()) {
             return PCL_MODE;
         }
-        //assert false : "getCurrentMode()";
-        System.err.println("assert false : \"getCurrentMode()\"");
+        log.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -372,16 +374,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         //  }
         zoomIn.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        graphPane.setScale(graphPane.getScale() + 0.1d);
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                graphPane.setScale(graphPane.getScale() + 0.1d);
+            }
+        });
         zoomOut.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        graphPane.setScale(Math.max(graphPane.getScale() - 0.1d, 0.1d));
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                graphPane.setScale(Math.max(graphPane.getScale() - 0.1d, 0.1d));
+            }
+        });
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
     // not under control of the application controller (Controller.java).  Small, simple anonymous inner classes
@@ -460,12 +462,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         graphPane.addMouseListener(new vCursorHandler());
         try {
-            //DropTarget dt = graphPane.getDropTarget();
-      //System.out.println("blub");
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (Exception e) {
-            //assert false : "Drop target init. error";
-            System.err.println("assert false : \"Drop target init. error\"");
+            log.error("assert false : \"Drop target init. error\"");
         }
 
         canvasPanel = new JPanel();
@@ -625,23 +624,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         @Override
         public void mouseEntered(MouseEvent e) {
-        /*
-      switch(getCurrentMode()) {
-      case SELECT_MODE:
-      case SELF_REF_MODE:
-       graphPane.setCursor(select);
-       break;
-      case ARC_MODE:
-       graphPane.setCursor(arc);
-       break;
-      case CANCEL_ARC_MODE:
-       graphPane.setCursor(cancel);
-       break;
-      default:
-       //assert false : "vCursorHandler";
-       System.err.println("assert false : \"vCursorHandler\"");
-      }
-      */
+        
         }
     }
 
@@ -660,7 +643,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    /** permits user to edit existing entities */
+    /** permits user to edit existing entities
+     * @param evNode
+     * @return 
+     */
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
         return EventGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), evNode);
     }
@@ -753,7 +739,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     private JFileChooser jfc = new JFileChooser(new File("."));
 
-    /** Display a file chooser filtered by Assembly XML files only */
+    /** Display a file chooser filtered by Assembly XML files only
+     * @return the chosen XML Assembly file
+     */
     public File openFileAsk() {
 
         jfc.setDialogTitle("Open Assembly File");
@@ -829,6 +817,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
      * Called by the controller after source has been generated.  Show to the user and provide him with the option
      * to save.
      *
+     * @param className 
      * @param s Java source
      */
     public void showAndSaveSource(String className, String s) {
