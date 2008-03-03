@@ -775,7 +775,7 @@
             <table border="1" width="60%">
                 <tr>
                     <th bgcolor="#FFFFCC">
-                        <b>Run #</b>
+                        <b>Replication #</b>
                     </th>
                     <th bgcolor="#FFFFCC">
                         <b>
@@ -845,7 +845,7 @@
                         <b>Property</b>
                     </th>
                     <th bgcolor="#FFFFCC">
-                        <b># Runs</b>
+                        <b># Replications</b>
                     </th>
                     <th bgcolor="#FFFFCC">
                         <b>Min</b>
