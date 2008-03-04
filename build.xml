@@ -187,8 +187,8 @@
         <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <!-- useful for autogenerating stats schema and adding type validator -->
         <!--trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd" />        
-        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/-->
+        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd"/-->        
+        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
     <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
