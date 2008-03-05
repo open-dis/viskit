@@ -35,7 +35,7 @@
                 </action>
                 <action name="run">
                     <script>${ant.script}</script>
-                    <target>quick-run</target>
+                    <target>quick.run</target>
                 </action>
                 <action name="test">
                     <script>${ant.script}</script>
@@ -77,7 +77,7 @@
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>runtime.extenstions</build-target>
+                <build-target>build.viskit.with.runtime.extenstions</build-target>
             </export>
             <view>
                 <items>
