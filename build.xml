@@ -36,8 +36,6 @@
     
     <property description="Generated JAXB bindings for SGE qstat config" location="${dir.bindings}/sge/qstat" name="dir.src.sge.qstat"/>
     
-    <property description="Examples directory" location="examples" name="dir.examples"/>
-    
     <property description="Behavior Libraries Directory" location="BehaviorLibraries" name="behavior.lib" />
     
     <property description="DISKIT directory" location="../DISKIT" name="dir.diskit"/>
@@ -787,7 +785,7 @@
         <available file="${winJre}" property="winJre.exists" />
     </target>
     <target name="getJre" depends="checkJre" unless="winJre.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u2/promoted/b02/binaries/jdk-6u2-ea-bin-b02-windows-i586-p-12_apr_2007.exe" dest="${winJre}" />
+        <get src="http://www.java.net/download/jdk6/6u10/promoted/b12/binaries/jdk-6u10-ea-bin-b12-windows-i586-p-19_feb_2008.exe" dest="${winJre}" />
     </target>
     
     <target name="moveIzPack" if="build.host.windows">
@@ -886,10 +884,12 @@
             <fileset dir="${basedir}">
                 <exclude name="${basedir}/viskit/xsd/bindings"/>
             </fileset>
-        </copy>        
-        <copy todir="${installer}/stage/sources/Simkit">
+        </copy>
+        
+        <!-- TODO: Why do we need this if simkit.jar is already in lib/ -->
+        <!--copy todir="${installer}/stage/sources/Simkit">
             <fileset dir="${basedir}/../Simkit/Simkit"/>
-        </copy>        
+        </copy-->        
         <copy todir="${installer}/stage/images">
             <fileset dir="${images}"/>
         </copy>
@@ -908,10 +908,7 @@
         </copy>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
-        </copy>
-        <copy todir="${installer}/stage/examples">
-            <fileset dir="${basedir}/examples"/>
-        </copy>
+        </copy>        
         <copy todir="${installer}/stage/license">
             <fileset dir="${dir.src}/license"/>
         </copy>
@@ -1026,9 +1023,11 @@
         <copy todir="${installer}/stage/sources/DISKIT">
             <fileset dir="${basedir}/../DISKIT"/>
         </copy>
-        <copy todir="${installer}/stage/sources/Simkit">
+        
+        <!-- TODO: Why do we need this if simkit.jar is already in lib/ -->
+        <!--copy todir="${installer}/stage/sources/Simkit">
             <fileset dir="${basedir}/../Simkit/Simkit"/>
-        </copy>        
+        </copy-->        
         <copy todir="${installer}/stage/images">
             <fileset dir="${images}"/>
         </copy>
@@ -1050,9 +1049,6 @@
         </copy>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
-        </copy>
-        <copy todir="${installer}/stage/examples">
-            <fileset dir="${basedir}/examples"/>
         </copy>
         <copy todir="${installer}/stage/license">
             <fileset dir="${dir.src}/license"/>
