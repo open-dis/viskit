@@ -96,7 +96,7 @@ public class PclNodeInspectorDialog extends JDialog {
         typeField.setEditable(false);
         typeLab.setLabelFor(typeField);
 
-        clearStatsCB = new JCheckBox("Clear statistics after each run");
+        clearStatsCB = new JCheckBox("Clear statistics after each replication");
         clearStatsCB.setSelected(true); // bug 706
         clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
         clearStatsCB.addActionListener(lis);
@@ -182,7 +182,9 @@ public class PclNodeInspectorDialog extends JDialog {
 
             content.add(cont);
 
-            // Put up a "clear statistics after each run" checkbox if type is descendent of one of these:
+            /* Put up a "clear statistics after each replication" checkbox if 
+             * type is descendent of one of these:
+             */
             if (pclNode.isSampleStats()) {
                 clearStatsCB.setSelected(pclNode.isClearStatsAfterEachRun());
                 content.add(clearStatsCB);

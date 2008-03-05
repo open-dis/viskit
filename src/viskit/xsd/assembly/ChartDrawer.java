@@ -91,7 +91,7 @@ public class ChartDrawer {
         final JFreeChart chart = ChartFactory.createHistogram(
                 title,
                 label,
-                "Percentage of Frequency",
+                "Percentage of Occurrence",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true,

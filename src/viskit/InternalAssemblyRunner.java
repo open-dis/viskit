@@ -719,7 +719,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         doTitle(null);
     }
                 
-    StringBuilder npsString = new StringBuilder("<html><body>\n" + "<p><b>Now Running Replication ");
+    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
     
     public void propertyChange(PropertyChangeEvent evt) {
         log.debug(evt.getPropertyName());
@@ -729,7 +729,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue() + " of " + Integer.parseInt(runPanel.numRepsTF.getText()) + "</b>\n");
-            npsString.append("</p></body></html>\n");
+            npsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(npsString.toString());
             
             // reset for the next replication output

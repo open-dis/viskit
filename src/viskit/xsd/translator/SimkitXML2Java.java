@@ -1,8 +1,3 @@
-/*
- * SimkitXML2Java.java
- *
- * Created on March 23, 2004, 4:59 PM
- */
 package viskit.xsd.translator;
 
 import java.io.File;
@@ -31,7 +26,8 @@ import viskit.xsd.bindings.eventgraph.*;
 import org.apache.log4j.Logger;
 
 /**
- * @author  Rick Goldberg
+ * @author Rick Goldberg
+ * @since March 23, 2004, 4:59 PM
  * @version $Id: SimkitXML2Java.java 1669 2007-12-19 20:27:14Z tdnorbra $
  */
 public class SimkitXML2Java {
@@ -289,7 +285,7 @@ public class SimkitXML2Java {
         pw.println(p.getType() + sp + shortinate(p.getName()) + rp + sp + ob);
         pw.print(sp8 + "this" + pd + p.getName() + sp + eq + sp);
 
-        if (isArray(p.getType())) {
+        if (isArray(p.getType()) || isGeneric(p.getType())) {
             pw.print(lp + p.getType() + rp + sp + shortinate(p.getName()));
             pw.println(pd + "clone" + lp + rp + sc);
         } else {
@@ -298,8 +294,9 @@ public class SimkitXML2Java {
         pw.println(sp4 + cb);
         pw.println();
 
-        // also provide indexed set/getters, may be multidimensional however not expected
-        // to actually be multidimensional
+        /* also provide indexed set/getters, may be multidimensional, however,
+         * not expected to actually be multidimensional
+         */
         if (isArray(p.getType())) {
             int d = dims(p.getType());
 
@@ -484,8 +481,7 @@ public class SimkitXML2Java {
         for (int l = superPList.size(); l < this.root.getParameter().size(); l++) {
 
             Parameter pt = this.root.getParameter().get(l);
-            pw.println(sp8 + "set" + capitalize(pt.getName()) +
-                    lp + shortinate(pt.getName()) + rp + sc);
+            pw.println(sp8 + "set" + capitalize(pt.getName()) + lp + shortinate(pt.getName()) + rp + sc);
         }
 
         // create new arrays, if any
@@ -581,12 +577,14 @@ public class SimkitXML2Java {
             pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
         }
 
-        liStateT = run.getStateTransition();
-
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
             pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
-            pw.println(cm + sv.getName() + rp + sc);
+            
+            // Give these FPC "getters" as argements
+            String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
+            String stateVariableGetter = "get" + stateVariableName + lp + rp;
+            pw.println(cm + sp + stateVariableGetter + rp + sc);
         }
 
         for (Object o : liSchedCanc) {
@@ -1057,7 +1055,7 @@ public class SimkitXML2Java {
         if (aClass != null) {
             return java.lang.Cloneable.class.isAssignableFrom(aClass);
         }
-        return isArray(c);
+        return isArray(c) || isGeneric(c);
     }
 
     private boolean isArray(String c) {
