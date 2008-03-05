@@ -6,7 +6,7 @@
             <!-- Do not use Project Properties customizer when editing this file manually. -->
             <name>Viskit</name>
             <properties>
-                <property name="ant.script">nbproject/ide-file-targets.xml</property> 
+                <property name="ant.script">nbproject/ide-file-targets.xml</property>
             </properties>
             <folders>
                 <source-folder>
@@ -22,11 +22,11 @@
             </folders>
             <ide-actions>
                 <action name="build">
-                    <script>${ant.script}</script> 
-                    <target>build.examples</target>
+                    <script>${ant.script}</script>
+                    <target>build.viskit.with.runtime.extenstions</target>
                 </action>
                 <action name="clean">
-                    <script>${ant.script}</script> 
+                    <script>${ant.script}</script>
                     <target>clean.all</target>
                 </action>
                 <action name="javadoc">
@@ -44,7 +44,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean.all</target>
-                    <target>build.examples</target>
+                    <target>build.viskit.with.runtime.extenstions</target>
                 </action>
                 <action name="run.single">
                     <script>${ant.script}</script>
@@ -71,13 +71,13 @@
                             <separated-files>,</separated-files>
                         </arity>
                     </context>
-                </action>                
+                </action>
             </ide-actions>
             <export>
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>build.examples</build-target>
+                <build-target>runtime.extenstions</build-target>
             </export>
             <view>
                 <items>
@@ -90,7 +90,7 @@
                         <location>test</location>
                     </source-folder>
                     <source-file>
-                        <location>${ant.script}</location> 
+                        <location>${ant.script}</location>
                     </source-file>
                 </items>
                 <context-menu>
