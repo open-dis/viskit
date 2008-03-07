@@ -1047,8 +1047,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 if (JOptionPane.YES_OPTION ==
                     JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
                     "Rename analyst report output?",
-                    "Confirm", JOptionPane.WARNING_MESSAGE))
-                {
+                    "Confirm", JOptionPane.YES_NO_OPTION)) {
                     genChooser.showSaveDialog(AnalystReportPanel.this);
                 }
 //                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
