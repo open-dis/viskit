@@ -71,7 +71,7 @@ import static edu.nps.util.GenericConversion.toArray;
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     static Logger log = Logger.getLogger(BasicAssembly.class);
-    protected LinkedHashMap<Integer, ArrayList> replicationData;
+    protected LinkedHashMap<Integer, ArrayList<SavedStats>> replicationData;
     protected PropertyChangeListener[] replicationStats;
     protected SampleStatistics[] designPointStats;
     protected SimEntity[] simEntity;
@@ -121,7 +121,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         form = new DecimalFormat("0.0000");
         setPrintReplicationReports(false);
         setPrintSummaryReport(true);
-        replicationData = new LinkedHashMap<Integer, ArrayList>();
+        replicationData = new LinkedHashMap<Integer, ArrayList<SavedStats>>();
         simEntity = new SimEntity[0];
         replicationStats = new PropertyChangeListener[0];
         designPointStats = new SampleStatistics[0];
@@ -437,14 +437,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return replicationStats.clone();
     }
 
-    // TODO: fix generics: SampleStatistics vs SavedStats
-    @SuppressWarnings("unchecked")
+    /**
+     * 
+     * @param id
+     * @return
+     */
     public SampleStatistics[] getReplicationStats(int id) {
         SampleStatistics[] stats = null;
 
-        ArrayList<SampleStatistics> reps = replicationData.get(new Integer(id));
+        ArrayList<SavedStats> reps = replicationData.get(new Integer(id));
         if (reps != null) {
-            stats = toArray(reps, new SampleStatistics[0]);
+            stats = toArray(reps, new SavedStats[0]);
         }
         return stats;
     }
@@ -470,8 +473,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-    public Map<Integer, ArrayList> getReplicationData() {
-        return new LinkedHashMap<Integer, ArrayList>(replicationData);
+    public Map<Integer, ArrayList<SavedStats>> getReplicationData() {
+        return new LinkedHashMap<Integer, ArrayList<SavedStats>>(replicationData);
     }
 
     /**
