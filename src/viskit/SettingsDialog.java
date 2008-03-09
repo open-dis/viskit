@@ -239,7 +239,7 @@ public class SettingsDialog extends JDialog {
         try {
             vConfig = VGlobals.instance().getHistoryConfig();
         } catch (Exception e) {
-            System.out.println("Error loading config file: " + e.getMessage());
+            log.error("Error loading config file: " + e.getMessage());
             vConfig = null;
         }
     }
@@ -300,7 +300,6 @@ public class SettingsDialog extends JDialog {
 
         progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         
-        //progressDialog.add(panel, BorderLayout.PAGE_START);
         progress.setIndeterminate(true);
         progress.setString("Loading Libraries");
         progress.setStringPainted(true);
@@ -549,6 +548,13 @@ public class SettingsDialog extends JDialog {
     }
 
     public static boolean isVerboseDebug() {
-        return getVisibilitySense(debugMsgsKey);
+        boolean b = false;
+        try {
+            b = vConfig.getBoolean(debugMsgsKey);
+        } catch (Exception e) {
+            // probably no-such-element
+        }
+        return b;
+//        return getVisibilitySense(debugMsgsKey);
     }
 }
