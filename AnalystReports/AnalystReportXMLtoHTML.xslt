@@ -772,40 +772,42 @@
             </div>
         </xsl:for-each>
         <div align="center">
-            <p>
-                <xsl:value-of select="Replication[@count != '0']"/>
+            <!--p>
                 <xsl:variable name="allCountsZero">
                     <xsl:choose>
-                        <xsl:when test="Replication[@count != '0']">
-                            <xsl:text>false</xsl:text>
+                        <xsl:when test="number(@count) != 0">
+                            <xsl:text>allCountsZero: false </xsl:text>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:text>true</xsl:text>
+                            <xsl:text>allCountsZero: true </xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
+                <xsl:value-of select="$allCountsZero"/>
                 <xsl:variable name="allCountsOne">
                     <xsl:choose>
-                        <xsl:when test="Replication[@count != '1']">
-                            <xsl:text>false</xsl:text>
+                        <xsl:when test="number(@count) != 1">
+                            <xsl:text>allCountsOne: false </xsl:text>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:text>true</xsl:text>
+                            <xsl:text>allCountsOne: true </xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
+                <xsl:value-of select="$allCountsOne"/>
                 <xsl:variable name="allMeansEqual">
-                    <xsl:variable name="firstMean" select="Replication[0]/@mean"/>
+                    <xsl:variable name="firstMean" select="number(@mean)"/>
                     <xsl:choose>
-                        <xsl:when test="Replication[@mean != $firstMean]">
-                            <xsl:text>false</xsl:text>
+                        <xsl:when test="number(Replication[@mean]) != $firstMean">
+                            <xsl:text>allMeansEqual: false</xsl:text>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:text>true</xsl:text>
+                            <xsl:text>allMeansEqual: true</xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-            </p>                            
+                <xsl:value-of select=" $allMeansEqual"/>
+            </p-->                            
             <table border="1" width="60%">
                 <tr>
                     <th bgcolor="#FFFFCC">
@@ -831,70 +833,75 @@
                     <th bgcolor="#FFFFCC">
                         <b>Variance</b>
                     </th>
-                </tr>                
-                <xsl:choose>
-                    <xsl:when test="@count = '1'">
-                        <xsl:for-each select="Replication">
-                            <tr>
-                                <td>
-                                    <xsl:value-of select="@number"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@mean"/>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:when test="@count = '0'">                    
-                        <xsl:for-each select="Replication">
-                            <tr>
-                                <td>
-                                    <xsl:value-of select="@number"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@count"/>
-                                </td>
-                                <td>
-                                </td>
-                                <td>
-                                </td>
-                                <td>
-                                </td>
-                                <td>
-                                </td>
-                                <td>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise>                
-                        <xsl:for-each select="Replication">
-                            <tr>
-                                <td>
-                                    <xsl:value-of select="@number"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@count"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@minObs"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@maxObs"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@mean"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@stdDeviation"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="@variance"/>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
-                    </xsl:otherwise>
-                </xsl:choose>                
+                </tr>
+                <xsl:for-each select="Replication">                        
+                    <xsl:if test="number(@count) = 0">                    
+                        <tr>
+                            <td>
+                                <xsl:value-of select="@number"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@count"/>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>                            
+                    </xsl:if>
+                    <xsl:if test="number(@count) = 1">
+                        <tr>
+                            <td>
+                                <xsl:value-of select="@number"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@count"/>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@mean"/>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </xsl:if>
+                    <xsl:if test="number(@count) &gt; 1">
+                        <tr>
+                            <td>
+                                <xsl:value-of select="@number"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@count"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@minObs"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@maxObs"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@mean"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@stdDeviation"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="@variance"/>
+                            </td>
+                        </tr>
+                    </xsl:if>
+                </xsl:for-each>
             </table>
         </div>
         <p/>
@@ -914,7 +921,7 @@
                         <b>Entity</b>
                     </th>
                     <th bgcolor="#FFFFCC">
-                        <b>Property</b>
+                        <b>MoE / MoP</b>
                     </th>
                     <th bgcolor="#FFFFCC">
                         <b># Replications</b>
