@@ -16,8 +16,13 @@
     </Cluster>
   </history>
   <extraClassPath>
+      <!-- required always -->
       <path value="lib/simkit.jar"/>
-      <path value="lib/ext/diskit.jar"/>
+      
+      <!-- Optional paths -->
+      
+      <!-- need to manually add this if runtime.extentions are desired -->
+      <!--path value="lib/ext/diskit.jar"/-->
       <path value="BehaviorLibraries"/>
   </extraClassPath>
   <application>
