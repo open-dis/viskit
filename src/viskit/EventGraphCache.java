@@ -202,7 +202,7 @@ public class EventGraphCache {
             
             // Don't care about jar files here
             if (eventGraphPath.contains("jar")) {continue;}
-            log.info("Event Graph Path: " + eventGraphPath);
+            log.debug("Event Graph Path: " + eventGraphPath);
             eventGraphDir = eventGraphPath + fileTypePackageToPath;
         }
         
