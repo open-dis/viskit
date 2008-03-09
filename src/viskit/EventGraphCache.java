@@ -194,17 +194,11 @@ public class EventGraphCache {
         
         String eventGraphDir = "";
         String eventGraphPath = "";
-        String tempDirPath = "";
         
         // Locate the URL of the event graph directory
-        // TODO: resolve when several paths contain EGs
+        // TODO: resolve case when several classpaths are registered
         for (URL eventGraphURL : SettingsDialog.getExtraClassPathArraytoURLArray()) {
             eventGraphPath = eventGraphURL.toString();
-            if (eventGraphPath.equals(tempDirPath)) {
-                log.info("equals");
-                continue;
-            }
-            tempDirPath = eventGraphPath;
             
             // Don't care about jar files here
             if (eventGraphPath.contains("jar")) {continue;}
