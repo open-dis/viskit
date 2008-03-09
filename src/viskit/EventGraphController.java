@@ -120,8 +120,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         VGlobals.instance().quitEventGraphEditor();
     }
 
-    public void newEventGraph() //-------------------------
-    {
+    public void newEventGraph() {
         Model mod = new Model(this);
         mod.init();
         mod.newModel(null);
@@ -195,7 +194,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 }
             }
         }
-        if (false == mod.newModel(file) || isOpenAlready) {
+        if (!mod.newModel(file) || isOpenAlready) {
             ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
             return;
         }

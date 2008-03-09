@@ -18,6 +18,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import edu.nps.util.FileIO;
+import org.apache.log4j.Logger;
 import viskit.ModelEvent;
 import viskit.VGlobals;
 import viskit.ViskitController;
@@ -34,7 +35,7 @@ import viskit.xsd.translator.SimkitXML2Java;
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
- * www.nps.navy.mil
+ * www.nps.edu
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 1:09:38 PM
@@ -42,6 +43,8 @@ import viskit.xsd.translator.SimkitXML2Java;
  */
 public class Model extends mvcAbstractModel implements ViskitModel {
 
+    static Logger log = Logger.getLogger(Model.class);
+    
     JAXBContext jc;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
@@ -56,7 +59,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private String stateVarPrefix = "state_";
     private GraphMetaData metaData;
     private ViskitController controller;
-
+    
     public Model(ViskitController controller) {
         this.controller = controller;
     }
@@ -108,7 +111,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
      * @return true for good open, else false
      */
     public boolean newModel(File f) {
-        GraphMetaData mymetaData;
+        GraphMetaData mymetaData = null;
         if (f == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
 
@@ -125,6 +128,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
                 // see u.isValidating()
                 // Unmarshaller does NOT validate by default
+                
                 jaxbRoot = (SimEntity) u.unmarshal(f);
                 mymetaData = new GraphMetaData();
                 mymetaData.author = jaxbRoot.getAuthor();

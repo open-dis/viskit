@@ -207,7 +207,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                 if (ch[i] instanceof CircleCell) {
                     CircleCell cc = (CircleCell) ch[i];
                     Map<String, Rectangle> m = cc.getAttributes();
-                    Rectangle r = (Rectangle) m.get("bounds");
+                    Rectangle r = m.get("bounds");
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
                         en.setPosition(new Point(r.x, r.y));
@@ -324,7 +324,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                     sb.append("</center>");
 
                     if (!en.getComments().isEmpty()) {
-                        String stripBrackets = new String((String) en.getComments().get(0)).trim();
+                        String stripBrackets = new String(en.getComments().get(0)).trim();
                         if (stripBrackets.length() > 0) {
                             sb.append("<u>description</u><br>");
                             sb.append(wrapAtPos(escapeLTGT(stripBrackets), 60));

@@ -1,6 +1,5 @@
 package viskit;
 
-import java.lang.reflect.InvocationTargetException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -1079,8 +1078,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             String cp = getCustomClassPath();
 
-            //int reti =  com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
-            System.out.println("Compiling " + f.getCanonicalPath());
+//            int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
+            log.info("Compiling " + f.getCanonicalPath());
             int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-classpath", cp, "-d", f.getParent(), f.getCanonicalPath()});
 
             if (reti == 0 || completeOnBadCompile) {

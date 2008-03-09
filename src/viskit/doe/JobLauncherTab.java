@@ -1208,12 +1208,12 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         }
         java.util.Enumeration stats = ret.elements();
         while (stats.hasMoreElements()) {
-            String data = (String) stats.nextElement();
+            String statsData = (String) stats.nextElement();
             try {
                 if (viskit.Vstatics.debug) {
-                    System.out.println("\tAdding data " + data);
+                    System.out.println("\tAdding data " + statsData);
                 }
-                SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
+                SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(statsData.getBytes()));
 
                 statsGraph.addSampleStatistic(sst, d, s);
             } catch (JAXBException ex) {

@@ -180,7 +180,9 @@ public class EventGraphCache {
         int fileTypeLength = fileType.length();
         for (int i = 0; i < fileTypeLength; i++) {
             letter = fileType.charAt(i);
-            if (letter == '.') idx = i;
+            if (letter == '.') {
+                idx = i;
+            }
         }
         
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
@@ -192,18 +194,22 @@ public class EventGraphCache {
         
         String eventGraphDir = "";
         String eventGraphPath = "";
+        String tempDirPath = "";
         
         // Locate the URL of the event graph directory
+        // TODO: resolve when several paths contain EGs
         for (URL eventGraphURL : SettingsDialog.getExtraClassPathArraytoURLArray()) {
             eventGraphPath = eventGraphURL.toString();
-            log.debug("Event Graph Path: " + eventGraphPath);
+            if (eventGraphPath.equals(tempDirPath)) {
+                log.info("equals");
+                continue;
+            }
+            tempDirPath = eventGraphPath;
             
-            /* TODO: Warning - this assumes that event graphs will be stored in
-             * a directory that has the name "Behavior" in its parent path
-             */
-            if (eventGraphPath.contains("Behavior")) {
-                eventGraphDir = eventGraphPath + fileTypePackageToPath;
-            } 
+            // Don't care about jar files here
+            if (eventGraphPath.contains("jar")) {continue;}
+            log.info("Event Graph Path: " + eventGraphPath);
+            eventGraphDir = eventGraphPath + fileTypePackageToPath;
         }
         
         eventGraphDir = eventGraphDir.replaceAll("\\\\", "/");

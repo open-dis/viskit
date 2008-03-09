@@ -382,7 +382,7 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                System.err.println("Can't resolve type: " + type);
+                log.error("Can't resolve type: " + type);
                 return resolved;
             }
             if (debug) {

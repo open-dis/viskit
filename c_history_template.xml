@@ -19,11 +19,11 @@
       <!-- required always -->
       <path value="lib/simkit.jar"/>
       
-      <!-- Optional paths -->
+      <!-- Optional paths -->      
+      <path value="BehaviorLibraries"/>
       
       <!-- need to manually add this if runtime.extentions are desired -->
       <!--path value="lib/ext/diskit.jar"/-->
-      <path value="BehaviorLibraries"/>
   </extraClassPath>
   <application>
     <tabs>

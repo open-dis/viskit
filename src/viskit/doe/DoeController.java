@@ -313,10 +313,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     private JFileChooser initFileChooser() {
-        JFileChooser chooser = new JFileChooser(); //System.getProperty("user.home")+"/Desktop"); //dir")); //"Scripts");
+        JFileChooser chooser = new JFileChooser(); 
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setCurrentDirectory(new File(System.getProperty("user.dir") +
-                System.getProperty("file.separator") + "examples"));
+        chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         FileHandler.FileFilterEx[] filter = {new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
                 new FileHandler.FileFilterEx(".xml", "Assembly files (*.xml)", true)};
         for (int i = 0; i < filter.length; i++) {

@@ -63,7 +63,7 @@ public class Launcher extends Thread implements Runnable {
                     JarEntry je;
                     while ((je = jis.getNextJarEntry()) != null) {
                         String name = je.getName();
-                        System.out.println("Loading EventGraph from BehaviorLibraries: " + name);
+                        System.out.println("Loading EventGraph from: " + name);
                         // nb: BehaviorLibraries is sort of hard coded here,
                         // better to have a property tbd
                         if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml")) {
