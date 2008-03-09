@@ -18,7 +18,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.JarOutputStream;
@@ -181,6 +180,8 @@ public class Launcher extends Thread implements Runnable {
 
     /**
      * read in XML to String
+     * @param assemblyURL
+     * @throws java.lang.Exception 
      */
     public void setAssembly(URL assemblyURL) throws Exception {
         URLConnection urlc = assemblyURL.openConnection();
@@ -234,6 +235,8 @@ public class Launcher extends Thread implements Runnable {
 
     /**
      * read in XML to String
+     * @param is
+     * @throws java.lang.Exception 
      */
     public void addEventGraph(InputStream is) throws Exception {
         int c = 0;

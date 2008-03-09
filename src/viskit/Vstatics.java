@@ -32,6 +32,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
 public class Vstatics {
     
     static Logger log = Logger.getLogger(Vstatics.class);
+    public static boolean debug = false;
 
     /**
      * Convert a class name to human readable form.  (See Class.getName());
@@ -548,5 +549,4 @@ public class Vstatics {
             }
         }
     }
-    public static boolean debug = false;
 }

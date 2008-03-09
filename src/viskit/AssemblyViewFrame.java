@@ -342,8 +342,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 "Zoom out on the graph");
 
         Action runAction = ActionIntrospector.getAction(getController(), "runAssembly");
-        runButt = makeButton(runAction, "viskit/images/Play24.gif",
-                "Run the assembly");
+        runButt = makeButton(runAction, "viskit/images/Play24.gif", "Run the assembly");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
         modeButtonGroup.add(simEventListenerMode);
@@ -892,6 +891,5 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 }
 
 interface DragStartListener {
-
     public void startingDrag(Transferable trans);
 }

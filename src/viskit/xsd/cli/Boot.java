@@ -14,7 +14,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.JarURLConnection;
 import java.net.URLClassLoader;
-import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.Properties;
@@ -144,7 +143,9 @@ public class Boot extends URLClassLoader implements Runnable {
                     // note this depends on the builder to rename the tools.jars appropriately!
                     
                     if ( name.endsWith("jar") ) {
-                        if (debug) System.out.println("Found internal jar externalizing "+name);
+                        if (debug) {
+                            System.out.println("Found internal jar externalizing " + name);
+                        }
                         File extJar;
                         extJar = File.createTempFile(name,".jar");
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
@@ -161,11 +162,17 @@ public class Boot extends URLClassLoader implements Runnable {
                         fos.close();
                         // capture any jars within the jar in the jar...
                         addURL(extJar.toURI().toURL());
-                        if (debug) System.out.println("File to new jar "+extJar.getCanonicalPath());
-                        if (debug) System.out.println("Added jar "+extJar.toURI().toURL().toString());
+                        if (debug) {
+                            System.out.println("File to new jar " + extJar.getCanonicalPath());
+                        }
+                        if (debug) {
+                            System.out.println("Added jar " + extJar.toURI().toURL().toString());
+                        }
                         String systemClassPath = System.getProperty("java.class.path");
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
-                        if (debug) System.out.println("ClassPath "+System.getProperty("java.class.path"));                        
+                        if (debug) {
+                            System.out.println("ClassPath " + System.getProperty("java.class.path"));
+                        }                        
                     }
                 }
             }
@@ -176,10 +183,14 @@ public class Boot extends URLClassLoader implements Runnable {
     
     @Override
     protected Class findClass(String name) throws ClassNotFoundException {
-        if (debug) System.out.println("Finding class "+name);
+        if (debug) {
+            System.out.println("Finding class " + name);
+        }
         Class clz = super.findClass(name);
         resolveClass(clz); // still needed?
-        if (debug) System.out.println(clz);
+        if (debug) {
+            System.out.println(clz);
+        }
         return clz;
     }
     
@@ -187,7 +198,7 @@ public class Boot extends URLClassLoader implements Runnable {
         try {
             Class<?> lclaz = loadClass("viskit.xsd.cli.Launcher");
             Constructor lconstructor = lclaz.getConstructor(new Class[0]);
-            Launcher launcher = (Launcher)lconstructor.newInstance(new Object[0]);
+            Launcher launcher = (Launcher) lconstructor.newInstance(new Object[0]);
             runner = new Thread(launcher);
             runner.setContextClassLoader(this);
             runner.start();
@@ -205,7 +216,7 @@ public class Boot extends URLClassLoader implements Runnable {
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);
-            String javaVersion = p.getProperty("JavaVersion") == null? "unk":p.getProperty("JavaVersion");
+            String javaVersion = (p.getProperty("JavaVersion") == null) ? "unk" : p.getProperty("JavaVersion");
             if (javaVersion.indexOf("1.4") > 0) {
                 rev = new String("java14");
             }
@@ -217,12 +228,16 @@ public class Boot extends URLClassLoader implements Runnable {
     
     public static void main(String[] args) throws Exception {
         URL u = Boot.class.getClassLoader().getResource("viskit/xsd/cli/Boot.class");
-        if (debug) System.out.println(u);
+        if (debug) {
+            System.out.println(u);
+        }
         URLConnection urlc = u.openConnection();
         if ( urlc instanceof JarURLConnection ) {
             u = ((JarURLConnection)urlc).getJarFileURL();
         }
-        if (debug) System.out.println("Booting "+u);
+        if (debug) {
+            System.out.println("Booting " + u);
+        }
         bootee = new Boot(new URL[] { u });
         bootee.setArgs(args);
         booter = new Thread(bootee);

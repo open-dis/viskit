@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -333,7 +333,6 @@ public class SettingsDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        //classPathJlist.removeAll();
         DefaultListModel mod = new DefaultListModel();
         String[] sa = getExtraClassPath();
         for (int i = 0; i < sa.length; i++) {
@@ -523,11 +522,12 @@ public class SettingsDialog extends JDialog {
             initConfig();
         }
 
+        // This is how we get the Analyst Report panel visible in SavageStudio
         boolean b = true; // by default
         try {
             b = vConfig.getBoolean(prop);
         } catch (Exception e) {
-        // probably no-such-element
+            // probably no-such-element
         }
         return b;
     }

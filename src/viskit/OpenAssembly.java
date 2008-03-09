@@ -118,13 +118,7 @@ public class OpenAssembly {
     public void doParamLocallyEditted(AssyChangeListener source) {
         fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
     }
-    /*
-    public void doSendAssyJdomChanged(AssyChangeListener source)
-    {
-    fireAction(AssyChangeListener.JDOM_CHANGED,source);
-    }
-     */
-
+   
     public void doSendAssyJaxbChanged(AssyChangeListener source) {
         fireAction(AssyChangeListener.JAXB_CHANGED, source, null);
     }

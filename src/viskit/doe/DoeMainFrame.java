@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,16 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Jul 20, 2005
- * @since 10:36:33 AM
- */
-
 package viskit.doe;
 
 import viskit.TitleListener;
@@ -54,141 +44,141 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class DoeMainFrame extends JFrame implements DoeEvents
-{
-  DoeController controller;
-  JScrollPane leftJsp;
-  JScrollPane rightJsp;
-  JPanel leftP, rightP;
-  JSplitPane split;
-  JComponent content;
-  boolean contentOnly;
-  public String titleString = "Simkit/Viskit/Gridkit Experiment Design";
+/**
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Jul 20, 2005
+ * @since 10:36:33 AM
+ * @version $Id:$
+ */
+public class DoeMainFrame extends JFrame implements DoeEvents {
 
-  public DoeMainFrame(boolean contentOnly, DoeController controller)
-  {
-    setTitle(titleString);
-    this.contentOnly = contentOnly;
-    this.controller = controller;
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    addWindowListener(new myWlistener());
+    DoeController controller;
+    JScrollPane leftJsp;
+    JScrollPane rightJsp;
+    JPanel leftP, rightP;
+    JSplitPane split;
+    JComponent content;
+    boolean contentOnly;
+    public String titleString = "Simkit/Viskit/Gridkit Experiment Design";
 
-    leftP = new JPanel(new BorderLayout());
-    //rightP = new JPanel(new BorderLayout());
-    //split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
+    public DoeMainFrame(boolean contentOnly, DoeController controller) {
+        setTitle(titleString);
+        this.contentOnly = contentOnly;
+        this.controller = controller;
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new myWlistener());
 
-    content = new JPanel();
-    content.setLayout(new BorderLayout());
+        leftP = new JPanel(new BorderLayout());
+        //rightP = new JPanel(new BorderLayout());
+        //split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
 
-    //content.add(split,BorderLayout.CENTER);
-    //content.add(leftP,BorderLayout.CENTER);
-    JLabel lab =new JLabel("This is initialized when an assembly is opened.");
-    lab.setHorizontalAlignment(JLabel.CENTER);
-    content.add(lab,BorderLayout.NORTH);
-    getContentPane().setLayout(new BorderLayout());
+        content = new JPanel();
+        content.setLayout(new BorderLayout());
+
+        //content.add(split,BorderLayout.CENTER);
+        //content.add(leftP,BorderLayout.CENTER);
+        JLabel lab = new JLabel("This is initialized when an assembly is opened.");
+        lab.setHorizontalAlignment(JLabel.CENTER);
+        content.add(lab, BorderLayout.NORTH);
+        getContentPane().setLayout(new BorderLayout());
     //getContentPane().add(split,BorderLayout.CENTER);
-  }
-
-  private DoeFileModel dfm;
-  public void setModel(DoeFileModel dfm)
-  {
-    this.dfm = dfm;
-    if(dfm == null)
-      doTitle("");
-    else {
-      dfm.paramTable.setBorder(new EtchedBorder()); // double etched with below
-      leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
-      leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10,10,5,10),new EtchedBorder()));
-      doTitle(dfm.userFile.getName());
     }
-  }
+    private DoeFileModel dfm;
 
-  public void removeContent()
-  {
-    content.removeAll();
-  }
-
-  public void installContent()
-  {
-    removeContent();
-    content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
-    if (leftJsp != null) {
-/*
-      if (contentOnly) {
-        content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
-      }
-*/
-      content.add(leftJsp); //, BorderLayout.CENTER);
-      JButton sv = new JButton("Save");
-      sv.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e)
-        {
-          controller.saveDoeParams();
+    public void setModel(DoeFileModel dfm) {
+        this.dfm = dfm;
+        if (dfm == null) {
+            doTitle("");
+        } else {
+            dfm.paramTable.setBorder(new EtchedBorder()); // double etched with below
+            leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
+            leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 5, 10), new EtchedBorder()));
+            doTitle(dfm.userFile.getName());
         }
-      });
-      sv.setToolTipText("<html><center>Save experiment parameters<br>to assembly file<br>"+
-                        "(not required to run job)");
-      sv.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0,0,10,10),sv.getBorder()));
-      JPanel moveRight = new JPanel();
-      moveRight.setLayout(new BoxLayout(moveRight,BoxLayout.X_AXIS));
-      moveRight.add(Box.createHorizontalGlue());
-      moveRight.add(sv);
-      content.add(moveRight);
-      content.validate();
     }
-    if (!contentOnly) {
-      getContentPane().add(content, BorderLayout.CENTER);
-      getContentPane().validate();
+
+    public void removeContent() {
+        content.removeAll();
     }
-  }
 
-  public DoeFileModel getModel()
-  {
-    return dfm;
-  }
+    public void installContent() {
+        removeContent();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        if (leftJsp != null) {
+            /*
+            if (contentOnly) {
+            content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
+            }
+             */
+            content.add(leftJsp); //, BorderLayout.CENTER);
+            JButton sv = new JButton("Save");
+            sv.addActionListener(new ActionListener() {
 
-  public DoeController getController()
-  {
-    return controller;
-  }
-
-  public JComponent getContent()
-  {
-    return content;
-  }
-
-  class myWlistener extends WindowAdapter
-  {
-    public void windowClosing(WindowEvent e)
-    {
-      SwingUtilities.invokeLater(new Runnable()
-      {
-        public void run()
-        {
-          controller.actionPerformed(EXIT_APP);
+                public void actionPerformed(ActionEvent e) {
+                    controller.saveDoeParams();
+                }
+            });
+            sv.setToolTipText("<html><center>Save experiment parameters<br>to assembly file<br>" +
+                    "(not required to run job)");
+            sv.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 10, 10), sv.getBorder()));
+            JPanel moveRight = new JPanel();
+            moveRight.setLayout(new BoxLayout(moveRight, BoxLayout.X_AXIS));
+            moveRight.add(Box.createHorizontalGlue());
+            moveRight.add(sv);
+            content.add(moveRight);
+            content.validate();
         }
-      });
+        if (!contentOnly) {
+            getContentPane().add(content, BorderLayout.CENTER);
+            getContentPane().validate();
+        }
     }
-  }
 
-  private String namePrefix = "Viskit Design of Experiments";
-  private String currentTitle = namePrefix;
-  private void doTitle(String nm)
-  {
-    if(nm != null && nm.length()>0)
-      currentTitle = namePrefix +": "+nm;
+    public DoeFileModel getModel() {
+        return dfm;
+    }
 
-    if(titlLis != null)
-      titlLis.setTitle(currentTitle,titlLisIdx);
-  }
+    public DoeController getController() {
+        return controller;
+    }
 
-  TitleListener titlLis;
-  int titlLisIdx;
-  public void setTitleListener(TitleListener tLis, int idx)
-  {
-    titlLis = tLis;
-    titlLisIdx = idx;
-    doTitle(null);
-  }
+    public JComponent getContent() {
+        return content;
+    }
 
+    class myWlistener extends WindowAdapter {
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    controller.actionPerformed(EXIT_APP);
+                }
+            });
+        }
+    }
+    private String namePrefix = "Viskit Design of Experiments";
+    private String currentTitle = namePrefix;
+
+    private void doTitle(String nm) {
+        if (nm != null && nm.length() > 0) {
+            currentTitle = namePrefix + ": " + nm;
+        }
+
+        if (titlLis != null) {
+            titlLis.setTitle(currentTitle, titlLisIdx);
+        }
+    }
+    TitleListener titlLis;
+    int titlLisIdx;
+
+    public void setTitleListener(TitleListener tLis, int idx) {
+        titlLis = tLis;
+        titlLisIdx = idx;
+        doTitle(null);
+    }
 }

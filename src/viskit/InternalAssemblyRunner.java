@@ -100,7 +100,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         inRegressionMode = false;
 
         saver = new saveListener();
-        runPanel = new RunnerPanel2(null, true); //"Initialize using Assembly Edit tab, then Run button",true);
+        
+        // ("Initialize using Assembly Edit tab, then Run button", true);        
+        runPanel = new RunnerPanel2(null, true);
         doMenus();
         runPanel.vcrStop.addActionListener(new stopListener());
         runPanel.vcrPlay.addActionListener(new startResumeListener());
@@ -130,10 +132,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
     }
 
-    public JComponent getContent() {
-        return runPanel;
-    }
-
+    public JComponent getRunnerPanel() {return runPanel;}
+    
     public JMenuBar getMenus() {
         return myMenuBar;
     }

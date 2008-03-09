@@ -80,7 +80,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     public void actionPerformed(char c, Object src) {
-        actionPerformed(new ActionEvent(src, 0, new String(new char[]{c})));
+        actionPerformed(new ActionEvent(src, 0, new String(new char[] {c})));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -202,14 +202,6 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         }
     }
 
-    /*
-  private void doClose()
-  {
-    checkDirty();
-    doeFrame.setModel(null);
-    doeFrame.removeContent();
-  }
-*/
     private void olddoOpen(File f) // todo remove
     {
         try {
@@ -404,7 +396,6 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 default:
 
             }
-
         }
     }
 }

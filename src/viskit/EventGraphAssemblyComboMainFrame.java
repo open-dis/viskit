@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -162,21 +162,21 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
         }
 
+        // Assembly Run
         runTabbedPane = new JTabbedPane();
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(new Color(206, 206, 255)); // light blue
-        p.add(runTabbedPane, BorderLayout.CENTER);
+        JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
+        runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
+        runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
+        int tabbedPaneIdx = -1;
         if (SettingsDialog.isAssemblyRunVisible()) {
-            tabbedPane.add(p);
-            int idx = tabbedPane.indexOfComponent(p);
-            tabbedPane.setTitleAt(idx, "Assembly Run");
-            tabbedPane.setToolTipTextAt(idx, "Run simulation defined by assembly");
+            tabbedPane.add(runTabbedPanePanel);
+            tabbedPaneIdx = tabbedPane.indexOfComponent(runTabbedPanePanel);
+            tabbedPane.setTitleAt(tabbedPaneIdx, "Assembly Run");
+            tabbedPane.setToolTipTextAt(tabbedPaneIdx, "Run simulation defined by assembly");
             menus.add(null); // placeholder
-            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
-        } else {
-            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = -1;
         }
-
+        tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = tabbedPaneIdx;
+        
         // Analyst report
         if (SettingsDialog.isAnalystReportVisible()) {
             tabbedPane.add(reportPanel = new AnalystReportPanel());
@@ -199,7 +199,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         // Assembly runner
         asyRunComponent = new InternalAssemblyRunner();
-        runTabbedPane.add(asyRunComponent.getContent(), TAB1_LOCALRUN_IDX);
+        runTabbedPane.add(asyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
         menuBar = asyRunComponent.getMenus();
@@ -244,9 +244,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         // Now setup the assembly file change listeners
         ViskitAssemblyController asyCntlr = (ViskitAssemblyController) asyFrame.getController();
+        
+        asyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
 
         asyCntlr.addAssemblyFileListener(asyCntlr.getAssemblyChangeListener());
-        //asyCntlr.addAssemblyFileListener(asyFrame);
         asyCntlr.addAssemblyFileListener(asyRunComponent);
         asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
         asyCntlr.addAssemblyFileListener(runGridComponent);
@@ -473,7 +474,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
          */
         public void exec(String[] execStrings) {
     
-            /* The default version of this does a RuntimeExex("java"....) to 
+            /* The default version of this does a RuntimeExec("java"....) to 
              * spawn a new VM.  We want to run the assembly in a new VM, but not
              * the GUI.
              */
