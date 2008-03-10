@@ -63,19 +63,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.category.ScatterRenderer;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.util.RectangleInsets;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
+import org.jfree.data.function.Function2D;
+import org.jfree.data.function.LineFunction2D;
+import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.statistics.Regression;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * Create Scatter Plots from statistical data collected from experimental 
@@ -97,7 +101,7 @@ import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
 public class ScatterPlotChartDrawer {
 
     static Logger log = Logger.getLogger(ScatterPlotChartDrawer.class);
-    
+        
     /** Creates a new instance of ScatterPlotChartDrawer */
     public ScatterPlotChartDrawer() {}
 
@@ -114,7 +118,7 @@ public class ScatterPlotChartDrawer {
         String baseUrl = "charts/" + fileName + "ScatterPlot.png";
         String chartUrl = "./" + baseUrl;
         String fileLocation = "./AnalystReports/" + baseUrl;
-        CategoryDataset dataset = createMultiValueCategoryDataset(label, data);
+        XYDataset dataset = createDataset(label, data);
         try {
             saveChart(createChart(dataset, title, "Value"), fileLocation);
         } catch (IOException ioe) {
@@ -124,29 +128,19 @@ public class ScatterPlotChartDrawer {
         return chartUrl;
     }
 
-    private List<Double> listOfValues(double[] values) {
-        List<Double> result = new ArrayList<Double>();
-        for (double value : values) {
-            result.add(value);
-        }
-        return result;
-    }
-    
     /**
      * Creates a data set that is used for making a scatter plot of the data
      * @param label
      * @param data
      * @return
      */
-    private CategoryDataset createMultiValueCategoryDataset(String label, double[] data) {
-
-        DefaultMultiValueCategoryDataset dataset = new DefaultMultiValueCategoryDataset();
+    private XYDataset createDataset(String label, double[] data) {
+        XYSeries series = new XYSeries(label);        
         int count = 0;
         for (double datum : data) {
-            dataset.add(listOfValues(new double[] {datum}), label, ++count);
-        }
-
-        return dataset;
+            series.add(++count, datum);
+        }        
+        return new XYSeriesCollection(series);
     }
 
     /**
@@ -156,34 +150,41 @@ public class ScatterPlotChartDrawer {
      * @param yLabel
      * @return a scatter plot chart
      */
-    private JFreeChart createChart(CategoryDataset dataset, String title, String yLabel) {
-//        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-//        renderer.setSeriesOutlinePaint(0, Color.black);
-//        renderer.setUseOutlinePaint(true);
-//        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
-//        domainAxis.setAutoRangeIncludesZero(false);
-//        domainAxis.setTickMarkInsideLength(2.0f);
-//        domainAxis.setTickMarkOutsideLength(0.0f);
-//        
-//        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-//        rangeAxis.setTickMarkInsideLength(2.0f);
-//        rangeAxis.setTickMarkOutsideLength(0.0f);
-        
-        CategoryPlot plot = new CategoryPlot(
+    private JFreeChart createChart(XYDataset dataset, String title, String yLabel) {
+        JFreeChart chart = ChartFactory.createScatterPlot(
+                title,
+                "Replications", 
+                yLabel, 
                 dataset, 
-                new CategoryAxis("Replications"), 
-                new NumberAxis(yLabel), 
-                new ScatterRenderer());
-        NumberAxis na = (NumberAxis) plot.getRangeAxis();
-        na.setAutoRangeIncludesZero(false);
+                PlotOrientation.VERTICAL, 
+                true, 
+                false, 
+                false);
+ 
+        XYPlot plot = (XYPlot) chart.getPlot();
+       
+        NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+        domainAxis.setAutoRangeIncludesZero(false);
+                
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAutoRangeIncludesZero(false);
         
-        plot.setBackgroundPaint(Color.lightGray);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        plot.setAxisOffset(new RectangleInsets(4, 4, 4, 4));
-        JFreeChart chart = new JFreeChart(plot);
+        // calculate the regression and create subplot 2...
+        double[] coefficients = Regression.getOLSRegression(dataset, 0);
+        Function2D curve = new LineFunction2D(coefficients[0], coefficients[1]);
+        XYDataset regressionData = DatasetUtilities.sampleFunction2D(
+                curve,
+                ((XYSeriesCollection) dataset).getDomainLowerBound(true), 
+                ((XYSeriesCollection) dataset).getDomainUpperBound(true), 
+                dataset.getItemCount(0), 
+                "Fitted Regression Line");
+
+        plot.setDataset(1, regressionData);
+        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
+        renderer2.setSeriesPaint(0, Color.blue);
+        plot.setRenderer(1, renderer2);
+
         chart.setTitle(title);
-        chart.setBackgroundPaint(Color.white);
         
         return chart;
     }
