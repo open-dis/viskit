@@ -20,7 +20,8 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 import viskit.model.AssemblyNode;
-import viskit.xsd.assembly.ChartDrawer;
+import viskit.xsd.assembly.HistogramChartDrawer;
+import viskit.xsd.assembly.ScatterPlotChartDrawer;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -630,7 +631,8 @@ public class AnalystReportBuilder {
         List<Element> simEntities = (List<Element>) statsReport.getRootElement().getChildren("SimEntity");
         
         // variables for JFreeChart construction
-        ChartDrawer chart = new ChartDrawer();
+        HistogramChartDrawer histogramChart = new HistogramChartDrawer();
+        ScatterPlotChartDrawer scatterPlotChart = new ScatterPlotChartDrawer();
         String chartTitle = "";
         String axisLabel  = "";
         String typeStat = "";
@@ -675,7 +677,7 @@ public class AnalystReportBuilder {
                 for (Element replicationReport : replicationReports) {
                     List<Element> replications = replicationReport.getChildren("Replication");
                     
-                    // Create a data set instance and chart for each replication report
+                    // Create a data set instance and histogramChart for each replication report
                     double[] data = new double[replicationReport.getChildren().size()];
                     int idx = 0;
                     for (Element replication : replications) {
@@ -689,16 +691,23 @@ public class AnalystReportBuilder {
                         repRecord.setAttribute("variance", replication.getAttributeValue("variance"));
                         entity.addContent(repRecord);
                         
-                        // Add the raw count, or mean of replication data to the chart
+                        // Add the raw count, or mean of replication data to the chart generators
                         log.debug(replication.getAttributeValue(typeStat));
                         data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
                         idx++;                        
                     }
                     
-                    Element chartDir = new Element("chartURL");
+                    Element histogramChartURL = new Element("HistogramChartURL");
+                    Element scatterPlotChartURL = new Element("ScatterPlotChartURL");
+                    
                     String filename = axisLabel;
-                    chartDir.setAttribute("dir", chart.createHistogram(chartTitle, axisLabel, data, filename));                    
-                    entity.addContent(chartDir);
+                    
+                    histogramChartURL.setAttribute("dir", histogramChart.createHistogram(chartTitle, axisLabel, data, filename));                    
+                    scatterPlotChartURL.setAttribute("dir", scatterPlotChart.createScatterPlot(chartTitle, axisLabel, data, filename));
+                    
+                    entity.addContent(histogramChartURL);
+                    entity.addContent(scatterPlotChartURL);
+                    
                     repReports.addContent(entity);
                 }
             }

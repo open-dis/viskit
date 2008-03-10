@@ -743,7 +743,7 @@
         <p align="left">Property:
             <xsl:value-of select="@property"/>
         </p>
-        <xsl:for-each select="chartURL">
+        <xsl:for-each select="HistogramChartURL">
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -760,15 +760,41 @@
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
                         <xsl:attribute name="description">
-                            <!-- TODO:  better description -->
-                            <xsl:text>statistical output</xsl:text>
+                            <xsl:text>replications histogram output</xsl:text>
                         </xsl:attribute>
                     </xsl:element>
                 </xsl:element>
 
                 <!-- add an index to the array -->
                 <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
-                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replication Statistics for <xsl:value-of select="$entityProperty"/></p>
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Histogram for <xsl:value-of select="$entityProperty"/></p>
+            </div>
+        </xsl:for-each>
+        <xsl:for-each select="ScatterPlotChartURL">
+            <div align="center">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="@dir"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="style">
+                        <xsl:text>border:0</xsl:text>
+                    </xsl:attribute>
+                    <xsl:element name="img">
+                        <xsl:attribute name="border">
+                            <xsl:text>1</xsl:text>
+                        </xsl:attribute>
+                        <xsl:attribute name="src">
+                            <xsl:value-of select="@dir"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="description">
+                            <xsl:text>replications scatter plot output</xsl:text>
+                        </xsl:attribute>
+                    </xsl:element>
+                </xsl:element>
+
+                <!-- add an index to the array -->
+                <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>            
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Scatter Plot for <xsl:value-of select="$entityProperty"/></p>
             </div>
         </xsl:for-each>
         <div align="center">

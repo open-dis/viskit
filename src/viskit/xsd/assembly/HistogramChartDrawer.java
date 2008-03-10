@@ -2,8 +2,9 @@ package viskit.xsd.assembly;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -22,37 +23,37 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
  * This class creates chart objects using the JFreeChart package
  *
  * @author Patrick Sullivan
- * @version $Id: ChartDrawer.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id: HistogramChartDrawer.java 1662 2007-12-16 19:44:04Z tdnorbra $
  * @since August 3, 2006, 10:21 AM
  */
-public class ChartDrawer {
+public class HistogramChartDrawer {
 
-    static Logger log = Logger.getLogger(ChartDrawer.class);
+    static Logger log = Logger.getLogger(HistogramChartDrawer.class);
     
-    /** Creates a new instance of ChartDrawer */
-    public ChartDrawer() {
-    }
+    /** Creates a new instance of HistogramChartDrawer */
+    public HistogramChartDrawer() {}
 
     /**
-     * Creates a histogram image in PNG format based on the parameters provided.
+     * Creates a histogram image in PNG format based on the parameters provided
      *
      * @param title 
      * @param label 
      * @param data an array of doubles that are to be plotted
      * @param fileName the name of the file to save the image out to
-     * @return the path name of the created object
+     * @return the path url of the created object
      */
     public String createHistogram(String title, String label, double[] data, String fileName) {
-        String fileLocation = "./AnalystReports/charts/" + fileName + ".png";
-        String url = "./charts/" + fileName + ".png";
+        String baseUrl = "charts/" + fileName + "Histogram.png";
+        String chartUrl = "./" + baseUrl;
+        String fileLocation = "./AnalystReports/" + baseUrl;
         IntervalXYDataset dataset = createIntervalXYDataset(label, data);
         try {
-            saveChart(createChart(dataset, title, label), fileLocation);
-        } catch (java.io.IOException e) {
-            System.err.println("Unable to create chart image: " + e.getMessage());
-            e.printStackTrace();
+            saveChart(createChart(dataset, title, "Value"), fileLocation);
+        } catch (IOException ioe) {
+            log.error("Unable to create chart image: " + ioe.getMessage());
+            ioe.printStackTrace();
         }
-        return url;
+        return chartUrl;
     }
 
     /**
@@ -84,13 +85,13 @@ public class ChartDrawer {
      * Creates the relative frequency histogram chart
      * @param dataset
      * @param title
-     * @param label
-     * @return 
+     * @param xLabel
+     * @return a histogram chart
      */
-    private JFreeChart createChart(IntervalXYDataset dataset, String title, String label) {
+    private JFreeChart createChart(IntervalXYDataset dataset, String title, String xLabel) {
         final JFreeChart chart = ChartFactory.createHistogram(
                 title,
-                label,
+                xLabel,
                 "Percentage of Occurrence",
                 dataset,
                 PlotOrientation.VERTICAL,
