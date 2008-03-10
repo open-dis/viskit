@@ -297,6 +297,8 @@ public class VGlobals {
             } else {
                 result = handleNameType(stateVariable.getName(), stateVariable.getType(), false);
             }
+            
+            // The news is bad....
             if (result != null) {
                 clearNamespace();
                 return bshErr + "\n" + result;                
@@ -352,6 +354,17 @@ public class VGlobals {
             
             // This was done at the top of the method, but, oh well, can't hurt
             String noCRs = s.replace('\n', ' ');
+            
+            /* Beahshell, unfortunately, does yet not know how to interpret 
+             * generic syntax, so, we can just return here and hope that the
+             * user typed correct syntax.  viskit.xsd.translator.SimkitXML2Java
+             * will report any syntax errors while compiling the EG as the next
+             * line of defense.
+             */
+            if (isGeneric(noCRs)) {
+                clearNamespace();
+                return null;
+            }
             Object o = interpreter.eval(noCRs);
         } catch (EvalError evalError) {
             if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
@@ -377,7 +390,7 @@ public class VGlobals {
     private String handleNameType(String name, String typ, boolean doInstantiate) // I don't think the instant part
     {                                                                                 // is or should be used here
         if (!handlePrimitive(name, typ)) {
-            if (!doInstantiate) {                
+            if (!doInstantiate) {
                 return (findType(name, typ));
             }
 
@@ -400,8 +413,7 @@ public class VGlobals {
         try {
             Class<?> c = Vstatics.classForName(typ);
             interpreter.eval(typ + " " + name + ";");
-        } //catch (Exception e) {
-        catch (Throwable e) {
+        } catch (Throwable e) {
             clearNamespace();
             return e.getMessage();
         }
