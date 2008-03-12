@@ -228,6 +228,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * corresponding name + ".count," or ".mean"
      */
     protected void createDesignPointStats() {
+        
+        /* Check for zero length.  SimplePropertyDumper may have been selected
+         * as the designPoint
+         */
+        if (getReplicationStats().length == 0) {return;}
         designPointStats = new SampleStatistics[getReplicationStats().length];
         String typeStat = "";
         int ix = 0; 
@@ -566,9 +571,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         System.setOut(out);
     }
 
-    /**
-     * Execute the simulation for the desired number of replications.
-     */
+    /** Execute the simulation for the desired number of replications */
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
     public void run() {
@@ -595,7 +598,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (isSingleStep()) {
             Schedule.setSingleStep(isSingleStep());
         }
+        
+        // This should be unchecked if only listening with a SimplePropertyDumper
         if (isSaveReplicationData()) {
+            log.info("in if isSaveReplicationData()");
             replicationData.clear();
             int repStatsLength = getReplicationStats().length;
             for (int i = 0; i < repStatsLength; i++) {
@@ -711,41 +717,45 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 int ix = 0;
                 boolean isCount = false;
                 
-                // # of PropertyChangeListenerNodes is == to ReplicationStats.length
-                for (Object node : getPclNodeCache().keySet()) {        
-                    if (node.toString().contains("PropertyChangeListener")) {
-                        try {
+                
+                // This should be unchecked if only listening with a SimplePropertyDumper
+                if (isSaveReplicationData()) {
+                    // # of PropertyChangeListenerNodes is == to replicationStats.length
+                    for (Object node : getPclNodeCache().keySet()) {
+                        if (node.toString().contains("PropertyChangeListener")) {
+                            try {
 
-                            /* in order to see PropChangeListenerNode, this thread has 
-                             * to work via reflection since an instance from a different
-                             * ClassLoader was sent to this class via reflection in the
-                             * first place
-                             */
-                            Object obj = getPclNodeCache().get(node);
-                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                            typeStat = isCount ? ".count" : ".mean";
-                            SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
-                            fireIndexedPropertyChange(ix, ss.getName(), ss);
-                            if (isCount) {
-                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
-                            } else {
-                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());                            
+                                /* in order to see PropChangeListenerNode, this thread has 
+                                 * to work via reflection since an instance from a different
+                                 * ClassLoader was sent to this class via reflection in the
+                                 * first place
+                                 */
+                                Object obj = getPclNodeCache().get(node);
+                                isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                                typeStat = isCount ? ".count" : ".mean";
+                                log.info("in here too");
+                                SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
+                                fireIndexedPropertyChange(ix, ss.getName(), ss);
+                                if (isCount) {
+                                    fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
+                                } else {
+                                    fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
+                                }
+                                ix++;
+                            } catch (NoSuchMethodException ex) {
+                                log.error(ex);
+                            } catch (SecurityException ex) {
+                                log.error(ex);
+                            } catch (IllegalAccessException ex) {
+                                log.error(ex);
+                            } catch (IllegalArgumentException ex) {
+                                log.error(ex);
+                            } catch (InvocationTargetException ex) {
+                                log.error(ex);
                             }
-                            ix++;
-                        } catch (NoSuchMethodException ex) {
-                            log.error(ex);
-                        } catch (SecurityException ex) {
-                            log.error(ex);
-                        } catch (IllegalAccessException ex) {
-                            log.error(ex);
-                        } catch (IllegalArgumentException ex) {
-                            log.error(ex);
-                        } catch (InvocationTargetException ex) {
-                            log.error(ex);
                         }
                     }
-                }           
-
+                }
                 if (isPrintReplicationReports()) {
                     println.println(getReplicationReport(replication));
                     println.flush();
