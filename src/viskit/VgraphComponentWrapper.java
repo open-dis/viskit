@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesiInstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,40 +31,36 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+package viskit;
+
+import javax.swing.JSplitPane;
+import viskit.jgraph.vGraphComponent;
+import viskit.jgraph.vGraphModel;
+import viskit.model.ViskitModel;
 
 /**
+ * A class to serve as the jgraph object, while carrying other objects needed 
+ * for the gui
+ * 
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
  * @author Mike Bailey
  * @since Sep 15, 2005
  * @since 11:13:40 AM
+ * @version $Id:$
  */
+public class VgraphComponentWrapper extends vGraphComponent {
 
-package viskit;
+    public ViskitModel model;
+    public JSplitPane drawingSplitPane;
+    public JSplitPane stateParamSplitPane;
+    public ParametersPanel paramPan;
+    public VariablesPanel varPan;
+    public CodeBlockPanel codeBlockPan;
+    public boolean isActive = true;
 
-import viskit.jgraph.vGraphComponent;
-import viskit.jgraph.vGraphModel;
-import viskit.model.ViskitModel;
-
-import javax.swing.*;
-
-/**
- * A class to serve as the jgraph object, while carrying other objects needed for the gui
- */
-public class VgraphComponentWrapper extends vGraphComponent
-{
-  public ViskitModel     model;
-  public JSplitPane      drawingSplitPane;
-  public JSplitPane      stateParamSplitPane;
-  public ParametersPanel paramPan;
-  public VariablesPanel  varPan;
-  public CodeBlockPanel  codeBlockPan;
-  
-  public boolean isActive = true;
-  
-  public VgraphComponentWrapper(vGraphModel model, EventGraphViewFrame frame)
-  {
-    super(model,frame);
-  }
+    public VgraphComponentWrapper(vGraphModel model, EventGraphViewFrame frame) {
+        super(model, frame);
+    }
 }
