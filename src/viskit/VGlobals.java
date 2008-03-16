@@ -394,7 +394,7 @@ public class VGlobals {
             try {
                 interpreter.unset(ns);
             } catch (EvalError evalError) {
-//                log.error(evalError);
+                log.error(evalError);
             }
         }
         nsSets.clear();
@@ -432,6 +432,10 @@ public class VGlobals {
             } /*else {
                 returnString = "no error, but not null";
             }*/
+            
+            /* TODO: the above else is a placeholder for when we implement full
+             * beahshell checking
+             */
               
         } catch (Exception ex) {
             clearNamespace();
