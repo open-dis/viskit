@@ -32,7 +32,7 @@ public class VariablesPanel extends ViskitTablePanel {
         String[] sa = new String[3];
         sa[0] = ((vStateVariable) o).getName();
         sa[1] = ((vStateVariable) o).getType();
-        sa[2] = (String) ((vStateVariable) o).getComment();
+        sa[2] = ((vStateVariable) o).getComment();
         return sa;
     }
 
