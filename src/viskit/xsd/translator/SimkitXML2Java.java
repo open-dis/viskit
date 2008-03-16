@@ -993,20 +993,11 @@ public class SimkitXML2Java {
     boolean compileCode(String fileName) {
         String fName = this.root.getName();
         if (!fName.equals(fileName)) {
-            System.out.println("Using " + fName);
+            log.info("Using " + fName);
             fileName = fName + ".java";
         }
         String path = this.root.getPackage();
         File fDest;
-        char[] pchars;
-        // this doesn't work! : path.replaceAll(pd,File.separator);
-        pchars = path.toCharArray();
-        for (char character : pchars) {
-            if (character == '.') {
-                character = File.separatorChar;
-            }
-        }
-        path = new String(pchars);
         try {
             File f = new File(pd + File.separator + path);
             f.mkdirs();
@@ -1016,8 +1007,15 @@ public class SimkitXML2Java {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return (com.sun.tools.javac.Main.compile(new String[] {"-Xlint:unchecked", 
-            "-Xlint:deprecation", "-verbose", "-sourcepath", path, "-d", pd, 
+        return (com.sun.tools.javac.Main.compile(
+            new String[] {
+            "-Xlint:unchecked", 
+            "-Xlint:deprecation", 
+            "-verbose", 
+            "-sourcepath", 
+            path, 
+            "-d", 
+            pd, 
             path + File.separator + fileName}) == 0);
     }
 
@@ -1082,28 +1080,22 @@ public class SimkitXML2Java {
      */
     public static void main(String[] args) {
 
-        log.info("XML file is: " + args[0]);
+        String xmlFile = args[0].replaceAll("\\\\", "/");
+        log.info("XML file is: " + xmlFile);
         log.info("Generating Java Source...");
         
         InputStream is = null;
         try {
-            is = new FileInputStream(args[0]);
+            is = new FileInputStream(xmlFile);
         } catch (FileNotFoundException fnfe) {log.error(fnfe);}
 
-//        SimkitXML2Java sx2j = new SimkitXML2Java(args[0]);
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
-        File baseName = new File(sx2j.baseNameOf(args[0]));
+        File baseName = new File(sx2j.baseNameOf(xmlFile));
         log.info("baseName: " + baseName.getAbsolutePath());
         sx2j.setFileBaseName(baseName.getName());
         sx2j.unmarshal();
 
-        String dotJava = sx2j.translate();
-        
-        // Print to console if given args < 1
-        if (args.length > 1) {
-            sx2j.writeOut(dotJava, System.out);
-        }
-
+        String dotJava = sx2j.translate();        
         log.info("Done.");
 
         // also write out the .java to a file and compile it
@@ -1123,5 +1115,5 @@ public class SimkitXML2Java {
         } catch (IOException ioe) {
             log.error(ioe);
         }
-    }   
+    }
 }

@@ -601,7 +601,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         
         // This should be unchecked if only listening with a SimplePropertyDumper
         if (isSaveReplicationData()) {
-            log.info("in if isSaveReplicationData()");
             replicationData.clear();
             int repStatsLength = getReplicationStats().length;
             for (int i = 0; i < repStatsLength; i++) {
@@ -733,7 +732,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 Object obj = getPclNodeCache().get(node);
                                 isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                                 typeStat = isCount ? ".count" : ".mean";
-                                log.info("in here too");
                                 SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
                                 fireIndexedPropertyChange(ix, ss.getName(), ss);
                                 if (isCount) {

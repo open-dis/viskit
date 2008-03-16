@@ -196,14 +196,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             return;
         }
         twiddleButtons(InternalAssemblyRunner.REWIND);
-
     }
 
     private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
         // Assembly has been compiled by now
         lastLoaderNoReset = VGlobals.instance().getWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-        targetClass = Vstatics.classForName(targetClassName);
+        targetClass = Vstatics.classForName(clName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }

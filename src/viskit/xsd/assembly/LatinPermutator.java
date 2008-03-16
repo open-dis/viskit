@@ -80,8 +80,7 @@ public class LatinPermutator {
         return
                 (i + ((size - j)%size))%size;
     }
-    
-    
+        
     // not really used except for test as per main()
     void bubbles() {
         int i;
@@ -90,14 +89,14 @@ public class LatinPermutator {
         }
         output();
         i = size;
-        while ( i-- > 0 )
+        while ( i-- > 0 ) {
             while (bubbleRow()) {
-            output();
-            while (bubbleCol()) {
                 output();
+                while (bubbleCol()) {
+                    output();
+                }
             }
-            }
-        
+        }        
     }
     
     // not really used except for test as per bubbles() in main()
@@ -162,10 +161,9 @@ public class LatinPermutator {
         }
         
         for ( int i = 0; i < size; i ++) {
-            row[i] = ((Integer)(r.remove((int)((double)r.size()*rnd.draw())))).intValue();
-            col[i] = ((Integer)(c.remove((int)((double)c.size()*rnd.draw())))).intValue();
-        }
-        
+            row[i] = r.remove((int) ((double) r.size() * rnd.draw())).intValue();
+            col[i] = c.remove((int) ((double) c.size() * rnd.draw())).intValue();
+        }        
     }
     
     int[][] getRandomLatinSquare() {
