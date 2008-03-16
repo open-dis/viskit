@@ -9,7 +9,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 
 import viskit.model.EventArgument;
@@ -351,8 +350,8 @@ public class EventInspectorDialog extends JDialog {
 
                 // Parse the state transitions
                 StringBuffer parseThis = new StringBuffer();
-                for (Iterator itr = transitions.getTransitions().iterator(); itr.hasNext();) {
-                    EventStateTransition est = (EventStateTransition) itr.next();
+                for (ViskitElement transition : transitions.getTransitions()) {
+                    EventStateTransition est = (EventStateTransition) transition;
                     parseThis.append(est.toString());
                     parseThis.append(";");
                     String idxv = est.getIndexingExpression();

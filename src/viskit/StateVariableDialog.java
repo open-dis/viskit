@@ -176,14 +176,14 @@ public class StateVariableDialog extends ViskitSmallDialog {
             stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
             arraySizeField.setText(getArraySize(ty));
             commentField.setText(stVar.getComment());
-            boolean isArray = isArray(stVar.getType());
+            boolean isArray = VGlobals.instance().isArray(stVar.getType());
             arraySizeField.setEditable(isArray);   // grays background if false
             arraySizeField.setEnabled(isArray);
             arrSizeLab.setEnabled(isArray);
         } else {
             stateVarNameField.setText(((ViskitModel) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             String ty = (String) stateVarTypeCombo.getSelectedItem();
-            boolean isArray = isArray(ty);
+            boolean isArray = VGlobals.instance().isArray(ty);
             commentField.setText("");
             arraySizeField.setText("");
             arraySizeField.setEditable(isArray); // grays out background
@@ -198,7 +198,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         // make sure there are no spaces
         String ty = (String) stateVarTypeCombo.getSelectedItem();
         ty = VGlobals.instance().typeChosen(ty);
-        if (isArray(ty)) {
+        if (VGlobals.instance().isArray(ty)) {
             ty = ty.substring(0, ty.indexOf('[') + 1) + arraySizeField.getText().trim() + "]";
         }
         String nm = stateVarNameField.getText();
@@ -213,10 +213,6 @@ public class StateVariableDialog extends ViskitSmallDialog {
             newType = ty;
             newComment = commentField.getText().trim();
         }
-    }
-
-    private boolean isArray(String s) {
-        return s.contains("[");
     }
 
     private boolean isGoodArray(String s) {
@@ -269,7 +265,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
          */
         private void handleArrayFieldEnable() {
             String s = (String) stateVarTypeCombo.getEditor().getItem();
-            boolean isAr = isArray(s);
+            boolean isAr = VGlobals.instance().isArray(s);
             arraySizeField.setEditable(isAr); // grays background if false
             arraySizeField.setEnabled(isAr);
             arrSizeLab.setEnabled(isAr);
@@ -311,7 +307,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
                 if (nam.length() <= 0 ||
                         typ.length() <= 0 ||
-                        (isArray(typ) && arsz.length() <= 0)) {
+                        (VGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
                     JOptionPane.showMessageDialog(StateVariableDialog.this, "Name, type and (if array) array size must be entered.",
                             "Data entry error", JOptionPane.ERROR_MESSAGE);
                     arrSizeLab.setEnabled(true);
@@ -319,7 +315,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     arraySizeField.setEditable(true);
                     arraySizeField.requestFocus();
                     return;
-                } else if (isArray(typ) && !isGoodArray(typ)) {
+                } else if (VGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
                     JOptionPane.showMessageDialog(StateVariableDialog.this, "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.",
                             "Data entry error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -331,8 +327,10 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     return;
                 }                    
 
-                // Do a beanshell test for array declaration
-                if (!VGlobals.instance().isPrimitive(typ) && isArray(typ)) {         // isPrimitive returns false for arrays
+                /* Do a beanshell test for array declaration
+                 * isPrimitive returns false for arrays
+                 */
+                if (!VGlobals.instance().isPrimitive(typ) && VGlobals.instance().isArray(typ)) {
 
                     String s = typ + " " + nam + " = new " + typ;
                     s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size

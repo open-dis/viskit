@@ -496,15 +496,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 Vector<String> vn = new Vector<String>();
                 HashMap<String, Method> hm = new HashMap<String, Method>();
 
-                for (int i = 0; i < statMeths.length; i++) {
-                    int mods = statMeths[i].getModifiers();
-                    Class retCl = statMeths[i].getReturnType();
+                for (Method method : statMeths) {
+                    int mods = method.getModifiers();
+                    Class retCl = method.getReturnType();
                     if (Modifier.isStatic(mods)) {
                         if (retCl == myObjClass) {
-                            String ts = statMeths[i].toString();
+                            String ts = method.toString();
                             int strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
                             ts = ts.substring(strt + 1, ts.length());
-                            hm.put(ts, statMeths[i]);
+                            hm.put(ts, method);
                             vn.add(ts);
                         }
                     }

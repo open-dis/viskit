@@ -203,7 +203,6 @@ public class Vstatics {
      * @return class
      */
     public static Class<?> classForName(String s) {
-        log.debug("s is a : " + s);
         Class<?> c;
 
         c = cForName(s, VGlobals.instance().getWorkClassLoader());
@@ -243,7 +242,6 @@ public class Vstatics {
     }
 
     static class retrnChar {
-
         char c;
     }
 
@@ -351,7 +349,6 @@ public class Vstatics {
             }
             return null;
         }
-
     }
 
     static public String getPathSeparator() {

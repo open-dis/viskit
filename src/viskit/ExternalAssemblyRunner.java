@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -428,7 +427,10 @@ public class ExternalAssemblyRunner extends JFrame {
         return v;
     }
 
-    /** An alternate entry point which doesn't assume we're to run in a different vm. */
+    /** An alternate entry point which doesn't assume we're to run in a different vm.
+     * @param args
+     * @return 
+     */
     public static ExternalAssemblyRunner main2(String[] args) {
         Vector<String> v = null;
         try {

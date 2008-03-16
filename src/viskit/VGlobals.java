@@ -10,9 +10,12 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -262,7 +265,7 @@ public class VGlobals {
                 try {
                     interpreter.getClassManager().addClassPath(new URL("file", "localhost", path));
                 } catch (IOException e) {
-                    System.err.println("bad extra classpath: " + path);
+                    log.error("bad extra classpath: " + path);
                 }
             }
         }
@@ -283,90 +286,95 @@ public class VGlobals {
     public String parseCode(EventNode node, String s) {
         initBeanShell();
         // Load the interpreter with the state variables and the sim parameters
-        // Load up the local variables and event parameters for this particular node
-        // Then do the parse.
+        // Load up any local variables and event parameters for this particular node
+        // Then, parse.
 
         // Lose the new lines
-        s = s.replace('\n', ' ');
+        String noCRs = s.replace('\n', ' ');
+        
+        String name = null;
+        String type = null;
 
+        if (node != null) {            
+            
+            // Event local variables
+            for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
+                String result;
+                type = eventLocalVariable.getType();
+                name = eventLocalVariable.getName();
+                if (isArray(type)) {
+                    result = handleNameType(name, eventLocalVariable.getArrayType());
+                } else {
+                    result = handleNameType(name, type);
+                }
+                if (result != null) {
+                    clearNamespace();
+                    return bshErr + "\n" + result;
+                }
+                nsSets.add(name);
+            }
+            
+            // Event arguments
+            for (ViskitElement ea : node.getArguments()) {
+                type = ea.getType();
+                name = ea.getName();
+                String result = handleNameType(name, type);
+                if (result != null) {
+                    clearNamespace();
+                    return bshErr + "\n" + result;
+                }
+                nsSets.add(name);
+            }
+        }
+        
         // state variables
         for (ViskitElement stateVariable : getStateVarsList()) {
             String result;
-            if (stateVariable.getType().indexOf('[') != -1) {
-                result = handleNameType(stateVariable.getName(), stateVariable.getArrayType(), false);
+            type = stateVariable.getType();
+            name = stateVariable.getName();
+            if (isArray(type)) {
+                result = handleNameType(name, stateVariable.getArrayType());
             } else {
-                result = handleNameType(stateVariable.getName(), stateVariable.getType(), false);
+                result = handleNameType(name, type);
             }
-            
+
             // The news is bad....
             if (result != null) {
                 clearNamespace();
-                return bshErr + "\n" + result;                
+                return bshErr + "\n" + result;
             }
-            nsSets.add(stateVariable.getName());
+            nsSets.add(name);
         }
         
         // Sim parameters
         for (ViskitElement par : getSimParmsList()) {
             String result;
-            if (par.getType().indexOf('[') != -1) {
-                result = handleNameType(par.getName(), par.getArrayType(), false);
+            type = par.getType();
+            name = par.getName();
+            if (isArray(type)) {
+                result = handleNameType(name, par.getArrayType());
             } else {
-                result = handleNameType(par.getName(), par.getType(), false);
+                result = handleNameType(name, type);
             }
             if (result != null) {
                 clearNamespace();
                 return bshErr + "\n" + result;
             }
-            nsSets.add(par.getName());
+            nsSets.add(name);
         }
         
-        // Event local variables
-        if (node != null) {
-            for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
-                String result;
-                if (eventLocalVariable.getType().indexOf('[') != -1) {
-                    result = handleNameType(eventLocalVariable.getName(), eventLocalVariable.getArrayType(), false);
-                } else {
-                    result = handleNameType(eventLocalVariable.getName(), eventLocalVariable.getType(), false);
-                }
-                if (result != null) {
-                    clearNamespace();
-                    return bshErr + "\n" + result;
-                }
-                nsSets.add(eventLocalVariable.getName());
-            }
-            
-            // Event arguments
-            for (ViskitElement ea : node.getArguments()) {                
-                String result = handleNameType(ea.getName(), ea.getType(), false);
-                if (result != null) {
-                    clearNamespace();
-                    return bshErr + "\n" + result;
-                }
-            }
-        }
-
         /* see if we can parse it.  We've initted all arrays to size = 1, so 
          * ignore outofbounds exceptions, bugfix 1183
          */
         try {
-            
-            // This was done at the top of the method, but, oh well, can't hurt
-            String noCRs = s.replace('\n', ' ');
-            
-            /* Beahshell, unfortunately, does yet not know how to interpret 
-             * generic syntax, so, we can just return here and hope that the
-             * user typed correct syntax.  viskit.xsd.translator.SimkitXML2Java
-             * will report any syntax errors while compiling the EG as the next
-             * line of defense.
+            /* Ignore anything that is assigned from a "getter" as we are not
+             * giving beanShell the whole EG picture.
              */
-            if (isGeneric(noCRs)) {
-                clearNamespace();
-                return null;
-            }
-            Object o = interpreter.eval(noCRs);
-        } catch (EvalError evalError) {
+            if(!noCRs.contains("get")) {
+                Object o = interpreter.eval(noCRs);
+                log.info("Interpreter evaluation result: " + o);
+            }            
+        } catch (EvalError evalError) {                    
             if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
                 clearNamespace();
                 return bshErr + "\n" + evalError.getMessage();
@@ -375,7 +383,12 @@ public class VGlobals {
         clearNamespace();
         return null;    // null means good parse!
     }
-
+    
+    public boolean isArray(String ty) {
+        return ty.contains("[") && ty.contains("]");
+    }
+    
+    // TODO: Fix the logic here, it doesn't seem to get used correctly
     private void clearNamespace() {
         for (String ns : nsSets) {
             try {
@@ -387,73 +400,92 @@ public class VGlobals {
         nsSets.clear();
     }
 
-    private String handleNameType(String name, String typ, boolean doInstantiate) // I don't think the instant part
-    {                                                                                 // is or should be used here
+    private String handleNameType(String name, String typ) {
+        String returnString = null;
         if (!handlePrimitive(name, typ)) {
-            if (!doInstantiate) {
-                return (findType(name, typ));
-            }
-
-            try {
-                Object o = instantiateType(typ);
-                if (o == null) {
-                    throw new Exception("Class not found: " + typ);
-                }
-                interpreter.eval(typ + " " + name + " = " + o);
-            } catch (Exception ex) {
-                clearNamespace();
-                return ex.getMessage();
-            }
+            returnString = (findType(name, typ));
         }
-        return null; // this is good
+        
+        // good if remains null
+        return returnString;
     }
 
-    private String findType(String name, String typ) {
-        if (isGeneric(typ)) {return null;}
+    @SuppressWarnings("unchecked")
+    private String findType(String name, String type) {        
+        String returnString = null;
         try {
-            Class<?> c = Vstatics.classForName(typ);
-            interpreter.eval(typ + " " + name + ";");
-        } catch (Throwable e) {
+            if (isGeneric(type)) {
+                type = type.substring(0, type.indexOf("<"));
+            }
+            Object o = instantiateType(type);
+            
+            // At this time, only default, no argument contructors can be set
+            if (o != null) {
+                if (o instanceof Collection) {
+                    ((Collection) o).add("E");
+                }
+                if (o instanceof Map) {
+                    ((Map) o).put("K", "V");
+                }
+                
+                interpreter.set(name, o);
+            } /*else {
+                returnString = "no error, but not null";
+            }*/
+              
+        } catch (Exception ex) {
             clearNamespace();
-            return e.getMessage();
+            returnString =  ex.getMessage();
         }
-        return null;
+        
+        // good if remains null
+        return returnString;
     }
     
-    private boolean isGeneric(String typ) {
-        return (typ.contains("<") && typ.contains(">"));
+    public boolean isGeneric(String type) {
+        return (type.contains("<") && type.contains(">"));
     }
 
-    private Object instantiateType(String typ) throws Exception {
+    private Object instantiateType(String type) throws Exception {
         Object o = null;
         boolean isArr = false;
-        if (typ.indexOf('[') != -1) {
-            typ = typ.substring(0, typ.length() - 2);
+        
+        // TODO: Have to get viskit.VsimkitObjects to work first
+        if (isSimkitDotRandom(type)) {return o;}
+        
+        if (type.contains("[")) {
+            type = type.substring(0, type.length() - "[]".length());
             isArr = true;
         }
         try {
-            Class<?> c = Vstatics.classForName(typ);
-            if (c == null) {
-                throw new Exception("Class not found: " + typ);
+            Class<?> c = Vstatics.classForName(type);           
+            if (c == null) {throw new Exception("Class not found: " + type);}
+            
+            Constructor<?>[] constructors = c.getConstructors();
+            
+            // The first constructor should be the default, no argument one
+            for (Constructor constructor : constructors) {
+                if (constructor.getParameterTypes().length == 0) {
+                    if (isArr) {
+                        o = Array.newInstance(c, 1);
+                    } else {
+                        o = c.newInstance();
+                    }
+                }
             }
-            if (isArr) {
-                o = Array.newInstance(c, 1);
-            } else {
-                o = c.newInstance();
-            }
-        } catch (Exception e) {            
-            o = null;
-        }
-        if (o != null) {
-            return o;
-        }
-
-        // OK. See if we've got a dummy one in our HashMap
-        try {
-            o = VsimkitObjects.getInstance(typ);
         } catch (Exception e) {
-            throw new Exception(e);
+            log.error(e);
         }
+        
+        // TODO: Fix the call to VsimkitObjects someday
+//        if (o == null) {
+//            try {
+//                o = VsimkitObjects.getInstance(type);
+//            } catch (Exception e) {
+//                throw new Exception(e);
+//            }
+//        }
+
         return o;
     }
 
@@ -461,87 +493,71 @@ public class VGlobals {
         try {
             if (typ.equals("int")) {
                 interpreter.eval("int " + name + " = 0");
-                //interpreter.set(name,(int)0);
                 return true;
             }
             if (typ.equals("int[]")) {
-                interpreter.eval("int[] " + name + " = new int[0]");
+                interpreter.eval("int[] " + name + " = new int[1]");
                 return true;
             }
             if (typ.equals("boolean")) {
                 interpreter.eval("boolean " + name + " = false");  // 17Aug04, should have always defaulted to false
-        //interpreter.set(name,true);
                 return true;
             }
             if (typ.equals("boolean[]")) {
-                interpreter.eval("boolean[] " + name + " = new boolean[0]");
-                //interpreter.set(name,new boolean[0]);
+                interpreter.eval("boolean[] " + name + " = new boolean[1]");
                 return true;
             }
             if (typ.equals("double")) {
                 interpreter.eval("double " + name + " = 0.0d");
-                //interpreter.set(name,0.0d);
                 return true;
             }
             if (typ.equals("double[]")) {
-                interpreter.eval("double[] " + name + " = new double[0]");
-                //interpreter.set(name,new double[0]);
+                interpreter.eval("double[] " + name + " = new double[1]");
                 return true;
             }
             if (typ.equals("float")) {
                 interpreter.eval("float " + name + " = 0.0f");
-                //interpreter.set(name,0.0f);
                 return true;
             }
             if (typ.equals("float[]")) {
-                interpreter.eval("float[] " + name + " = new float[0]");
-                //interpreter.set(name,new float[0]);
+                interpreter.eval("float[] " + name + " = new float[1]");
                 return true;
             }
             if (typ.equals("byte")) {
                 interpreter.eval("byte " + name + " = 0");
-                //interpreter.set(name,(byte)0);
                 return true;
             }
             if (typ.equals("byte[]")) {
-                interpreter.eval("byte[] " + name + " = new byte[0]");
-                //interpreter.set(name,new byte[0]);
+                interpreter.eval("byte[] " + name + " = new byte[1]");
                 return true;
             }
             if (typ.equals("char")) {
-                interpreter.eval("char " + name + " = 0");
-                //interpreter.set(name,(char)0);
+                interpreter.eval("char " + name + " = '0'");
                 return true;
             }
             if (typ.equals("char[]")) {
-                interpreter.eval("char[] " + name + " = new char[0]");
-                //interpreter.set(name,new char[0]);
+                interpreter.eval("char[] " + name + " = new char[1]");
                 return true;
             }
             if (typ.equals("short")) {
                 interpreter.eval("short " + name + " = 0");
-                //interpreter.set(name,(short)0);
                 return true;
             }
             if (typ.equals("short[]")) {
-                interpreter.eval("short[] " + name + " = new short[0]");
-                //interpreter.set(name,new short[0]);
+                interpreter.eval("short[] " + name + " = new short[1]");
                 return true;
             }
             if (typ.equals("long")) {
                 interpreter.eval("long " + name + " = 0");
-                //interpreter.set(name,(long)0);
                 return true;
             }
             if (typ.equals("long[]")) {
-                interpreter.eval("long[] " + name + " = new long[0]");
-                //interpreter.set(name,new long[0]);
+                interpreter.eval("long[] " + name + " = new long[1]");
                 return true;
             }
         } catch (EvalError evalError) {
-            System.err.println(bshErr);
+            log.error(bshErr);
             evalError.printStackTrace();
-            return false;
         }
         return false;
     }
@@ -550,31 +566,29 @@ public class VGlobals {
      * user-typed object types.
      */
     private String moreTypesString = "more...";
-    private String[] defaultTypeStrings = {"int",
+    private String[] defaultTypeStrings = {
+            "int",
             "double",
             "Integer",
             "Double",
             "String",
             moreTypesString};
     private String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
-    private final int primitivesIndex = 0; // for above array
+    private final int PRIMITIVES_INDEX = 0; // for moreClasses array
+    private final int JAVA_LANG_INDEX = 1; // for moreClasses array
+    private final int JAVA_UTIL_INDEX = 2; // for moreClasses array
+    private final int SIMKIT_RANDOM_INDEX = 3; // for moreClasses array
 
     private String[][] moreClasses =
-            {{"boolean", "char", "byte", "short", "int", "long", "float", "double"},
-            {"Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double", "String", "StringBuffer"},
+            {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
+            {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuffer"},
             {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
             {"RandomNumber", "RandomVariate"}, {}
     };
     
-    public boolean isPrimitive(String ty) {
-        for (int i = 0; i < moreClasses[primitivesIndex].length; i++) {
-            if (ty.equals(moreClasses[primitivesIndex][i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    /** @param ty the type to check if primitive or array
+     * @return true if primitive or array
+     */
     public boolean isPrimitiveOrPrimitiveArray(String ty) {
         int idx;
         if ((idx = ty.indexOf('[')) != -1) {
@@ -582,6 +596,56 @@ public class VGlobals {
         }
         return isPrimitive(ty);
     }
+    
+    /** @param ty the type to check if primitive type
+     * @return true if primitive type
+     */
+    public boolean isPrimitive(String ty) {
+        for (String s : moreClasses[PRIMITIVES_INDEX]) {
+            if (ty.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** @param ty the type to check if member of java.lang.*
+     * @return true if member of java.lang.*
+     */
+    public boolean isJavaDotLang(String ty) {
+        for (String s : moreClasses[JAVA_LANG_INDEX]) {
+            if (s.contains(ty)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** The simple (basic) class name is required for this
+     * @param ty the type to check if member of java.util.*
+     * @return true if member of java.util.*
+     */
+    public boolean isJavaDotUtil(String ty) {
+        for (String s : moreClasses[JAVA_UTIL_INDEX]) {
+            if (s.contains(ty)) {
+                return true;
+            }
+        }
+        return false;
+    }    
+    
+    /**@param ty the type to check if member of simkit.random.*
+     * @return true if member of simkit.random.*
+     */
+    public boolean isSimkitDotRandom(String ty) {
+        for (String s : moreClasses[SIMKIT_RANDOM_INDEX]) {
+            if (s.contains(ty)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     Pattern bracketsPattern = Pattern.compile("\\[.*?\\]");
     Pattern spacesPattern = Pattern.compile("\\s");
 
@@ -647,7 +711,7 @@ public class VGlobals {
             } else {
                 m = new JMenu(morePackages[i]);
                 for (int j = 0; j < moreClasses[i].length; j++) {
-                    if (i == primitivesIndex) {
+                    if (i == PRIMITIVES_INDEX) {
                         mi = new MyJMenuItem(moreClasses[i][j], moreClasses[i][j]);
                     } // no package
                     else {
@@ -694,7 +758,8 @@ public class VGlobals {
     class myTypeListRenderer extends JLabel implements ListCellRenderer {
         //Font specialFont = getFont().deriveFont(Font.ITALIC);
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list, Object value, 
+                int index, boolean isSelected, boolean cellHasFocus) {
             JLabel lab = new JLabel(value.toString());
             if (value.toString().equals(moreTypesString)) {
                 lab.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -829,7 +894,10 @@ public class VGlobals {
 
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
-            LocalBootLoader loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), Thread.currentThread().getContextClassLoader(), getWorkDirectory());
+            LocalBootLoader loader = new LocalBootLoader(
+                    SettingsDialog.getExtraClassPathArraytoURLArray(), 
+                    Thread.currentThread().getContextClassLoader(), 
+                    getWorkDirectory());
             workLoader = loader.init(true);
         }
         return workLoader;
@@ -860,8 +928,8 @@ public class VGlobals {
                 }
                 hConfig = ViskitConfig.instance().getIndividualXMLConfig(hf.getAbsolutePath());
             } catch (Exception e) {
-                System.out.println("Error loading history file: " + e.getMessage());
-                System.out.println("Recent file saving disabled");
+                log.error("Error loading history file: " + e.getMessage());
+                log.error("Recent file saving disabled");
                 hConfig = null;
             }
         }
