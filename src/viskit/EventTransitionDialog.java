@@ -84,7 +84,7 @@ public class EventTransitionDialog extends JDialog {
 
         actionLab = new JLabel("invoke");
         Dimension dx = actionLab.getPreferredSize();
-        actionLab.setText("=");
+        actionLab.setText("");
         actionLab.setPreferredSize(dx);
         actionLab.setHorizontalAlignment(JLabel.TRAILING);
 
@@ -234,9 +234,14 @@ public class EventTransitionDialog extends JDialog {
             } else {
                 arrayIndexField.setText(ie);
             }
-            opOn.setSelected(param.isOperation());
-            assTo.setSelected(!param.isOperation());
-
+            boolean isOp = param.isOperation();
+            if (isOp) {
+                opOn.setSelected(isOp);
+                actionLab.setText(".");
+            } else {
+                assTo.setSelected(!isOp);
+                actionLab.setText("=");
+            }
             setVarNameComboBox(param);
             if (stateVarsCB.getItemCount() > 0) {
                 commentField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());

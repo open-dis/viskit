@@ -372,7 +372,7 @@ public class VGlobals {
              */
             if(!noCRs.contains("get")) {
                 Object o = interpreter.eval(noCRs);
-                log.info("Interpreter evaluation result: " + o);
+                log.debug("Interpreter evaluation result: " + o);
             }            
         } catch (EvalError evalError) {                    
             if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
