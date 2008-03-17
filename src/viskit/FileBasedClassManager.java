@@ -40,7 +40,6 @@ public class FileBasedClassManager implements Runnable {
     private static XMLConfiguration vConfig;
     private HashMap<String, FileBasedAssyNode> fileMap;
     private HashMap<String, Class<?>> classMap;
-    static HashMap parameterMap;
     static Logger log = Logger.getLogger(FileBasedClassManager.class);
 
     public static synchronized FileBasedClassManager inst() {
@@ -53,8 +52,6 @@ public class FileBasedClassManager implements Runnable {
     private FileBasedClassManager() {
         classMap = new HashMap<String, Class<?>>();
         fileMap = new HashMap<String, FileBasedAssyNode>();
-        parameterMap = new HashMap();
-        //new Thread(this,"FileBasedClsMgr").start();
 
         try {
             vConfig = VGlobals.instance().getHistoryConfig();
@@ -62,7 +59,6 @@ public class FileBasedClassManager implements Runnable {
             log.debug("Error loading config file: " + e.getMessage());
             vConfig = null;
         }
-
     }
 
     public void addFileClass(Class<?> c) {
@@ -287,7 +283,8 @@ public class FileBasedClassManager implements Runnable {
 
     /**
      * @param file 
-     * @return an XML file given its cached class file */
+     * @return an XML file given its cached class file 
+     */
     public File getCachedXML(File file) {
         List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@xml]"));
         List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@class]"));

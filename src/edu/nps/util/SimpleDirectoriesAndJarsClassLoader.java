@@ -84,6 +84,8 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     /**
      *  Provide delegation constructor
      *
+     * @param parent
+     * @param dirsJarsOrZips 
      */
     public SimpleDirectoriesAndJarsClassLoader(ClassLoader parent, String[] dirsJarsOrZips) {
         super(parent);
@@ -93,6 +95,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     /**
      *  Same old ClassLoader constructor
      *
+     * @param dirsJarsOrZips 
      */
     public SimpleDirectoriesAndJarsClassLoader(String[] dirsJarsOrZips) {
         super();
@@ -246,6 +249,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
      *
      *  @param name the resource name
      *  @return Enumeration of one URL
+     * @throws java.io.IOException 
      */
     @Override
     protected Enumeration<URL> findResources(final String name) throws IOException {
@@ -276,6 +280,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     /**
      *  Minimal package definition
      *
+     * @param className 
      */
     private void definePackage(String className) {
         // Extract the package name from the class name,
@@ -287,8 +292,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
 
         // Pre-conditions - need a manifest and the package
         // is not previously defined
-        if (null == manifest ||
-                getPackage(pkgName) != null) {
+        if (null == manifest || getPackage(pkgName) != null) {
             return;
         }
 
