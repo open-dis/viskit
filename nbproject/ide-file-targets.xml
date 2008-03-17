@@ -8,14 +8,15 @@
         <fail unless="run.class">Must set property 'run.class'</fail>
         
         <!-- This target assumes that viskit.jar is already built -->
-        <!--java classname="viskit.xsd.translator.SimkitXML2Java" failonerror="true" fork="true"-->
-        <java classname="viskit.xsd.assembly.SimkitAssemblyXML2Java" failonerror="true" fork="true">
+        <java classname="${run.class}" failonerror="true" fork="true">
             <classpath>
+                <pathelement path="${basedir}"/>
+                <pathelement location="${basedir}/NabilThesis/"/>
                 <path refid="runtime.classpath.paths"/>
             </classpath>
-            <!--arg value="${basedir}/BehaviorLibraries/examples/ServerWithReneges.xml"/-->
+            <!--arg value="${basedir}/NabilThesis/scenarioEGs/Scenario_TakeOff16.xml"/>
             <arg value="-f"/>
-            <arg value="${basedir}/BehaviorLibraries/examples/ServerWithRenegesAssembly.xml"/>
+            <arg value="${basedir}/NabilThesis/Assembly6withStats.xml"/-->
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
