@@ -230,24 +230,32 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected void createDesignPointStats() {
         
         /* Check for zero length.  SimplePropertyDumper may have been selected
-         * as the designPoint
+         * as the only PCL
          */
         if (getReplicationStats().length == 0) {return;}
         designPointStats = new SampleStatistics[getReplicationStats().length];
         String typeStat = "";
         int ix = 0; 
         boolean isCount = false;
-        for (Object node : getPclNodeCache().keySet()) {        
+        for (Object node : getPclNodeCache().keySet()) {
             if (node.toString().contains("PropertyChangeListener")) {
                 try {
                     
-                    /* in order to see PropChangeListenerNode, this thread has 
+                    String nodeType = node.getClass().getMethod("getType").invoke(node).toString();
+                    
+                    /* in order to see PropChangeListenerNodes, this thread has 
                      * to work via reflection since an instance from a different
                      * ClassLoader was sent to this class via reflection in the
                      * first place
                      */
                     Object obj = getPclNodeCache().get(node);
-                    log.debug("Reflected object is: " + obj);
+                    
+                    // This is not a designPoint, so skip
+                    if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
+                        log.debug("SimplePropertyDumper encountered");
+                        continue;
+                    }
+                    log.info("Reflected object is: " + obj);
                     isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                     log.debug("isGetCount: " + isCount);
                     typeStat = isCount ? ".count" : ".mean";
@@ -724,12 +732,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                         if (node.toString().contains("PropertyChangeListener")) {
                             try {
 
-                                /* in order to see PropChangeListenerNode, this thread has 
+                                String nodeType = node.getClass().getMethod("getType").invoke(node).toString();
+                    
+                                /* in order to see PropChangeListenerNodes, this thread has 
                                  * to work via reflection since an instance from a different
                                  * ClassLoader was sent to this class via reflection in the
                                  * first place
                                  */
                                 Object obj = getPclNodeCache().get(node);
+
+                                // This is not a designPoint, so skip
+                                if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
+                                    log.debug("SimplePropertyDumper encountered");
+                                    continue;
+                                }
                                 isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                                 typeStat = isCount ? ".count" : ".mean";
                                 SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
