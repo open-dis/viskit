@@ -605,9 +605,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             if ( tasksCompleted == designPointCount * totalSamples) {
                 File dump = File.createTempFile(root.getName(),"Results.xml",experimentFile.getParentFile());
                 
-                (new SimkitAssemblyXML2Java())
-                .marshal((javax.xml.bind.Element)root,
-                        (OutputStream)new FileOutputStream(dump));
+                (new SimkitAssemblyXML2Java()).marshal(
+                        (javax.xml.bind.Element) root, 
+                        (OutputStream) new FileOutputStream(dump));
                 
             }
         } catch (java.io.IOException ioe) {
@@ -633,8 +633,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         }
         if (root != null) {
             try {
-                (new SimkitAssemblyXML2Java()).marshal((javax.xml.bind.Element)root,
-                        (OutputStream)new FileOutputStream(new File(root.getName()+"Exp.xml")));
+                (new SimkitAssemblyXML2Java()).marshal((javax.xml.bind.Element) root,
+                        (OutputStream) new FileOutputStream(new File(root.getName() + "Exp.xml")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -791,8 +791,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // deposit the Experiment file
        
         try {
-            (new SimkitAssemblyXML2Java()).marshal((javax.xml.bind.Element)root,
-                    (OutputStream)new FileOutputStream(experimentFile));
+            (new SimkitAssemblyXML2Java()).marshal((javax.xml.bind.Element) root,
+                    (OutputStream) new FileOutputStream(experimentFile));
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;

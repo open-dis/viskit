@@ -1080,7 +1080,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
 //            int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
             log.info("Compiling " + f.getCanonicalPath());
-            int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-classpath", cp, "-d", f.getParent(), f.getCanonicalPath()});
+            int reti = com.sun.tools.javac.Main.compile(new String[] 
+                    {"-Xlint:unchecked", 
+                     "-Xlint:deprecation", 
+                     "-classpath", 
+                     cp, 
+                     "-d", 
+                     f.getParent(), 
+                     f.getCanonicalPath()});
 
             if (reti == 0 || completeOnBadCompile) {
                 return new File(f.getParentFile().getAbsoluteFile(), packagePath + baseName + ".class");

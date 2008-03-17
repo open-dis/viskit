@@ -2,7 +2,7 @@ To use the Assembly XML 2 Java compiler from the command line, have viskit.xsd.a
 
 From the command line:
 
-%java viskit.xsd.assembly.SimkitAssemblyXML2Java myFile.xml
+%java viskit.xsd.assembly.SimkitAssemblyXML2Java -f myFile.xml
 
 note: the file extension is ignored, so it could be a myFile.abc etc.
 

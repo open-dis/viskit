@@ -1,16 +1,28 @@
 package viskit;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.jar.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+import org.apache.log4j.Logger;
 
 /**
  * @version $Id: FindClassesForInterface.java 1662 2007-12-16 19:44:04Z tdnorbra $
  * @author  ahbuss
  */
 public class FindClassesForInterface {
+    
+    static Logger log = Logger.getLogger(FindClassesForInterface.class);
 
     /**
      * Added by Mike Bailey
@@ -69,7 +81,7 @@ public class FindClassesForInterface {
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
             if (found.get(name) != null) {
-                return (Class) found.get(name);
+                return (Class<?>) found.get(name);
             }
             byte[] buf = new byte[128 * 1024];        // todo make dynamically sized
             int num = 0;
@@ -80,7 +92,7 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                System.out.println("FindClassForInterface: findClass for " + name);
+                log.info("FindClassForInterface: findClass for " + name);
 
                 Class<?> clz = defineClass(null, buf, 0, num); // do this to get proper name/pkg
 
@@ -89,7 +101,7 @@ public class FindClassesForInterface {
                 // bug here, a byte[] loaded class will not have its package set, but 
                 // has it in the name. this causes problems later on when trying to create
                 // a FileBasedAssemblyNode
-                System.out.println("FindClassForInterface: found Class " + clz.getPackage() + "." + clz.getName());
+                log.info("FindClassForInterface: found Class " + clz.getPackage() + "." + clz.getName());
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -211,7 +223,7 @@ public class FindClassesForInterface {
             return;
         }
         System.out.println(loader);
-        Class c = loader.loadClass("png.PNGChunk");
+        Class<?> c = loader.loadClass("png.PNGChunk");
         System.out.println(c);
 
         String ps = System.getProperty("path.separator");
