@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import java.util.LinkedHashMap;
@@ -100,8 +101,8 @@ public class SimkitAssemblyXML2Java {
         try {
             this.fileBaseName = baseNameOf(xmlFile);
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader()); // exp classLoader bit
-            this.fileInputStream = new FileInputStream(xmlFile);
-        } catch (FileNotFoundException ex) {
+            this.fileInputStream = Class.forName("viskit.xsd.assembly.SimkitAssemblyXML2Java").getClassLoader().getResourceAsStream(xmlFile);        
+        } catch (ClassNotFoundException ex) {
             log.error(ex);
         } catch (JAXBException ex) {
             log.error(ex);
@@ -314,35 +315,42 @@ public class SimkitAssemblyXML2Java {
         pw.println();
     }
     
-    // This method currently unused
-    void printImports(PrintWriter pw) {
-        TreeSet<String> list = new TreeSet<String>();
+    /** This method currently unused
+     * @param pw 
+     */
+    void printImports(PrintWriter pw) {        
+        SortedSet<String> list = Collections.synchronizedSortedSet(new TreeSet<String>());
         List<SimEntity> r = this.root.getSimEntity();
-        
+
         for (SimEntity se : r) {
-            traverseForImports(se, list);    
+            traverseForImports(se, list);
         }
-        
+
         List<PropertyChangeListener> lpcl = this.root.getPropertyChangeListener();
-        
+
         for (PropertyChangeListener pcl : lpcl) {
-            traverseForImports(pcl, list);    
+            traverseForImports(pcl, list);
         }
-        
-        String[] excludes = { 
-                "byte","byte[]","char","char[]",
-                "int","int[]","float","float[]","double","double[]",
-                "long","long[]","boolean","boolean[]"
+
+        String[] excludes = {
+            "byte", "byte[]", "char", "char[]",
+            "int", "int[]", "float", "float[]", "double", "double[]",
+            "long", "long[]", "boolean", "boolean[]"
         };
-        
+
         List<String> exList = java.util.Arrays.asList(excludes);
-        for (String clazz : list) {
-            if ( exList.contains(clazz) ) {
-                synchronized(list) {
-                    list.remove(clazz);
+        
+        synchronized (list) {
+            Iterator<String> listI = list.iterator();
+            while (listI.hasNext()) {
+                String clazz = listI.next();
+                if (exList.contains(clazz)) {
+                    listI.remove();
+                    log.debug("Removed type \"" + clazz + "\" from the TreeSet");
                 }
             }
         }
+        
         for (String imports : list) {
             if (!imports.startsWith("java.lang")) {
                 pw.println("import" + sp + imports + sc);
@@ -350,16 +358,18 @@ public class SimkitAssemblyXML2Java {
         }
     }
     
-    // This method currently unused
-    void traverseForImports(Object branch, TreeSet<String> tlist) {
-        SortedSet<String> list = Collections.synchronizedSortedSet(tlist);
+    /** This method currently unused
+     * 
+     * @param branch
+     * @param tlist
+     */
+    void traverseForImports(Object branch, SortedSet<String> tlist) {
         if ( branch instanceof SimEntity ) {
             String t = stripBrackets(((SimEntity) branch).getType());
-            if ( !list.contains(t) ) {
-                synchronized(list) {
-                    list.add(t);
-                }
+            if (!tlist.contains(t)) {
+                tlist.add(t);
             }
+            
             List<Object> p = ((SimEntity) branch).getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
@@ -367,11 +377,10 @@ public class SimkitAssemblyXML2Java {
         } else if ( branch instanceof FactoryParameter ) {
             FactoryParameter fp = (FactoryParameter) branch;
             String t = stripBrackets(fp.getType());
-            if ( !list.contains(t) ) {
-                synchronized(list) {
-                    list.add(t);
-                }
+            if (!tlist.contains(t)) {
+                tlist.add(t);
             }
+            
             List<Object> p = fp.getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
@@ -379,38 +388,30 @@ public class SimkitAssemblyXML2Java {
         } else if ( branch instanceof MultiParameter ) {
             MultiParameter mp = (MultiParameter)branch;
             String t = stripBrackets(mp.getType());
-            if ( !list.contains(t) ) {
-                synchronized(list) {
-                    list.add(t);
-                }
+            if (!tlist.contains(t)) {
+                tlist.add(t);
             }
             
             List<Object> p = mp.getParameters();            
             for (Object o : p) {
                 traverseForImports(o, tlist);
-            }
-            
+            }            
         } else if ( branch instanceof TerminalParameter ) {
             TerminalParameter tp = (TerminalParameter)branch;
             String t = stripBrackets(tp.getType());
-            if ( !list.contains(t) ){
-                synchronized(list) {
-                    list.add(t);
-                }
+            if (!tlist.contains(t)) {
+                tlist.add(t);
             }
         } else if ( branch instanceof PropertyChangeListener ) {
-            if ( !list.contains("java.beans.PropertyChangeListener") ) {
-                synchronized(list) {
-                    list.add("java.beans.PropertyChangeListener");
-                }
+            if ( !tlist.contains("java.beans.PropertyChangeListener") ) {
+                tlist.add("java.beans.PropertyChangeListener");
             }
             PropertyChangeListener pcl = (PropertyChangeListener) branch;
             String t = stripBrackets(pcl.getType());
-            if ( !list.contains(t) ) {
-                synchronized(list) {
-                    list.add(t);
-                }
+            if (!tlist.contains(t)) {
+                tlist.add(t);
             }
+            
             List<Object> p = pcl.getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
@@ -418,14 +419,13 @@ public class SimkitAssemblyXML2Java {
         }
     }
     
-    // This method currently unused
+    /** This method currently unused
+     * @param type
+     * @return 
+     */
     String stripBrackets(String type) {
         int brindex = type.indexOf('[');
-        if (brindex > 0) {
-            return new String(type.substring(0, brindex));
-        } else {
-            return type;
-        }
+        return (brindex > 0) ? new String(type.substring(0, brindex)): type;
     }    
     
     void buildEntities(StringWriter entities) {
@@ -786,30 +786,16 @@ public class SimkitAssemblyXML2Java {
     }
     
     boolean compileCode(String fileName) {
-        String fName = this.root.getName();
-        if (!fName.equals(fileName)) {
-            log.info("Using " + fName);
-            fileName = fName + ".java";
-        }
-        String path = this.root.getPackage();
-        File fDest;
-        try {
-            File f = new File(pd + File.separator + path);
-            f.mkdirs();
-            fDest = new File(path + File.separator + fileName);
-            f = new File(fileName);
-            f.renameTo(fDest);
-        } catch (Exception e) { e.printStackTrace(); }
+        fileName = fileName.replaceAll("\\\\", "/");
+        log.info("compiling: " + fileName);
+        String path = fileName.substring(0, fileName.lastIndexOf("/"));        
         return (com.sun.tools.javac.Main.compile(
-                new String[] {
-                "-Xlint:unchecked", 
-                "-Xlint:deprecation", 
-                "-verbose", 
-                "-sourcepath", 
-                path, 
-                "-d", 
-                pd, 
-                path + File.separator + fileName}) == 0);
+            new String[] {
+            "-Xlint:unchecked", 
+            "-Xlint:deprecation",
+            "-sourcepath", 
+            path,
+            fileName}) == 0);
     }
     
     void runIt() {
@@ -875,7 +861,8 @@ public class SimkitAssemblyXML2Java {
             }
         }
         
-        log.info("XML file is: " + fileName);
+        String newFilePath = fileName.substring(0, fileName.lastIndexOf("/"));
+        log.info("Assembly file is: " + fileName);
         log.info("Generating Java Source...");
         
         if (port == 0) {
@@ -895,15 +882,13 @@ public class SimkitAssemblyXML2Java {
                 } catch (FileNotFoundException fnfe) {
                     log.error(fnfe);
                 }
-
-                sax2j = new SimkitAssemblyXML2Java(is);
-                File baseName = new File(sax2j.baseNameOf(fileName));
-                log.info("baseName: " + baseName.getAbsolutePath());
-                sax2j.setFileBaseName(baseName.getName());
-                sax2j.unmarshal();
+                sax2j = new SimkitAssemblyXML2Java(is);                
             }
         }
         
+        File baseName = new File(sax2j.baseNameOf(fileName));
+        sax2j.setFileBaseName(baseName.getName());
+        sax2j.unmarshal();
         String dotJava = sax2j.translate();
         log.info("Done.");
 
@@ -911,7 +896,7 @@ public class SimkitAssemblyXML2Java {
         // to a .class
         log.info("Generating Java Bytecode...");
         try {
-            String path = sax2j.getRoot().getPackage() + "/" + sax2j.getFileBaseName() + ".java";
+            String path = newFilePath + "/" + sax2j.getFileBaseName() + ".java";
             File f = new File(path);
             f.getParentFile().mkdir();
             FileOutputStream fout = new FileOutputStream(f);

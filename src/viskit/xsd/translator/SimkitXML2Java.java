@@ -635,7 +635,9 @@ public class SimkitXML2Java {
                 lines = value.split("\\;");
             }
             pw.print(sp8 + local.getType() + sp + local.getName() + sp + eq);
-            pw.println(sp + lp + local.getType() + rp + sp + lines[0].trim() + sc);
+                        
+            // reduce redundant casts
+            pw.println(sp + lines[0].trim() + sc);
             for (int i = 1; i < lines.length; i++) {
                 pw.println(sp8 + lines[i].trim() + sc);
             }
@@ -991,32 +993,16 @@ public class SimkitXML2Java {
     }
 
     boolean compileCode(String fileName) {
-        String fName = this.root.getName();
-        if (!fName.equals(fileName)) {
-            log.info("Using " + fName);
-            fileName = fName + ".java";
-        }
-        String path = this.root.getPackage();
-        File fDest;
-        try {
-            File f = new File(pd + File.separator + path);
-            f.mkdirs();
-            fDest = new File(path + File.separator + fileName);
-            f = new File(fileName);
-            f.renameTo(fDest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        fileName = fileName.replaceAll("\\\\", "/");
+        log.info("compiling: " + fileName);
+        String path = fileName.substring(0, fileName.lastIndexOf("/"));        
         return (com.sun.tools.javac.Main.compile(
             new String[] {
             "-Xlint:unchecked", 
-            "-Xlint:deprecation", 
-            "-verbose", 
+            "-Xlint:deprecation",
             "-sourcepath", 
-            path, 
-            "-d", 
-            pd, 
-            path + File.separator + fileName}) == 0);
+            path,
+            fileName}) == 0);
     }
 
     // bug fix 1183
@@ -1081,7 +1067,8 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        log.info("XML file is: " + xmlFile);
+        String newFilePath = xmlFile.substring(0, xmlFile.lastIndexOf("/"));
+        log.info("Event Graph (EG) file is: " + xmlFile);
         log.info("Generating Java Source...");
         
         InputStream is = null;
@@ -1091,18 +1078,16 @@ public class SimkitXML2Java {
 
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
-        log.info("baseName: " + baseName.getAbsolutePath());
         sx2j.setFileBaseName(baseName.getName());
         sx2j.unmarshal();
-
-        String dotJava = sx2j.translate();        
+        String dotJava = sx2j.translate();
         log.info("Done.");
 
         // also write out the .java to a file and compile it
         // to a .class
         log.info("Generating Java Bytecode...");
         try {
-            File fileName = new File(sx2j.getRoot().getPackage() + "/" + sx2j.getFileBaseName() + ".java");
+            File fileName = new File(newFilePath + "/" + sx2j.getFileBaseName() + ".java");
             fileName.getParentFile().mkdir();
             FileOutputStream fout = new FileOutputStream(fileName);
             PrintStream ps = new PrintStream(fout, true);
