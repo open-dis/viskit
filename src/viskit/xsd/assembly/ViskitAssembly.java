@@ -206,7 +206,7 @@ public class ViskitAssembly extends BasicAssembly {
 
         // the super.
         for (SampleStatistics sampleStats : designPointStats) {
-            log.debug(sampleStats.getName() + " designPointStat created");
+//            log.debug(sampleStats.getName() + " designPointStat created");
             designPointStatistics.put(sampleStats.getName(), sampleStats);
         }
     }

@@ -255,7 +255,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                         log.debug("SimplePropertyDumper encountered");
                         continue;
                     }
-                    log.info("Reflected object is: " + obj);
+                    log.debug("Reflected object is: " + obj);
                     isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                     log.debug("isGetCount: " + isCount);
                     typeStat = isCount ? ".count" : ".mean";
