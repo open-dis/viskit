@@ -17,6 +17,7 @@
     
     <!-- CVS properties (this file) -->
     <property name="CVSId" value="$Id: build.xml 1672 2007-12-21 02:45:44Z tdnorbra $"/>
+    <property name="SVNId" value="$Id: build.xml 1672 2007-12-21 02:45:44Z tdnorbra $"/>
     
     <!-- Project directories -->
     
