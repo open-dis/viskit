@@ -229,7 +229,8 @@
         <javac destdir="${dir.build.classes}"
                debug="off"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="no">
             
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
@@ -246,7 +247,8 @@
         <javac destdir="${dir.build.classes}"
                debug="on"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="no">
             
             <!-- Reveals generics and deprecation warins -->
             <compilerarg value="${javac.unchecked}"/>
@@ -261,7 +263,8 @@
         <javac destdir="${dir.build.classes}"
                debug="on"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="no">
             
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
@@ -276,7 +279,8 @@
         <javac destdir="${dir.build.classes}"
                debug="on"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="no">
             
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
