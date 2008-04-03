@@ -604,11 +604,12 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    /** these Events should now not be any Run event
-     * @param e
-     * @param eventBlock 
+    /** these Events should now be any other than the Run event
+     * @param e the Event to process
+     * @param eventBlock the StringWriter assigned to write the Event
      */
     void doEventBlock(Event e, StringWriter eventBlock) {
+        log.debug("Event is: " + e.getName());
         PrintWriter pw = new PrintWriter(eventBlock);
         List<StateTransition> liStateT = e.getStateTransition();
         List<Argument> liArgs = e.getArgument();
