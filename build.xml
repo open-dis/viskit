@@ -15,8 +15,7 @@
 
     <property name="build.compiler" value="modern"/>
     
-    <!-- CVS properties (this file) -->
-    <property name="CVSId" value="$Id$"/>
+    <!-- ID properties (this file) -->
     <property name="SVNId" value="$Id$"/>
     
     <!-- Project directories -->
@@ -150,15 +149,16 @@
             This is the Ant build file for the NPS Viskit and associated libraries.
             Third-party jar files are not compiled from source here, but they are
             copied as necessary for the simkit distribution.  This buildfile was created
-            and tested using Ant version 1.6.5. Modified from Simkit's build.xml.
+            and tested using Ant version 1.7.0.  Modified from Simkit's build.xml.
         </echo>
     </target>
     
     <!--  === TARGET: init === -->
-    <target description="Preparatory actions required for all targets." name="init">
+    <target name="init"
+            description="Preparatory actions required for all targets">
         <tstamp/>
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
-        <echo message="Buildfile version ${CVSId}"/>
+        <echo message="Buildfile version ${SVNId}"/>
         <echo message="Base directory: ${basedir}"/>
         <echo message="Source directory: ${dir.src}"/>
         <echo message="Build directory: ${dir.build}"/>
@@ -166,7 +166,9 @@
     </target>
     
     <!--  === TARGET: build.init === -->
-    <target depends="init" description="Preparatory actions for compilation and documentation targets" name="build.init">
+    <target  name="build.init"
+             depends="init" 
+             description="Preparatory actions for compilation and documentation targets">
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
@@ -181,7 +183,9 @@
         <mkdir dir="${charts}"/>
     </target>
     
-    <target depends="build.init" description="Create xsd Schemas from dtd" name="build.schema">
+    <target name="build.schema"
+            depends="build.init" 
+            description="Create xsd Schemas from dtd">
         <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
         <!-- useful for autogenerating stats schema and adding type validator -->
@@ -190,7 +194,9 @@
         <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
-    <target depends="build.schema" description="Create bindings to the simkit XML Schema" name="bindings.simkit">
+    <target name="bindings.simkit"
+            depends="build.schema" 
+            description="Create bindings to the simkit XML Schema" >
         
         <xjc extension="true" 
              package="viskit.xsd.bindings.eventgraph" 
@@ -225,7 +231,9 @@
         </xjc-->
     </target>    
     
-    <target depends="bindings.simkit" description="Build bindings to Schemas" name="compile.bindings">
+    <target name="compile.bindings"
+            depends="bindings.simkit" 
+            description="Build bindings to Schemas" >
         <javac destdir="${dir.build.classes}"
                debug="off"
                source="1.5"
@@ -307,7 +315,7 @@
         </copy-->
     </target>
     
-    <target depends="compile.bindings" name="jar.stage1">
+    <target name="jar.stage1" depends="compile.bindings">
          <jar basedir="${dir.build.classes}" 
               compress="false" 
               excludes="*/test/*" 
@@ -389,9 +397,10 @@
         </copy>
     </target>
     
-    <target depends="init" 
-            description="build the help search database" 
-            name="javahelp">
+    <target name="javahelp"
+            depends="init"
+            description="build the help search database">
+                
         <java classname="com.sun.java.help.search.Indexer"
               fork="true">            
             
@@ -410,7 +419,7 @@
     </target>
     
     <!--  === TARGET: jar === -->
-    <target depends="compile,javahelp" name="jar">       
+    <target name="jar" depends="compile,javahelp">       
         <jar basedir="${dir.build.classes}" 
              compress="false"
              destfile="${dist.jar}">
@@ -462,11 +471,11 @@
             depends="fresh.diskit" 
             description="compile application specific modules, like diskit"/>    
     
-    <target depends="jar,runtime.extenstions" 
-            description="Build viskit and diskit jars" 
-            name="build.viskit.with.runtime.extenstions"/>
+    <target name="build.viskit.with.runtime.extenstions"
+            depends="jar,runtime.extenstions" 
+            description="Build viskit and diskit jars"/>
     
-    <target depends="compile" name="jar.executable">
+    <target name="jar.executable" depends="compile">
         <pathconvert targetos="windows" pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
             <map from="${dir.lib}" to=".\lib" />
         </pathconvert>
@@ -521,7 +530,7 @@
     </target>
     
     <!-- === TARGET: dist === -->
-    <target depends="clean.all,jar,doc" name="dist">
+    <target name="dist" depends="clean.all,jar,doc">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/BehaviorLibraries"/>
@@ -538,7 +547,7 @@
         </copy>
     </target>
     
-    <target depends="jar" name="gridkit.jar">
+    <target name="gridkit.jar" depends="jar">
         <delete dir="${dir.dist}/gridkit-stage"/>
         <mkdir dir="${dir.dist}/gridkit-stage"/>
         
@@ -596,9 +605,9 @@
     </target>
     
     <!-- TARGET: Run w/Viskit custom splash -->
-    <target depends="runtime.extenstions,checkJAVA_HOME" 
-            description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash" 
-            name="build.run.with.runtime.extensions">
+    <target name="build.run.with.runtime.extensions"
+            depends="build.viskit.with.runtime.extenstions,checkJAVA_HOME" 
+            description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -608,9 +617,9 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target depends="jar" 
-            description="Build and Run Viskit only, no module dependencies, Viskit custom Splash" 
-            name="build.run.no.runtime.extensions">
+    <target name="build.run.no.runtime.extensions"
+            depends="jar" 
+            description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -620,9 +629,9 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target depends="jar" 
-            description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated (Use build.run.no.runtime.extensions)" 
-            name="build.run.default.orig">
+    <target name="build.run.default.orig"
+            depends="jar" 
+            description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated (Use build.run.no.runtime.extensions)">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -638,9 +647,9 @@
     </target>
        
     <!-- TARGET: Run w/Ant Splash @deprecated -->
-    <target depends="splashy,runtime.extenstions,checkJAVA_HOME" 
-            description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.runtime.extensions)" 
-            name="build.run">
+    <target name="build.run"
+            depends="splashy,runtime.extenstions,checkJAVA_HOME"
+            description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.runtime.extensions)">
         <java classname="viskit.EventGraphAssemblyComboMain" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -649,9 +658,9 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target depends="splashy,jar" 
-            description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated (Use build.run.no.runtime.extensions)" 
-            name="build.run.orig">
+    <target name="build.run.orig"
+            depends="splashy,jar" 
+            description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated (Use build.run.no.runtime.extensions)">
         <java classname="viskit.Main" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -662,7 +671,7 @@
     </target>    
     
     <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
-    <target description="Run Viskit, don't check dependencies" name="quick.run">
+    <target name="quick.run" description="Run Viskit, don't check dependencies">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -672,8 +681,8 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target description="Run Viskit (original L and F), don't check dependencies @deprecated (Use quick.run)" 
-            name="quick.run.orig">
+    <target name="quick.run.orig"
+            description="Run Viskit (original L and F), don't check dependencies @deprecated (Use quick.run)">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
               fork="true">
@@ -684,34 +693,36 @@
         </java>
     </target>
     
-    <target description="TestCodeFormat runner" name="test-code-format">
+    <target name="test-code-format" description="TestCodeFormat runner">
         <java classname="viskit.test.TestCodeFormat" classpathref="runtime.classpath" fork="true">
             <arg value="viskit/test/ArrayTester.xml"/>
         </java>
     </target>
     
-    <target description="Test Gridkit login" name="test-gridkit-login">
+    <target name="test-gridkit-login" description="Test Gridkit login">
         <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.classpath" fork="true">
             <arg value="localhost" />
             <arg value="4444" />
         </java>
     </target>
     
-    <target description="Test Gridkit qstat" name="test-gridkit-qstat">
+    <target name="test-gridkit-qstat" description="Test Gridkit qstat">
         <java classname="viskit.test.TestGridkitQstat" classpathref="runtime.classpath" fork="true">
             <arg value="localhost" />
             <arg value="4444" />
         </java>
     </target>
     
-    <target description="Test Gridkit ServerAssembly3" name="test-gridkit-ServerAssembly3">
+    <target name="test-gridkit-ServerAssembly3" description="Test Gridkit ServerAssembly3">
         <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.classpath" fork="true">
             <arg value="localhost" />
             <arg value="4444" />
         </java>
     </target>
     
-    <target depends="jar, runtime.extenstions" description="Run Design-Of-Experiments" name="runDOE">
+    <target  name="runDOE" 
+             depends="jar, runtime.extenstions" 
+             description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
     
@@ -1157,9 +1168,9 @@
     </target>
     
     <!--  === TARGET: clean === -->
-    <target depends="init" 
-            description="Deletes build directory, javadoc and dist directories, and lib/ext/diskit.jar" 
-            name="clean">
+    <target name="clean"
+            depends="init" 
+            description="Deletes build directory, javadoc and dist directories, and lib/ext/diskit.jar">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
         <delete dir="${dir.api.doc}"/>
