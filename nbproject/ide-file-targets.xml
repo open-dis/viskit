@@ -14,9 +14,12 @@
                 <pathelement location="${basedir}/NabilThesis/"/>
                 <path refid="runtime.classpath.paths"/>
             </classpath>
-            <!--arg value="${basedir}/NabilThesis/scenarioEGs/Scenario_TakeOff16.xml"/>
-            <arg value="-f"/>
-            <arg value="${basedir}/NabilThesis/Assembly6withStats.xml"/-->
+            <!-- For translating and compiling EGs -->
+            <arg value="${basedir}/NabilThesis/src/Neutral/TunisianBoeing747DeparturesWithMover3D.xml"/>            
+            
+            <!-- For translating and compiling Assemblies -->
+            <!--arg value="-f"/>
+            <arg value="${basedir}/NabilThesis/src/nabilthesis/ScenarioArrivalAssembly.xml"/-->
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
