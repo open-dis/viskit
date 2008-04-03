@@ -51,7 +51,7 @@
                     <target>run-selected-file-in-Viskit</target>
                     <context>
                         <property>run.class</property>
-                        <folder>.</folder>
+                        <folder>src</folder>
                         <pattern>\.java$</pattern>
                         <format>java-name</format>
                         <arity>
@@ -77,7 +77,7 @@
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>no.runtime.extensions</build-target>
+                <build-target>jar</build-target>
             </export>
             <view>
                 <items>
