@@ -485,7 +485,7 @@ public class SimkitAssemblyXML2Java {
      /** Build up a parameter up to but not including a trailing comma.
       * _callers_ should check the size of the list to determine if a
       * comma is needed. This may include a closing paren or brace
-      * and any nesting. Note a a doParameter may also be a caller
+      * and any nesting. Note a doParameter may also be a caller
       * of a doParameter, so the comma placement is tricky.
       * @param plist
       * @param param
@@ -594,13 +594,14 @@ public class SimkitAssemblyXML2Java {
             }
             pw.print(indent + sp4 + cb);
         } else { // some multi param object
-            pw.println(indent + sp4 + castIfSimEntity(ptype) + nw + sp + ptype + lp);
+            
+            // Reduce redundant casting
+            pw.println(indent + sp4 + /*castIfSimEntity(ptype) +*/ nw + sp + ptype + lp);
             for (Object o : params) {
                 doParameter(params, o, indent + sp4, pw);
             }
             pw.print(indent + sp4 + rp);
-        }
-        
+        }        
     }
     
     void maybeComma(List<Object> params, Object param, PrintWriter pw) {
