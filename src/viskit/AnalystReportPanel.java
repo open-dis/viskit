@@ -1001,13 +1001,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 XsltUtility.runXslt(reportFile.getAbsolutePath(),
                         outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
 
-// don't need to display when simply saving
-//                        // pop up the system html viewer, or send currently running browser to html page
-//                        try {
-//                            viskit.util.BareBonesBrowserLaunch.openURL((new File(outFile)).toURI().toURL().toString());
-//                        } catch (java.net.MalformedURLException mue) {
-//                            log.error(mue);
-//                        }
             }
         };
         save.addActionListener(saveAsLis);
@@ -1050,13 +1043,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                     "Confirm", JOptionPane.YES_NO_OPTION)) {
                     genChooser.showSaveDialog(AnalystReportPanel.this);
                 }
-//                        int resp = genChooser.showSaveDialog(AnalystReportPanel.this);
-//
-//                        if (resp == JFileChooser.APPROVE_OPTION) {
-//                        XsltUtility.runXslt(reportFile.getAbsolutePath(),
-//                                genChooser.getSelectedFile().getAbsolutePath(),
-//                                "AnalystReports/AnalystReportXMLtoHTML.xslt");
-//                        }
 
                 // always generate new report before display, regardless of old or new name
                 // TODO:  change XML input to temp file, rather than final file, if possible
