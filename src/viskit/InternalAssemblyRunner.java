@@ -43,7 +43,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.*;
@@ -71,7 +70,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     static String lineSep = System.getProperty("line.separator");
     String targetClassName;
     String targetClassPath;
-    List outputs;
     ArrayList<Long> seeds;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;

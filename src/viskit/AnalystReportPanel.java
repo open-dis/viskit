@@ -1008,6 +1008,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         ActionListener generateViewHtmlListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+                
+                if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
+                        JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
+                        "The checkbox for <code>Enable Analyst Reports </code>is not" +
+                        " currently selected.  Please select on the <code>Assembly Run </code>panel," +
+                        " re-run the experiment and the report will then be available to " +
+                        "view.</p></body></html>", "Enable Analyst Reports not selected", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
 
                 unFillLayout(); // wondering why this is needed?
                 saveReport(reportFile);

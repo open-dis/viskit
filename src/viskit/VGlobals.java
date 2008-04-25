@@ -53,7 +53,10 @@ public class VGlobals {
     private JPopupMenu popup;
     private myTypeListener myListener;
     private JFrame mainAppWindow;
-
+    
+    /** Need hold of the Enable Analyst Reports checkbox */
+    private RunnerPanel2 runPanel;
+    
     /** Flag to denote called sysExit only once */
     private boolean sysExitCalled = false;
 
@@ -730,6 +733,14 @@ public class VGlobals {
     }
     JComboBox pending;
     Object lastSelected = "void";
+
+    public RunnerPanel2 getRunPanel() {
+        return runPanel;
+    }
+
+    public void setRunPanel(RunnerPanel2 runPanel) {
+        this.runPanel = runPanel;
+    }
 
     class myTypeListener implements ActionListener, ItemListener {
 

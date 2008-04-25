@@ -153,6 +153,9 @@ public class RunnerPanel2 extends JPanel {
         rightSplit.setDividerLocation(350);
 
         add(leftRightSplit, BorderLayout.CENTER);
+        
+        // Provide access to Enable Analyst Report checkbox
+        VGlobals.instance().setRunPanel(this);
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButt) {
