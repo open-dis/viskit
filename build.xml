@@ -926,7 +926,7 @@
             <fileset dir="${behavior.lib}"/>
         </copy>        
         <copy todir="${installer}/stage/license">
-            <fileset dir="${dir.src}/license"/>
+            <fileset dir="./license"/>
         </copy>
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
