@@ -337,7 +337,6 @@
             <compilerarg value="${javac.deprecation}"/>
             <classpath>
                 <pathelement location="${log4j.jar}"/>
-                <pathelement location="${dir.lib}/visxml.jar"/>
             </classpath>            
             <src path="${dir.src}/edu/"/>
             <src path="${dir.src.simevg.util}"/>
@@ -350,7 +349,7 @@
     </target>    
     
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="build.init,compile.simxml.util">
+    <target name="compile" depends="compile.simxml.util">
         <javac verbose="no" 
                destdir="${dir.build.classes}" 
                excludes="xsd/** test/**"
@@ -456,7 +455,8 @@
                 <section name="viskit.xsd.translator"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
-        </jar>
+        </jar>        
+        <delete file="${dir.build.lib}/visxml.jar"/>
     </target>
     
     <target name="fresh.diskit" description="diskit module">
@@ -475,18 +475,23 @@
             depends="jar,runtime.extenstions" 
             description="Build viskit and diskit jars"/>
     
-    <target name="jar.executable" depends="compile">
-        <pathconvert targetos="windows" pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">
-            <map from="${dir.lib}" to=".\lib" />
+    <target name="jar.executable" depends="jar">
+        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">            
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="../../lib/*"/>
+            </chainedmapper>
         </pathconvert>
         
         <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit-exe.jar">
             <manifest>
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2$DefaultEntry" />
-                <attribute name="Class-Path" value=". ${launcher.jar.internal.classpath}" />
+                <attribute name="Main-Class" value="viskit.Splash2" />
+                <attribute name="Class-Path" value="${launcher.jar.internal.classpath}" />
             </manifest>
-        </jar>        
+        </jar>
+        <delete file="${dist.jar}"/>
+        <delete file="${dir.build.lib}/visxml.jar"/>
     </target>   
     
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
