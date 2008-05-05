@@ -19,8 +19,8 @@
       <!-- required always -->
       <path value="lib/simkit.jar"/>
       
-      <!-- Optional paths -->      
-      <path value="BehaviorLibraries"/>
+      <!-- Optional paths -->
+      <!--path value="BehaviorLibraries"/-->
       
       <!-- need to manually add this if runtime.extentions are desired -->
       <!--path value="lib/ext/diskit.jar"/-->

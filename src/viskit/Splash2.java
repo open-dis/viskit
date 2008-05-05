@@ -175,6 +175,9 @@ public class Splash2 extends JFrame {
         }
     }
 
+    /** Deprecated, please use viskit.EventGraphAssemblyComboMain 
+     * @deprecated since DEC 2007
+     */
     static public class DefaultEntryOrig {
 
         public static void main(String[] args) {

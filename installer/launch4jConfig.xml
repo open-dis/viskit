@@ -4,16 +4,15 @@
     Document   : launch4jConfig.xml
     Created on : September 3, 2006, 2:34 PM
     Author     : rmgold
-    Description:
-        Purpose of the document follows.
+    Version    : $Id:$
 -->
 
 <launch4jConfig>
     <!-- Header types: 0-GUI, 1-console -->
     <headerType>0</headerType>
     <outfile>stage/Viskit.exe</outfile>
-    <jar>stage/viskit-exe.jar</jar>
-    <dontWrapJar>false</dontWrapJar>
+    <jar>viskit-exe.jar</jar>
+    <dontWrapJar>true</dontWrapJar>
     <errTitle>Viskit Install Error</errTitle>
     <jarArgs></jarArgs>
     <chdir>.</chdir>
@@ -28,22 +27,21 @@
       <args>-client</args>
     </jre>
     
-    <splash>
+    <!--splash>
       <file>images/ViskitSplash2.bmp</file>
       
       <waitForWindow>true</waitForWindow>
       
       <timeout>600</timeout>
-      <timeoutErr>false</timeoutErr>-->
-    </splash>
-   <!--
-    <versionInfo>
-      <fileVersion>0.4.1.0</fileVersion>
-      <txtFileVersion>0.4.1.0</txtFileVersion>
+      <timeoutErr>false</timeoutErr>
+    </splash-->
+    <!--versionInfo>
+      <fileVersion>0.4.7</fileVersion>
+      <txtFileVersion>0.4.7</txtFileVersion>
       <fileDescription>Viskit, Windows installer</fileDescription>
       <copyright>Copyright Naval Postgraduate School 2006</copyright>
-      <productVersion>0.4.1.0</productVersion>
-      <txtProductVersion>0.4.1.0</txtProductVersion>
+      <productVersion>0.4.7</productVersion>
+      <txtProductVersion>0.4.7</txtProductVersion>
       <productName>Viskit, Windows Installer</productName>
       <companyName>Naval Postgraduate School</companyName>
       <internalName>viskit.jar</internalName>

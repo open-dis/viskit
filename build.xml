@@ -479,7 +479,7 @@
         <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">            
             <chainedmapper>
                 <flattenmapper/>
-                <globmapper from="*" to="../../lib/*"/>
+                <globmapper from="*" to="lib/*"/>
             </chainedmapper>
         </pathconvert>
         
@@ -772,8 +772,8 @@
     </target>
     
     
-    <!-- The Installer contains the JRE, a native wrapper around ${dist.jar} and its jars, 
-        and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
+    <!-- The Installer contains the JDK, a native wrapper around ${dist.jar} and its jars, 
+        and the actual installer. JDK, IzPack the installer generator, launch4j the wrapper
         maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
         To save time, all slow steps are checked if needed, including the build. -->
         
@@ -797,32 +797,38 @@
         which will break runtime.jars below -->
     <mkdir dir="${dir.lib.ext}" />
     <property name="runtime.jars" refid="runtime.classpath" />
-    <!-- the following name can be anything, the url link to download returns the latest jre 1.5 for windows -->
+    <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
     <!-- it should be named manually though for what version has been tested -->
-    <property name="winJreExe" value="jdk-6u2-windows-i586-p.exe"/>
-    <property name="winJre" value="${user.home}${file.separator}${winJreExe}" />
+    <property name="winJDKExe" value="jdk-6u10-windows-i586-p.exe"/>
+    <property name="winJDK" value="${user.home}${file.separator}${winJDKExe}" />
     
-    <target name="checkJre" >
-        <available file="${winJre}" property="winJre.exists" />
+    <target name="checkJDK" >
+        <available file="${winJDK}" property="winJDK.exists" />
     </target>
-    <target name="getJre" depends="checkJre" unless="winJre.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u10/promoted/b12/binaries/jdk-6u10-ea-bin-b12-windows-i586-p-19_feb_2008.exe" dest="${winJre}" />
+    <target name="getJDK" depends="checkJDK" unless="winJDK.exists"  >
+        <get src="http://www.java.net/download/jdk6/6u10/promoted/b12/binaries/jdk-6u10-ea-bin-b12-windows-i586-p-19_feb_2008.exe" dest="${winJDK}" />
     </target>
     
     <target name="moveIzPack" if="build.host.windows">
-        <copy todir="${user.home}\IzPack">
+        <copy todir="${user.home}/IzPack">
             <!-- for 64 bit windows only
             <fileset dir="C:\Program Files (x86)\IzPack"/>
             -->
-            <fileset dir="C:\Program Files\IzPack"/>
+            <fileset dir="/Program Files/IzPack"/>
         </copy>
+        <!-- This should delete /Program Files/IzPack and any registry entries after moving -->
+        <java jar="/Program Files/IzPack/Uninstaller/uninstaller.jar" fork="true"/>
     </target>
     <target name="checkIzPack">
         <available file="${izpack}/lib/compiler.jar" property="izPack.exists" />
     </target>
     <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
-        <get src="http://download.berlios.de/izpack/IzPack-install-3.10.2.jar" dest="${user.home}/izpack-install.jar" />
-        <echo>Installing IzPack from web, please just use default install path when prompted.</echo>
+        <get src="http://dist.codehaus.org/izpack/releases/3.11.0/IzPack-install-3.11.0.jar" dest="${user.home}/izpack-install.jar" />
+        <echo>Installing IzPack from web, please just use default install path when prompted </echo>
+        <echo>and unselect the placing of shortcuts in your Start-Menu.</echo>
+        <echo>Perform an unistall when prompted and force the deletion of </echo>
+        <echo>/Program Files/IzPack.  This is being copied elsewhere to complete </echo>
+        <echo>the Viskit installer building process.</echo>
         <java fork="true" jar="${user.home}/izpack-install.jar" />
         <ant target="moveIzPack"/>
         <copy todir="${izpack}/bin/langpacks/flags">
@@ -862,10 +868,10 @@
     </target>
     
     <target name="checkOrangevolt">
-        <available file="${user.home}/orangevolt.jar" property="orangevolt.exists" />
+        <available file="${orangevolt}.jar" property="orangevolt.exists" />
     </target>
     <target name="getOrangevolt" depends="checkOrangevolt" unless="orangevolt.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${user.home}/orangevolt.jar" />
+        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${orangevolt}.jar" />
     </target>
     
     <target name="checkRoxes" >
@@ -890,7 +896,7 @@
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions" 
-            depends="no.runtime.extensions,getJre,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
+            depends="no.runtime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
             description="Build the installers with no runtime extensions">
         <delete dir="${installer}/build"/>
         <mkdir dir="${installer}/build" />
@@ -906,13 +912,8 @@
                 <exclude name="${basedir}/viskit/xsd/bindings"/>
             </fileset>
         </copy>
-        
-        <!-- TODO: Why do we need this if simkit.jar is already in lib/ -->
-        <!--copy todir="${installer}/stage/sources/Simkit">
-            <fileset dir="${basedir}/../Simkit/Simkit"/>
-        </copy-->        
         <copy todir="${installer}/stage/images">
-            <fileset dir="${images}"/>
+            <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
@@ -927,6 +928,9 @@
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
         </copy>
+        <delete>
+            <fileset refid="runtime.viskit.exe"/>
+        </delete>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
         </copy>        
@@ -941,6 +945,14 @@
         <copy todir="${installer}/stage">
             <fileset dir="${dir.src}">
                 <include name="*.xml"/>
+            </fileset>
+        </copy>
+        <copy todir="${installer}/stage">
+            <fileset dir="${basedir}">
+                <include name="c_history_template.xml"/>
+                <include name="vconfig.xml"/>
+                <include name="c_app.xml"/>
+                <include name="c_gui.xml"/>
             </fileset>
         </copy>
         <delete file="${installer}/stage/build.xml"/>
@@ -965,7 +977,7 @@
                  classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
         
         <taskdef
-            classpath="${user.home}/orangevolt.jar:${user.home}/roxes.jar"
+            classpath="${orangevolt}.jar:${user.home}/roxes.jar"
             resource="com/orangevolt/tools/ant/taskdefs.properties"/>
         
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
@@ -998,21 +1010,21 @@
         
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
-            rem ${winJreExe} /S /v/qn 
-            ${winJreExe}
+            rem ${winJDKExe} /S /v/qn 
+            ${winJDKExe}
             ViskitInstall.exe
         </echo>
         
         <chmod perm="+x" file="${installer}/build/both.bat" />
         <!-- this would only work on Unix 
-        <symlink link="installer/build/${winJre}" resource="../${winJre}" />
+        <symlink link="installer/build/${winJDK}" resource="../${winJDK}" />
         plus the file is 16M, do we need that in CVS?
         -->
-        <copy file="${winJre}" todir="${installer}/build" />
+        <copy file="${winJDK}" todir="${installer}/build" />
         
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJreExe}" />
+             includes="both.bat,ViskitInstall.exe,${winJDKExe}" />
         
         <sfx
             archive="${installer}/build/install.zip"
@@ -1020,12 +1032,11 @@
             execute="both.bat"
             icon="${installer}/images/ViskitIcon.ico"
             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
-        
     </target>
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions" 
-            depends="with.rutime.extensions,getJre,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
+            depends="with.rutime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
             description="Builds the installers with runtime extension libraries included">
         <delete dir="${installer}/build"/>
         <mkdir dir="${installer}/build" />
@@ -1044,13 +1055,8 @@
         <copy todir="${installer}/stage/sources/DISKIT">
             <fileset dir="${basedir}/../DISKIT"/>
         </copy>
-        
-        <!-- TODO: Why do we need this if simkit.jar is already in lib/ -->
-        <!--copy todir="${installer}/stage/sources/Simkit">
-            <fileset dir="${basedir}/../Simkit/Simkit"/>
-        </copy-->        
         <copy todir="${installer}/stage/images">
-            <fileset dir="${images}"/>
+            <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
@@ -1068,6 +1074,9 @@
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
         </copy>
+        <delete>
+            <fileset refid="runtime.viskit.exe"/>
+        </delete>
         <copy todir="${installer}/stage/BehaviorLibraries">
             <fileset dir="${behavior.lib}"/>
         </copy>
@@ -1082,6 +1091,14 @@
         <copy todir="${installer}/stage">
             <fileset dir="${dir.src}">
                 <include name="*.xml"/>
+            </fileset>
+        </copy>
+        <copy todir="${installer}/stage">
+            <fileset dir="${basedir}">
+                <include name="c_history_template.xml"/>
+                <include name="vconfig.xml"/>
+                <include name="c_app.xml"/>
+                <include name="c_gui.xml"/>
             </fileset>
         </copy>
         <delete file="${installer}/stage/build.xml"/>
@@ -1106,7 +1123,7 @@
                  classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
         
         <taskdef
-            classpath="${user.home}/orangevolt.jar:${user.home}/roxes.jar"
+            classpath="${orangevolt}.jar:${user.home}/roxes.jar"
             resource="com/orangevolt/tools/ant/taskdefs.properties"/>
         
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
@@ -1139,21 +1156,21 @@
         
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
-            rem ${winJreExe} /S /v/qn 
-            ${winJreExe}
+            rem ${winJDKExe} /S /v/qn 
+            ${winJDKExe}
             ViskitInstall.exe
         </echo>
         
         <chmod perm="+x" file="${installer}/build/both.bat" />
         <!-- this would only work on Unix 
-        <symlink link="installer/build/${winJre}" resource="../${winJre}" />
+        <symlink link="installer/build/${winJDK}" resource="../${winJDK}" />
         plus the file is 16M, do we need that in CVS?
         -->
-        <copy file="${winJre}" todir="${installer}/build" />
+        <copy file="${winJDK}" todir="${installer}/build" />
         
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJreExe}" />
+             includes="both.bat,ViskitInstall.exe,${winJDKExe}" />
         
         <sfx
             archive="${installer}/build/install.zip"
@@ -1161,15 +1178,24 @@
             execute="both.bat"
             icon="${installer}/images/ViskitIcon.ico"
             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
-        
     </target>
     
     <target name="clean.installers">
-        <delete file="${installer}/build/install.zip"/>
-        <!--delete file="${installer}/build/both.bat"/-->
-        <delete file="${user.home}/izpack-installer.jar"/>
-        <delete file="${user.home}/launch4j.*"/>
-        <delete file="${installer}/build/${winJre}"/>
+        <delete dir="${installer}/build"/>
+        <delete dir="${installer}/stage"/>
+    </target>
+    
+    <target name="clean.installer.materials"
+            depends="clean.installers"
+            description="Clean up all materials from building a Viskit installation executable">
+             
+         <delete dir="${izpack}"/>         
+         <delete file="${user.home}/izpack-install.jar"/>
+         <delete dir="${launch4j}"/>
+         <delete file="${launch4j}.zip"/>
+         <delete file="${orangevolt}.jar"/>
+         <delete file="${user.home}/roxes.jar"/>
+         <delete file="${winJDK}"/>
     </target>
     
     <!--  === TARGET: clean === -->
@@ -1200,12 +1226,12 @@ ${delete.temp.and.hx}</echo>
             and forth from SavageStuido Viskit to basic Viskit.  This will also
             delete all Analyst Report generated materials">
                        
-         <delete includeemptydirs="true" dir="${images}"/>
-         <delete includeemptydirs="true" dir="${charts}"/>
-         <delete includeemptydirs="true" dir="${statistics}"/>
-         <delete>
-             <fileset dir="${analyst.reports.dir}" includes="*.xml,*.html"/>
-         </delete>
-     </target>
-    
+        <delete includeemptydirs="true" dir="${images}"/>
+        <delete includeemptydirs="true" dir="${charts}"/>
+        <delete includeemptydirs="true" dir="${statistics}"/>
+        <delete>
+            <fileset dir="${analyst.reports.dir}" includes="*.xml,*.html"/>
+        </delete>
+    </target>
+     
 </project>
