@@ -324,15 +324,14 @@ public class LocalBootLoader extends URLClassLoader {
                     // loading the original directory.
                     boolean isEventGraph = true;
                     try {
-
                         Class<?> clz = stage1.loadClass(entryClass);
                         Class<?> vzClz = stage1.loadClass("viskit.xsd.assembly.ViskitAssembly");
                         if (vzClz.isAssignableFrom(clz)) {
                             isEventGraph = false;
-                        //System.out.println("caught Assembly: "+entryClass);
                         }
-                    } catch (ClassNotFoundException ex) {
-                    //ex.printStackTrace();
+                    } catch (Exception ex) {
+                        System.out.println("Check viskit.jar has jaxb bindings, or that entryClass "+entryClass);
+                        ex.printStackTrace();
                     }
 
                     if (isEventGraph | allowAssembly) {

@@ -196,7 +196,8 @@ public class SourceWindow extends JFrame {
                     sb = new StringBuffer();
                     sb.append(baosOut.toString());
                     sb.append(diag.messageString);
-
+                    sb.append(jofs.toUri());
+                   
                     sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
                     if (diag.messageString.toString().indexOf("No Compiler Errors") < 0) {
@@ -318,7 +319,7 @@ public class SourceWindow extends JFrame {
         }
     }
 
-    class ErrorHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+    public class ErrorHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
 
         public ErrorHighlightPainter(Color color) {
             super(color);

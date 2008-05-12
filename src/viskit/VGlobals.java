@@ -46,7 +46,7 @@ import viskit.model.ViskitModel;
  */
 public class VGlobals {
 
-    static Logger log = Logger.getLogger(VGlobals.class);
+    public static Logger log = Logger.getLogger(VGlobals.class);
     private static VGlobals me;
     private Interpreter interpreter;
     private DefaultComboBoxModel cbMod;
@@ -856,6 +856,7 @@ public class VGlobals {
     }
 
     public File getWorkDirectory() {
+        if ( !workDirectory.exists() ) workDirectory.mkdir(); 
         return workDirectory;
     }
     private File workDirectory;
@@ -868,9 +869,8 @@ public class VGlobals {
             newWorkDir();
         } else {
             workDirectory = new File(getHistoryConfig().getString("Cached[@workDir]"));
-            if (workDirectory.listFiles().length == 0) {
-                newWorkDir();
-            }
+            if (workDirectory == null) newWorkDir();
+            else if (workDirectory.listFiles().length == 0) newWorkDir();
         }
     }
 
@@ -894,6 +894,7 @@ public class VGlobals {
             nf.deleteOnExit();
             return;
         } catch (IOException e) {
+            log.error(e.toString());
         }
 
         if (workDirectory.mkdir() == false) {

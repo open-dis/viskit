@@ -22,6 +22,7 @@ import viskit.mvc.mvcAbstractController;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.SimkitXML2Java;
+import viskit.util.Compiler;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -41,6 +42,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private String initialFile;
     private JTabbedPane runTabbedPane;
     private int runTabbedPaneIdx;
+    private Compiler compiler;
 
     public AssemblyController() {
         initConfig();
@@ -987,8 +989,37 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             e.printStackTrace();
             return -1;
         }
-        //    return com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), canPath});
-        return com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-classpath", cp, "-d", f.getParent(), canPath});
+        String className="";
+        String pkg="";
+        Pattern pat = Pattern.compile("package.+;");
+        Matcher mat = pat.matcher(src);
+        boolean fnd = mat.find();
+        
+        if (fnd) {
+            pkg = src.substring(mat.start(),mat.end());
+            className += pkg ;
+        } else {
+            log.error("No package declaration in attempted compile of "+src);
+            return -1;
+        }
+        pat = Pattern.compile("public\\s+class\\s+");
+        mat = pat.matcher(src);
+        fnd = mat.find();
+        if (fnd) {
+            className += src.substring(mat.start(),mat.end());
+        } else {
+            log.error("No class declaration in attempted compile of "+src);
+            return -1;
+        }
+        
+        String diagnostic = Compiler.invoke(pkg,className,src);
+        
+        if ( diagnostic == null ) {
+            log.error("Compile error of "+src);
+            return -1;
+        }
+        log.info(diagnostic);
+        return 0;
     }
 
     private static File makeFile(String src) {
@@ -1044,13 +1075,16 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         boolean fnd = mat.find();
 
         String packagePath = "";
+        String pkg = "";
         if (fnd) {
             int st = mat.start();
             int end = mat.end();
             String s = src.substring(st, end);
-            s = s.replace(';', '/');
+            pkg = src.substring(st, end-1);
+            pkg = pkg.substring("package".length(),pkg.length()).trim();
+            s = s.replace(';', File.separatorChar);
             String[] sa = s.split("\\s");
-            sa[1] = sa[1].replace('.', '/');
+            sa[1] = sa[1].replace('.', File.separatorChar);
             packagePath = sa[1].trim();
         }
         // done finding the package subdir (just to mark the file as "deleteOnExit")
@@ -1058,13 +1092,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         pat = Pattern.compile("public\\s+class\\s+");
         mat = pat.matcher(src);
         fnd = mat.find();
-        // if(fnd) {
+        
         int end = mat.end();
         String s = src.substring(end, end + 128).trim();
         String[] sa = s.split("\\s+");
 
         baseName = sa[0];
-        // }
+        
         try {
             File f = VGlobals.instance().getWorkDirectory();
             f = new File(f, baseName + ".java");
@@ -1077,20 +1111,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             fw.close();
 
             String cp = getCustomClassPath();
-
-//            int reti = com.sun.tools.javac.Main.compile(new String[]{"-Xlint:unchecked", "-Xlint:deprecation", "-verbose", "-classpath",cp,"-d", f.getParent(), f.getCanonicalPath()});
             log.info("Compiling " + f.getCanonicalPath());
-            int reti = com.sun.tools.javac.Main.compile(new String[] 
-                    {"-Xlint:unchecked", 
-                     "-Xlint:deprecation", 
-                     "-classpath", 
-                     cp, 
-                     "-d", 
-                     f.getParent(), 
-                     f.getCanonicalPath()});
-
-            if (reti == 0 || completeOnBadCompile) {
-                return new File(f.getParentFile().getAbsoluteFile(), packagePath + baseName + ".class");
+            
+            String diagnostic = Compiler.invoke(pkg,baseName, src);
+            if (diagnostic != null) {
+                log.info(diagnostic);
+                File fClass = new File(f.getParentFile().getAbsoluteFile(), packagePath + baseName + ".class");
+                return fClass;
             }
         } catch (Exception e) {
             e.printStackTrace();

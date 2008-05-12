@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang.CharSet;
 
 /**
  *
@@ -88,13 +89,13 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
                 decipher.init(Cipher.DECRYPT_MODE,key,paramSpec);
                 // Decode base64 to get bytes
-                byte[] dec = new sun.misc.BASE64Decoder().decodeBuffer(passcrypt);
+                byte[] dec = new org.apache.commons.codec.binary.Base64().decodeBase64(passcrypt.getBytes("UTF-8"));
                 // Decrypt
                 byte[] utf8 = decipher.doFinal(dec);
                 // Decode using utf-8, the uid is encrypted with the password
                 // to create the database entry for the encrypted pass. decrypting
                 // that with the password gives the uid.
-                String clear = new String(utf8, "UTF8");
+                String clear = new String(utf8, "UTF-8");
                 if (clear.equals(username)) {
                     String cookie = generateCookie(username);
                     if (! cookie.equals("BAD-COOKIE")) {
@@ -183,11 +184,11 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
                     
                     // encrypt newUser id with newUser id for temporary password token
-                    byte[] utf8 = newUser.getBytes("UTF8");
+                    byte[] utf8 = newUser.getBytes("UTF-8");
                     byte[] enc = encipher.doFinal(utf8);
                     
                     // Encode bytes to base64 to get a string and write out to passwd.xml file
-                    user.setPassword( new sun.misc.BASE64Encoder().encode(enc) );
+                    user.setPassword( new String(new org.apache.commons.codec.binary.Base64().encode(enc)) );
                     users.add(user);
                     
                     // write out to XML user database
@@ -235,11 +236,11 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                         encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
                         
                         // encrypt username id with newPassword for temporary password token
-                        byte[] utf8 = username.getBytes("UTF8");
+                        byte[] utf8 = username.getBytes("UTF-8");
                         byte[] enc = encipher.doFinal(utf8);
                         
                         // Encode bytes to base64 to get a string and write out to passwd.xml file
-                        user.setPassword( new sun.misc.BASE64Encoder().encode(enc) );
+                        user.setPassword( new String(new org.apache.commons.codec.binary.Base64().encode(enc)) );
                     }
                 }
                 FileOutputStream fos = new FileOutputStream(pwd);
@@ -269,10 +270,10 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             Cipher encipher = Cipher.getInstance(key.getAlgorithm());
             PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
             encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
-            byte[] utf8 = (""+new java.util.Date().getTime()).getBytes("UTF8");
+            byte[] utf8 = (""+new java.util.Date().getTime()).getBytes("UTF-8");
             byte[] enc = encipher.doFinal(utf8);
             // Encode bytes to base64 to get a String
-            return new sun.misc.BASE64Encoder().encode(enc);
+            return new String(new org.apache.commons.codec.binary.Base64().encode(enc));
         } catch (Exception e) {
             return "BAD-COOKIE";
         }
