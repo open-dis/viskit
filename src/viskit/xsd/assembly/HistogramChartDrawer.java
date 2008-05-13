@@ -119,8 +119,8 @@ public class HistogramChartDrawer {
 
     /**
      * Saves a chart to PNG format
-     * @param chart
-     * @param path
+     * @param chart the created JFreeChart instance
+     * @param path the path to save the generated PNG to
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException 
      */

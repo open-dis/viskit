@@ -72,7 +72,6 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.util.RectangleInsets;
 import org.jfree.data.function.Function2D;
 import org.jfree.data.function.LineFunction2D;
 import org.jfree.data.general.DatasetUtilities;
@@ -191,8 +190,8 @@ public class ScatterPlotChartDrawer {
 
     /**
      * Saves a chart to PNG format
-     * @param chart
-     * @param path
+     * @param chart the created JFreeChart instance
+     * @param path the path to save the generated PNG to
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException 
      */
