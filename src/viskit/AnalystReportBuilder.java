@@ -674,14 +674,18 @@ public class AnalystReportBuilder {
                 chartTitle = simEntity.getAttributeValue("name");
                 axisLabel  = dataPoint.getAttributeValue("property") ;
                 
+                Element histogramChartURL = null;
+                Element scatterPlotChartURL = null;
+                double[] data = null;
+                Element repRecord = null;
                 for (Element replicationReport : replicationReports) {
                     List<Element> replications = replicationReport.getChildren("Replication");
                     
                     // Create a data set instance and histogramChart for each replication report
-                    double[] data = new double[replicationReport.getChildren().size()];
+                    data = new double[replicationReport.getChildren().size()];
                     int idx = 0;
                     for (Element replication : replications) {
-                        Element repRecord = new Element("Replication");
+                        repRecord = new Element("Replication");
                         repRecord.setAttribute("number", replication.getAttributeValue("number"));
                         repRecord.setAttribute("count", replication.getAttributeValue("count"));
                         repRecord.setAttribute("minObs", replication.getAttributeValue("minObs"));
@@ -697,8 +701,8 @@ public class AnalystReportBuilder {
                         idx++;                        
                     }
                     
-                    Element histogramChartURL = new Element("HistogramChartURL");
-                    Element scatterPlotChartURL = new Element("ScatterPlotChartURL");
+                    histogramChartURL = new Element("HistogramChartURL");
+                    scatterPlotChartURL = new Element("ScatterPlotChartURL");
                     
                     String filename = axisLabel;
                     
