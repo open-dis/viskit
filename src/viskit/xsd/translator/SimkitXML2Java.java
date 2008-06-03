@@ -199,7 +199,9 @@ public class SimkitXML2Java {
         pw.println("import java.util.*;");
         pw.println();
         pw.println("// Application specific imports");
-        pw.println("import org.apache.log4j.Logger;");
+        
+        // For debugging only
+//        pw.println("import org.apache.log4j.Logger;");
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
         pw.println();
@@ -215,9 +217,9 @@ public class SimkitXML2Java {
         List<Parameter> superParams = resolveSuperParams(this.root.getParameter());
 
         // Logger instantiation
-        pw.println(sp4 + "static Logger log " + eq + " Logger" + pd + 
-                "getLogger" + lp + className + pd + "class" + rp + sc);
-        pw.println();
+//        pw.println(sp4 + "static Logger log " + eq + " Logger" + pd + 
+//                "getLogger" + lp + className + pd + "class" + rp + sc);
+//        pw.println();
         pw.println(sp4 + "/* Simulation Parameters */");
         for (Parameter p : liParam) {
 
