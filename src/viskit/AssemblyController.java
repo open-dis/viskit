@@ -1113,9 +1113,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             String cp = getCustomClassPath();
             log.info("Compiling " + f.getCanonicalPath());
             
-            String diagnostic = Compiler.invoke(pkg,baseName, src);
+            String diagnostic = Compiler.invoke(pkg, baseName, src);
             if (diagnostic != null) {
-                log.info(diagnostic);
+                if (diagnostic.equals("")) {
+                    log.info("No compile errors");
+                } else {
+                    log.info(diagnostic);
+                }
                 File fClass = new File(f.getParentFile().getAbsoluteFile(), packagePath + baseName + ".class");
                 return fClass;
             }
