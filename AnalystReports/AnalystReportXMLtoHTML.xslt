@@ -8,7 +8,7 @@
     <meta name="version"     content="$Id: AnalystReportXMLtoHTML.xslt 1620 2007-11-20 07:23:43Z tdnorbra $"/>
 </head>
 -->
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:xalan="http://xml.apache.org/xslt"
