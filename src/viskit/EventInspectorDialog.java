@@ -345,7 +345,6 @@ public class EventInspectorDialog extends JDialog {
                             // are interested in for this purpose of this bug 
                             // fix
                             ((SchedulingEdge) ve).parameters.add(new vEdgeParameter("0"));
-                            log.info("SE parameter added");
                         }                        
                     }
                 }
