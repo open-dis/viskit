@@ -366,11 +366,11 @@ public class EdgeInspectorDialog extends JDialog {
         targEvent.setText(edge.to.getName());
         myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
-        parameters.setData(edge.parameters);
         if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
             myParmPanel.setVisible(false);
         } else {
             parameters.setArgumentList(edge.to.getArguments());
+            parameters.setData(edge.parameters);
             myParmPanel.setVisible(true);
         }
 
