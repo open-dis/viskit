@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import viskit.model.ViskitElement;
 
 /**
@@ -32,7 +33,8 @@ import viskit.model.ViskitElement;
  */
 public abstract class ViskitTablePanel extends JPanel /***************************************************/
 {
-
+    static Logger log = Logger.getLogger(ViskitTablePanel.class);
+    
     protected JTable tab;
     private JScrollPane jsp;
     private JButton plusButt,  minusButt,  edButt;
@@ -255,7 +257,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
 
     /**
      * Get all the current table data in the form of an array of row objects.
-     * @return ArrayList of row objects
+     * @return ArrayList copy of row objects
      */
     // We know this to be an ArrayList<ViskitElement> clone
     @SuppressWarnings("unchecked")
@@ -324,7 +326,8 @@ public abstract class ViskitTablePanel extends JPanel /*************************
 
     // private methods
     /**
-     * If a double-clicked listener has been installed, message it with the row object to be edited.
+     * If a double-clicked listener has been installed, message it with the row
+     * object to be edited.
      */
     private void doEdit() //-------------------
     {
@@ -414,8 +417,8 @@ public abstract class ViskitTablePanel extends JPanel /*************************
     private boolean shouldDoAddsAndDeletes = true;
 
     /**
-     * Whether this class should add and delete rows on plus-minus clicks.  Else that's left to
-     * a listener
+     * Whether this class should add and delete rows on plus-minus clicks.  
+     * Else that's left to a listener
      * @param boo How to play it
      */
     protected void doAddsAndDeletes(boolean boo) {
@@ -425,8 +428,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
     /**
      * The local listener for plus, minus and edit clicks
      */
-    class MyAddDelEditHandler implements ActionListener /*************************************************/
-    {
+    class MyAddDelEditHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
             if (event.getActionCommand().equals("p")) {
@@ -446,10 +448,14 @@ public abstract class ViskitTablePanel extends JPanel /*************************
                     event.setSource(shadow.get(tab.getSelectedRow()));
                     myMinusLis.actionPerformed(event);
                 }
+                
+                // Begin T/S for Bug 1373.  This process should remove edge 
+                // parameters not only from the preceding EdgeInspectorDialog,
+                // but also from the EG XML representation
                 if (shouldDoAddsAndDeletes) {
                     removeRow(tab.getSelectedRow());
                 }
-            } else {// if(event.getActionCommand() == "e")
+            } else {
                 doEdit();
             }
             adjustColumnWidths();
@@ -485,7 +491,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
             int colIndex = columnAtPoint(p);
 
             tip = getValueAt(rowIndex, colIndex).toString();  // tool tip is contents (for long contents)
-            if (tip == null || tip.length() == 0) {
+            if (tip == null || tip.isEmpty()) {
                 return null;
             }
             return tip;

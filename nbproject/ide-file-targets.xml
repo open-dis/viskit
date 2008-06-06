@@ -10,8 +10,7 @@
         <!-- This target assumes that viskit.jar is already built -->
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath>
-                <pathelement path="${basedir}"/>
-                <pathelement location="${basedir}/NabilThesis/"/>
+                <pathelement location="${basedir}/NabilThesis/build/classes"/>
                 <path refid="runtime.classpath.paths"/>
             </classpath>
             <!-- For translating and compiling EGs -->
@@ -19,8 +18,8 @@
             
             <!-- For translating and compiling Assemblies -->
             <!--arg value="-f"/>
-            <arg value="${basedir}/NabilThesis/src/nabilthesis/ScenarioArrivalAssembly.xml"/-->
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+            <arg value="${basedir}/NabilThesis/src/atfp/IndianIslandLandsideECPToTarget_assembly.xml"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/-->
         </java>
     </target>
     

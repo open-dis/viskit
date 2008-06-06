@@ -222,12 +222,11 @@
              destdir="${dir.src}">
             <produces dir="${dir.src.cli}"/>
         </xjc>
-        <!--xjc extension="true" 
+        <!--xjc extension="true"
                 package="viskit.xsd.bindings.sge.qstat" 
                 schema="${dir.src.sge.util}/qstat/qstat.xsd" 
                 destdir="${dir.src}">
-            <produces dir="${dir.src.sge.qstat}" 
-                      includes="* impl/* impl/runtime/*"/>
+            <produces dir="${dir.src.sge.qstat}"/>
         </xjc-->
     </target>    
     

@@ -30,6 +30,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame 
+ * showing a jgraph on the left and state variables and sim parameters panels on 
+ * the right, with menus and a toolbar.  To fully implement application-level 
+ * MVC, events like the dragging and dropping of a node on the screen are first 
+ * recognized in this class, but the GUI is not yet changed.  Instead, this 
+ * class (the View) messages the controller class (EventGraphController -- by 
+ * means of the ViskitController i/f).  The controller then informs the model 
+ * (Model), which then updates itself and "broadcasts" that fact.  This class is
+ * a model listener, so it gets the report, then updates the GUI.  A round trip.
+ *
+ * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is 
+ * largely unchanged.  To understand the flow, understand that 
+ * 1) The tab "ChangeListener" plays a key role; 
+ * 2) When the ChangeListener is hit, the controller.setModel() method installs
+ * the appropriate model for the newly-selected eventgraph.
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -39,17 +55,6 @@ import javax.swing.event.ChangeListener;
  * @since 12:52:59 PM
  * @version $Id: EventGraphViewFrame.java 1667 2007-12-17 20:24:55Z tdnorbra $
  *
- * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame showing a jgraph on the left and state
- * variables and sim parameters panels on the right, with menus and a toolbar.  To fully implement application-level MVC,
- * events like the
- * dragging and dropping of a node on the screen are first recognized in this class, but the GUI is not yet changed.
- * Instead, this class (the View) messages the controller class (EventGraphController -- by means of the ViskitController i/f).
- * The controller then informs the model (Model), which then updates itself and "broadcasts" that fact.  This class is a model
- * listener, so it gets the report, then updates the GUI.  A round trip.
- *
- * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is largely unchanged.  To understand the
- * flow, understand that 1) The tab "ChangeListener" plays a key role; 2) When the ChangeListener is hit, the controller.setModel()
- * method installs the appropriate model for the newly-selected eventgraph.
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements ViskitView {
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
@@ -1046,12 +1051,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * This is where the "master" model (simkit.viskit.model.Model) updates the view.
+     * This is where the "master" model (viskit.model.Model) updates the view.
      * @param event
      */
     @Override
-    public void modelChanged(mvcModelEvent event)
-    {
+    public void modelChanged(mvcModelEvent event) {
         VgraphComponentWrapper vgcw = getCurrentVgcw();
         ParametersPanel pp = vgcw.paramPan;
         VariablesPanel vp = vgcw.varPan;
@@ -1097,7 +1101,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             // Changes the graph needs to know about
             default:
                 getCurrentVgcw().viskitModelChanged((ModelEvent) event);
-
         }
     }
 

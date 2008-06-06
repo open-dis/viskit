@@ -3,8 +3,6 @@ package viskit.model;
 import java.util.ArrayList;
 import viskit.xsd.bindings.assembly.SimEntity;
 
-import java.awt.*;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute

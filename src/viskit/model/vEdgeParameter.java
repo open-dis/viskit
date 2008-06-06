@@ -8,38 +8,34 @@ import java.util.ArrayList;
  * @since Apr 7, 2004
  * @since 3:19:43 PM
  * @version $Id: vEdgeParameter.java 1662 2007-12-16 19:44:04Z tdnorbra $
- * To change this template use File | Settings | File Templates.
  */
 public class vEdgeParameter extends ViskitElement {
-    
-    private String type;
-    private String value;
-    public String bogus; //todo fix
-    private String name;
+
+    private String stateVarType;    
     private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private String type;    
+    private String name;    
+    public String bogus; //todo fix
+    private String value;
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String comment;
-    private String stateVarType;
-    
-    public vEdgeParameter(String value)
-    {
+
+    public vEdgeParameter(String value) {
         this.value = value;
     }
-    
-    public String getType()
-    {
-    return type;
+
+    public String getType() {
+        return type;
     }
-    
-    public void setType(String type)
-    {
-    this.type = type;
+
+    public void setType(String type) {
+        this.type = type;
     }
-    
+
     public String getValue() {
         return value;
     }
@@ -97,7 +93,7 @@ public class vEdgeParameter extends ViskitElement {
     public boolean isOperation() {
         return operation;
     }
-    
+
     @Override
     public String getStateVarType() {
         return stateVarType;

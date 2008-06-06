@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -29,6 +30,7 @@ import java.util.ArrayList;
  */
 public class EdgeInspectorDialog extends JDialog {
 
+    static Logger log = Logger.getLogger(EdgeInspectorDialog.class);
     private static EdgeInspectorDialog dialog;
     private Edge edge;
     private static boolean modified = false;
@@ -77,12 +79,10 @@ public class EdgeInspectorDialog extends JDialog {
         // above call blocks
         return modified;
     }
-    Vector nodeList;
+    Vector<ViskitElement> nodeList;
     Model mod; //todo fix
 
-    private EdgeInspectorDialog(JFrame frame,
-            Component locationComp,
-            Edge edge) {
+    private EdgeInspectorDialog(JFrame frame, Component locationComp, Edge edge) {
         super(frame, "Edge Inspector", true);
         this.edge = edge;
 
@@ -366,11 +366,11 @@ public class EdgeInspectorDialog extends JDialog {
         targEvent.setText(edge.to.getName());
         myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
-        parameters.setArgumentList(edge.to.getArguments());  //
         parameters.setData(edge.parameters);
-        if (edge.to.getArguments() == null || edge.to.getArguments().size() <= 0) {
+        if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
             myParmPanel.setVisible(false);
         } else {
+            parameters.setArgumentList(edge.to.getArguments());
             myParmPanel.setVisible(true);
         }
 
@@ -437,19 +437,23 @@ public class EdgeInspectorDialog extends JDialog {
             }
         }
         String delaySt = delay.getText();
-        if (delaySt == null || delaySt.trim().length() <= 0) {
+        if (delaySt == null || delaySt.trim().isEmpty()) {
             edge.delay = "0.0";
         } else {
             edge.delay = delay.getText();
         }
         String condSt = conditionalExpressionPanel.getText();
-        if (condSt == null || condSt.trim().length() <= 0) {
+        if (condSt == null || condSt.trim().isEmpty()) {
             edge.conditional = "true";
         } else {
             edge.conditional = conditionalExpressionPanel.getText();
         }
         edge.conditionalDescription = getDescription();
         edge.parameters.clear();
+        
+        // Bug 1373: This is how applying changes to this EdgeInspectorDialog
+        // causes the correct EG XML representation when removing event
+        // parameters from a proceding node.  This loop adds vEdgeParameters
         for (ViskitElement o : parameters.getData()) {
             edge.parameters.add(o);
         }

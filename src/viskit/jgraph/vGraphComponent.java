@@ -1085,8 +1085,8 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
         CircleCell vcc = (CircleCell) view.getSource().getParentView().getCell();
         EventNode en = (EventNode) vcc.getUserObject();
         double retd = -rotIncr;
-        for (Iterator itr = en.getConnections().iterator(); itr.hasNext();) {
-            Edge e = (Edge) itr.next();
+        for (ViskitElement ve : en.getConnections()) {
+            Edge e = (Edge) ve;
             if (e.to == en && e.from == en) {
                 retd += rotIncr;
                 if (e == edg) {

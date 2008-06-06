@@ -856,7 +856,9 @@ public class VGlobals {
     }
 
     public File getWorkDirectory() {
-        if ( !workDirectory.exists() ) workDirectory.mkdir(); 
+        if ( !workDirectory.exists() ) {
+            workDirectory.mkdir();
+        } 
         return workDirectory;
     }
     private File workDirectory;
@@ -869,8 +871,11 @@ public class VGlobals {
             newWorkDir();
         } else {
             workDirectory = new File(getHistoryConfig().getString("Cached[@workDir]"));
-            if (workDirectory == null) newWorkDir();
-            else if (workDirectory.listFiles().length == 0) newWorkDir();
+            if (workDirectory == null) {
+                newWorkDir();
+            } else if (workDirectory.listFiles().length == 0) {
+                newWorkDir();
+            }
         }
     }
 

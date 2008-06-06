@@ -149,7 +149,7 @@ public class EventArgumentDialog extends JDialog {
             nameField.setText(myEA.getName());
             parameterTypeCombo.setSelectedItem(myEA.getType());
             if (myEA.getDescription().size() > 0) {
-                descriptionField.setText((String) myEA.getDescription().get(0));
+                descriptionField.setText(myEA.getDescription().get(0));
             } else {
                 descriptionField.setText("");
             }

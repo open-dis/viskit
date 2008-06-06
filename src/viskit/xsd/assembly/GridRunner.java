@@ -32,7 +32,6 @@ import simkit.random.MersenneTwister;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.bindings.eventgraph.*; 
 
 /**
  * The GridRunner launches a number of Gridlets to
@@ -938,10 +937,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
-        }
-        
-    }
-    
+        }        
+    }    
     
     public void doFullFactorial() {
         
@@ -977,8 +974,6 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         }
     }
     
-   
-    
     void iterate(HashMap values, int depth) {
         
         Object[] terms = ((values.keySet()).toArray());
@@ -1013,13 +1008,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     terminalParams.add(termCopy);
                 }
 
-                // TODO: fix generics
                 designPoints.add(designPoint);
             }
-        }
-        
-        
-        
+        }        
     }
     
     /**

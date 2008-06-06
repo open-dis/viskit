@@ -505,7 +505,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private ArrayList<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
         ArrayList<ViskitElement> alis = new ArrayList<ViskitElement>(3);
         for (EdgeParameter ep : lis) {
-            vEdgeParameter vep = new vEdgeParameter(ep.getValue()); //,ep.getType());
+            vEdgeParameter vep = new vEdgeParameter(ep.getValue());
             alis.add(vep);
         }
         return alis;
@@ -1030,6 +1030,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         sch.setEvent((Event) e.to.opaqueModelObject);
         sch.setPriority(e.priority);
         sch.getEdgeParameter().clear();
+        
+        // Bug 1373: This is where an edge parameter gets written out to XML
         for (ViskitElement edgeParameter : e.parameters) {
             EdgeParameter p = oFactory.createEdgeParameter();
             p.setValue(nIe(edgeParameter.getValue()));
@@ -1060,12 +1062,12 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     /**
      * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s
-     * @return 
+     * @param s the string to evaluate for nullity
+     * @return the passed string if non-zero length, else null
      */
     private String nIe(String s) {
         if (s != null) {
-            if (s.length() == 0) {
+            if (s.isEmpty()) {
                 s = null;
             }
         }

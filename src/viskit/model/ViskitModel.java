@@ -40,7 +40,8 @@ public interface ViskitModel {
   public File getLastFile();
   
   /**
-   *  Reports saved state of model.  Becomes "clean" after a save.
+   * Reports saved state of model.  Becomes "clean" after a save.
+   * @return state of model
    */
   public boolean isDirty();
 

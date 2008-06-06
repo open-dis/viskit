@@ -11,17 +11,20 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import viskit.model.EventArgument;
 import viskit.model.EventLocalVariable;
 import viskit.model.EventNode;
 import viskit.model.EventStateTransition;
+import viskit.model.SchedulingEdge;
 import viskit.model.ViskitElement;
+import viskit.model.vEdgeParameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
- * www.nps.navy.mil
+ * www.nps.edu
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 2:56:21 PM
@@ -29,6 +32,8 @@ import viskit.model.ViskitElement;
  */
 public class EventInspectorDialog extends JDialog {
 
+    static Logger log = Logger.getLogger(EventInspectorDialog.class);
+    
     private static EventInspectorDialog dialog;
     private Component locationComponent;
     private JFrame fr;
@@ -206,6 +211,7 @@ public class EventInspectorDialog extends JDialog {
         arguments.addMinusListener(myChangeListener);
         arguments.addDoubleClickedListener(new ActionListener() {
             
+            // EventArgumentDialong: Event arguments
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
                 boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
@@ -219,6 +225,7 @@ public class EventInspectorDialog extends JDialog {
         transitions.addMinusListener(myChangeListener);
         transitions.addDoubleClickedListener(new MouseAdapter() {
 
+            // EventTransitionDialog: State transition
             // bug fix 1183
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -305,7 +312,47 @@ public class EventInspectorDialog extends JDialog {
 
             en.setTransitions(transitions.getTransitions());
 
+            // Bug 1373: This is how the EdgeInspectorDialog will have knowledge
+            // of edge parameter additions, or removals
             en.setArguments(arguments.getData());
+            
+            // Bug 1373: This is how we will now sync up any SchedulingEdge
+            // parameters with corresponding EventNode parameters
+            for (ViskitElement ve : en.getConnections()) {
+                
+                // Okay, it's a SchedulingEdge
+                if (ve instanceof SchedulingEdge) {
+                    
+                    // and, this SchedulingEdge is going to this node
+                    if (((SchedulingEdge) ve).to.getName().equals(en.getName())) {
+                        log.debug("Found the SE's 'to' Node that matches this EventNode");
+                        
+                        // The lower key values signal when it was connected to
+                        // to this event node.  We're interested in the first
+                        // SchedulingEdge to this EventNode
+                        log.debug("SE ID is: " + ((SchedulingEdge) ve).getModelKey());
+                        ((SchedulingEdge) ve).parameters.clear();
+                        
+                        // We match EventArgument count to EdgeParameter count
+                        // here.  
+                        for (ViskitElement v : arguments.getData()) {
+
+                            // The user will be able to change any values from
+                            // the EdgeInspectorDialog.  Right now, values are
+                            // defaulted to zeros.  Am betting that since this
+                            // scheduling edge is the first in this event node's
+                            // connections list, it is the very scheduling edge 
+                            // are interested in for this purpose of this bug 
+                            // fix
+                            ((SchedulingEdge) ve).parameters.add(new vEdgeParameter("0"));
+                            log.info("SE parameter added");
+                        }                        
+                    }
+                }
+                
+                // We have our SchedulingEdge and are now finsihed
+                break;
+            }
             en.setLocalVariables(new Vector<ViskitElement>(localVariables.getData()));
             en.getComments().clear();
             en.getComments().add(description.getText().trim());

@@ -46,23 +46,23 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     public String[] getFields(Object o, int rowNum) {
         String[] sa = new String[2];
-        EventArgument ea = (EventArgument) argList.get(rowNum);
-        sa[0] = ea.getName() + " (" + ea.getType() + ")";
-        sa[1] = ((vEdgeParameter) o).getValue();
+        ViskitElement eventArgument = argList.get(rowNum);
+        sa[0] = eventArgument.getName() + " (" + eventArgument.getType() + ")";
+        sa[1] = ((ViskitElement) o).getValue();
         return sa;
     }
 
     public ViskitElement newRowObject() {
-        vEdgeParameter ea = new vEdgeParameter("value"); //,"type");
+        vEdgeParameter ea = new vEdgeParameter("value");
         return ea;
     }
 
     public int getNumVisibleRows() {
         return 3;
     }
-    ArrayList argList;
+    ArrayList<ViskitElement> argList;
 
-    public void setArgumentList(ArrayList lis) {
+    public void setArgumentList(ArrayList<ViskitElement> lis) {
         argList = lis;
     }
 
@@ -78,7 +78,8 @@ public class EdgeParametersPanel extends ViskitTablePanel {
         if (diff == 0) {
             super.setData(data);
         } else if (diff > 0) {
-            //more arguments than we've got.
+            
+            // more arguments than we've got.
             for (int i = 0; i < diff; i++) {
                 myList.add(new vEdgeParameter("0"));
             }
@@ -125,7 +126,6 @@ public class EdgeParametersPanel extends ViskitTablePanel {
                 ActionEvent ae = new ActionEvent(o, 0, "");
                 alis.actionPerformed(ae);
             }
-
         }
     }
 }
