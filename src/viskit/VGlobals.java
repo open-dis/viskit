@@ -963,9 +963,9 @@ public class VGlobals {
 
             log.debug("Viskit is exiting with status: " + status);
 
-            /* If an application launched a JVM, and is still running, this will
-             * only make Viskit disappear.  If Viskit is running standalone, 
-             * then then all JFrames created by Viskit will dispose, and the JVM
+            /* If an application launched a JVM, and is still running, these
+             * will only make Viskit disappear. If Viskit is running standalone, 
+             * then when all JFrames created by Viskit will dispose, and the JVM
              * will then cease.
              * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
              * @see http://72.5.124.55/javase/6/docs/api/java/awt/doc-files/AWTThreadIssues.html
