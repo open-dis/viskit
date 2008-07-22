@@ -55,6 +55,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import edu.nps.util.CryptoMethods;
+import edu.nps.util.TempFileManager;
 import static edu.nps.util.GenericConversion.toArray;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.jdom.Attribute;
@@ -74,7 +75,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * @author Mike Bailey
  * @since Jul 18, 2006
  * @since 2:50:08 PM
- * @version $Id: JobLauncherTab2.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
 
@@ -408,7 +409,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         filteredFile = inputFile;      // will be possibly changed
 
         try {
-            filteredFile = File.createTempFile("DoeInputFile", ".xml");
+            filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
             System.out.println("couldn't make temp file");
         }
@@ -1284,7 +1285,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private void initConfig() {
         try {
-            vConfig = VGlobals.instance().getHistoryConfig();
+            vConfig = ViskitConfig.instance().getViskitConfig();
         } catch (Exception e) {
             System.out.println("Error loading config file: " + e.getMessage());
             vConfig = null;

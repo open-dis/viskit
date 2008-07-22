@@ -19,7 +19,7 @@ import viskit.model.ViskitElement;
  * @author Mike Bailey
  * @since Apr 8, 2004
  * @since 8:49:21 AM
- * @version $Id: EdgeParametersPanel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class EdgeParametersPanel extends ViskitTablePanel {
 

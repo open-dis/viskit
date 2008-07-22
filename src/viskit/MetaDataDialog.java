@@ -17,11 +17,10 @@ import java.awt.event.ActionListener;
  * @author Mike Bailey
  * @since Apr 12, 2004
  * @since 3:52:05 PM
- * @version $Id:$
+ * @version $Id$
  */
 abstract public class MetaDataDialog extends JDialog {
 
-    protected static MetaDataDialog dialog;
     protected static boolean modified = false;
     protected JComponent runtimePanel;
     private JButton canButt;
@@ -161,10 +160,6 @@ abstract public class MetaDataDialog extends JDialog {
         fillWidgets();
 
         modified = (gmd == null);
-        //   okButt.setEnabled((gmd==null?true:false));
-
-//    getRootPane().setDefaultButton(canButt);
-
         this.setLocationRelativeTo(c);
     }
 
@@ -212,7 +207,7 @@ abstract public class MetaDataDialog extends JDialog {
             modified = true;
             if (modified) {
                 if (nameTf.getText().trim().length() <= 0) {
-                    JOptionPane.showMessageDialog(MetaDataDialog.this, "An event graph must have a non-zero length name.",
+                    JOptionPane.showMessageDialog(MetaDataDialog.this, "Must have a non-zero length name.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     nameTf.requestFocus();
                     return;

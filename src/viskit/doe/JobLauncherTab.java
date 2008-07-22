@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import edu.nps.util.CryptoMethods;
+import edu.nps.util.TempFileManager;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
@@ -42,15 +43,12 @@ import org.jdom.Text;
 import viskit.OpenAssembly;
 import viskit.SpringUtilities;
 import viskit.TitleListener;
-import viskit.VGlobals;
 import viskit.xsd.assembly.SessionManager;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.Schedule;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -65,6 +63,7 @@ import java.net.URL;
 import java.security.Key;
 import java.util.*;
 import java.util.List;
+import viskit.ViskitConfig;
 
 /**
  * MOVES Institute
@@ -73,7 +72,7 @@ import java.util.List;
  * @author Mike Bailey
  * @since Jul 21, 2005
  * @since 12:29:08 PM
- * @version $Id: JobLauncherTab.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
 
@@ -283,7 +282,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         filteredFile = inputFile;      // will be possibly changed
 
         try {
-            filteredFile = File.createTempFile("DoeInputFile", ".xml");
+            filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
             System.out.println("couldn't make temp file");
         }
@@ -639,10 +638,10 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             try {
                 createOutputDir();
                 int chosenPort = Integer.parseInt(portTF.getText());
-                String clusterDNS = clusterTF.getText().trim();
+                String localClusterDNS = clusterTF.getText().trim();
 
-                writeStatus("Building XML-RPC client to " + clusterDNS + ".");
-                rpc = new XmlRpcClientLite(clusterDNS, chosenPort);
+                writeStatus("Building XML-RPC client to " + localClusterDNS + ".");
+                rpc = new XmlRpcClientLite(localClusterDNS, chosenPort);
                 // login
                 args.add(unameTF.getText());
                 args.add(new String(upwPF.getPassword()));
@@ -681,7 +680,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 if (viskit.Vstatics.debug) {
                     System.out.println(dataS);
                 }
-                writeStatus("Sending job file to " + clusterDNS);
+                writeStatus("Sending job file to " + localClusterDNS);
                 Boolean retBool = (Boolean) rpc.execute("gridkit.setAssembly", args);
                 writeStatus("gridkit.setAssembly returned " + retBool.booleanValue());
                 if (retBool.booleanValue() == false) {
@@ -1147,7 +1146,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     private void initConfig() {
         try {
-            vConfig = VGlobals.instance().getHistoryConfig();
+            vConfig = ViskitConfig.instance().getViskitConfig();
         } catch (Exception e) {
             System.out.println("Error loading config file: " + e.getMessage());
             vConfig = null;
@@ -1220,6 +1219,5 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 ex.printStackTrace();
             }
         }
-
     }
 }

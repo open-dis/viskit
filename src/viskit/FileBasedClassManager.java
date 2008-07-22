@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author Mike Bailey
  * @since Jul 23, 2004
  * @since 12:53:36 PM
- * @version $Id: FileBasedClassManager.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class FileBasedClassManager implements Runnable {
     // Singleton:
@@ -42,7 +42,7 @@ public class FileBasedClassManager implements Runnable {
     private HashMap<String, Class<?>> classMap;
     static Logger log = Logger.getLogger(FileBasedClassManager.class);
 
-    public static synchronized FileBasedClassManager inst() {
+    public static synchronized FileBasedClassManager instance() {
         if (me == null) {
             me = new FileBasedClassManager();
         }
@@ -53,19 +53,14 @@ public class FileBasedClassManager implements Runnable {
         classMap = new HashMap<String, Class<?>>();
         fileMap = new HashMap<String, FileBasedAssyNode>();
 
-        try {
-            vConfig = VGlobals.instance().getHistoryConfig();
-        } catch (Exception e) {
-            log.debug("Error loading config file: " + e.getMessage());
-            vConfig = null;
-        }
+        vConfig = ViskitConfig.instance().getViskitConfig();        
     }
 
     public void addFileClass(Class<?> c) {
         classMap.put(c.getName(), c);
     }
 
-    public void removeFileClass(Class c) {
+    public void removeFileClass(Class<?> c) {
         removeFileClass(c.getName());
     }
 
@@ -73,8 +68,8 @@ public class FileBasedClassManager implements Runnable {
         classMap.remove(nm);
     }
 
-    public Class getFileClass(String s) {
-        return (Class) classMap.get(s);
+    public Class<?> getFileClass(String s) {
+        return classMap.get(s);
     }
 
     public void unloadFile(FileBasedAssyNode fban) {
@@ -84,7 +79,7 @@ public class FileBasedClassManager implements Runnable {
 
     public FileBasedAssyNode loadFile(File f) throws Throwable {
         FileBasedAssyNode fban = null;
-        Class fclass = null;
+        Class<?> fclass = null;
         // if it is cached, cache directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
             if (!isCached(f)) {
@@ -95,7 +90,9 @@ public class FileBasedClassManager implements Runnable {
                     if (paf == null) {
                         return null;
                     }
-                    ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
+                    
+                    // TODO: Lessen the amount of resetting the LBL
+                    ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
                     // since we're here, cache the parameter names
                     JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                     Unmarshaller um = jaxbCtx.createUnmarshaller();
@@ -120,7 +117,9 @@ public class FileBasedClassManager implements Runnable {
             } else {
                 f = getCachedClass(f);
                 File fXml = getCachedXML(f);
-                ClassLoader loader = VGlobals.instance().getWorkClassLoader(true);
+                
+                // TODO: Lessen the amount of resetting the LBL
+                ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
                 JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                 Unmarshaller um = jaxbCtx.createUnmarshaller();
                 try {
@@ -181,7 +180,9 @@ public class FileBasedClassManager implements Runnable {
                 if (viskit.Vstatics.debug) {
                     log.debug("Cache is empty, creating workDir entry at " + VGlobals.instance().getWorkDirectory().getCanonicalPath());
                 }
-                vConfig.setProperty("Cached[@workDir]", VGlobals.instance().getWorkDirectory().getCanonicalPath());
+                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath();
+                s = s.replace('\\', '/');
+                vConfig.setProperty("Cached[@workDir]", s);
             }
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
@@ -337,8 +338,11 @@ public class FileBasedClassManager implements Runnable {
         }
     }
 
-    // check if digests match as well as being on list, if no digest match
-    // file changed since being a miss, so do updates etc.
+    /** Check if digests match as well as being on list, if no digest match
+     * file changed since being a miss, so do updates etc.
+     * @param file
+     * @return 
+     */
     public boolean isCacheMiss(File file) {
         List<String> cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss[@file]"));
         List<String> digests = Arrays.asList(vConfig.getStringArray("Cached.Miss[@digest]"));
@@ -383,14 +387,12 @@ public class FileBasedClassManager implements Runnable {
         }
     }
 
-
     /** if either the egFile changed, or the classFile, the cache is stale
      * @param egFile
      * @return 
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@xml]"));
         List<String> cacheDigest = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@digest]"));
         String filePath;
         try {
@@ -415,7 +417,7 @@ public class FileBasedClassManager implements Runnable {
         Annotation[] paramAnnots;
         List<Object>[] l = newListObjectTypeArray(ArrayList.class, constr.length);
         for (int j = 0; j < constr.length; j++) {
-            Class[] clz = constr[j].getParameterTypes();
+            Class<?>[] clz = constr[j].getParameterTypes();
             paramAnnots = constr[j].getDeclaredAnnotations();
             if (paramAnnots == null) {
                 l[j] = new ArrayList<Object>();

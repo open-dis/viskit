@@ -226,10 +226,15 @@ public class RunnerPanel2 extends JPanel {
         flowPan.add(printRepReportsCB);
         printSummReportsCB = new JCheckBox("Print summary reports");
         flowPan.add(printSummReportsCB);
+        
+        /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable Analyst Reports");
         flowPan.add(analystReportCB);
-        resetSeedCB = new JCheckBox("Reset seed each rerun");
-        flowPan.add(resetSeedCB);
+        
+//        resetSeedCB = new JCheckBox("Reset seed each rerun");
+//        flowPan.add(resetSeedCB);
+        /* End DIFF between OA3302 branch and trunk */
+        
         searchB = new JButton("Search...");
         searchKey = new JTextField();
         flowPan.add(searchB);
@@ -510,7 +515,7 @@ public class RunnerPanel2 extends JPanel {
                     page = new String(chbuf, "UTF8");
                 }
             }
-            ///System.err.println(page);
+            //System.err.println(page);
             return page;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -564,6 +569,9 @@ public class RunnerPanel2 extends JPanel {
         }
 
         public void mousePressed(MouseEvent e) {
+            
+            // Prevent NPE here
+            if(fileChaser == null) {return;}
             fileChaser.stop();
             bar.removeMouseListener(this);
             bar.addMouseListener(new MousePressListener());

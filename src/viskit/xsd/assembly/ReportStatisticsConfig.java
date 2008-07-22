@@ -38,8 +38,7 @@ import simkit.stat.SampleStatistics;
  *       BasicAssembly or ViskitAssembly classes.
  *
  * @author Patrick Sullivan
- * @version $Id: ReportStatisticsConfig.java 1666 2007-12-17 05:24:41Z tdnorbra $
- * @author Terry D. Norbraten
+ * @version $Id$
  */
 public class ReportStatisticsConfig {
 
@@ -93,9 +92,8 @@ public class ReportStatisticsConfig {
      * @param keyValues 
      */
     public void setEntityIndex(LinkedList<String> keyValues) {
-        System.out.println("\n\nAnalyst Report Selected for the following:");
-        System.out.println("         Entity Name Data Point");
-        System.out.println("-----------------------------------------");
+        System.out.println("Replication Statistic(s) created");
+        System.out.println("--------------------------------");
         entityIndex = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
         int seperator = 0;

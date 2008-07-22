@@ -1,13 +1,15 @@
 package viskit;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationFactory;
+import edu.nps.util.FileIO;
+import java.io.File;
+import java.io.IOException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.commons.configuration.CombinedConfiguration;
+import org.apache.commons.configuration.DefaultConfigurationBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * Viskit Discrete Event Simulation (DES) Tool
@@ -16,41 +18,90 @@ import java.util.List;
  * @author Mike Bailey
  * @since Mar 8, 2005
  * @since 11:09:07 AM
- * @version $Id: ViskitConfig.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class ViskitConfig {
+    
+    public static final Logger logger = Logger.getLogger(ViskitConfig.class);
 
-    public static String configFile = "vconfig.xml";
+    public static final File VISKIT_HOME_DIR = new File(System.getProperty("user.home"), ".viskit");
+    public static final File V_CONFIG_FILE = new File(VISKIT_HOME_DIR, "vconfig.xml");
+    public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");    public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
+    
+    public static final String PROJECT_HOME_KEY = "app.projecthome.path[@dir]";
+    public static final String EG_HISTORY_KEY = "history.EventGraphEditor.Recent.EventGraphFile";
+    public static final String EG_HISTORY_CLEAR_KEY = "history.EventGraphEditor.Recent";
+    public static final String X_CLASS_PATH_KEY = "extraClassPath.path";
+    public static final String X_CLASS_PATH_CLEAR_KEY = "extraClassPath";
+    public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
+    public static final String RECENT_ASSY_CLEAR_KEY = "history.AssemblyEditor.Recent";
+    public static final String EG_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
+    public static final String ASSY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
+    public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
+    public static final String DEBUG_MSGS_KEY = "app.debug";
+    public static final String CACHED_EVENTGRAPHS_KEY = "Cached.EventGraphs[@xml]";
+    public static final String CACHED_WORKING_DIR_KEY = "Cached[@workDir]";
+    public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
+    
     private static ViskitConfig me;
 
+    private HashMap<String, XMLConfiguration> configs = new HashMap<String, XMLConfiguration>();
+    private HashMap<String, String> sessionHM = new HashMap<String, String>();
+    private CombinedConfiguration cc;
+    private DefaultConfigurationBuilder builder;
+
+    static {
+        logger.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
+        logger.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists());
+    }
+    
     public static synchronized ViskitConfig instance() {
         if (me == null) {
-            me = new ViskitConfig(configFile);
+            me = new ViskitConfig();
         }
         return me;
     }
-    private HashMap<String, XMLConfiguration> configs = new HashMap<String, XMLConfiguration>();
-    private HashMap<String, String> sessionHM = new HashMap<String, String>();
-    private CompositeConfiguration config;
-
-    private ViskitConfig(String cfile) {
+    
+    private ViskitConfig() {
         try {
-            ConfigurationFactory factory = new ConfigurationFactory();
-            factory.setConfigurationFileName(cfile);
-            config = (CompositeConfiguration) factory.getConfiguration();
+            if (!VISKIT_HOME_DIR.exists()) {
+                VISKIT_HOME_DIR.mkdirs();
+                logger.info("Created dir: " + VISKIT_HOME_DIR);
+            }
+            File vconfigSrc = new File(V_CONFIG_FILE.getName());
+            if (!V_CONFIG_FILE.exists()) {
+                V_CONFIG_FILE.createNewFile();
+                FileIO.copyFile(vconfigSrc, V_CONFIG_FILE, true);
+            }
+            File cAppSrc = new File(C_APP_FILE.getName());
+            if (!C_APP_FILE.exists()) {
+                C_APP_FILE.createNewFile();
+                FileIO.copyFile(cAppSrc, C_APP_FILE, true);
+            }
+            File cGuiSrc = new File(C_GUI_FILE.getName());
+            if (!C_GUI_FILE.exists()) {
+                C_GUI_FILE.createNewFile();
+                FileIO.copyFile(cGuiSrc, C_GUI_FILE, true);
+            }
+        } catch (IOException ex) {
+            Vstatics.log.error(ex);
+        }
+        try {
+            builder = new DefaultConfigurationBuilder();
+            builder.setFile(V_CONFIG_FILE);
+            cc = builder.getConfiguration(true);
 
             // Save off the indiv XML config for each prefix so we can write back
-            for (int i = 0; i < config.getNumberOfConfigurations(); i++) {
-                Object obj = config.getConfiguration(i);
+            for (int i = 0; i < cc.getNumberOfConfigurations(); i++) {
+                Object obj = cc.getConfiguration(i);
                 if (!(obj instanceof XMLConfiguration)) {
                     continue;
                 }
                 XMLConfiguration xc = (XMLConfiguration) obj;
                 xc.setAutoSave(true);
                 HierarchicalConfiguration.Node n = xc.getRoot();
-                List lis = n.getChildren();
-                for (Iterator itr = lis.iterator(); itr.hasNext();) {
-                    Object o = itr.next();
+                for (Object o : n.getChildren()) {
                     configs.put(((HierarchicalConfiguration.Node) o).getName(), xc);
                 }
             }
@@ -82,11 +133,11 @@ public class ViskitConfig {
             return retS;
         }
 
-        return config.getString(key);
+        return cc.getString(key);
     }
 
     public int getConfigValueCount(String key) {
-        String[] sa = config.getStringArray(key);
+        String[] sa = cc.getStringArray(key);
         return sa.length;
     }
 
@@ -94,5 +145,10 @@ public class ViskitConfig {
         XMLConfiguration xmlConfig = new XMLConfiguration(f);
         xmlConfig.setAutoSave(true);
         return xmlConfig;
+    }
+
+    /** @return the XMLConfiguration for Viskit */
+    public XMLConfiguration getViskitConfig() {
+        return (XMLConfiguration) cc.getConfiguration("app");
     }
 }

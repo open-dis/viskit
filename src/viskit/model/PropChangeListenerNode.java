@@ -12,7 +12,7 @@ import viskit.Vstatics;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 9:08:08 AM
- * @version $Id: PropChangeListenerNode.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  *
  * An event as seen by the model (not the view)
  */

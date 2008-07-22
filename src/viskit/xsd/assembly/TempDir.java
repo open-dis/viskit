@@ -32,6 +32,10 @@ public class TempDir {
     /**
      * Creates a temp directory with a generated name (given a certain prefix) in a given directory.
      * The directory (and all its content) will be destroyed on exit.
+     * @param prefix
+     * @param directory
+     * @return 
+     * @throws IOException
      */
     public static File createGeneratedName(String prefix, File directory)
             throws IOException {
@@ -49,6 +53,10 @@ public class TempDir {
     /**
      * Creates a temp directory with a given name in a given directory.
      * The directory (and all its content) will be destroyed on exit.
+     * @param name
+     * @param directory
+     * @return
+     * @throws IOException 
      */
     public static File createNamed(String name, File directory)
             throws IOException {

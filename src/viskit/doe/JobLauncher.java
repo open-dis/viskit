@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.TempFileManager;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -61,9 +62,9 @@ import viskit.TitleListener;
  * @author Mike Bailey
  * @since Jul 21, 2005
  * @since 12:29:08 PM
- * @version $Id: JobLauncher.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
-public class JobLauncher extends JFrame implements Runnable, edu.nps.util.DirectoryWatch.DirectoryChangeListener {
+public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener {
 
     String inputFileString;
     File inputFile;
@@ -215,7 +216,7 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
         filteredFile = inputFile;      // will be possibly changed
 
         try {
-            filteredFile = File.createTempFile("DoeInputFile", ".xml");
+            filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
             System.out.println("couldn't make temp file");
         }
@@ -741,9 +742,8 @@ public class JobLauncher extends JFrame implements Runnable, edu.nps.util.Direct
         public void run() {
             if (waitToGo == true) {
                 try {
-                    statusThread.sleep(60000);
-                } catch (InterruptedException e) {
-                }
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {}
             }
 
             while (statusThread != null && clusterStatusFrame != null) {

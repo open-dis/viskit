@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Reads a file assumed to be in the following form (2 lines):
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  * $Date: 2007-12-16 11:44:04 -0800 (Sun, 16 Dec 2007) $
  * </pre>
  *
- * @version $Id: Version.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * @author ahbuss
  */
 public class Version {
@@ -32,6 +33,8 @@ public class Version {
     protected int patchVersion;
     
     protected Date lastModified;
+    
+    protected int svnRevisionNumber;
     
     public Version(String versionString, String dateString) {
         int[] version = parseVersionString(versionString);
@@ -53,6 +56,9 @@ public class Version {
             patchVersion = version[2];
             String dateString = reader.readLine();
             lastModified = parseDateString(dateString);
+            String revisionString = reader.readLine();
+            svnRevisionNumber = parseRevisionString(revisionString);
+            versionString += "." + svnRevisionNumber;
         } catch (IOException e) {
             log.fine("Problem reading " + fileName + ": " + e);
         }
@@ -60,11 +66,11 @@ public class Version {
     
     protected static int[] parseVersionString(String versionString) {
         String[] versions = versionString.split("\\.");
-        if (versions.length != 3) {
-            log.fine("Expected x.y.x: " + versionString);
-            throw new IllegalArgumentException("Expected x.y.x: " + versionString +
-                    " length = " + versions.length);
-        }
+//        if (versions.length != 4) {
+//            log.fine("Expected w.x.y.z: " + versionString);
+//            throw new IllegalArgumentException("Expected w.x.y.z: " + versionString +
+//                    " length = " + versions.length);
+//        }
         int[] versionNumber = new int[versions.length];
         for (int i = 0; i < versionNumber.length; ++i) {
             versionNumber[i] = Integer.parseInt(versions[i]);
@@ -73,22 +79,23 @@ public class Version {
     }
     
     protected static Date parseDateString(String dateString) {
-        GregorianCalendar calendar = null;
+        Date date = null;
         try {
-            String[] data = dateString.split("[: $-]");
-            int year = Integer.parseInt(data[3]);
-            int month = Integer.parseInt(data[4]);
-            int day = Integer.parseInt(data[5]);
-            int hour = Integer.parseInt(data[6]);
-            int minute = Integer.parseInt(data[7]);
-            int second = Integer.parseInt(data[8]);
-            
-            calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-            calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Pattern pattern = 
+                    Pattern.compile("\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d \\d\\d:\\d\\d:\\d\\d");
+            Matcher matcher = pattern.matcher(dateString);
+            if (matcher.find()) {
+                date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matcher.group());
+            }
         } catch (Throwable t) {
-            System.err.println("Problem parsing date string " + dateString + ": " + t);
+            log.fine("Problem parsing date string " + dateString + ": " + t);
         }
-        return calendar.getTime();
+        return date;
+    }
+    
+    protected static int parseRevisionString(String revisionString) {
+        String[] data = revisionString.split("\\D+");
+        return Integer.parseInt(data[1]);
     }
     
     public String getVersionString() {
@@ -109,6 +116,10 @@ public class Version {
     
     public int getPatchVersion() {
         return patchVersion;
+    }
+    
+    public int getSVNRevisionNumber() {
+        return svnRevisionNumber;
     }
     
     public boolean isSameVersionAs(String otherVersionString) {

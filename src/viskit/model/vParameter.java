@@ -9,7 +9,7 @@ import viskit.VGlobals;
  * a name and type.
  *
  * @author DMcG
- * @version $Id: vParameter.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class vParameter extends ViskitElement {
 

@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
 /**
  * Filters files whose names contain a given String, case insensitive
  *
- * @version $Id: AssemblyFileFilter.java 1667 2007-12-17 20:24:55Z tdnorbra $
+ * @version $Id$
  * <p>
  *   <b>History:</b>
  *   <pre><b>

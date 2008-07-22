@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Nov 2, 2005
  * @since 11:24:06 AM
- * @version $Id: SettingsDialog.java 1667 2007-12-17 20:24:55Z tdnorbra $
+ * @version $Id$
  */
 package viskit;
 
@@ -165,9 +165,9 @@ public class SettingsDialog extends JDialog {
         JButton upCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/upArrow.png")));
         upCPButt.setBorder(null);
         upCPButt.addActionListener(new upCPhandler());
-        JButton addCPButt = new JButton("add");
+        JButton addCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
         addCPButt.addActionListener(new addCPhandler());
-        JButton removeCPButt = new JButton("remove");
+        JButton removeCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
         removeCPButt.addActionListener(new delCPhandler());
         JButton dnCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/downArrow.png")));
         dnCPButt.setBorder(null);
@@ -195,7 +195,7 @@ public class SettingsDialog extends JDialog {
         recentP.add(clearAssRecent);
         recentP.add(Box.createVerticalGlue());
 
-        tabbedPane.addTab("Recent files lists", recentP);
+        tabbedPane.addTab("Recent files", recentP);
 
         JPanel visibleP = new JPanel();
         visibleP.setLayout(new BoxLayout(visibleP, BoxLayout.Y_AXIS));
@@ -225,23 +225,9 @@ public class SettingsDialog extends JDialog {
         tabbedPane.addTab("Tab visibility", visibleP);
     }
     private static XMLConfiguration vConfig;
-    private static String xClassPathKey = "extraClassPath.path";
-    private static String xClassPathClearKey = "extraClassPath";
-    private static String recentEGClearKey = "history.EventGraphEditor.Recent";
-    private static String recentAssyClearKey = "history.AssemblyEditor.Recent";
-    private static String egEdVisibleKey = "application.tabs.EventGraphEditor[@visible]";
-    private static String asEdVisibleKey = "application.tabs.AssemblyEditor[@visible]";
-    private static String asRunVisibleKey = "application.tabs.AssemblyRun[@visible]";
-    private static String anRptVisibleKey = "application.tabs.AnalystReport[@visible]";
-    private static String debugMsgsKey = "application.debug";
-
+    
     private static void initConfig() {
-        try {
-            vConfig = VGlobals.instance().getHistoryConfig();
-        } catch (Exception e) {
-            log.error("Error loading config file: " + e.getMessage());
-            vConfig = null;
-        }
+        vConfig = ViskitConfig.instance().getViskitConfig();
     }
 
     class VisibilityHandler implements ActionListener {
@@ -249,9 +235,9 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
-                vConfig.setProperty(egEdVisibleKey, evGrCB.isSelected());
+                vConfig.setProperty(ViskitConfig.EG_VISIBLE_KEY, evGrCB.isSelected());
             } else if (src == assyCB) {
-                vConfig.setProperty(asEdVisibleKey, assyCB.isSelected());
+                vConfig.setProperty(ViskitConfig.ASSY_EDIT_VISIBLE_KEY, assyCB.isSelected());
             } else if (src == runCB) {
                 if (runCB.isSelected()) {
                     // if we turn on the assembly runner, we need also the assy editor
@@ -259,12 +245,12 @@ public class SettingsDialog extends JDialog {
                         assyCB.doClick();
                     } // reenter here
                 }
-                vConfig.setProperty(asRunVisibleKey, runCB.isSelected());
+                vConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
             } else if (src == debugMsgsCB) {
-                vConfig.setProperty(debugMsgsKey, debugMsgsCB.isSelected());
+                vConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
                 Vstatics.debug = debugMsgsCB.isSelected();
             } else /* if(src == analRptCB) */ {
-                vConfig.setProperty(anRptVisibleKey, analRptCB.isSelected());
+                vConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
             }
         }
     }
@@ -272,72 +258,83 @@ public class SettingsDialog extends JDialog {
     class clearEGHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            vConfig.clearTree(recentEGClearKey);
+            vConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         }
     }
 
     class clearAssHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            vConfig.clearTree(recentAssyClearKey);
+            vConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
         }
     }
 
-    private void clearClassPathEntries() {
-        vConfig.clearTree(xClassPathClearKey);
+    public static void clearClassPathEntries() {
+        vConfig.clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
     }
     
-    JDialog progressDialog = new JDialog(this);
-    JProgressBar progress = new JProgressBar(0, 100);
+    static JDialog progressDialog;
+    static JProgressBar progress = new JProgressBar(0, 100);
 
-    private void saveClassPathEntries(String[] lis) {
+    public static void saveClassPathEntries(String[] lis) {
         clearClassPathEntries();
         
-        for (int ix = 0; ix < lis.length; ix++) {
-            log.debug("lis[" + ix + "]: " + lis[ix]);
-            vConfig.setProperty(xClassPathKey + "(" + ix + ")[@value]", lis[ix]);
+        int ix = 0;
+        for (String s : lis) {
+            s = s.replaceAll("\\\\", "/");
+            log.debug("lis[" + ix + "]: " + s);
+            vConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
+            ix++;
         }
 
-        progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        
-        progress.setIndeterminate(true);
-        progress.setString("Loading Libraries");
-        progress.setStringPainted(true);
-        progressDialog.add(progress);
-        //panel.add(progress);
-        progressDialog.pack();
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        progressDialog.setLocation((d.width - progressDialog.getWidth()) / 2, (d.height - progressDialog.getHeight()) / 2);
-        progressDialog.setVisible(true);
-        progressDialog.setResizable(false);
+        if (dialog != null) {
+            progressDialog = new JDialog(dialog);
+            progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            progress.setIndeterminate(true);
+            progress.setString("Loading Libraries");
+            progress.setStringPainted(true);
+            progressDialog.add(progress);
+            progressDialog.pack();
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            progressDialog.setLocation((d.width - progressDialog.getWidth()) / 2, (d.height - progressDialog.getHeight()) / 2);
+            progressDialog.setVisible(true);
+            progressDialog.setResizable(false);
+        }
         Task t = new Task();
         t.execute();
     }
 
-    class Task extends SwingWorker<Void, Void> {
+    static class Task extends SwingWorker<Void, Void> {
 
         public Void doInBackground() {
-            progressDialog.setVisible(true);
-            progressDialog.toFront();
+            if (dialog != null) {
+                progressDialog.setVisible(true);
+                progressDialog.toFront();
+            }
+            
             VGlobals.instance().rebuildTreePanels();
             return null;
         }
 
         @Override
         public void done() {
-            progress.setIndeterminate(false);
-            progress.setValue(100);
-            progressDialog.setVisible(false);
+            if (dialog != null && progressDialog != null) {
+                progress.setIndeterminate(false);
+                progress.setValue(100);
+                progressDialog.setVisible(false);
+            }
         }
     }
 
     private void fillWidgets() {
         DefaultListModel mod = new DefaultListModel();
-        String[] sa = getExtraClassPath();
-        for (int i = 0; i < sa.length; i++) {
-            mod.addElement(sa[i]);
+        if (getExtraClassPath() != null) {
+            String[] sa = getExtraClassPath();
+            for (String s : sa) {
+                mod.addElement(s);
+            }
+            classPathJlist.setModel(mod);
         }
-        classPathJlist.setModel(mod);
 
         evGrCB.setSelected(isEventGraphEditorVisible());
         assyCB.setSelected(isAssemblyEditorVisible());
@@ -391,7 +388,7 @@ public class SettingsDialog extends JDialog {
 
         public void actionPerformed(ActionEvent e) {
             if (addChooser == null) {
-                addChooser = new JFileChooser(System.getProperty("user.dir"));
+                addChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
                 addChooser.setMultiSelectionEnabled(false);
                 addChooser.setAcceptAllFileFilterUsed(false);
                 addChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -423,7 +420,7 @@ public class SettingsDialog extends JDialog {
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
-                String sep = System.getProperty("file.separator");
+                String sep = Vstatics.getFileSeparator();
                 if (selFile.isDirectory() && !absPath.endsWith(sep)) {
                     absPath = absPath + sep;
                 }
@@ -436,9 +433,8 @@ public class SettingsDialog extends JDialog {
     private void installClassPathIntoConfig() {
         Object[] oa = ((DefaultListModel) classPathJlist.getModel()).toArray();
         String[] sa = new String[oa.length];
-        for (int j = 0; j < oa.length; j++) {
-            sa[j] = (String) oa[j];
-        }
+        
+        System.arraycopy(oa, 0, sa, 0, oa.length);
 
         saveClassPathEntries(sa);
     }
@@ -496,13 +492,19 @@ public class SettingsDialog extends JDialog {
         if (vConfig == null) {
             initConfig();
         }
-        VGlobals.instance().resetWorkClassLoader();
-        return vConfig.getStringArray(xClassPathKey + "[@value]");
+        
+        // Still no viskitConfig.xml file
+        if (vConfig == null) {return null;}
+        
+        // TODO: lessen amount of resetting the LBL
+//        VGlobals.instance().resetWorkClassLoader();
+        return vConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */
     public static URL[] getExtraClassPathArraytoURLArray() {
         String[] extClassPaths = getExtraClassPath();
+        if (extClassPaths == null) {return null;}
         URL[] extClassPathsUrls = new URL[extClassPaths.length];
         int i = 0;
         for (String path : extClassPaths) {
@@ -517,44 +519,26 @@ public class SettingsDialog extends JDialog {
     }
 
     public static boolean getVisibilitySense(String prop) {
-        if (vConfig == null) {
-            initConfig();
-        }
-
-        // This is how we get the Analyst Report panel visible in SavageStudio
-        boolean b = true; // by default
-        try {
-            b = vConfig.getBoolean(prop);
-        } catch (Exception e) {
-            // probably no-such-element
-        }
-        return b;
+        return Boolean.valueOf(ViskitConfig.instance().getVal(prop));
     }
 
     public static boolean isEventGraphEditorVisible() {
-        return getVisibilitySense(egEdVisibleKey);
+        return getVisibilitySense(ViskitConfig.EG_VISIBLE_KEY);
     }
 
     public static boolean isAssemblyEditorVisible() {
-        return getVisibilitySense(asEdVisibleKey);
+        return getVisibilitySense(ViskitConfig.ASSY_EDIT_VISIBLE_KEY);
     }
 
     public static boolean isAssemblyRunVisible() {
-        return getVisibilitySense(asRunVisibleKey);
+        return getVisibilitySense(ViskitConfig.ASSY_RUN_VISIBLE_KEY);
     }
 
     public static boolean isAnalystReportVisible() {
-        return getVisibilitySense(anRptVisibleKey);
+        return getVisibilitySense(ViskitConfig.ANALYST_RPT_VISIBLE_KEY);
     }
 
     public static boolean isVerboseDebug() {
-        boolean b = false;
-        try {
-            b = vConfig.getBoolean(debugMsgsKey);
-        } catch (Exception e) {
-            // probably no-such-element
-        }
-        return b;
-//        return getVisibilitySense(debugMsgsKey);
+        return Boolean.valueOf(ViskitConfig.instance().getVal(ViskitConfig.DEBUG_MSGS_KEY));
     }
 }

@@ -1,9 +1,3 @@
-/*
- * LocalTaskQueue.java
- *
- * Created on January 15, 2007, 1:07 PM
- */
-
 package viskit.xsd.assembly;
 
 import java.io.File;
@@ -20,13 +14,16 @@ import viskit.doe.LocalBootLoader;
  * them unstarted in its Vectorness, overriding the set
  * and get methods to return boolean values according to
  * each Gridlet's isAlive() status.
+ * 
+ * @since January 15, 2007, 1:07 PM
  * @author Rick Goldberg
- * @version $Id: LocalTaskQueue.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class LocalTaskQueue extends ArrayList<Object> {
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;
+    
     /** Creates a new instance of LocalTaskQueue, instanced by
      * GridRunner in local mode.
      *
@@ -41,6 +38,10 @@ public class LocalTaskQueue extends ArrayList<Object> {
      * should have been loaded in the current Thread's context
      * ClassLoader, which is also a LocalBootLoader which 
      * provides the list of "ext" URL's. 
+     * @param gridRunner
+     * @param experimentFile
+     * @param totalTasks
+     * @throws DoeException 
      */
     public LocalTaskQueue(GridRunner gridRunner, File experimentFile, int totalTasks) throws DoeException {
         this.experimentFile = experimentFile;
@@ -49,18 +50,19 @@ public class LocalTaskQueue extends ArrayList<Object> {
 
         for (int i = 0; i < totalTasks; i++) {            
             super.add(new Boolean(true));
-        }
-          
+        }          
     }
 
     /** 
      * Activate Gridlet indexed at i
      *
+     * @param i
+     * @return 
      */
     public boolean activate(int i) {
         Object o = super.get(i);
         if (o instanceof Thread) {
-            if (! ((Thread)o).isAlive() ) {
+            if (!((Thread) o).isAlive()) {
                 ((Thread) super.get(i)).start();
                 return true;
             }   
@@ -73,7 +75,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 Method getWorkDir = parentz.getMethod("getWorkDir");
                 File workDir = (File) getWorkDir.invoke(parent);
                 // really doesn't matter which ClassLoader gets passed to LBL, that's the whole point, it "boots" up from the bottom
-                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader)parent/* ClassLoader.getSystemClassLoader()*/, workDir);
+                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader) parent, workDir);
                 loader = loader.init();
                 Thread.currentThread().setContextClassLoader(loader); // this line is not kidding around!
                 Object task;
@@ -120,15 +122,12 @@ public class LocalTaskQueue extends ArrayList<Object> {
        
     @Override
     public Object get(int i) {
-        if (super.get(i) instanceof Thread)
-            return new Boolean(Boolean.TRUE);
-        
-        else return super.get(i);
+        return (super.get(i) instanceof Thread) ? 
+            new Boolean(Boolean.TRUE): super.get(i);
     }
     
     @Override    
-    public boolean add(Object o) {
-       
+    public boolean add(Object o) {       
         return true;
     }
     
@@ -152,7 +151,6 @@ public class LocalTaskQueue extends ArrayList<Object> {
             }
             sbuf.append(task+"\n");
         }
-
         return buf;
     }
 }

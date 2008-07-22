@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -42,30 +42,29 @@ import java.io.*;
  * @author Mike Bailey
  * @since Oct 4, 2005
  * @since 9:44:44 AM
+ * @version $Id$
  *
  * Taken from Java Cookbook, by Ian F. Darwin
  */
-public class FileIO
-{
-  public static void copyFile(File infile, PrintWriter pw, boolean close) throws IOException
-  {
-    BufferedReader is = new BufferedReader(new FileReader(infile));
-    copyFile(is,pw,close);
-  }
+public class FileIO {
 
-  public static void copyFile(File infile, File outfile, boolean close) throws IOException
-  {
-    copyFile(infile,new PrintWriter(new BufferedWriter(new FileWriter(outfile))),close);
-  }
-
-  public static void copyFile(Reader is, Writer os, boolean close) throws IOException
-  {
-    int b; // byte read from file
-    while( (b=is.read()) != -1) {
-      os.write(b);
+    public static void copyFile(File infile, PrintWriter pw, boolean close) throws IOException {
+        BufferedReader is = new BufferedReader(new FileReader(infile));
+        copyFile(is, pw, close);
     }
-    is.close();
-    if(close)
-      os.close();
-  }
+
+    public static void copyFile(File infile, File outfile, boolean close) throws IOException {
+        copyFile(infile, new PrintWriter(new BufferedWriter(new FileWriter(outfile))), close);
+    }
+
+    public static void copyFile(Reader is, Writer os, boolean close) throws IOException {
+        int b; // byte read from file
+        while ((b = is.read()) != -1) {
+            os.write(b);
+        }
+        is.close();
+        if (close) {
+            os.close();
+        }
+    }
 }

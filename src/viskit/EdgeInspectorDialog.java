@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 2:56:21 PM
- * @version $Id: EdgeInspectorDialog.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class EdgeInspectorDialog extends JDialog {
 

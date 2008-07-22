@@ -10,7 +10,7 @@ import viskit.mvc.mvcModelEvent;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 1:04:35 PM
- * @version $Id: ModelEvent.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  *
  * This defines every event with which the application Model informs its listeners. Typically
  * this is the view.

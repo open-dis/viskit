@@ -25,7 +25,7 @@ import viskit.xsd.bindings.assembly.ObjectFactory;
  * @author Mike Bailey
  * @since Jun 15, 2004
  * @since 9:43:42 AM
- * @version $Id: VInstantiator.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public abstract class VInstantiator {
     
@@ -255,7 +255,7 @@ public abstract class VInstantiator {
                     ObjectFactory of = new ObjectFactory();
 
                     // TerminalParameter
-                    if (Vstatics.isPrimitive(type) || type.equals("String") || type.equals("java.lang.String")) {
+                    if (Vstatics.isPrimitive(type) || type.contains("String")) {
                         TerminalParameter tp = of.createTerminalParameter();
                         tp.setType(type);
                         tp.setName(name);

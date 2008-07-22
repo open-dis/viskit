@@ -18,7 +18,7 @@ import org.jdom.*;
  * A class to present an XML file in a JTree widget
  * @author Mike Bailey
  * @since 27 Aug 2004
- * @version $Id: XTree.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  */
 public class XTree extends JTree {
 

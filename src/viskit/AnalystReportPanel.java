@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Jul 20, 2006
  * @since 2:47:03 PM
- * @version $Id: AnalystReportPanel.java 1670 2007-12-20 00:23:36Z tdnorbra $
+ * @version $Id$
  */
 package viskit;
 

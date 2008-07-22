@@ -28,7 +28,7 @@ import viskit.model.vEdgeParameter;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 2:56:21 PM
- * @version $Id: EventInspectorDialog.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class EventInspectorDialog extends JDialog {
 

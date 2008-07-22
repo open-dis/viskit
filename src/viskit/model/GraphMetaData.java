@@ -11,12 +11,12 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * @author Mike Bailey
  * @since Apr 12, 2004
  * @since 3:50:28 PM
- * @version $Id: GraphMetaData.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class GraphMetaData {
 
     public String name = "EventGraphName";
-    public String packageName = "";
+    public String packageName = "test";
     public String author = "";
     public String version = "1.0";
     public String description = ""; // originally called "comment"

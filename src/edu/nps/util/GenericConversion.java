@@ -66,7 +66,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Converter for a Collection to an Array using reification
- * @version $Id: GenericConversion.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * <p>
  *   <b>History:</b>
  *   <pre><b>
@@ -90,6 +90,7 @@ public class GenericConversion {
     
     /** Method to convert a "Collection" to an array.  Will warn of an 
      * "unchecked cast," but this is a known cast to us, therefore permissible.
+     * @param <T> the type to cast this array
      * @param c the Collection of Type to convert
      * @param a the Array Type to convert the Collection into
      * @return an Array Type with contents from a Collection given
@@ -114,6 +115,7 @@ public class GenericConversion {
     /** Method to return a generic List&lt;Object&gt; array initialized based 
      * on runtime type information.  Will warn of an unchecked cast, which in
      * this case is permissible
+     * @param <T> the type to cast this array
      * @param type a Class&lt;? extends T&gt; type
      * @param length the desired length of the type array
      * @throws IllegalArgumentException if a primative class type is given

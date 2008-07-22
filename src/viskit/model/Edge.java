@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 2:57:37 PM
- * @version $Id: Edge.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public abstract class Edge extends ViskitElement {
 

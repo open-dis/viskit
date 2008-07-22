@@ -37,10 +37,11 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Jul 20, 2005
  * @since 12:59:43 PM
- * @version $Id: DoeFileModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 package viskit.doe;
 
+import edu.nps.util.TempFileManager;
 import org.jdom.Document;
 import viskit.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
@@ -67,7 +68,7 @@ public class DoeFileModel {
     private Map<String, Integer> nameSpace = new HashMap<String, Integer>();
     
     public File marshallJaxb() throws Exception {
-        File f = File.createTempFile("DOEtemp", ".xml");
+        File f = TempFileManager.createTempFile("DOEtemp", ".xml");
         return marshallJaxb(f);
     }
 

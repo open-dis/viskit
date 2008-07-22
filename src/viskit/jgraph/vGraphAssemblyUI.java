@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 3:17:59 PM
- * @version $Id: vGraphAssemblyUI.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  *
  * BasicGraphUI must be overridden to allow in node and edge editing.
  * This code is a copy of the appropriate part of EditorGraph.java, which is

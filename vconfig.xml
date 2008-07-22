@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!-- This is the master file used by the Apache Jakarta Commons Configuration code. -->
+<!-- This is the master file used by the Apache Commons Configuration code. -->
 <configuration>
-  <!-- stack up your config files here -->
-  <xml fileName="c_app.xml"/>
-  <xml fileName="c_gui.xml"/>
+    <header>
+	<!-- Meta data about the resulting combined configuration -->
+    </header>
+    <override>
+	<!-- Configuration declarations with override semantics -->
+	<!-- stack up your config files here -->
+	<xml fileName="c_app.xml" config-name="app"/>
+	<xml fileName="c_gui.xml" config-name="gui"/>	
+    </override>
+    <additional>
+	<!-- Configuration declarations that form a union configuration -->
+    </additional>
 </configuration>

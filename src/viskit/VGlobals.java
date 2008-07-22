@@ -1,3 +1,36 @@
+/*
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer
+      in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the names of the Naval Postgraduate School (NPS)
+      Modeling Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and http://www.movesinstitute.org)
+      nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+*/
 package viskit;
 
 import javax.swing.*;
@@ -23,9 +56,7 @@ import java.util.regex.Pattern;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
-import edu.nps.util.FileIO;
 import edu.nps.util.SysExitHandler;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import static edu.nps.util.GenericConversion.toArray;
 import viskit.doe.LocalBootLoader;
@@ -42,7 +73,7 @@ import viskit.model.ViskitModel;
  * @author Mike Bailey
  * @since Apr 5, 2004
  * @since 3:20:33 PM
- * @version $Id: VGlobals.java 1667 2007-12-17 20:24:55Z tdnorbra $
+ * @version $Id$
  */
 public class VGlobals {
 
@@ -54,12 +85,14 @@ public class VGlobals {
     private myTypeListener myListener;
     private JFrame mainAppWindow;
     
+    private ViskitProject currentViskitProject;
+    
     /** Need hold of the Enable Analyst Reports checkbox */
     private RunnerPanel2 runPanel;
     
     /** Flag to denote called sysExit only once */
     private boolean sysExitCalled = false;
-
+    
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -68,12 +101,10 @@ public class VGlobals {
     }
 
     private VGlobals() {
-        //initBeanShell();
-
         cbMod = new DefaultComboBoxModel(new Vector<String>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
-        setupWorkDirectory();
+        initProjectHome();
     }
 
     /* routines to manage the singleton-aspect of the views. */
@@ -98,7 +129,6 @@ public class VGlobals {
     public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod) {
         initAssemblyViewFrame(contentOnly, cont, mod);
         cont.begin();
-
         return avf;
     }
 
@@ -113,7 +143,6 @@ public class VGlobals {
         amod = mod;
         cont.setModel(mod);   // registers cntl as model listener
         cont.setView(avf);
-
         mod.init();
         return avf;
     }
@@ -149,7 +178,6 @@ public class VGlobals {
                 acont.newAssembly();
             }
         });
-
     }
     ActionListener defaultAssyQuitHandler = new ActionListener() {
 
@@ -174,6 +202,9 @@ public class VGlobals {
     public void setAssemblyQuitHandler(ActionListener lis) {
         assyQuitHandler = lis;
     }
+    
+    /* EventGraphViewFrame / EventGraphController */
+    
     EventGraphViewFrame egvf;
 
     public EventGraphViewFrame getEventGraphEditor() {
@@ -190,6 +221,17 @@ public class VGlobals {
         return egvf;
     }
 
+    /** This method starts the chain of various Viskit startup steps.  By 
+     * calling for a new EventGraphController(), in its constructor is a call
+     * to initConfig() which is the first time that the viskitConfig.xml is
+     * looked for, or if one is not there, to create one from the template.  The
+     * viskitConfig.xml is an important file that holds information on recent
+     * assembly and event graph openings, gui sizes and cacheing of compiled
+     * source from EventGraphs.
+     *  
+     * @param contentOnly
+     * @return an instance of the EventGraphViewFrame
+     */
     public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly) {
         return initEventGraphViewFrame(contentOnly, new EventGraphController());
     }
@@ -453,6 +495,22 @@ public class VGlobals {
         return (type.contains("<") && type.contains(">"));
     }
 
+    private void initProjectHome() {
+        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY);
+        log.debug(projectHome);
+        if (projectHome.isEmpty()) {            
+            ViskitProjectGenerationDialog.instance();
+        } else {
+            ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
+        }
+            projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+
+        // Need to make from scratch /MyViskitProjects
+            if (!projectsBaseDir.exists()) {
+                projectsBaseDir.mkdirs();
+        }
+    }
+    
     private Object instantiateType(String type) throws Exception {
         Object o = null;
         boolean isArr = false;
@@ -742,6 +800,192 @@ public class VGlobals {
         this.runPanel = runPanel;
     }
 
+    public ViskitProject getCurrentViskitProject() {
+        return currentViskitProject;
+    }
+
+    public void setCurrentViskitProject(ViskitProject currentViskitProject) {
+        this.currentViskitProject = currentViskitProject;
+    }
+    
+    private File projectsBaseDir;       
+    
+    /**
+     * TODO: this is not good behavior for a getter, which shoud simply
+     * return the desired thing, not create it.
+     * @return a working directory which is now non null and exists in the
+     * filesystem
+     */
+    public File getWorkDirectory() {
+        if (workDirectory == null) {
+            createWorkingDirectory();
+        }
+        return workDirectory;
+    }
+    private File workDirectory;
+
+    private void createWorkingDirectory() {
+        if (ViskitConfig.instance().getViskitConfig() == null) {return;}
+        List<String> cache = 
+                Arrays.asList(ViskitConfig.instance().getViskitConfig().getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+
+        if (cache.isEmpty()) {
+            newProjectDirectory();
+        } else {
+            workDirectory = 
+                    new File(ViskitConfig.instance().getViskitConfig().getString(ViskitConfig.CACHED_WORKING_DIR_KEY));            
+        }
+    }
+
+    /** Creates a new Viskit project and automatically sets the extra classpath */
+    private void newProjectDirectory() {
+        currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
+        if (currentViskitProject.createProject()) {
+            workDirectory = currentViskitProject.getClassDir();
+            SettingsDialog.saveClassPathEntries(getCurrentViskitProject().getProjectContents());
+        } else {
+            throw new RuntimeException("Unable to crete project directory");
+        }
+    }
+    
+    private ClassLoader workLoader;
+
+    public ClassLoader getWorkClassLoader() {
+        URL[] urlArray = new URL[] {};
+        
+        if (SettingsDialog.getExtraClassPathArraytoURLArray() != null) {
+            urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
+        }
+        if (workLoader == null) {
+            LocalBootLoader loader = new LocalBootLoader(urlArray,
+                    Thread.currentThread().getContextClassLoader(), 
+                    getWorkDirectory());
+            workLoader = loader.init(true);
+        }
+        return workLoader;
+    }
+
+    public void resetWorkClassLoader() {
+        workLoader = null;
+    }
+
+    /**
+     * Returns a reset classloader.  Use very carefully.  
+     * Warning - Can cause unwanted recursive jar creation for every EG found 
+     * if reset causing JVM bog down.
+     * @param reboot if true, reset the working class loader
+     * @return a reset classloader
+     */
+    public ClassLoader getResetWorkClassLoader(boolean reboot) {        
+        if (reboot) {resetWorkClassLoader();}
+        return getWorkClassLoader();
+    }
+    
+    /** @return a model to print a stack trace of calling classes and their methods */
+    public String printCallerLog() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Calling class: " + new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
+        sb.append(" Calling method: " + new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
+        return sb.toString();
+    }
+    
+    private SysExitHandler sysexithandler = new SysExitHandler() {
+
+        public void doSysExit(int status) {
+
+            log.debug("Viskit is exiting with status: " + status);
+
+            /* If an application launched a JVM, and is still running, this will
+             * only make Viskit disappear.  If Viskit is running standalone, 
+             * then then all JFrames created by Viskit will dispose, and the JVM
+             * will then cease.
+             * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
+             * @see http://72.5.124.55/javase/6/docs/api/java/awt/doc-files/AWTThreadIssues.html
+             */
+            Frame[] frames = Frame.getFrames();
+            int count = 0;
+            for (Frame f : frames) {
+                log.debug("Frame count in Viskit: " + (++count));
+                log.debug("Frame is: " + f);
+
+                /* Prevent non-viskit components from disposing if launched from
+                 * another application.  SwingUtilities is a little "ify" though
+                 * as it's not Viskit specific.  Viskit, however, spawns a lot
+                 * of anonymous Runnables with SwingUtilities
+                 */
+                if (f.toString().toLowerCase().contains("viskit") || 
+                        f.toString().contains("SwingUtilities")) {
+                    f.dispose();
+                }
+                // Case for XMLTree JFrames
+                if (f.getTitle().contains("xml")) {
+                    f.dispose();
+                }
+            }
+            
+            /* The SwingWorker Thread is active when the assembly runner is
+             * running and will subsequently block a JVM exit due to its "wait"
+             * state.  Must interrupt it in order to cause the JVM to exit
+             * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
+             */
+            Thread[] threads = new Thread[Thread.activeCount()];
+            Thread.enumerate(threads);
+            for (Thread t : threads) {
+                log.debug("Thread is: " + t);
+                if (t.getName().contains("SwingWorker")) {
+                    t.interrupt();
+                }
+                // Now attempt to release the URLClassLoader's file lock on open JARs
+                t.setContextClassLoader(ClassLoader.getSystemClassLoader());
+            }            
+        }        
+    };
+
+    public void setSysExitHandler(SysExitHandler handler) {
+        sysexithandler = handler;
+    }
+
+    public SysExitHandler getSysExitHandler() {
+        return sysexithandler;
+    }
+
+    /** Called to perform proper thread shutdown without calling System.exit(0)
+     * 
+     * @param status the status of JVM shutdown
+     */
+    public void sysExit(int status) {
+        if (!sysExitCalled) {
+            sysexithandler.doSysExit(status);
+            sysExitCalled = true;
+        }
+    }
+
+    public JFrame getMainAppWindow() {
+        return mainAppWindow;
+    }
+
+    public void setMainAppWindow(JFrame mainAppWindow) {
+        this.mainAppWindow = mainAppWindow;
+    }
+    
+    /**
+     * Small class to hold on to the fully-qualified class name, while displaying only the
+     * un-qualified name;
+     */
+    class MyJMenuItem extends JMenuItem {
+
+        private String fullName;
+
+        MyJMenuItem(String nm, String fullName) {
+            super(nm);
+            this.fullName = fullName;
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+    }
+    
     class myTypeListener implements ActionListener, ItemListener {
 
         public void itemStateChanged(ItemEvent e) {
@@ -783,253 +1027,5 @@ public class VGlobals {
             return lab;
         }
     }
-    Vector<String> existingNames = new Vector<String>();
-    Vector existingAssemblyNames = new Vector();
-    
-    /**
-     * @param nm 
-     * @return true if the data is valid, eg we have a valid parameter name
-     * and a valid type.
-     */
-    private boolean checkLegalJavaName(String nm) {
 
-        String javaVariableNameRegExp;
-
-        // Do a REGEXP to confirm that the variable name fits the criteria for
-        // a Java variable. We don't want to allow something like "2f", which
-        // Java will misinterpret as a number literal rather than a variable. This regexp
-        // is slightly more restrictive in that it demands that the variable name
-        // start with a lower case letter (which is not demanded by Java but is
-        // a strong convention) and disallows the underscore. "^" means it
-        // has to start with a lower case letter in the leftmost position.
-
-        javaVariableNameRegExp = "^[a-z][a-zA-Z0-9]*$";
-        if (!Pattern.matches(javaVariableNameRegExp, nm)) {
-            JOptionPane.showMessageDialog(null,
-                    "variable names must start with a lower case letter and conform to the Java variable naming conventions",
-                    "alert",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        // Check to make sure the name the user specified isn't already used by a state variable
-        // or parameter.
-
-        for (String existingName : existingNames) {
-            if (nm.equals(existingName)) {
-                JOptionPane.showMessageDialog(null,
-                        "variable names must be unique and not match any existing parameter or state variable name",
-                        "alert",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
-
-        existingNames.add(nm);
-        return true;
-    }
-
-    public void reset() {
-        existingNames.clear();
-    }
-
-    public void assemblyReset() {
-        existingAssemblyNames.clear();
-    }
-    
-    /**
-     * Small class to hold on to the fully-qualified class name, while displaying only the
-     * un-qualified name;
-     */
-    class MyJMenuItem extends JMenuItem {
-
-        private String fullName;
-
-        MyJMenuItem(String nm, String fullName) {
-            super(nm);
-            this.fullName = fullName;
-        }
-
-        public String getFullName() {
-            return fullName;
-        }
-    }
-
-    public File getWorkDirectory() {
-        if ( !workDirectory.exists() ) {
-            workDirectory.mkdir();
-        } 
-        return workDirectory;
-    }
-    private File workDirectory;
-
-    private void setupWorkDirectory() {
-
-        List<String> cache = Arrays.asList(getHistoryConfig().getStringArray("Cached.EventGraphs" + "[@xml]"));
-
-        if (cache.isEmpty()) {
-            newWorkDir();
-        } else {
-            workDirectory = new File(getHistoryConfig().getString("Cached[@workDir]"));
-            if (workDirectory == null) {
-                newWorkDir();
-            } else if (workDirectory.listFiles().length == 0) {
-                newWorkDir();
-            }
-        }
-    }
-
-    private void newWorkDir() {
-        try {
-            workDirectory = File.createTempFile("viskit", "work");   // actually creates
-            String p = workDirectory.getAbsolutePath();   // just want the name part of it
-            workDirectory.delete();        // Don't want the file to be made yet
-            workDirectory = new File(p);
-            workDirectory.mkdir();
-            workDirectory.deleteOnExit();
-
-            /* TODO: nothing really seems to ever go in here, but it deletes on
-             * JVM exit anyway
-             */
-            File nf = new File(workDirectory, "simkit");     // most go here
-            nf.mkdir();
-            nf.deleteOnExit();
-            nf = new File(nf, "examples");
-            nf.mkdir();
-            nf.deleteOnExit();
-            return;
-        } catch (IOException e) {
-            log.error(e.toString());
-        }
-
-        if (workDirectory.mkdir() == false) {
-            JOptionPane.showMessageDialog(null, "The directory " + workDirectory.getPath() +
-                    " could not be created.  Correct permissions before proceeding.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    private XMLConfiguration hConfig;
-    private String userConfigPath = System.getProperty("user.home") +
-            System.getProperty("file.separator") + ".viskit_history.xml";
-    private ClassLoader workLoader;
-
-    public ClassLoader getWorkClassLoader() {
-        if (workLoader == null) {
-            LocalBootLoader loader = new LocalBootLoader(
-                    SettingsDialog.getExtraClassPathArraytoURLArray(), 
-                    Thread.currentThread().getContextClassLoader(), 
-                    getWorkDirectory());
-            workLoader = loader.init(true);
-        }
-        return workLoader;
-    }
-
-    public void resetWorkClassLoader() {
-        workLoader = null;
-    }
-
-    public ClassLoader getWorkClassLoader(boolean reboot) {
-        resetWorkClassLoader();
-        return getWorkClassLoader();
-    }
-
-    public String getUserConfigFile() {
-        return userConfigPath;
-    }
-
-    public XMLConfiguration getHistoryConfig() {
-        if (hConfig == null) {
-            try {
-                File hf = new File(userConfigPath);
-                System.out.println("Loading history configuration from " + hf);
-                if (!hf.exists() || hf.length() < 3) {
-                    File src = new File("c_history_template.xml");
-                    hf.createNewFile();
-                    FileIO.copyFile(src, hf, true);
-                }
-                hConfig = ViskitConfig.instance().getIndividualXMLConfig(hf.getAbsolutePath());
-            } catch (Exception e) {
-                log.error("Error loading history file: " + e.getMessage());
-                log.error("Recent file saving disabled");
-                hConfig = null;
-            }
-        }
-        return hConfig;
-    }
-    
-    private SysExitHandler sysexithandler = new SysExitHandler() {
-
-        public void doSysExit(int status) {
-
-            log.debug("Viskit is exiting with status: " + status);
-
-            /* If an application launched a JVM, and is still running, these
-             * will only make Viskit disappear. If Viskit is running standalone, 
-             * then when all JFrames created by Viskit will dispose, and the JVM
-             * will then cease.
-             * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
-             * @see http://72.5.124.55/javase/6/docs/api/java/awt/doc-files/AWTThreadIssues.html
-             */
-            Frame[] frames = Frame.getFrames();
-            int count = 0;
-            for (Frame f : frames) {
-                log.debug("Frame count in Viskit: " + (++count));
-                log.debug("Frame is: " + f);
-
-                /* Prevent non-viskit components from disposing if launched from
-                 * another application.  SwingUtilities is a little "ify" though
-                 * as it's not Viskit specific.  Viskit, however, spawns a lot
-                 * of anonymous Runnables with SwingUtilities
-                 */
-                if (f.toString().contains("viskit") || f.toString().contains("SwingUtilities")) {
-                    f.dispose();
-                }
-                // Case for XMLTree JFrames
-                if (f.getTitle().contains("xml")) {
-                    f.dispose();
-                }
-            }
-            
-            /* The SwingWorker Thread is active when the assembly runner is
-             * running and will subsequently block a JVM exit due to its "wait"
-             * state.  Must interrupt it in order to cause the JVM to exit
-             * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
-             */
-            Thread[] threads = new Thread[Thread.activeCount()];
-            Thread.enumerate(threads);
-            for (Thread t : threads) {
-                log.debug("Thread is: " + t);
-                if (t.getName().contains("SwingWorker")) {
-                    t.interrupt();
-                }
-            }
-        }
-    };
-
-    public void setSysExitHandler(SysExitHandler handler) {
-        sysexithandler = handler;
-    }
-
-    public SysExitHandler getSysExitHandler() {
-        return sysexithandler;
-    }
-
-    /** Called to perform proper thread shutdown without calling System.exit(0)
-     * 
-     * @param status the status of JVM shutdown
-     */
-    public void sysExit(int status) {
-        if (!sysExitCalled) {
-            sysexithandler.doSysExit(status);
-            sysExitCalled = true;
-        }
-    }
-
-    public JFrame getMainAppWindow() {
-        return mainAppWindow;
-    }
-
-    public void setMainAppWindow(JFrame mainAppWindow) {
-        this.mainAppWindow = mainAppWindow;
-    }
 }

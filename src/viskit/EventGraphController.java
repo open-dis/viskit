@@ -17,6 +17,7 @@ import javax.swing.*;
 
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
+import edu.nps.util.TempFileManager;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -32,7 +33,7 @@ import viskit.mvc.mvcModel;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM
- * @version $Id: EventGraphController.java 1669 2007-12-19 20:27:14Z tdnorbra $
+ * @version $Id$
  *
  * This is the MVC controller for the Viskit app.  All user inputs come here, and this
  * code decides what to do about it.  To add new events:
@@ -40,15 +41,12 @@ import viskit.mvc.mvcModel;
  * 2 instantiate it in the constructor, mapping it to a handler (name)
  * 3 write the handler
  */
-public class EventGraphController extends mvcAbstractController implements ViskitController 
-/*******************************************************************************/
-{
+public class EventGraphController extends mvcAbstractController implements ViskitController {
 
     static File lastFile;
     static Logger log = Logger.getLogger(EventGraphController.class);
 
-    public EventGraphController() //=================
-    {
+    public EventGraphController() {
         initConfig();
         initFileWatch();
         this._setFileLists();
@@ -60,10 +58,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     public void begin() {
         ArrayList<String> lis = getOpenFileList(false);
-        
+
         // don't default to new event graph
-        if (lis.size() <= 0) { 
-//            newEventGraph()
+        if (lis.size() <= 0) {
             log.debug("In begin() (if) of EventGraphController");
             return;
         } else {
@@ -82,7 +79,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
                         }
                     }
                 }
-            } else {return;}            
+            } else {return;}
         }
     }
 
@@ -121,6 +118,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void newEventGraph() {
+        GraphMetaData oldGmd = null;
+        ViskitModel viskitModel = (ViskitModel) getModel();
+        if (viskitModel != null) {
+            oldGmd = viskitModel.getMetaData();
+        }
+
         Model mod = new Model(this);
         mod.init();
         mod.newModel(null);
@@ -128,10 +131,28 @@ public class EventGraphController extends mvcAbstractController implements Viski
         // No model set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
         ((ViskitView) getView()).addTab(mod, true);
-        editGraphMetaData();
+//        editGraphMetaData();
 
-        buildNewNode(new Point(30, 30), "Run");   // always start with a run event
-        ((ViskitModel) getModel()).setDirty(false); // we're not really dirty yet
+        GraphMetaData gmd = new GraphMetaData(mod);
+        if (oldGmd != null) {
+            gmd.packageName = oldGmd.packageName;
+        }
+
+        boolean modified = EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
+                VGlobals.instance().getMainAppWindow(), gmd);
+        if (modified) {
+            ((ViskitModel) getModel()).changeMetaData(gmd);
+
+            // update title bar
+            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
+        }
+
+        if (EventGraphMetaDataDialog.modified) {
+            buildNewNode(new Point(30, 30), "Run");   // always start with a run event
+            ((ViskitModel) getModel()).setDirty(false); // we're not really dirty yet
+        } else {
+           ((ViskitView) getView()).delTab(mod);
+        }
     }
 
     /**
@@ -139,7 +160,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
      * @return true = continue, false = don't (i.e., we cancelled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((ViskitView) getView()).genericAsk("Question", "Save modified graph?"));
+        int yn = (((ViskitView) getView()).genericAskYN("Question", "Save modified graph?"));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -147,13 +168,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 if (((Model) getModel()).isDirty()) {
                     return false;
                 } // we cancelled
-                // else
                 return true;
             //break;
             case JOptionPane.NO_OPTION:
                 return true;
-            //break;
-            case JOptionPane.CANCEL_OPTION:
+                
+            // Something funny if we're here
             default:
                 return false;
         }
@@ -174,14 +194,16 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void _doOpen(File file) {
+        ViskitView viskitView = (ViskitView) getView();
         Model mod = new Model(this);
         mod.init();
+
         // these may init to null on startup, check
         // before doing any openAlready lookups
-        ((ViskitView) getView()).addTab(mod, false);
+        viskitView.addTab(mod, false);
         ViskitModel[] openAlready = null;
-        if ((ViskitView) getView() != null) {
-            openAlready = ((ViskitView) getView()).getOpenModels();
+        if (viskitView != null) {
+            openAlready = viskitView.getOpenModels();
         }
         boolean isOpenAlready = false;
         if (openAlready != null) {
@@ -195,10 +217,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
         }
         if (!mod.newModel(file) || isOpenAlready) {
-            ((ViskitView) getView()).delTab(mod);   // Not a good open, tell view
+            viskitView.delTab(mod);   // Not a good open, tell view
             return;
         }
-        ((ViskitView) getView()).setSelectedEventGraphName(mod.getMetaData().name);
+        viskitView.setSelectedEventGraphName(mod.getMetaData().name);
         adjustRecentList(file);
 
         fileWatchOpen(file);
@@ -229,12 +251,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     private void initFileWatch() {
         try { // TBD this may be obsolete
-            watchDir = File.createTempFile("egs", "current");   // actually creates
+            watchDir = TempFileManager.createTempFile("egs", "current");   // actually creates
             String p = watchDir.getAbsolutePath();   // just want the name part of it
             watchDir.delete();        // Don't want the file to be made yet
             watchDir = new File(p);
             watchDir.mkdir();
-            watchDir.deleteOnExit();
 
             dirWatch = new DirectoryWatch(watchDir);
             dirWatch.setLoopSleepTime(1 * 1000); // 1 secs
@@ -248,19 +269,26 @@ public class EventGraphController extends mvcAbstractController implements Viski
         fileWatchOpen(f);
     }
 
+    /** Create a temporary location to store copies of EventGraphs in XML form.
+     * This is to compare against any changes to and whether to re-cache the
+     * MD5 hash generated elsewhere for this EG.
+     *
+     * @param f the EventGraph file to generate MD5 hash for
+     */
     private void fileWatchOpen(File f) {
         String nm = f.getName();
         lastFile = f;
         File ofile = new File(watchDir, nm);
+        log.debug("f is: " + f + " and ofile is: " + ofile);
         try {
             FileIO.copyFile(f, ofile, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
         ViskitAssemblyView view = (ViskitAssemblyView) AssemblyController.inst.getView();
-        
+
         // not temporary, but use static method anyway
-        Object paf = AssemblyController.createTemporaryEventGraphClass(f);
+        PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
         if (paf != null) {
             view.addToEventGraphPallette(f);
         } else {
@@ -302,30 +330,33 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
         saveHistoryXML(recentFileList);
     }
-    
+
     private ArrayList<String> openV;
     private void _setFileLists() {
         recentFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
         openV = new ArrayList<String>(4);
-        String[] valueAr = historyConfig.getStringArray(egHistoryKey + "[@value]");
-        for (int i = 0; i < valueAr.length; i++) {
-            
+        if (historyConfig == null) {return;}
+        String[] valueAr = historyConfig.getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
+        int i = 0;
+        for (String s : valueAr) {
+
             // Attempt to prevent dupicate entries
-            if (recentFileList.contains(valueAr[i])) {continue;}
-            recentFileList.add(valueAr[i]);
-            String op = historyConfig.getString(egHistoryKey + "(" + i + ")[@open]");
+            if (recentFileList.contains(s)) {continue;}
+            recentFileList.add(s);
+            String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
             if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                openV.add(valueAr[i]);
+                openV.add(s);
             }
+            i++;
         }
     }
 
     private void saveHistoryXML(ArrayList<String> recentFiles) {
-        historyConfig.clearTree(egHistoryClearKey);
+        historyConfig.clearTree(ViskitConfig.EG_HISTORY_CLEAR_KEY);
 
         for (int i = 0; i < recentFiles.size(); i++) {
             String value = recentFiles.get(i);
-            historyConfig.setProperty(egHistoryKey + "(" + i + ")[@value]", value);
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@value]", value);
         }
         historyConfig.getDocument().normalize();
     }
@@ -336,14 +367,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     private void markConfigAllClosed() {
         for (int i = 0; i < recentFileList.size(); i++) {
-            historyConfig.setProperty(egHistoryKey + "(" + i + ")[@open]", "false");
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]", "false");
         }
     }
 
     private void markConfigOpen(File f) {
         int idx = recentFileList.indexOf(f.getAbsolutePath());
         if (idx != -1) {
-            historyConfig.setProperty(egHistoryKey + "(" + idx + ")[@open]", "true");
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
         }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
@@ -398,9 +429,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             return false;
         }
         if (mod.isDirty()) {
-            if (!askToSaveAndContinue()) {
-                return false;
-            }
+            return askToSaveAndContinue();
         }
         return true;
     }
@@ -435,8 +464,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public void saveAs() //------------------
-    {
+    public void saveAs() {
         ViskitModel mod = (ViskitModel) getModel();
         ViskitView view = (ViskitView) getView();
         GraphMetaData gmd = mod.getMetaData();
@@ -638,6 +666,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             return;
         }
         String source = ((ViskitModel) getModel()).buildJavaSource();
+        log.debug(source);
         if (source != null && source.length() > 0) {
             String className = ((ViskitModel) getModel()).getMetaData().packageName + "." + ((ViskitModel) getModel()).getMetaData().name;
             ((ViskitView) getView()).showAndSaveSource(className, source, localLastFile.getName());
@@ -710,17 +739,16 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public void editGraphMetaData() //--------------------------
-    {
+    public void editGraphMetaData() {
         GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
         boolean modified = EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
                 VGlobals.instance().getMainAppWindow(), gmd);
         if (modified) {
             ((ViskitModel) getModel()).changeMetaData(gmd);
-        }
 
-        // update title bar
-        ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
+            // update title bar
+            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
+        }
     }
 
     public void nodeEdit(viskit.model.EventNode node) // shouldn't be required
@@ -775,23 +803,23 @@ public class EventGraphController extends mvcAbstractController implements Viski
         imgSaveCount = "" + (++imgSaveInt);
     }
 
-    /** Provides an automatic capture of all Event Graphs images used in an 
-     * Assembly and stores them to a specified location for inclusion in the 
+    /** Provides an automatic capture of all Event Graphs images used in an
+     * Assembly and stores them to a specified location for inclusion in the
      * generated Analyst Report
-     * 
+     *
      * @param eventGraphs a list of Event Graph paths to image capture
      * @param eventGraphImages a list of Event Graph image paths to write .png files
      */
-    public void captureEventGraphImages(LinkedList<String> eventGraphs, LinkedList<String> eventGraphImages) {
-
+    public void captureEventGraphImages(LinkedList<File> eventGraphs, LinkedList<String> eventGraphImages) {
         ListIterator<String> itr = eventGraphImages.listIterator(0);
+        
         String eventGraphImage;
         File eventGraphImageFile;
         TimerCallback tcb;
 
-        /* If another run is to be performed with the intention of generating 
+        /* If another run is to be performed with the intention of generating
          * an Analyst Report, prevent the last Event Graph open (from prior group
-         * if any open) from being the dominant (only) screen shot taken.  In 
+         * if any open) from being the dominant (only) screen shot taken.  In
          * other words, if the prior group of Event Graphs were open on the same
          * Assembly, then all of the screen shots would be of the last Event Graph
          * that was opened either manually, or automatically by the below process.
@@ -799,8 +827,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
         closeAll();
 
         // Each Event Graph needs to be opened first
-        for (String eventGraph : eventGraphs) {
-            _doOpen(new File(eventGraph));
+        for (File eventGraph : eventGraphs) {
+            _doOpen(eventGraph);
             log.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
@@ -812,7 +840,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
                 // Make sure we have a directory ready to receive these images
                 if (!eventGraphImageFile.getParentFile().isDirectory()) {
-                    eventGraphImageFile.getParentFile().mkdir();
+                    eventGraphImageFile.getParentFile().mkdirs();
                 }
 
                 // Fire this quickly as another Event Graph will immediately load
@@ -834,12 +862,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
 
         public void actionPerformed(ActionEvent ev) {
-            // create and save the image
-            //Component component = (Component) getView();
 
-            // The next two sub for the above, which worked until we did the tabbed display.
+            // create and save the image
             EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
-            //Component component = egvf.getContent();
 
             // Get only the jgraph part
             Component component = egvf.getCurrentJgraphComponent();
@@ -860,25 +885,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 return;
             }
 
-            /*   Point p = new Point(0, 0);
-            SwingUtilities.convertPointToScreen(p, component);
-            Rectangle region = component.getBounds();
-            region.x = p.x;
-            region.y = p.y;
-            BufferedImage image = null;
-            try {
-            image = new Robot().createScreenCapture(region);
-            ImageIO.write(image, "png", fil);
-            }
-            catch (Exception e) {
-            e.printStackTrace();
-            }
-             */
             // display a scaled version
             if (display) {
                 JFrame frame = new JFrame("Saved as " + fil.getName());
-                //ImageIcon ii = new ImageIcon(image.getScaledInstance(image.getWidth() * 50 / 100, image.getHeight() * 50 / 100, Image.SCALE_FAST));
-                // Nah...
                 ImageIcon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
@@ -890,12 +899,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
     XMLConfiguration historyConfig;
-    String egHistoryKey = "history.EventGraphEditor.Recent.EventGraphFile";
-    String egHistoryClearKey = "history.EventGraphEditor.Recent";
 
+    /** This is the very first caller for getViskitConfig() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = VGlobals.instance().getHistoryConfig();
+            historyConfig = ViskitConfig.instance().getViskitConfig();
         } catch (Exception e) {
             System.out.println("Error loading history file: " + e.getMessage());
             System.out.println("Recent file saving disabled");

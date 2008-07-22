@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
 /**
  * Filters files whose names contain a given String, case insensitive
  *
- * @version $Id: EventGraphFileFilter.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * <p>
  *   <b>History:</b>
  *   <pre><b>

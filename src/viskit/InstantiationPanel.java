@@ -41,7 +41,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @author Mike Bailey
  * @since Jun 8, 2004
  * @since 8:31:41 AM
- * @version $Id: InstantiationPanel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
     
@@ -60,12 +60,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     private JDialog packMe;
     boolean constructorOnly = false;
 
-    /*
-    public InstantiationPanel(ActionListener changedListener)
-    {
-    this(null,changedListener);
-    }
-     */
     public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener) {
         this(ownerDialog, changedListener, false);
     }
@@ -125,12 +119,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         conPan = new ConstrPanel(this);
         factPan = new FactoryPanel(this);
 
-        /*
-        instPaneLayMgr.addLayoutComponent(ffPan,"ffPan");
-        instPaneLayMgr.addLayoutComponent(conPan,"conPan");
-        instPaneLayMgr.addLayoutComponent(factPan,"factPan");
-        //false advertising
-         */
         instPane.add(ffPan, "ffPan");
         instPane.add(conPan, "conPan");
         instPane.add(factPan, "factPan");

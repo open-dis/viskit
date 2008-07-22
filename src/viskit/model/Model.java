@@ -18,9 +18,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import edu.nps.util.FileIO;
+import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
 import viskit.ModelEvent;
-import viskit.VGlobals;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.eventgraph.*;
@@ -39,7 +39,7 @@ import viskit.xsd.translator.SimkitXML2Java;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 1:09:38 PM
- * @version $Id: Model.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class Model extends mvcAbstractModel implements ViskitModel {
 
@@ -59,9 +59,11 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private String stateVarPrefix = "state_";
     private GraphMetaData metaData;
     private ViskitController controller;
+    private boolean modelDirty = false;
     
     public Model(ViskitController controller) {
-        this.controller = controller;
+        this.controller = controller;        
+        metaData = new GraphMetaData();
     }
 
     public void init() {
@@ -83,9 +85,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
      */
     public boolean isDirty() {
         return modelDirty;
-    }
-    
-    private boolean modelDirty = false;
+    }    
 
     /**
      * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
@@ -107,30 +107,22 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     /**
      * Replace current model with one contained in the passed file.
      *
-     * @param f
+     * @param f the EventGraph file to check open
      * @return true for good open, else false
      */
     public boolean newModel(File f) {
-        GraphMetaData mymetaData = null;
+        stateVariables.removeAllElements();
+        simParameters.removeAllElements();
+        evNodeCache.clear();
+        edgeCache.clear();
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
         if (f == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
-
-            VGlobals.instance().reset();
-            stateVariables.removeAllElements();
-            simParameters.removeAllElements();
-            evNodeCache.clear();
-            edgeCache.clear();
-            mymetaData = new GraphMetaData();
-            this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
-                // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
-                // see u.isValidating()
-                // Unmarshaller does NOT validate by default
-                
                 jaxbRoot = (SimEntity) u.unmarshal(f);
-                mymetaData = new GraphMetaData();
+                GraphMetaData mymetaData = new GraphMetaData();
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
@@ -143,13 +135,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                     sb.append(" ");
                 }
                 mymetaData.description = sb.toString().trim();
-
-                VGlobals.instance().reset();
-                stateVariables.removeAllElements();
-                simParameters.removeAllElements();
-                evNodeCache.clear();
-                edgeCache.clear();
-                this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New model loaded from file"));
+                changeMetaData(mymetaData);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
                 buildParametersFromJaxb(jaxbRoot.getParameter());
@@ -167,14 +153,14 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                             "Wrong File Format", JOptionPane.ERROR_MESSAGE);
                 } catch (JAXBException e) {
                     JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
-                            "\n" + f.getName() +
-                            "\n" + e.getMessage(),
+                            "\n" + f +
+                            "\n" + e.getMessage() +
+                            "\nin Model.newModel(File)",
                             "XML I/O Error", JOptionPane.ERROR_MESSAGE);
                 }
                 return false;    // from either error case
             }
         }
-        metaData = mymetaData;
         currentFile = f;
         setDirty(false);
         return true;
@@ -190,8 +176,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         File tmpF = null;
         try {
-            tmpF = File.createTempFile("tmpEGmarshal", ".xml");
-            tmpF.deleteOnExit();
+            tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Exception creating temporary file, Model.saveModel():" +
                     "\n" + e.getMessage(),

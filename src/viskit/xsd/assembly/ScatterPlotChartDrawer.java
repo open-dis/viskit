@@ -84,7 +84,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  * Create Scatter Plots from statistical data collected from experimental 
  * replications
  *
- * @version $Id:$
+ * @version $Id$
  * <p>
  *   <b>History:</b>
  *   <pre><b>

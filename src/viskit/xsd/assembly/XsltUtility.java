@@ -16,7 +16,7 @@ import java.io.FileOutputStream;
  * It was copied to this application to perform XSLT conversions.
  *
  * @author Duane Davis
- * @version $Id: XsltUtility.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class XsltUtility {
 

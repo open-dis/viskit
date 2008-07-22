@@ -22,6 +22,7 @@
  */
 package viskit.xsd.assembly;
 
+import edu.nps.util.TempFileManager;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -88,7 +89,7 @@ import viskit.xsd.translator.SimkitXML2Java;
  * mode, but most importantly enable entities with a large number of
  * parameters.
  *
- * @version $Id: Gridlet.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class Gridlet extends Thread {
     
@@ -297,15 +298,14 @@ public class Gridlet extends Thread {
                 classPath = System.getProperty("java.class.path");
             } else {
                 
-                tempDir = File.createTempFile("viskit","doe");
+                tempDir = TempFileManager.createTempFile("viskit","doe");
                 tempDir.delete();
                 tempDir.mkdir();
-                tempDir.deleteOnExit();
                 workDir = new File(tempDir.toURI());
                 
                 Object loader = getContextClassLoader();
                 Class<?> loaderz = loader.getClass();
-                String[] classPaths = (String[]) (loaderz.getMethod("getClassPath",new Class<?>[]{})).invoke(loader,new Object[]{});
+                String[] classPaths = (String[]) (loaderz.getMethod("getClassPath",new Class<?>[] {})).invoke(loader, new Object[] {});
                 for (String path : classPaths) {
                     classPath += path + File.pathSeparator;
                 }
@@ -352,7 +352,7 @@ public class Gridlet extends Thread {
             cmdLine.add("-Xlint:unchecked");
             cmdLine.add("-Xlint:deprecation");
             cmdLine.add("-verbose");
-            cmdLine.add("-classpath");
+            cmdLine.add("-cp");
             cmdLine.add(classPath);
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());            

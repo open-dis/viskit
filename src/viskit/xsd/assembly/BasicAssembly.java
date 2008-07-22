@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.xsd.assembly;
 
+import edu.nps.util.TempFileManager;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +67,7 @@ import static edu.nps.util.GenericConversion.toArray;
  * Modified to be BeanShellable and Viskit VCR aware - rmgoldbe, jmbailey
  *
  * @author ahbuss
- * @version $Id: BasicAssembly.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
@@ -104,7 +105,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private int designPointID;
     private DecimalFormat form;
     private LinkedList<String> entitiesWithStats;
-    private PrintWriter println;
+    private PrintWriter printWriter;
     private int verboseReplicationNumber;
 
     /**
@@ -134,7 +135,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         //TODO MIKE: instead of this.getName() We may not need to worry about the name of
         //the stats report file. Should discuss though.
         statsConfig = new ReportStatisticsConfig(this.getName());
-        println = new PrintWriter(System.out);
     }
 
     /**
@@ -203,10 +203,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             String ent = entry.getKey();
             log.debug("Entry is: " + entry);
             entitiesWithStats.add(ent);
-            println.println(ent);
-            println.flush();
-        }
-        statsConfig.setEntityIndex(entitiesWithStats);
+        }        
     }
 
     protected abstract void createSimEntities();
@@ -300,7 +297,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
         }
         stopTime = time;
-        System.out.println("stopTime: " + time);
     }
 
     public double getStopTime() {
@@ -329,49 +325,38 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return singleStep;
     }
 
-    public void setStopRun(boolean wh) {
-        stopRun = wh; //?
+    /** Causes simulation runs to halt
+     * 
+     * @param b if true, stops further simulation runs
+     */
+    public void setStopRun(boolean b) {
+        stopRun = b;
         if (stopRun) {
             Schedule.stopSimulation();
         }
     }
-
-    private void saveState(int lastRepNum) {
-        boolean midRun = !Schedule.getDefaultEventList().isFinished();
-        boolean midReps = lastRepNum < getNumberReplications();
-
-        if (midReps) {
-            // middle of some rep, fell out because of GUI stop
-            startRepNumber = lastRepNum;
-        } else if (!midReps && !midRun) {
-            // done with all reps
-            startRepNumber = 0;
-        } else if (!midReps && midRun) {
-            // n/a can't be out of reps but in a run
-            throw new RuntimeException("Bad state in ViskitAssembly");
-        }
+    
+    public void pause() {
+        Schedule.pause();
     }
 
-    /**
-     * Called at top of rep loop;  This will support "pause", but the GUI
-     * is not taking advantage of it presently.
-     * <p/>
-     * rg - try using Schedule.pause() directly from GUI?
+    public void resume() {
+        Schedule.startSimulation();
+    }
+
+    /** this is getting called by the Assembly Runner stop
+     * button, which may get called on startup.
      */
-    private void maybeReset() {
-        // We reset if we're not in the middle of a run
-
-        // but, isFinished didn't happen for the 0th
-        // replication
-        if (Schedule.getDefaultEventList().isFinished()) {
-            try {
-                Schedule.reset();
-            } catch (java.util.ConcurrentModificationException cme) {
-                System.out.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
-            }
-        }
+    public void stop() {
+        stopRun = true;
     }
 
+    public void setEnableAnalystReports(boolean enable) {
+        enableAnalystReports = enable;
+    }
+    
+    public boolean isEnableAnalystReports() {return enableAnalystReports;}
+    
     public void setNumberReplications(int num) {
         if (num < 1) {
             throw new IllegalArgumentException("Number replications must be > 0: " + num);
@@ -490,6 +475,42 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return new LinkedHashMap<Integer, ArrayList<SavedStats>>(replicationData);
     }
 
+    private void saveState(int lastRepNum) {
+        boolean midRun = !Schedule.getDefaultEventList().isFinished();
+        boolean midReps = lastRepNum < getNumberReplications();
+
+        if (midReps) {
+            // middle of some rep, fell out because of GUI stop
+            startRepNumber = lastRepNum;
+        } else if (!midReps && !midRun) {
+            // done with all reps
+            startRepNumber = 0;
+        } else if (!midReps && midRun) {
+            // n/a can't be out of reps but in a run
+            throw new RuntimeException("Bad state in ViskitAssembly");
+        }
+    }
+
+    /**
+     * Called at top of rep loop;  This will support "pause", but the GUI
+     * is not taking advantage of it presently.
+     * <p/>
+     * rg - try using Schedule.pause() directly from GUI?
+     */
+    private void maybeReset() {
+        // We reset if we're not in the middle of a run
+
+        // but, isFinished didn't happen for the 0th
+        // replication
+        if (Schedule.getDefaultEventList().isFinished()) {
+            try {
+                Schedule.reset();
+            } catch (java.util.ConcurrentModificationException cme) {
+                System.out.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
+            }
+        }
+    }
+    
     /**
      * For each inner stats, print to console name, count, min, max, mean, 
      * standard deviation and variance.  This can be done generically.
@@ -569,13 +590,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public void setOutputStream(OutputStream os) {
         PrintStream out = new PrintStream(os);
-        this.println = new PrintWriter(os);
+        this.printWriter = new PrintWriter(os);
+        
+        // This OutputStream gets ported to the JScrollPane of the Assy Runner
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
         // send debug message directy to System.out.
         // ie, one thread sets System.out then another
-        // takes it mid thread.
+        // takes it mid thread.        
+        
+        // This is possibly what causes output to dump to a console
         System.setOut(out);
     }
 
@@ -586,9 +611,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             System.out.println("Already running.");
-        //Schedule.stopSimulation();
         }
-        System.out.println("stopTime set at " + getStopTime());
         createObjects();
         performHookups();
         // reset the document with
@@ -599,7 +622,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (!hookupsCalled) {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
-        System.out.println("\nStopping at " + getStopTime());
+        System.out.println("\nStopping at time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
         Schedule.setVerbose(isVerbose());
@@ -632,15 +655,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 // access the SM's numberOfReplications parameter setter
                 try {
                     Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
-                    try {
-                        setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
-                    } catch (IllegalArgumentException ex) {
+                    setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
+                } catch (IllegalArgumentException ex) {
                     //ex.printStackTrace(); // nop, this is the default case
-                    } catch (InvocationTargetException ex) {
-                        ex.printStackTrace();
-                    } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
-                    }
+                } catch (InvocationTargetException ex) {
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
                 } catch (NoSuchMethodException ex) {
@@ -678,11 +699,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     }
                 }
                 System.out.println();
-
             }
             if (stopRun) {
-                System.out.println("Stopped in Replication # " + replication + 1);
-
+                log.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
                 Long seed = new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed());
@@ -714,16 +733,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     for (SimEntity entity : runEntities) {
                         Schedule.addRerun(entity);
                     }
-                //Schedule.reset();
-
                 }
 
                 Schedule.startSimulation();
 
                 String typeStat = "";
                 int ix = 0;
-                boolean isCount = false;
-                
+                boolean isCount = false;                
                 
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
@@ -771,27 +787,24 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     }
                 }
                 if (isPrintReplicationReports()) {
-                    println.println(getReplicationReport(replication));
-                    println.flush();
+                    printWriter.println(getReplicationReport(replication));
+                    printWriter.flush();
                 }
                                 
-//                Schedule.stopSimulation();
                 System.runFinalization();
                 System.gc();
             }
 
-            if (false && scenarioManager != null) {
+            if (scenarioManager != null) {
                 try {
-                    Method doStop = scenarioManager.getClass().getMethod("doStop");
-                    try {
-                        doStop.invoke(scenarioManager, getNumberReplications());
-                    } catch (IllegalArgumentException ex) {
+                    Method doStop = scenarioManager.getClass().getMethod("doStopSimulation");
+                    doStop.invoke(scenarioManager, getNumberReplications());
+                } catch (IllegalArgumentException ex) {
                     //ex.printStackTrace();
-                    } catch (InvocationTargetException ex) {
-                        ex.printStackTrace();
-                    } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
-                    }
+                } catch (InvocationTargetException ex) {
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
                 } catch (NoSuchMethodException ex) {
@@ -801,8 +814,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
 
         if (isPrintSummaryReport()) {
-            println.println(getSummaryReport());
-            println.flush();
+            printWriter.println(getSummaryReport());
+            printWriter.flush();
         }
 
         if (isEnableAnalystReports()) {
@@ -823,48 +836,25 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);
             } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (InstantiationException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (IllegalAccessException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (SecurityException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
+                log.error(ex);
             } catch (InvocationTargetException ex) {
+                log.error(ex);
                 ex.printStackTrace();
-            } catch (Exception e) {
-                log.error("BasicAssembly can't write analyst report XML to " + analystReportFile.getAbsolutePath());
-                log.error(e);
             }
         }
         System.runFinalization();
         System.gc();
     }
-
-    public void pause() {
-        Schedule.pause();
-    }
-
-    public void resume() {
-        Schedule.startSimulation();
-    }
-
-    /** this is getting called by the Assembly Runner stop
-     * button, which may get called on startup.
-     */
-    public void stop() {
-        stopRun = true;
-    }
-
-    public void setEnableAnalystReports(boolean enable) {
-        enableAnalystReports = enable;
-    }
-    
-    public boolean isEnableAnalystReports() {return enableAnalystReports;}
 
     /**
      * This gets called at the top of every run.  It builds a tempFile and saves the path.  That path is what
@@ -873,7 +863,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     private void initReportFile() {
         try {
-            analystReportFile = File.createTempFile("ViskitAnalystReport", ".xml");
+            analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml");
         } catch (IOException e) {
             analystReportFile = null;
             System.err.println("Error creating AnalystReport file: " + e.getMessage());

@@ -28,7 +28,7 @@ import javax.tools.ToolProvider;
  * @author Mike Bailey
  * @since Apr 23, 2004
  * @since 3:17:23 PM
- * @version $Id: SourceWindow.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class SourceWindow extends JFrame {
     // weird compiler error, lets src be visible as final
@@ -48,7 +48,7 @@ public class SourceWindow extends JFrame {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
-            saveChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            saveChooser.setCurrentDirectory(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
@@ -111,7 +111,6 @@ public class SourceWindow extends JFrame {
         JButton closeButt = new JButton("Close");
         buttPan.add(closeButt);
 
-        //buttPan.add(Box.createHorizontalStrut(40));
         con.add(buttPan);
 
         setupSearchKeys();
@@ -151,7 +150,6 @@ public class SourceWindow extends JFrame {
 
             StringBuffer sb = new StringBuffer();
             BufferedReader br;
-            String nl = System.getProperty("line.separator");
 
             public void actionPerformed(ActionEvent e) {
 
@@ -178,7 +176,7 @@ public class SourceWindow extends JFrame {
                     String[] options = {                        
                         "-Xlint:unchecked",
                         "-Xlint:deprecation",
-                        "-classpath",
+                        "-cp",
                         classPaths.toString(),
                         "-d",
                         workDirPath
@@ -190,13 +188,11 @@ public class SourceWindow extends JFrame {
                             sjfm,
                             diag,
                             optionsList,
-                            //clNameList,
                             null,
                             fileObjects).call();
-                    sb = new StringBuffer();
                     sb.append(baosOut.toString());
                     sb.append(diag.messageString);
-                    sb.append(jofs.toUri());
+                    sb.append(jofs.toUri() + "\n\n");
                    
                     sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
@@ -495,6 +491,11 @@ class sysOutDialog extends JDialog implements ActionListener {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
+     * @param frameComp
+     * @param locationComp
+     * @param labelText 
+     * @param title 
+     * @return the dialog for this SourceWindow
      */
     public static String showDialog(Component frameComp,
             Component locationComp,

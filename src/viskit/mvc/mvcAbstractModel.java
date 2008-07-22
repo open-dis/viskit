@@ -14,21 +14,14 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 11:04:25 AM
- * @version $Id:$
+ * @version $Id$
  */
 public abstract class mvcAbstractModel implements mvcModel {
 
     private ArrayList<mvcModelListener> listeners = new ArrayList<mvcModelListener>(4);
 
-    // We know this to return an ArrayList<mvcModelListener>
-//    @SuppressWarnings("unchecked")
     public void notifyChanged(mvcModelEvent event) {
         
-        // TODO: Determine why do we require a cloned list here?
-//        ArrayList<mvcModelListener> list = (ArrayList<mvcModelListener>) listeners.clone();
-//        for (mvcModelListener ml : list) {
-//            ml.modelChanged(event);
-//        }
         for (mvcModelListener ml : listeners) {
             ml.modelChanged(event);
         }

@@ -17,7 +17,7 @@ import java.util.jar.JarFile;
 import org.apache.log4j.Logger;
 
 /**
- * @version $Id: FindClassesForInterface.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * @author  ahbuss
  */
 public class FindClassesForInterface {

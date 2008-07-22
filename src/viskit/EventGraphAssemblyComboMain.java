@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -13,7 +13,7 @@ are met:
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Sep 22, 2005
  * @since 3:23:52 PM
- * @version $Id: EventGraphAssemblyComboMain.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 package viskit;
 
@@ -79,50 +79,14 @@ public class EventGraphAssemblyComboMain {
     public static void setLandFandFonts() {
         LookAndFeel laf = new PlasticLookAndFeel();
         Options.setUseNarrowButtons(true);
-        PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer()); //SkyBluerTahoma()); //SkyBluerTahoma()); //new DesertBlue()); //new ExperienceBlue());
-     //PlasticLookAndFeel.setTabStyle(com.jgoodies.looks.plastic.Plastic3DLookAndFeel.TAB_STYLE_METAL_VALUE);
+        PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());
         PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
 
         try {
             UIManager.setLookAndFeel(laf);
-            ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
-       //Wrapper.wrap(); //Force all widgets to go anti-aliased
+            ShadowPopupFactory.uninstall();
         } catch (UnsupportedLookAndFeelException e) {
             System.out.println("can't change l&f");
-        }
-    //setAllFonts();
-/*
-    //System.out.println(System.getProperty("java.class.path"));
-    //System.out.println(System.getProperty("user.dir"));
-    String laf = "javax.swing.plaf.metal.MetalLookAndFeel";          //default
-
-    String os = System.getProperty("os.name").toLowerCase();
-    if (os.indexOf("windows") != -1)
-      laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    else if (os.indexOf("mac") != -1) {
-      //laf = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-      //laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-      //laf = "apple.laf.AquaLookAndFeel";
-      laf = "javax.swing.plaf.metal.MetalLookAndFeel";
-
-      //com.jgoodies.plaf.plastic.Plastic3DLookAndFeel.setMyCurrentTheme(new com.jgoodies.plaf.plastic.theme.DesertGreen());
-      //laf = "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel";
-
-      //laf = QuaquaManager.getLookAndFeelClassName();
-      //System.setProperty("apple.awt.brushMetalLook","true");
-      System.setProperty("apple.awt.antialiasing", "true");
-      //System.setProperty("apple.awt.showGrowBox","true");     // only for aqua
-    }
-
-    try {
-      UIManager.setLookAndFeel(laf);
-      UIDefaults def = UIManager.getDefaults();
-      def.put("Tree.font", new Font("Verdana", Font.PLAIN, 12));
-      setAllFonts(/*null);
-    }
-    catch (Exception e) {
-      System.err.println("Could not enable " + laf);
-    }
-    */
+        }    
     }
 }

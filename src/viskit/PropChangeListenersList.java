@@ -25,7 +25,7 @@ import javax.swing.*;
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 10:10:45 AM
- * @version $Id: PropChangeListenersList.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class PropChangeListenersList extends JList implements DragGestureListener, DragSourceListener {
 

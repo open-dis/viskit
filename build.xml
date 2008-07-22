@@ -68,7 +68,6 @@
     <fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
         <include name="tools.jar"/>
     </fileset>
-    <fileset file="${dist.jar}" id="runtime.viskit"/>
     <fileset dir="${dir.build}/lib" id="runtime.viskit.exe">
         <include name="viskit-exe.jar"/>
     </fileset>
@@ -79,17 +78,7 @@
     <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >        
         <include name="**/*.jar"/>
     </fileset>
-    
-    <!-- so following could replace the next path after the following -->
-    
-    <path id="runtime.classpath.paths">
-        <fileset refid="runtime.javac"/>
-        <fileset refid="runtime.viskit"/>
-        <fileset refid="runtime.lib"/>
-        <fileset refid="runtime.lib.ext"/>
-        <fileset refid="jaxb.classes"/>
-    </path>
-    
+        
     <!-- this path gets pathconverted for the native launcher in the jar target, see launch4j -->
     <path id="launcher.classpath">
         <fileset refid="runtime.lib"/>
@@ -118,9 +107,9 @@
         <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
         <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
         <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
-        <pathelement location="${dir.lib}/commons-configuration-1.2.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration-1.5.jar"/>
         <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
-        <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
+        <pathelement location="${dir.lib}/commons-lang-2.4.jar"/>
         <pathelement location="${dir.lib}/commons-logging-1.1.jar"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
@@ -322,12 +311,13 @@
     </target>
     
     <!-- depends on create stage 1 visxml.jar which later includes stuff from this compile to make ${dist.jar} -->
-    <target name="compile.simxml.util"
+    <target name="compile.edu.util"
             depends="jar.stage1" 
-            description="Build xml2java utils">
+            description="Build nps.edu.utils">
 
         <javac destdir="${dir.build.classes}"
-               debug="off"
+               debug="true"
+               debugLevel="lines,vars,source"
                source="1.5"
                target="1.5">
             
@@ -338,7 +328,6 @@
                 <pathelement location="${log4j.jar}"/>
             </classpath>            
             <src path="${dir.src}/edu/"/>
-            <src path="${dir.src.simevg.util}"/>
         </javac>        
         
         <jar update="yes" 
@@ -348,7 +337,7 @@
     </target>    
     
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="compile.simxml.util">
+    <target name="compile" depends="compile.edu.util">
         <javac verbose="no" 
                destdir="${dir.build.classes}" 
                excludes="xsd/** test/**"
@@ -369,17 +358,18 @@
                 <pathelement location="${dir.lib}/jhall.jar"/>
                 <pathelement location="${jfreechart.jar}"/>
                 <pathelement location="${dir.lib}/jedit.jar"/>
-                <pathelement location="${dir.lib}/commons-configuration-1.2.jar"/>
+                <pathelement location="${dir.lib}/commons-configuration-1.5.jar"/>
                 <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-                <pathelement location="${dir.lib}/commons-lang-2.0.jar"/>
+                <pathelement location="${dir.lib}/commons-lang-2.4.jar"/>
                 <pathelement location="${log4j.jar}"/>
                 <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
-                <pathelement location="${dir.build.classes}"/>
+                <pathelement location="${dir.build.lib}/visxml.jar"/>
             </classpath>
+            <src path="${dir.src}/viskit"/>
+            <src path="${dir.src.simevg.util}"/>
             <src path="${dir.src.simasm.util}"/>            
             <src path="${dir.src.cli.util}"/>
-            <src path="${dir.src}/viskit"/>
         </javac>
         <copy todir="${dir.build.classes}">
             <fileset dir="${dir.src}">
@@ -531,6 +521,8 @@
             <link href="${j2se.api}"/>
             <link href="${simkit.api}"/>
             <link href="${jdom.api}"/>
+	    <link href="${commons.config.api}"/>
+	    <link href="${jfreechart.api}"/>
         </javadoc>
     </target>
     
@@ -565,12 +557,12 @@
                 <include name="simkit.jar"/>
                 <include name="xmlrpc-2.0.jar"/>
                 <include name="bsh-2.0b4.jar"/>
-                <include name="commons-configuration-1.2.jar"/>
+                <include name="commons-configuration-1.5.jar"/>
                 <include name="commons-beanutils-1.7.0.jar"/>
                 <include name="commons-codec-1.3.jar"/>
                 <include name="commons-collections-3.1.jar"/>
                 <include name="commons-digester-1.6.jar"/>
-                <include name="commons-lang-2.0.jar"/>
+                <include name="commons-lang-2.4.jar"/>
                 <include name="commons-logging-1.1.jar"/>
                 <include name="jdom.jar"/>
             </fileset>
@@ -681,6 +673,9 @@
               classpathref="runtime.classpath" 
               fork="true">
             <arg value="viskit.EventGraphAssemblyComboMain"/>
+	    <!--arg value="Your path to an assembly file to initialize Viskit ready to run"/-->
+	    <!--arg value="${basedir}/MyViskitProjects/DefaultProject/Assemblies/atfp/PortOfBaltimoreAssembly.xml"/-->
+	    <!--arg value="${basedir}/MyViskitProjects/TestFoo/Assemblies/oa3302/ServerAssembly.xml"/-->
             <jvmarg value="-XX:MaxPermSize=160m"/>
             <jvmarg value="-Xmx256m"/>            
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
@@ -730,48 +725,7 @@
              description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
-    
-    <target name="debug.quick"  description="Quick debug">
-        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-        <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
-            <classpath refid="runtime.classpath"/>
-            <!-- Optional - If source roots are properly declared in project, should
-            wor/home/rmgold/CVS/Viskit/viskit/xsd/assembly/GridRunner.java:683: cannot find symbolk without setting source path.     
-            <sourcepath path="debug.sourcepath"/> -->
-        </nbjpdastart>
-        <java classname="viskit.Splash2" fork="true">
-            <arg value="viskit.EventGraphAssemblyComboMain"/>
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-XX:MaxPermSize=1024m"/>
-            <jvmarg value="-client"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-            <classpath refid="runtime.classpath"/>
-        </java>
-    </target>
-    
-    <target name="debug" depends="compile" description="Debug Project">
-        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-        <nbjpdastart name="Viskit" addressproperty="jpda.address" transport="dt_socket">
-            <classpath path="runtime.classpath"/>
-            <!-- Optional - If source roots are properly declared in project, should
-            work without setting source path.     
-            <sourcepath path="debug.sourcepath"/> -->
-        </nbjpdastart>
-        <java fork="true" classname="viskit.Main">
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <classpath refid="runtime.classpath"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    
-    
+        
     <!-- The Installer contains the JDK, a native wrapper around ${dist.jar} and its jars, 
         and the actual installer. JDK, IzPack the installer generator, launch4j the wrapper
         maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
@@ -939,7 +893,7 @@
         </copy>
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-                <include name="intro.html"/>
+                <include name="intro_no_diskit.html"/>
             </fileset>
         </copy>
         <copy todir="${installer}/stage">
@@ -1210,21 +1164,18 @@
         <delete file="${dir.lib.ext}/diskit.jar"/>
     </target>
     
-    <target name="delete.temps.and.hx" depends="init">
+    <!--target name="delete.temps.cache" depends="init"-->
         <!-- create the batch file to delete temp files -->
-        <echo file="deleteTempsAndHx.bat" append="false">@echo on
+        <!--echo file="deleteTempsCache.bat" append="false">@echo on
 @rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
-${delete.temp.and.hx}</echo>
-        <exec executable="deleteTempsAndHx.bat" resolveexecutable="true"/>
-    </target>
+${delete.temps.cache}</echo>
+        <exec executable="deleteTempsCache.bat" resolveexecutable="true"/>
+    </target-->
     
-    <!-- Clean everything, including Viskit generated temp files -->
+    <!-- Clean everything -->
     <target name="clean.all" 
-            depends="delete.temps.and.hx,clean"
-            description="Invokes the delete.temps.and.hx target to clean Viskit 
-            created temp files and the .viskit_history.xml when switching back 
-            and forth from SavageStuido Viskit to basic Viskit.  This will also
-            delete all Analyst Report generated materials">
+            depends="clean"
+            description="This will also delete all Analyst Report generated materials">
                        
         <delete includeemptydirs="true" dir="${images}"/>
         <delete includeemptydirs="true" dir="${charts}"/>

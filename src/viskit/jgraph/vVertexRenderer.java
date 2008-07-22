@@ -16,7 +16,7 @@ import java.util.Vector;
  * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 3:40:51 PM
- * @version $Id: vVertexRenderer.java 1662 2007-12-16 19:44:04Z tdnorbra $ 
+ * @version $Id$ 
  */
 
 /*

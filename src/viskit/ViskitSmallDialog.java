@@ -10,7 +10,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 
-/**
+/** This is a class to help in code reuse.  There are several small Dialogs 
+ * which are all used the same way.  This class puts the common code in a single
+ * super class.
+ * 
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -18,11 +21,7 @@ import java.lang.reflect.Constructor;
  * @author Mike Bailey
  * @since May 3, 2004
  * @since: 2:39:34 PM
- * @version $Id:$
- */
-/**
- * This is a class to help in code reuse.  There are several small Dialogs which are all used the same way.  This
- * class puts the common code in a single super class.
+ * @version $Id$
  */
 public abstract class ViskitSmallDialog extends JDialog {
 
@@ -32,13 +31,13 @@ public abstract class ViskitSmallDialog extends JDialog {
     protected static boolean showDialog(String className, JFrame f, Component comp, Object var) {
         if (dialog == null) {
             try {
-                Class[] args = new Class[]{Class.forName("javax.swing.JFrame"),
+                Class[] args = new Class[] {Class.forName("javax.swing.JFrame"),
                     Class.forName("java.awt.Component"),
                     Class.forName("java.lang.Object")
                 };
                 Class<?> c = Vstatics.classForName("viskit." + className);
                 Constructor constr = c.getDeclaredConstructor(args);
-                dialog = (ViskitSmallDialog) constr.newInstance(new Object[]{f, comp, var});
+                dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, comp, var});
             } catch (Exception e) {
                 e.printStackTrace();
             }

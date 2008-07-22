@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Oct 28, 2005
  * @since 11:09:19 AM
- * @version $Id: SysExitHandler.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 package edu.nps.util;
 

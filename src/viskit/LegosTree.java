@@ -35,7 +35,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:31 AM
- * @version $Id: LegosTree.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener {
     
@@ -166,7 +166,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     try {
                         if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
                             mod.removeNodeFromParent(n);
-                            FileBasedClassManager.inst().unloadFile(fban);
+                            FileBasedClassManager.instance().unloadFile(fban);
                             return n;
                         }
                     } catch (IOException e) {
@@ -207,12 +207,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         if (!f.getName().endsWith(".java")) {
             addContentRoot(f, recurse, v);
         }
-        /* Skip the bad news reporting
-        if(recurseNogoList != null && recurseNogoList.size()>0) {
-        JOptionPane.showMessageDialog(this,recurseNogoList.toArray(new String[0]),"Classes or files not added:",JOptionPane.INFORMATION_MESSAGE);
-        }
-         */
-
+        
         if (classNodeCount != 0) {
             return;
         }
@@ -274,7 +269,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         else {
             FileBasedAssyNode fban;
             try {
-                fban = FileBasedClassManager.inst().loadFile(f);
+                fban = FileBasedClassManager.instance().loadFile(f);
                 
                 // If an Assembly was encountered by the FBCM, just return
                 if (fban == null) {
@@ -369,15 +364,15 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 f = c.getField("parameterMap");
             } catch (SecurityException ex) {
                 ex.printStackTrace();
-            } catch (NoSuchFieldException ex) {
-            }
+            } catch (NoSuchFieldException ex) {}
+            
             if (viskit.Vstatics.debug) {
                 System.out.println("adding " + c.getName());
             }
-
             if (viskit.Vstatics.debug) {
                 System.out.println("\t # constructors: " + constr.length);
             }
+            
             for (int i = 0; i < constr.length; i++) {
                 Class[] ptypes = constr[i].getParameterTypes();
                 plist[i] = new ArrayList<Object>();
@@ -462,16 +457,17 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                     }
                 }
-            } // for
+            }
             Vstatics.putParameterList(c.getName(), plist);
         }
 
         if (list == null || list.size() <= 0) {
-            JOptionPane.showMessageDialog(LegosTree.this, "No classes of type " + targetClassName + " found\n" +
-                    "in " + jarFile.getName(), "Not found", JOptionPane.WARNING_MESSAGE);
+            log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
+            log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree");
+            
+            // TODO: should just be safe to return here without annoying warning popup dialog
             return;
         }
 

@@ -8,7 +8,7 @@ import viskit.VGlobals;
  * @author Mike Bailey
  * @since Apr 1, 2004
  * @since 3:59:01 PM
- * @version $Id: EventLocalVariable.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * To change this template use File | Settings | File Templates.
  */
 public class EventLocalVariable extends ViskitElement {

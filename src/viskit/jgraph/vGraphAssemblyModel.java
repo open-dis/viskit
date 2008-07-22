@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 1:21:52 PM
- * @version $Id: vGraphAssemblyModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class vGraphAssemblyModel extends DefaultGraphModel
 {

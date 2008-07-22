@@ -17,7 +17,7 @@ import org.jdom.Element;
  * document out of the replication and summary stats objects that are passed to it.
  *
  * @author Patrick Sullivan
- * @version $Id: ReportStatisticsDOM.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class ReportStatisticsDOM {
 
@@ -149,7 +149,7 @@ public class ReportStatisticsDOM {
         }
 
         /**
-         * Returns this entity record object which is a properly formatted 
+         * Returns this entity record object which is properly formatted 
          * 
          * @return simEntity returns this entity in jdom.Element form
          */

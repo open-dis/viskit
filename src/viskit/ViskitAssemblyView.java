@@ -10,7 +10,7 @@ import java.util.Collection;
  * @author Mike Bailey
  * @since Mar 18, 2004
  * @since 12:06:11 PM
- * @version $Id: ViskitAssemblyView.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  *
  * The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
  * chosen view only as much as is described by this interface.

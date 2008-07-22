@@ -15,53 +15,55 @@ import viskit.model.*;
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:27:13 AM
- * @version $Id:$
+ * @version $Id$
  */
 public interface ViskitAssemblyController {
+    
+    /* start app */
+    void begin();
+    
     // user has clicked a menu item
-    public void newEventGraphNode();
-
-    public void newPropChangeListenerNode();
+    void newEventGraphNode();
+    void newPropChangeListenerNode();
 
     // user has established some parameter, model can create object
-    public void newEventGraphNode(String name, Point p);
+    void newEventGraphNode(String name, Point p);
+    void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
 
-    public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
+    void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
 
-    public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
+    void newPropChangeListenerNode(String name, Point p);
 
-    public void newPropChangeListenerNode(String name, Point p);
+    void editGraphMetaData();
 
-    public void editGraphMetaData();
+    void newAssembly();
 
-    public void newAssembly();
-
-    public void setRunTabbedPane(JComponent runTabbedPane, int idx);
+    void setRunTabbedPane(JComponent runTabbedPane, int idx);
 
     void runEventGraphEditor();
 
     void showXML();
 
     /* a component, e.g., model, wants to say something. */
-    public void messageUser(int typ, String msg);    // typ is one of JOptionPane types
+    void messageUser(int typ, String msg);    // typ is one of JOptionPane types
 
-    public void selectNodeOrEdge(Vector v);
+    void selectNodeOrEdge(Vector v);
 
-    public void newAdapterArc(Object[] nodes);
+    void newAdapterArc(Object[] nodes);
 
-    public void newSimEvListArc(Object[] nodes);
+    void newSimEvListArc(Object[] nodes);
 
-    public void newPropChangeListArc(Object[] nodes);
+    void newPropChangeListArc(Object[] nodes);
 
-    public void pcListenerEdit(PropChangeListenerNode pclNode);
+    void pcListenerEdit(PropChangeListenerNode pclNode);
 
-    public void evGraphEdit(EvGraphNode evNode);
+    void evGraphEdit(EvGraphNode evNode);
 
-    public void pcListenerEdgeEdit(PropChangeEdge pclEdge);
+    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
 
-    public void adapterEdgeEdit(AdapterEdge edgeObj);
+    void adapterEdgeEdit(AdapterEdge edgeObj);
 
-    public void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);
+    void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);
 
     /* menu selections */
     void copy();
@@ -103,7 +105,7 @@ public interface ViskitAssemblyController {
 
     void generateJavaSource();
 
-    void runAssembly();
+    void compileAssemblyAndPrepSimRunner();
 
     void initAssemblyRun();
 

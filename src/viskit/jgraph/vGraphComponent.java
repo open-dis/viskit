@@ -39,7 +39,7 @@ import java.util.*;
  * @author Mike Bailey 
  * @since Feb 19, 2004
  * @since 2:54:31 PM
- * @version $Id: vGraphComponent.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class vGraphComponent extends JGraph implements GraphModelListener /**********************************************/
 {

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Apr 7, 2004
  * @since 3:19:43 PM
- * @version $Id: vEdgeParameter.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class vEdgeParameter extends ViskitElement {
 

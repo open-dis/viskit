@@ -53,7 +53,7 @@ import javax.swing.event.ChangeListener;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM
- * @version $Id: EventGraphViewFrame.java 1667 2007-12-17 20:24:55Z tdnorbra $
+ * @version $Id$
  *
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements ViskitView {
@@ -84,16 +84,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private int titlKey;
     private JTextArea descriptionTextArea;
     public EventGraphController controller;
-    private final static String frameDefaultTitle = "Viskit Event Graph Editor";
+    private final static String FRAME_DEFAULT_TITLE = "Viskit Event Graph Editor";
 
     /**
      * Constructor; lays out initial GUI objects
      * @param contentOnly
      * @param ctrl 
      */
-    public EventGraphViewFrame(boolean contentOnly, EventGraphController ctrl) //====================================================
-    {
-        super(frameDefaultTitle);
+    public EventGraphViewFrame(boolean contentOnly, EventGraphController ctrl) {
+        super(FRAME_DEFAULT_TITLE);
         this.controller = ctrl;
         initMVC(ctrl);   // set up mvc linkages
         initUI(contentOnly);    // build widgets
@@ -164,7 +163,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * @param ctrl 
      */
     private void initMVC(EventGraphController ctrl) {
-        //setModel(mod);
         setController(ctrl);
     }
 
@@ -427,8 +425,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // but this call serves also to register the view with the passed model
     }
 
-    public void delTab(ViskitModel mod) // When a tab is removed
-    {
+    public void delTab(ViskitModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
         for (int i = 0; i < ca.length; i++) {
@@ -441,7 +438,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 return;
             }
         }
-        System.out.println("Deleting a tab that wasn't there!");
     }
 
     public ViskitModel[] getOpenModels() {
@@ -463,13 +459,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         help.mainFrameLocated(this.getBounds());
     }
 
-    public void prepareToQuit() {
-        String boundsKey = "app.EventGraphEditor.FrameBounds";
+    // TODO: This saves the size/shape of the EG Editor frame, but doesn't 
+    // load this config on next startup
+    public void prepareToQuit() {        
         Rectangle bounds = getBounds();
-        ViskitConfig.instance().setVal(boundsKey + "[@h]", "" + bounds.height);
-        ViskitConfig.instance().setVal(boundsKey + "[@w]", "" + bounds.width);
-        ViskitConfig.instance().setVal(boundsKey + "[@x]", "" + bounds.x);
-        ViskitConfig.instance().setVal(boundsKey + "[@y]", "" + bounds.y);
+        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
+        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
+        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }
 
     /**
@@ -917,7 +914,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     public File[] openFilesAsk() {
         if (jfc == null) {
-            jfc = new JFileChooser(System.getProperty("user.dir"));
+            jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
             jfc.setDialogTitle("Open Event Graph Files");
 
             // Bug fix: 1246
@@ -951,10 +948,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return fil;
     }
 
-    public File saveFileAsk(String suggName, boolean showUniqueName) //-----------------------
-    {
+    public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {
-            jfc = new JFileChooser(System.getProperty("user.dir"));
+            jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
         }
 
         File fil = new File(suggName);
@@ -993,7 +989,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public void setSelectedEventGraphName(String s) //----------------------------
     {
         boolean nullString = !(s != null && s.length() > 0);
-        String ttl = nullString ? frameDefaultTitle : "Viskit Event Graph: " + s;
+        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Event Graph: " + s;
         setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
@@ -1034,13 +1030,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), gmd);
     }
 
-    public int genericAsk(String title, String msg) //---------------------------------------------
-    {
+    public int genericAsk(String title, String msg) {
         return JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(), msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
-    public void genericErrorReport(String title, String msg) //-----------------------------------------------------
-    {
+    public int genericAskYN(String title, String msg) {
+        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
+    }
+    
+    public void genericErrorReport(String title, String msg) {
         JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
@@ -1163,7 +1161,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // default
         if (titlList != null) {
-            titlList.setTitle(frameDefaultTitle, titlKey);
+            titlList.setTitle(FRAME_DEFAULT_TITLE, titlKey);
         }
     }
 }

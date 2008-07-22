@@ -437,11 +437,11 @@ public class Launcher extends Thread implements Runnable {
 
             ArrayList<String> cmdLine = new ArrayList<String>();
             cmdLine.add("-Xlint:unchecked");
-            cmdLine.add("--Xlint:deprecation");
+            cmdLine.add("-Xlint:deprecation");
             cmdLine.add("-sourcepath");
             cmdLine.add(tempDir.getCanonicalPath());
             cmdLine.add("-verbose");
-            cmdLine.add("-classpath");
+            cmdLine.add("-cp");
             cmdLine.add(System.getProperty("java.class.path"));
             cmdLine.add("-d");
             cmdLine.add(tempDir.getCanonicalPath());

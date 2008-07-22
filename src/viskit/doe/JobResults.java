@@ -58,7 +58,7 @@ import java.util.Vector;
  * @author Mike Bailey
  * @since Aug 9, 2005
  * @since 10:42:36 AM
- * @version $Id: JobResults.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class JobResults extends JFrame {
 

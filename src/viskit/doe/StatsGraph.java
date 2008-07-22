@@ -65,7 +65,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * To consider, maybe clicking on a bar brings up replication stats for 
  * that design point with horizontal line across the mean. 
  * @author Patrick Sullivan
- * @version $Id: StatsGraph.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * @since April 20, 2006, 11:19 AM
  */
 public class StatsGraph extends JPanel {

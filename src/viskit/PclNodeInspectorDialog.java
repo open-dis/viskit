@@ -21,7 +21,7 @@ import viskit.model.PropChangeListenerNode;
  * @author Mike Bailey
  * @since June 2, 2004
  * @since 9:19:41 AM
- * @version $Id: PclNodeInspectorDialog.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class PclNodeInspectorDialog extends JDialog {
 

@@ -15,7 +15,7 @@ import java.io.File;
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:55 AM
- * @version $Id: ClassPanel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class ClassPanel extends JPanel {
 
@@ -25,7 +25,7 @@ public class ClassPanel extends JPanel {
 
     public ClassPanel(LegosTree ltree, String title, String plusTT, String minusTT) {
         this.tree = ltree;
-        jfc = new JFileChooser(System.getProperty("user.dir"));
+        jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JLabel lab = new JLabel(title); //"Event Graphs");
@@ -100,7 +100,7 @@ public class ClassPanel extends JPanel {
 
         private Class<?> targetClass;     // looking for classes of this kind (or jars or directories)
 
-        ClassTypeFilter(Class c) {
+        ClassTypeFilter(Class<?> c) {
             this.targetClass = c;
         }
 
@@ -127,13 +127,11 @@ public class ClassPanel extends JPanel {
             return true;
         }
 
-        Class getClass(File f) {
-            Class c = null;
+        Class<?> getClass(File f) {
+            Class<?> c = null;
             try {
                 c = FindClassesForInterface.classFromFile(f, c);
-
-            } catch (Throwable e) {
-            }
+            } catch (Throwable e) {}
 
             // Here we don't show any classes that are reachable through the viskit classpath..i.e., simkit.jar
             // We want no dups there.

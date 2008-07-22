@@ -17,7 +17,9 @@ import java.net.URLClassLoader;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
+import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implememnts 
  * class loading that can be used in "Local Grid" mode. 
@@ -77,7 +79,7 @@ import org.apache.log4j.Logger;
  * as originally expected.
  *
  * @author Rick Goldberg
- * @version $Id:$
+ * @version $Id$
  */
 public class LocalBootLoader extends URLClassLoader {
 
@@ -89,27 +91,152 @@ public class LocalBootLoader extends URLClassLoader {
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
 
+    /** Creates a new instance of LocalBootLoader
+     * @param classes
+     * @param parent
+     * @param workDir
+     */
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
-        super(new URL[]{}, parent);
+        super(new URL[] {}, parent);
         extUrls = classes;
-        this.workDir = new File(workDir.toURI());
-    //System.out.println("WorkDir: "+workDir);
+        this.workDir = (workDir != null) ? new File(workDir.toURI()) : workDir;
+        log.debug(VGlobals.instance().printCallerLog());
     }
 
-    /** Creates a new instance of LocalBootLoader */
-    public void initStage1() {
+    /** Create a context with viskit's libs along with
+     * the generated eventgraphs, takes two stages
+     * the returned LocalBootLoader can be used
+     * as an isolated context, i.e., where static methods
+     * and variables from one class don't interfere with
+     * one another or between LocalBootLoaders, here
+     * done by setting threads' contextClassLoaders to
+     * their own LocalBootLoaders
+     * @param allowAssembly 
+     * @return
+     */
+    public LocalBootLoader init(boolean allowAssembly) {
+        this.allowAssembly = allowAssembly;
+        return init();
+    }
+
+    /** @return a custom ClassLoader */
+    public LocalBootLoader init() {
+        File jar;
+        //System.out.println("Stage1 start init ");
+        initStage1();
+        stage1.allowAssembly = this.allowAssembly;
+        jar = buildCleanWorkJar();
+        
+        //stage1 gets dirty during bring up of clean jar
+        //reboot it with cleanWorkJar
+        //System.out.println("Stage1 reinit ");
+        initStage1();
+        //System.out.println("Adding cleaned jar "+jar);
+        for (URL ext : extUrls) {
+            stage1.addURL(ext);
+            String[] tmp = new String[getClassPath().length + 1];
+            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            try {
+                tmp[tmp.length - 1] = new File(ext.toURI()).getCanonicalPath();
+                classPath = tmp;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        }
+        try {
+            if (jar != null)  {
+                stage1.addURL(jar.toURI().toURL());
+                String[] tmp = new String[getClassPath().length + 1];
+                System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+                try {
+                    tmp[tmp.length - 1] = jar.getCanonicalPath();
+                    classPath = tmp;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+        stage1.classPath = getClassPath();
+        return stage1;
+    }
+
+    /**
+     * 
+     * @param u
+     */
+    public void doAddURL(URL u) {
+        super.addURL(u);
+    }
+
+    /** @return a custom classpath String [] */
+    public String[] getClassPath() {
+        
+        // very verbose when "info" mode
+//        for (String line : classPath) {
+//            log.debug(line);
+//        }
+        return classPath;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public URL[] getExtUrls() {
+        return extUrls;
+    }
+
+    @Override
+    protected void addURL(URL u) {
+        super.addURL(u);
+    //System.out.println("Adding url "+u);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public File getWorkDir() {
+        return workDir;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean getAllowAssemby() {
+        return allowAssembly;
+    }
+
+    /**
+     * 
+     * @param enable
+     */
+    public void setAllowAssemby(boolean enable) {
+        this.allowAssembly = enable;
+    }
+
+    /**
+     * 
+     * @param reload
+     */
+    public void setReloadSimkit(boolean reload) {
+        this.reloadSimkit = reload;
+    }
+
+    /** Recursively creates new instances of LocalBootLoader */
+    private void initStage1() {
         String classPathProp = System.getProperty("java.class.path");
         String pathSep = System.getProperty("path.separator");
         classPath = classPathProp.split(pathSep);
-        if (false) {
-            for (String line : classPath) {
-                System.out.println("classpath: " + line);
-            }
-        }
         ClassLoader parentClassLoader = getParent();
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
 
-        stage1 = new LocalBootLoader(new URL[]{}, parentClassLoader, workDir);
+        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, workDir);
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -126,12 +253,12 @@ public class LocalBootLoader extends URLClassLoader {
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[]{}, parentClassLoader, workDir);
+                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, workDir);
             } catch (Exception e) { // should probably be class not found exception
                 loop = false;
             }
         }
-        for (String path : classPath) {
+        for (String path : getClassPath()) {
             try {
                 // build up stage1 libs
                 stage1.addURL(new File(path).toURI().toURL());
@@ -139,113 +266,21 @@ public class LocalBootLoader extends URLClassLoader {
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
             }
-            stage1.classPath = classPath;
+            stage1.classPath = getClassPath();
         }
-    }
-
-    public void doAddURL(URL u) {
-        super.addURL(u);
-    }
-
-    public String[] getClassPath() {
-        if (false) {
-            for (String line : classPath) {
-                System.out.println(line);
-            }
-        }
-        return classPath;
-    }
-
-    public URL[] getExtUrls() {
-        return extUrls;
-    }
-
-    @Override
-    protected void addURL(URL u) {
-        super.addURL(u);
-    //System.out.println("Adding url "+u);
-    }
-
-    public File getWorkDir() {
-        return workDir;
-    }
-
-    public boolean getAllowAssemby() {
-        return allowAssembly;
-    }
-
-    public void setAllowAssemby(boolean enable) {
-        this.allowAssembly = enable;
-    }
-
-    public void setReloadSimkit(boolean reload) {
-        this.reloadSimkit = reload;
-    }
-
-    // create a context with viskit's libs along with
-    // the generated eventgraphs, takes two stages
-    // the returned LocalBootLoader can be used
-    // as an isolated context, i.e., where static methods
-    // and variables from one class don't interfere with
-    // one another or between LocalBootLoaders, here
-    // done by setting threads' contextClassLoaders to
-    // their own LocalBootLoaders
-    public LocalBootLoader init(boolean allowAssembly) {
-        this.allowAssembly = allowAssembly;
-        return init();
-    }
-
-    public LocalBootLoader init() {
-        File jar;
-        //System.out.println("Stage1 start init ");
-        initStage1();
-        stage1.allowAssembly = this.allowAssembly;
-        jar = buildCleanWorkJar();
-
-        //stage1 gets dirty during bring up of clean jar
-        //reboot it with cleanWorkJar
-        //System.out.println("Stage1 reinit ");
-        initStage1();
-        //System.out.println("Adding cleaned jar "+jar);
-        for (URL ext : extUrls) {
-            stage1.addURL(ext);
-            String[] tmp = new String[classPath.length + 1];
-            System.arraycopy(classPath, 0, tmp, 0, classPath.length);
-            try {
-                tmp[tmp.length - 1] = new File(ext.toURI()).getCanonicalPath();
-                classPath = tmp;
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (URISyntaxException ex) {
-                ex.printStackTrace();
-            }
-        }
-        try {
-            stage1.addURL(jar.toURI().toURL());
-            String[] tmp = new String[classPath.length + 1];
-            System.arraycopy(classPath, 0, tmp, 0, classPath.length);
-            try {
-                tmp[tmp.length - 1] = jar.getCanonicalPath();
-                classPath = tmp;
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-        }
-        stage1.classPath = classPath;
-        return stage1;
     }
 
     private File buildCleanWorkJar() {
         File newJar = null;
         try {
-            //File currentDir = VGlobals.instance().getWorkDirectory();
             File currentDir = workDir;
-            File newDir = File.createTempFile("viskit", "doe");
+            if (currentDir == null) {return null;}
+            
+            // This will for sure delete the temp "cruf" that we generate
+            File newDir = TempFileManager.createTempFile("viskit", "working");
             newDir.delete();
             newDir.mkdir();
-            newDir.deleteOnExit();
+                        
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
             stage1.addURL(currentDir.toURI().toURL());
@@ -273,8 +308,9 @@ public class LocalBootLoader extends URLClassLoader {
 
         } catch (java.util.zip.ZipException ze) {
             return dir2jar;
-        } // could be first time through
-        catch (IOException ex) {
+            
+        // could be first time through
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return jarOut;

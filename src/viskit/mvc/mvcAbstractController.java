@@ -8,7 +8,7 @@ package viskit.mvc;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 11:30:36 AM
- * @version $Id: mvcAbstractController.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  *
  * From an article at www.jaydeetechnology.co.uk
  */

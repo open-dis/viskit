@@ -12,7 +12,7 @@ import java.util.Vector;
  * @author Mike Bailey
  * @since Mar 18, 2004
  * @since 1:43:07 PM
- * @version $Id: ViskitModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public interface ViskitModel {
     

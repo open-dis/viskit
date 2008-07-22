@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Sep 22, 2005
  * @since 3:25:11 PM
- * @version $Id: EventGraphAssemblyComboMainFrame.java 1669 2007-12-19 20:27:14Z tdnorbra $
+ * @version $Id$
  */
 package viskit;
 
@@ -48,7 +48,11 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.doe.DoeMain;
+
+/* DIFF between OA3302 branch and trunk */
 import viskit.doe.DoeMainFrame;
+/* End DIFF between OA3302 branch and trunk */
+
 import viskit.doe.FileHandler;
 import viskit.doe.JobLauncherTab2;
 
@@ -57,7 +61,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
@@ -212,8 +215,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
         asyRunComponent.setAnalystReportGUI(reportPanel);
-
-        // Design of experiments
+        
+        /* DIFF between OA3302 branch and trunk */
+        
+        // Design of experiments    
         doeMain = DoeMain.main2();
         DoeMainFrame doeFrame = doeMain.getMainFrame();
         runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
@@ -242,31 +247,41 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         doCommonHelp(menuBar);
         runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
 
-        // Now setup the assembly file change listeners
-        ViskitAssemblyController asyCntlr = (ViskitAssemblyController) asyFrame.getController();
+        /* End DIFF between OA3302 branch and trunk */
         
-        asyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
-
-        asyCntlr.addAssemblyFileListener(asyCntlr.getAssemblyChangeListener());
-        asyCntlr.addAssemblyFileListener(asyRunComponent);
-        asyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
-        asyCntlr.addAssemblyFileListener(runGridComponent);
+        // Now setup the assembly file change listener(s)
+        final ViskitAssemblyController assyCntlr = (ViskitAssemblyController) asyFrame.getController();        
+        assyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
+        assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
+        assyCntlr.addAssemblyFileListener(asyRunComponent);
+        
+        /* DIFF between OA3302 branch and trunk */
+        assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
+        /* End DIFF between OA3302 branch and trunk */
+        
+        assyCntlr.addAssemblyFileListener(runGridComponent);
         if (SettingsDialog.isAnalystReportVisible()) {
-            asyCntlr.addAssemblyFileListener(reportPanel);
+            assyCntlr.addAssemblyFileListener(reportPanel);
         }
         
         // Now setup the open-event graph listener(s)
-        ViskitController cntl = (ViskitController) egFrame.getController();
-        cntl.addOpenEventGraphListener(asyCntlr.getOpenEventGraphListener());
-        cntl.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
+        final ViskitController egCntlr = (ViskitController) egFrame.getController();
+        egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
+        
+        /* DIFF between OA3302 branch and trunk */
+        egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
+        /* End DIFF between OA3302 branch and trunk */
         
         // Start the controllers
-        ((ViskitController) egFrame.getController()).begin();
+        runLater(0, new Runnable() {
+            public void run() {
+                egCntlr.begin();
+            }
+        });
 
         runLater(3000, new Runnable() {
-
             public void run() {
-                ((AssemblyController) asyFrame.getController()).begin();
+                assyCntlr.begin();
             }
         });
 
@@ -407,6 +422,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                         break outer;
                     }
                 }
+                
+                /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
                     runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
@@ -414,6 +431,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                         break outer;
                     }
                 }
+                /* End DIFF between OA3302 branch and trunk */
 
                 //todo other preQuits here if needed
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
@@ -424,14 +442,19 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
                     ((AssemblyController) asyFrame.getController()).postQuit();
                 }
+                
+                /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     doeMain.getController().postQuit();
                 }
+                /* End DIFF between OA3302 branch and trunk */
+                
                 //todo other postQuits here if needed
 
                 thisClassCleanup();
                 
                 // TODO: What is setting this true when it's false?
+                // The Viskit Setting Dialog, third tab
                 if (viskit.Vstatics.debug) {
                     System.out.println("in actionPerformed of exit");
                 }
@@ -444,18 +467,17 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     }
 
     private void thisClassCleanup() {
-        // Lot of hoops to pretty-fy the config xml file
-        String uConfig = VGlobals.instance().getUserConfigFile();
+        // Lot of hoops to pretty-fy config xml files
         Document doc;
-        File f = new File(uConfig);
+        Format form = Format.getPrettyFormat();
+        XMLOutputter xout = new XMLOutputter(form);
         try {
-            doc = FileHandler.unmarshallJdom(f);
-            Format form = Format.getPrettyFormat();
-            XMLOutputter xout = new XMLOutputter(form);
-            xout.output(doc, new FileWriter(f));
+            
+            // For c_app.xml
+            doc = FileHandler.unmarshallJdom(ViskitConfig.C_APP_FILE);
+            xout.output(doc, new FileWriter(ViskitConfig.C_APP_FILE));            
         } catch (Exception e) {
-            System.out.println("Bad jdom op: " + e.getMessage());
-            return;
+            Vstatics.log.error("Bad jdom op: " + e.getMessage());
         }
     }
     

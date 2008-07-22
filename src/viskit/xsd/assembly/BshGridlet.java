@@ -43,7 +43,7 @@ import viskit.xsd.cli.Boot;
 
 /**
  * @author Rick Goldberg
- * @version $Id: BshGridlet.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class BshGridlet extends Thread {
     SimkitAssemblyXML2Java sax2j;

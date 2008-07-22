@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Mar 19, 2004
  * @since 2:10:07 PM
- * @version $Id: ViskitElement.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  *  
  * Base class for the objects that get passed around between M, V and C.
  */

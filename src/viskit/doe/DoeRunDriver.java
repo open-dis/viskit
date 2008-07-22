@@ -13,7 +13,7 @@ import java.util.ArrayList;
 /**
  *
  * @author Rick Goldberg
- * @version $Id: DoeRunDriver.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public interface DoeRunDriver {
     

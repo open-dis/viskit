@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -62,7 +63,7 @@ import viskit.doe.LocalBootLoader;
  * @author Rick Goldberg
  * @since Sep 26, 2005
  * @since 3:43:51 PM
- * @version $Id:$
+ * @version $Id$
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
 
@@ -76,6 +77,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     JMenuBar myMenuBar;
     BufferedReader backChan;
     Thread simRunner;
+    SimThreadMonitor swingThreadMonitor;
     PipedOutputStream pos;
     PipedInputStream pis;
     BasicAssembly assembly;
@@ -172,8 +174,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
      * @param parms
      */
     public void initParams(String[] parms) {
-        parms[AssemblyController.EXEC_RUNNER_CLASS_NAME] = "viskit.InternalAssemblyRunner$ExternalSimRunner"; // no longer used
 
+//        for (String s : parms) {
+//            log.info(s);
+//        }
         targetClassName = parms[AssemblyController.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
 
@@ -182,7 +186,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         double defaultStopTime = Double.parseDouble(parms[AssemblyController.EXEC_STOPTIME_SWITCH]);
 
         runPanel.vcrStopTime.setText("" + defaultStopTime);
-        runPanel.vcrSimTime.setText("0"); //Schedule.getSimTimeStr());
+        runPanel.vcrSimTime.setText("0");
         runPanel.vcrVerbose.setSelected(defaultVerbose);
 
         try {
@@ -198,7 +202,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
         // Assembly has been compiled by now
-        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader(true);
+        lastLoaderNoReset = VGlobals.instance().getResetWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
         targetClass = Vstatics.classForName(clName);
         if (targetClass == null) {
@@ -229,10 +233,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         Schedule.clearRerun();
         Schedule.coldReset();
     }
+    
     File tmpFile;
     RandomAccessFile rTmpFile;
-    ClassLoader lastLoader;
-    boolean resetSeeds;
+    boolean resetSeeds = false;
 
     protected void initRun() {
         mutex++;
@@ -242,10 +246,12 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         Runnable assemblyRunnable;
 
         try {
-            resetSeeds = runPanel.resetSeedCB.isSelected();
+            
+            /* DIFF between OA3302 branch and trunk */
+//            resetSeeds = runPanel.resetSeedCB.isSelected();
+            /* End DIFF between OA3302 branch and trunk */
             try {
-                tmpFile = File.createTempFile("viskit", "out.txt");
-                tmpFile.deleteOnExit();
+                tmpFile = TempFileManager.createTempFile("viskit", "out.txt");
                 tmpFile.setReadable(true);
                 tmpFile.setWritable(true);
                 rTmpFile = new RandomAccessFile(tmpFile, "rws");
@@ -270,20 +276,33 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 System.err.println("Can't write to tmp space: " + ioe.getMessage());
                 ioe.printStackTrace();
             }
-            if (!resetSeeds) {
-                if (seeds.size() > 0) {
-                    // start with last cached seed
-                    seed = seeds.get(seeds.size() - 1);
-                }
-            } else {
-                seeds.clear();
-            }
+            
+            /* DIFF between OA3302 branch and trunk */
+//            if (!resetSeeds) {
+//                if (seeds.size() > 0) {
+//                    // start with last cached seed
+//                    seed = seeds.get(seeds.size() - 1);
+//                }
+//            } else {
+//                seeds.clear();
+//            }
+            /* End DIFF between OA3302 branch and trunk */
 
-            loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader(true); // true->reboot
+            loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
-            loader = new LocalBootLoader(loader.getExtUrls(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
+            
+            // TODO: Right here, this new LocalBootLoader is NOT getting the External URLs (extra classpaths) Bug 1237
+//            loader = new LocalBootLoader(loader.getExtUrls(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
+            
+            // Forcing the extra classpaths here bug fix 1237
+            loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());            
             loader = loader.init(true);
             Thread.currentThread().setContextClassLoader(loader);
+            
+            // Test for Bug 1237
+//            for (String s : loader.getClassPath()) {
+//                log.info(s);
+//            }
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
@@ -305,13 +324,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Class<?> RNClass = loader.loadClass("simkit.random.RandomNumber");
             Method setSeed = RNClass.getMethod("setSeed", long.class);
             
-            setSeed.invoke(rn, seed);            
+            setSeed.invoke(rn, seed);
+            
+            // This OutStream is to be set for the JScrollPane output of the Assy Rnr
             setOutputStream.invoke(assemblyObj, fos);
             setNumberReplications.invoke(assemblyObj, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
             setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyObj, runPanel.printRepReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyObj, runPanel.printSummReportsCB.isSelected());
+            
+            /* DIFF between OA3302 branch and trunk */
             setEnableAnalystReports.invoke(assemblyObj, runPanel.analystReportCB.isSelected());
+            /* End DIFF between OA3302 branch and trunk */
+            
             setStopTime.invoke(assemblyObj, getStopTime());
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
             setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
@@ -319,9 +344,12 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
             assemblyRunnable = (Runnable) assemblyObj;              
             
+            // This allows the Assy Rnr's text output to be collected in a text file
             runPanel.wakeUpTextUpdater(fis);
+            
+            // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
-            (new SimThreadMonitor(simRunner)).start();
+            new SimThreadMonitor(simRunner).start();
             simRunner.join();
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
@@ -354,7 +382,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         @Override
         public void run() {
-            System.out.println("Inside IAR run");
             waitOn.start();
             try {
                 waitOn.join();
@@ -400,7 +427,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                     } catch (Exception e) {
                         coldReset.invoke(null);
                     }
-                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
                 } catch (IllegalArgumentException ex) {
@@ -416,7 +443,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 }
             } else {
                 Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-                assembly.setStopRun(true);
                 Schedule.getDefaultEventList().clearRerun();
             }
             mutex--;
@@ -427,7 +453,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
      * get the value of the RunnerPanel2 text field. This number
      * starts counting at 0, the method will return -1 for blank
      * or non-integer value.
-     * @return 
+     * @return the replication instance to output verbose on
      */
     public int getVerboseReplicationNumber() {
         int ret = -1;
@@ -459,8 +485,23 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     class stopListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            Method setStopRun;
+            try {
+                setStopRun = targetClass.getMethod("setStopRun", boolean.class);
+                setStopRun.invoke(assemblyObj, true);
+            } catch (SecurityException ex) {
+                ex.printStackTrace();
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
+            } catch (InvocationTargetException ex) {
+                ex.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
+            }
+                    
             twiddleButtons(InternalAssemblyRunner.STOP);
-            assembly.stop();
             runPanel.fileChaser.stop();
         }
     }
@@ -473,7 +514,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     }
 
     /**
-     * 
+     * TODO: not sure this is required.  setVerbose gets set in initRun()
      */
     class verboseListener implements ActionListener {
 
@@ -489,19 +530,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(System.getProperty("user.dir"));
+                saveChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
             }
             File fil = getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
-            int retv = saveChooser.showSaveDialog(null); //InternalAssemblyRunner.this);
+            int retv = saveChooser.showSaveDialog(null);
             if (retv != JFileChooser.APPROVE_OPTION) {
                 return;
             }
 
             fil = saveChooser.getSelectedFile();
             if (fil.exists()) {
-                int r = JOptionPane.showConfirmDialog(null/*InternalAssemblyRunner.this*/, "File exists.  Overwrite?", "Confirm",
+                int r = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (r != JOptionPane.YES_OPTION) {
                     return;
@@ -517,7 +558,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 bw.flush();
                 bw.close();
             } catch (IOException e1) {
-                JOptionPane.showMessageDialog(null/*InternalAssemblyRunner.this*/, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

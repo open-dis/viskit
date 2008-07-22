@@ -43,7 +43,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
-import org.apache.log4j.Logger;
 
 /**
  * Naval Postgraduate School, Monterey, CA
@@ -51,11 +50,10 @@ import org.apache.log4j.Logger;
  * @author Mike Bailey
  * @since Jul 20, 2005
  * @since 4:13:25 PM
- * @version $Id: ParamTableModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class ParamTableModel extends DefaultTableModel implements TableModelListener {
 
-    static Logger log = Logger.getLogger(ParamTableModel.class);
     public static final int NUM_COLS = 6;
     public static String[] columnNames = {
         "SimEntity/Parameter name",
@@ -110,7 +108,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
 
     public void tableChanged(TableModelEvent e) {
         if (viskit.Vstatics.debug) {
-            System.out.println("Sending param locally editted from ParamTableModel");
+            System.out.println("Sending paramlocally editted from ParamTableModel");
         }
         OpenAssembly.inst().doParamLocallyEditted(dummyListener);
     }
@@ -120,17 +118,10 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         typ = (typ == null ? "" : typ);
 
         String nm = tp.getName();
-        if (nm.isEmpty()) {
+        if (nm.length() <= 0) {
             System.err.println("Terminal param w/out name ref!");
         }
-        // TODO: This is here for T/S a MultiParameter "name" attribute
-        // error being thrown
-//        for (String key : termHashMap.keySet()) {
-//            log.info("key is: " + key);
-//        }
-//        for (Integer i : termHashMap.values()) {
-//            log.info("value is: " + i);
-//        }
+
         int row = termHashMap.get(nm).intValue();
 
         String val = tp.getValue();

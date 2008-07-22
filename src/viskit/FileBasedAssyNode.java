@@ -10,7 +10,7 @@ import java.io.File;
  * @author Mike Bailey
  * @since Jul 21, 2004
  * @since 3:26:42 PM
- * @version $Id: FileBasedAssyNode.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class FileBasedAssyNode {
 

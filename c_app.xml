@@ -1,13 +1,41 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- values in this file are retrieved by keys such as 'app.beanshell.warning' --><!-- the root element name is ignored when assembling keys --><ViskitConfig>
-  <app>
-    <beanshell>
-      <warning>true</warning>
-    </beanshell>
-    <EventGraphEditor>
-      <FrameBounds h="0" w="0" x="0" y="0"/>
-    </EventGraphEditor>
-    <AssemblyEditor>
-      <FrameBounds h="600" w="800" x="400" y="212"/>
-    </AssemblyEditor>
-  </app>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- values in this file are retrieved by keys such as 'app.beanshell.warning' -->
+<!-- the root element name is ignored when assembling keys -->
+<ViskitConfig>
+    <app>
+	<beanshell>
+	    <warning>true</warning>
+	</beanshell>
+	<EventGraphEditor>
+	    <FrameBounds h="0" w="0" x="0" y="0" />
+	</EventGraphEditor>
+	<AssemblyEditor>
+	    <FrameBounds h="600" w="800" x="400" y="212" />
+	</AssemblyEditor>
+	<projecthome>
+	    <path dir="" />
+	</projecthome>
+	<tabs>
+	    <EventGraphEditor visible="true"/>
+	    <AssemblyEditor visible="true"/>
+	    <AssemblyRun visible="true"/>
+	    <AnalystReport visible="false"/>
+	</tabs>
+    </app>
+    <history>
+	<EventGraphEditor>
+	    <Recent>
+	    </Recent>
+	</EventGraphEditor>
+	<AssemblyEditor>
+	    <Recent>
+	    </Recent>
+	</AssemblyEditor>
+	<Cluster>
+	    <Account last="true"  server="wipeout.hpr.nps.edu" port="4444" username="" password=""/>
+	</Cluster>
+    </history>
+    <extraClassPath>      
+      <!-- Manually added EventGraph directories, java classes, jar or zip files if desired -->
+    </extraClassPath>
 </ViskitConfig>

@@ -11,18 +11,18 @@
  * Compiler:     JDK1.6
  * O/S:          Windows XP Home Ed. (SP2)
  *
- * Description:  Set of utility methods for cacheing a List<String> of 
+ * Description:  Set of utility methods for cacheing a List<String> of
  *               EventGraph paths
  *
- * References:   
+ * References:
  *
- * URL:          
+ * URL:
  *
- * Requirements: 1) 
+ * Requirements: 1)
  *
- * Assumptions:  1) 
+ * Assumptions:  1)
  *
- * TODO:         
+ * TODO:
  *
  * Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
  *
@@ -61,6 +61,7 @@ package viskit;
 import java.io.File;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,35 +73,41 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * Set of utility methods for cacheing a List<String> of EventGraph paths
- * @version $Id:$
- * <p>
+ * Set of utility methods for caching a List<File> of EventGraph paths
+ * @version $Id$
+ * <p>cacheing
  *   <b>History:</b>
  *   <pre><b>
  *     Date:     17 DEC 2007
  *     Time:     0108Z
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
- * 
+ *
+ *     Date:     24 JUN 2008
+ *     Time:     1832Z
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
+ *     Comments: 1) Twas bad using Strings to hold file/directory path info. Now
+ *                  using File and URL objects to better deal with whitespace in
+ *                  a directory/file path name *
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
 
-    /** The jdom.Document object of the assembly file */    
+    /** The jdom.Document object of the assembly file */
     private static Document assemblyDocument;
-    
+
     /**
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
     private static LinkedList<String> eventGraphNames  = new LinkedList<String>();
-    private static LinkedList<String> eventGraphFiles  = new LinkedList<String>();
+    private static LinkedList<File> eventGraphFiles  = new LinkedList<File>();
     private static LinkedList<String> eventGraphImagePaths = new LinkedList<String>();
-    
+
     static Logger log = Logger.getLogger(EventGraphCache.class);
-    
+
     /**
      * Creates the entity table for this analyst xml object
      *
@@ -143,18 +150,22 @@ public class EventGraphCache {
         }
         return entityTable;
     }
-    
+
     /**
      * Loads an XML document file for processing
      *
-     * @param xmlFile the location of the file to load as a Document
+     * @param xmlFileName the location of the file to load as a Document
      * @return the document object of the loaded XML
      */
-    public static Document loadXML(String xmlFile) {
+    public static Document loadXML(String xmlFileName) {
+        return loadXML(new File(xmlFileName));
+    }
+
+    public static Document loadXML(File xmlFile) {
         Document doc = null;
         try {
             SAXBuilder builder = new SAXBuilder();
-            doc = builder.build(new File(xmlFile));
+            doc = builder.build(xmlFile);
         } catch (JDOMException ex) {
             log.error(ex);
         } catch (IOException ex) {
@@ -162,18 +173,18 @@ public class EventGraphCache {
         }
         return doc;
     }
-    
+
     /**
      * Processes the 'type' value from a Viskit assembly, if it is an xml file, and
      * adds it to the list of event graphs with the proper formatting of the file's
      * path
      *
-     * @param fileType the type of XML file being used that includes a package 
+     * @param fileType the type of XML file being used that includes a package
      * name
      */
     private static void saveEventGraphReferences(String fileType) {
         log.debug("Parameter fileType: " + fileType);
-        
+
         // find the package seperator
         char letter;
         int idx = 0;
@@ -184,65 +195,67 @@ public class EventGraphCache {
                 idx = i;
             }
         }
-        
+
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
-        
+
         String eventGraphImageDir = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
-        
+
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
         log.debug("Event Graph Name: " + eventGraphName);
-        
-        String eventGraphDir = "";
+
         String eventGraphPath = "";
-        
+        File eventGraphDir = null;
+
+        // Why does this only process the last one?? -AB
         // Locate the URL of the event graph directory
         // TODO: resolve case when several classpaths are registered
         for (URL eventGraphURL : SettingsDialog.getExtraClassPathArraytoURLArray()) {
-            eventGraphPath = eventGraphURL.toString();
-            
-            // Don't care about jar files here
-            if (eventGraphPath.contains("jar")) {continue;}
-            log.debug("Event Graph Path: " + eventGraphPath);
-            eventGraphDir = eventGraphPath + fileTypePackageToPath;
+            try {
+                eventGraphPath = eventGraphURL.toString();
+
+                // Don't care about jar files here
+                if (eventGraphPath.contains("jar")) {
+                    continue;
+                }
+                log.debug("EventGraph Path: " + eventGraphPath);
+                eventGraphDir = new File(eventGraphURL.toURI().getPath());
+                eventGraphDir = new File(eventGraphDir, fileTypePackageToPath);
+                log.debug("EventGraph dir: " + eventGraphDir);
+            } catch (URISyntaxException ex) {
+                log.error(ex);
+            }
         }
-        
-        eventGraphDir = eventGraphDir.replaceAll("\\\\", "/");
-        
-        /* This is now a URL, so, we need to strip out the "file:/" header so 
-         * that the SAXBuilder won't append the base directory to the URL 
-         * causing a fnfe
-         */
-        eventGraphDir = eventGraphDir.replaceFirst("file:/", "");
+
         log.debug("Event Graph Directory: " + eventGraphDir);
-        
-        String eventGraphFile = eventGraphDir + eventGraphName + ".xml";
+
+        File eventGraphFile = new File(eventGraphDir, eventGraphName + ".xml");
         log.debug("Event Graph File: " + eventGraphFile);
-        
+
         String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
         log.debug("Event Graph Image location: " + imgFile);
-                
-        if (!eventGraphFiles.contains(eventGraphFile)) {            
-            eventGraphNames.add(fileType);
-            eventGraphFiles.add(eventGraphFile);
-            eventGraphImagePaths.add(imgFile);
-        }
+
+        // These get cleared when makeEntityTable gets called, so they start fresh
+        eventGraphNames.add(fileType);
+        eventGraphFiles.add(eventGraphFile);
+        log.debug("Event Graph added to cache: " + eventGraphFile);
+        eventGraphImagePaths.add(imgFile);
     }
-    
+
     /** @param pDoc the JDOM Document to set */
     public static void setAssemblyDocument(Document pDoc) {
         assemblyDocument = pDoc;
     }
-    
+
     /** @return a JDOM document (Assembly XML file) */
     public static Document getAssemblyDocument() {return assemblyDocument;}
-    
+
     public static LinkedList<String> getEventGraphNames() {return eventGraphNames;}
-    public static LinkedList<String> getEventGraphFiles() {return eventGraphFiles;}
+    public static LinkedList<File> getEventGraphFiles() {return new LinkedList<File>(eventGraphFiles);}
     public static LinkedList<String> getEventGraphImagePaths() {return eventGraphImagePaths;}
-    
-    public static void setEventGraphNames(LinkedList<String> pEGNames) {eventGraphNames = pEGNames;}
-    public static void setEventGraphFiles(LinkedList<String> pEGFiles) {eventGraphFiles = pEGFiles;}
-    public static void setEventGraphImagePaths(LinkedList<String> pEGImagePaths) {eventGraphImagePaths = pEGImagePaths;}
-    
+
+//    public static void setEventGraphNames(LinkedList<String> pEGNames) {eventGraphNames = pEGNames;}
+//    public static void setEventGraphFiles(LinkedList<String> pEGFiles) {eventGraphFiles = pEGFiles;}
+//    public static void setEventGraphImagePaths(LinkedList<String> pEGImagePaths) {eventGraphImagePaths = pEGImagePaths;}
+
 } // end class file EventGraphCache.java

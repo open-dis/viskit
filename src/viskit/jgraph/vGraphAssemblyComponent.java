@@ -39,7 +39,7 @@ import viskit.model.*;
  * @author Mike Bailey
  * @since Feb 19, 2004
  * @since 2:54:31 PM
- * @version $Id: vGraphAssemblyComponent.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  */
 public class vGraphAssemblyComponent extends JGraph implements GraphModelListener /**********************************************/
 {

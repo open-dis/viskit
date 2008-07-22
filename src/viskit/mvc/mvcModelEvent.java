@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 11:01:04 AM
- * @version $Id: mvcModelEvent.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 
 /**

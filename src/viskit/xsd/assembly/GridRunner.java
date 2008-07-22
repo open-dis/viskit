@@ -6,6 +6,7 @@
  */
 package viskit.xsd.assembly;
 
+import edu.nps.util.TempFileManager;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,7 +63,7 @@ import viskit.xsd.bindings.assembly.*;
  * TBD and will refactor the handler-handler later.
  *
  * @author Rick Goldberg
- * @version $Id: GridRunner.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
@@ -770,10 +771,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 // give it unique name
                 experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
             } else {
-                File tempDir = File.createTempFile("viskit","exp");
+                File tempDir = TempFileManager.createTempFile("viskit","exp");
                 tempDir.delete();
                 tempDir.mkdir();
-                tempDir.deleteOnExit();
                 experimentFile = File.createTempFile(root.getName()+"Exp",".xml",tempDir);
             }            
         } catch (Exception e) {

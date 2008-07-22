@@ -83,6 +83,8 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
     /**
      *  Provide delegation constructor
      *
+     * @param parent
+     * @param directoryRoot 
      */
     public SimpleDirectoryClassLoader(ClassLoader parent, File directoryRoot) {
         super(parent);
@@ -92,6 +94,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
     /**
      *  Same old ClassLoader constructor
      *
+     * @param directoryRoot 
      */
     public SimpleDirectoryClassLoader(File directoryRoot) {
         super();
@@ -186,6 +189,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
      *
      *  @param name the resource name
      *  @return Enumeration of one URL
+     * @throws IOException 
      */
     @Override
     protected Enumeration<URL> findResources(final String name) throws IOException {
@@ -216,6 +220,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
     /**
      *  Minimal package definition
      *
+     * @param className 
      */
     private void definePackage(String className) {
         // Extract the package name from the class name,

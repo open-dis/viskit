@@ -10,10 +10,9 @@ import java.util.Vector;
  * @author Mike Bailey
  * @since Mar 19, 2004
  * @since 9:00:57 AM
- * @version $Id: ViskitController.java 1670 2007-12-20 00:23:36Z tdnorbra $
+ * @version $Id$
  */
-public interface ViskitController
-{
+public interface ViskitController {
   /* start app */
   void begin();
 

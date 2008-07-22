@@ -23,7 +23,7 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
  * This class creates chart objects using the JFreeChart package
  *
  * @author Patrick Sullivan
- * @version $Id: HistogramChartDrawer.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  * @since August 3, 2006, 10:21 AM
  */
 public class HistogramChartDrawer {

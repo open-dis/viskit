@@ -124,9 +124,7 @@ public class Splash2 extends JFrame {
     }
 
     public static void main(String[] args) {
-        if (viskit.Vstatics.debug) {
-            System.out.println(System.getProperty("user.dir"));
-        }
+        
         if (viskit.Vstatics.debug) {
             System.out.println(System.getProperty("java.class.path"));
         }
@@ -151,11 +149,11 @@ public class Splash2 extends JFrame {
             Thread.sleep(2000);
         } catch (Exception e) {
         }  // this is used to give us some min splash viewing
-        progressBar.setString("Importing Event Graphs...");
+        progressBar.setString("Starting Viskit...");
         try {
             // Call the main() method of the application using reflection
-            Object[] arguments = new Object[]{newArgs};
-            Class[] parameterTypes = new Class[]{newArgs.getClass()};
+            Object[] arguments = new Object[] {newArgs};
+            Class[] parameterTypes = new Class[] {newArgs.getClass()};
 
             Class<?> mainClass = Class.forName(target);
 
@@ -171,12 +169,12 @@ public class Splash2 extends JFrame {
     static public class DefaultEntry {
 
         public static void main(String[] args) {
-            Splash2.main(new String[]{"viskit.EventGraphAssemblyComboMain"});
+            Splash2.main(new String[] {"viskit.EventGraphAssemblyComboMain"});
         }
     }
 
     /** Deprecated, please use viskit.EventGraphAssemblyComboMain 
-     * @deprecated since DEC 2007
+     * @deprecated since DEC 2007.
      */
     static public class DefaultEntryOrig {
 

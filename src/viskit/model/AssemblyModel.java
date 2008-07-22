@@ -13,10 +13,10 @@ import java.util.*;
 import java.util.List;
 
 import edu.nps.util.FileIO;
+import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
-import viskit.VGlobals;
 import viskit.ViskitAssemblyController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.xsd.bindings.assembly.*;
@@ -29,7 +29,7 @@ import viskit.xsd.bindings.assembly.*;
  * @author Mike Bailey
  * @since May 17, 2004
  * @since 9:16:44 AM
- * @version $Id: AssemblyModel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyModel {
     
@@ -81,8 +81,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         File tmpF = null;
         try {
-            tmpF = File.createTempFile("tmpAsymarshal", ".xml");
-            tmpF.deleteOnExit();
+            tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage(),
@@ -126,7 +125,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             currentFile = f;
         } catch (JAXBException e) {
             JOptionPane.showMessageDialog(null, "Exception on JAXB marshalling" +
-                    "\n" + f.getName() +
+                    "\n" + f +
                     "\n" + e.getMessage() +
                     "\n(check for blank data fields)",
                     "XML I/O Error", JOptionPane.ERROR_MESSAGE);
@@ -710,29 +709,19 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     public boolean newModel(File f) {
+        getNodeCache().clear();
+        assEdgeCache.clear();
+        pointLess = new Point(100, 100);
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
         
-        GraphMetaData mymetaData = null;
         if (f == null) {
-
-            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph    
-
-            VGlobals.instance().assemblyReset();
-            getNodeCache().clear();
-            assEdgeCache.clear();
-            pointLess = new Point(100, 100);
-            mymetaData = new GraphMetaData(this); //todo need new object?
-            mymetaData.name = "Assembly_name"; // override
-            this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
+            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } else {
             try {
-                mymetaData = new GraphMetaData(this);
                 Unmarshaller u = jc.createUnmarshaller();
-                // u.setValidating(true); can't do this, the unmarshaller needs to have this capability..
-                // see u.isValidating()
-                // Unmarshaller does NOT validate by default
                 jaxbRoot = (SimkitAssembly) u.unmarshal(f);
-                pointLess = new Point(100, 100);
-                //  mymetaData.author = jaxbRoot.getAuthor();
+                
+                GraphMetaData mymetaData = new GraphMetaData(this);
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();
@@ -746,17 +735,12 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
 
-                VGlobals.instance().assemblyReset();
-                getNodeCache().clear();
-                assEdgeCache.clear();
-                this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New model loaded from file"));
+                changeMetaData(mymetaData);
                 buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
-
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
-
             } catch (JAXBException e) {
                 // want a clear way to know if they're trying to load an event graph
                 try {
@@ -783,9 +767,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                 return false;
             }
         }
-        metaData = mymetaData;
+        
         currentFile = f;
-        modelDirty = false;
+        setDirty(false);
         return true;
     }
 

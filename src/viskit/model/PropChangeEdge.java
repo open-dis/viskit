@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Mar 8, 2004
  * @since 9:04:09 AM
- * @version $Id: PropChangeEdge.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class PropChangeEdge extends AssemblyEdge {
 

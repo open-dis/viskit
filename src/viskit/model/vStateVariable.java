@@ -8,7 +8,7 @@ import viskit.VGlobals;
  * includes its name, type, initial value, and current value.
  *
  * @author DMcG
- * @version $Id: vStateVariable.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class vStateVariable extends ViskitElement {
 

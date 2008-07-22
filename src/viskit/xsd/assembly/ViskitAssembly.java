@@ -13,7 +13,7 @@ import static edu.nps.util.GenericConversion.toArray;
  * reference a known SimEntity within a constructor. This class 
  * provides hooks into the BasicAssembly and enables named references
  * to instances within the design tool. 
- * @version $Id: ViskitAssembly.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  * @author Rick Goldberg
  * @since September 25, 2005, 1:44 PM
  */

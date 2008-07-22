@@ -12,7 +12,7 @@ import java.util.List;
  * @author Mike Bailey
  * @since Jun 8, 2004
  * @since 8:33:17 AM
- * @version $Id: ConstructorPanel.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class ConstructorPanel extends JPanel {
 
@@ -80,7 +80,7 @@ public class ConstructorPanel extends JPanel {
     public void setSelected(boolean tf) {
         if (olp != null) {
             olp.setEnabled(tf);
-        }  // todo...make this work  maybe olp should be built in constructor
+        }  // todo...make this work maybe olp should be built in constructor
     }
 
     /**

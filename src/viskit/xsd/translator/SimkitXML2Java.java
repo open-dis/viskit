@@ -3,8 +3,6 @@ package viskit.xsd.translator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -24,11 +22,12 @@ import javax.xml.bind.Unmarshaller;
 // Application specific imports
 import viskit.xsd.bindings.eventgraph.*;
 import org.apache.log4j.Logger;
+import viskit.AssemblyController;
 
 /**
  * @author Rick Goldberg
  * @since March 23, 2004, 4:59 PM
- * @version $Id: SimkitXML2Java.java 1669 2007-12-19 20:27:14Z tdnorbra $
+ * @version $Id$
  */
 public class SimkitXML2Java {
 
@@ -995,19 +994,6 @@ public class SimkitXML2Java {
         return subset;
     }
 
-    boolean compileCode(String fileName) {
-        fileName = fileName.replaceAll("\\\\", "/");
-        log.info("compiling: " + fileName);
-        String path = fileName.substring(0, fileName.lastIndexOf("/"));        
-        return (com.sun.tools.javac.Main.compile(
-            new String[] {
-            "-Xlint:unchecked", 
-            "-Xlint:deprecation",
-            "-sourcepath", 
-            path,
-            fileName}) == 0);
-    }
-
     // bug fix 1183
     private String indexFrom(StateTransition st) {
         return st.getIndex();
@@ -1070,7 +1056,6 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        String newFilePath = xmlFile.substring(0, xmlFile.lastIndexOf("/"));
         log.info("Event Graph (EG) file is: " + xmlFile);
         log.info("Generating Java Source...");
         
@@ -1089,19 +1074,8 @@ public class SimkitXML2Java {
         // also write out the .java to a file and compile it
         // to a .class
         log.info("Generating Java Bytecode...");
-        try {
-            File fileName = new File(newFilePath + "/" + sx2j.getFileBaseName() + ".java");
-            fileName.getParentFile().mkdir();
-            FileOutputStream fout = new FileOutputStream(fileName);
-            PrintStream ps = new PrintStream(fout, true);
-            sx2j.writeOut(dotJava, ps);
-            if (!sx2j.compileCode(fileName.getAbsolutePath())) {
-                sx2j.error("Compile error " + fileName);
-            } else {
-                log.info("Done.");
-            }
-        } catch (IOException ioe) {
-            log.error(ioe);
+        if(AssemblyController.compileJavaClassFromString(dotJava) != null) {
+           log.info("Done.");   
         }
     }
 }

@@ -2,15 +2,17 @@ package viskit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.*;
 import javax.help.HelpBroker;
 import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 /**
- * @version $Id: Help.java 1665 2007-12-16 21:51:23Z tdnorbra $
+ * @version $Id$
  * @author  ahbuss
  */
 public class Help {
@@ -23,31 +25,53 @@ public class Help {
     private Component parent;
     private Icon icon;
     
-    private static final String CR = System.getProperty("line.separator");
+    private JEditorPane aboutEGEditorPane;
+    private JEditorPane aboutAssemblyEditorPane;
     
-    public static final String ABOUT_EG_STRING =
-        "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR + CR;
+    public static final String CR = "<br>";
+    
+    public static final String ABOUT_EG_STRING = 
+        "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR  +
+        VERSION.getLastModified() + CR + CR;
     
     public static final String ABOUT_ASSEMBLY_STRING =
-        "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR + CR ;
+        "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR +
+        VERSION.getLastModified() + CR + CR ;
 
+    public static final String SIMKIT_URL = "http://diana.nps.edu/Simkit/";
+    public static final String VISKIT_URL = "http://diana.nps.edu/Viskit/";
+    public static final String BUGZILLA_URL = "https://diana.nps.edu/bugzilla/";
     
     public static final String DEVELOPERS =         
-        "(c) 2004-2007 under the Lesser GNU License" +CR +CR +
-        "Developers:" + CR +
-        "  Arnold Buss" + CR +
-        "  Mike Bailey" + CR +
-        "  Rick Goldberg" + CR +
-        "  Don McGregor" + CR +
-        "  Don Brutzman" + CR +
-        "  Patrick Sullivan" + CR +
-        "  Terry Norbraten";
+        "(c) 2004-2008 under the Lesser GNU License" +CR +CR +
+        "<b>Developers:</b>" + CR +
+        "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR +
+        "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR +
+        "&nbsp;&nbsp;&nbsp;Rick Goldberg" + CR +
+        "&nbsp;&nbsp;&nbsp;Don McGregor" + CR +
+        "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR +
+        "&nbsp;&nbsp;&nbsp;Patrick Sullivan" + CR +
+        "&nbsp;&nbsp;&nbsp;Terry Norbraten";
 
-    public static final String SIMKITPAGE =
+    public static final String SIMKIT_PAGE =
         CR +
         "Visit the Simkit home page at" + CR +
-        "  http://diana.nps.edu/Simkit/"+CR;
+        LinkURLString(SIMKIT_URL) + CR;
+    
+    public static final String VISKIT_PAGE = CR +
+            "Visit the Viskit home page at" + CR +
+            LinkURLString(VISKIT_URL);
+    
+    public static final String VERSIONS =
+            "<hr>Simkit Version: " +
+            simkit.Version.getVersion() +
+            CR + "Java version: " + 
+            System.getProperty("java.version");
 
+    public static final String BUGZILLA_PAGE = CR +
+            "Please register for the Viskit Issue tracker:" + CR +
+            LinkURLString(BUGZILLA_URL);
+    
     private static HelpBroker hb;
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
     private static Component      tutorialComponent;
@@ -80,17 +104,36 @@ public class Help {
                 "viskit/images/ViskitLogo.png"
             )
         );
+        aboutEGEditorPane = new JEditorPane();
+
+        aboutEGEditorPane.addHyperlinkListener(
+                new BrowserLauncher());
+        aboutEGEditorPane.setContentType("text/html");
+        aboutEGEditorPane.setEditable(false);
+        aboutEGEditorPane.setText(ABOUT_EG_STRING +
+            DEVELOPERS + CR + VISKIT_PAGE  + BUGZILLA_PAGE + 
+             SIMKIT_PAGE + VERSIONS);
+        
+        aboutAssemblyEditorPane = new JEditorPane();
+
+        aboutAssemblyEditorPane.addHyperlinkListener(
+                new BrowserLauncher());
+        aboutAssemblyEditorPane.setContentType("text/html");
+        aboutAssemblyEditorPane.setEditable(false);
+        aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY_STRING +
+            DEVELOPERS + CR + VISKIT_PAGE  + BUGZILLA_PAGE + 
+             SIMKIT_PAGE);
     }
     
     public void aboutEventGraphEditor() {
-        JOptionPane.showMessageDialog(parent, ABOUT_EG_STRING +
-            DEVELOPERS + CR + SIMKITPAGE, "About Viskit Event Graph Editor...",
+        JOptionPane.showMessageDialog(parent, aboutEGEditorPane, 
+                "About Viskit Event Graph Editor...",
             JOptionPane.OK_OPTION, icon);
     }
     
     public void aboutAssemblyEditor() {
-        JOptionPane.showMessageDialog(parent, ABOUT_ASSEMBLY_STRING +
-            DEVELOPERS + CR + SIMKITPAGE, "About Viskit Event Graph Editor...",
+        JOptionPane.showMessageDialog(parent, aboutAssemblyEditorPane,
+                "About Viskit Event Graph Editor...",
             JOptionPane.OK_OPTION, icon);
     }
 
@@ -129,4 +172,18 @@ public class Help {
     hb.setLocation(p);
   }
 
+  public static String LinkURLString(String urlString) {
+        String linkString = "";
+        try {
+            URL url = new URL(urlString);
+            linkString = "<a href = " + url +
+                    ">" + url + "<a>";
+
+        } catch (MalformedURLException ex) {
+
+        }
+        return linkString;
+
+    }
+  
 }

@@ -17,9 +17,9 @@
  * (TBD later retrieval post session).
  * Sessions may timeout due to inactivity (TBD).
  */
-
 package viskit.xsd.assembly;
 
+import org.apache.commons.codec.binary.Base64;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFile;
 import viskit.xsd.bindings.assembly.User;
@@ -37,10 +37,9 @@ import java.io.FileOutputStream;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.lang.CharSet;
 
 /**
- *
+ * @version $Id$
  * @author Rick Goldberg
  */
 public class SessionManager /* compliments DoeSessionDriver*/ {
@@ -89,7 +88,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
                 decipher.init(Cipher.DECRYPT_MODE,key,paramSpec);
                 // Decode base64 to get bytes
-                byte[] dec = new org.apache.commons.codec.binary.Base64().decodeBase64(passcrypt.getBytes("UTF-8"));
+                byte[] dec = Base64.decodeBase64(passcrypt.getBytes("UTF-8"));
                 // Decrypt
                 byte[] utf8 = decipher.doFinal(dec);
                 // Decode using utf-8, the uid is encrypted with the password
@@ -119,7 +118,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     
     public Boolean logout(String ssid) {
         if (sessions.containsKey(ssid)) {
-            String[] session = (((String) sessions.get(ssid)).trim()).split("\\s+");
+            String[] session = sessions.get(ssid).trim().split("\\s+");
             long startTime = Long.parseLong(session[session.length - 1]);
             long endTime = new java.util.Date().getTime();
             sessions.remove(ssid);
@@ -134,6 +133,9 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
      * uid encrypted with uid. To bootstrap a password file,
      * addUser will check if file exists, enabling if it doesn't
      * without a valid usid, once.
+     * @param usid
+     * @param newUser
+     * @return 
      */
     
     public Boolean addUser(String usid, String newUser) {
@@ -319,17 +321,21 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     }
     
     boolean isAdmin(String usid) {
-        if (getUser(usid).equals("admin")) return true;
+        if (getUser(usid).equals("admin")) {
+            return true;
+        }
         
         File f = new File(PASSWD);
-        if(!f.exists()) return true; // init passwd with addUser for admin
+        if(!f.exists()) {
+            return true; // init passwd with addUser for admin
+        } // init passwd with addUser for admin
         
         return false;
     }
     
     private String getUser(String usid) {
         if ( sessions.containsKey(usid) ) {
-            String[] session = ((String)sessions.get(usid)).trim().split("\\s+");
+            String[] session = sessions.get(usid).trim().split("\\s+");
             return session[0];
         }
         return "nobody";

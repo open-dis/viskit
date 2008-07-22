@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @author Mike Bailey
  * @since Apr 1, 2004
  * @since 3:57:26 PM
- * @version $Id: EventArgument.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class EventArgument extends ViskitElement {
 

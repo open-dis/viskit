@@ -5,6 +5,7 @@
  */
 package viskit.xsd.cli;
 
+import edu.nps.util.TempFileManager;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,7 +22,7 @@ import java.util.StringTokenizer;
 
 /**
  * @author Rick Goldberg
- * @version $Id: Boot.java 1662 2007-12-16 19:44:04Z tdnorbra $
+ * @version $Id$
  */
 public class Boot extends URLClassLoader implements Runnable {
     static Boot bootee;
@@ -147,9 +148,8 @@ public class Boot extends URLClassLoader implements Runnable {
                             System.out.println("Found internal jar externalizing " + name);
                         }
                         File extJar;
-                        extJar = File.createTempFile(name,".jar");
+                        extJar = TempFileManager.createTempFile(name,".jar");
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
-                        extJar.deleteOnExit(); 
                         FileOutputStream fos = new FileOutputStream(extJar);
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         int c = 0;

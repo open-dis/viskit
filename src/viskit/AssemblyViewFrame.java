@@ -40,11 +40,11 @@ import viskit.mvc.mvcModelEvent;
  * @author Mike Bailey
  * @since May 10, 2004
  * @since 2:07:37 PM
- * @version $Id: AssemblyViewFrame.java 1666 2007-12-17 05:24:41Z tdnorbra $
+ * @version $Id$
  */
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener {
     
-    /** log4j logger instance */
+    /** log4j log instance */
     static Logger log = Logger.getLogger(AssemblyViewFrame.class);
     
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
@@ -52,6 +52,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public static final int ADAPTER_MODE = 1;
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
+    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor";
     private JSplitPane jsp;
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
@@ -72,9 +73,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public AssemblyViewFrame(boolean contentOnly, AssemblyModel model, AssemblyController controller) {
-        super("Viskit -- Simkit Assembly Editor");
+        super(FRAME_DEFAULT_TITLE);
         initMVC(model, controller);   // set up mvc linkages
-        initUI(contentOnly);            // build widgets
+        initUI(contentOnly);          // build widgets
 
         if (!contentOnly) {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -129,16 +130,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private void initUI(boolean contentOnly) {
         buildMenus(contentOnly);
         buildToolbar(contentOnly);
-        //buildVCRToolbar();
 
         // Set up a assemblyEditorContent level pane that will be the content pane. This
-    // has a border layout, and contains the toolbar on the assemblyEditorContent and
-    // the main splitpane underneath.
+        // has a border layout, and contains the toolbar on the assemblyEditorContent and
+        // the main splitpane underneath.
 
         // assemblyEditorContent level panel
         assemblyEditorContent = new JPanel();
         assemblyEditorContent.setLayout(new BorderLayout());
-        //assemblyEditorContent.add(toolBar, BorderLayout.NORTH);
 
         JComponent canvas = buildCanvas();
         JSplitPane trees = buildTreePanels();
@@ -146,16 +145,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         JScrollPane leftsp = new JScrollPane(trees);
         leftsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        //leftsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trees, new JScrollPane(canvasPanel)); //canvas));
+        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trees, new JScrollPane(canvasPanel));
         jsp.setOneTouchExpandable(true);
         trees.setMinimumSize(new Dimension(20, 20));
         canvas.setMinimumSize(new Dimension(20, 20));
-        //jsp.setDividerLocation(0.5d);
         assemblyEditorContent.add(jsp, BorderLayout.CENTER);
-        // uncomment following to put the vcr toolbar back in place.
-    // It's now in ExternalAssemblyRunner
-    //assemblyEditorContent.add(vcrToolBar,BorderLayout.SOUTH);
         assemblyEditorContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         if (!contentOnly) // Can't add it here if we're going to put it somewhere else
@@ -191,8 +185,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", new Integer(KeyEvent.VK_I),
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "runAssembly", "Run Assembly", new Integer(KeyEvent.VK_R),
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, accelMod)));
+        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Compile Assembly", new Integer(KeyEvent.VK_C),
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
         if (contentOnly) {
             fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", new Integer(KeyEvent.VK_C), null));
@@ -341,8 +335,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
 
-        Action runAction = ActionIntrospector.getAction(getController(), "runAssembly");
-        runButt = makeButton(runAction, "viskit/images/Play24.gif", "Run the assembly");
+        Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
+        runButt = makeButton(runAction, "viskit/images/Play24.gif", 
+                "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
         modeButtonGroup.add(simEventListenerMode);
@@ -368,7 +363,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         toolBar.add(zoomOut);
         // if(!contentOnly) {
         toolBar.addSeparator(new Dimension(24, 24));
-        toolBar.add(new JLabel("  Initialize assembly runner: "));
+        toolBar.add(new JLabel("  Compile/initialize assembly runner: "));
         toolBar.add(runButt);
         //  }
         zoomIn.addActionListener(new ActionListener() {
@@ -489,15 +484,21 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // Decouple diskit from vanilla Viskit operation
         File diskitJar = new File("lib/ext/diskit.jar");
-        for (String path : SettingsDialog.getExtraClassPath()) { // tbd same for pcls
-            if (path.endsWith(".jar")) {
-                if (diskitJar.getName().contains(new File(path).getName())) {
+        if (SettingsDialog.getExtraClassPath() != null) {
+            for (String path : SettingsDialog.getExtraClassPath()) { // tbd same for pcls
+                if (path.endsWith(".jar")) {
+                    if (diskitJar.getName().contains(new File(path).getName())) {
+                        continue;
+                    } else {
+                        lTree.addContentRoot(new File(path));
+                    }
+
+                // A new project may contain an empty EventGraphs directory
+                } else if (new File(path).listFiles().length == 0) {
                     continue;
                 } else {
-                    lTree.addContentRoot(new File(path));
+                    lTree.addContentRoot(new File(path), true);
                 }
-            } else {
-                lTree.addContentRoot(new File(path), true);
             }
         }
 
@@ -666,10 +667,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), seEdge);
     }
 
-    public void fileName(String s) // informative, tells view what we're working on
-    {
+    public void fileName(String s) {
+        boolean nullString = !(s != null && s.length() > 0);
         this.filename = s;
-        String ttl = "Viskit Assembly Editor: " + s;
+        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Assembly: " + s;
         setTitle(ttl);
         if (titlList != null) {
             titlList.setTitle(ttl, titlkey);
@@ -712,13 +713,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         pclTree.removeContentRoot(f);
     }
 
-    public int genericAsk(String title, String msg) //---------------------------------------------
-    {
+    public int genericAsk(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
-    public int genericAskYN(String title, String msg) //-----------------------------------------------
-    {
+    public int genericAskYN(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
     }
 
@@ -736,7 +735,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     // ViskitView-required methods:
 
-    private JFileChooser jfc = new JFileChooser(new File("."));
+    private JFileChooser jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
 
     /** Display a file chooser filtered by Assembly XML files only
      * @return the chosen XML Assembly file
@@ -744,12 +743,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public File openFileAsk() {
 
         jfc.setDialogTitle("Open Assembly File");
-        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
         jfc.setFileFilter(filter);
         int returnVal = jfc.showOpenDialog(this);
+        
+        // TODO: For JFC Swing issue with Win32ShellFolder2?
+        jfc.setFileFilter(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             log.info("You chose to open: " + jfc.getSelectedFile().getName());
             return jfc.getSelectedFile();
@@ -813,8 +815,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /**
-     * Called by the controller after source has been generated.  Show to the user and provide him with the option
-     * to save.
+     * Called by the controller after source has been generated.  Show to the 
+     * user and provide the option to save.
      *
      * @param className 
      * @param s Java source
@@ -885,7 +887,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // default
         if (titlList != null) {
-            titlList.setTitle("Viskit Assembly Editor", titlkey);
+            titlList.setTitle(FRAME_DEFAULT_TITLE, titlkey);
         }
     }
 }
