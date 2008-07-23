@@ -3,6 +3,8 @@ package viskit;
 import edu.nps.util.FileIO;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
@@ -21,16 +23,17 @@ import org.apache.log4j.Logger;
  * @version $Id$
  */
 public class ViskitConfig {
-    
+
     public static final Logger logger = Logger.getLogger(ViskitConfig.class);
 
     public static final File VISKIT_HOME_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File V_CONFIG_FILE = new File(VISKIT_HOME_DIR, "vconfig.xml");
-    public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");    public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
-    
+    public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");
+    public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
+
     public static final String PROJECT_HOME_KEY = "app.projecthome.path[@dir]";
     public static final String EG_HISTORY_KEY = "history.EventGraphEditor.Recent.EventGraphFile";
-    public static final String EG_HISTORY_CLEAR_KEY = "history.EventGraphEditor.Recent";
+    public static final String ASSY_HISTORY_KEY = "history.AssemblyEditor.Recent.AssemblyFile";
     public static final String X_CLASS_PATH_KEY = "extraClassPath.path";
     public static final String X_CLASS_PATH_CLEAR_KEY = "extraClassPath";
     public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
@@ -41,9 +44,13 @@ public class ViskitConfig {
     public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
     public static final String CACHED_EVENTGRAPHS_KEY = "Cached.EventGraphs[@xml]";
+    public static final String CACHED_EVENTGRAPHS_CLASS_KEY = "Cached.EventGraphs[@class]";
     public static final String CACHED_WORKING_DIR_KEY = "Cached[@workDir]";
+    public static final String CACHED_MISS_FILE_KEY = "Cached.Miss[@file]";
+    public static final String CACHED_MISS_DIGEST_KEY = "Cached.Miss[@digest]";
+    public static final String CACHED_CLEAR_KEY = "Cached";
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
-    
+
     private static ViskitConfig me;
 
     private HashMap<String, XMLConfiguration> configs = new HashMap<String, XMLConfiguration>();
@@ -53,16 +60,16 @@ public class ViskitConfig {
 
     static {
         logger.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
-        logger.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists());
+        logger.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
     }
-    
+
     public static synchronized ViskitConfig instance() {
         if (me == null) {
             me = new ViskitConfig();
         }
         return me;
     }
-    
+
     private ViskitConfig() {
         try {
             if (!VISKIT_HOME_DIR.exists()) {
@@ -85,8 +92,13 @@ public class ViskitConfig {
                 FileIO.copyFile(cGuiSrc, C_GUI_FILE, true);
             }
         } catch (IOException ex) {
-            Vstatics.log.error(ex);
+            logger.error(ex);
         }
+        setDefaultConfig();
+    }
+
+    /** Builds, or rebuilds a default configuration */
+    private void setDefaultConfig() {
         try {
             builder = new DefaultConfigurationBuilder();
             builder.setFile(V_CONFIG_FILE);
@@ -150,5 +162,20 @@ public class ViskitConfig {
     /** @return the XMLConfiguration for Viskit */
     public XMLConfiguration getViskitConfig() {
         return (XMLConfiguration) cc.getConfiguration("app");
+    }
+
+    /** Used to clear all Viskit Configuration information to create a new
+     * Viskit Project
+     */
+    public void clearViskitConfig() {
+        setVal(ViskitConfig.PROJECT_HOME_KEY, " ");
+        getViskitConfig().clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
+        getViskitConfig().clearTree(ViskitConfig.CACHED_CLEAR_KEY);
+        getViskitConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+        getViskitConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+    }
+    
+    public void resetViskitConfig() {
+        me = null;
     }
 }

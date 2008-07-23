@@ -209,20 +209,6 @@ public class Vstatics {
         return cPath.toString();
     }
 
-    static String getExtraClassPaths() {
-        String sep = Vstatics.getPathSeparator();
-        StringBuffer cPath = new StringBuffer();
-
-        String[] extraPaths = SettingsDialog.getExtraClassPath();
-        if (extraPaths != null && extraPaths.length > 0) {
-            for (int i = 0; i < extraPaths.length; i++) {
-                cPath.append(extraPaths[i]);
-                cPath.append(sep);
-            }
-        }
-        return cPath.toString();
-    }
-
     static String[] getExtraClassPathArray() {
         return SettingsDialog.getExtraClassPath();
     }

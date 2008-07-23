@@ -93,6 +93,12 @@ public class VGlobals {
     /** Flag to denote called sysExit only once */
     private boolean sysExitCalled = false;
     
+    /** The current project working directory */
+    private File workDirectory;
+    
+    /** The current project base directory */    
+    private File projectsBaseDir;       
+    
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -495,19 +501,19 @@ public class VGlobals {
         return (type.contains("<") && type.contains(">"));
     }
 
-    private void initProjectHome() {
+    public void initProjectHome() {
         String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY);
         log.debug(projectHome);
-        if (projectHome.isEmpty()) {            
+        if (projectHome.trim().isEmpty()) {            
             ViskitProjectGenerationDialog.instance();
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
         }
-            projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 
         // Need to make from scratch /MyViskitProjects
-            if (!projectsBaseDir.exists()) {
-                projectsBaseDir.mkdirs();
+        if (!projectsBaseDir.exists()) {
+            projectsBaseDir.mkdirs();
         }
     }
     
@@ -799,7 +805,7 @@ public class VGlobals {
     public void setRunPanel(RunnerPanel2 runPanel) {
         this.runPanel = runPanel;
     }
-
+    
     public ViskitProject getCurrentViskitProject() {
         return currentViskitProject;
     }
@@ -807,9 +813,7 @@ public class VGlobals {
     public void setCurrentViskitProject(ViskitProject currentViskitProject) {
         this.currentViskitProject = currentViskitProject;
     }
-    
-    private File projectsBaseDir;       
-    
+        
     /**
      * TODO: this is not good behavior for a getter, which shoud simply
      * return the desired thing, not create it.
@@ -818,13 +822,12 @@ public class VGlobals {
      */
     public File getWorkDirectory() {
         if (workDirectory == null) {
-            createWorkingDirectory();
+            createWorkDirectory();
         }
         return workDirectory;
     }
-    private File workDirectory;
-
-    private void createWorkingDirectory() {
+            
+    public void createWorkDirectory() {
         if (ViskitConfig.instance().getViskitConfig() == null) {return;}
         List<String> cache = 
                 Arrays.asList(ViskitConfig.instance().getViskitConfig().getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));

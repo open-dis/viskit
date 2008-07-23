@@ -88,26 +88,47 @@ import org.jdom.input.SAXBuilder;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Twas bad using Strings to hold file/directory path info. Now
  *                  using File and URL objects to better deal with whitespace in
- *                  a directory/file path name *
+ *                  a directory/file path name
+ * 
+ *     Date:     23 JUL 2008
+ *     Time:     0930Z
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
+ *     Comments: 1) Made a singleton to deal with new project creation tasks
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
 
+
+    static Logger log = Logger.getLogger(EventGraphCache.class);
+    
     /** The jdom.Document object of the assembly file */
-    private static Document assemblyDocument;
+    private Document assemblyDocument;
 
     /**
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
-    private static LinkedList<String> eventGraphNames  = new LinkedList<String>();
-    private static LinkedList<File> eventGraphFiles  = new LinkedList<File>();
-    private static LinkedList<String> eventGraphImagePaths = new LinkedList<String>();
+    private LinkedList<String> eventGraphNames  = new LinkedList<String>();
+    private LinkedList<File> eventGraphFiles  = new LinkedList<File>();
+    private LinkedList<String> eventGraphImagePaths = new LinkedList<String>();
 
-    static Logger log = Logger.getLogger(EventGraphCache.class);
+    private static EventGraphCache me;
+    
+    public static synchronized EventGraphCache instance() {
+        if (me == null) {
+            me = new EventGraphCache();
+        }
+        return me;
+    }
 
+    private EventGraphCache() {
+        eventGraphNames  = new LinkedList<String>();
+        eventGraphFiles  = new LinkedList<File>();
+        eventGraphImagePaths = new LinkedList<String>();
+    }
+    
     /**
      * Creates the entity table for this analyst xml object
      *
@@ -116,7 +137,7 @@ public class EventGraphCache {
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public static Element makeEntityTable(String assemblyFile) {
+    public Element makeEntityTable(String assemblyFile) {
         Element entityTable = new Element("EntityTable");
 
         // Clear the cache if currently full
@@ -131,7 +152,7 @@ public class EventGraphCache {
         }
         setAssemblyDocument(loadXML(assemblyFile));
 
-        Element localRootElement = EventGraphCache.getAssemblyDocument().getRootElement();
+        Element localRootElement = getAssemblyDocument().getRootElement();
         List<Element> simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
 
         // Conduct a test for a diskit package which is native java
@@ -157,11 +178,11 @@ public class EventGraphCache {
      * @param xmlFileName the location of the file to load as a Document
      * @return the document object of the loaded XML
      */
-    public static Document loadXML(String xmlFileName) {
+    public Document loadXML(String xmlFileName) {
         return loadXML(new File(xmlFileName));
     }
 
-    public static Document loadXML(File xmlFile) {
+    public Document loadXML(File xmlFile) {
         Document doc = null;
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -182,7 +203,7 @@ public class EventGraphCache {
      * @param fileType the type of XML file being used that includes a package
      * name
      */
-    private static void saveEventGraphReferences(String fileType) {
+    private void saveEventGraphReferences(String fileType) {
         log.debug("Parameter fileType: " + fileType);
 
         // find the package seperator
@@ -243,19 +264,15 @@ public class EventGraphCache {
     }
 
     /** @param pDoc the JDOM Document to set */
-    public static void setAssemblyDocument(Document pDoc) {
+    public void setAssemblyDocument(Document pDoc) {
         assemblyDocument = pDoc;
     }
 
     /** @return a JDOM document (Assembly XML file) */
-    public static Document getAssemblyDocument() {return assemblyDocument;}
+    public Document getAssemblyDocument() {return assemblyDocument;}
 
-    public static LinkedList<String> getEventGraphNames() {return eventGraphNames;}
-    public static LinkedList<File> getEventGraphFiles() {return new LinkedList<File>(eventGraphFiles);}
-    public static LinkedList<String> getEventGraphImagePaths() {return eventGraphImagePaths;}
-
-//    public static void setEventGraphNames(LinkedList<String> pEGNames) {eventGraphNames = pEGNames;}
-//    public static void setEventGraphFiles(LinkedList<String> pEGFiles) {eventGraphFiles = pEGFiles;}
-//    public static void setEventGraphImagePaths(LinkedList<String> pEGImagePaths) {eventGraphImagePaths = pEGImagePaths;}
-
+    public LinkedList<String> getEventGraphNames() {return eventGraphNames;}
+    public LinkedList<File> getEventGraphFiles() {return eventGraphFiles;}
+    public LinkedList<String> getEventGraphImagePaths() {return eventGraphImagePaths;}
+    
 } // end class file EventGraphCache.java

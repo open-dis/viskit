@@ -102,7 +102,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public Component getCurrentJgraphComponent() {
         return graphPane;
-
     }
 
     public JMenuBar getMenus() {
@@ -167,8 +166,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));        
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", new Integer(KeyEvent.VK_N),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
+        fileMenu.addSeparator();
+        
         fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(buildMenuItem(controller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
@@ -735,13 +738,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     // ViskitView-required methods:
 
-    private JFileChooser jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+    private JFileChooser jfc;
 
     /** Display a file chooser filtered by Assembly XML files only
      * @return the chosen XML Assembly file
      */
     public File openFileAsk() {
-
+        
+        // Try to open in the current project directory
+        if (VGlobals.instance().getCurrentViskitProject() != null) {
+            jfc = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        } else {
+            jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+        }
         jfc.setDialogTitle("Open Assembly File");
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 

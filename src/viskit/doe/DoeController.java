@@ -393,7 +393,6 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                     //System.out.println("DoeController got eg change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
                     break;
                 default:
-
             }
         }
     }

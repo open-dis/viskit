@@ -172,7 +172,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      */
     private void initUI(boolean contentOnly) {
         // Layout menus
-        setupMenus(contentOnly);
+        buildMenus(contentOnly);
 
         // Layout of toolbar
         setupToolbar();
@@ -505,15 +505,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     //todo
     }
 
-    private void setupMenus(boolean contentOnly) {
+    private void buildMenus(boolean contentOnly) {
         ViskitController vcontroller = (ViskitController) getController();
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));        
         fileMenu.add(buildMenuItem(vcontroller, "newEventGraph", "New Event Graph", new Integer(KeyEvent.VK_N),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
+            fileMenu.addSeparator();
+                
         fileMenu.add(buildMenuItem(vcontroller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));

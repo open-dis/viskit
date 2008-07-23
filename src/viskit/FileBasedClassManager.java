@@ -35,8 +35,9 @@ import org.apache.log4j.Logger;
  * @version $Id$
  */
 public class FileBasedClassManager implements Runnable {
+    
     // Singleton:
-    private static FileBasedClassManager me;
+    protected static FileBasedClassManager me;
     private static XMLConfiguration vConfig;
     private HashMap<String, FileBasedAssyNode> fileMap;
     private HashMap<String, Class<?>> classMap;
@@ -77,6 +78,12 @@ public class FileBasedClassManager implements Runnable {
         fileMap.remove(fban.loadedClass);
     }
 
+    /** Known path for EventGraph Compilation
+     * 
+     * @param f an event graph to compile
+     * @return a node tree for viewing in the Assembly Editor
+     * @throws java.lang.Throwable
+     */
     public FileBasedAssyNode loadFile(File f) throws Throwable {
         FileBasedAssyNode fban = null;
         Class<?> fclass = null;
@@ -85,13 +92,11 @@ public class FileBasedClassManager implements Runnable {
             if (!isCached(f)) {
                 if (!isCacheMiss(f)) {
                     PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
-                    
                     // Tried to compile an Assembly as an EventGraph, so just return here
                     if (paf == null) {
                         return null;
                     }
                     
-                    // TODO: Lessen the amount of resetting the LBL
                     ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
                     // since we're here, cache the parameter names
                     JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
@@ -118,7 +123,6 @@ public class FileBasedClassManager implements Runnable {
                 f = getCachedClass(f);
                 File fXml = getCachedXML(f);
                 
-                // TODO: Lessen the amount of resetting the LBL
                 ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
                 JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                 Unmarshaller um = jaxbCtx.createUnmarshaller();
@@ -168,7 +172,7 @@ public class FileBasedClassManager implements Runnable {
             return;
         }
         try {
-            List<String> cache = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs" + "[@xml]"));
+            List<String> cache = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
             if (viskit.Vstatics.debug) {
                 if (cache == null) {
                     log.debug("cache " + cache);
@@ -182,7 +186,7 @@ public class FileBasedClassManager implements Runnable {
                 }
                 String s = VGlobals.instance().getWorkDirectory().getCanonicalPath();
                 s = s.replace('\\', '/');
-                vConfig.setProperty("Cached[@workDir]", s);
+                vConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
             }
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
@@ -230,7 +234,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public boolean isCached(File file) {
-        List<String> cache = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@xml]"));
+        List<String> cache = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
             if (viskit.Vstatics.debug) {
                 log.debug("isCached() " + file + " of cacheSize " + cache.size());
@@ -260,10 +264,11 @@ public class FileBasedClassManager implements Runnable {
 
     /**
      * @param file 
-     * @return a cached class file given its cached XML file */
+     * @return a cached class file given its cached XML file 
+     */
     public File getCachedClass(File file) {
-        List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@xml]"));
-        List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@class]"));
+        List<String> cacheXML = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath());
@@ -287,8 +292,8 @@ public class FileBasedClassManager implements Runnable {
      * @return an XML file given its cached class file 
      */
     public File getCachedXML(File file) {
-        List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@xml]"));
-        List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@class]"));
+        List<String> cacheXML = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath());
@@ -307,10 +312,12 @@ public class FileBasedClassManager implements Runnable {
         return cachedFile;
     }
 
-    // delete cache given either xml or class file
+    /** Delete cache given either xml or class file 
+     * @param file the XML, or class file to delete from the cache
+     */
     public void deleteCache(File file) {
-        List<String> cacheXML = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs" + "[@xml]"));
-        List<String> cacheClass = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs" + "[@class]"));
+        List<String> cacheXML = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         String filePath;
         File deletedCache = null;
         try {
@@ -344,8 +351,8 @@ public class FileBasedClassManager implements Runnable {
      * @return 
      */
     public boolean isCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss[@file]"));
-        List<String> digests = Arrays.asList(vConfig.getStringArray("Cached.Miss[@digest]"));
+        List<String> cacheMisses = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY));
+        List<String> digests = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         int index;
         try {
             index = cacheMisses.lastIndexOf(file.getCanonicalPath());
@@ -365,7 +372,7 @@ public class FileBasedClassManager implements Runnable {
     public void addCacheMiss(File file) {
         deleteCache(file);
         removeCacheMiss(file); // remove any old ones
-        int index = vConfig.getStringArray("Cached.Miss[@file]").length;
+        int index = vConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY).length;
         try {
             vConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath());
             vConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
@@ -375,7 +382,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public void removeCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(vConfig.getStringArray("Cached.Miss[@file]"));
+        List<String> cacheMisses = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY));
         int index;
         try {
             if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath())) > -1) {
@@ -393,7 +400,7 @@ public class FileBasedClassManager implements Runnable {
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheDigest = Arrays.asList(vConfig.getStringArray("Cached.EventGraphs[@digest]"));
+        List<String> cacheDigest = Arrays.asList(vConfig.getStringArray(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         String filePath;
         try {
             filePath = egFile.getCanonicalPath();

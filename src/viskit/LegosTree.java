@@ -465,7 +465,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
         if (list == null || list.size() <= 0) {
             log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
-            log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree");
+            log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
             
             // TODO: should just be safe to return here without annoying warning popup dialog
             return;

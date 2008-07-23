@@ -117,6 +117,19 @@ public class EventGraphController extends mvcAbstractController implements Viski
         VGlobals.instance().quitEventGraphEditor();
     }
 
+    /** Creates a new Viskit Project */
+    public void newProject() {
+        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(), 
+                "Are you sure you want to close your current Viskit Project?", 
+                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        if (ret == JOptionPane.YES_OPTION) {
+            VGlobals.instance().getAssemblyController().close();
+            ViskitConfig.instance().clearViskitConfig();
+            VGlobals.instance().initProjectHome();
+            VGlobals.instance().createWorkDirectory();            
+        }
+    }
+    
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
         ViskitModel viskitModel = (ViskitModel) getModel();
@@ -179,8 +192,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public void open() //----------------
-    {
+    public void open() {
         // Bug fix: 1249
         File[] files = ((ViskitView) getView()).openFilesAsk();
         if (files == null) {
@@ -272,7 +284,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     /** Create a temporary location to store copies of EventGraphs in XML form.
      * This is to compare against any changes to and whether to re-cache the
      * MD5 hash generated elsewhere for this EG.
-     *
+     * This is a known EventGraph compilation path
      * @param f the EventGraph file to generate MD5 hash for
      */
     private void fileWatchOpen(File f) {
@@ -309,7 +321,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) {
-        dirWatch.addListener(lis);
+        dirWatch.removeListener(lis);
     }
 
     /**
@@ -352,7 +364,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     private void saveHistoryXML(ArrayList<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.EG_HISTORY_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
 
         for (int i = 0; i < recentFiles.size(); i++) {
             String value = recentFiles.get(i);
@@ -452,8 +464,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public void save() //----------------
-    {
+    public void save() {
         ViskitModel mod = (ViskitModel) getModel();
         File localLastFile = mod.getLastFile();
         if (localLastFile == null) {

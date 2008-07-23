@@ -280,13 +280,15 @@ public class SettingsDialog extends JDialog {
         clearClassPathEntries();
         
         int ix = 0;
-        for (String s : lis) {
-            s = s.replaceAll("\\\\", "/");
-            log.debug("lis[" + ix + "]: " + s);
-            vConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
-            ix++;
+        if (lis != null) {
+            for (String s : lis) {
+                s = s.replaceAll("\\\\", "/");
+                log.debug("lis[" + ix + "]: " + s);
+                vConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
+                ix++;
+            }
         }
-
+        
         if (dialog != null) {
             progressDialog = new JDialog(dialog);
             progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -312,6 +314,8 @@ public class SettingsDialog extends JDialog {
                 progressDialog.toFront();
             }
             
+            // Incase we have custom jars, need to add these to the ClassLoader
+            VGlobals.instance().resetWorkClassLoader();
             VGlobals.instance().rebuildTreePanels();
             return null;
         }
@@ -496,8 +500,6 @@ public class SettingsDialog extends JDialog {
         // Still no viskitConfig.xml file
         if (vConfig == null) {return null;}
         
-        // TODO: lessen amount of resetting the LBL
-//        VGlobals.instance().resetWorkClassLoader();
         return vConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
     }
 

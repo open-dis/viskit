@@ -177,15 +177,13 @@ public class LocalBootLoader extends URLClassLoader {
         
         // very verbose when "info" mode
 //        for (String line : classPath) {
-//            log.debug(line);
+//            log.info(line);
 //        }
+//        log.info("End ClassPath entries\n");
         return classPath;
     }
 
-    /**
-     * 
-     * @return
-     */
+    /** @return a URL[] of External ClassPath paths */
     public URL[] getExtUrls() {
         return extUrls;
     }
