@@ -446,16 +446,20 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (!checkSaveIfDirty()) {
             return;
         }
-
-        GraphMetaData gmd = new GraphMetaData(new AssemblyModel(this) );
-        GraphMetaData oldGmd = ((ViskitAssemblyModel) getModel()).getMetaData();
+        
+        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
+        GraphMetaData oldGmd = vmod.getMetaData();
+        GraphMetaData gmd = new GraphMetaData(vmod);   // build a new one, specific to Assy
         gmd.packageName = oldGmd.packageName;
-        AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
-                VGlobals.instance().getMainAppWindow(), gmd);
+        
+        AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(), 
+                                          VGlobals.instance().getMainAppWindow(),
+                                          gmd);
         if (AssemblyMetaDataDialog.modified) {
             close();
-            ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-            ((ViskitAssemblyView) getView()).fileName(vmod.getMetaData().name);
+            vmod.newModel(null);    // current design has assembly model always hanging around, this method resets it
+            vmod.changeMetaData(gmd);
+            ((ViskitAssemblyView) getView()).fileName(gmd.name);  // into title bar
         }
     }
     
