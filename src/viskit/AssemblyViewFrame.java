@@ -739,18 +739,22 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // ViskitView-required methods:
 
     private JFileChooser jfc;
-
+    private JFileChooser buildOpenSaveChooser()
+    {
+        // Try to open in the current project directory
+        if (VGlobals.instance().getCurrentViskitProject() != null) 
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+         else 
+            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));   
+    }
+        
     /** Display a file chooser filtered by Assembly XML files only
      * @return the chosen XML Assembly file
      */
     public File openFileAsk() {
-        
-        // Try to open in the current project directory
-        if (VGlobals.instance().getCurrentViskitProject() != null) {
-            jfc = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        } else {
-            jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        }
+        if(jfc == null)
+          jfc = buildOpenSaveChooser();
+ 
         jfc.setDialogTitle("Open Assembly File");
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
@@ -801,7 +805,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-
+       if(jfc == null)
+          jfc = buildOpenSaveChooser();
+ 
         jfc.setDialogTitle("Save Assembly File");
         File fil = new File(suggName);
         if (showUniqueName) {
