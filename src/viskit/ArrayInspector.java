@@ -29,7 +29,7 @@ import javax.swing.event.CaretListener;
  * @author Mike Bailey
  * @since Jun 16, 2004
  * @since 3:27:42 PM
- * @version $Id:$
+ * @version $Id$
  */
 public class ArrayInspector extends JDialog {
 

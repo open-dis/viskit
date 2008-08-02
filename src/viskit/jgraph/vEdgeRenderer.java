@@ -15,7 +15,7 @@ import org.jgraph.graph.EdgeView;
  * @author Mike Bailey
  * @since Feb 24, 2004
  * @since 2:32:30 PM
- * @version $Id:$
+ * @version $Id$
  *
  * The guy that actually paints edges.
  */

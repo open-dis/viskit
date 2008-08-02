@@ -57,7 +57,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  * @author  Mike Bailey
  * @since Jul 20, 2005
  * @since 11:44:06 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class FileHandler {
 

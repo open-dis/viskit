@@ -26,7 +26,7 @@ import java.awt.event.WindowEvent;
  * @author DMcG
  * @since June 2, 2004
  * @since 9:19:41 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class EventListDialog extends JDialog {
 

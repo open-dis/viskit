@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * @author Mike Bailey
  * @since Jun 16, 2004
  * @since 3:03:09 PM
- * @version $Id:$
+ * @version $Id$
  */
 public class ObjListPanel extends JPanel implements ActionListener, CaretListener {
 

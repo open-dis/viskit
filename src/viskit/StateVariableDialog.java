@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * Naval Postgraduate School, Monterey CA
  * www.nps.edu
  * @author Mike Bailey
- * @version $Id:$
+ * @version $Id$
  */
 public class StateVariableDialog extends ViskitSmallDialog {
 

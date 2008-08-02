@@ -51,7 +51,7 @@ import java.awt.event.WindowEvent;
  * @author Mike Bailey
  * @since Jul 20, 2005
  * @since 10:36:33 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class DoeMainFrame extends JFrame implements DoeEvents {
 

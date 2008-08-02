@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  * @author Mike Bailey
  * @since May 26, 2004 : 
  * @since 8:43:39 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class PropChangListIcon extends ImageIcon {
 

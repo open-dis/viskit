@@ -20,7 +20,7 @@ import simkit.random.*;
  * @author Mike Bailey
  * @since Apr 27, 2004
  * @since 10:42:12 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class VsimkitObjects {
 

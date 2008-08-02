@@ -17,7 +17,7 @@ import java.awt.event.*;
  * @author Mike Bailey
  * @since Mar 15, 2004
  * @since 11:47:09 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class BooleanExpressionEditor extends JDialog {
 

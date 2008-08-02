@@ -48,7 +48,7 @@ import viskit.model.ViskitModel;
  * @author Mike Bailey
  * @since Sep 15, 2005
  * @since 11:13:40 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class VgraphComponentWrapper extends vGraphComponent {
 

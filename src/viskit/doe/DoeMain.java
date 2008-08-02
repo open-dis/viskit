@@ -42,7 +42,7 @@ import javax.swing.*;
  * @author Mike Bailey
  * @since Jul 20, 2005
  * @since 10:36:33 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class DoeMain implements DoeEvents {
 

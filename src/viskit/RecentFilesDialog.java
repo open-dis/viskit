@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * @author Mike Bailey
  * @since Sep 19, 2005
  * @since 2:00:51 PM
- * @version $Id:$
+ * @version $Id$
  */
 package viskit;
 

@@ -26,7 +26,7 @@ import java.awt.event.WindowEvent;
  * @author DMcG, Mike Bailer
  * @since Apr 12, 2004
  * @since 9:19:41 AM
- * @version $Id:$
+ * @version $Id$
  */
 public class LocalVariableDialog extends JDialog {
 
