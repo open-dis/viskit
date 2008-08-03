@@ -780,7 +780,7 @@ public class SimkitXML2Java {
         pw.print(s.getDelay() + cm + "Priority" + pd + prio);
 
         // varargs can throw a mostly harmless compiler warning if there is only one arg here
-        // "warning: non-varargs call of varargs method with inexact argument type for last parameter""
+        // "warning: non-varargs call of varargs method with inexact argument type for last parameter"
         // If there are more than one or none there is no ambiguity.
         // If the one arg case is cast as Object then the warning is suppressed
 
@@ -788,8 +788,7 @@ public class SimkitXML2Java {
 
             EdgeParameter ep = s.getEdgeParameter().get(0);
 
-            pw.print(cm + "(Object)");
-            pw.print(lp + ep.getValue() + rp);
+            pw.print(cm + ep.getValue());
 
         } else if (s.getEdgeParameter().size() > 1) {
             pw.print(cm);

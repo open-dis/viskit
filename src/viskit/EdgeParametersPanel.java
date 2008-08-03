@@ -24,6 +24,7 @@ import viskit.model.ViskitElement;
 public class EdgeParametersPanel extends ViskitTablePanel {
 
     private String[] mytitles = {"event argument", "value"};
+    private List<? extends ViskitElement> argList;
 
     EdgeParametersPanel(int wid) {
         super(wid);            // separate constructor from initialization
@@ -34,6 +35,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
         tc.setCellRenderer(new DifferentTableColumnBackgroundRenderer(getBackground()));
 
         super.addDoubleClickedListener(new myEditListener());
+        argList = new ArrayList<ViskitElement>();
     }
 
     public String[] getColumnTitles() {
@@ -60,9 +62,8 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     public int getNumVisibleRows() {
         return 3;
     }
-    ArrayList<ViskitElement> argList;
 
-    public void setArgumentList(ArrayList<ViskitElement> lis) {
+    public void setArgumentList(List<? extends ViskitElement> lis) {
         argList = lis;
     }
 
@@ -110,8 +111,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
      * @param edLis
      */
     @Override
-    public void addDoubleClickedListener(ActionListener edLis) //--------------------------------------------------------
-    {
+    public void addDoubleClickedListener(ActionListener edLis) {
         alis = edLis;
     }
 

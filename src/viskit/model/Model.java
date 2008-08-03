@@ -816,7 +816,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
      * @param targ
      * @param local
      */
-    private void cloneTransitions(List<StateTransition> targ, ArrayList<ViskitElement> local) {
+    private void cloneTransitions(List<StateTransition> targ, List<ViskitElement> local) {
         targ.clear();
         for (ViskitElement transition : local) {
             StateTransition st = oFactory.createStateTransition();
@@ -843,12 +843,12 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
-    private void cloneComments(List<String> targ, ArrayList<String> local) {
+    private void cloneComments(List<String> targ, List<String> local) {
         targ.clear();
         targ.addAll(local);
     }
 
-    private void cloneArguments(List<Argument> targ, ArrayList<ViskitElement> local) {
+    private void cloneArguments(List<Argument> targ, List<ViskitElement> local) {
         targ.clear();
         for (ViskitElement eventArguments : local) {
             Argument arg = oFactory.createArgument();
@@ -931,7 +931,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         srcEv.getScheduleOrCancel().add(sch);
 
         // Put in dummy edge parameters to match the target arguments
-        ArrayList<ViskitElement> args = target.getArguments();
+        List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
             ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
             for (int i = 0; i < args.size(); i++) {
@@ -964,7 +964,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         srcEv.getScheduleOrCancel().add(can);
 
         // Put in dummy edge parameters to match the target arguments
-        ArrayList<ViskitElement> args = target.getArguments();
+        List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
             ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
             for (int i = 0; i < args.size(); i++) {

@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -56,7 +57,7 @@ abstract public class ViskitElement {
 
     public abstract String getComment();
 
-    public abstract ArrayList<String> getDescriptionArray();
+    public abstract List<String> getDescriptionArray();
 
     public abstract void setDescriptionArray(ArrayList<String> descriptionArray);
 

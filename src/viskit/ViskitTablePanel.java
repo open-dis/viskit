@@ -31,8 +31,7 @@ import viskit.model.ViskitElement;
  * @since 8:49:21 AM
  * @version $Id$
  */
-public abstract class ViskitTablePanel extends JPanel /***************************************************/
-{
+public abstract class ViskitTablePanel extends JPanel {
     static Logger log = Logger.getLogger(ViskitTablePanel.class);
     
     protected JTable tab;
@@ -45,20 +44,18 @@ public abstract class ViskitTablePanel extends JPanel /*************************
     private String plusToolTip = "Add a row to this table";
     private String minusToolTip = "Delete the selected row from this table;";
     private boolean plusMinusEnabled = false;
+    private boolean shouldDoAddsAndDeletes = true;
 
-    public ViskitTablePanel(int defaultWidth) //=======================================
-    {
+    public ViskitTablePanel(int defaultWidth) {
         this.defaultWidth = defaultWidth;
     }
 
-    public ViskitTablePanel(int defaultWidth, int numRows) //==========================================================
-    {
+    public ViskitTablePanel(int defaultWidth, int numRows) {
         this.defaultWidth = defaultWidth;
         this.defaultNumRows = numRows;
     }
 
-    public void init(boolean wantAddDelButts) //----------------
-    {
+    public void init(boolean wantAddDelButts) {
         plusMinusEnabled = wantAddDelButts;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -90,7 +87,6 @@ public abstract class ViskitTablePanel extends JPanel /*************************
         jsp = new JScrollPane(tab);
         jsp.setMinimumSize(new Dimension(defaultWidth, defaultHeight));       // jmb test
         add(jsp);
-        //add(Box.createVerticalStrut(5));
 
         ActionListener lis = new MyAddDelEditHandler();
 
@@ -123,7 +119,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
             buttPan.add(minusButt);
             buttPan.add(Box.createHorizontalGlue());
             add(buttPan);
-            //add(Box.createVerticalStrut(5));
+            
             // install local add, delete handlers
             plusButt.addActionListener(lis);
             minusButt.addActionListener(lis);
@@ -167,8 +163,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * ActionEvent.getSource().
      * @param edLis
      */
-    public void addDoubleClickedListener(ActionListener edLis) //--------------------------------------------------------
-    {
+    public void addDoubleClickedListener(ActionListener edLis) {
         myEditLis = edLis;
     }
 
@@ -176,8 +171,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * Install external handler for row-add requests.
      * @param addLis
      */
-    public void addPlusListener(ActionListener addLis) //------------------------------------------------
-    {
+    public void addPlusListener(ActionListener addLis) {
         myPlusLis = addLis;
     }
 
@@ -195,8 +189,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * will be retrieved through the abstract method, getFields(o).
      * @param o
      */
-    public void addRow(ViskitElement o) //--------------------------
-    {
+    public void addRow(ViskitElement o) {
         shadow.add(o);
 
         Vector<String> rowData = new Vector<String>();
@@ -215,8 +208,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * Add a row to the end of the table.  The row object will be built through 
      * the abstract method, newRowObject().
      */
-    public void addRow() //-----------------
-    {
+    public void addRow() {
         addRow(newRowObject());
     }
 
@@ -224,18 +216,17 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * Remove the row representing the argument from the table.
      * @param o
      */
-    public void removeRow(Object o) //-----------------------------
-    {
+    public void removeRow(Object o) {
         removeRow(findObjectRow(o));
     }
 
     /**
-     * Remove the row identified by the passed zero-based row number from the table.
-     * @param r
+     * Remove the row identified by the passed zero-based row number from the 
+     * table.
+     * @param r index of the object to remove
      */
-    public void removeRow(int r) //--------------------------
-    {
-        shadow.remove(r);
+    public void removeRow(int r) {
+        ViskitElement e = shadow.remove(r);
         mod.removeRow(r);
     }
 
@@ -261,8 +252,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      */
     // We know this to be an ArrayList<ViskitElement> clone
     @SuppressWarnings("unchecked")
-    public ArrayList<ViskitElement> getData() //------------------------
-    {
+    public ArrayList<ViskitElement> getData() {
         return (ArrayList<ViskitElement>) shadow.clone();
     }
 
@@ -274,8 +264,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * Update the table row, typically after editing, representing the passed rowObject.
      * @param rowObject
      */
-    public void updateRow(Object rowObject) //-------------------------------------
-    {
+    public void updateRow(Object rowObject) {
         int row = findObjectRow(rowObject);
 
         String[] fields = getFields(rowObject, 0);
@@ -286,13 +275,11 @@ public abstract class ViskitTablePanel extends JPanel /*************************
     }
 
     // Protected methods
-    protected String getPlusToolTip() //-------------------------------
-    {
+    protected String getPlusToolTip() {
         return plusToolTip;
     }
 
-    protected String getMinusToolTip() //--------------------------------
-    {
+    protected String getMinusToolTip() {
         return minusToolTip;
     }
 
@@ -302,7 +289,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * @return String array of titles
      */
     abstract public String[] getColumnTitles();
-    //-----------------------------------------
+    
     /**
      * Return the fields to be displayed in the table.
      * @param o row object
@@ -310,27 +297,25 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * @return  String array of fields
      */
     abstract public String[] getFields(Object o, int rowNum);
-    //-------------------------------------------
+    
     /**
      * Build a new row object
-     * @return Row object
+     * @return a new row object
      */
     abstract public ViskitElement newRowObject();
-    //--------------------------------------
+    
     /**
      * Specify how many rows the table should display at a minimum
      * @return number of rows
      */
     abstract public int getNumVisibleRows();
-    //--------------------------------------
-
+    
     // private methods
     /**
      * If a double-clicked listener has been installed, message it with the row
      * object to be edited.
      */
-    private void doEdit() //-------------------
-    {
+    private void doEdit() {
         if (myEditLis != null) {
             Object o = shadow.get(tab.getSelectedRow());
             ActionEvent ae = new ActionEvent(o, 0, "");
@@ -343,8 +328,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
      * @param o row object
      * @return row index
      */
-    protected int findObjectRow(Object o) //---------------------------------
-    {
+    protected int findObjectRow(Object o) {
         int row = 0;
 
         // the most probable case
@@ -404,7 +388,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
 
     /**
      * Build a table row based on the passed row object.
-     * @param o
+     * @param o a ViskitElement to add to the table row
      */
     private void putARow(ViskitElement o) {
         shadow.add(o);
@@ -414,7 +398,6 @@ public abstract class ViskitTablePanel extends JPanel /*************************
         rowData.addAll(Arrays.asList(fields));
         mod.addRow(rowData);
     }
-    private boolean shouldDoAddsAndDeletes = true;
 
     /**
      * Whether this class should add and delete rows on plus-minus clicks.  
@@ -425,9 +408,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
         shouldDoAddsAndDeletes = boo;
     }
 
-    /**
-     * The local listener for plus, minus and edit clicks
-     */
+    /** The local listener for plus, minus and edit clicks */
     class MyAddDelEditHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
@@ -491,10 +472,7 @@ public abstract class ViskitTablePanel extends JPanel /*************************
             int colIndex = columnAtPoint(p);
 
             tip = getValueAt(rowIndex, colIndex).toString();  // tool tip is contents (for long contents)
-            if (tip == null || tip.isEmpty()) {
-                return null;
-            }
-            return tip;
+            return (tip == null || tip.isEmpty()) ? null : tip;
         }
     }
 }

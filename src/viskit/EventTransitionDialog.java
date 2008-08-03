@@ -97,7 +97,6 @@ public class EventTransitionDialog extends JDialog {
         newSVButt = new JButton("new");
         commentField = new JTextField(25);
         setMaxHeight(commentField);
-//        commentField.setEditable(false);
         actionField = new JTextField(25);
         setMaxHeight(actionField);
         arrayIndexField = new JTextField(25);
@@ -141,7 +140,6 @@ public class EventTransitionDialog extends JDialog {
                 vStateVariable sv = (vStateVariable) cb.getSelectedItem();
                 commentField.setText(sv.getComment());
                 okButt.setEnabled(true);
-//                arrayIndexField.setEditable(false);
                 indexPanel.setVisible(sv.getType().indexOf('[') != -1);
                 modified = true;
                 pack();
@@ -257,7 +255,6 @@ public class EventTransitionDialog extends JDialog {
         }
        
         // We have an indexing argument already set
-//        arrayIndexField.setEditable(false);
         indexPanel.setVisible(((vStateVariable) stateVarsCB.getSelectedItem()).getType().indexOf('[') != -1);
         pack();
     }

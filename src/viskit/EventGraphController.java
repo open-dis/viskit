@@ -624,7 +624,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }  // remove leading stuff
 
             String specialNodeMsg = (localNodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
-            if (((ViskitView) getView()).genericAsk("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
+            if (((ViskitView) getView()).genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
                 // do edges first?
                 copyVector = (Vector) selectionVector.clone();
                 for (Object elem : copyVector) {

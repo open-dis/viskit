@@ -918,7 +918,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     public File[] openFilesAsk() {
         if (jfc == null) {
-            jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+            
+            // Try to open in the current project directory
+            if (VGlobals.instance().getCurrentViskitProject() != null) {
+                jfc = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+            } else {
+                jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+            }
+
             jfc.setDialogTitle("Open Event Graph Files");
 
             // Bug fix: 1246
@@ -1096,8 +1103,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             case ModelEvent.NEWMODEL:
                 vp.setData(null);
                 pp.setData(null);
-            //VGlobals.instance().setStateVarsList(((ViskitModel)this.getModel()).getStateVariables());
-            //VGlobals.instance().setSimParmsList(((ViskitModel)this.getModel()).getSimParameters());
             // fall through
 
             // Changes the graph needs to know about

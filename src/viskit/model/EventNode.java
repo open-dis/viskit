@@ -4,6 +4,7 @@ import viskit.xsd.bindings.eventgraph.Event;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -22,14 +23,14 @@ public class EventNode extends ViskitElement {
 
     private String name;
     private Vector<ViskitElement> connections = new Vector<ViskitElement>();
-    private ArrayList<String> comments = new ArrayList<String>();
-    private ArrayList<ViskitElement> transitions = new ArrayList<ViskitElement>();
     private Vector<ViskitElement> localVariables = new Vector<ViskitElement>();
-    private ArrayList<ViskitElement> arguments = new ArrayList<ViskitElement>();
+    private List<String> comments = new ArrayList<String>();
+    private List<ViskitElement> transitions = new ArrayList<ViskitElement>();
+    private List<ViskitElement> arguments = new ArrayList<ViskitElement>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private Point position = new Point(0, 0);
     private String codeblock = "";
     private String type;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -71,7 +72,7 @@ public class EventNode extends ViskitElement {
         this.name = s;
     }
 
-    public ArrayList<ViskitElement> getArguments() {
+    public List<ViskitElement> getArguments() {
         return arguments;
     }
 
@@ -79,7 +80,7 @@ public class EventNode extends ViskitElement {
         this.arguments = arguments;
     }
 
-    public ArrayList<String> getComments() {
+    public List<String> getComments() {
         return comments;
     }
 
@@ -111,7 +112,7 @@ public class EventNode extends ViskitElement {
         this.localVariables = localVariables;
     }
 
-    public ArrayList<ViskitElement> getTransitions() {
+    public List<ViskitElement> getTransitions() {
         return transitions;
     }
 
@@ -138,7 +139,7 @@ public class EventNode extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 

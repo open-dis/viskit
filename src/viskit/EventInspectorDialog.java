@@ -1,14 +1,16 @@
 package viskit;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -211,7 +213,7 @@ public class EventInspectorDialog extends JDialog {
         arguments.addMinusListener(myChangeListener);
         arguments.addDoubleClickedListener(new ActionListener() {
             
-            // EventArgumentDialong: Event arguments
+            // EventArgumentDialog: Event arguments
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
                 boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
@@ -284,16 +286,16 @@ public class EventInspectorDialog extends JDialog {
         description.setCaretPosition(0);
         description.setPreferredSize(d);
 
-        hideShowDescription(s != null && s.length() > 0);
+        hideShowDescription(s != null && !s.isEmpty());
 
         s = node.getCodeBlock();
         codeBlock.setData(s);
         codeBlock.setVisibleLines(1);
-        hideShowCodeBlock(s != null && s.length() > 0);
+        hideShowCodeBlock(s != null && !s.isEmpty());
 
         transitions.setTransitions(node.getTransitions());
         s = transitions.getString();
-        hideShowStateTransitions(s != null && s.length() > 0);
+        hideShowStateTransitions(s != null && !s.isEmpty());
 
         arguments.setData(node.getArguments());
         hideShowArguments(!arguments.isEmpty());
@@ -312,7 +314,7 @@ public class EventInspectorDialog extends JDialog {
 
             en.setTransitions(transitions.getTransitions());
 
-            // Bug 1373: This is how the EdgeInspectorDialog will have knowledge
+            // Bug 1373: This is how an EventNode will have knowledge
             // of edge parameter additions, or removals
             en.setArguments(arguments.getData());
             
@@ -335,22 +337,15 @@ public class EventInspectorDialog extends JDialog {
                         
                         // We match EventArgument count to EdgeParameter count
                         // here.  
-                        for (ViskitElement v : arguments.getData()) {
-
+                        for (ViskitElement v : en.getArguments()) {
+                            
                             // The user will be able to change any values from
                             // the EdgeInspectorDialog.  Right now, values are
-                            // defaulted to zeros.  Am betting that since this
-                            // scheduling edge is the first in this event node's
-                            // connections list, it is the very scheduling edge 
-                            // are interested in for this purpose of this bug 
-                            // fix
+                            // defaulted to zeros.
                             ((SchedulingEdge) ve).parameters.add(new vEdgeParameter("0"));
-                        }                        
+                        }
                     }
                 }
-                
-                // We have our SchedulingEdge and are now finsihed
-                break;
             }
             en.setLocalVariables(new Vector<ViskitElement>(localVariables.getData()));
             en.getComments().clear();
@@ -359,7 +354,7 @@ public class EventInspectorDialog extends JDialog {
         }
     }
 
-    private String fillString(ArrayList<String> lis) {
+    private String fillString(List<String> lis) {
         if (lis == null) {
             return "";
         }

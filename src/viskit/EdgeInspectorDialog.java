@@ -34,7 +34,7 @@ public class EdgeInspectorDialog extends JDialog {
     private static EdgeInspectorDialog dialog;
     private Edge edge;
     private static boolean modified = false;
-    private boolean schedulingType = true; // true=scheduling, false = cancelling
+    private boolean schedulingType = true; // true = scheduling, false = cancelling
     private JButton canButt,  okButt;
     private JLabel srcEvent,  targEvent;
     private JTextField delay;
@@ -54,7 +54,10 @@ public class EdgeInspectorDialog extends JDialog {
     private JButton addDescriptionButton;
     private JTextArea descriptionJta;
     private JScrollPane descriptionJsp;
-
+    
+    Vector<ViskitElement> nodeList;
+    Model mod; //todo fix
+    
     /**
      * Set up and show the dialog.  The first Component argument
      * determines which frame the dialog depends on; it should be
@@ -79,9 +82,7 @@ public class EdgeInspectorDialog extends JDialog {
         // above call blocks
         return modified;
     }
-    Vector<ViskitElement> nodeList;
-    Model mod; //todo fix
-
+    
     private EdgeInspectorDialog(JFrame frame, Component locationComp, Edge edge) {
         super(frame, "Edge Inspector", true);
         this.edge = edge;
@@ -90,10 +91,7 @@ public class EdgeInspectorDialog extends JDialog {
         this.addWindowListener(new myCloseListener());
 
         mod = (Model) (VGlobals.instance().getEventGraphEditor().getModel());
-        // nodeList = mod.getAllNodes();
-
-        //Collections.sort(nodeList);             // todo get working
-
+        
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
@@ -249,7 +247,6 @@ public class EdgeInspectorDialog extends JDialog {
 
         fillWidgets();     // put the data into the widgets
 
-        modified = false;
         okButt.setEnabled(false);
         getRootPane().setDefaultButton(canButt);
 
@@ -310,7 +307,7 @@ public class EdgeInspectorDialog extends JDialog {
         priorityNames = new Vector<String>(10);
         priorityList = new ArrayList<Priority>(10);
         try {
-            Class c = Class.forName("simkit.Priority");
+            Class<?> c = Class.forName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
@@ -325,8 +322,8 @@ public class EdgeInspectorDialog extends JDialog {
             jcb.setEditable(true); // this allows anything to be intered
             return jcb;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return new JComboBox(new String[]{"simkit package not in class path"});
+            Vstatics.log.error(e);
+            return new JComboBox(new String[] {"simkit package not in class path"});
         }
     }
 
@@ -354,17 +351,19 @@ public class EdgeInspectorDialog extends JDialog {
                 i++;
             }
 
-            System.err.println("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
+            log.error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
             priorityCB.setSelectedIndex(priorityDefaultIndex);
         }
     }
 
     private void fillWidgets() {
-        nodeList = mod.getAllNodes();                  // todo fix
+        nodeList = mod.getAllNodes();            // todo fix
+       //Collections.sort(nodeList);             // todo get working
 
         srcEvent.setText(edge.from.getName());
         targEvent.setText(edge.to.getName());
-        myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
+        myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), 
+                BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
         if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
             myParmPanel.setVisible(false);
@@ -375,7 +374,7 @@ public class EdgeInspectorDialog extends JDialog {
         }
 
         if (edge instanceof SchedulingEdge) {
-            if (edge.conditional == null || edge.conditional.trim().length() <= 0) {
+            if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
                 conditionalExpressionPanel.setText("true");
                 hideShowConditionals(false);
             } else {
@@ -384,16 +383,13 @@ public class EdgeInspectorDialog extends JDialog {
             }
             setDescription(edge.conditionalDescription);
 
-//      always show
-//        hideShowDescription(true);
-
-            if (edge.conditionalDescription == null || edge.conditionalDescription.length() <= 0) {
+            if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
                 hideShowDescription(false);
             } else {
                 hideShowDescription(true);
             }
 
-            if (edge.delay == null || edge.delay.trim().length() <= 0) {
+            if (edge.delay == null || edge.delay.trim().isEmpty()) {
                 delay.setText("0.0");
             } else {
                 delay.setText("" + edge.delay);
@@ -404,7 +400,7 @@ public class EdgeInspectorDialog extends JDialog {
             setPriorityCBValue(((SchedulingEdge) edge).priority);
 
         } else {
-            if (edge.conditional == null || edge.conditional.trim().length() <= 0) {
+            if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
                 conditionalExpressionPanel.setText("true");
             } else {
                 conditionalExpressionPanel.setText(edge.conditional);
@@ -425,7 +421,7 @@ public class EdgeInspectorDialog extends JDialog {
             int idx = priorityCB.getSelectedIndex();
             if (idx < 0) {
                 String s = (String) priorityCB.getSelectedItem();
-                if (s.length() <= 0) {
+                if (s.isEmpty()) {
                     Priority p = priorityList.get(priorityDefaultIndex);
                     ((SchedulingEdge) edge).priority = "" + p.getPriority();
                 } else {
@@ -437,25 +433,29 @@ public class EdgeInspectorDialog extends JDialog {
             }
         }
         String delaySt = delay.getText();
-        if (delaySt == null || delaySt.trim().isEmpty()) {
-            edge.delay = "0.0";
-        } else {
-            edge.delay = delay.getText();
-        }
-        String condSt = conditionalExpressionPanel.getText();
-        if (condSt == null || condSt.trim().isEmpty()) {
-            edge.conditional = "true";
-        } else {
-            edge.conditional = conditionalExpressionPanel.getText();
-        }
-        edge.conditionalDescription = getDescription();
-        edge.parameters.clear();
+        edge.delay = (delaySt == null || delaySt.trim().isEmpty()) ? "0.0" : delay.getText();
         
-        // Bug 1373: This is how applying changes to this EdgeInspectorDialog
-        // causes the correct EG XML representation when removing event
-        // parameters from a proceding node.  This loop adds vEdgeParameters
-        for (ViskitElement o : parameters.getData()) {
-            edge.parameters.add(o);
+        String condSt = conditionalExpressionPanel.getText();
+        edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? "true" : conditionalExpressionPanel.getText();
+        
+        edge.conditionalDescription = getDescription();
+        if (!edge.parameters.isEmpty()) {
+            edge.parameters.clear();
+        }
+        
+        // Key on the EdgeNode's list of potential arguments
+        // TODO: How do we do this automatically from the EventInspectorDialog
+        // when we remove an argument?
+        if (!edge.to.getArguments().isEmpty()) {
+
+            // Bug 1373: This is how applying changes to a scheduling edge
+            // causes the correct EG XML representation when removing event
+            // parameters from a proceding node.  This loop adds vEdgeParameters
+            for (ViskitElement o : parameters.getData()) {
+                edge.parameters.add(o);
+            }
+        } else {
+            parameters.setData(edge.parameters);
         }
     }
 
@@ -559,9 +559,7 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void keyTyped(KeyEvent e) {
             stateChanged(null);
-            // TODO:  update OK buttone when description field modified, rather than waiting to select another field
-            modified = true;
-            okButt.setEnabled(true);
+            // TODO:  update OK button when description field modified, rather than waiting to select another field            
         }
     }
 
@@ -592,8 +590,7 @@ public class EdgeInspectorDialog extends JDialog {
     }
     private ChangeListener changeListener;
 
-    public void addChangeListener(ChangeListener listener) //-----------------------------------------------
-    {
+    public void addChangeListener(ChangeListener listener) {
         this.changeListener = listener;
     }
 

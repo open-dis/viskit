@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -27,8 +28,8 @@ public class SchedulingEdge extends Edge {
     private String comment;
     private String stateVarType;
 
-    SchedulingEdge() // package-limited
-    {
+    /** package-limited constructor */
+    SchedulingEdge() {
         parameters = new ArrayList<ViskitElement>();
     }
 
@@ -114,4 +115,5 @@ public class SchedulingEdge extends Edge {
     public String getStateVarType() {
         return stateVarType;
     }
+    
 }

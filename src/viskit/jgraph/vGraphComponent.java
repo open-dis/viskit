@@ -332,10 +332,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                         }
                     }
 
-                    ArrayList st = en.getTransitions();
+                    List<ViskitElement> st = en.getTransitions();
                     StringBuffer sttrans = new StringBuffer();
-                    for (Iterator itr = st.iterator(); itr.hasNext();) {
-                        EventStateTransition est = (EventStateTransition) itr.next();
+                    for (ViskitElement ve : st) {
+                        EventStateTransition est = (EventStateTransition) ve;
                         sttrans.append("&nbsp;");
                         sttrans.append(est.getStateVarName());
                         sttrans.append(!est.isOperation() ? "=" : ".");
@@ -347,11 +347,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                         sb.append(sttrans);
                     }
 
-                    ArrayList argLis = en.getArguments();
+                    List<ViskitElement> argLis = en.getArguments();
                     StringBuffer args = new StringBuffer();
                     int n = 1;
-                    for (Iterator itr = argLis.iterator(); itr.hasNext();) {
-                        EventArgument arg = (EventArgument) itr.next();
+                    for (ViskitElement ve : argLis) {
+                        EventArgument arg = (EventArgument) ve;
                         String as = arg.getName() + " (" + arg.getType() + ")";
                         args.append("&nbsp;");
                         args.append(n);

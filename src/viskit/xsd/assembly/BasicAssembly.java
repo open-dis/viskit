@@ -686,6 +686,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Schedule.setVerbose(isVerbose());
                 Schedule.setReallyVerbose(isVerbose());
             }
+            
             int nextRunCount = Schedule.getReruns().size();
             if (nextRunCount != runCount) {
                 System.out.println("Reruns changed old: " + runCount + " new: " + nextRunCount);
