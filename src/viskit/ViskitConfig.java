@@ -50,7 +50,11 @@ public class ViskitConfig {
     public static final String CACHED_MISS_DIGEST_KEY = "Cached.Miss[@digest]";
     public static final String CACHED_CLEAR_KEY = "Cached";
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
-
+    public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
+    
+    public static final String LAF_DEFAULT = "default";
+    public static final String LAF_PLATFORM = "platform";
+    
     private static ViskitConfig me;
 
     private HashMap<String, XMLConfiguration> configs = new HashMap<String, XMLConfiguration>();
