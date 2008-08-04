@@ -75,8 +75,22 @@ public class EventGraphAssemblyComboMain {
         VGlobals.instance().setMainAppWindow(mainFrame);
         mainFrame.setVisible(true);
     }
-
-    public static void setLandFandFonts() {
+    
+    public static void setLandFandFonts()
+    {
+      ViskitConfig cfg = ViskitConfig.instance();
+      String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
+      if(s == null || s.length()<=0 || s.equalsIgnoreCase("platform"))
+        return;
+      if(s.equalsIgnoreCase("default"))
+        setJGoodies();
+      else try {
+        UIManager.setLookAndFeel(s);
+      } catch(Exception ex) {
+        System.err.println("Error setting Look and Feel to "+s);
+      }
+    }
+    public static void setJGoodies() {
         LookAndFeel laf = new PlasticLookAndFeel();
         Options.setUseNarrowButtons(true);
         PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());
