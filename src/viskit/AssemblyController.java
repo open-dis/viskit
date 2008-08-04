@@ -427,6 +427,30 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
                 VGlobals.instance().getMainAppWindow(), gmd);
     }
+    
+    private String shortEgName(String typeName) {     
+        return shortName(typeName,"evgr_",egNodeCount++);
+    }
+    
+    private String shortPCLName(String typeName) {
+        return shortName(typeName,"lstnr_",egNodeCount++); // use same counter
+    }
+
+    private String shortAdapterName(String typeName) {
+        return shortName(typeName,"adptr_",egNodeCount++); // use same counter
+    }
+
+    private String shortName(String typeName, String prefix, int count) {
+        String shortname = prefix;
+        if (typeName.lastIndexOf('.') != -1)
+            shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
+  
+        // Don't capitalize the first letter
+        char[] ca = shortname.toCharArray();
+        ca[0] = Character.toLowerCase(ca[0]);
+        shortname = new String(ca);
+        return shortname + count;
+     }
 
     /** Creates a new Viskit Project */
     public void newProject() {
@@ -496,15 +520,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, false);
     }
 
-    private int egNodeCount = 0;
-
-    private String shortEgName(String typeName) {
-        String shortname = "evgr_";
-        if (typeName.lastIndexOf('.') != -1) {
-            shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
-        }
-        return shortname + egNodeCount++;
-    }
+    private int   egNodeCount = 0;
     private Point nextPoint = new Point(25, 25);
 
     private Point getNextPoint() {
@@ -551,23 +567,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
         ((viskit.model.ViskitAssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
-    }
-
-    private String shortPCLName(String typeName) {
-        String shortname = "lstnr_";
-        if (typeName.lastIndexOf('.') != -1) {
-            shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
-        }
-
-        return shortname + egNodeCount++; // use same counter
-    }
-
-    private String shortAdapterName(String typeName) {
-        String shortname = "adptr_";
-        if (typeName.lastIndexOf('.') != -1) {
-            shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
-        }
-        return shortname + egNodeCount++; // use same counter
     }
 
     /**

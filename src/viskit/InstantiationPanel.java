@@ -277,7 +277,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     class ConstrPanel extends JPanel implements ActionListener, CaretListener {
 
         private JTabbedPane tp;
-        private Constructor[] construct;
+        //private Constructor[] construct;
         private ConstructorPanel[] constructorPanels;
         private String noParamString = "(no parameters)";
         private ImageIcon checkMark;
@@ -331,12 +331,18 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void actionPerformed(ActionEvent e) {
             int idx = tp.getSelectedIndex();
-            if (construct == null || construct.length <= 0) // some classes have no constructors
-            {
-                return;
-            }
-
-            for (int i = 0; i < tp.getTabCount(); i++) {
+//            if (construct == null || construct.length <= 0) // some classes have no constructors
+//            {
+//                return;
+//            }
+// Don't know what the above was about; the field was never being initted
+            
+            // tell mommy...put up here to emphasize that it is the chief reason for having this listener
+            ip.actionPerformed(e);
+            
+          // But we can do this: leave off the red border if only one to choose from
+            if(tp.getTabCount() > 1)
+              for (int i = 0; i < tp.getTabCount(); i++) {
                 if (i == idx) {
                     tp.setIconAt(i, checkMark);
                     constructorPanels[i].setBorder(BorderFactory.createLineBorder(Color.red));
@@ -346,9 +352,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     constructorPanels[i].setBorder(null);
                     constructorPanels[i].setSelected(false);
                 }
-            }
-            // tell mommy
-            ip.actionPerformed(e);
+              }
         }
 
         public void setData(VInstantiator.Constr vi) {
@@ -365,11 +369,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (viskit.Vstatics.debug) {
                 System.out.println("found a matching constructor at " + indx);
             }
-            
-            constructorPanels[indx].setData(vi.getArgs());
-            tp.setSelectedIndex(indx);
+            if(indx != -1) {       
+                constructorPanels[indx].setData(vi.getArgs());
+                tp.setSelectedIndex(indx);
+            }
             actionPerformed(null);
-        }
+       }
 
         public VInstantiator getData() {
             ConstructorPanel cp = (ConstructorPanel) tp.getSelectedComponent();
