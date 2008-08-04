@@ -178,9 +178,9 @@ public class EdgeInspectorDialog extends JDialog {
         priorityPanel.setOpaque(false);
         priorityPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Priority")));
         priorityCB = buildPriorityComboBox();
-        priorityPanel.add(Box.createHorizontalStrut(102));     // set packed width clamp here
+        priorityPanel.add(Box.createHorizontalStrut(50)); //102));     // set packed width clamp here
         priorityPanel.add(priorityCB);
-        priorityPanel.add(Box.createHorizontalStrut(102));
+        priorityPanel.add(Box.createHorizontalStrut(50)); //102));
         edgeInspectorPanel.add(priorityPanel);
         BoxLayoutUtils.clampHeight(priorityPanel);
 
@@ -217,20 +217,21 @@ public class EdgeInspectorDialog extends JDialog {
         JPanel twoRowButtonPanel = new JPanel();
         twoRowButtonPanel.setLayout(new BoxLayout(twoRowButtonPanel, BoxLayout.Y_AXIS));
 
-        JPanel tinyButtonPanel = new JPanel();
-        tinyButtonPanel.setLayout(new BoxLayout(tinyButtonPanel, BoxLayout.X_AXIS));
-        addDescriptionButton = new JButton("add description");
-        addConditionalButton = new JButton("add conditional");
+        JPanel addButtonPanel = new JPanel();
+        addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
+        addButtonPanel.setBorder(new TitledBorder("add"));
+        addDescriptionButton = new JButton("description"); //add description");
+        addConditionalButton = new JButton("conditional"); //add conditional");
 
-        Font defButtFont = addConditionalButton.getFont();
-        int defButtFontSize = defButtFont.getSize();
-        addConditionalButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
-        addDescriptionButton.setFont(addConditionalButton.getFont());
-        tinyButtonPanel.add(Box.createHorizontalGlue());
-        tinyButtonPanel.add(addDescriptionButton);
-        tinyButtonPanel.add(addConditionalButton);
-        tinyButtonPanel.add(Box.createHorizontalGlue());
-        twoRowButtonPanel.add(tinyButtonPanel);
+//        Font defButtFont = addConditionalButton.getFont();
+//        int defButtFontSize = defButtFont.getSize();
+//        addConditionalButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
+//        addDescriptionButton.setFont(addConditionalButton.getFont());
+        addButtonPanel.add(Box.createHorizontalGlue());
+        addButtonPanel.add(addDescriptionButton);
+        addButtonPanel.add(addConditionalButton);
+        addButtonPanel.add(Box.createHorizontalGlue());
+        twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
 
         JPanel buttPan = new JPanel();

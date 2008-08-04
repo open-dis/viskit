@@ -2,7 +2,6 @@ package viskit;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -13,6 +12,7 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.border.TitledBorder;
 import org.apache.log4j.Logger;
 import viskit.model.EventArgument;
 import viskit.model.EventLocalVariable;
@@ -150,31 +150,32 @@ public class EventInspectorDialog extends JDialog {
         JPanel twoRowButtonPanel = new JPanel();
         twoRowButtonPanel.setLayout(new BoxLayout(twoRowButtonPanel, BoxLayout.Y_AXIS));
 
-        JPanel tinyButtonPanel = new JPanel();
-        tinyButtonPanel.setLayout(new BoxLayout(tinyButtonPanel, BoxLayout.X_AXIS));
+        JPanel addButtonPanel = new JPanel();
+        addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
+        addButtonPanel.setBorder(new TitledBorder("add"));
+        
+        addDescriptionButton = new JButton("description"); //add description");
+        addArgumentsButton = new JButton("arguments"); //add arguments");
+        addLocalsButton = new JButton("locals"); //add locals");
+        addCodeBlockButton = new JButton("code block"); //add code block");
+        addStateTransitionsButton = new JButton("state transitions"); //add state transitions");
 
-        addDescriptionButton = new JButton("add description");
-        addArgumentsButton = new JButton("add arguments");
-        addLocalsButton = new JButton("add locals");
-        addCodeBlockButton = new JButton("add code block");
-        addStateTransitionsButton = new JButton("add state transitions");
-
-        Font defButtFont = addDescriptionButton.getFont();
-        int defButtFontSize = defButtFont.getSize();
-        addDescriptionButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
+        //Font defButtFont = addDescriptionButton.getFont();
+        //int defButtFontSize = defButtFont.getSize();
+        //addDescriptionButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
         addArgumentsButton.setFont(addDescriptionButton.getFont());
         addLocalsButton.setFont(addDescriptionButton.getFont());
         addCodeBlockButton.setFont(addDescriptionButton.getFont());
         addStateTransitionsButton.setFont(addDescriptionButton.getFont());
 
-        tinyButtonPanel.add(Box.createHorizontalGlue());
-        tinyButtonPanel.add(addDescriptionButton);
-        tinyButtonPanel.add(addArgumentsButton);
-        tinyButtonPanel.add(addLocalsButton);
-        tinyButtonPanel.add(addCodeBlockButton);
-        tinyButtonPanel.add(addStateTransitionsButton);
-        tinyButtonPanel.add(Box.createHorizontalGlue());
-        twoRowButtonPanel.add(tinyButtonPanel);
+        addButtonPanel.add(Box.createHorizontalGlue());
+        addButtonPanel.add(addDescriptionButton);
+        addButtonPanel.add(addArgumentsButton);
+        addButtonPanel.add(addLocalsButton);
+        addButtonPanel.add(addCodeBlockButton);
+        addButtonPanel.add(addStateTransitionsButton);
+        addButtonPanel.add(Box.createHorizontalGlue());
+        twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
 
         JPanel buttonPanel = new JPanel();
