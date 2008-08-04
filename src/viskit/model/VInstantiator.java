@@ -471,6 +471,7 @@ public abstract class VInstantiator {
             if (!found) {
                 indx = -1;
                 log.error("An index of -1 will throw an error to the caller of VInstantiator.indexOfArgNames(String, List<Object>)");
+                log.error("...correction, won't throw error from Constr because of check, but whole logic should be cleaned up.");
             }
             return indx;
         }
