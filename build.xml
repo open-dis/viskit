@@ -367,6 +367,7 @@
                 <pathelement location="${dir.build.lib}/visxml.jar"/>
             </classpath>
             <src path="${dir.src}/viskit"/>
+            <src path="${dir.test}"/>
             <src path="${dir.src.simevg.util}"/>
             <src path="${dir.src.simasm.util}"/>            
             <src path="${dir.src.cli.util}"/>
@@ -464,7 +465,11 @@
     <target name="build.viskit.with.runtime.extenstions"
             depends="jar,runtime.extenstions" 
             description="Build viskit and diskit jars"/>
-    
+            
+    <target name="build.viskit.no.runtime.extensions"
+            depends="jar"
+            description="Build viskit jar(s)"/>
+            
     <target name="jar.executable" depends="jar">
         <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">            
             <chainedmapper>
