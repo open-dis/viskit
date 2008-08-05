@@ -654,8 +654,8 @@ public class SimkitXML2Java {
         if (e.getCode() != null) {
             pw.println(sp8 + "/* Code insertion for Event " + e.getName() + " */");
             String[] lines = e.getCode().split("\\n");
-            for (int i = 0; i < lines.length; i++) {
-                pw.println(sp8 + lines[i]);
+            for (String line : lines) {
+                pw.println(sp8 + line);
             }
             pw.println(sp8 + "/* End Code insertion */");
             pw.println();
@@ -785,16 +785,28 @@ public class SimkitXML2Java {
 
             EdgeParameter ep = s.getEdgeParameter().get(0);
 
+            pw.print(cm + sp);
+            
             /* NOTE: varargs can throw a mostly harmless compiler warning if 
-             * there is only one arg here.
+             * there is only one arg here and it happens to be a non primative
+             * array.
              * "warning: non-varargs call of varargs method with inexact argument type for last parameter"
-             * If there are more than one or none there is no ambiguity.
-             * If the one arg case is cast as Object then the warning is 
+             * If the non primative array is cast as Object then the warning is 
              * suppressed.  Will cause CacheMiss from the AssemblyController if 
-             * not cast to Object in single arg case.
+             * not cast as an Object causing problems further up the line of not
+             * being able to find certain CacheMiss EventGraphs.
              */
-            pw.print(cm + "(Object) ");
-            pw.print(lp + ep.getValue() + rp);
+            
+            // TODO: Cheap way to test for arrays (by variable/parameter name)
+            // Would be better to have the actual object to check to see if a 
+            // non primative array, however, the variable/parameter name is the
+            // only item captured in the EdgeParameter list from Schedule
+            if (ep.getValue().endsWith("s")) {
+                pw.print("(Object) ");
+                pw.print(lp + ep.getValue() + rp);
+            } else {
+                pw.print(ep.getValue());
+            }
 
         } else if (s.getEdgeParameter().size() > 1) {
             pw.print(cm);
