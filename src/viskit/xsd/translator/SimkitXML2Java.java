@@ -823,45 +823,14 @@ public class SimkitXML2Java {
             pw.println(sp8 + "if" + sp + lp + c.getCondition() + rp + sp + ob);
         }
 
-        pw.print(sp8 + condent + "interrupt" + lp + qu + event.getName() + qu + cm);
-        pw.print("new Object[]" + ob);
-
+        pw.print(sp8 + condent + "interrupt" + lp + qu + event.getName() + qu);
         for (EdgeParameter ep : liEdgeP) {
-            Argument arg = eventArgsi.next();
-            try {
-                cl = Class.forName(arg.getType());
-            } catch (ClassNotFoundException cnfe) {
-                // most likely a primitive type
-                String type = arg.getType();
-                String constructor = "new" + sp;
-                if (type.equals("int")) {
-                    constructor += "Integer";
-                } else if (type.equals("float")) {
-                    constructor += "Float";
-                } else if (type.equals("double")) {
-                    constructor += "Double";
-                } else if (type.equals("long")) {
-                    constructor += "Long";
-                } else if (type.equals("boolean")) {
-                    constructor += "Boolean";
-                } else if (ep.getValue().equals("this")) {
-                    constructor = "";
-                }
-                pw.print(constructor + lp + ep.getValue() + rp);
-            }
-            if (cl != null) {
-                pw.print(ep.getValue());
-            }
-
-            if (liEdgeP.size() > 1 && liEdgeP.indexOf(ep) < liEdgeP.size() - 1) {
-                pw.print(cm);
-            }
+            pw.print(cm + sp + ep.getValue());
         }
-        pw.println(cb + rp + sc);
+        pw.print(rp + sc);
+        pw.println();
+        pw.println(sp8 + cb);
 
-        if (c.getCondition() != null) {
-            pw.println(sp8 + cb);
-        }
     }
 
     void buildTail(StringWriter t) {
