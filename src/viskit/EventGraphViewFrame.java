@@ -491,7 +491,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private void adjustMenus(ViskitModel mod) {
     //todo
     }
-    
+  /*  
     class _RecentFileListener implements ViskitController.RecentFileListener
     {
       public void listChanged()
@@ -501,15 +501,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         openRecentMI.
       }     
     }
-    
+   */ 
     private JMenuItem openRecentMI;
-    private _RecentFileListener myFileListener;
+    //private _RecentFileListener myFileListener;
     
     private void buildMenus(boolean contentOnly) {
         ViskitController vcontroller = (ViskitController) getController();
         
-        myFileListener = new _RecentFileListener();      
-        vcontroller.addRecentFileListListener(myFileListener);
+    //    myFileListener = new _RecentFileListener();      
+    //    vcontroller.addRecentFileListListener(myFileListener);
         
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
