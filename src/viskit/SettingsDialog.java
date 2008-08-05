@@ -423,10 +423,10 @@ public class SettingsDialog extends JDialog {
         debugMsgsCB.setSelected(isVerboseDebug());
         
         String laf = getLookAndFeel();
-        if(laf.equals(ViskitConfig.LAF_DEFAULT))
-          defaultLafRB.setSelected(true);         
-        else if(laf.equals(ViskitConfig.LAF_PLATFORM))
+        if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM))
           platformLafRB.setSelected(true);
+        else if(laf.equals(ViskitConfig.LAF_DEFAULT))
+          defaultLafRB.setSelected(true);         
         else {
           otherLafRB.setSelected(true);
           otherTF.setEnabled(true);
