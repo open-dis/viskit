@@ -3,7 +3,6 @@ package viskit;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.EventGraphFileFilter;
-import edu.nps.util.JSplitPaneInitDivider;
 import org.apache.log4j.Logger;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
@@ -26,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -283,18 +283,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         parametersPanel.add(Box.createVerticalStrut(5));
 
         JLabel descriptionLabel = new JLabel("Description");
+        descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
 
-        descriptionTextArea = new JTextArea(2, 40);
+        descriptionTextArea = new JTextArea(); //2, 40);
         descriptionTextArea.setWrapStyleWord(true);
         descriptionTextArea.setLineWrap(true);
-        descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+        //test descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+        descriptionTextArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
         descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
-        parametersPanel.add(descriptionTextArea); // TODO: descriptionScrollPane not working?
+        parametersPanel.add(descriptionScrollPane); //descriptionTextArea); // TODO: descriptionScrollPane not working?
         parametersPanel.add(Box.createVerticalStrut(5));
 
         parametersPanel.setMinimumSize(new Dimension(20, 20));
@@ -336,16 +338,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(stateVariablesPanel),
-                buildCodeBlockComponent(codeblockPan));
+                new JScrollPane(buildCodeBlockComponent(codeblockPan)));
         // Split pane that has parameters, state variables and code block.
         JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                new JScrollPane(parametersPanel),
+                parametersPanel,
                 stateCblockSplt);
 
-        // TODO:  how to get description in as a separate pane?
-        JSplitPane descriptionSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                descriptionScrollPane,
-                spltPn);
         spltPn.setMinimumSize(new Dimension(20, 20));
 
         vgcw.stateParamSplitPane = spltPn;
@@ -393,15 +391,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         graphPane.model = mod;
 
         buildStateParamSplit(graphPane);
+        
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
-        graphPane.drawingSplitPane = new JSplitPaneInitDivider(JSplitPane.HORIZONTAL_SPLIT,
-                new JLabel(), //new JScrollPane(graphPane),
-                new JLabel()); //dummy stateParameterSplit);
-
-
-        // Save the existing as the first setting for the new one.
-        //graphPane.drawingSplitSetting = drawingSplitPane.getDividerLocation();
-
+        JScrollPane jsp = new JScrollPane(graphPane);
+        jsp.setPreferredSize(new Dimension(500,100)); // this is the key to getting the jgraph half to come up appropriately wide
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,jsp,graphPane.stateParamSplitPane);
+        
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
@@ -409,20 +404,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             //assert false : "Drop target init. error";
             System.err.println("assert false : \"Drop target init. error\"");
         }
-        JScrollPane jsp = new JScrollPane(graphPane);
-        graphPane.drawingSplitPane.setLeftComponent(jsp);
-        graphPane.drawingSplitPane.setRightComponent(graphPane.stateParamSplitPane);
-
+ 
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        // If a new one, the splitpane is off
-        if (isNewEG) {
-            graphPane.drawingSplitPane.setDividerLocation(250);
-        }
-
         setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
-    // but this call serves also to register the view with the passed model
+        // but this call serves also to register the view with the passed model
     }
 
     public void delTab(ViskitModel mod) {
@@ -504,13 +491,31 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private void adjustMenus(ViskitModel mod) {
     //todo
     }
-
+    
+    class _RecentFileListener implements ViskitController.RecentFileListener
+    {
+      public void listChanged()
+      {
+        ViskitController vcontroller = (ViskitController) getController();
+        java.util.List<String> lis = vcontroller.getRecentFileList();
+        openRecentMI.
+      }     
+    }
+    
+    private JMenuItem openRecentMI;
+    private _RecentFileListener myFileListener;
+    
     private void buildMenus(boolean contentOnly) {
         ViskitController vcontroller = (ViskitController) getController();
+        
+        myFileListener = new _RecentFileListener();      
+        vcontroller.addRecentFileListListener(myFileListener);
+        
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
+
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));        
@@ -520,7 +525,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 
         fileMenu.add(buildMenuItem(vcontroller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
+        fileMenu.add(openRecentMI=buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
         fileMenu.add(buildMenuItem(vcontroller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "closeAll", "Close All", null, null));
@@ -591,6 +596,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
         myMenuBar.add(helpMenu);
 
+        
         if (!contentOnly) {
             setJMenuBar(myMenuBar);
         }
