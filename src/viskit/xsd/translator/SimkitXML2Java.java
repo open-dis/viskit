@@ -287,7 +287,9 @@ public class SimkitXML2Java {
         pw.print(sp8 + "this" + pd + p.getName() + sp + eq + sp);
 
         if (isArray(p.getType()) || isGeneric(p.getType())) {
-            pw.print(lp + p.getType() + rp + sp + shortinate(p.getName()));
+            
+            // Lessen cause for redundant casts
+            pw.print(/*lp + p.getType() + rp + sp + */shortinate(p.getName()));
             pw.println(pd + "clone" + lp + rp + sc);
         } else {
             pw.println(shortinate(p.getName()) + sc);
@@ -779,16 +781,20 @@ public class SimkitXML2Java {
 
         pw.print(s.getDelay() + cm + "Priority" + pd + prio);
 
-        // varargs can throw a mostly harmless compiler warning if there is only one arg here
-        // "warning: non-varargs call of varargs method with inexact argument type for last parameter"
-        // If there are more than one or none there is no ambiguity.
-        // If the one arg case is cast as Object then the warning is suppressed
-
         if (s.getEdgeParameter().size() == 1) {
 
             EdgeParameter ep = s.getEdgeParameter().get(0);
 
-            pw.print(cm + ep.getValue());
+            /* NOTE: varargs can throw a mostly harmless compiler warning if 
+             * there is only one arg here.
+             * "warning: non-varargs call of varargs method with inexact argument type for last parameter"
+             * If there are more than one or none there is no ambiguity.
+             * If the one arg case is cast as Object then the warning is 
+             * suppressed.  Will cause CacheMiss from the AssemblyController if 
+             * not cast to Object in single arg case.
+             */
+            pw.print(cm + "(Object) ");
+            pw.print(lp + ep.getValue() + rp);
 
         } else if (s.getEdgeParameter().size() > 1) {
             pw.print(cm);
@@ -812,11 +818,8 @@ public class SimkitXML2Java {
 
     void doCancel(Cancel c, Event e, PrintWriter pw) {
         List<EdgeParameter> liEdgeP = c.getEdgeParameter();
-        Class<?> cl = null;
         String condent = "";
         Event event = (Event) c.getEvent();
-        List<Argument> eventArgs = event.getArgument();
-        ListIterator<Argument> eventArgsi = eventArgs.listIterator();
 
         if (c.getCondition() != null) {
             condent = sp4;
@@ -829,8 +832,9 @@ public class SimkitXML2Java {
         }
         pw.print(rp + sc);
         pw.println();
-        pw.println(sp8 + cb);
-
+        if (c.getCondition() != null) {
+            pw.println(sp8 + cb);
+        }
     }
 
     void buildTail(StringWriter t) {
