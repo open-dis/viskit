@@ -281,7 +281,6 @@ public class SettingsDialog extends JDialog {
       {
         if(e.getSource() == otherTF) {
           vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
-          System.out.println("update other laf to " + otherTF.getText().trim());
         }
         else {
          if(defaultLafRB.isSelected()) {
@@ -294,7 +293,6 @@ public class SettingsDialog extends JDialog {
         }
          else if(otherLafRB.isSelected()) {
            vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
-           System.out.println("update other laf to " + otherTF.getText().trim());
            otherTF.setEnabled(true);
          }
         } 
