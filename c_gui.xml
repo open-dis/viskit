@@ -29,5 +29,6 @@
 	<projecttitles>
 	    <locationfilechoosertitle>Viskit Project Location</locationfilechoosertitle>
 	</projecttitles>
+    <lookandfeel>default</lookandfeel>
     </gui>
 </ViskitConfig>

@@ -135,7 +135,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // the main splitpane underneath.
 
         // assemblyEditorContent level panel
-        assemblyEditorContent = new JPanel();
+        assemblyEditorContent = new JPanel() {
+          @Override
+          public void setVisible(boolean aFlag)
+          {
+            super.setVisible(aFlag);
+            if (aFlag && !firstShown) {
+              firstShown = true;
+              jsp.setDividerLocation(0.33d); //225);
+              panJsp.setDividerLocation(0.5d);
+            }        
+          }         
+        };
         assemblyEditorContent.setLayout(new BorderLayout());
 
         JComponent canvas = buildCanvas();
@@ -155,7 +166,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         {
             getContentPane().add(assemblyEditorContent);
         }
-
+        jsp.setDividerLocation(0.33d);
         trees.setDividerLocation(250);
     }
 
@@ -602,7 +613,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         super.setVisible(b);
         if (!firstShown) {
             firstShown = true;
-            jsp.setDividerLocation(225);
+            jsp.setDividerLocation(0.33d); //225);
             panJsp.setDividerLocation(0.5d);
         }
     }
