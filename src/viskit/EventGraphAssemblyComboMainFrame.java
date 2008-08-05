@@ -97,8 +97,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - 800) / 2, (d.height - 600) / 2);
-        this.setSize(800, 600);
-
+        //this.setSize(800, 600);
+        this.setSize(930, 680);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
 

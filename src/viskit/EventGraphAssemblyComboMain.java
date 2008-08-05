@@ -80,27 +80,26 @@ public class EventGraphAssemblyComboMain {
     {
       ViskitConfig cfg = ViskitConfig.instance();
       String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
-      if(s == null || s.length()<=0 || s.equalsIgnoreCase("platform"))
-        return;
-      if(s.equalsIgnoreCase("default"))
-        setJGoodies();
-      else try {
-        UIManager.setLookAndFeel(s);
-      } catch(Exception ex) {
+      try {
+        if(s == null || s.length()<=0 || s.equalsIgnoreCase("default"))
+          setJGoodies();
+        else if(s.equalsIgnoreCase("platform"))
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        else 
+          UIManager.setLookAndFeel(s);
+      }
+      catch(Exception ex) {
         System.err.println("Error setting Look and Feel to "+s);
       }
     }
-    public static void setJGoodies() {
+    
+    public static void setJGoodies() throws Exception{
         LookAndFeel laf = new PlasticLookAndFeel();
         Options.setUseNarrowButtons(true);
         PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());
         PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
 
-        try {
-            UIManager.setLookAndFeel(laf);
-            ShadowPopupFactory.uninstall();
-        } catch (UnsupportedLookAndFeelException e) {
-            System.out.println("can't change l&f");
-        }    
+        UIManager.setLookAndFeel(laf);
+        ShadowPopupFactory.uninstall();
     }
 }

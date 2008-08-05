@@ -135,7 +135,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // the main splitpane underneath.
 
         // assemblyEditorContent level panel
-        assemblyEditorContent = new JPanel() {
+        assemblyEditorContent = new JPanel()
+        {
           @Override
           public void setVisible(boolean aFlag)
           {
@@ -155,7 +156,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         JScrollPane leftsp = new JScrollPane(trees);
         leftsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trees, new JScrollPane(canvasPanel));
+        JScrollPane jscrp = new JScrollPane(canvasPanel);
+        jscrp.setPreferredSize(new Dimension(500,500));  // experiment to see if splitpane
+        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trees, jscrp);
         jsp.setOneTouchExpandable(true);
         trees.setMinimumSize(new Dimension(20, 20));
         canvas.setMinimumSize(new Dimension(20, 20));
@@ -166,7 +169,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         {
             getContentPane().add(assemblyEditorContent);
         }
-        jsp.setDividerLocation(0.33d);
+        //jsp.setDividerLocation(0.33d);
         trees.setDividerLocation(250);
     }
 
