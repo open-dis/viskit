@@ -18,6 +18,7 @@ import javax.swing.*;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
+import java.util.HashSet;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -255,6 +256,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    public void openRecentEventGraph(String path) {
+      _doOpen(new File(path));
+    }
+    
     // Support for informing listeners about open eventgraphs
     // Methods to implement a scheme where other modules will be informed of file changes //
     // (Would Java Beans do this with more or less effort?
@@ -324,6 +329,23 @@ public class EventGraphController extends mvcAbstractController implements Viski
         dirWatch.removeListener(lis);
     }
 
+    HashSet<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    public void addRecentFileListListener(RecentFileListener lis)
+    {
+      recentListeners.add(lis);
+    }
+    
+    public void removeRecentFileListListener(RecentFileListener lis)
+    {
+      recentListeners.remove(lis);
+    }
+    
+    private void notifyRecentFileListeners()
+    {
+      for(RecentFileListener lis : recentListeners)
+        lis.listChanged();
+    }
+    
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
@@ -341,6 +363,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             recentFileList.remove(recentFileList.size() - 1);
         }
         saveHistoryXML(recentFileList);
+        notifyRecentFileListeners();
     }
 
     private ArrayList<String> openV;
@@ -361,6 +384,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
             i++;
         }
+        notifyRecentFileListeners();
     }
 
     private void saveHistoryXML(ArrayList<String> recentFiles) {
@@ -391,7 +415,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
     }
-
+    
+    public java.util.List<String> getRecentFileList()  // implement interface
+    {
+      return getRecentFileList(false);
+    }
+    
     private ArrayList<String> getRecentFileList(boolean refresh) {
         if (refresh || recentFileList == null) {
             _setFileLists();

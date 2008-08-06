@@ -74,6 +74,8 @@ public interface ViskitAssemblyController {
 
     void openRecent();
 
+    void openRecentAssembly(String fullPath);
+    
     void paste();
 
     void quit();
@@ -112,4 +114,13 @@ public interface ViskitAssemblyController {
     void export2grid();
 
     void captureWindow();
+    
+    void addRecentFileListListener(RecentFileListener lis);
+    void removeRecentFileListListener(RecentFileListener lis);
+    java.util.List<String> getRecentFileList();
+  
+    public static interface RecentFileListener
+    {
+      public void listChanged();
+    }
 }

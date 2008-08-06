@@ -491,25 +491,50 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private void adjustMenus(ViskitModel mod) {
     //todo
     }
-  /*  
+    private String FULLPATH = "FULLPATH";
     class _RecentFileListener implements ViskitController.RecentFileListener
     {
       public void listChanged()
       {
         ViskitController vcontroller = (ViskitController) getController();
         java.util.List<String> lis = vcontroller.getRecentFileList();
-        openRecentMI.
+        openRecentMenu.removeAll();
+        for(String fullPath : lis) {
+          File f = new File(fullPath);
+          if(!f.exists())
+            continue;
+          String nameOnly = f.getName();
+          Action act = new ParameterizedAction(nameOnly);
+          act.putValue(FULLPATH,fullPath);
+          JMenuItem mi = new JMenuItem(act);
+          mi.setToolTipText(fullPath);
+          openRecentMenu.add(mi);
+        }
       }     
     }
-   */ 
-    private JMenuItem openRecentMI;
-    //private _RecentFileListener myFileListener;
+    
+    class ParameterizedAction extends javax.swing.AbstractAction
+    {
+      ParameterizedAction(String s)
+      {
+        super(s);
+      }
+     
+      public void actionPerformed(ActionEvent ev)
+      {
+        ViskitController vcontroller = (ViskitController) getController();
+        vcontroller.openRecentEventGraph((String)getValue(FULLPATH));
+      }     
+    }
+    
+    private JMenu openRecentMenu;
+    private _RecentFileListener myFileListener;
     
     private void buildMenus(boolean contentOnly) {
         ViskitController vcontroller = (ViskitController) getController();
         
-    //    myFileListener = new _RecentFileListener();      
-    //    vcontroller.addRecentFileListListener(myFileListener);
+        myFileListener = new _RecentFileListener();      
+        vcontroller.addRecentFileListListener(myFileListener);
         
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -525,7 +550,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 
         fileMenu.add(buildMenuItem(vcontroller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentMI=buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
+        //fileMenu.add(openRecentMI=buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
+        fileMenu.add(openRecentMenu=buildMenu("Open Recent Event Graph"));
         fileMenu.add(buildMenuItem(vcontroller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "closeAll", "Close All", null, null));
@@ -621,7 +647,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         return ActionUtilities.createMenuItem(a);
     }
-
+    
+    private JMenu buildMenu(String name)
+    {
+      return new JMenu(name);
+    }
+    
     private JToggleButton makeJTButton(Action a, String icPath, String tt) {
         JToggleButton jtb;
         if (a != null) {

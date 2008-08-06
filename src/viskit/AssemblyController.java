@@ -362,6 +362,24 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     {
         OpenAssembly.inst().removeListener(lis);
     }
+    
+    HashSet<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    public void addRecentFileListListener(RecentFileListener lis)
+    {
+      recentListeners.add(lis);
+    }
+    
+    public void removeRecentFileListListener(RecentFileListener lis)
+    {
+      recentListeners.remove(lis);
+    }
+    
+    private void notifyRecentFileListeners()
+    {
+      for(RecentFileListener lis : recentListeners)
+        lis.listChanged();
+    }
+    
 
     /////////////////////////////////////////////////////////////////////////////////////
     /** Here we are informed of open Event Graphs */
@@ -1634,7 +1652,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         // v might have been changed
         setRecentFileList(v);
     }
-
+    
+    public void openRecentAssembly(String path) {
+      _doOpen(new File(path));
+    }
+    
     /** Opens each EG associated with this Assembly
      * @param f the Assembly File to open EventGraphs for
      */
@@ -1673,6 +1695,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             recentFileList.remove(recentFileList.size() - 1);
         }
         saveHistoryXML(recentFileList);
+        notifyRecentFileListeners();
     }
 
     private ArrayList<String> openV;
@@ -1692,6 +1715,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 openV.add(valueAr[i]);
             }
         }
+        notifyRecentFileListeners();
     }
 
     private void saveHistoryXML(ArrayList recentFiles) {
@@ -1716,7 +1740,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
     }
-
+    
+    public java.util.List<String> getRecentFileList()  // implement interface
+    {
+      return getRecentFileList(false);
+    }
+    
     private ArrayList<String> getRecentFileList(boolean refresh) {
         if (refresh || recentFileList == null) {
             _setFileLists();

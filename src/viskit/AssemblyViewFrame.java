@@ -172,9 +172,52 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         //jsp.setDividerLocation(0.33d);
         trees.setDividerLocation(250);
     }
+    
+    private String FULLPATH = "FULLPATH";
+    JMenu openRecentMenu;
+    private _RecentFileListener myFileListener;
+    
+    class _RecentFileListener implements ViskitAssemblyController.RecentFileListener
+    {
+      public void listChanged()
+      {
+        ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+        java.util.List<String> lis = acontroller.getRecentFileList();
+        openRecentMenu.removeAll();
+        for(String fullPath : lis) {
+          File f = new File(fullPath);
+          if(!f.exists())
+            continue;
+          String nameOnly = f.getName();
+          Action act = new ParameterizedAction(nameOnly);
+          act.putValue(FULLPATH,fullPath);
+          JMenuItem mi = new JMenuItem(act);
+          mi.setToolTipText(fullPath);
+          openRecentMenu.add(mi);
+        }
+      }     
+    }
+    
+    class ParameterizedAction extends javax.swing.AbstractAction
+    {
+      ParameterizedAction(String s)
+      {
+        super(s);
+      }
+     
+      public void actionPerformed(ActionEvent ev)
+      {
+        ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+        acontroller.openRecentAssembly((String)getValue(FULLPATH));
+      }     
+    }
 
     private void buildMenus(boolean contentOnly) {
         ViskitAssemblyController controller = (ViskitAssemblyController) getController();
+        
+        myFileListener = new _RecentFileListener();      
+        controller.addRecentFileListListener(myFileListener);
+              
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Set up file menu
@@ -188,8 +231,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         
         fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
-        
+        //fileMenu.add(buildMenuItem(controller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
+        fileMenu.add(openRecentMenu=buildMenu("Open Recent Assembly"));       
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
@@ -271,6 +314,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         if (!contentOnly) {
             setJMenuBar(myMenuBar);
         }
+    }
+
+    private JMenu buildMenu(String name)
+    {
+      return new JMenu(name);
     }
 
     // Use the actions package
