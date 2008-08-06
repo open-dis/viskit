@@ -801,8 +801,8 @@ public class SimkitXML2Java {
             // Would be better to have the actual object to check to see if a 
             // non primative array, however, the variable/parameter name is the
             // only item captured in the EdgeParameter list from Schedule
+            pw.print("(Object) ");
             if (ep.getValue().endsWith("s")) {
-                pw.print("(Object) ");
                 pw.print(lp + ep.getValue() + rp);
             } else {
                 pw.print(ep.getValue());
@@ -840,7 +840,7 @@ public class SimkitXML2Java {
 
         pw.print(sp8 + condent + "interrupt" + lp + qu + event.getName() + qu);
         for (EdgeParameter ep : liEdgeP) {
-            pw.print(cm + sp + ep.getValue());
+            pw.print(cm + sp + "(Object)" + ep.getValue());
         }
         pw.print(rp + sc);
         pw.println();
