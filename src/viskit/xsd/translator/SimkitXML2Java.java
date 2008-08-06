@@ -780,13 +780,20 @@ public class SimkitXML2Java {
         String prio = priorities[prioIndex + 3];
 
         pw.print(s.getDelay() + cm + "Priority" + pd + prio);
+        
+//        Note: The following loop covers all possibilities with the
+//        interim "fix" that all parameters are cast to (Object) whether
+//        they need to be or not.
+        for (EdgeParameter ep : s.getEdgeParameter()) {
+            pw.print(cm + " (Object) " + ep.getValue());
+        }
 
-        if (s.getEdgeParameter().size() == 1) {
-
-            EdgeParameter ep = s.getEdgeParameter().get(0);
-
-            pw.print(cm + sp);
-            
+//        if (s.getEdgeParameter().size() == 1) {
+//
+//            EdgeParameter ep = s.getEdgeParameter().get(0);
+//
+//            pw.print(cm + sp);
+//            
             /* NOTE: varargs can throw a mostly harmless compiler warning if 
              * there is only one arg here and it happens to be a non primative
              * array.
@@ -801,25 +808,25 @@ public class SimkitXML2Java {
             // Would be better to have the actual object to check to see if a 
             // non primative array, however, the variable/parameter name is the
             // only item captured in the EdgeParameter list from Schedule
-            pw.print("(Object) ");
-            if (ep.getValue().endsWith("s")) {
-                pw.print(lp + ep.getValue() + rp);
-            } else {
-                pw.print(ep.getValue());
-            }
-
-        } else if (s.getEdgeParameter().size() > 1) {
-            pw.print(cm);
-
-            // prevent a comma after the last parameter
-            for (ListIterator<EdgeParameter> edgeParamIterator = s.getEdgeParameter().listIterator(); edgeParamIterator.hasNext();) {
-                EdgeParameter param = edgeParamIterator.next();
-                pw.print(param.getValue());
-                if (edgeParamIterator.hasNext()) {
-                    pw.print(cm);
-                }
-            }
-        }
+//            pw.print("(Object) ");
+//            if (ep.getValue().endsWith("s")) {
+//                pw.print(lp + ep.getValue() + rp);
+//            } else {
+//                pw.print(ep.getValue());
+//            }
+//
+//        } else if (s.getEdgeParameter().size() > 1) {
+//            pw.print(cm);
+//
+//            // prevent a comma after the last parameter
+//            for (ListIterator<EdgeParameter> edgeParamIterator = s.getEdgeParameter().listIterator(); edgeParamIterator.hasNext();) {
+//                EdgeParameter param = edgeParamIterator.next();
+//                pw.print(param.getValue());
+//                if (edgeParamIterator.hasNext()) {
+//                    pw.print(cm);
+//                }
+//            }
+//        }
 
         pw.println(rp + sc);
 
