@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -785,7 +784,16 @@ public class SimkitXML2Java {
 //        interim "fix" that all parameters are cast to (Object) whether
 //        they need to be or not.
         for (EdgeParameter ep : s.getEdgeParameter()) {
-            pw.print(cm + " (Object) " + ep.getValue());
+            pw.print(cm + " (Object) ");
+            
+            String epValue = ep.getValue();
+            
+            // Cover case where there is a "+ 1" increment, or "-1" decrement on a value
+            if (epValue.contains("+") || epValue.contains("-")) {
+                pw.print(lp + ep.getValue() + rp);
+            } else {
+                pw.print(ep.getValue());
+            }            
         }
 
 //        if (s.getEdgeParameter().size() == 1) {
