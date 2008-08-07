@@ -91,26 +91,30 @@ public class ReportStatisticsConfig {
      * index of entities and properties
      * @param keyValues 
      */
-    public void setEntityIndex(LinkedList<String> keyValues) {
-        System.out.println("Replication Statistic(s) created");
-        System.out.println("--------------------------------");
+    public void setEntityIndex(LinkedList<String> keyValues)
+    {
         entityIndex = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
-        int seperator = 0;
-        int idx = 0;
-        for (String key : keyValues) {
-            seperator = findUnderscore(key);
-            
-            // TODO: verify this logic works with/without underscores present
-            entityIndex[idx] = key.substring(0, seperator);
-            if (seperator > 0) {
-                propertyIndex[idx] = key.substring(seperator + 1, key.length());
-            } else {
-                propertyIndex[idx] = key.substring(seperator, key.length());
-            }
+      
+        if (keyValues.size() > 0) {
+            System.out.println("Replication Statistic(s) created");
+            System.out.println("--------------------------------");
+            int seperator = 0;
+            int idx = 0;
+            for (String key : keyValues) {
+                seperator = findUnderscore(key);
 
-            System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
-            idx++;
+                // TODO: verify this logic works with/without underscores present
+                entityIndex[idx] = key.substring(0, seperator);
+                if (seperator > 0) {
+                    propertyIndex[idx] = key.substring(seperator + 1, key.length());
+                }
+                else {
+                    propertyIndex[idx] = key.substring(seperator, key.length());
+                }
+                System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
+                idx++;
+            }
         }
         reportStats.initializeEntities(entityIndex, propertyIndex);
     }
