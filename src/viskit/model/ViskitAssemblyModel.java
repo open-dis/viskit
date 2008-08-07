@@ -61,4 +61,5 @@ public interface ViskitAssemblyModel {
 
   public Vector<String> getVerboseEntityNames();
   public void externalClassesChanged(Vector<String> v);
+  public boolean nameExists(String name);
 }
