@@ -737,22 +737,62 @@ public class SimkitAssemblyXML2Java {
     void buildOutput(StringWriter out) {
         PrintWriter pw = new PrintWriter(out);
         
+        // override the printInfo method to dump detailed output from the nodes which are marked, if any
+        List<Output> outputs = this.root.getOutput();
+        if(!outputs.isEmpty()) {
+            pw.println(sp4 + "@Override");
+            pw.println(sp4 + "public void printInfo() {");
+            pw.println(sp8 + "System.out.println" + lp + qu + "Entity Details" + qu + rp + sc);
+            pw.println(sp8 + "System.out.println" + lp + qu + "--------------" + qu + rp + sc);
+            dumpEntities(outputs,pw);
+            pw.println(sp8 + "System.out.println" + lp + qu + "--------------" + qu + rp + sc);
+            pw.println(sp4 + cb);
+            pw.println();
+            pw.println();
+        }
+        
+        // The main method doesn't need to dump the outputs, since their done at object init time now
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
         
-        List<Output> outputs = this.root.getOutput();
-        for (Output output : outputs) {
+//        List<Output> outputs = this.root.getOutput();
+//        for (Output output : outputs) {
+//            Object elem = output.getEntity();
+//            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
+//            
+//            if ( elem instanceof SimEntity ) {
+//                name = ((SimEntity)elem).getName();
+//            } else if ( elem instanceof PropertyChangeListener ) {
+//                name = ((PropertyChangeListener)elem).getName();
+//            }
+//            pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+//        }
+    }
+    
+    private void dumpEntities(List<Output> lis, PrintWriter pw)
+    {
+        for (Output output : lis) {
             Object elem = output.getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
             
+            boolean error = false;
             if ( elem instanceof SimEntity ) {
                 name = ((SimEntity)elem).getName();
             } else if ( elem instanceof PropertyChangeListener ) {
                 name = ((PropertyChangeListener)elem).getName();
             }
-            pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+            else {
+                error = true;
+            }
+            
+            if(!error)
+            //pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+              pw.println(sp8 + "System.out.println" + lp +                    "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+            else
+              ;  // todo what here?
         }
+      
     }
     
     void buildTail(StringWriter t) {
