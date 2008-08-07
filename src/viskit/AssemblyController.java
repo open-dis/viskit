@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.TempFileManager;
+import java.lang.reflect.Field;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -446,19 +447,38 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 VGlobals.instance().getMainAppWindow(), gmd);
     }
     
+    private int egNodeCount = 0;
+    private int adptrNodeCount = 0;
+    private int pclNodeCount = 0;
+    
+    // A little experiment in class introspection
+    private static Field egCountField;
+    private static Field adptrCountField;
+    private static Field pclCountField;
+    static { // do at class init time
+      try {
+        egCountField = AssemblyController.class.getDeclaredField("egNodeCount");
+        adptrCountField = AssemblyController.class.getDeclaredField("adptrNodeCount");
+        pclCountField = AssemblyController.class.getDeclaredField("pclNodeCount");
+      }
+      catch(Exception ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    
     private String shortEgName(String typeName) {     
-        return shortName(typeName,"evgr_",egNodeCount++);
+        return shortName(typeName,"evgr_",egCountField);
     }
     
     private String shortPCLName(String typeName) {
-        return shortName(typeName,"lstnr_",egNodeCount++); // use same counter
+        return shortName(typeName,"lstnr_",pclCountField); // use same counter
     }
 
     private String shortAdapterName(String typeName) {
-        return shortName(typeName,"adptr_",egNodeCount++); // use same counter
+        return shortName(typeName,"adptr_",adptrCountField); // use same counter
     }
 
-    private String shortName(String typeName, String prefix, int count) {
+    private String shortName(String typeName, String prefix, Field intField) {
         String shortname = prefix;
         if (typeName.lastIndexOf('.') != -1)
             shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
@@ -467,7 +487,21 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         char[] ca = shortname.toCharArray();
         ca[0] = Character.toLowerCase(ca[0]);
         shortname = new String(ca);
-        return shortname + count;
+        
+        String retn = shortname;
+        try {
+          int count = intField.getInt(this);
+          // Find a unique name
+          ViskitAssemblyModel model = (ViskitAssemblyModel)getModel();
+          do {
+            retn = shortname + count++;
+          } while (model.nameExists(retn));   // don't force the model to mangle the name
+          intField.setInt(this, count);
+        }
+        catch(Exception ex) {
+          System.err.println("Program error in AssemblyController.shortName" + ex.getLocalizedMessage());
+        }
+        return retn;
      }
 
     /** Creates a new Viskit Project */
@@ -538,7 +572,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, false);
     }
 
-    private int   egNodeCount = 0;
     private Point nextPoint = new Point(25, 25);
 
     private Point getNextPoint() {
