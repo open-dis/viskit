@@ -306,7 +306,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
-            
+                        
             Method setOutputStream = targetClass.getMethod("setOutputStream", OutputStream.class);
             Method setNumberReplications = targetClass.getMethod("setNumberReplications", int.class);
             Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData", boolean.class);
@@ -460,7 +460,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         try {
             ret = Integer.parseInt(runPanel.verboseRepNumberTF.getText().trim());
         } catch (NumberFormatException ex) {
-            ;
+          //  ;
         }
         return ret;
     }
