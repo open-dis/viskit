@@ -614,6 +614,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
         createObjects();
         performHookups();
+        
+        printInfo();    // subclasses may display what they wish at the top of the run.
+        
         // reset the document with
         // existing parameters
         // might have run before
@@ -622,6 +625,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (!hookupsCalled) {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
+        
         System.out.println("\nStopping at time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
@@ -886,4 +890,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void setPclNodeCache(Map<Object, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
     }
+    
+    /**
+     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after 
+     * createObject() at run time.
+     */
+    public void printInfo() {
+    }
+
 }
