@@ -192,7 +192,16 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         return true;
     }
-
+    
+    public boolean nameExists(String name) {
+        for (Object o : getNodeCache().values()) {
+            AssemblyNode n = (AssemblyNode) o;
+            if(n.getName().equals(name))
+                return true;           
+        }
+        return false;
+    }
+    
     public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
