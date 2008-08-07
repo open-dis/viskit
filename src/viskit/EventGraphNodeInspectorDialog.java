@@ -55,7 +55,13 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             dialog = null;
             return false; // unmodified
         }
-
+        
+        //Having trouble getting this beast to redraw with new data, at least on the Mac.
+        //The following little bogosity works, plus the invalidate call down below.
+        Dimension d = dialog.getSize();
+        dialog.setSize(d.width+1, d.height+1);
+        dialog.setSize(d);
+        
         dialog.setVisible(true);
         // above call blocks
         return modified;
@@ -73,6 +79,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         JPanel content = new JPanel();
         setContentPane(content);
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         handleField = new JTextField();
         Vstatics.clampHeight(handleField);
@@ -95,6 +102,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         buttPan.add(canButt);
         buttPan.add(okButt);
 
+        placeWidgets();
         fillWidgets();     // put the data into the widgets
 
         modified = (lv == null);     // if it's a new egNode, they can always accept defaults with no typing
@@ -119,66 +127,59 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         locationComp = c;
 
         fillWidgets();
-
+        getContentPane().invalidate();
         modified = (p == null);
         okButt.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(canButt);
-        pack();
-        this.setLocationRelativeTo(c);
+        //getRootPane().setDefaultButton(canButt);
+        //pack();
+        //this.setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() throws ClassNotFoundException {
-        if (egNode != null) {
-            handleField.setText(egNode.getName());
-            outputCheck.setSelected(egNode.isOutputMarked());
-            descField.setText(egNode.getDescriptionString());
-            //ArrayList alis = egNode.getComments();
+    private void placeWidgets()
+    {
+        JPanel content = (JPanel)getContentPane();
+        content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            ip = new InstantiationPanel(this, lis, true);
+        JPanel bcont = new JPanel();
+        bcont.setLayout(new BoxLayout(bcont, BoxLayout.X_AXIS));
+        bcont.add(handleLab);
+        bcont.add(Box.createHorizontalStrut(5));
+        bcont.add(handleField);
+        bcont.add(outputCheck);
+        bcont.add(Box.createHorizontalGlue());
+        content.add(bcont);
 
-            ip.setData(egNode.getInstantiator());
-            ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+        JPanel dcont = new JPanel();
+        dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
+        dcont.add(descLab);
+        dcont.add(Box.createHorizontalStrut(5));
+        dcont.add(descField);
+        content.add(dcont);
+        ip = new InstantiationPanel(this, lis, true);
+
+        ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
-            JPanel content = new JPanel();
-            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-            content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            /*
-            JPanel cont = new JPanel(new SpringLayout());
-            cont.add(handleLab);
-            cont.add(handleField);
-            //cont.add(outputLab);
-            cont.add(outputCheck);
-            SpringUtilities.makeCompactGrid(cont, 1 , 3, 10, 10, 5, 5);
-            content.add(cont);
-             */
-
-            JPanel bcont = new JPanel();
-            bcont.setLayout(new BoxLayout(bcont, BoxLayout.X_AXIS));
-            bcont.add(handleLab);
-            bcont.add(Box.createHorizontalStrut(5));
-            bcont.add(handleField);
-            bcont.add(outputCheck);
-            bcont.add(Box.createHorizontalGlue());
-            content.add(bcont);
-
-            JPanel dcont = new JPanel();
-            dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
-            dcont.add(descLab);
-            dcont.add(Box.createHorizontalStrut(5));
-            dcont.add(descField);
-            content.add(dcont);
-
-            ip.setAlignmentX(Box.CENTER_ALIGNMENT);
-            content.add(ip);
-            content.add(Box.createVerticalStrut(5));
-            content.add(buttPan);
-            setContentPane(content);
-        } else {
+        ip.setAlignmentX(Box.CENTER_ALIGNMENT);
+        content.add(ip);
+        content.add(Box.createVerticalStrut(5));
+        content.add(buttPan);     
+    }
+    
+    private void fillWidgets() throws ClassNotFoundException {
+        if (egNode != null) {
+            handleField.setText(egNode.getName()); 
+            outputCheck.setSelected(egNode.isOutputMarked());
+            descField.setText(egNode.getDescriptionString());
+            //ArrayList alis = egNode.getComments(); //? 
+            ip.setData(egNode.getInstantiator());
+          } else {
             handleField.setText("egNode name");
-        }
+            outputCheck.setSelected(false);
+            descField.setText("");
+       }
     }
 
     private void unloadWidgets() {
@@ -219,13 +220,17 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
         public void caretUpdate(CaretEvent event) {
-            modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            common();
         }
 
         public void actionPerformed(ActionEvent event) {
-            caretUpdate(null);
+            common();
+        }
+        private void common()
+        {
+            modified = true;
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);       
         }
     }
 
