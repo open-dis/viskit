@@ -365,11 +365,14 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(sw);
         String clStr = "";
         String tyStr = "";
-
+        
         // check for cloneable
         if (isCloneable(s.getType())) {
             clStr = ".clone()";
-            tyStr = lp + stripLength(s.getType()) + rp;
+            
+            if (!isArray(s.getType())) {
+                tyStr = lp + stripLength(s.getType()) + rp;
+            }
          
             // Supress warning call to unchecked cast
             if (isGeneric(s.getType())) {
@@ -379,7 +382,7 @@ public class SimkitXML2Java {
 
         pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()));
         pw.println(lp + rp + sp + ob);
-        pw.println(sp8 + "return" + sp + tyStr + sp + s.getName() + clStr + sc);
+        pw.println(sp8 + "return" + sp + (tyStr + sp + s.getName() + clStr).trim() + sc);
         pw.println(sp4 + cb);
         pw.println();
 
