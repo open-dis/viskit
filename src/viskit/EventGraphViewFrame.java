@@ -492,6 +492,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     //todo
     }
     private String FULLPATH = "FULLPATH";
+    private String CLEARPATHFLAG = "<<clearPath>>";
+    
     class _RecentFileListener implements ViskitController.RecentFileListener
     {
       public void listChanged()
@@ -510,6 +512,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
           mi.setToolTipText(fullPath);
           openRecentMenu.add(mi);
         }
+        if(lis.size()>0) {
+          openRecentMenu.add(new JSeparator());
+          Action act = new ParameterizedAction("clear");
+          act.putValue(FULLPATH,CLEARPATHFLAG);  // flag
+          JMenuItem mi = new JMenuItem(act);
+          mi.setToolTipText("Clear this list");
+          openRecentMenu.add(mi);
+        }
       }     
     }
     
@@ -523,7 +533,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
       public void actionPerformed(ActionEvent ev)
       {
         ViskitController vcontroller = (ViskitController) getController();
-        vcontroller.openRecentEventGraph((String)getValue(FULLPATH));
+        String fullPath = (String)getValue(FULLPATH);
+        if(fullPath.equals(CLEARPATHFLAG))
+          vcontroller.clearRecentFileList();
+        else
+          vcontroller.openRecentEventGraph(fullPath);
       }     
     }
     

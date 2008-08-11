@@ -59,6 +59,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import viskit.model.ViskitModel;
 
 public class SettingsDialog extends JDialog {
 
@@ -332,14 +333,18 @@ public class SettingsDialog extends JDialog {
     class clearEGHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            vConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+            ViskitController ctrlr = (ViskitController)VGlobals.instance().getEventGraphEditor().getController();
+            ctrlr.clearRecentFileList();             
+            //vConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY); gets done in controller
         }
     }
 
     class clearAssHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            vConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+            AssemblyController aCtrlr = (AssemblyController)VGlobals.instance().getAssemblyController();
+            aCtrlr.clearRecentFileList();
+            //vConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);  gets done in controller
         }
     }
 

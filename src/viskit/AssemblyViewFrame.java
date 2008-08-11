@@ -174,6 +174,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     
     private String FULLPATH = "FULLPATH";
+    private String CLEARPATHFLAG = "<<clearPath>>";
     JMenu openRecentMenu;
     private _RecentFileListener myFileListener;
     
@@ -195,6 +196,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
           mi.setToolTipText(fullPath);
           openRecentMenu.add(mi);
         }
+        if(lis.size() > 0) {
+          openRecentMenu.add(new JSeparator());
+          Action act = new ParameterizedAction("clear");
+          act.putValue(FULLPATH,CLEARPATHFLAG);  // flag
+          JMenuItem mi = new JMenuItem(act);
+          mi.setToolTipText("Clear this list");
+          openRecentMenu.add(mi);         
+        }
       }     
     }
     
@@ -208,7 +217,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       public void actionPerformed(ActionEvent ev)
       {
         ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-        acontroller.openRecentAssembly((String)getValue(FULLPATH));
+        String fullPath = (String)getValue(FULLPATH);
+        if(fullPath.equals(CLEARPATHFLAG))
+          acontroller.clearRecentFileList();
+        else
+          acontroller.openRecentAssembly(fullPath);
       }     
     }
 
@@ -825,11 +838,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         jfc.setFileFilter(filter);
         int returnVal = jfc.showOpenDialog(this);
         
-        // TODO: For JFC Swing issue with Win32ShellFolder2?
-        jfc.setFileFilter(null);
+        
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            log.info("You chose to open: " + jfc.getSelectedFile().getName());
-            return jfc.getSelectedFile();
+            File f = jfc.getSelectedFile();
+            jfc.setFileFilter(null);  // TODO: For JFC Swing issue with Win32ShellFolder2? // what's this? (mike asks)
+            log.info("You chose to open: " + f.getName());
+            return f;
         }
         return null;
     }

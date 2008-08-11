@@ -118,7 +118,8 @@ public interface ViskitAssemblyController {
     void addRecentFileListListener(RecentFileListener lis);
     void removeRecentFileListListener(RecentFileListener lis);
     java.util.List<String> getRecentFileList();
-  
+    void clearRecentFileList();
+
     public static interface RecentFileListener
     {
       public void listChanged();

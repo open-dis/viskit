@@ -1774,6 +1774,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     // The open attribute is zeroed out for all recent files the first time a file is opened
     }
     
+    public void clearRecentFileList()
+    {
+        recentFileList.clear();
+        saveHistoryXML(recentFileList);
+        notifyRecentFileListeners();
+    }
+
     public java.util.List<String> getRecentFileList()  // implement interface
     {
       return getRecentFileList(false);

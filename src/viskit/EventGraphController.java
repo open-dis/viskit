@@ -416,9 +416,16 @@ public class EventGraphController extends mvcAbstractController implements Viski
     // The open attribute is zeroed out for all recent files the first time a file is opened
     }
     
+    public void clearRecentFileList()
+    {
+        recentFileList.clear();
+        saveHistoryXML(recentFileList);
+        notifyRecentFileListeners();
+    }
+
     public java.util.List<String> getRecentFileList()  // implement interface
     {
-      return getRecentFileList(false);
+        return getRecentFileList(false);
     }
     
     private ArrayList<String> getRecentFileList(boolean refresh) {
