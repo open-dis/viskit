@@ -562,8 +562,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // Decouple diskit from vanilla Viskit operation
         File diskitJar = new File("lib/ext/diskit.jar");
-        if (SettingsDialog.getExtraClassPath() != null) {
-            for (String path : SettingsDialog.getExtraClassPath()) { // tbd same for pcls
+        String[] extraCP = SettingsDialog.getExtraClassPath();
+        if (extraCP != null) {
+            for (String path : extraCP) { // tbd same for pcls
                 if (path.endsWith(".jar")) {
                     if (diskitJar.getName().contains(new File(path).getName())) {
                         continue;
