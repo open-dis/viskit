@@ -97,7 +97,7 @@ public class FileBasedClassManager implements Runnable {
                         return null;
                     }
                     
-                    // Definitely need a reset ClassLoader here
+                    // Definitely need a reset ClassLoader here (Bugfix 1407)
                     ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
                     
                     // since we're here, cache the parameter names
