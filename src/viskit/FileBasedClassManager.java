@@ -97,7 +97,9 @@ public class FileBasedClassManager implements Runnable {
                         return null;
                     }
                     
-                    ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
+                    // Definitely need a reset ClassLoader here
+                    ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
+                    
                     // since we're here, cache the parameter names
                     JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                     Unmarshaller um = jaxbCtx.createUnmarshaller();
