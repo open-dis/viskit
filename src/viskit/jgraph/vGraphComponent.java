@@ -331,22 +331,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                             sb.append("<br>");
                         }
                     }
-
-                    List<ViskitElement> st = en.getTransitions();
-                    StringBuffer sttrans = new StringBuffer();
-                    for (ViskitElement ve : st) {
-                        EventStateTransition est = (EventStateTransition) ve;
-                        sttrans.append("&nbsp;");
-                        sttrans.append(est.getStateVarName());
-                        sttrans.append(!est.isOperation() ? "=" : ".");
-                        sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
-                        sttrans.append("<br>");
-                    }
-                    if (sttrans.length() > 0) {
-                        sb.append("<u>state transitions</u><br>");
-                        sb.append(sttrans);
-                    }
-
+                    
                     List<ViskitElement> argLis = en.getArguments();
                     StringBuffer args = new StringBuffer();
                     int n = 1;
@@ -364,10 +349,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                         sb.append(args);
                     }
 
-                    Vector locVarLis = en.getLocalVariables();
+                    Vector<ViskitElement> locVarLis = en.getLocalVariables();
                     StringBuffer lvs = new StringBuffer();
-                    for (Iterator itr = locVarLis.iterator(); itr.hasNext();) {
-                        EventLocalVariable lv = (EventLocalVariable) itr.next();
+                    for (ViskitElement ve : locVarLis) {
+                        EventLocalVariable lv = (EventLocalVariable) ve;
                         lvs.append("&nbsp;");
                         lvs.append(lv.getName());
                         lvs.append(" (");
@@ -381,6 +366,22 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                         sb.append("<u>local variables</u><br>");
                         sb.append(lvs);
                     }
+                    List<ViskitElement> st = en.getTransitions();
+                    StringBuffer sttrans = new StringBuffer();
+                    for (ViskitElement ve : st) {
+                        EventStateTransition est = (EventStateTransition) ve;
+                        sttrans.append("&nbsp;");
+                        sttrans.append(est.getStateVarName());
+                        sttrans.append(!est.isOperation() ? "=" : ".");
+                        sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
+                        sttrans.append("<br>");
+                    }
+                    
+                    if (sttrans.length() > 0) {
+                        sb.append("<u>state transitions</u><br>");
+                        sb.append(sttrans);
+                    }
+
                     if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
                         sb.setLength(sb.length() - 4);
                     }
@@ -477,7 +478,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
     }
 
     /**
-     * This class informs the controller that the selected set has changed.  Since we're only useing this
+     * This class informs the controller that the selected set has changed.  Since we're only using this
      * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
      * to the View, and the controller needn't be involved.  Nevertheless, the round trip through the controller
      * remains in place.
@@ -502,7 +503,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
         }
     }
 
-// MarqueeHandler that Connects Vertices and Displays PopupMenus
+    // MarqueeHandler that Connects Vertices and Displays PopupMenus
     public class MyMarqueeHandler extends BasicMarqueeHandler {
 
         // Holds the Start and the Current Point
@@ -822,11 +823,11 @@ class vPortView extends PortView {
 }
 
 /**
- * Sub class EdgeView to install our own renderer.
+ * Sub class EdgeView to install our own localRenderer.
  */
 class vEdgeView extends EdgeView {
 
-    public static vEdgeRenderer renderer = new vEdgeRenderer();
+    public static vEdgeRenderer localRenderer = new vEdgeRenderer();
 
     public vEdgeView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -834,7 +835,7 @@ class vEdgeView extends EdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return localRenderer;
     }
 }
 
@@ -870,7 +871,7 @@ class CircleCell extends DefaultGraphCell {
 }
 
 /**
- * Sub class VertexView to install our own renderer.
+ * Sub class VertexView to install our own localRenderer.
  */
 class CircleView extends VertexView {
 
