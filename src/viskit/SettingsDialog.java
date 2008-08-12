@@ -59,7 +59,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import viskit.model.ViskitModel;
 
 public class SettingsDialog extends JDialog {
 
@@ -342,7 +341,7 @@ public class SettingsDialog extends JDialog {
     class clearAssHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyController aCtrlr = (AssemblyController)VGlobals.instance().getAssemblyController();
+            AssemblyController aCtrlr = VGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentFileList();
             //vConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);  gets done in controller
         }
@@ -426,11 +425,11 @@ public class SettingsDialog extends JDialog {
         debugMsgsCB.setSelected(isVerboseDebug());
         
         String laf = getLookAndFeel();
-        if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM))
-          platformLafRB.setSelected(true);
-        else if(laf.equals(ViskitConfig.LAF_DEFAULT))
-          defaultLafRB.setSelected(true);         
-        else {
+        if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {
+            platformLafRB.setSelected(true);
+        } else if(laf.equals(ViskitConfig.LAF_DEFAULT)) {
+            defaultLafRB.setSelected(true);
+        } else {
           otherLafRB.setSelected(true);
           otherTF.setEnabled(true);
           otherTF.setText(laf);
