@@ -110,7 +110,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             if (!metaData.stopTime.equals("")) {
                 jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
             } else {
-                jaxbRoot.getSchedule().setStopTime("100.");
+                jaxbRoot.getSchedule().setStopTime("100.0");
             }
 
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);

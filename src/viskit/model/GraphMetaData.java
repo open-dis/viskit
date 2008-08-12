@@ -20,7 +20,7 @@ public class GraphMetaData {
     public String author = "";
     public String version = "1.0";
     public String description = ""; // originally called "comment"
-    public String stopTime = "100.";
+    public String stopTime = "100.0";
     public boolean verbose = false;
     public String extendsPackageName = "";
 
