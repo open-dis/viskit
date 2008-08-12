@@ -860,7 +860,7 @@ public class VGlobals {
         if (arrayTmp != null) {
             urlArray = arrayTmp;
         }
-        if (true) { //workLoader == null) {
+        if (workLoader == null) {
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     Thread.currentThread().getContextClassLoader(), 
                     getWorkDirectory());
