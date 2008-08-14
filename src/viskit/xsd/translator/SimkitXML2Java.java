@@ -770,7 +770,7 @@ public class SimkitXML2Java {
         } else if (s.getPriority().contains("2")) {
             pri = "HIGHER";
         } else if (s.getPriority().contains("3")) {
-            pri = "HIGEST";
+            pri = "HIGHEST";
         } else {
             pri = "DEFAULT";
         }
