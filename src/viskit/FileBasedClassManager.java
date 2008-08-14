@@ -125,7 +125,9 @@ public class FileBasedClassManager implements Runnable {
                 f = getCachedClass(f);
                 File fXml = getCachedXML(f);
                 
+                // And, definitely need a reset ClassLoader here (Bugfix 1407)                    
                 ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
+                
                 JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                 Unmarshaller um = jaxbCtx.createUnmarshaller();
                 try {
