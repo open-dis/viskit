@@ -529,9 +529,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (ret == JOptionPane.YES_OPTION) {
             int retv = jfc.showOpenDialog(avf);
             if (retv == JFileChooser.APPROVE_OPTION) {
-                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
-                VGlobals.instance().getAssemblyController().close();
+                close();
                 ViskitConfig.instance().clearViskitConfig();
+                ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
                 VGlobals.instance().createWorkDirectory();
             }
         }
