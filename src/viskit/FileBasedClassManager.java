@@ -125,7 +125,7 @@ public class FileBasedClassManager implements Runnable {
                 f = getCachedClass(f);
                 File fXml = getCachedXML(f);
                 
-                ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
+                ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
                 JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
                 Unmarshaller um = jaxbCtx.createUnmarshaller();
                 try {
@@ -153,10 +153,8 @@ public class FileBasedClassManager implements Runnable {
             String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
             fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
             Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
-        } else {
-            if (!f.getName().toLowerCase().endsWith(".java")) {
-                throw new Exception("Unsupported file type.");
-            }
+        } else if (!f.getName().toLowerCase().endsWith(".java")) {
+            throw new Exception("Unsupported file type.");
         }
         if (fclass == null) {
             return (FileBasedAssyNode) null;
