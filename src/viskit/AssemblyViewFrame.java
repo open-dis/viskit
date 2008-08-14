@@ -244,8 +244,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         
         fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        //fileMenu.add(buildMenuItem(controller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
         fileMenu.add(openRecentMenu=buildMenu("Open Recent Assembly"));       
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
+       
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
@@ -815,8 +817,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     // ViskitView-required methods:
 
     private JFileChooser jfc;
-    private JFileChooser buildOpenSaveChooser()
-    {
+    private JFileChooser buildOpenSaveChooser() {
+        
         // Try to open in the current project directory
         if (VGlobals.instance().getCurrentViskitProject() != null) 
             return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
@@ -828,8 +830,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
      * @return the chosen XML Assembly file
      */
     public File openFileAsk() {
-        if(jfc == null)
+        if(jfc == null) {
           jfc = buildOpenSaveChooser();
+        }
  
         jfc.setDialogTitle("Open Assembly File");
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -862,6 +865,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
+    /** Open an already existing Viskit Project */
+    public void openProject() {
+        jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+        jfc.setDialogTitle("Open an Existing Viskit Project");
+        jfc.setDialogType(JFileChooser.OPEN_DIALOG);
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        ((AssemblyController) getController()).openProject(jfc, this);
+        jfc = null;
+    }
+    
     private File getUniqueName(String suggName) {
         String appnd = "";
         String suffix = "";

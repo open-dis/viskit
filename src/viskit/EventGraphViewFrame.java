@@ -556,7 +556,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         JMenu fileMenu = new JMenu("File");
 
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
+        fileMenu.add(buildMenuItem(vcontroller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));        
         fileMenu.add(buildMenuItem(vcontroller, "newEventGraph", "New Event Graph", new Integer(KeyEvent.VK_N),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
@@ -564,8 +564,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 
         fileMenu.add(buildMenuItem(vcontroller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        //fileMenu.add(openRecentMI=buildMenuItem(vcontroller, "openRecent", "Open Recent", new Integer(KeyEvent.VK_P), null));
         fileMenu.add(openRecentMenu=buildMenu("Open Recent Event Graph"));
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P),
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "closeAll", "Close All", null, null));
@@ -622,7 +623,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         myMenuBar = new JMenuBar();
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
-        //menuBar.add(simulationMenu);
 
         help = new Help(this);
         JMenu helpMenu = new JMenu("Help");
@@ -633,7 +633,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         helpMenu.addSeparator();
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", new Integer(KeyEvent.VK_T), null));
         helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", new Integer(KeyEvent.VK_A), null));
-        //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
+        
         myMenuBar.add(helpMenu);
 
         
@@ -967,21 +967,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // ViskitView-required methods:
     private JFileChooser jfc;
 
+    private JFileChooser buildOpenSaveChooser() {
+
+        // Try to open in the current project directory
+        if (VGlobals.instance().getCurrentViskitProject() != null) {
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        } else {
+            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+        }
+    }
+
     public File[] openFilesAsk() {
         if (jfc == null) {
-            
-            // Try to open in the current project directory
-            if (VGlobals.instance().getCurrentViskitProject() != null) {
-                jfc = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
-            } else {
-                jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-            }
-
+            jfc = buildOpenSaveChooser();
             jfc.setDialogTitle("Open Event Graph Files");
 
             // Bug fix: 1246
             jfc.addChoosableFileFilter(new EventGraphFileFilter(
-                    new String[] {"assembly", "smal", "x3d", "x3dv", "java", "class"}));
+                    new String[]{"assembly", "smal", "x3d", "x3dv", "java", "class"}));
 
             // Bug fix: 1249
             jfc.setMultiSelectionEnabled(true);
@@ -991,6 +994,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
     }
 
+    /** Open an already existing Viskit Project */
+    public void openProject() {
+        jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+        jfc.setDialogTitle("Open an Existing Viskit Project");
+        jfc.setDialogType(JFileChooser.OPEN_DIALOG);
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        controller.openProject(jfc, this);
+        jfc = null;
+    }
+    
     private File getUniqueName(String suggName) {
         String appnd = "";
         String suffix = "";
@@ -1012,7 +1025,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {
-            jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+            jfc = buildOpenSaveChooser();
         }
 
         File fil = new File(suggName);

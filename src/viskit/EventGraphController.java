@@ -131,6 +131,26 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
     
+    /** Opens an already existing Viskit Project
+     * @param jfc the JFileChooser from the EventGraphViewFrame to select 
+     * the project directory
+     * @param egvf the EventGraphViewFrame for the JFileChooser's orientation
+     */
+    public void openProject(JFileChooser jfc, EventGraphViewFrame egvf) {
+        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(),
+                "Are you sure you want to close your current Viskit Project?",
+                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        if (ret == JOptionPane.YES_OPTION) {
+            int retv = jfc.showOpenDialog(egvf);
+            if (retv == JFileChooser.APPROVE_OPTION) {
+                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
+                VGlobals.instance().getAssemblyController().close();
+                ViskitConfig.instance().clearViskitConfig();
+                VGlobals.instance().createWorkDirectory();
+            }
+        }
+    }
+    
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
         ViskitModel viskitModel = (ViskitModel) getModel();
@@ -342,8 +362,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
     
     private void notifyRecentFileListeners()
     {
-      for(RecentFileListener lis : recentListeners)
-        lis.listChanged();
+      for(RecentFileListener lis : recentListeners) {
+            lis.listChanged();
+        }
     }
     
     /**

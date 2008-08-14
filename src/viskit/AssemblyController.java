@@ -517,6 +517,26 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
     
+    /** Opens an already existing Viskit Project
+     * @param jfc the JFileChooser from the EventGraphViewFrame to select 
+     * the project directory
+     * @param avf the AssemblyViewFrame for the JFileChooser's orientation
+     */
+    public void openProject(JFileChooser jfc, AssemblyViewFrame avf) {
+        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(),
+                "Are you sure you want to close your current Viskit Project?",
+                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        if (ret == JOptionPane.YES_OPTION) {
+            int retv = jfc.showOpenDialog(avf);
+            if (retv == JFileChooser.APPROVE_OPTION) {
+                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
+                VGlobals.instance().getAssemblyController().close();
+                ViskitConfig.instance().clearViskitConfig();
+                VGlobals.instance().createWorkDirectory();
+            }
+        }
+    }
+    
     /** Create a new blank assembly graph model */
     public void newAssembly() {
         if (!checkSaveIfDirty()) {
