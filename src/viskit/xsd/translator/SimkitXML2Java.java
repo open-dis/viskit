@@ -751,41 +751,35 @@ public class SimkitXML2Java {
 
         pw.print(sp8 + condent + "waitDelay" + lp + qu + ((Event) s.getEvent()).getName() + qu + cm);
 
-        // according to schema to meet Priority class definition, the following tags should be permitted:
+        // according to schema to meet Priority class definition, the following 
+        // tags should be permitted:
         // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
         // however, historically these could be numbers.
         // check if Number, assign TAG; tbd how these are scaled?
-
-        int prioIndex = 0;
-        try {
-            prioIndex = Integer.parseInt(s.getPriority());
-        } catch (NumberFormatException nfe1) {
-            try {
-                prioIndex = (int) Double.parseDouble(s.getPriority());
-            } catch (NumberFormatException nfe2) {
-//                log.error(nfe2);
-            }
-        }
-
-        // numerical priority values from -3 to 3 
-        // this range may need to be scaled or shifted
-        // or not, see simkit
-
-        if (prioIndex > 3) {
-            prioIndex = 3;
-        }
-        if (prioIndex < -3) {
-            prioIndex = -3;
-        }
-
-        String[] priorities = {"LOWEST", "LOWER", "LOW", "DEFAULT", "HIGH", "HIGHER", "HIGHEST"};
-        String prio = priorities[prioIndex + 3];
-
-        pw.print(s.getDelay() + cm + "Priority" + pd + prio);
         
-//        Note: The following loop covers all possibilities with the
-//        interim "fix" that all parameters are cast to (Object) whether
-//        they need to be or not.
+        // Bugfix 1400
+        String pri = "";
+        if (s.getPriority().contains("-3")) {
+            pri = "LOWEST";
+        } else if (s.getPriority().contains("-2")) {
+            pri = "LOWER";
+        } else if (s.getPriority().contains("-1")) {
+            pri = "LOW";
+        } else if (s.getPriority().contains("1")) {
+            pri = "HIGH";
+        } else if (s.getPriority().contains("2")) {
+            pri = "HIGHER";
+        } else if (s.getPriority().contains("3")) {
+            pri = "HIGEST";
+        } else {
+            pri = "DEFAULT";
+        }
+
+        pw.print(s.getDelay() + cm + " Priority" + pd + pri);
+        
+        // Note: The following loop covers all possibilities with the
+        // interim "fix" that all parameters are cast to (Object) whether
+        // they need to be or not.
         for (EdgeParameter ep : s.getEdgeParameter()) {
             pw.print(cm + " (Object) ");
             
