@@ -157,7 +157,6 @@ public class SimkitAssemblyXML2Java {
     
     public void marshalRoot() {
         try {
-//            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader());
             Marshaller m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.marshal(this.root, System.out);
@@ -178,7 +177,6 @@ public class SimkitAssemblyXML2Java {
             s = "<Errors/>";
         }
         try {
-//            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",jaxb.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
@@ -202,7 +200,6 @@ public class SimkitAssemblyXML2Java {
             s = "<Errors/>";
         }
         try {
-//            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",jaxb.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
@@ -225,7 +222,6 @@ public class SimkitAssemblyXML2Java {
     public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
         Marshaller m;
         try {
-//            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly",node.getClass().getClassLoader());
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.marshal(node,o);
@@ -266,9 +262,8 @@ public class SimkitAssemblyXML2Java {
         pw.println("package " + pkg + sc);
         pw.println();
         
-        // Printing imports is not necessary with assemblies
-//        printImports(pw);        
-//        pw.println();
+        printImports(pw);        
+        pw.println();
         
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
@@ -304,8 +299,8 @@ public class SimkitAssemblyXML2Java {
         pw.println();
     }
     
-    /** This method currently unused
-     * @param pw 
+    /** Print out required imports to the Assembly
+     * @param pw the PrintWriter to write out Java source
      */
     void printImports(PrintWriter pw) {        
         SortedSet<String> list = Collections.synchronizedSortedSet(new TreeSet<String>());

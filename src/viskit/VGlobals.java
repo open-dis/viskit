@@ -509,12 +509,6 @@ public class VGlobals {
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
         }
-        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
-
-        // Need to make from scratch /MyViskitProjects
-        if (!projectsBaseDir.exists()) {
-            projectsBaseDir.mkdirs();
-        }
     }
     
     private Object instantiateType(String type) throws Exception {
@@ -842,6 +836,12 @@ public class VGlobals {
 
     /** Creates a new Viskit project and automatically sets the extra classpath */
     private void newProjectDirectory() {
+        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+
+        // Need to make from scratch /MyViskitProjects
+        if (!projectsBaseDir.exists()) {
+            projectsBaseDir.mkdirs();
+        }
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
         if (currentViskitProject.createProject()) {
             workDirectory = currentViskitProject.getClassDir();
