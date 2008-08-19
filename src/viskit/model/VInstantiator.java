@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import viskit.Vstatics;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -35,12 +36,12 @@ public abstract class VInstantiator {
     private String name = "";
     private String description = "";
 
-    public String getType() {
-        return type;
-    }
-
     public VInstantiator(String typ) {
         type = typ;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public void setName(String nm) {
@@ -121,6 +122,7 @@ public abstract class VInstantiator {
     public static class Constr extends VInstantiator {
 
         private List<Object> args;
+        private boolean argNameFound = false;
 
         // takes List of Assembly parameters and args for type
         public Constr(List<Object> params, String type) {
@@ -214,7 +216,7 @@ public abstract class VInstantiator {
         public Constr(String type, List<Object> args) {
             super(type);
             setArgs(args);
-            findArgNames(type, args);
+            setArgNameFound(findArgNames(type, args));
         }
 
         public Constr(String type, List<Object> args, List<String> names) {
@@ -391,27 +393,34 @@ public abstract class VInstantiator {
          * Find the names of the arguments
          * @param type
          * @param args List of VInstantiators
+         * @return true if arg names have been found
          */
-        private void findArgNames(String type, List<Object> args) {
+        private boolean findArgNames(String type, List<Object> args) {
+            boolean found = false;
             if (args == null) {
                 setArgs(getDefaultArgs(type));
                 args = getArgs();
             }
             if (indexOfArgNames(type, args) < 0) {
-                log.info(type + " not loaded?");
+                log.warn(type + " was not loaded");                
+            } else {
+                found = true;
             }
+            return found;
         }
 
-        /**
-         * @param type 
+        /** Find a constructor match in the ClassLoader of the given EG's parameters
+         * @param type the EventGraph to parameter check
          * @param args 
-         * @return the index into the found matching constructor **/
+         * @return the index into the found matching constructor 
+         */
         public int indexOfArgNames(String type, List<Object> args) {
             List<Object>[] parameters = Vstatics.resolveParameters(type);
+            int indx = -1;
+            
             if (parameters == null) {
-                return -1;
+                return indx;
             }
-            int indx = 0;
             int ix = 0;
             boolean found = false;
 
@@ -419,37 +428,50 @@ public abstract class VInstantiator {
                 log.info("args length " + args.size());
                 log.info("resolveParameters " + type + " list length is " + parameters.length);
             }
-            for (List<Object> parameterLi : parameters) {
+            for (List<Object> parameter : parameters) {
                 if (viskit.Vstatics.debug) {
-                    log.info("parameterLi.size() " + parameterLi.size());
+                    log.info("parameterLi.size() " + parameter.size());
                 }
-                if (parameterLi.size() == args.size()) {
+                if (parameter.size() == args.size()) {
                     boolean match = true;
                     for (int j = 0; j < args.size(); j++) {
 
                         if (viskit.Vstatics.debug) {
-                            System.out.print("touching " + Vstatics.convertClassName(((Parameter) (parameterLi.get(j))).getType()) + " " + ((VInstantiator) args.get(j)).getType());
+                            log.info("touching " + Vstatics.convertClassName(((Parameter) (parameter.get(j))).getType()) + " " + ((VInstantiator) args.get(j)).getType());
                         }
-                        String pType = Vstatics.convertClassName(((Parameter) (parameterLi.get(j))).getType());
+                        String pType = Vstatics.convertClassName(((Parameter) (parameter.get(j))).getType());
                         String vType = ((VInstantiator) args.get(j)).getType();
                         
                         // check if vType was assignable from pType.
 
                         Class<?> pClazz = Vstatics.classForName(pType);
-                        Class<?> vClazz = Vstatics.classForName(vType);
-                        Class<?>[] vInterfz = vClazz.getInterfaces();
-                        boolean interfz = false;
-                        for (Class<?> clazz : vInterfz) {
-                            //interfz |= vInterfz[k].isAssignableFrom(pClazz);
-                            interfz |= pClazz.isAssignableFrom(clazz);
-                        }
-                        match &= (pClazz.isAssignableFrom(vClazz) | interfz);
                         
-                        // set the names, the final iteration of while cleans up
-                        ((VInstantiator) (args.get(j))).setName(((Parameter) (parameterLi.get(j))).getName());
-                        if (viskit.Vstatics.debug) {
-                            log.info(" to " + ((Parameter) (parameterLi.get(j))).getName());
-                        }                        
+                        if (pClazz == null) {
+                            JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
+                                    "Please check Event Graph <b>" + type + "</b> parameter(s) for compliance using" +
+                                    " fully qualified Java class names.  " + pType + " should be a " +
+                                    vType + ".</p></body></html>",
+                                    "Basic Java Class Name Found",
+                                    JOptionPane.ERROR_MESSAGE);
+                            match = false;
+                        } else {
+
+                            Class<?> vClazz = Vstatics.classForName(vType);
+                            Class<?>[] vInterfz = vClazz.getInterfaces();
+                            boolean interfz = false;
+                            for (Class<?> clazz : vInterfz) {
+                                //interfz |= vInterfz[k].isAssignableFrom(pClazz);
+                                interfz |= pClazz.isAssignableFrom(clazz);
+                            }
+
+                            match &= (pClazz.isAssignableFrom(vClazz) | interfz);
+
+                            // set the names, the final iteration of while cleans up
+                            ((VInstantiator) (args.get(j))).setName(((Parameter) (parameter.get(j))).getName());
+                            if (viskit.Vstatics.debug) {
+                                log.info(" to " + ((Parameter) (parameter.get(j))).getName());
+                            }
+                        }
                     }
                     found = match;
                     if (found) {
@@ -468,11 +490,6 @@ public abstract class VInstantiator {
             // to resolve the bean there, then in that case, a null could
             // indicate a zero-parameter constructor.
 
-            if (!found) {
-                indx = -1;
-                log.error("An index of -1 will throw an error to the caller of VInstantiator.indexOfArgNames(String, List<Object>)");
-                log.error("...correction, won't throw error from Constr because of check, but whole logic should be cleaned up.");
-            }
             return indx;
         }
 
@@ -598,6 +615,14 @@ public abstract class VInstantiator {
                 }
             }
             return true;
+        }
+
+        public boolean isArgNameFound() {
+            return argNameFound;
+        }
+
+        public void setArgNameFound(boolean argNameFound) {
+            this.argNameFound = argNameFound;
         }
     }
 

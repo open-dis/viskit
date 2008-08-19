@@ -225,6 +225,11 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         jaxbEG.setType(className);
 
         VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
+        
+        // Don't allow placement of a bad SimEntity on the Assembly palette
+        if (!vc.isArgNameFound()) {
+            return;
+        }
         node.setInstantiator(vc);
 
         getNodeCache().put(jaxbEG, node);   // key = ev
@@ -233,7 +238,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             mangleEGName(node);
         }
 
-        // TODO: update with generic JWSDP
         jaxbRoot.getSimEntity().add(jaxbEG);
 
         modelDirty = true;

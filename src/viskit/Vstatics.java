@@ -216,11 +216,11 @@ public class Vstatics {
     /**
      * Call this method to inst a class representation of an entity.  We'll try first
      * the "standard" classpath-classloader, then try to inst any that were loaded by file.
-     * @param s
-     * @return class
+     * @param s the name of the class to instantiate
+     * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c;
+        Class<?> c = null;
 
         c = cForName(s, VGlobals.instance().getWorkClassLoader());
         if (c == null) {
