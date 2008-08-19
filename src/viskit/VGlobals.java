@@ -502,10 +502,12 @@ public class VGlobals {
     }
 
     public void initProjectHome() {
-        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY);
+        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY).trim();
         log.debug(projectHome);
-        if (projectHome.trim().isEmpty()) {            
-            ViskitProjectGenerationDialog.instance();
+        if (projectHome.isEmpty() || !(new File(projectHome).exists())) {            
+           // ViskitProjectGenerationDialog.instance();
+           // ViskitProjectGenerationDialog2.showDialog();
+            ViskitProjectButtonPanel.showDialog();
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
         }
@@ -847,7 +849,7 @@ public class VGlobals {
             workDirectory = currentViskitProject.getClassDir();
             SettingsDialog.saveClassPathEntries(getCurrentViskitProject().getProjectContents());
         } else {
-            throw new RuntimeException("Unable to crete project directory");
+            throw new RuntimeException("Unable to create project directory");
         }
     }
     
