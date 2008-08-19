@@ -567,6 +567,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         String[] extraCP = SettingsDialog.getExtraClassPath();
         if (extraCP != null) {
             for (String path : extraCP) { // tbd same for pcls
+              if(new File(path).exists()) {
                 if (path.endsWith(".jar")) {
                     if (diskitJar.getName().contains(new File(path).getName())) {
                         continue;
@@ -581,6 +582,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     lTree.addContentRoot(new File(path), true);
                 }
             }
+          }
         }
 
         LegosPanel lPan = new LegosPanel(lTree);
