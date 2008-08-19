@@ -70,7 +70,7 @@ public class ViskitProjectGenerationDialog2 extends javax.swing.JPanel
     
     private void setDefaults()
     {
-        String defaultProjectDir = ViskitProject.MY_DEFAULT_VISKIT_PROJECTS_DIR;
+        String defaultProjectDir = ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR;
         File f = new File(defaultProjectDir);
         if(!f.exists()) {
           f.mkdirs();

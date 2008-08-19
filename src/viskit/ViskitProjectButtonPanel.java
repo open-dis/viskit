@@ -69,6 +69,14 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
     initComponents();
   }
 
+  private void setupViskitProject(File projFile)
+  {
+     ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, projFile.getAbsolutePath());
+      ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent();
+      ViskitProject.DEFAULT_PROJECT = projFile.getName();
+    
+  }
+  
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -78,22 +86,22 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    existingButt = new javax.swing.JButton();
     defaultButt = new javax.swing.JButton();
+    existingButt = new javax.swing.JButton();
     createButt = new javax.swing.JButton();
     exitButt = new javax.swing.JButton();
-
-    existingButt.setText("Open existing project");
-    existingButt.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        existingButtActionPerformed(evt);
-      }
-    });
 
     defaultButt.setText("Open default project");
     defaultButt.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         defaultButtActionPerformed(evt);
+      }
+    });
+
+    existingButt.setText("Open existing project");
+    existingButt.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        existingButtActionPerformed(evt);
       }
     });
 
@@ -118,10 +126,9 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-          .addComponent(exitButt)
+          .addComponent(existingButt)
           .addComponent(createButt)
-          .addComponent(defaultButt)
-          .addComponent(existingButt))
+          .addComponent(exitButt))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
@@ -130,10 +137,8 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
         .addContainerGap()
         .addComponent(existingButt)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(defaultButt)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(createButt)
-        .addGap(30, 30, 30)
+        .addGap(18, 18, 18)
         .addComponent(exitButt)
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -144,6 +149,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
   chooser.setDialogTitle("Open Viskit Project (directory)");
   //chooser.addChoosableFileFilter(new ProjectFilter());
   chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+  chooser.setCurrentDirectory(new File(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR));
   do {
     int ret = chooser.showOpenDialog(null);
     if (ret != JFileChooser.APPROVE_OPTION)
@@ -154,7 +160,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
       JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
       // do continue
     else {
-      // todo....setup
+      setupViskitProject(selectedFile);
       dialog.setVisible(false);
     }
   }
@@ -167,48 +173,32 @@ private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_defaultButtActionPerformed
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
-    JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle("Select Project Location");
-    //chooser.addChoosableFileFilter(new ProjectFilter());
-    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-    int ret = chooser.showOpenDialog(null);
-    
-    File projectParentF = chooser.getSelectedFile();
-    
-    String projName;
-    File projF;
-    if (ret == JFileChooser.APPROVE_OPTION) {
+      File projF;
       do {
-        projName = (String) JOptionPane.showInputDialog(this, "Enter project name", "Project Name", JOptionPane.QUESTION_MESSAGE, null, null, "MyViskitProject");
-        if (projName != null) {
-          projF = new File(projectParentF, projName);
+          ViskitProjectGenerationDialog3.showDialog();
+          if(ViskitProjectGenerationDialog3.cancelled)
+              return;
+          String projPath = ViskitProjectGenerationDialog3.projectPath;
+          projF = new File(projPath);
           if (projF.exists() && (projF.isFile() || projF.list().length > 0)) {
-            JOptionPane.showMessageDialog(this, "Chosen project name exists.");
+              JOptionPane.showMessageDialog(this, "Chosen project name exists.");
           }
           else         
             break; // out of do
-        }
-      }
-      while (true);
+      } while(true);
       
       projF.mkdirs();
-      boolean nuts = new File(projF,ViskitProject.EVENT_GRAPH_DIRECTORY_NAME).mkdir();
+      
+      new File(projF,ViskitProject.EVENT_GRAPH_DIRECTORY_NAME).mkdir();
       new File(projF,ViskitProject.ASSEMBLY_DIRECTORY_NAME).mkdir();
       new File(projF,ViskitProject.LIB_DIRECTORY_NAME).mkdir();
-      new File(projF,ViskitProject.BUILD_DIRECTORY_NAME).mkdir();
-      new File(projF,ViskitProject.SOURCE_DIRECTORY_NAME).mkdir();
-      new File(projF,ViskitProject.CLASSES_DIRECTORY_NAME).mkdir();
-      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
+//      new File(projF,ViskitProject.BUILD_DIRECTORY_NAME).mkdir();
+//      new File(projF,ViskitProject.SOURCE_DIRECTORY_NAME).mkdir();
+//      new File(projF,ViskitProject.CLASSES_DIRECTORY_NAME).mkdir();
+//      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
       
-      ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, projF.getAbsolutePath());
-      ViskitProject.MY_VISKIT_PROJECTS_DIR = projF.getParent();
-      ViskitProject.DEFAULT_PROJECT = projF.getName();
-
-      // on success:
-      dialog.setVisible(false);
-    }
-  
+      setupViskitProject(projF);
+      dialog.setVisible(false); 
 }//GEN-LAST:event_createButtActionPerformed
 
 private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
