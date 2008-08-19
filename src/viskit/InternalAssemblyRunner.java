@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -237,7 +236,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     File tmpFile;
     RandomAccessFile rTmpFile;
     boolean resetSeeds = false;
-
+    JTextAreaOutputStream textAreaOutputStream;
+    
     protected void initRun() {
         mutex++;
         if (mutex > 1) {
@@ -246,37 +246,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         Runnable assemblyRunnable;
 
         try {
-            
-            /* DIFF between OA3302 branch and trunk */
-//            resetSeeds = runPanel.resetSeedCB.isSelected();
-            /* End DIFF between OA3302 branch and trunk */
-            try {
-                tmpFile = TempFileManager.createTempFile("viskit", "out.txt");
-                tmpFile.setReadable(true);
-                tmpFile.setWritable(true);
-                rTmpFile = new RandomAccessFile(tmpFile, "rws");
-                if (fos != null) {
-                    fos.flush();
-                    fos.close();
-                    rTmpFile.close();
-                    tmpFile.delete();
-                }
-                if (fis != null) {
-                    fis.close();
-                }
-                fos = new FileOutputStream(tmpFile);
-                fis = new FileInputStream(tmpFile);
-                if (runPanel.fileChaser != null) {
-                    runPanel.fileChaser.cancel(true);
-                }
-                System.runFinalization();
-                System.gc();
-                runPanel.setFileChannel(rTmpFile.getChannel());
-            } catch (IOException ioe) {
-                System.err.println("Can't write to tmp space: " + ioe.getMessage());
-                ioe.printStackTrace();
-            }
-            
             /* DIFF between OA3302 branch and trunk */
 //            if (!resetSeeds) {
 //                if (seeds.size() > 0) {
@@ -326,8 +295,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             
             setSeed.invoke(rn, seed);
             
-            // This OutStream is to be set for the JScrollPane output of the Assy Rnr
-            setOutputStream.invoke(assemblyObj, fos);
+            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA,16*1024);
+
+            setOutputStream.invoke(assemblyObj, textAreaOutputStream);
             setNumberReplications.invoke(assemblyObj, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
             setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyObj, runPanel.printRepReportsCB.isSelected());
@@ -343,9 +313,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             addPropertyChangeListener.invoke(assemblyObj, this);
             setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
             assemblyRunnable = (Runnable) assemblyObj;              
-            
-            // This allows the Assy Rnr's text output to be collected in a text file
-            runPanel.wakeUpTextUpdater(fis);
             
             // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
@@ -412,6 +379,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         public void end() {
 
             System.out.println("Simulation ended");
+            System.out.println("----------------");
             runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             if (resetSeeds) {
                 try {
@@ -446,6 +414,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 Schedule.getDefaultEventList().clearRerun();
             }
             mutex--;
+            
+            twiddleButtons(InternalAssemblyRunner.STOP);
         }
     }
 
@@ -502,7 +472,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             }
                     
             twiddleButtons(InternalAssemblyRunner.STOP);
-            runPanel.fileChaser.stop();
+            textAreaOutputStream.kill();
+            //runPanel.fileChaser.stop();
         }
     }
 
@@ -553,8 +524,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 BufferedWriter bw = new BufferedWriter(new FileWriter(fil));
 
                 bw.write(runPanel.soutTA.getText());
-                bw.write(lineSep);
-                bw.write(runPanel.serrTA.getText());
                 bw.flush();
                 bw.close();
             } catch (IOException e1) {
@@ -689,7 +658,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     class copyListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            String s = runPanel.soutTA.getSelectedText() + "\n" + runPanel.serrTA.getSelectedText();
+            String s = runPanel.soutTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbd.setContents(ss, ss);
@@ -701,7 +670,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         public void actionPerformed(ActionEvent e) {
             runPanel.soutTA.requestFocus();
             runPanel.soutTA.selectAll();
-            runPanel.serrTA.selectAll();
         }
     }
 
@@ -709,7 +677,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         public void actionPerformed(ActionEvent e) {
             runPanel.soutTA.setText(null);
-            runPanel.serrTA.setText(null);
         }
     }
 
