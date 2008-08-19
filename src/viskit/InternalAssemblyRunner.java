@@ -680,29 +680,41 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
     }
 
-    class viewListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            File f = tmpFile;
+    class viewListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            File f; // = tmpFile;
             String osName = System.getProperty("os.name");
             String filePath = "";
             String tool = "notepad";
             if (!osName.startsWith("Windows")) {
                 tool = "gedit";
             }
+
+            String s = runPanel.soutTA.getText().trim();
             try {
+                f = File.createTempFile("ViskitOutput", ".txt");
+                f.deleteOnExit();
+                BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+                bw.append(s);
+                bw.close();
                 filePath = f.getCanonicalPath();
                 java.awt.Desktop.getDesktop().open(new File(filePath));
-            } catch (IOException ex) {
-            } catch (UnsupportedOperationException ex) {
-                try {
-                    Runtime.getRuntime().exec(tool + " " + filePath);
-                } catch (IOException ex1) {
-                    ex1.printStackTrace();
-                }
+              }
+            catch (IOException ex) {
+            }
+            catch (UnsupportedOperationException ex) {
+              try {
+                  Runtime.getRuntime().exec(tool + " " + filePath);
+              }
+              catch (IOException ex1) {
+                  ex1.printStackTrace();
+              }
             }
         }
     }
+    
     private String namePrefix = "Viskit Assembly Runner";
     private String currentTitle = namePrefix;
 
