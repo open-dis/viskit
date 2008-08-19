@@ -61,9 +61,10 @@ public class ViskitProject {
      * to determine a project home space on the user's machine.  A default
      * home will be the user's profile, or home directory.
      */
-    public static String MY_VISKIT_PROJECTS_DIR = 
+    public static final String MY_DEFAULT_VISKIT_PROJECTS_DIR = 
             System.getProperty("user.home") + Vstatics.getFileSeparator() +
             "MyViskitProjects";
+    public static String MY_VISKIT_PROJECTS_DIR = MY_DEFAULT_VISKIT_PROJECTS_DIR;
     
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine.  A default
