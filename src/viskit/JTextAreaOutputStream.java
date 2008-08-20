@@ -54,37 +54,44 @@ import javax.swing.Timer;
  */
 public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
-  JTextArea jta;
-  Timer swingTimer;
-  int delay = 125;//250;   // Performance adjuster for slow machines
+    private JTextArea jta;
+    private Timer swingTimer;
+    private int delay = 125; //250;   // Performance adjuster for slow machines
+    private long totalbytes = 0;
+    final public static int OUTPUTLIMIT = 1024 * 1024 * 8; // 8M
+    private boolean outputexceeded = false;
 
-  JTextAreaOutputStream(JTextArea ta, int buffSize)
-  {
-    super(buffSize);
-    jta = ta;
-    swingTimer = new Timer(delay, this);
-    swingTimer.start();
-  }
-
-  public void actionPerformed(ActionEvent e)
-  {
-    if (size() > 0) {
-      /* totalbytes+=size()
-       * if(totalbytes > 1024*1024) {
-       *   jta.append("Output limit exceeded.");
-       *    swingTimer.stop();
-       * }
-       */
-      String s = JTextAreaOutputStream.this.toString();
-      reset();
-      jta.append(s);
-      jta.setCaretPosition(jta.getDocument().getLength() - 1);
+    JTextAreaOutputStream(JTextArea ta, int buffSize) {
+        super(buffSize);
+        jta = ta;
+        swingTimer = new Timer(delay, this);
+        swingTimer.start();
     }
-  }
 
-  public void kill()
-  {
-    swingTimer.stop();
-    actionPerformed(null);
-  }
+    public void actionPerformed(ActionEvent e) {
+        int buffSize = size();
+        
+        if (buffSize > 0) {
+            String s = this.toString();
+            reset();
+
+            if (!outputexceeded) {
+                if ((totalbytes += buffSize) > OUTPUTLIMIT) {
+                    jta.append("Output limit exceeded.\n");
+                    jta.append("----------------------");
+                    jta.setCaretPosition(jta.getDocument().getLength() - 1);
+                    outputexceeded = true;
+                }
+                if (!outputexceeded) {
+                    jta.append(s);
+                    jta.setCaretPosition(jta.getDocument().getLength() - 1);
+                }
+            }
+         }
+      }
+
+    public void kill() {
+        swingTimer.stop();
+        actionPerformed(null);  // flush last bit
+    }
 }
