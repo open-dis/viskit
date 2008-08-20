@@ -162,7 +162,7 @@ private void quitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
   if(created != null) {
     created.delete();
   }
-  System.exit(0);
+  VGlobals.instance().sysExit(0);
 }//GEN-LAST:event_quitButtActionPerformed
 
 private void resetButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtActionPerformed

@@ -203,7 +203,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_createButtActionPerformed
 
 private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
-  System.exit(0);
+    VGlobals.instance().sysExit(0);
 }//GEN-LAST:event_exitButtActionPerformed
 
 private boolean isViskitProject(File fil)

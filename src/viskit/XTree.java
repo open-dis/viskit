@@ -269,7 +269,7 @@ public class XTree extends JTree {
                 jfc.showOpenDialog(f);
                 File fil = jfc.getSelectedFile();
                 if (fil == null) {
-                    System.exit(0);
+                    VGlobals.instance().sysExit(0);
                 }
 
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

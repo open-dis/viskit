@@ -216,7 +216,7 @@ public class RunnerPanel2 extends JPanel {
         vcrStop.setEnabled(false);
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
         vcrStop.setText(null);
-        //vcrStop.addActionListener(new FileChaserStopper());
+//        vcrStop.addActionListener(new FileChaserStopper());
         buttPan.add(vcrStop);
 
         vcrRewind = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Rewind24.gif")));
