@@ -71,9 +71,9 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
 
   private void setupViskitProject(File projFile)
   {
-     ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, projFile.getAbsolutePath());
-      ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent();
-      ViskitProject.DEFAULT_PROJECT = projFile.getName();
+     ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, projFile.getParent());
+     ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent();
+     ViskitProject.DEFAULT_PROJECT = projFile.getName();
     
   }
   
@@ -149,7 +149,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     chooser.setDialogTitle("Open Viskit Project (directory)");
     //chooser.addChoosableFileFilter(new ProjectFilter());
     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    chooser.setCurrentDirectory(new File(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR));
+    chooser.setCurrentDirectory(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
     boolean foundProject = false;
     File selectedFile;
     do {
