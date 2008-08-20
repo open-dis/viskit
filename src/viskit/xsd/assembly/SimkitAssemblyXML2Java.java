@@ -262,8 +262,9 @@ public class SimkitAssemblyXML2Java {
         pw.println("package " + pkg + sc);
         pw.println();
         
-        printImports(pw);        
-        pw.println();
+        // Fully qualified names are used, no imports required
+//        printImports(pw);        
+//        pw.println();
         
         if ( extend.equals("java.lang.Object") ) {
             extend = "";
