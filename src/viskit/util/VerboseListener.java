@@ -20,12 +20,15 @@ public class VerboseListener extends BasicSimEntity {
     }
 
     /**
-     * Dump the Event List for any heard event
+     * Dump the Event List for any heard event.  This will only happen
+     * if the source's EventList is not set to versbose or reallyVerbose.
      * @param simEvent The event that is heard
      */
     @Override
     public void processSimEvent(SimEvent simEvent) {
-        getEventList().dump(simEvent.getSource().getName());
+        if (!(getEventList().isVerbose() || getEventList().isReallyVerbose())) {
+            getEventList().dump(simEvent.getSource().getName());
+        }
     }
 
 }
