@@ -416,6 +416,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             mutex--;
             
             twiddleButtons(InternalAssemblyRunner.STOP);
+            textAreaOutputStream.kill();
         }
     }
 

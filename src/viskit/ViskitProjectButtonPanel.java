@@ -145,26 +145,27 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
   }// </editor-fold>//GEN-END:initComponents
 
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
-  JFileChooser chooser = new JFileChooser();
-  chooser.setDialogTitle("Open Viskit Project (directory)");
-  //chooser.addChoosableFileFilter(new ProjectFilter());
-  chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-  chooser.setCurrentDirectory(new File(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR));
-  do {
-    int ret = chooser.showOpenDialog(null);
-    if (ret != JFileChooser.APPROVE_OPTION)
-      return;  // back to button panel
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Open Viskit Project (directory)");
+    //chooser.addChoosableFileFilter(new ProjectFilter());
+    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    chooser.setCurrentDirectory(new File(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR));
+    boolean foundProject = false;
+    File selectedFile;
+    do {
+        int ret = chooser.showOpenDialog(null);
+        if (ret != JFileChooser.APPROVE_OPTION)
+          return;  // back to button panel
 
-    File selectedFile = chooser.getSelectedFile();
-    if (!isViskitProject(selectedFile))
-      JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
-      // do continue
-    else {
-      setupViskitProject(selectedFile);
-      dialog.setVisible(false);
-    }
-  }
-  while (true);
+        selectedFile = chooser.getSelectedFile();
+        foundProject = isViskitProject(selectedFile);
+        if (!foundProject)
+            JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
+      }
+    while (!foundProject);
+
+    setupViskitProject(selectedFile);
+    dialog.setVisible(false);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed

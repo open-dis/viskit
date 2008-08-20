@@ -5,18 +5,18 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
 
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer
-      in the documentation and/or other materials provided with the
-      distribution.
-    * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.movesinstitute.org)
-      nor the names of its contributors may be used to endorse or
-      promote products derived from this software without specific
-      prior written permission.
+ * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+ * Neither the names of the Naval Postgraduate School (NPS)
+Modeling Virtual Environments and Simulation (MOVES) Institute
+(http://www.nps.edu and http://www.movesinstitute.org)
+nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific
+prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 package viskit;
 
 import java.awt.event.ActionEvent;
@@ -52,33 +52,39 @@ import javax.swing.Timer;
  * @author mike
  * @version $Id$
  */
-public class JTextAreaOutputStream extends ByteArrayOutputStream    
+public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
   JTextArea jta;
   Timer swingTimer;
   int delay = 125;//250;   // Performance adjuster for slow machines
-  
+
   JTextAreaOutputStream(JTextArea ta, int buffSize)
   {
     super(buffSize);
     jta = ta;
-    swingTimer = new Timer(delay, new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        if(size() > 0) {
-          String s = JTextAreaOutputStream.this.toString();
-          reset();
-          jta.append(s);
-          jta.setCaretPosition(jta.getDocument().getLength()-1);
-        }
-      }      
-    });
+    swingTimer = new Timer(delay, this);
     swingTimer.start();
   }
-  
+
+  public void actionPerformed(ActionEvent e)
+  {
+    if (size() > 0) {
+      /* totalbytes+=size()
+       * if(totalbytes > 1024*1024) {
+       *   jta.append("Output limit exceeded.");
+       *    swingTimer.stop();
+       * }
+       */
+      String s = JTextAreaOutputStream.this.toString();
+      reset();
+      jta.append(s);
+      jta.setCaretPosition(jta.getDocument().getLength() - 1);
+    }
+  }
+
   public void kill()
   {
     swingTimer.stop();
+    actionPerformed(null);
   }
 }
