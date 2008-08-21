@@ -35,6 +35,8 @@ package viskit;
 
 import java.awt.Dialog;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -161,16 +163,16 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         foundProject = isViskitProject(selectedFile);
         if (!foundProject)
             JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
-      }
-    while (!foundProject);
+    } while (!foundProject);
 
     setupViskitProject(selectedFile);
-    dialog.setVisible(false);
+    defaultButtActionPerformed(null);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
     // TODO setup
     dialog.setVisible(false);
+    dialog.dispose();
 }//GEN-LAST:event_defaultButtActionPerformed
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
@@ -199,11 +201,17 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 //      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
       
       setupViskitProject(projF);
-      dialog.setVisible(false); 
+      defaultButtActionPerformed(null);
 }//GEN-LAST:event_createButtActionPerformed
 
 private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
-    VGlobals.instance().sysExit(0);
+    defaultButtActionPerformed(null);
+
+    // I don't like the idea of a SysExit call right here, but the way each
+    // frame component needs to develop while starting Viskit; each has to 
+    // finish before the VGlobals.instance().sysExit(0) call will work
+    // properly, so, reluctantly...
+    System.exit(0);
 }//GEN-LAST:event_exitButtActionPerformed
 
 private boolean isViskitProject(File fil)

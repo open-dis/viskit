@@ -433,7 +433,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 }
                 /* End DIFF between OA3302 branch and trunk */
 
-                //todo other preQuits here if needed
+                // TODO: other preQuits here if needed
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {

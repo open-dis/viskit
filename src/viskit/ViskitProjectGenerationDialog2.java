@@ -162,6 +162,7 @@ private void quitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
   if(created != null) {
     created.delete();
   }
+  dialog.dispose();
   VGlobals.instance().sysExit(0);
 }//GEN-LAST:event_quitButtActionPerformed
 

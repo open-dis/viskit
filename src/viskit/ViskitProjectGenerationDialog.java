@@ -235,6 +235,7 @@ public class ViskitProjectGenerationDialog extends JDialog {
                 "Cancel and Exit Viskit",
                 JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
+            dialog.dispose();
             VGlobals.instance().sysExit(0);
         }
     }

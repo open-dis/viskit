@@ -146,7 +146,7 @@ public class Splash2 extends JFrame {
         }
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (Exception e) {
         }  // this is used to give us some min splash viewing
         progressBar.setString("Starting Viskit...");

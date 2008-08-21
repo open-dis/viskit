@@ -194,7 +194,6 @@ public class VGlobals {
             if (egvf != null && egvf.isVisible()) {
                 return;
             }
-            sysExit(0);
         }
      };
     ActionListener assyQuitHandler = defaultAssyQuitHandler;
@@ -261,7 +260,6 @@ public class VGlobals {
             if (avf != null && avf.isVisible()) {
                 return;
             }
-            sysExit(0);
         }
     };
     ActionListener eventGraphQuitHandler = defaultEventGraphQuitHandler;
@@ -912,19 +910,25 @@ public class VGlobals {
             int count = 0;
             for (Frame f : frames) {
                 log.debug("Frame count in Viskit: " + (++count));
-                log.debug("Frame is: " + f);
-
-                /* Prevent non-viskit components from disposing if launched from
-                 * another application.  SwingUtilities is a little "ify" though
-                 * as it's not Viskit specific.  Viskit, however, spawns a lot
-                 * of anonymous Runnables with SwingUtilities
+                
+                /* Prevent non-viskit created components from disposing if 
+                 * launched from another application.  SwingUtilities is a 
+                 * little "ify" though as it's not Viskit specific.  Viskit, 
+                 * however, spawns a lot of anonymous Runnables with 
+                 * SwingUtilities
                  */
-                if (f.toString().toLowerCase().contains("viskit") || 
-                        f.toString().contains("SwingUtilities")) {
+                if (f.toString().toLowerCase().contains("viskit")) {
+                    log.debug("Frame is: " + f);
                     f.dispose();
                 }
+                if (f.toString().contains("SwingUtilities")) {                    
+                    log.debug("Frame is: " + f);
+                    f.dispose();
+                }
+                
                 // Case for XMLTree JFrames
                 if (f.getTitle().contains("xml")) {
+                    log.debug("Frame is: " + f);
                     f.dispose();
                 }
             }
