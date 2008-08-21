@@ -38,6 +38,7 @@ import viskit.xsd.bindings.assembly.SimEntity;
 import viskit.xsd.bindings.assembly.SimEventListenerConnection;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.TerminalParameter;
+import viskit.xsd.bindings.assembly.Verbose;
 
 /**
  * @author  Rick Goldberg
@@ -734,10 +735,13 @@ public class SimkitAssemblyXML2Java {
     
     void buildVerbose(StringWriter out)
     {
-        //todo build code
         PrintWriter pw = new PrintWriter(out);
-        pw.println(sp4 + "// marker for verbose output");
-        pw.println();
+        List<Verbose> vbose = this.root.getVerbose();
+        if(!vbose.isEmpty()) {
+            //todo build code
+            pw.println(sp4 + "// marker for verbose output");
+            pw.println();
+        }
     }
     
     void buildOutput(StringWriter out) {
