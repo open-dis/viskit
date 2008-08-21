@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(inputString).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -54,44 +54,43 @@ import javax.swing.Timer;
  */
 public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
-    private JTextArea jta;
-    private Timer swingTimer;
-    private int delay = 125; //250;   // Performance adjuster for slow machines
-    private long totalbytes = 0;
-    final public static int OUTPUTLIMIT = 1024 * 1024 * 8; // 8M
-    private boolean outputexceeded = false;
+  private JTextArea jta;
+  private Timer swingTimer;
+  private int delay = 125; //250;   // Performance adjuster for slow machines
+  
+  final public static int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
+  final public static int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
+  
+  private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
+                                    "----------------------------------------------\n";
+  JTextAreaOutputStream(JTextArea ta, int buffSize)
+  {
+    super(buffSize);
+    jta = ta;
+    swingTimer = new Timer(delay, this);
+    swingTimer.start();
+  }
 
-    JTextAreaOutputStream(JTextArea ta, int buffSize) {
-        super(buffSize);
-        jta = ta;
-        swingTimer = new Timer(delay, this);
-        swingTimer.start();
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        int buffSize = size();
-        
-        if (buffSize > 0) {
-            String s = this.toString();
-            reset();
-
-            if (!outputexceeded) {
-                if ((totalbytes += buffSize) > OUTPUTLIMIT) {
-                    jta.append("Output limit exceeded.\n");
-                    jta.append("----------------------");
-                    jta.setCaretPosition(jta.getDocument().getLength() - 1);
-                    outputexceeded = true;
-                }
-                if (!outputexceeded) {
-                    jta.append(s);
-                    jta.setCaretPosition(jta.getDocument().getLength() - 1);
-                }
-            }
-         }
+  public void actionPerformed(ActionEvent e)
+  {
+    int inputSize = size();
+    if (inputSize > 0) {
+      
+      String inputString = this.toString();  // "this" = this output stream
+      reset();
+          
+      if (jta.getDocument().getLength() > OUTPUTLIMIT) {
+        int backoff = Math.max(BACKOFFSIZE, inputSize);
+        jta.replaceRange(warningMsg, 0, backoff - 1);
       }
+      jta.append(inputString);
+      jta.setCaretPosition(jta.getDocument().getLength()-1);
+     }
+  }
 
-    public void kill() {
-        swingTimer.stop();
-        actionPerformed(null);  // flush last bit
-    }
+  public void kill()
+  {
+    swingTimer.stop();
+    actionPerformed(null);  // flush last bit
+  }
 }
