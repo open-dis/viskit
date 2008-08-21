@@ -1293,19 +1293,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         fnd = mat.find();
 
         int end = mat.end();
-        String s = src.substring(end, end + 128).trim();
+        String s = src.substring(end, src.length()).trim();
         String[] sa = s.split("\\s+");
 
         baseName = sa[0];
 
         try {
+            
+            // Should always have a live ViskitProject
             ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
             File workingDir = VGlobals.instance().getWorkDirectory().getParentFile();
 
             // Create, or find the project's java source
-            File srcPkg = (viskitProj != null) ?
-                new File(viskitProj.getSrcDir(), pkg) :
-                new File(workingDir, ViskitProject.SOURCE_DIRECTORY_NAME + Vstatics.getFileSeparator() + pkg);
+            File srcPkg = new File(viskitProj.getSrcDir(), pkg);
             if (!srcPkg.isDirectory()) {srcPkg.mkdirs();}
             File javaFile = new File(srcPkg, baseName + ".java");
             javaFile.createNewFile();

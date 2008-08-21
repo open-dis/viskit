@@ -194,6 +194,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
     }
 
+    /** Adds SimEntity icons to the Assembly Editor drag and drop tree
+     * 
+     * @param f the directory to recurse to find SimEntitiy based EGs
+     * @param recurse if true, recurse the directory
+     */
     public void addContentRoot(File f, boolean recurse) {
         Vector<DefaultMutableTreeNode> v = new Vector<DefaultMutableTreeNode>();
         directoryRoots = new HashMap<String, DefaultMutableTreeNode>();
@@ -215,7 +220,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         JOptionPane.showMessageDialog(LegosTree.this, "Compile error in " + f.getName() + ",\n" +
                 "or no classes of type " + targetClass.getName() +
                 " found,\n" +
-                "or only duplicate class type(s) encountered.",
+                "or duplicate class type(s) encountered.",
                 "Error", JOptionPane.WARNING_MESSAGE);
     }
 

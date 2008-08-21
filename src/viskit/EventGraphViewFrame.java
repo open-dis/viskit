@@ -969,9 +969,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     private JFileChooser buildOpenSaveChooser() {
 
-        // Try to open in the current project directory
+        // Try to open in the current project directory for EventGraphs
         if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphDir());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }

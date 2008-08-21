@@ -821,11 +821,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private JFileChooser jfc;
     private JFileChooser buildOpenSaveChooser() {
         
-        // Try to open in the current project directory
-        if (VGlobals.instance().getCurrentViskitProject() != null) 
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
-         else 
-            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));   
+        // Try to open in the current project directory for Assemblies
+        if (VGlobals.instance().getCurrentViskitProject() != null) {
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssemblyDir());
+        } else {
+            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+        }
     }
         
     /** Display a file chooser filtered by Assembly XML files only

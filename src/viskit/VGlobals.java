@@ -827,10 +827,17 @@ public class VGlobals {
                 Arrays.asList(ViskitConfig.instance().getViskitConfig().getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
 
         if (cache.isEmpty()) {
-            newProjectDirectory();
+            newProjectDirectory();            
+            workDirectory = currentViskitProject.getClassDir();
         } else {
             workDirectory = 
-                    new File(ViskitConfig.instance().getViskitConfig().getString(ViskitConfig.CACHED_WORKING_DIR_KEY));            
+                    new File(ViskitConfig.instance().getViskitConfig().getString(ViskitConfig.CACHED_WORKING_DIR_KEY));
+            ViskitProject.DEFAULT_PROJECT = workDirectory.getParentFile().getParentFile().getName();
+            currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
+            currentViskitProject.setClassDir(workDirectory);
+            currentViskitProject.setSrcDir(new File(workDirectory.getParentFile(), ViskitProject.SOURCE_DIRECTORY_NAME));            
+            currentViskitProject.setEventGraphDir(new File(ViskitConfig.instance().getVal(ViskitConfig.X_CLASS_PATH_KEY + "[@value]")));
+            currentViskitProject.setAssemblyDir(new File(currentViskitProject.getProjectRoot(), ViskitProject.ASSEMBLY_DIRECTORY_NAME));
         }
     }
 
@@ -844,7 +851,6 @@ public class VGlobals {
         }
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
         if (currentViskitProject.createProject()) {
-            workDirectory = currentViskitProject.getClassDir();
             SettingsDialog.saveClassPathEntries(getCurrentViskitProject().getProjectContents());
         } else {
             throw new RuntimeException("Unable to create project directory");

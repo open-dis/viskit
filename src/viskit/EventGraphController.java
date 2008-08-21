@@ -560,7 +560,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
 
             String n = saveFile.getName();
-            if (n.endsWith(".xml") || n.endsWith(".XML")) {
+            if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
             gmd.name = n;

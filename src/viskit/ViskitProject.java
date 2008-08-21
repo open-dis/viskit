@@ -122,9 +122,9 @@ public class ViskitProject {
             getEventGraphDir().mkdir();
         }
         
-        assemblyDir = new File(projectRoot, ASSEMBLY_DIRECTORY_NAME);
+        setAssemblyDir(new File(projectRoot, ASSEMBLY_DIRECTORY_NAME));
         if (!assemblyDir.exists()) {
-            assemblyDir.mkdir();
+            getAssemblyDir().mkdir();
         }
         
         setLibDir(new File(projectRoot, LIB_DIRECTORY_NAME));
@@ -133,8 +133,8 @@ public class ViskitProject {
         }
         
         buildDir = new File(projectRoot, BUILD_DIRECTORY_NAME);
-        srcDir = new File(getBuildDir(), SOURCE_DIRECTORY_NAME);
-        classDir = new File(getBuildDir(), CLASSES_DIRECTORY_NAME);
+        setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
+        setClassDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
         
         // Start with a fresh build directory
         if (buildDir.exists()) {
@@ -284,9 +284,17 @@ public class ViskitProject {
     public File getSrcDir() {
         return srcDir;
     }
-
+    
+    public void setSrcDir(File srcDir) {
+        this.srcDir = srcDir;
+    }
+    
     public File getClassDir() {
         return classDir;
+    }
+    
+    public void setClassDir(File classDir) {
+        this.classDir = classDir;
     }
     
     public String[] getProjectContents() {
@@ -309,18 +317,6 @@ public class ViskitProject {
         return sa.toArray(new String[sa.size()]);
     }
 
-    @Override
-    public String toString() {
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        StringWriter stringWriter = new StringWriter();
-        try {
-            xmlOutputter.output(projectDocument, stringWriter);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-        return stringWriter.toString();
-    }
-
     public File getEventGraphDir() {
         return eventGraphDir;
     }
@@ -335,5 +331,25 @@ public class ViskitProject {
 
     public void setLibDir(File libDir) {
         this.libDir = libDir;
+    }
+
+    public File getAssemblyDir() {
+        return assemblyDir;
+    }
+
+    public void setAssemblyDir(File assemblyDir) {
+        this.assemblyDir = assemblyDir;
+    }
+
+    @Override
+    public String toString() {
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+        StringWriter stringWriter = new StringWriter();
+        try {
+            xmlOutputter.output(projectDocument, stringWriter);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return stringWriter.toString();
     }
 }
