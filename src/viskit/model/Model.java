@@ -697,8 +697,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     // -----------------
     /**
      * Add a new event to the graph with the given label, at the given point
-     * @param nodeName
-     * @param p 
+     * @param nodeName the name of the Event Node
+     * @param p the (x, y) position of the Event Node
      */
     public void newEvent(String nodeName, Point p) {
         EventNode node = new EventNode(nodeName);

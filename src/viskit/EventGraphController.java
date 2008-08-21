@@ -120,9 +120,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     /** Creates a new Viskit Project */
     public void newProject() {
-        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(), 
-                "Are you sure you want to close your current Viskit Project?", 
-                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        String msg = "Are you sure you want to close your current Viskit Project?";
+        String title = "Close Current Project";
+                
+        int ret = ((ViskitView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
             VGlobals.instance().getAssemblyController().close();
             ViskitConfig.instance().clearViskitConfig();
@@ -137,9 +138,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
      * @param egvf the EventGraphViewFrame for the JFileChooser's orientation
      */
     public void openProject(JFileChooser jfc, EventGraphViewFrame egvf) {
-        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(),
-                "Are you sure you want to close your current Viskit Project?",
-                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        String msg = "Are you sure you want to close your current Viskit Project?";
+        String title = "Close Current Project";
+                
+        int ret = ((ViskitView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
             int retv = jfc.showOpenDialog(egvf);
             if (retv == JFileChooser.APPROVE_OPTION) {
@@ -184,8 +186,19 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
 
         if (EventGraphMetaDataDialog.modified) {
-            buildNewNode(new Point(30, 30), "Run");   // always start with a run event
-            ((ViskitModel) getModel()).setDirty(false); // we're not really dirty yet
+            
+            // Bugfix 1398
+            String msg = 
+                    "<html><body><p align='center'>Do you wish to start with a <b>\"Run\"</b> Event?</p></body></html>";
+            String title = "Confirm Run Event";                    
+                    
+            int ret = ((ViskitView) getView()).genericAskYN(title, msg);
+            boolean dirty = false;
+            if (ret == JOptionPane.YES_OPTION) {
+                buildNewNode(new Point(30, 30), "Run");
+                dirty = true; 
+            } 
+            ((ViskitModel) getModel()).setDirty(dirty);
         } else {
            ((ViskitView) getView()).delTab(mod);
         }
@@ -721,7 +734,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
     // TODO: This will throw a null pointer if no Event Graph is loaded
     private boolean checkSave() {
         if (((ViskitModel) getModel()).isDirty() || ((ViskitModel) getModel()).getLastFile() == null) {
-            int ret = JOptionPane.showConfirmDialog(null, "The model will be saved.\nContinue?", "Confirm", JOptionPane.YES_NO_OPTION);
+            String msg = "The model will be saved.\nContinue?";
+            String title = "Confirm";
+            int ret = ((ViskitView) getView()).genericAskYN(title, msg);
             if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }
@@ -732,7 +747,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     public void generateJavaClass() {
         File localLastFile = ((ViskitModel) getModel()).getLastFile();
-        if (checkSave() == false || localLastFile == null) {
+        if (!checkSave() || localLastFile == null) {
             return;
         }
         String source = ((ViskitModel) getModel()).buildJavaSource();

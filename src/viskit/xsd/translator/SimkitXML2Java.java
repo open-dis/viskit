@@ -401,21 +401,14 @@ public class SimkitXML2Java {
     void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
        
         List<Event> events = this.root.getEvent();
-        boolean didRun = false;
 
+        // Bugfix 1398
         for (Event e : events) {
             if (e.getName().equals("Run")) {
                 doRunBlock(e, runBlock);
-                didRun = true;
             } else {
                 doEventBlock(e, eventBlock);
             }
-        }
-
-        if (!didRun) {
-            Event r = (new ObjectFactory()).createEvent();
-            r.setName("Run");
-            doRunBlock(r, runBlock);
         }
     }
 
