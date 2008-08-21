@@ -547,12 +547,13 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    /** Save the current Event Graph "as" desired by user */        
     public void saveAs() {
         ViskitModel mod = (ViskitModel) getModel();
         ViskitView view = (ViskitView) getView();
         GraphMetaData gmd = mod.getMetaData();
+        File saveFile = view.saveFileAsk(gmd.packageName + Vstatics.getFileSeparator() + gmd.name + ".xml", false);
 
-        File saveFile = view.saveFileAsk(gmd.name + ".xml", false);
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();
             if (localLastFile != null) {
@@ -867,8 +868,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 
-    public void captureWindow() //-------------------------
-    {
+    /** Screen capture a snapshot of the Event Graph View Frame */
+    public void captureWindow() {
         String fileName = "ViskitScreenCapture";
         File localLastFile = ((ViskitModel) getModel()).getLastFile();
         if (localLastFile != null) {

@@ -833,7 +833,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
      * @return the chosen XML Assembly file
      */
     public File openFileAsk() {
-        if(jfc == null) {
+        if (jfc == null) {
           jfc = buildOpenSaveChooser();
         }
  
@@ -843,8 +843,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
         jfc.setFileFilter(filter);
-        int returnVal = jfc.showOpenDialog(this);
-        
+        int returnVal = jfc.showOpenDialog(this);        
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File f = jfc.getSelectedFile();
@@ -852,6 +851,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             log.info("You chose to open: " + f.getName());
             return f;
         }
+        jfc = null;
         return null;
     }
 
@@ -897,12 +897,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return fil;
     }
 
+    /** Saves the current Assembly "as" desired by the user
+     * 
+     * @param suggName the package and file name of the Assembly
+     * @param showUniqueName show Assembly name only
+     * @return a File object of the saved Assembly
+     */
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-       if(jfc == null)
-          jfc = buildOpenSaveChooser();
- 
+        if (jfc == null) {
+            jfc = buildOpenSaveChooser();
+        }
+
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(suggName);
+        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssemblyDir(), suggName);
+        if (!fil.getParentFile().isDirectory()) {fil.getParentFile().mkdirs();}
         if (showUniqueName) {
             fil = getUniqueName(suggName);
         }
@@ -919,6 +927,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             }
             return jfc.getSelectedFile();
         }
+        jfc = null;
         return null;
     }
 

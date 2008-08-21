@@ -208,9 +208,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         // placeholder for combo gui
     }
 
-    /**
-     * 
-     */
+    /** Opens a Viskit Project Assembly File */
     public void open() {
 
         if (!checkSaveIfDirty()) {
@@ -399,9 +397,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return egListener;
     }
 
-    /**
-     * 
-     */
+    /** Save the current Assembly File */
     public void save() {
         if (lastFile == null) {
             saveAs();
@@ -410,15 +406,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    /**
-     * 
-     */
+    /** Save the current Assembly File "as" desired by user */    
     public void saveAs() {
         ViskitAssemblyModel model = (ViskitAssemblyModel) getModel();
         ViskitAssemblyView view = (ViskitAssemblyView) getView();
         GraphMetaData gmd = model.getMetaData();
-
-        File saveFile = view.saveFileAsk(gmd.name + ".xml", false);
+        File saveFile = view.saveFileAsk(gmd.packageName + Vstatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
             if (lastFile != null) {
@@ -506,9 +499,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /** Creates a new Viskit Project */
     public void newProject() {
-        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(), 
-                "Are you sure you want to close your current Viskit Project?", 
-                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        String msg = "Are you sure you want to close your current Viskit Project?";
+        String title = "Close Current Project";
+                
+        int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
             close();
             ViskitConfig.instance().clearViskitConfig();            
@@ -523,9 +517,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param avf the AssemblyViewFrame for the JFileChooser's orientation
      */
     public void openProject(JFileChooser jfc, AssemblyViewFrame avf) {
-        int ret = JOptionPane.showConfirmDialog(VGlobals.instance().getMainAppWindow(),
-                "Are you sure you want to close your current Viskit Project?",
-                "Close Current Project", JOptionPane.YES_NO_OPTION);
+        String msg = "Are you sure you want to close your current Viskit Project?";
+        String title = "Close Current Project";
+                
+        int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
             int retv = jfc.showOpenDialog(avf);
             if (retv == JFileChooser.APPROVE_OPTION) {
@@ -1084,7 +1079,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     private boolean checkSaveForSourceCompile() {
         if (((ViskitAssemblyModel) getModel()).isDirty() || lastFile == null) {
-            int ret = JOptionPane.showConfirmDialog(null, "The model will be saved.\nContinue?", "Confirm", JOptionPane.YES_NO_OPTION);
+            int ret = ((ViskitAssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
             if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }
@@ -1592,9 +1587,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 
-    /**
-     * 
-     */
+    /** Screen capture a snapshot of the Assembly View Frame */
     public void captureWindow() {
         String fileName = "AssemblyScreenCapture";
         if (lastFile != null) {

@@ -822,10 +822,18 @@ public class VGlobals {
     }
             
     public void createWorkDirectory() {
-        if (ViskitConfig.instance().getViskitConfig() == null) {return;}
-        List<String> cache = 
+        if (ViskitConfig.instance().getViskitConfig() == null) {
+            return;
+        }
+        List<String> cache =
                 Arrays.asList(ViskitConfig.instance().getViskitConfig().getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        
+        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 
+        if (!projectsBaseDir.exists()) {
+            projectsBaseDir.mkdirs();
+        }
+        
         if (cache.isEmpty()) {
             newProjectDirectory();            
             workDirectory = currentViskitProject.getClassDir();
@@ -842,13 +850,7 @@ public class VGlobals {
     }
 
     /** Creates a new Viskit project and automatically sets the extra classpath */
-    private void newProjectDirectory() {
-        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
-
-        // Need to make from scratch /MyViskitProjects
-        if (!projectsBaseDir.exists()) {
-            projectsBaseDir.mkdirs();
-        }
+    private void newProjectDirectory() {        
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
         if (currentViskitProject.createProject()) {
             SettingsDialog.saveClassPathEntries(getCurrentViskitProject().getProjectContents());

@@ -1023,12 +1023,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return fil;
     }
 
+    /** Saves the current Event Graph "as" desired by the user
+     * 
+     * @param suggName the package and file name of the EG
+     * @param showUniqueName show EG name only
+     * @return a File object of the saved EG
+     */
     public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
         }
 
-        File fil = new File(suggName);
+        File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphDir(), suggName);
+        if (!fil.getParentFile().isDirectory()) {fil.getParentFile().mkdirs();}
         if (showUniqueName) {
             fil = getUniqueName(suggName);
         }
