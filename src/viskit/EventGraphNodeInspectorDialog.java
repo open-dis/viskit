@@ -27,7 +27,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     private JLabel handleLab; //,outputLab;
     private JTextField handleField;
-    private JCheckBox outputCheck;
+    private JCheckBox outputCheck, verboseCheck;
     private InstantiationPanel ip;
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
@@ -92,8 +92,10 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         Vstatics.clampHeight(descField);
         descLab = new JLabel("description", JLabel.TRAILING);
         descLab.setLabelFor(descField);
+        verboseCheck = new JCheckBox("verbose output");
+        
         Vstatics.cloneSize(handleLab, descLab);    // make handle same size
-
+        
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
@@ -120,6 +122,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         handleField.addCaretListener(lis);
         descField.addCaretListener(lis);
         outputCheck.addActionListener(lis);
+        verboseCheck.addActionListener(lis);
     }
 
     public void setParams(Component c, EvGraphNode p) throws ClassNotFoundException {
@@ -146,8 +149,9 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         bcont.add(handleLab);
         bcont.add(Box.createHorizontalStrut(5));
         bcont.add(handleField);
+        bcont.add(Box.createHorizontalStrut(2));
         bcont.add(outputCheck);
-        bcont.add(Box.createHorizontalGlue());
+        //bcont.add(Box.createHorizontalGlue());
         content.add(bcont);
 
         JPanel dcont = new JPanel();
@@ -155,6 +159,10 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         dcont.add(descLab);
         dcont.add(Box.createHorizontalStrut(5));
         dcont.add(descField);
+        dcont.add(Box.createHorizontalStrut(2));
+        dcont.add(verboseCheck);
+        //dcont.add(Box.createHorizontalGlue());
+       
         content.add(dcont);
         ip = new InstantiationPanel(this, lis, true);
 
@@ -172,12 +180,14 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         if (egNode != null) {
             handleField.setText(egNode.getName()); 
             outputCheck.setSelected(egNode.isOutputMarked());
+            verboseCheck.setSelected(egNode.isVerboseMarked());
             descField.setText(egNode.getDescriptionString());
             //ArrayList alis = egNode.getComments(); //? 
             ip.setData(egNode.getInstantiator());
           } else {
             handleField.setText("egNode name");
             outputCheck.setSelected(false);
+            verboseCheck.setSelected(false);
             descField.setText("");
        }
     }
@@ -190,6 +200,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             egNode.setDescriptionString(descField.getText().trim());
             egNode.setInstantiator(ip.getData());
             egNode.setOutputMarked(outputCheck.isSelected());
+            egNode.setVerboseMarked(verboseCheck.isSelected());
         } else {
             newName = nm;
             newInstantiator = ip.getData();

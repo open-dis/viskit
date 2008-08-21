@@ -554,6 +554,12 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             removeFromOutputList(jaxbSE);
         }
 
+        if (evNode.isVerboseMarked()) {
+            addToVerboseList(jaxbSE);
+        } else {
+            removeFromVerboseList(jaxbSE);
+        }
+
         modelDirty = true;
         this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
         return retcode;
@@ -569,6 +575,16 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
+    private void removeFromVerboseList(SimEntity se) {
+        List<Verbose> vTL = jaxbRoot.getVerbose();
+        for (Verbose v : vTL) {
+            if (v.getEntity() == se) {
+                vTL.remove(v);
+                return;
+            }
+        }
+    }
+
     private void addToOutputList(SimEntity se) {
         List<Output> outTL = jaxbRoot.getOutput();
         for (Output o : outTL) {
@@ -577,13 +593,23 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             }
         }
         Output op = oFactory.createOutput();
-
         op.setEntity(se);
-
         outTL.add(op);
     }
 
-    public Vector<String> getVerboseEntityNames() {
+    private void addToVerboseList(SimEntity se) {
+        List<Verbose> vTL = jaxbRoot.getVerbose();
+        for (Verbose v : vTL) {
+            if (v.getEntity() == se) {
+                return;
+            }
+        }
+        Verbose op = oFactory.createVerbose();
+        op.setEntity(se);
+        vTL.add(op);
+    }
+    
+    public Vector<String> getDetailedOutputEntityNames() {
         Vector<String> v = new Vector<String>();
         for (Output ot : jaxbRoot.getOutput()) {
             Object entity = ot.getEntity();
@@ -596,7 +622,20 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return v;
     }
 
-    private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
+     public Vector<String> getVerboseOutputEntityNames() {
+        Vector<String> v = new Vector<String>();
+        for (Verbose ot : jaxbRoot.getVerbose()) {
+            Object entity = ot.getEntity();
+            if (entity instanceof SimEntity) {
+                v.add(((SimEntity) entity).getName());
+            } else if (entity instanceof PropertyChangeListener) {
+                v.add(((PropertyChangeListener) entity).getName());
+            }
+        }
+        return v;
+    }
+
+   private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
 
         List<Object> vi = new ArrayList<Object>();
 
@@ -749,7 +788,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                 }
 
                 changeMetaData(mymetaData);
-                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput());
+                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
@@ -848,10 +887,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
-    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList) {
+    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose>verboseList) {
         for (SimEntity se : simEntities) {
             boolean isOutput = false;
-
+            boolean isVerbose = false;
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
             for (Output o : outputList) {
@@ -861,7 +900,14 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     break;
                 }
             }
-            buildEvgNodeFromJaxbSimEntity(se, isOutput);
+            for (Verbose v : verboseList) {
+                SimEntity simE = (SimEntity) v.getEntity();
+                if (simE == se) {
+                    isVerbose = true;
+                    break;
+                }
+            }
+            buildEvgNodeFromJaxbSimEntity(se, isOutput, isVerbose);
         }
     }
 
@@ -903,7 +949,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return pNode;
     }
 
-    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode) {
+    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
         EvGraphNode en = (EvGraphNode) getNodeCache().get(se);
         if (en != null) {
             return en;
@@ -921,6 +967,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         en.setDescriptionString(se.getDescription());
         en.setOutputMarked(isOutputNode);
+        en.setVerboseMarked(isVerboseNode);
         List<Object> lis = se.getParameters();
         VInstantiator.Constr vc = new VInstantiator.Constr(lis, se.getType());
         en.setInstantiator(vc);

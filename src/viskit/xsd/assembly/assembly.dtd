@@ -4,7 +4,7 @@
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter">
 <!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics">
 
-<!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, EventGraph*, SimEntity*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Schedule?, Experiment?)>
+<!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, EventGraph*, SimEntity*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
 <!ATTLIST SimkitAssembly
 	name 	ID      #REQUIRED
 	version	CDATA	"1.0"
@@ -96,6 +96,11 @@
 
 <!ELEMENT Output EMPTY>
 <!ATTLIST Output
+    entity   IDREF #REQUIRED
+>
+
+<!ELEMENT Verbose EMPTY>
+<!ATTLIST Verbose
     entity   IDREF #REQUIRED
 >
 

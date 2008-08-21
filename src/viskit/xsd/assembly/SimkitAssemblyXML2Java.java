@@ -240,14 +240,16 @@ public class SimkitAssemblyXML2Java {
         StringWriter listeners = new StringWriter();
         StringWriter output = new StringWriter();
         StringWriter tail = new StringWriter();
+        StringWriter verbose = new StringWriter();
         
         buildHead(head);
         buildEntities(entities);
         buildListeners(listeners);
         buildOutput(output);
+        buildVerbose(verbose);
         buildTail(tail);
         
-        buildSource(source, head, entities, listeners, output, tail);
+        buildSource(source, head, entities, listeners, output, verbose, tail);
         
         return source.toString();
     }
@@ -730,6 +732,14 @@ public class SimkitAssemblyXML2Java {
         return asm;
     }
     
+    void buildVerbose(StringWriter out)
+    {
+        //todo build code
+        PrintWriter pw = new PrintWriter(out);
+        pw.println(sp4 + "// marker for verbose output");
+        pw.println();
+    }
+    
     void buildOutput(StringWriter out) {
         PrintWriter pw = new PrintWriter(out);
         
@@ -747,23 +757,6 @@ public class SimkitAssemblyXML2Java {
             pw.println();
         }
         
-        // The main method doesn't need to dump the outputs, since their done at object init time now
-        pw.println(sp4 + "public static void main(String[] args) {");
-        pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
-        pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
-        
-//        List<Output> outputs = this.root.getOutput();
-//        for (Output output : outputs) {
-//            Object elem = output.getEntity();
-//            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
-//            
-//            if ( elem instanceof SimEntity ) {
-//                name = ((SimEntity)elem).getName();
-//            } else if ( elem instanceof PropertyChangeListener ) {
-//                name = ((PropertyChangeListener)elem).getName();
-//            }
-//            pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
-//        }
     }
     
     private void dumpEntities(List<Output> lis, PrintWriter pw)
@@ -796,6 +789,11 @@ public class SimkitAssemblyXML2Java {
         PrintWriter pw = new PrintWriter(t);
         String nAsm = nameAsm();
         
+        // The main method doesn't need to dump the outputs, since their done at object init time now
+        pw.println(sp4 + "public static void main(String[] args) {");
+        pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
+        pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
+                
         pw.println(sp8 + nw + sp + "Thread" + lp + nAsm + rp + pd + "start" + lp + rp + sc);
         
         pw.println();
@@ -804,10 +802,10 @@ public class SimkitAssemblyXML2Java {
     }
     
     void buildSource(StringBuffer source, StringWriter head, StringWriter entities,
-            StringWriter listeners, StringWriter output, StringWriter tail ) {
+            StringWriter listeners, StringWriter output, StringWriter verbose, StringWriter tail ) {
         
-        source.append(head.getBuffer()).append(entities.getBuffer()).append(listeners.getBuffer());
-        source.append(output.getBuffer()).append(tail.getBuffer());
+        source.append(head.getBuffer()).  append(entities.getBuffer()).append(listeners.getBuffer());
+        source.append(output.getBuffer()).append(verbose.getBuffer()). append(tail.getBuffer());
     }
     
     public void writeOut(String data, java.io.PrintStream out) {

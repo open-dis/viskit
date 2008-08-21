@@ -18,6 +18,7 @@ import viskit.xsd.bindings.assembly.SimEntity;
 public class EvGraphNode extends AssemblyNode {
 
     protected boolean outputMarked = false;
+    protected boolean verboseMarked = false;
     private ArrayList<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
@@ -39,6 +40,14 @@ public class EvGraphNode extends AssemblyNode {
 
     public void setOutputMarked(boolean outputMarked) {
         this.outputMarked = outputMarked;
+    }
+
+    public boolean isVerboseMarked() {
+        return verboseMarked;
+    }
+
+    public void setVerboseMarked(boolean verboseMarked) {
+        this.verboseMarked = verboseMarked;
     }
 
     @Override

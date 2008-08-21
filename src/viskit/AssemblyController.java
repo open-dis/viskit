@@ -1580,7 +1580,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         v.add("" + ((ViskitAssemblyModel) getModel()).getMetaData().verbose); // 7
         v.add(((ViskitAssemblyModel) getModel()).getMetaData().stopTime);     // 8
 
-        Vector<String> vec = ((ViskitAssemblyModel) getModel()).getVerboseEntityNames();
+        Vector<String> vec = ((ViskitAssemblyModel) getModel()).getDetailedOutputEntityNames();
         for (String s : vec) {
             v.add(s);                                                         // 9+
         }

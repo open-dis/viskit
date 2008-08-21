@@ -59,7 +59,9 @@ public interface ViskitAssemblyModel {
   public void deletePropChangeEdge(PropChangeEdge pce);
   public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
 
-  public Vector<String> getVerboseEntityNames();
+  public Vector<String> getDetailedOutputEntityNames();
+  public Vector<String> getVerboseOutputEntityNames();
+  
   public void externalClassesChanged(Vector<String> v);
   public boolean nameExists(String name);
 }
