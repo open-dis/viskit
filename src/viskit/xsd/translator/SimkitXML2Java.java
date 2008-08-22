@@ -58,6 +58,15 @@ public class SimkitXML2Java {
     private String extend = "";
     private String className = "";
 
+    /** Default to initialize the JAXBContext only */
+    private SimkitXML2Java() {
+        try {
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+        } catch (JAXBException ex) {
+            log.error(ex);
+        }       
+    }
+    
     /**
      * Creates a new instance of SimkitXML2Java
      * when used from another class, instance this
@@ -65,29 +74,23 @@ public class SimkitXML2Java {
      * @param xmlFile 
      */
     public SimkitXML2Java(String xmlFile) {
+        this();
         try {
             fileBaseName = baseNameOf(xmlFile);
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe);
-        } catch (JAXBException ex) {
-            log.error(ex);
         }
     }
 
     public SimkitXML2Java(InputStream stream) {
-        try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
-            fileInputStream = stream;
-        } catch (JAXBException ex) {
-            log.error(ex);
-        }
+        this();
+        fileInputStream = stream;        
     }
 
     public SimkitXML2Java(File f) throws Exception {
+        this();
         fileBaseName = baseNameOf(f.getName());
-        jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         fileInputStream = new FileInputStream(f);
     }
 
@@ -111,10 +114,7 @@ public class SimkitXML2Java {
         this.unMarshaller = unMarshaller;
     }
 
-    /**
-     * 
-     * @return
-     */
+    /** @return an unmarshalled JAXB Ojbect */
     public Object getUnMarshalledObject() {
         return unMarshalledObject;
     }
@@ -123,11 +123,13 @@ public class SimkitXML2Java {
         this.unMarshalledObject = unMarshalledObject;
     }
     
+    /** @return the XML to Java translated source as a string */
     public String translate() {
         
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
         StringWriter vars = new StringWriter();
+        StringWriter parameterMapAndConstructor = new StringWriter();
         StringWriter runBlock = new StringWriter();
         StringWriter eventBlock = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
@@ -135,18 +137,16 @@ public class SimkitXML2Java {
 
         buildHead(head);
         buildVars(vars, accessorBlock);
+        buildParameterMapAndConstructor(parameterMapAndConstructor);
         buildEventBlock(runBlock, eventBlock);
         buildTail(tail);
 
-        buildSource(source, head, vars, runBlock, eventBlock, accessorBlock, tail);
+        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, tail);
 
         return source.toString();
     }
     
-    /**
-     * 
-     * @return
-     */
+    /** @return the base name of this EG file */
     public String getFileBaseName() {
         return fileBaseName;
     }
@@ -287,8 +287,7 @@ public class SimkitXML2Java {
 
         if (isArray(p.getType()) || isGeneric(p.getType())) {
             
-            // Lessen cause for redundant casts
-            pw.print(/*lp + p.getType() + rp + sp + */shortinate(p.getName()));
+            pw.print(shortinate(p.getName()));
             pw.println(pd + "clone" + lp + rp + sc);
         } else {
             pw.println(shortinate(p.getName()) + sc);
@@ -398,24 +397,9 @@ public class SimkitXML2Java {
         }
     }
 
-    void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
-       
-        List<Event> events = this.root.getEvent();
-
-        // Bugfix 1398
-        for (Event e : events) {
-            if (e.getName().equals("Run")) {
-                doRunBlock(e, runBlock);
-            } else {
-                doEventBlock(e, eventBlock);
-            }
-        }
-    }
-
-    void doRunBlock(Event run, StringWriter runBlock) {
+    void buildParameterMapAndConstructor(StringWriter parameterMapAndConstructor) {
         
-        PrintWriter pw = new PrintWriter(runBlock);
-        List<Object> liSchedCanc = run.getScheduleOrCancel();
+        PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
         List<Parameter> superPList = new ArrayList<Parameter>();
         List<Parameter> pList = this.root.getParameter();
 
@@ -498,6 +482,27 @@ public class SimkitXML2Java {
 
         pw.println(sp4 + cb);
         pw.println();
+    }
+
+   void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
+       
+        List<Event> events = this.root.getEvent();
+
+        // Bugfix 1398
+        for (Event e : events) {
+            if (e.getName().equals("Run")) {
+                doRunBlock(e, runBlock);
+            } else {
+                doEventBlock(e, eventBlock);
+            }
+        }
+    }
+    
+    void doRunBlock(Event run, StringWriter runBlock) {
+        
+        PrintWriter pw = new PrintWriter(runBlock);
+        List<Object> liSchedCanc = run.getScheduleOrCancel();
+        
         pw.println(sp4 + "/** Set initial values of all state variables */");
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void reset() {");
@@ -786,46 +791,6 @@ public class SimkitXML2Java {
             }            
         }
 
-//        if (s.getEdgeParameter().size() == 1) {
-//
-//            EdgeParameter ep = s.getEdgeParameter().get(0);
-//
-//            pw.print(cm + sp);
-//            
-            /* NOTE: varargs can throw a mostly harmless compiler warning if 
-             * there is only one arg here and it happens to be a non primative
-             * array.
-             * "warning: non-varargs call of varargs method with inexact argument type for last parameter"
-             * If the non primative array is cast as Object then the warning is 
-             * suppressed.  Will cause CacheMiss from the AssemblyController if 
-             * not cast as an Object causing problems further up the line of not
-             * being able to find certain CacheMiss EventGraphs.
-             */
-            
-            // TODO: Cheap way to test for arrays (by variable/parameter name)
-            // Would be better to have the actual object to check to see if a 
-            // non primative array, however, the variable/parameter name is the
-            // only item captured in the EdgeParameter list from Schedule
-//            pw.print("(Object) ");
-//            if (ep.getValue().endsWith("s")) {
-//                pw.print(lp + ep.getValue() + rp);
-//            } else {
-//                pw.print(ep.getValue());
-//            }
-//
-//        } else if (s.getEdgeParameter().size() > 1) {
-//            pw.print(cm);
-//
-//            // prevent a comma after the last parameter
-//            for (ListIterator<EdgeParameter> edgeParamIterator = s.getEdgeParameter().listIterator(); edgeParamIterator.hasNext();) {
-//                EdgeParameter param = edgeParamIterator.next();
-//                pw.print(param.getValue());
-//                if (edgeParamIterator.hasNext()) {
-//                    pw.print(cm);
-//                }
-//            }
-//        }
-
         pw.println(rp + sc);
 
         if (s.getCondition() != null) {
@@ -868,11 +833,15 @@ public class SimkitXML2Java {
         pw.println(cb);
     }
 
-    void buildSource(StringBuffer source, StringWriter head, StringWriter vars, StringWriter runBlock,
+    void buildSource(StringBuffer source, StringWriter head, StringWriter vars, 
+            StringWriter parameterMapAndConstructor, StringWriter runBlock,
             StringWriter eventBlock, StringWriter accessorBlock, StringWriter tail) {
 
-        source.append(head.getBuffer()).append(vars.getBuffer()).append(runBlock.getBuffer());
-        source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer()).append(tail.getBuffer());
+        source.append(head.getBuffer()).append(vars.getBuffer());
+        source.append(parameterMapAndConstructor.getBuffer());
+        source.append(runBlock.getBuffer());
+        source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer());
+        source.append(tail.getBuffer());
     }
 
     private String capitalize(String s) {

@@ -422,7 +422,6 @@ public abstract class VInstantiator {
                 return indx;
             }
             int ix = 0;
-            boolean found = false;
 
             if (viskit.Vstatics.debug) {
                 log.info("args length " + args.size());
@@ -473,8 +472,7 @@ public abstract class VInstantiator {
                             }
                         }
                     }
-                    found = match;
-                    if (found) {
+                    if (match) {
                         indx = ix;
                         break;
                     }
