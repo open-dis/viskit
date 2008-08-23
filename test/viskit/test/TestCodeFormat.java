@@ -9,7 +9,6 @@ package viskit.test;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.SimkitXML2Java;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
 import java.io.FileInputStream;

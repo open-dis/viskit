@@ -340,7 +340,7 @@
     <target name="compile" depends="compile.edu.util">
         <javac verbose="no" 
                destdir="${dir.build.classes}" 
-               excludes="xsd/** test/**"
+               excludes="xsd/** */test/*"
                debug="true"
                debugLevel="lines,vars,source"
                source="1.5"

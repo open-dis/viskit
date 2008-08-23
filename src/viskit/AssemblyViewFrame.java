@@ -22,15 +22,18 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
-import viskit.jgraph.vGraphAssemblyComponent;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
+
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -52,21 +55,21 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public static final int ADAPTER_MODE = 1;
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
-    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor";
-    private JSplitPane jsp;
+    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor"; 
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
 
-    /** Toolbar for dropping icons, connecting, etc. */
+    /** Toolbar for dropping icons, connecting, etc. */   
+    private JTabbedPane tabbedPane;
     private JToolBar toolBar;
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
-    private JPanel canvasPanel;
     private LegosTree lTree,  pclTree;
     private JPanel assemblyEditorContent;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private JButton runButt;
+    private int untitledCount = 0;
 
     public AssemblyViewFrame(AssemblyModel model, AssemblyController controller) {
         this(false, model, controller);
@@ -74,7 +77,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public AssemblyViewFrame(boolean contentOnly, AssemblyModel model, AssemblyController controller) {
         super(FRAME_DEFAULT_TITLE);
-        initMVC(model, controller);   // set up mvc linkages
+        initMVC(controller);   // set up mvc linkages
         initUI(contentOnly);          // build widgets
 
         if (!contentOnly) {
@@ -98,12 +101,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public JComponent getContent() {
         return assemblyEditorContent;
-    }
-
-    public Component getCurrentJgraphComponent() {
-        return graphPane;
-    }
-
+    }    
+    
     public JMenuBar getMenus() {
         return myMenuBar;
     }
@@ -114,11 +113,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     /**
      * Initialize the MCV connections
-     * @param mod
      * @param ctrl 
      */
-    private void initMVC(AssemblyModel mod, AssemblyController ctrl) {
-        setModel(mod);
+    private void initMVC(AssemblyController ctrl) {
         setController(ctrl);
     }
 
@@ -135,48 +132,70 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // the main splitpane underneath.
 
         // assemblyEditorContent level panel
-        assemblyEditorContent = new JPanel()
-        {
-          @Override
-          public void setVisible(boolean aFlag)
-          {
-            super.setVisible(aFlag);
-            if (aFlag && !firstShown) {
-              firstShown = true;
-              jsp.setDividerLocation(0.33d); //225);
-              panJsp.setDividerLocation(0.5d);
-            }        
-          }         
-        };
+        assemblyEditorContent = new JPanel();
         assemblyEditorContent.setLayout(new BorderLayout());
-
-        JComponent canvas = buildCanvas();
-        JSplitPane trees = buildTreePanels();
-        trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        JScrollPane leftsp = new JScrollPane(trees);
-        leftsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        JScrollPane jscrp = new JScrollPane(canvasPanel);
-        jscrp.setPreferredSize(new Dimension(500,500));  // experiment to see if splitpane
-        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trees, jscrp);
-        jsp.setOneTouchExpandable(true);
-        trees.setMinimumSize(new Dimension(20, 20));
-        canvas.setMinimumSize(new Dimension(20, 20));
-        assemblyEditorContent.add(jsp, BorderLayout.CENTER);
+        assemblyEditorContent.add(getToolBar(), BorderLayout.NORTH);
+        
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addChangeListener(new TabSelectionHandler());
+        assemblyEditorContent.add(tabbedPane, BorderLayout.CENTER);
         assemblyEditorContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         if (!contentOnly) // Can't add it here if we're going to put it somewhere else
         {
             getContentPane().add(assemblyEditorContent);
         }
-        //jsp.setDividerLocation(0.33d);
-        trees.setDividerLocation(250);
     }
     
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
     JMenu openRecentMenu;
     private _RecentFileListener myFileListener;
+    
+    private vGraphAssemblyComponentWrapper getCurrentVgacw() {
+        JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
+        if (jsplt == null) {
+            return null;
+        }
+
+        JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
+        return (vGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
+    }
+
+    public Component getCurrentJgraphComponent() {
+        vGraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        return vcw.drawingSplitPane.getRightComponent();
+    }
+
+    public JToolBar getToolBar() {
+        return toolBar;
+    }
+
+    public void setToolBar(JToolBar toolBar) {
+        this.toolBar = toolBar;
+    }
+
+    class TabSelectionHandler implements ChangeListener {
+        
+        /** Tab switch: this will come in with the newly selected tab in place */
+        public void stateChanged(ChangeEvent e) {
+            vGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
+
+            if (myVgacw == null) {     // last tab has been closed
+                fileName(null);
+                return;
+            }
+            setModel((AssemblyModel) myVgacw.model);          // hold on locally
+            getController().setModel((AssemblyModel) myVgacw.model);  // tell controller
+            
+            GraphMetaData gmd = myVgacw.model.getMetaData();
+            if (gmd != null) {
+                fileName(gmd.name);
+            } else if (viskit.Vstatics.debug) {
+                System.out.println("error: AssemblyViewFrame gmd null..");
+            }
+        }
+    }
     
     class _RecentFileListener implements ViskitAssemblyController.RecentFileListener
     {
@@ -187,8 +206,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         openRecentMenu.removeAll();
         for(String fullPath : lis) {
           File f = new File(fullPath);
-          if(!f.exists())
-            continue;
+          if(!f.exists()) {
+                    continue;
+                }
           String nameOnly = f.getName();
           Action act = new ParameterizedAction(nameOnly);
           act.putValue(FULLPATH,fullPath);
@@ -218,10 +238,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
       {
         ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
         String fullPath = (String)getValue(FULLPATH);
-        if(fullPath.equals(CLEARPATHFLAG))
-          acontroller.clearRecentFileList();
-        else
-          acontroller.openRecentAssembly(fullPath);
+        if(fullPath.equals(CLEARPATHFLAG)) {
+                acontroller.clearRecentFileList();
+            }
+        else {
+                acontroller.openRecentAssembly(fullPath);
+            }
       }     
     }
 
@@ -382,7 +404,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     private void buildToolbar(boolean contentOnly) {
         ButtonGroup modeButtonGroup = new ButtonGroup();
-        toolBar = new JToolBar();
+        setToolBar(new JToolBar());
 
         // Buttons for what mode we are in
 
@@ -391,19 +413,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         Border defBor = selectMode.getBorder();
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        //adapterMode          = makeJTButton(null, "viskit/images/adapter.png",
         adapterMode = makeJTButton(null, new AdapterIcon(24, 24),
                 "Connect assemblies with adapter pattern");
         defBor = adapterMode.getBorder();
         adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        //simEventListenerMode = makeJTButton(null, "viskit/images/bridge.png",
         simEventListenerMode = makeJTButton(null, new SimEventListenerIcon(24, 24),
                 "Connect assemblies through a SimEvent listener pattern");
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        //propChangeListenerMode = makeJTButton(null, "viskit/images/bridge.png",
         propChangeListenerMode = makeJTButton(null, new PropChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity");
         defBor = propChangeListenerMode.getBorder();
@@ -426,42 +445,44 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Make selection mode the default mode
         selectMode.setSelected(true);
 
-        toolBar.add(new JLabel("Mode: "));
+        getToolBar().add(new JLabel("Mode: "));
 
-        toolBar.add(selectMode);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(adapterMode);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(simEventListenerMode);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(propChangeListenerMode);
+        getToolBar().add(selectMode);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(adapterMode);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(simEventListenerMode);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(propChangeListenerMode);
 
-        toolBar.addSeparator(new Dimension(24, 24));
-        toolBar.add(new JLabel("Zoom: "));
-        toolBar.add(zoomIn);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(zoomOut);
-        // if(!contentOnly) {
-        toolBar.addSeparator(new Dimension(24, 24));
-        toolBar.add(new JLabel("  Compile/initialize assembly runner: "));
-        toolBar.add(runButt);
-        //  }
+        getToolBar().addSeparator(new Dimension(24, 24));
+        getToolBar().add(new JLabel("Zoom: "));
+        getToolBar().add(zoomIn);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(zoomOut);
+        getToolBar().addSeparator(new Dimension(24, 24));
+        getToolBar().add(new JLabel("  Compile/initialize assembly runner: "));
+        getToolBar().add(runButt);
+        
+        // Let the opening of Assembliess make this visible
+        getToolBar().setVisible(false);
+
         zoomIn.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                graphPane.setScale(graphPane.getScale() + 0.1d);
+                getCurrentVgacw().setScale(getCurrentVgacw().getScale() + 0.1d);
             }
         });
         zoomOut.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                graphPane.setScale(Math.max(graphPane.getScale() - 0.1d, 0.1d));
+                getCurrentVgacw().setScale(Math.max(getCurrentVgacw().getScale() - 0.1d, 0.1d));
             }
         });
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
-    // not under control of the application controller (Controller.java).  Small, simple anonymous inner classes
-    // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
+        // not under control of the application controller (Controller.java).  Small, simple anonymous inner classes
+        // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
         class PortsVisibleListener implements ActionListener {
 
@@ -472,7 +493,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             }
 
             public void actionPerformed(ActionEvent e) {
-                graphPane.setPortsVisible(tOrF);
+                getCurrentVgacw().setPortsVisible(tOrF);
             }
         }
 
@@ -526,37 +547,81 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         b.setText(null);
         return b;
     }
-    private vGraphAssemblyComponent graphPane;
+    private vGraphAssemblyComponentWrapper graphPane;
 
-    private JComponent buildCanvas() {
-        // Set up the basic panes for the layouts
-        vGraphAssemblyModel mod = new vGraphAssemblyModel();
-        graphPane = new vGraphAssemblyComponent(mod, this);
-        mod.graph = graphPane;                               // todo fix this
-
+    /** Enable adding of one or more Assembly tabs
+     * @param mod the ViskitAssemblyModel to view on this tab
+     */
+    public void addTab(ViskitAssemblyModel mod) {
+        vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
+        graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
+        vGAmod.graph = graphPane;                               // todo fix this
+        graphPane.model = mod;
+        
+        graphPane.trees = buildTreePanels();
+        graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        graphPane.trees.setMinimumSize(new Dimension(20, 20));
+        graphPane.trees.setDividerLocation(250);
+        
+        // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
+        JScrollPane jscrp = new JScrollPane(graphPane);
+        jscrp.setPreferredSize(new Dimension(500,500));  // experiment to see if splitpane
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
+        graphPane.drawingSplitPane.setOneTouchExpandable(true);        
+        
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (Exception e) {
             log.error("assert false : \"Drop target init. error\"");
-        }
+        }        
+                
+        tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
+        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        canvasPanel = new JPanel();
-        canvasPanel.setLayout(new BorderLayout());
-        canvasPanel.add(graphPane, BorderLayout.CENTER);
-        canvasPanel.add(toolBar, BorderLayout.NORTH);
-        return graphPane;
+        setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed model
     }
-    private JSplitPane panJsp;
 
+    public void delTab(ViskitAssemblyModel mod) {
+        Component[] ca = tabbedPane.getComponents();
+
+        for (int i = 0; i < ca.length; i++) {
+            JSplitPane jsplt = (JSplitPane) ca[i];
+            JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
+            vGraphAssemblyComponentWrapper vgacw = (vGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            if (vgacw.model == mod) {
+                tabbedPane.remove(i);
+                vgacw.isActive = false;
+                
+                // Don't allow operation of tools with no Assembly tab in view (NPEs)
+                if (tabbedPane.getTabCount() == 0) {getToolBar().setVisible(false);}
+                return;
+            }
+        }
+    }
+    
+    public ViskitAssemblyModel[] getOpenModels() {
+        Component[] ca = tabbedPane.getComponents();
+        ViskitAssemblyModel[] vm = new ViskitAssemblyModel[ca.length];
+        for (int i = 0; i < vm.length; i++) {
+            JSplitPane jsplt = (JSplitPane) ca[i];
+            JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
+            vGraphAssemblyComponentWrapper vgacw = (vGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            vm[i] = vgacw.model;
+        }
+        return vm;
+    }
+    
     void rebuildTreePanels() {
         lTree.clear();
         JSplitPane treeSplit = buildTreePanels();
-        jsp.setTopComponent(treeSplit);
+        graphPane.drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         lTree.repaint();
     }
 
+    private JSplitPane panJsp;
     private JSplitPane buildTreePanels() {
 
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
@@ -599,21 +664,22 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
         diskitJar = null;
 
-        PropChangeListenersPanel pcPan = new PropChangeListenersPanel(pclTree);
+        PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
 
         lTree.setBackground(background);
         pclTree.setBackground(background);
 
-        panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pcPan);
+        panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
         panJsp.setBorder(null);
         panJsp.setOneTouchExpandable(true);
 
-        pcPan.setMinimumSize(new Dimension(20, 80));
+        pclPan.setMinimumSize(new Dimension(20, 80));
         lPan.setMinimumSize(new Dimension(20, 80));
         lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
         lTree.setDragEnabled(true);
-        pclTree.setDragEnabled(true);
+        pclTree.setDragEnabled(true);        
+        
         return panJsp;
     }
 
@@ -682,7 +748,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         super.setVisible(b);
         if (!firstShown) {
             firstShown = true;
-            jsp.setDividerLocation(0.33d); //225);
+            graphPane.drawingSplitPane.setDividerLocation(0.33d); //225);
             panJsp.setDividerLocation(0.5d);
         }
     }
@@ -718,11 +784,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
      * @param event
      */
     @Override
-    public void modelChanged(mvcModelEvent event) //-------------------------------------------
-    {
+    public void modelChanged(mvcModelEvent event) {
         switch (event.getID()) {
             default:
-                this.graphPane.viskitModelChanged((ModelEvent) event);
+                this.getCurrentVgacw().viskitModelChanged((ModelEvent) event);
         }
     }
 
@@ -748,16 +813,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), seEdge);
-    }
-
-    public void fileName(String s) {
-        boolean nullString = !(s != null && s.length() > 0);
-        this.filename = s;
-        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Assembly: " + s;
-        setTitle(ttl);
-        if (titlList != null) {
-            titlList.setTitle(ttl, titlkey);
-        }
     }
 
     private Object getLeafUO(JTree tree) {
@@ -868,6 +923,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
+    public void fileName(String s) {
+        boolean nullString = !(s != null && s.length() > 0);
+        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Assembly: " + s;
+        setTitle(ttl);
+        if (!nullString) {
+            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
+        }
+        if (this.titlList != null) {
+            titlList.setTitle(ttl, titlkey);
+        }
+    }
+    
     /** Open an already existing Viskit Project */
     public void openProject() {
         jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
@@ -1008,7 +1075,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 }
-
 interface DragStartListener {
     public void startingDrag(Transferable trans);
 }

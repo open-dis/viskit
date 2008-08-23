@@ -27,7 +27,8 @@ public interface ViskitView
   /**
    * @param title 
    * @param prompt 
-   * @return yes, no or cancel constants */
+   * @return yes, no or cancel constants 
+   */
   int     genericAsk             ( String title, String prompt );
   int     genericAskYN           (String title, String msg);
   void    genericErrorReport     ( String title, String message );
@@ -39,7 +40,7 @@ public interface ViskitView
 
   void    setSelectedEventGraphName(String s);    // informative, tells view what we're working on //todo make sure this is called with each addTab
 
-  void    addTab(ViskitModel mod, boolean isNew); // When a tab is added
+  void    addTab(ViskitModel mod); // When a tab is added
   void    delTab(ViskitModel mod); // When a tab is removed
   ViskitModel[] getOpenModels();
 

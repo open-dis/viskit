@@ -64,9 +64,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public final static int CANCEL_ARC_MODE = 3;
     public final static int SELF_REF_MODE = 4;
     static Logger log = Logger.getLogger(EventGraphViewFrame.class);
-    /**
-     * Toolbar for dropping icons, connecting, etc.
-     */
+    
+    /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;
 
     // Mode buttons on the toolbar
@@ -183,7 +182,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         eventGraphViewerContent = new JPanel();
         eventGraphViewerContent.setLayout(new BorderLayout());
-        eventGraphViewerContent.add(toolBar, BorderLayout.NORTH);
+        eventGraphViewerContent.add(getToolBar(), BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new TabSelectionHandler());
@@ -211,11 +210,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return vcw.drawingSplitPane.getLeftComponent();
     }
 
-    class TabSelectionHandler implements ChangeListener {
-        /*
-         * Tab switch: this will come in with the newly selected tab in place.
-         */
+    public JToolBar getToolBar() {
+        return toolBar;
+    }
 
+    public void setToolBar(JToolBar toolBar) {
+        this.toolBar = toolBar;
+    }
+
+    class TabSelectionHandler implements ChangeListener {
+        
+        /** Tab switch: this will come in with the newly selected tab in place */
         public void stateChanged(ChangeEvent e) {
             VgraphComponentWrapper myVgcw = getCurrentVgcw();
 
@@ -289,7 +294,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         descriptionTextArea = new JTextArea(); //2, 40);
         descriptionTextArea.setWrapStyleWord(true);
         descriptionTextArea.setLineWrap(true);
-        //test descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
         descriptionTextArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
         descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -383,10 +387,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
     int untitledCount = 0;
 
-    public void addTab(ViskitModel mod, boolean isNewEG) // When a tab is added
-    {
+    public void addTab(ViskitModel mod) {
         vGraphModel vmod = new vGraphModel();
-        VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this); //vGraphComponent(mod,this);
+        VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
         vmod.graph = graphPane;                               // todo fix this
         graphPane.model = mod;
 
@@ -422,6 +425,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             if (vgcw.model == mod) {
                 tabbedPane.remove(i);
                 vgcw.isActive = false;
+                
+                // Don't allow operation of tools with no Event Graph tab in view (NPEs)
+                if (tabbedPane.getTabCount() == 0) {getToolBar().setVisible(false);}
                 return;
             }
         }
@@ -703,7 +709,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     private void setupToolbar() {
         ButtonGroup modeButtonGroup = new ButtonGroup();
-        toolBar = new JToolBar();
+        setToolBar(new JToolBar());
 
         // Buttons for what mode we are in
 
@@ -729,8 +735,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
                 "Connect nodes with a cancelling edge");
         cancelArcMode.setIcon(new CanArcIcon());
-//    selfRefMode   = makeJTButton(null, "viskit/images/selfArc.png",
-//                                       "Add a self-referential edge to a node");
 
         JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
@@ -741,32 +745,32 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(arcMode);
         modeButtonGroup.add(cancelArcMode);
-        //modeButtonGroup.add(selfRefMode);
 
         // Make selection mode the default mode
         selectMode.setSelected(true);
 
-        toolBar.add(new JLabel("Add: "));
-        toolBar.add(addEvent);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(addSelfRef);
+        getToolBar().add(new JLabel("Add: "));
+        getToolBar().add(addEvent);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(addSelfRef);
 
-        toolBar.addSeparator(new Dimension(24, 24));
+        getToolBar().addSeparator(new Dimension(24, 24));
 
-        toolBar.add(new JLabel("Mode: "));
-        toolBar.add(selectMode);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(arcMode);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(cancelArcMode);
-        //toolBar.addSeparator(new Dimension(5,24));
-        //toolBar.add(selfRefMode);
+        getToolBar().add(new JLabel("Mode: "));
+        getToolBar().add(selectMode);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(arcMode);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(cancelArcMode);
 
-        toolBar.addSeparator(new Dimension(24, 24));
-        toolBar.add(new JLabel("Zoom: "));
-        toolBar.add(zoomIn);
-        toolBar.addSeparator(new Dimension(5, 24));
-        toolBar.add(zoomOut);
+        getToolBar().addSeparator(new Dimension(24, 24));
+        getToolBar().add(new JLabel("Zoom: "));
+        getToolBar().add(zoomIn);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(zoomOut);
+        
+        // Let the opening of EGs make this visible
+        getToolBar().setVisible(false);
 
         zoomIn.addActionListener(new ActionListener() {
 
@@ -1068,8 +1072,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return null;
     }
 
-    public void setSelectedEventGraphName(String s) //----------------------------
-    {
+    public void setSelectedEventGraphName(String s) {
         boolean nullString = !(s != null && s.length() > 0);
         String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Event Graph: " + s;
         setTitle(ttl);

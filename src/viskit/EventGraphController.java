@@ -168,7 +168,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
         // No model set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((ViskitView) getView()).addTab(mod, true);
+        ((ViskitView) getView()).addTab(mod);
 //        editGraphMetaData();
 
         GraphMetaData gmd = new GraphMetaData(mod);
@@ -248,7 +248,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
         // these may init to null on startup, check
         // before doing any openAlready lookups
-        viskitView.addTab(mod, false);
+        viskitView.addTab(mod);
+        ((EventGraphViewFrame) viskitView).getToolBar().setVisible(true);
         ViskitModel[] openAlready = null;
         if (viskitView != null) {
             openAlready = viskitView.getOpenModels();

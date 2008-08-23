@@ -804,11 +804,11 @@ class AssemblyPropListCell extends DefaultGraphCell {
 }
 
 /**
- * Sub class VertexView to install our own renderer.
+ * Sub class VertexView to install our own vapvr.
  */
 class AssemblyPropListView extends VertexView {
 
-    static vAssemblyPclVertexRenderer renderer = new vAssemblyPclVertexRenderer();
+    static vAssemblyPclVertexRenderer vapvr = new vAssemblyPclVertexRenderer();
 
     public AssemblyPropListView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -816,7 +816,7 @@ class AssemblyPropListView extends VertexView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return vapvr;
     }
 }
 
@@ -832,11 +832,11 @@ class AssemblyCircleCell extends DefaultGraphCell {
 }
 
 /**
- * Sub class VertexView to install our own renderer.
+ * Sub class VertexView to install our own vapvr.
  */
 class AssemblyCircleView extends VertexView {
 
-    static vAssemblyEgVertexRenderer renderer = new vAssemblyEgVertexRenderer();
+    static vAssemblyEgVertexRenderer vaevr = new vAssemblyEgVertexRenderer();
 
     public AssemblyCircleView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -844,14 +844,14 @@ class AssemblyCircleView extends VertexView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return vaevr;
     }
 }
 
 // Begin support for custom line ends and double line (adapter) on assembly edges
 class vAssyAdapterEdgeView extends vEdgeView {
 
-    public static vAssyAdapterEdgeRenderer renderer = new vAssyAdapterEdgeRenderer();
+    public static vAssyAdapterEdgeRenderer vaaer = new vAssyAdapterEdgeRenderer();
 
     public vAssyAdapterEdgeView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -859,13 +859,13 @@ class vAssyAdapterEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return vaaer;
     }
 }
 
 class vAssySelEdgeView extends vEdgeView {
 
-    public static vAssySelEdgeRenderer renderer = new vAssySelEdgeRenderer();
+    public static vAssySelEdgeRenderer vaser = new vAssySelEdgeRenderer();
 
     public vAssySelEdgeView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -873,13 +873,13 @@ class vAssySelEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return vaser;
     }
 }
 
 class vAssyPclEdgeView extends vEdgeView {
 
-    public static vAssyPclEdgeRenderer renderer = new vAssyPclEdgeRenderer();
+    public static vAssyPclEdgeRenderer vaper = new vAssyPclEdgeRenderer();
 
     public vAssyPclEdgeView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -887,14 +887,14 @@ class vAssyPclEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return vaper;
     }
 }
 
 class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
 
     /**
-     * Paint the renderer.  Overridden to do a double line and paint over the end shap
+     * Paint the vapvr.  Overridden to do a double line and paint over the end shap
      */
     @Override
     public void paint(Graphics g) {

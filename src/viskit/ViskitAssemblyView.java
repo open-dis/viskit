@@ -18,47 +18,59 @@ import java.util.Collection;
 public interface ViskitAssemblyView {
 
     // permit user to edit existing entities
-    public boolean doEditPclNode(PropChangeListenerNode pclNode);
+    boolean doEditPclNode(PropChangeListenerNode pclNode);
 
-    public boolean doEditEvGraphNode(EvGraphNode evNode);
+    boolean doEditEvGraphNode(EvGraphNode evNode);
 
-    public boolean doEditPclEdge(PropChangeEdge pclEdge);
+    boolean doEditPclEdge(PropChangeEdge pclEdge);
 
-    public boolean doEditAdapterEdge(AdapterEdge aEdge);
+    boolean doEditAdapterEdge(AdapterEdge aEdge);
 
-    public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge);
+    boolean doEditSimEvListEdge(SimEvListenerEdge seEdge);
 
-    public Object getSelectedPropChangeListener();
+    Object getSelectedPropChangeListener();
 
-    public Object getSelectedEventGraph();
+    Object getSelectedEventGraph();
 
-    public void addToEventGraphPallette(File f);
+    void addToEventGraphPallette(File f);
 
-    public void removeFromEventGraphPallette(File f);
+    void removeFromEventGraphPallette(File f);
 
-    public void addToPropChangePallette(File f);
+    void addToPropChangePallette(File f);
 
-    public void removeFromPropChangePallette(File f);
+    void removeFromPropChangePallette(File f);
 
-    public int genericAsk(String title, String prompt);      // returns JOptionPane constants
+    int genericAsk(String title, String prompt);      // returns JOptionPane constants
 
-    public int genericAskYN(String title, String prompt);
+    int genericAskYN(String title, String prompt);
 
-    public int genericAsk2Butts(String title, String prompt, String button1, String button2);
+    int genericAsk2Butts(String title, String prompt, String button1, String button2);
 
-    public void genericErrorReport(String title, String message);
+    void genericErrorReport(String title, String message);
 
-    public String promptForStringOrCancel(String title, String message, String initval);
+    String promptForStringOrCancel(String title, String message, String initval);
+ 
+    File openFileAsk();
 
-    public File openFileAsk();
+    File openRecentFilesAsk(Collection<String> lis);
 
-    public File openRecentFilesAsk(Collection<String> lis);
+    File saveFileAsk(String suggName, boolean suggUniqueName);
 
-    public File saveFileAsk(String suggName, boolean suggUniqueName);
-
-    public void fileName(String s);    // informative, tells view what we're working on
+    void fileName(String s);    // informative, tells view what we're working on
     
-    public void showAndSaveSource(String className, String s);
+    void showAndSaveSource(String className, String s);
 
-    public void displayXML(File f);
+    void displayXML(File f);
+    
+    /** Add an Assembly tab to the Assembly View Editor
+     * 
+     * @param mod the Assembly model to display graphically
+     */
+    void addTab(ViskitAssemblyModel mod);
+    
+    /** Remove an Assembly tab from the Assembly View Editor
+     * 
+     * @param mod the Assembly model to remove from view
+     */
+    void delTab(ViskitAssemblyModel mod);
 }

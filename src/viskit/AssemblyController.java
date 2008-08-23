@@ -228,8 +228,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
 
         lastFile = f;
+        ViskitAssemblyView vaw = (ViskitAssemblyView) getView();
 
         ViskitAssemblyModel mod = (ViskitAssemblyModel) getModel();
+        vaw.addTab(mod);
+        ((AssemblyViewFrame) vaw).getToolBar().setVisible(true);
         boolean goodOpen = mod.newModel(lastFile);
         if (goodOpen) {
             GraphMetaData gmd = mod.getMetaData();
@@ -238,6 +241,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             // replaces old fileWatchOpen(lastFile);
             initOpenAssyWatch(lastFile, mod.getJaxbRoot());
+        } else {
+            vaw.delTab(mod);
         }
 
         openEventGraphs(lastFile);
@@ -541,6 +546,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
         
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
+        
+        ((ViskitAssemblyView) getView()).addTab(vmod);
+        
         GraphMetaData oldGmd = vmod.getMetaData();
         GraphMetaData gmd = new GraphMetaData(vmod);   // build a new one, specific to Assy
         gmd.packageName = oldGmd.packageName;
@@ -553,6 +561,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             vmod.newModel(null);    // current design has assembly model always hanging around, this method resets it
             vmod.changeMetaData(gmd);
             ((ViskitAssemblyView) getView()).fileName(gmd.name);  // into title bar
+        } else {
+            ((ViskitAssemblyView) getView()).delTab(vmod);
         }
     }
     
@@ -570,12 +580,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return true;
     }
 
-    /**
-     * 
-     */
+    /** Clean up for closing Assembly models */
     public void postClose() {
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-        vmod.newModel(null);
+        
+        ((ViskitAssemblyView) getView()).delTab(vmod);
 
         if (lastFile != null) {
             fileWatchClose(lastFile);
