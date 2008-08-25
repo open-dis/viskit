@@ -68,7 +68,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
-    public File getFile() {
+    public File getLastFile() {
         return currentFile;
     }
 
@@ -196,8 +196,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     public boolean nameExists(String name) {
         for (Object o : getNodeCache().values()) {
             AssemblyNode n = (AssemblyNode) o;
-            if(n.getName().equals(name))
-                return true;           
+            if (n.getName().equals(name)) {
+                return true;
+            }           
         }
         return false;
     }

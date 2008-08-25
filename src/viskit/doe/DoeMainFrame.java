@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -72,19 +72,14 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         addWindowListener(new myWlistener());
 
         leftP = new JPanel(new BorderLayout());
-        //rightP = new JPanel(new BorderLayout());
-        //split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,leftP,rightP);
-
+        
         content = new JPanel();
         content.setLayout(new BorderLayout());
 
-        //content.add(split,BorderLayout.CENTER);
-        //content.add(leftP,BorderLayout.CENTER);
         JLabel lab = new JLabel("This is initialized when an assembly is opened.");
         lab.setHorizontalAlignment(JLabel.CENTER);
         content.add(lab, BorderLayout.NORTH);
         getContentPane().setLayout(new BorderLayout());
-    //getContentPane().add(split,BorderLayout.CENTER);
     }
     private DoeFileModel dfm;
 
@@ -108,11 +103,6 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         removeContent();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         if (leftJsp != null) {
-            /*
-            if (contentOnly) {
-            content.add(new JLabel("Initialize from the Run Design of Experiments button on the Assembly tab."));
-            }
-             */
             content.add(leftJsp); //, BorderLayout.CENTER);
             JButton sv = new JButton("Save");
             sv.addActionListener(new ActionListener() {

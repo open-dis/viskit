@@ -408,6 +408,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
             VGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
+            // Tell Visit to not recompile open EGs from any remaining open 
+            // Assemblies when we perform a Viskit exit
+            VGlobals.instance().getAssemblyController().setCloseAll(true);
+            
             outer:
             {
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
@@ -434,8 +438,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 /* End DIFF between OA3302 branch and trunk */
 
                 // TODO: other preQuits here if needed
-                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
-
+                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler                
+                
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
                     ((ViskitController) egFrame.getController()).postQuit();
                 }

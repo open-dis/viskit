@@ -16,52 +16,52 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * Date: May 17, 2004
  * Time: 9:16:26 AM
  */
-public interface ViskitAssemblyModel {
+ public interface ViskitAssemblyModel {
     
-  public void newEventGraph(String widgetName, String className, Point p);
-  public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p);
+   void newEventGraph(String widgetName, String className, Point p);
+   void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p);
 
-  public void newPropChangeListener(String widgetName, String className, Point p);
-  public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
+   void newPropChangeListener(String widgetName, String className, Point p);
+   void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
   
   /**
    *  Reports saved state of model.  Becomes "clean" after a save.
    * @return 
    */
-  public boolean isDirty       ();
-  public void    setDirty      (boolean tf);  // to force save
+   boolean isDirty       ();
+   void    setDirty      (boolean tf);  // to force save
   /**
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
    * @return 
    */
-  public boolean newModel      (File f);
-  public void    saveModel     (File f);
-  public File    getFile       ();
+   boolean newModel      (File f);
+   void    saveModel     (File f);
+   File    getLastFile   ();
 
-  public GraphMetaData getMetaData();
-  public void changeMetaData    (GraphMetaData gmd);
+   GraphMetaData getMetaData();
+   void changeMetaData    (GraphMetaData gmd);
 
-  public SimkitAssembly getJaxbRoot();
-  public AdapterEdge    newAdapterEdge    (String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
-  public PropChangeEdge newPclEdge        (AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
-  public void           newSimEvLisEdge   (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
+   SimkitAssembly getJaxbRoot();
+   AdapterEdge    newAdapterEdge    (String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
+   PropChangeEdge newPclEdge        (AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
+   void           newSimEvLisEdge   (AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-  public boolean changePclNode     (PropChangeListenerNode pclNode);
-  public boolean changeEvGraphNode (EvGraphNode evNode);
-  public void changePclEdge     (PropChangeEdge pclEdge);
-  public void changeAdapterEdge (AdapterEdge aEdge);
-  public void changeSimEvEdge   (SimEvListenerEdge seEdge);
+   boolean changePclNode     (PropChangeListenerNode pclNode);
+   boolean changeEvGraphNode (EvGraphNode evNode);
+   void changePclEdge     (PropChangeEdge pclEdge);
+   void changeAdapterEdge (AdapterEdge aEdge);
+   void changeSimEvEdge   (SimEvListenerEdge seEdge);
 
-  public void deleteEvGraphNode   (EvGraphNode evNode);
-  public void deletePCLNode       (PropChangeListenerNode pclNode);
-  public void deleteAdapterEdge   (AdapterEdge ae);
-  public void deletePropChangeEdge(PropChangeEdge pce);
-  public void deleteSimEvLisEdge  (SimEvListenerEdge sele);
+   void deleteEvGraphNode   (EvGraphNode evNode);
+   void deletePCLNode       (PropChangeListenerNode pclNode);
+   void deleteAdapterEdge   (AdapterEdge ae);
+   void deletePropChangeEdge(PropChangeEdge pce);
+   void deleteSimEvLisEdge  (SimEvListenerEdge sele);
 
-  public Vector<String> getDetailedOutputEntityNames();
-  public Vector<String> getVerboseOutputEntityNames();
+   Vector<String> getDetailedOutputEntityNames();
+   Vector<String> getVerboseOutputEntityNames();
   
-  public void externalClassesChanged(Vector<String> v);
-  public boolean nameExists(String name);
+   void externalClassesChanged(Vector<String> v);
+   boolean nameExists(String name);
 }

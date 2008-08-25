@@ -44,17 +44,12 @@ import viskit.mvc.mvcModel;
  */
 public class EventGraphController extends mvcAbstractController implements ViskitController {
 
-    static File lastFile;
     static Logger log = Logger.getLogger(EventGraphController.class);
 
     public EventGraphController() {
         initConfig();
         initFileWatch();
         this._setFileLists();
-    }
-
-    public static File getLastFile() {
-        return lastFile;
     }
 
     public void begin() {
@@ -94,8 +89,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public boolean preQuit() //----------------
-    {
+    public boolean preQuit() {
         markConfigAllClosed();
         ViskitModel[] modAr = ((ViskitView) getView()).getOpenModels();
         for (int i = 0; i < modAr.length; i++) {
@@ -169,7 +163,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
         // No model set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
         ((ViskitView) getView()).addTab(mod);
-//        editGraphMetaData();
 
         GraphMetaData gmd = new GraphMetaData(mod);
         if (oldGmd != null) {
@@ -183,10 +176,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
             // update title bar
             ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
-        }
-
-        if (EventGraphMetaDataDialog.modified) {
-            
+        
             // Bugfix 1398
             String msg = 
                     "<html><body><p align='center'>Do you wish to start with a <b>\"Run\"</b> Event?</p></body></html>";
@@ -241,15 +231,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    public void _doOpen(File file) {
+    protected void _doOpen(File file) {
         ViskitView viskitView = (ViskitView) getView();
         Model mod = new Model(this);
         mod.init();
 
-        // these may init to null on startup, check
-        // before doing any openAlready lookups
         viskitView.addTab(mod);
         ((EventGraphViewFrame) viskitView).getToolBar().setVisible(true);
+        
         ViskitModel[] openAlready = null;
         if (viskitView != null) {
             openAlready = viskitView.getOpenModels();
@@ -265,14 +254,13 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 }
             }
         }
-        if (!mod.newModel(file) || isOpenAlready) {
+        if (mod.newModel(file) && !isOpenAlready) {
+            viskitView.setSelectedEventGraphName(mod.getMetaData().name);
+            adjustRecentList(file);
+            fileWatchOpen(file);
+        } else {
             viskitView.delTab(mod);   // Not a good open, tell view
-            return;
         }
-        viskitView.setSelectedEventGraphName(mod.getMetaData().name);
-        adjustRecentList(file);
-
-        fileWatchOpen(file);
     }
     private static final int RECENTLISTSIZE = 15;
     private ArrayList<String> recentFileList;
@@ -330,7 +318,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
      */
     private void fileWatchOpen(File f) {
         String nm = f.getName();
-        lastFile = f;
         File ofile = new File(watchDir, nm);
         log.debug("f is: " + f + " and ofile is: " + ofile);
         try {
@@ -531,8 +518,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     public void closeAll() {
         ViskitModel[] modAr = ((ViskitView) getView()).getOpenModels();
-        for (int i = 0; i < modAr.length; i++) {
-            setModel((mvcModel) modAr[i]);
+        for (ViskitModel mod : modAr) {
+            setModel((mvcModel) mod);
             close();
         }
     }

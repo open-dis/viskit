@@ -46,20 +46,18 @@ import viskit.mvc.mvcModelEvent;
  * @version $Id$
  */
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener {
-    
+
     /** log4j log instance */
     static Logger log = Logger.getLogger(AssemblyViewFrame.class);
-    
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
     public static final int ADAPTER_MODE = 1;
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
-    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor"; 
+    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor";
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
-
-    /** Toolbar for dropping icons, connecting, etc. */   
+    /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
     private JToggleButton selectMode;
@@ -71,11 +69,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private JButton runButt;
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(AssemblyModel model, AssemblyController controller) {
-        this(false, model, controller);
+    public AssemblyViewFrame(AssemblyController controller) {
+        this(false, controller);
     }
 
-    public AssemblyViewFrame(boolean contentOnly, AssemblyModel model, AssemblyController controller) {
+    public AssemblyViewFrame(boolean contentOnly, AssemblyController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI(contentOnly);          // build widgets
@@ -101,8 +99,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public JComponent getContent() {
         return assemblyEditorContent;
-    }    
-    
+    }
+
     public JMenuBar getMenus() {
         return myMenuBar;
     }
@@ -127,6 +125,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         buildMenus(contentOnly);
         buildToolbar(contentOnly);
 
+        // Build here to prevent NPE from EGContrlr
+        buildTreePanels();
+
         // Set up a assemblyEditorContent level pane that will be the content pane. This
         // has a border layout, and contains the toolbar on the assemblyEditorContent and
         // the main splitpane underneath.
@@ -135,7 +136,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         assemblyEditorContent = new JPanel();
         assemblyEditorContent.setLayout(new BorderLayout());
         assemblyEditorContent.add(getToolBar(), BorderLayout.NORTH);
-        
+
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new TabSelectionHandler());
         assemblyEditorContent.add(tabbedPane, BorderLayout.CENTER);
@@ -146,12 +147,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             getContentPane().add(assemblyEditorContent);
         }
     }
-    
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
     JMenu openRecentMenu;
     private _RecentFileListener myFileListener;
-    
+
     private vGraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
@@ -176,7 +176,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     class TabSelectionHandler implements ChangeListener {
-        
+
         /** Tab switch: this will come in with the newly selected tab in place */
         public void stateChanged(ChangeEvent e) {
             vGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
@@ -185,8 +185,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 fileName(null);
                 return;
             }
+            
+            // Key to getting the LEGOs tree panel in each tab view
+            myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
+            
             setModel((AssemblyModel) myVgacw.model);          // hold on locally
             getController().setModel((AssemblyModel) myVgacw.model);  // tell controller
+            AssemblyModel mod = (AssemblyModel) getModel();
+            
+            if (mod.getLastFile() != null) {
+                
+                // Also, tell the Design of Experiments Panel to update
+                VGlobals.instance().amod = mod;
+                ((AssemblyController) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
+            }
             
             GraphMetaData gmd = myVgacw.model.getMetaData();
             if (gmd != null) {
@@ -196,87 +208,84 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             }
         }
     }
-    
-    class _RecentFileListener implements ViskitAssemblyController.RecentFileListener
-    {
-      public void listChanged()
-      {
-        ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-        java.util.List<String> lis = acontroller.getRecentFileList();
-        openRecentMenu.removeAll();
-        for(String fullPath : lis) {
-          File f = new File(fullPath);
-          if(!f.exists()) {
+
+    class _RecentFileListener implements ViskitAssemblyController.RecentFileListener {
+
+        public void listChanged() {
+            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            java.util.List<String> lis = acontroller.getRecentFileList();
+            openRecentMenu.removeAll();
+            for (String fullPath : lis) {
+                File f = new File(fullPath);
+                if (!f.exists()) {
                     continue;
                 }
-          String nameOnly = f.getName();
-          Action act = new ParameterizedAction(nameOnly);
-          act.putValue(FULLPATH,fullPath);
-          JMenuItem mi = new JMenuItem(act);
-          mi.setToolTipText(fullPath);
-          openRecentMenu.add(mi);
-        }
-        if(lis.size() > 0) {
-          openRecentMenu.add(new JSeparator());
-          Action act = new ParameterizedAction("clear");
-          act.putValue(FULLPATH,CLEARPATHFLAG);  // flag
-          JMenuItem mi = new JMenuItem(act);
-          mi.setToolTipText("Clear this list");
-          openRecentMenu.add(mi);         
-        }
-      }     
-    }
-    
-    class ParameterizedAction extends javax.swing.AbstractAction
-    {
-      ParameterizedAction(String s)
-      {
-        super(s);
-      }
-     
-      public void actionPerformed(ActionEvent ev)
-      {
-        ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-        String fullPath = (String)getValue(FULLPATH);
-        if(fullPath.equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentFileList();
+                String nameOnly = f.getName();
+                Action act = new ParameterizedAction(nameOnly);
+                act.putValue(FULLPATH, fullPath);
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText(fullPath);
+                openRecentMenu.add(mi);
             }
-        else {
+            if (lis.size() > 0) {
+                openRecentMenu.add(new JSeparator());
+                Action act = new ParameterizedAction("clear");
+                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText("Clear this list");
+                openRecentMenu.add(mi);
+            }
+        }
+    }
+
+    class ParameterizedAction extends javax.swing.AbstractAction {
+
+        ParameterizedAction(String s) {
+            super(s);
+        }
+
+        public void actionPerformed(ActionEvent ev) {
+            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            String fullPath = (String) getValue(FULLPATH);
+            if (fullPath.equals(CLEARPATHFLAG)) {
+                acontroller.clearRecentFileList();
+            } else {
                 acontroller.openRecentAssembly(fullPath);
             }
-      }     
+        }
     }
 
     private void buildMenus(boolean contentOnly) {
         ViskitAssemblyController controller = (ViskitAssemblyController) getController();
-        
-        myFileListener = new _RecentFileListener();      
+
+        myFileListener = new _RecentFileListener();
         controller.addRecentFileListListener(myFileListener);
-              
+
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));        
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", new Integer(KeyEvent.VK_N),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
-        
+
         fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentMenu=buildMenu("Open Recent Assembly"));       
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P), 
+        fileMenu.add(openRecentMenu = buildMenu("Open Recent Assembly"));
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P),
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-       
+
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
+        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All", null, null));
         fileMenu.add(buildMenuItem(controller, "save", "Save", new Integer(KeyEvent.VK_S),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
         fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", new Integer(KeyEvent.VK_A), null));
-        
+
         fileMenu.addSeparator();
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", new Integer(KeyEvent.VK_X), null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
@@ -334,8 +343,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         myMenuBar = new JMenuBar();
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
-        //menuBar.add(simulationMenu);
-
+        
         Help help = new Help(this);
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -345,7 +353,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         helpMenu.addSeparator();
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", new Integer(KeyEvent.VK_T), null));
         helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", new Integer(KeyEvent.VK_A), null));
-        //helpMenu.add( buildMenuItem(help, "help", "Help...", null, null ) );
         myMenuBar.add(helpMenu);
 
         if (!contentOnly) {
@@ -353,15 +360,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    private JMenu buildMenu(String name)
-    {
-      return new JMenu(name);
+    private JMenu buildMenu(String name) {
+        return new JMenu(name);
     }
 
     // Use the actions package
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
         Action a = ActionIntrospector.getAction(source, method);
-        
+
         Map<String, Object> map = new HashMap<String, Object>();
         if (mn != null) {
             map.put(Action.MNEMONIC_KEY, mn);
@@ -435,7 +441,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 "Zoom out on the graph");
 
         Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
-        runButt = makeButton(runAction, "viskit/images/Play24.gif", 
+        runButt = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -463,7 +469,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("  Compile/initialize assembly runner: "));
         getToolBar().add(runButt);
-        
+
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
 
@@ -547,40 +553,39 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         b.setText(null);
         return b;
     }
-    private vGraphAssemblyComponentWrapper graphPane;
 
     /** Enable adding of one or more Assembly tabs
      * @param mod the ViskitAssemblyModel to view on this tab
      */
     public void addTab(ViskitAssemblyModel mod) {
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
-        graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
+        vGraphAssemblyComponentWrapper graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
         graphPane.model = mod;
-        
-        graphPane.trees = buildTreePanels();
+
+        graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
         graphPane.trees.setDividerLocation(250);
-        
+
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
         JScrollPane jscrp = new JScrollPane(graphPane);
-        jscrp.setPreferredSize(new Dimension(500,500));  // experiment to see if splitpane
+        jscrp.setPreferredSize(new Dimension(500, 500));  // experiment to see if splitpane
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
-        graphPane.drawingSplitPane.setOneTouchExpandable(true);        
-        
+        graphPane.drawingSplitPane.setOneTouchExpandable(true);
+
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (Exception e) {
             log.error("assert false : \"Drop target init. error\"");
-        }        
-                
+        }
+
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
         setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
-        // but this call serves also to register the view with the passed model
+    // but this call serves also to register the view with the passed model
     }
 
     public void delTab(ViskitAssemblyModel mod) {
@@ -593,14 +598,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             if (vgacw.model == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
-                
+
                 // Don't allow operation of tools with no Assembly tab in view (NPEs)
-                if (tabbedPane.getTabCount() == 0) {getToolBar().setVisible(false);}
+                if (tabbedPane.getTabCount() == 0) {
+                    getToolBar().setVisible(false);
+                }
                 return;
             }
         }
     }
-    
+
     public ViskitAssemblyModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
         ViskitAssemblyModel[] vm = new ViskitAssemblyModel[ca.length];
@@ -612,16 +619,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
         return vm;
     }
-    
+
     void rebuildTreePanels() {
         lTree.clear();
         JSplitPane treeSplit = buildTreePanels();
-        graphPane.drawingSplitPane.setTopComponent(treeSplit);
+        getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         lTree.repaint();
     }
+    private JSplitPane treePanels;
 
-    private JSplitPane panJsp;
     private JSplitPane buildTreePanels() {
 
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
@@ -632,22 +639,22 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         String[] extraCP = SettingsDialog.getExtraClassPath();
         if (extraCP != null) {
             for (String path : extraCP) { // tbd same for pcls
-              if(new File(path).exists()) {
-                if (path.endsWith(".jar")) {
-                    if (diskitJar.getName().contains(new File(path).getName())) {
+                if (new File(path).exists()) {
+                    if (path.endsWith(".jar")) {
+                        if (diskitJar.getName().contains(new File(path).getName())) {
+                            continue;
+                        } else {
+                            lTree.addContentRoot(new File(path));
+                        }
+
+                    // A new project may contain an empty EventGraphs directory
+                    } else if (new File(path).listFiles().length == 0) {
                         continue;
                     } else {
-                        lTree.addContentRoot(new File(path));
+                        lTree.addContentRoot(new File(path), true);
                     }
-
-                // A new project may contain an empty EventGraphs directory
-                } else if (new File(path).listFiles().length == 0) {
-                    continue;
-                } else {
-                    lTree.addContentRoot(new File(path), true);
                 }
             }
-          }
         }
 
         LegosPanel lPan = new LegosPanel(lTree);
@@ -657,7 +664,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // todo get from project
         pclTree.addContentRoot(new File("lib/simkit.jar"));
-        
+
         // If we built diskit.jar, then include it
         if (diskitJar.exists()) {
             pclTree.addContentRoot(diskitJar);
@@ -669,18 +676,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         lTree.setBackground(background);
         pclTree.setBackground(background);
 
-        panJsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
-        panJsp.setBorder(null);
-        panJsp.setOneTouchExpandable(true);
+        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
+        treePanels.setBorder(null);
+        treePanels.setOneTouchExpandable(true);
 
         pclPan.setMinimumSize(new Dimension(20, 80));
         lPan.setMinimumSize(new Dimension(20, 80));
         lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
         lTree.setDragEnabled(true);
-        pclTree.setDragEnabled(true);        
-        
-        return panJsp;
+        pclTree.setDragEnabled(true);
+
+        return treePanels;
     }
 
     public void genericErrorReport(String title, String msg) //-----------------------------------------------------
@@ -743,18 +750,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     private boolean firstShown = false;
 
-    @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
-        if (!firstShown) {
-            firstShown = true;
-            graphPane.drawingSplitPane.setDividerLocation(0.33d); //225);
-            panJsp.setDividerLocation(0.5d);
-        }
+    // TODO: This saves the size/shape of the EG Editor frame, but doesn't 
+    // load this config on next startup
+    public void prepareToQuit() {
+        Rectangle bounds = getBounds();
+        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
+        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
+        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }
 
     // Some private classes to implement dnd and dynamic cursor update
-
     class vCursorHandler extends MouseAdapter {
 
         Cursor select;
@@ -773,7 +779,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         @Override
         public void mouseEntered(MouseEvent e) {
-        
         }
     }
 
@@ -787,7 +792,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public void modelChanged(mvcModelEvent event) {
         switch (event.getID()) {
             default:
-                this.getCurrentVgacw().viskitModelChanged((ModelEvent) event);
+                getCurrentVgacw().viskitModelChanged((ModelEvent) event);
         }
     }
 
@@ -834,7 +839,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     // For auto load of open eventgraphs
-
     public void addToEventGraphPallette(File f) {
         lTree.addContentRoot(f);
     }
@@ -865,17 +869,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 new String[]{butt1, butt2}, butt1);
     }
 
-    public String promptForStringOrCancel(String title, String message, String initval) //---------------------------------------------------------------------------------
-    {
+    public String promptForStringOrCancel(String title, String message, String initval) {
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
                 null, null, initval);
-    }
-
-    // ViskitView-required methods:
-
+    }    // ViskitView-required methods:
     private JFileChooser jfc;
+
     private JFileChooser buildOpenSaveChooser() {
-        
+
         // Try to open in the current project directory for Assemblies
         if (VGlobals.instance().getCurrentViskitProject() != null) {
             return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssemblyDir());
@@ -883,23 +884,23 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
     }
-        
+
     /** Display a file chooser filtered by Assembly XML files only
      * @return the chosen XML Assembly file
      */
     public File openFileAsk() {
         if (jfc == null) {
-          jfc = buildOpenSaveChooser();
+            jfc = buildOpenSaveChooser();
         }
- 
+
         jfc.setDialogTitle("Open Assembly File");
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
         jfc.setFileFilter(filter);
-        int returnVal = jfc.showOpenDialog(this);        
-        
+        int returnVal = jfc.showOpenDialog(this);
+
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File f = jfc.getSelectedFile();
             jfc.setFileFilter(null);  // TODO: For JFC Swing issue with Win32ShellFolder2? // what's this? (mike asks)
@@ -934,7 +935,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             titlList.setTitle(ttl, titlkey);
         }
     }
-    
+
     /** Open an already existing Viskit Project */
     public void openProject() {
         jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
@@ -944,7 +945,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         ((AssemblyController) getController()).openProject(jfc, this);
         jfc = null;
     }
-    
+
     private File getUniqueName(String suggName) {
         String appnd = "";
         String suffix = "";
@@ -977,7 +978,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         jfc.setDialogTitle("Save Assembly File");
         File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssemblyDir(), suggName);
-        if (!fil.getParentFile().isDirectory()) {fil.getParentFile().mkdirs();}
+        if (!fil.getParentFile().isDirectory()) {
+            fil.getParentFile().mkdirs();
+        }
         if (showUniqueName) {
             fil = getUniqueName(suggName);
         }
@@ -1075,6 +1078,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 }
+
 interface DragStartListener {
+
     public void startingDrag(Transferable trans);
 }

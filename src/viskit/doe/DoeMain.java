@@ -65,8 +65,8 @@ public class DoeMain implements DoeEvents {
         }
 
         if (args != null) {
-            for (int i = 0; i < args.length; i++) {
-                controller.actionPerformed(OPEN_FILE, args[i]);
+            for (String arg : args) {
+                controller.actionPerformed(OPEN_FILE, arg);
             }
         }
     }

@@ -86,6 +86,8 @@ public interface ViskitAssemblyController {
 
     // Bug fix: 1195
     void close();
+    
+    void closeAll();
 
     boolean preClose();
 

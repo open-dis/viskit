@@ -31,9 +31,7 @@ public class ViskitAssembly extends BasicAssembly {
     private static boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
-    public ViskitAssembly() {
-        
-    }  
+    public ViskitAssembly() {}  
     
     @Override
     public void createObjects() {

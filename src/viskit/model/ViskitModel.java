@@ -14,94 +14,94 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id$
  */
-public interface ViskitModel {
+ public interface ViskitModel {
     
   /**
    * Separate initialization from object construction.
    */
-  public void init();
+  void init();
 
   /**
    * Messaged by controller when a new Model should be loaded.
    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
    * @return for good open
    */
-  public boolean newModel(File f);
+  boolean newModel(File f);
 
   /**
    * Save existing model to specified file.  If null, save to last file.  If no last file, error.
    * @param f File to save to.
    */
-  public void saveModel(File f);
+  void saveModel(File f);
 
   /**
    * @return A File object representing the last one passed to the two methods above.
    */
-  public File getLastFile();
+  File getLastFile();
   
   /**
    * Reports saved state of model.  Becomes "clean" after a save.
    * @return state of model
    */
-  public boolean isDirty();
+  boolean isDirty();
 
   /**
    * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
    * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
    * @return Vector of EventNodes.
    */
-  public Vector<? extends ViskitElement> getAllNodes();
+  Vector<? extends ViskitElement> getAllNodes();
 
   /**
    * Messaged by controller to inst all defined StateVariables.
    * @return Vector of StateVariables.
    */
-  public Vector<? extends ViskitElement> getStateVariables();
+  Vector<? extends ViskitElement> getStateVariables();
   
   /**
    * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
    * @return Vector of vParameter objects.
    */
-  public Vector<? extends ViskitElement> getSimParameters();
+  Vector<? extends ViskitElement> getSimParameters();
 
 
   /**
    * Message by the controller to create JavaSource from the model.
    * @return The generated source as a String, or null if error.
    */
-  public String buildJavaSource();
+  String buildJavaSource();
 
   // todo further comments...
-  public void    newEvent      (String nodeName, Point p);
-  public void    newEdge       (EventNode src, EventNode target);
-  public void    newCancelEdge (EventNode src, EventNode target);
+  void    newEvent      (String nodeName, Point p);
+  void    newEdge       (EventNode src, EventNode target);
+  void    newCancelEdge (EventNode src, EventNode target);
 
-  public void    deleteEvent      (EventNode node);
-  public void    deleteEdge       (SchedulingEdge edge);
-  public void    deleteCancelEdge (CancellingEdge edge);
+  void    deleteEvent      (EventNode node);
+  void    deleteEdge       (SchedulingEdge edge);
+   void    deleteCancelEdge (CancellingEdge edge);
 
-  public void    changeEdge       (SchedulingEdge e);
-  public void    changeCancelEdge (CancellingEdge e);
-  public void    changeMetaData   (GraphMetaData gmd);
-  public boolean changeEvent      (EventNode en);
+   void    changeEdge       (SchedulingEdge e);
+   void    changeCancelEdge (CancellingEdge e);
+   void    changeMetaData   (GraphMetaData gmd);
+   boolean changeEvent      (EventNode en);
 
-  public void    newStateVariable    (String name, String type, String initVal, String comment);
-  public void    newSimParameter     (String name, String type, String initVal, String comment);
-  public boolean changeStateVariable (vStateVariable st);
-  public boolean changeSimParameter  (vParameter p);
-  public void    changeCodeBlock     (String s);
-  public void    deleteStateVariable (vStateVariable sv);
-  public void    deleteSimParameter  (vParameter p);
+   void    newStateVariable    (String name, String type, String initVal, String comment);
+   void    newSimParameter     (String name, String type, String initVal, String comment);
+   boolean changeStateVariable (vStateVariable st);
+   boolean changeSimParameter  (vParameter p);
+   void    changeCodeBlock     (String s);
+   void    deleteStateVariable (vStateVariable sv);
+   void    deleteSimParameter  (vParameter p);
 
-  public GraphMetaData getMetaData();
+   GraphMetaData getMetaData();
 
-  public void   setDirty (boolean dirty);
+   void   setDirty (boolean dirty);
 
-  public String generateLocalVariableName();
-  public String generateIndexVariableName();
+   String generateLocalVariableName();
+   String generateIndexVariableName();
 
-  public void   resetLVNameGenerator();
-  public void   resetIdxNameGenerator();
+   void   resetLVNameGenerator();
+   void   resetIdxNameGenerator();
   
-  public String generateStateVariableName();
+   String generateStateVariableName();
 }

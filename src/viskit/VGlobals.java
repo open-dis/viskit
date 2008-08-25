@@ -129,27 +129,24 @@ public class VGlobals {
 
     public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly) {
         AssemblyController cont = new AssemblyController();
-        return buildAssemblyViewFrame(contentOnly, cont, new AssemblyModel(cont));
+        return buildAssemblyViewFrame(contentOnly, cont);
     }
 
-    public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod) {
-        initAssemblyViewFrame(contentOnly, cont, mod);
+    public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+        initAssemblyViewFrame(contentOnly, cont);
         cont.begin();
         return avf;
     }
 
     public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly) {
         AssemblyController cont = new AssemblyController();
-        return initAssemblyViewFrame(contentOnly, cont, new AssemblyModel(cont));
+        return initAssemblyViewFrame(contentOnly, cont);
     }
 
-    public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont, AssemblyModel mod) {
-        avf = new AssemblyViewFrame(contentOnly, mod, cont);
+    public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+        avf = new AssemblyViewFrame(contentOnly, cont);
         acont = cont;
-        amod = mod;
-        cont.setModel(mod);   // registers cntl as model listener
         cont.setView(avf);
-        mod.init();
         return avf;
     }
 
@@ -972,9 +969,9 @@ public class VGlobals {
      * @param status the status of JVM shutdown
      */
     public void sysExit(int status) {
-        if (!sysExitCalled) {
+        if (!isSysExitCalled()) {
             sysexithandler.doSysExit(status);
-            sysExitCalled = true;
+            setSysExitCalled(true);
         }
     }
 
@@ -984,6 +981,14 @@ public class VGlobals {
 
     public void setMainAppWindow(JFrame mainAppWindow) {
         this.mainAppWindow = mainAppWindow;
+    }
+
+    public boolean isSysExitCalled() {
+        return sysExitCalled;
+    }
+
+    public void setSysExitCalled(boolean sysExitCalled) {
+        this.sysExitCalled = sysExitCalled;
     }
     
     /**

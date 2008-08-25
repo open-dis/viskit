@@ -73,4 +73,10 @@ public interface ViskitAssemblyView {
      * @param mod the Assembly model to remove from view
      */
     void delTab(ViskitAssemblyModel mod);
+    
+    /** @return an array of open ViskitAssemblyModels */
+    ViskitAssemblyModel[] getOpenModels();
+    
+    /** Capture Assembly Editor user set Frame bounds */
+    void prepareToQuit();
 }
