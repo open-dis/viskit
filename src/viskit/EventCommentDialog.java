@@ -130,7 +130,7 @@ public class EventCommentDialog extends JDialog
     public void actionPerformed(ActionEvent event)
     {
       modified = false;    // for the caller
-      setVisible(false);
+      dispose();
     }
   }
 
@@ -140,7 +140,7 @@ public class EventCommentDialog extends JDialog
     {
       if(modified)
         unloadWidgets();
-      setVisible(false);
+      dispose();
     }
   }
 

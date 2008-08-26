@@ -499,7 +499,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -537,7 +537,7 @@ public class EdgeInspectorDialog extends JDialog {
                  */
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

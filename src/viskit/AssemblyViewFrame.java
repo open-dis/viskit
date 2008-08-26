@@ -1049,7 +1049,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         closeButt.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                jf.setVisible(false);
+                jf.dispose();
             }
         });
     }

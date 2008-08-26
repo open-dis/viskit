@@ -202,11 +202,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 return false;
             }
         }
-
-        if (((AssemblyModel) getModel()).isDirty()) {
-            return askToSaveAndContinue();
+        boolean ret = true;
+        AssemblyModel mod = (AssemblyModel) getModel();
+        if (mod != null) {
+            if (((AssemblyModel) getModel()).isDirty()) {
+                return askToSaveAndContinue();
+            }
         }
-        return true;  // proceed
+        return ret;  // proceed
     }
 
     /**
@@ -410,14 +413,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     DirectoryWatch.DirectoryChangeListener egListener = new DirectoryWatch.DirectoryChangeListener() {
 
         public void fileChanged(File file, int action, DirectoryWatch source) {
-            ;
+            // Do nothing?
         }
     };
 
-    /**
-     * 
-     * @return
-     */
+    /** @return a DirectoryChangeListener */
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
         return egListener;
     }
@@ -603,10 +603,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     /** @return in most cases, a true */
     public boolean preClose() {
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-        if (vmod.isDirty()) {
-            return askToSaveAndContinue();
+        boolean ret = true;
+        if (vmod != null) {
+            if (vmod.isDirty()) {
+                return askToSaveAndContinue();
+            }
         }
-        return true;
+        return ret;
     }
 
     /** Clean up for closing Assembly models */

@@ -364,7 +364,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                         outputDirty = false;
                     }
 
-                    setVisible(false);
+                    dispose();
                     break;
                 default:
                     //assert false:"Program error JobLauncher.java";
@@ -716,7 +716,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     private void hideClusterStatus() {
         if (clusterStatusFrame != null) {
-            clusterStatusFrame.setVisible(false);
+            clusterStatusFrame.dispose();
         }
         stopStatusThread();
     }

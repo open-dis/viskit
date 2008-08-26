@@ -184,7 +184,7 @@ public class EventArgumentDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -194,7 +194,7 @@ public class EventArgumentDialog extends JDialog {
             if (modified) {
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

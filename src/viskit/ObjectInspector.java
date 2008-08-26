@@ -87,23 +87,17 @@ public class ObjectInspector  extends JDialog implements ActionListener
   class cancelButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
-    {
-      //if(checkBlankFields())
-      //  return;
+    {     
       modified = false;    // for the caller
-      setVisible(false);
+      dispose();
     }
   }
 
   class applyButtonListener implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
-    {
-      //if(checkBlankFields())
-       // return;
-      //if (modified)
-        //unloadWidgets();
-      setVisible(false);
+    {      
+      dispose();
     }
   }
 

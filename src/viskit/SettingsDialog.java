@@ -403,7 +403,7 @@ public class SettingsDialog extends JDialog {
             if (dialog != null && progressDialog != null) {
                 progress.setIndeterminate(false);
                 progress.setValue(100);
-                progressDialog.setVisible(false);
+                progressDialog.dispose();
             }
         }
     }
@@ -447,17 +447,15 @@ public class SettingsDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
     class applyButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-         //   if (modified) {
-                unloadWidgets();
-         //   }
-            setVisible(false);
+            unloadWidgets();
+            dispose();
         }
     }
 

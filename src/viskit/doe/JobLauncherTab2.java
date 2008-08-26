@@ -228,7 +228,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
             public void actionPerformed(ActionEvent e) {
                 clusterConfigReturn = new Boolean(false);
-                configDialog.setVisible(false);
+                configDialog.dispose();
                 configDialog = null;
             }
         });
@@ -236,7 +236,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
             public void actionPerformed(ActionEvent e) {
                 clusterConfigReturn = new Boolean(true);
-                configDialog.setVisible(false);
+                configDialog.dispose();
                 configDialog = null;
             }
         });
@@ -1157,7 +1157,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private void hideClusterStatus() {
         if (clusterStatusFrame != null) {
-            clusterStatusFrame.setVisible(false);
+            clusterStatusFrame.dispose();
         }
         stopStatusThread();
     }

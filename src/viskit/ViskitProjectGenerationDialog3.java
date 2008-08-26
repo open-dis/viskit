@@ -194,13 +194,13 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel
 
 private void cancelButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtActionPerformed
   cancelled = true;
-  dialog.setVisible(false);
+  dialog.dispose();
 }//GEN-LAST:event_cancelButtActionPerformed
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
   cancelled = false;
   projectPath = pathTF.getText().trim();
-  dialog.setVisible(false);
+  dialog.dispose();
 }//GEN-LAST:event_createButtActionPerformed
 
 JFileChooser chooser;

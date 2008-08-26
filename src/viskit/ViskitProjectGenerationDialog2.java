@@ -177,7 +177,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
   ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, selF.getParent());
   ViskitProject.MY_VISKIT_PROJECTS_DIR = selF.getParent();
   ViskitProject.DEFAULT_PROJECT = selF.getName();
-  dialog.setVisible(false);
+  dialog.dispose();
 }//GEN-LAST:event_createButtActionPerformed
 
 

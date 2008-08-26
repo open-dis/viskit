@@ -261,21 +261,13 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     //todo implement
     //newTarget,newTargetEvent,newSource,newSourceEvent;
 
-    /*
-    if (xpclEdge != null) {
-    xpclEdge.setProperty(xpropertyTF.getText().trim());
-    }
-    else {
-    xnewProperty = xpropertyTF.getText().trim();
-    }
-     */
     }
 
     class cancelButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -291,7 +283,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
             if (modified) {
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

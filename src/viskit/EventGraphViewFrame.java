@@ -1205,7 +1205,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         closeButt.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                jf.setVisible(false);
+                jf.dispose();
             }
         });
     }

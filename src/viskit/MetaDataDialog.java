@@ -193,7 +193,7 @@ abstract public class MetaDataDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -216,7 +216,7 @@ abstract public class MetaDataDialog extends JDialog {
                 // OK, we're good....
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

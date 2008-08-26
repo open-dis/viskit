@@ -349,7 +349,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                 // ok, we passed
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 }

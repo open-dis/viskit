@@ -169,7 +169,6 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
     // TODO setup
-    dialog.setVisible(false);
     dialog.dispose();
 }//GEN-LAST:event_defaultButtActionPerformed
 

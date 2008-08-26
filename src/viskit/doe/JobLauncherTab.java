@@ -1018,7 +1018,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     private void hideClusterStatus() {
         if (clusterStatusFrame != null) {
-            clusterStatusFrame.setVisible(false);
+            clusterStatusFrame.dispose();
         }
         stopStatusThread();
     }

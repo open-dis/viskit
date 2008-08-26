@@ -306,7 +306,7 @@ public class EventTransitionDialog extends JDialog {
             modified = false;    // for the caller
             actionField.setText("");
             VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -359,7 +359,7 @@ public class EventTransitionDialog extends JDialog {
                 }
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

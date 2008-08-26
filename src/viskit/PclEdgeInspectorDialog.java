@@ -198,7 +198,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -208,7 +208,7 @@ public class PclEdgeInspectorDialog extends JDialog {
             if (modified) {
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

@@ -122,7 +122,7 @@ public class BeanshellErrorDialog extends JDialog {
 
             public void actionPerformed(ActionEvent e) {
                 returnBool = false;
-                setVisible(false);
+                dispose();
             }
         });
 
@@ -135,7 +135,7 @@ public class BeanshellErrorDialog extends JDialog {
                     ViskitConfig.instance().setVal("app.beanshell.warning", "false");
                 }
                 returnBool = true;
-                setVisible(false);
+                dispose();
             }
         });
     }

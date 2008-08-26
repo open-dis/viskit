@@ -558,6 +558,6 @@ class sysOutDialog extends JDialog implements ActionListener {
 
     //Handle clicks on the Set and Cancel buttons.
     public void actionPerformed(ActionEvent e) {
-        sysOutDialog.dialog.setVisible(false);
+        sysOutDialog.dialog.dispose();
     }
 }

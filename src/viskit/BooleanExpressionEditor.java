@@ -163,7 +163,7 @@ public class BooleanExpressionEditor extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -175,7 +175,7 @@ public class BooleanExpressionEditor extends JDialog {
             if (modified) {
                 unloadWidgets();
             }
-            setVisible(false);
+            dispose();
         }
     }
 

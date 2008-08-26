@@ -134,14 +134,14 @@ public class EventListDialog extends JDialog {
 
         public void actionPerformed(ActionEvent event) {
             selection = -1;
-            setVisible(false);
+            dispose();
         }
     }
 
     class applyButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-            setVisible(false);
+            dispose();
         }
     }
 

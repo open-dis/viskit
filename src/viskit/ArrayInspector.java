@@ -164,14 +164,14 @@ public class ArrayInspector extends JDialog {
             //if(checkBlankFields())
             //  return;
             modified = false;    // for the caller
-            setVisible(false);
+            dispose();
         }
     }
 
     class applyButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-            setVisible(false);
+            dispose();
         }
     }
 

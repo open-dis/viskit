@@ -313,7 +313,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
         System.err.println("Error logging out from cluster.");
       }
     }
-    ClusterAdminDialog.this.setVisible(false);
+    ClusterAdminDialog.this.dispose();
   }
   Thread execThread;
   private void runInThread(Runnable runner)

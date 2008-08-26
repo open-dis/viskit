@@ -97,7 +97,7 @@ public class RecentFilesDialog extends JDialog {
         closeButt.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                RecentFilesDialog.this.setVisible(false);
+                RecentFilesDialog.this.dispose();
             }
         });
         closeButt.addMouseListener(myRollOverHandler);

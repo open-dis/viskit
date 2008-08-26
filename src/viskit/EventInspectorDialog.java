@@ -374,7 +374,7 @@ public class EventInspectorDialog extends JDialog {
             
             // To start numbering over next time
             VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
-            setVisible(false);
+            dispose();
         }
     }
 
@@ -414,7 +414,7 @@ public class EventInspectorDialog extends JDialog {
                 }
                 unloadWidgets(node);
             }
-            setVisible(false);
+            dispose();
         }
 
         private void addPotentialLocalIndexVariable(EventNode n, String lvName) {

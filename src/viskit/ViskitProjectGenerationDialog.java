@@ -213,7 +213,6 @@ public class ViskitProjectGenerationDialog extends JDialog {
     public void generateProject() {
         setProjectNameResult(projectNameTF.getText());
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        dialog.setVisible(false);
         dialog.dispose();
         
         // Only way to get this dialog to show up each time it's called
