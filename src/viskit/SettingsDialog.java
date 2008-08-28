@@ -332,7 +332,7 @@ public class SettingsDialog extends JDialog {
     class clearEGHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent actionEvent) {
-            ViskitController ctrlr = (ViskitController)VGlobals.instance().getEventGraphEditor().getController();
+            ViskitController ctrlr = (ViskitController) VGlobals.instance().getEventGraphEditor().getController();
             ctrlr.clearRecentFileList();             
             //vConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY); gets done in controller
         }
@@ -348,6 +348,9 @@ public class SettingsDialog extends JDialog {
     }
 
     public static void clearClassPathEntries() {
+        if (vConfig == null) {
+            initConfig();
+        }
         vConfig.clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
     }
     
@@ -437,9 +440,9 @@ public class SettingsDialog extends JDialog {
     }
 
     private void unloadWidgets() {
-        // most everything gets instantly updated;  check for pending text entry
+      // most everything gets instantly updated;  check for pending text entry
       if(otherLafRB.isSelected()) {
-        vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+          vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
       }
     }
 
@@ -586,10 +589,6 @@ public class SettingsDialog extends JDialog {
         if (vConfig == null) {
             initConfig();
         }
-        
-        // Still no viskitConfig.xml file
-        if (vConfig == null) {return null;}
-        
         return vConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
     }
 

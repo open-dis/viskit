@@ -149,6 +149,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         reportPanel = pan;
     }
 
+    // TODO: not used?
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
@@ -259,9 +260,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
             loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
-            
-            // TODO: Right here, this new LocalBootLoader is NOT getting the External URLs (extra classpaths) Bug 1237
-//            loader = new LocalBootLoader(loader.getExtUrls(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
             
             // Forcing the extra classpaths here bug fix 1237
             loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());            

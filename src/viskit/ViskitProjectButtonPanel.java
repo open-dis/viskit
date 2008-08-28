@@ -69,13 +69,12 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
     initComponents();
   }
 
-  private void setupViskitProject(File projFile)
-  {
-     ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, projFile.getParent());
-     ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent();
-     ViskitProject.DEFAULT_PROJECT = projFile.getName();
-    
-  }
+    private void setupViskitProject(File projFile) {
+        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent();
+        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        ViskitProject.DEFAULT_PROJECT = projFile.getName();
+        VGlobals.instance().createWorkDirectory();
+    }
   
   /** This method is called from within the constructor to
    * initialize the form.
@@ -162,14 +161,15 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         if (!foundProject)
             JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
     } while (!foundProject);
-
-    setupViskitProject(selectedFile);
+    
     defaultButtActionPerformed(null);
+    setupViskitProject(selectedFile);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
-    // TODO setup
+    // TODO setup differently, but for now...
     dialog.dispose();
+    dialog = null;
 }//GEN-LAST:event_defaultButtActionPerformed
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
@@ -197,8 +197,8 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 //      new File(projF,ViskitProject.CLASSES_DIRECTORY_NAME).mkdir();
 //      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
       
-      setupViskitProject(projF);
       defaultButtActionPerformed(null);
+      setupViskitProject(projF);
 }//GEN-LAST:event_createButtActionPerformed
 
 private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
