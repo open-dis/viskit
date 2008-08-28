@@ -162,6 +162,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
     } while (!foundProject);
     
+    // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
     setupViskitProject(selectedFile);
 }//GEN-LAST:event_existingButtActionPerformed
@@ -197,6 +198,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 //      new File(projF,ViskitProject.CLASSES_DIRECTORY_NAME).mkdir();
 //      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
       
+      // Since this dialog is modal, need to dispose() before we can move along in the startup
       defaultButtActionPerformed(null);
       setupViskitProject(projF);
 }//GEN-LAST:event_createButtActionPerformed
