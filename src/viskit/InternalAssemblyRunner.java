@@ -70,7 +70,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     static String lineSep = System.getProperty("line.separator");
     String targetClassName;
     String targetClassPath;
-    ArrayList<Long> seeds;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;
     JMenuBar myMenuBar;
@@ -115,7 +114,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
         twiddleButtons(OFF);
         lastLoaderNoReset = Thread.currentThread().getContextClassLoader();
-        seeds = new ArrayList<Long>();
     }
 
     /**
@@ -247,17 +245,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         Runnable assemblyRunnable;
 
         try {
-            /* DIFF between OA3302 branch and trunk */
-//            if (!resetSeeds) {
-//                if (seeds.size() > 0) {
-//                    // start with last cached seed
-//                    seed = seeds.get(seeds.size() - 1);
-//                }
-//            } else {
-//                seeds.clear();
-//            }
-            /* End DIFF between OA3302 branch and trunk */
-
             loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
             
@@ -379,37 +366,22 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             System.out.println("Simulation ended");
             System.out.println("----------------");
             runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
-            if (resetSeeds) {
-                try {
-                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-                    Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
-                    setStopRun.invoke(assemblyObj, true);
-                    Class<?> schedule = loader.loadClass("simkit.Schedule");
-                    Method clearRerun = schedule.getMethod("clearRerun");
-                    clearRerun.invoke(null);
-                    Method coldReset = schedule.getMethod("coldReset");
-                    try {
-                        coldReset.invoke(null);
-                    } catch (Exception e) {
-                        coldReset.invoke(null);
-                    }
+            try {
+                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
+                setStopRun.invoke(assemblyObj, true);
+                Schedule.coldReset();
                 Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-                } catch (SecurityException ex) {
-                    ex.printStackTrace();
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                } catch (NoSuchMethodException ex) {
-                    ex.printStackTrace();
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (InvocationTargetException ex) {
-                    ex.printStackTrace();
-                } catch (IllegalAccessException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-                Schedule.getDefaultEventList().clearRerun();
+            } catch (SecurityException ex) {
+                ex.printStackTrace();
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
+            } catch (InvocationTargetException ex) {
+                ex.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
             }
             mutex--;
             
@@ -739,9 +711,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     
     public void propertyChange(PropertyChangeEvent evt) {
         log.debug(evt.getPropertyName());
-        if (evt.getPropertyName().equals("seed")) {
-            seeds.add((Long) evt.getNewValue());
-        }
+        
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue() + " of " + Integer.parseInt(runPanel.numRepsTF.getText()) + "</b>\n");
