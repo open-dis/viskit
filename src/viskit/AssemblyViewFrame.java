@@ -111,7 +111,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     /**
      * Initialize the MCV connections
-     * @param ctrl 
+     * @param ctrl
      */
     private void initMVC(AssemblyController ctrl) {
         setController(ctrl);
@@ -119,7 +119,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     /**
      * Initialize the user interface
-     * @param contentOnly 
+     * @param contentOnly
      */
     private void initUI(boolean contentOnly) {
         buildMenus(contentOnly);
@@ -185,21 +185,21 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 fileName(null);
                 return;
             }
-            
+
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
-            
+
             setModel((AssemblyModel) myVgacw.model);          // hold on locally
             getController().setModel((AssemblyModel) myVgacw.model);  // tell controller
             AssemblyModel mod = (AssemblyModel) getModel();
-            
+
             if (mod.getLastFile() != null) {
-                
+
                 // Also, tell the Design of Experiments Panel to update
                 VGlobals.instance().amod = mod;
                 ((AssemblyController) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
-            
+
             GraphMetaData gmd = myVgacw.model.getMetaData();
             if (gmd != null) {
                 fileName(gmd.name);
@@ -343,7 +343,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         myMenuBar = new JMenuBar();
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
-        
+
         Help help = new Help(this);
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -750,7 +750,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     private boolean firstShown = false;
 
-    // TODO: This saves the size/shape of the EG Editor frame, but doesn't 
+    // TODO: This saves the size/shape of the EG Editor frame, but doesn't
     // load this config on next startup
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
@@ -798,7 +798,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     /** permits user to edit existing entities
      * @param evNode
-     * @return 
+     * @return
      */
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
         return EventGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), evNode);
@@ -966,7 +966,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /** Saves the current Assembly "as" desired by the user
-     * 
+     *
      * @param suggName the package and file name of the Assembly
      * @param showUniqueName show Assembly name only
      * @return a File object of the saved Assembly
@@ -1002,10 +1002,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /**
-     * Called by the controller after source has been generated.  Show to the 
+     * Called by the controller after source has been generated.  Show to the
      * user and provide the option to save.
      *
-     * @param className 
+     * @param className
      * @param s Java source
      */
     public void showAndSaveSource(String className, String s) {

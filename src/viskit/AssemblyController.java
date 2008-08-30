@@ -547,7 +547,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (ret == JOptionPane.YES_OPTION) {
             int retv = jfc.showOpenDialog(avf);
             if (retv == JFileChooser.APPROVE_OPTION) {
-                close();
+                closeAll();
                 ViskitConfig.instance().clearViskitConfig();
                 ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent();
                 ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -1506,7 +1506,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     /** Compile the Assembly and prepare the Simulation Runner for external JVM */
-    public void compileAssemblyAndPrepSimRunner() {
+    public void compileAssemblyAndPrepSimRunner() {        
         initAssemblyRun();
         if (execStrings == null) {
             JOptionPane.showMessageDialog(null, "Compile not attempted, check log for details",
@@ -1516,6 +1516,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             // Ensure changes to the Assembly Properties dialog get saved
             save();
+        
+            // Ensure a cleared Assembly Run panel upon every Assembly compile
+            RunnerPanel2 rp2 = VGlobals.instance().getRunPanel();
+            rp2.soutTA.setText(null);
+            rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd +
+                    "----------------------" + rp2.lineEnd);
+        
             runner.exec(execStrings);
             runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, true);
         }
@@ -1754,7 +1761,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     void setAssemblyRunner(AssemblyRunnerPlug plug) {
         runner = plug;
-    }    // Recent open file support:
+    }    
+    
+    // Recent open file support:
     private static final int RECENTLISTSIZE = 15;
     private ArrayList<String> recentFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
 

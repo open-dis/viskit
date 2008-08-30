@@ -43,7 +43,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.*;
 
@@ -227,8 +226,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
         runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
-
-        Schedule.clearRerun();
+        
         Schedule.coldReset();
     }
     

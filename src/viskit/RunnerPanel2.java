@@ -54,7 +54,7 @@ public class RunnerPanel2 extends JPanel {
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     public boolean dump = true;
     public boolean search;
-    String lineEnd = System.getProperty("line.separator");
+    public String lineEnd = System.getProperty("line.separator");
     public JScrollPane jsp;
     public JTextArea soutTA;
     public JSplitPane xsplPn;
