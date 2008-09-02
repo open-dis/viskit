@@ -226,9 +226,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             return;
         }
 
-        File file = ((ViskitAssemblyView) getView()).openFileAsk();
-        if (file != null) {
-            _doOpen(file);
+        File[] files = ((ViskitAssemblyView) getView()).openFilesAsk();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file != null) {
+                _doOpen(file);
+            }
         }
     }
     
@@ -1012,8 +1017,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     /**
      * 
      */
-    public void copy() //----------------
-    {
+    public void copy() {
         if (selectionVector.size() <= 0) {
             return;
         }
@@ -1207,123 +1211,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             log.error("Error building Java from " + x2j.getFileBaseName() + ": " + e.getMessage() + ", erroneous event-graph xml found");
         }
         return null;
-    }
-
-    /**
-     * TODO: Determine if actually used for anything
-     * @param src
-     * @return
-     */
-    public static File compileJavaClassFromStringAndHandleDependencies(String src) {
-        handleFileBasedClasses();
-        log.info("I was called\n");
-        return compileJavaClassFromString(src);
-    }
-
-    /**
-     * 
-     * @param src
-     * @return
-     */
-    public static int compileJavaFromStringAndHandleDependencies(String src) {
-        handleFileBasedClasses();
-        return compileJavaFromString(src);
-    }
-
-    /**
-     * 
-     * @param src
-     * @return
-     */
-    public static int compileJavaFromString(String src) {
-        File f = makeFile(src);
-        if (f == null) {
-            return -1;
-        }
-
-        String canPath;
-        try {
-            canPath = f.getCanonicalPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
-        String className = "";
-        String pkg = "";
-        Pattern pat = Pattern.compile("package.+;");
-        Matcher mat = pat.matcher(src);
-        boolean fnd = mat.find();
-
-        if (fnd) {
-            pkg = src.substring(mat.start(), mat.end());
-            className += pkg;
-        } else {
-            log.error("No package declaration in attempted compile of " + src);
-            return -1;
-        }
-        pat = Pattern.compile("public\\s+class\\s+");
-        mat = pat.matcher(src);
-        fnd = mat.find();
-        if (fnd) {
-            className += src.substring(mat.start(), mat.end());
-        } else {
-            log.error("No class declaration in attempted compile of " + src);
-            return -1;
-        }
-
-        String diagnostic = Compiler.invoke(pkg, className, src);
-        if (diagnostic == null) {
-            log.error("Compile error of " + src);
-            return -1;
-        }
-        log.info(diagnostic);
-        return 0;
-    }
-
-    private static File makeFile(String src) {
-        String baseName = null;
-
-        // Find the package subdirectory
-        Pattern pat = Pattern.compile("package.+;");
-        Matcher mat = pat.matcher(src);
-        boolean fnd = mat.find();
-
-        if (fnd) {
-            int st = mat.start();
-            int end = mat.end();
-            String s = src.substring(st, end);
-            s = s.replace(';', '/');
-            String[] sa = s.split("\\s");
-            sa[1] = sa[1].replace('.', '/');
-        }
-        // done finding the package subdir (just to mark the file as "deleteOnExit")
-
-        pat = Pattern.compile("public\\s+class\\s+");
-        mat = pat.matcher(src);
-        fnd = mat.find();
-        // if(fnd) {
-        int end = mat.end();
-        String s = src.substring(end, end + 128).trim();
-        String[] sa = s.split("\\s+");
-
-        baseName = sa[0];
-        // }
-        try {
-            File f = VGlobals.instance().getWorkDirectory();
-            f = new File(f, baseName + ".java");
-            f.createNewFile();
-            f.deleteOnExit();
-
-            FileWriter fw = new FileWriter(f);
-            fw.write(src);
-            fw.flush();
-            fw.close();
-            return f;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
+    }   
+    
     /** Create and test compile our EventGraphs and Assemblies from XML
      * Know complilation path
      * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
@@ -1528,40 +1417,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    private static void handleFileBasedClasses() {
-        Collection<FileBasedAssyNode> fileClasses =
-                FileBasedClassManager.instance().getFileLoadedClasses();
-        for (FileBasedAssyNode fbn : fileClasses) {
-            if (fbn.isXML) {
-                createTemporaryEventGraphClass(fbn.xmlSource);
-                log.info("I was called\n");
-            } else {
-                moveClassFileIntoPlace(fbn);
-            }
-        }
-    }
-
-    private static void moveClassFileIntoPlace(FileBasedAssyNode fbn) {
-        File f = new File(VGlobals.instance().getWorkDirectory(),
-                fbn.pkg.replace('.', Vstatics.getFileSeparator().charAt(0)));
-        f.mkdir();
-
-        File target = new File(f, fbn.classFile.getName());
-        try {
-            target.createNewFile();
-
-            BufferedInputStream is = new BufferedInputStream(new FileInputStream(fbn.classFile));
-            BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(target));
-            int b;
-            while ((b = is.read()) != -1) {
-                os.write(b);
-            }
-            is.close();
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     /**
      * 
      */

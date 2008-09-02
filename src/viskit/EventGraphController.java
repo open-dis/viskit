@@ -720,7 +720,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ((ViskitModel) getModel()).deleteStateVariable(var);
     }
 
-    // TODO: This will throw a null pointer if no Event Graph is loaded
     private boolean checkSave() {
         if (((ViskitModel) getModel()).isDirty() || ((ViskitModel) getModel()).getLastFile() == null) {
             String msg = "The model will be saved.\nContinue?";

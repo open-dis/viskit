@@ -885,30 +885,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    /** Display a file chooser filtered by Assembly XML files only
-     * @return the chosen XML Assembly file
-     */
-    public File openFileAsk() {
+    public File[] openFilesAsk() {
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
+            jfc.setDialogTitle("Open Assembly Files");
+            
+            // Look for assembly in the filename, Bug 1247 fix
+            FileFilter filter = new AssemblyFileFilter("assembly");
+            jfc.setFileFilter(filter);
+            
+            jfc.setMultiSelectionEnabled(true);
         }
 
-        jfc.setDialogTitle("Open Assembly File");
-        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        // Look for assembly in the filename, Bug 1247 fix
-        FileFilter filter = new AssemblyFileFilter("assembly");
-        jfc.setFileFilter(filter);
         int returnVal = jfc.showOpenDialog(this);
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File f = jfc.getSelectedFile();
-            jfc.setFileFilter(null);  // TODO: For JFC Swing issue with Win32ShellFolder2? // what's this? (mike asks)
-            log.info("You chose to open: " + f.getName());
-            return f;
-        }
-        jfc = null;
-        return null;
+        return (returnVal == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
     }
 
     public File openRecentFilesAsk(Collection<String> lis) {

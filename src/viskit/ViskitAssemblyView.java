@@ -50,7 +50,11 @@ public interface ViskitAssemblyView {
 
     String promptForStringOrCancel(String title, String message, String initval);
  
-    File openFileAsk();
+    /** Allow opening of one, or more Assembly files
+     * 
+     * @return one or more chosen Assembly files
+     */
+    File[] openFilesAsk();
 
     File openRecentFilesAsk(Collection<String> lis);
 
