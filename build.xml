@@ -199,12 +199,12 @@
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}"/>
         </xjc>
-        <xjc extension="true" 
+        <!--xjc extension="true" 
              package="viskit.xsd.bindings.assembly.stats" 
              schema="${dir.src.simasm.util}/statistics.xsd" 
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}/stats"/>
-        </xjc>       
+        </xjc-->       
         <xjc extension="true" 
              package="viskit.xsd.bindings.cli" 
              schema="${dir.src.cli.util}/cli.xsd" 
@@ -458,12 +458,12 @@
     </target>
     
     <!-- just add new modules to the depends variable here -->
-    <target name="runtime.extenstions"
+    <target name="runtime.extensions"
             depends="fresh.diskit" 
             description="compile application specific modules, like diskit"/>    
     
-    <target name="build.viskit.with.runtime.extenstions"
-            depends="jar,runtime.extenstions" 
+    <target name="build.viskit.with.runtime.extensions"
+            depends="jar,runtime.extensions" 
             description="Build viskit and diskit jars"/>
             
     <target name="build.viskit.no.runtime.extensions"
@@ -608,7 +608,7 @@
     
     <!-- TARGET: Run w/Viskit custom splash -->
     <target name="build.run.with.runtime.extensions"
-            depends="build.viskit.with.runtime.extenstions,checkJAVA_HOME" 
+            depends="build.viskit.with.runtime.extensions,checkJAVA_HOME" 
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
         <java classname="viskit.Splash2" 
               classpathref="runtime.classpath" 
@@ -650,7 +650,7 @@
        
     <!-- TARGET: Run w/Ant Splash @deprecated -->
     <target name="build.run"
-            depends="splashy,runtime.extenstions,checkJAVA_HOME"
+            depends="splashy,runtime.extensions,checkJAVA_HOME"
             description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.runtime.extensions)">
         <java classname="viskit.EventGraphAssemblyComboMain" 
               classpathref="runtime.classpath" 
@@ -726,7 +726,7 @@
     </target>
     
     <target  name="runDOE" 
-             depends="jar, runtime.extenstions" 
+             depends="jar, runtime.extensions" 
              description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
@@ -850,7 +850,7 @@
         <ant target="jar.executable"/>
     </target>
     <target name="with.rutime.extensions" depends="no.runtime.extensions" unless="extensions.built">
-        <ant target="runtime.extenstions"/>
+        <ant target="runtime.extensions"/>
     </target>    
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
