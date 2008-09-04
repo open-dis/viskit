@@ -199,12 +199,12 @@
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}"/>
         </xjc>
-        <!--xjc extension="true" 
+        <xjc extension="true" 
              package="viskit.xsd.bindings.assembly.stats" 
              schema="${dir.src.simasm.util}/statistics.xsd" 
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}/stats"/>
-        </xjc-->       
+        </xjc>       
         <xjc extension="true" 
              package="viskit.xsd.bindings.cli" 
              schema="${dir.src.cli.util}/cli.xsd" 
