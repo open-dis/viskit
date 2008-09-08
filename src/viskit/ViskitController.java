@@ -74,7 +74,9 @@ public interface ViskitController {
   void deleteStateVariable(vStateVariable var);
 
   void eventList();
-  void generateJavaClass();  
+  
+  /** Generates Java source code from an Event Graph file */
+  void generateJavaSource();  
   
   /** Provides a single screenshot capture capability */
   void captureWindow();

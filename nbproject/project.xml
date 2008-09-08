@@ -23,7 +23,7 @@
             <ide-actions>
                 <action name="build">
                     <script>${ant.script}</script>
-                    <target>build.viskit.with.runtime.extenstions</target>
+                    <target>build.viskit.with.runtime.extensions</target>
                 </action>
                 <action name="clean">
                     <script>${ant.script}</script>
@@ -44,7 +44,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean.all</target>
-                    <target>build.viskit.with.runtime.extenstions</target>
+                    <target>build.viskit.with.runtime.extensions</target>
                 </action>
                 <action name="run.single">
                     <script>${ant.script}</script>
@@ -81,7 +81,7 @@
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>jar</build-target>
+                <build-target>build.viskit.with.runtime.extenstions</build-target>
             </export>
             <view>
                 <items>
@@ -120,6 +120,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
+                <classpath mode="compile">lib/simkit.jar;build/classes</classpath>
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>

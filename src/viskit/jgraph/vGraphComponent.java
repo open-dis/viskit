@@ -31,6 +31,7 @@ import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -248,7 +249,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
 
                         double priority;
                         String s;
-                        try {
+                        
+                        // Assume numeric comes in, avoid NumberFormatException via Regex check
+                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority)) {
                             priority = Double.parseDouble(((SchedulingEdge) se).priority);
                             NumberFormat df = DecimalFormat.getNumberInstance();
                             df.setMaximumFractionDigits(3);
@@ -260,7 +263,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
                             } else {
                                 s = df.format(priority);
                             }
-                        } catch (NumberFormatException e) {
+                        } else {
                             s = ((SchedulingEdge) se).priority;
                         }
 
@@ -844,7 +847,7 @@ class vEdgeView extends EdgeView {
  */
 class vSelfEdgeView extends vEdgeView {
 
-    public static vSelfEdgeRenderer renderer = new vSelfEdgeRenderer();
+    public static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
 
     public vSelfEdgeView(Object cell, JGraph gr, CellMapper cm) {
         super(cell, gr, cm);
@@ -852,7 +855,7 @@ class vSelfEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return renderer;
+        return localRenderer2;
     }
 }
 

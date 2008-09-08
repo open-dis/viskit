@@ -579,7 +579,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         fileMenu.add(buildMenuItem(vcontroller, "saveAs", "Save as...", new Integer(KeyEvent.VK_A), null));
         fileMenu.addSeparator();
         fileMenu.add(buildMenuItem(vcontroller, "showXML", "View Saved XML", new Integer(KeyEvent.VK_X), null));
-        fileMenu.add(buildMenuItem(vcontroller, "generateJavaClass", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
+        fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
         fileMenu.add(buildMenuItem(vcontroller, "captureWindow", "Save Screen Image", new Integer(KeyEvent.VK_I),
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         if (!contentOnly) {

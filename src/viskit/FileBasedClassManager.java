@@ -91,7 +91,8 @@ public class FileBasedClassManager implements Runnable {
         if (f.getName().toLowerCase().endsWith(".xml")) {
             if (!isCached(f)) {
                 if (!isCacheMiss(f)) {
-                    PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
+                    PkgAndFile paf = 
+                            VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
                     // Tried to compile an Assembly as an EventGraph, so just return here
                     if (paf == null) {
                         return null;

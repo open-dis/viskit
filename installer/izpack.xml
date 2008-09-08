@@ -23,7 +23,7 @@
             <author name="Alan Hudson" email="giles@yumetech.com"/>
             <author name="Don McGregor" email="mcgredo@nps.edu"/>
             <author name="Terry Norbraten" email="tdnorbra@nps.edu"/>
-            <author name="Pat Sullivan" email="pjsulliv@nps.edu"/>
+            <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>http://diana.nps.edu/Viskit</url>
         <javaversion>1.6</javaversion>
@@ -72,6 +72,7 @@
         <pack name="Core" required="yes">
             <description>Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
+		<include name="Schemas/**/*"/>
                 <include name="images/**/*"/>
                 <include name="lib/**/*" />
                 <include name="Viskit.exe"/>

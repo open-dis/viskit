@@ -1,0 +1,14 @@
+5,10c5,10
+<       <xs:attribute name="mean" default="0.0"/>
+<       <xs:attribute name="variance" default="0.0"/>
+<       <xs:attribute name="standardDeviation" default="0.0"/>
+<       <xs:attribute name="count" default="0"/>
+<       <xs:attribute name="minObs" default="0.0"/>
+<       <xs:attribute name="maxObs" default="0.0"/>
+---
+>       <xs:attribute name="mean" default="0.0" type="xs:decimal"/>
+>       <xs:attribute name="variance" default="0.0" type="xs:decimal"/>
+>       <xs:attribute name="standardDeviation" default="0.0" type="xs:decimal"/>
+>       <xs:attribute name="count" default="0" type="xs:integer"/>
+>       <xs:attribute name="minObs" default="0.0" type="xs:decimal"/>
+>       <xs:attribute name="maxObs" default="0.0" type="xs:decimal"/>

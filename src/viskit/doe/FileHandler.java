@@ -47,6 +47,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.OpenAssembly;
+import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.SimEntity;
 import viskit.xsd.bindings.assembly.TerminalParameter;
@@ -61,7 +62,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  */
 public class FileHandler {
 
-    public static final String schemaLoc = "http://diana.nps.edu/Simkit/assembly.xsd";
+    private static String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
 
     public static DoeFileModel openFile(File f) throws Exception {
         SAXBuilder builder;

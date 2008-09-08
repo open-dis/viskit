@@ -24,14 +24,13 @@ import java.awt.event.WindowEvent;
 public class EdgeParameterDialog extends JDialog {
 
     private JTextField valueField;       // Text field that holds the expression
-    private JLabel typeLabel;    // static type value passed in
-    //private JTextField commentField;          // Text field that holds the comment
+    private JLabel typeLabel;            // static type value passed in
     private static EdgeParameterDialog dialog;
     private static boolean modified = false;
     private vEdgeParameter param;
     private String type;
     private JButton okButt,  canButt;
-    public static String newValue; //, newType; //, newComment;
+    public static String newValue;
 
     public static boolean showDialog(JDialog d, Component comp, vEdgeParameter parm) {
         if (dialog == null) {
@@ -65,18 +64,14 @@ public class EdgeParameterDialog extends JDialog {
 
         JLabel valueLab = new JLabel("value");
         JLabel typeLab = new JLabel("type");
-        //JLabel commLab = new JLabel("description");
-        int w = maxWidth(new JComponent[]{valueLab, typeLab}); //commLab});
+        int w = maxWidth(new JComponent[]{valueLab, typeLab});
 
         valueField = new JTextField(25);
         setMaxHeight(valueField);
-        // commentField       = new JTextField(25);   setMaxHeight(commentField);
-        typeLabel = new JLabel("argument type"); //new JComboBox(VGlobals.instance().getTypeCBModel());
-        //setMaxHeight(typeLabel);
+        typeLabel = new JLabel("argument type");
 
         fieldsPanel.add(new OneLinePanel(typeLab, w, typeLabel));
         fieldsPanel.add(new OneLinePanel(valueLab, w, valueField));
-        //fieldsPanel.add(new OneLinePanel(commLab,w,commentField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
@@ -88,12 +83,12 @@ public class EdgeParameterDialog extends JDialog {
         buttPan.add(canButt);
         buttPan.add(okButt);
         con.add(buttPan);
-        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        con.add(Box.createVerticalGlue());           // takes up space when dialog is expanded vertically
         cont.add(con);
 
-        fillWidgets();     // put the data into the widgets
+        fillWidgets();                               // put the data into the widgets
 
-        modified = (param == null);     // if it's a new param, they can always accept defaults with no typing
+        modified = (param == null);                  // if it's a new param, they can always accept defaults with no typing
         okButt.setEnabled((param == null));
 
         getRootPane().setDefaultButton(canButt);
@@ -106,9 +101,7 @@ public class EdgeParameterDialog extends JDialog {
         okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
-        //this.commentField.      addCaretListener(lis);
         this.valueField.addCaretListener(lis);
-    //this.typeLabel.addActionListener(lis);
     }
 
     private int maxWidth(JComponent[] c) {
@@ -145,16 +138,13 @@ public class EdgeParameterDialog extends JDialog {
     private void fillWidgets() {
         valueField.setText(param.getValue());
         typeLabel.setText(type);
-    //this.commentField.setText(param.getComment());
     }
 
     private void unloadWidgets() {
         if (param != null) {
             param.setValue(valueField.getText().trim());
-        //param.setComment(this.commentField.getText());
         } else {
             newValue = valueField.getText().trim();
-        //newComment = commentField.getText().trim();
         }
     }
 

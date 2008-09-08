@@ -63,11 +63,15 @@
         <delete dir="${dir.build.lib}">
             <include name="*.tmp"/>
         </delete>
-        <javac destdir="${dir.build.classes}" includes="${files}" source="1.5" srcdir="src">
+        <javac destdir="${dir.build.classes}" 
+	       includes="${files}"
+               source="1.5"
+               target="1.5" 
+	       srcdir="src">
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
-            <compilerarg value="${javac.debug}"/>
+	    <compilerarg value="${javac.debug}"/>
             <classpath>
                 <path refid="runtime.classpath"/>
             </classpath>

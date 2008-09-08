@@ -1,9 +1,5 @@
 package viskit;
 
-import edu.nps.util.BoxLayoutUtils;
-import simkit.Priority;
-import viskit.model.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.CaretEvent;
@@ -16,7 +12,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import java.util.ArrayList;
+
+import edu.nps.util.BoxLayoutUtils;
+import java.util.regex.Pattern;
+import simkit.Priority;
 import org.apache.log4j.Logger;
+import viskit.model.EventNode;
+import viskit.model.Edge;
+import viskit.model.Model;
+import viskit.model.SchedulingEdge;
+import viskit.model.ViskitElement;
+import viskit.model.vEdgeParameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -46,7 +52,7 @@ public class EdgeInspectorDialog extends JDialog {
     private JComboBox priorityCB;
     private ArrayList<Priority> priorityList;  // matches combo box
     private Vector<String> priorityNames;
-    private int priorityDefaultIndex = 3;  // set properly below
+    private int priorityDefaultIndex = 3;      // set properly below
     private JPanel myParmPanel;
     private JLabel schedulingLabel;
     private JLabel cancellingLabel;
@@ -316,7 +322,7 @@ public class EdgeInspectorDialog extends JDialog {
                     priorityList.add((Priority) f.get(null)); // static objects
                     if (f.getName().equalsIgnoreCase("default")) {
                         priorityDefaultIndex = priorityNames.size() - 1;
-                    }  // save the default one
+                    } // save the default one
                 }
             }
             JComboBox jcb = new JComboBox(priorityNames);
@@ -329,8 +335,10 @@ public class EdgeInspectorDialog extends JDialog {
     }
 
     private void setPriorityCBValue(String pr) {
-        try {
-            // Assume numeric comes in
+            
+        // Assume numeric comes in, avoid NumberFormatException via Regex check
+        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, pr)) {
+
             double prd = Double.parseDouble(pr);
             for (Priority p : priorityList) {
                 int cmp = Double.compare(p.getPriority(), prd);
@@ -341,7 +349,7 @@ public class EdgeInspectorDialog extends JDialog {
             }
             // Must have been an odd one, but we know it's a good double
             priorityCB.setSelectedItem(pr);
-        } catch (NumberFormatException e) {
+        } else {
             // First try to find it in the list
             int i = 0;
             for (String s : priorityNames) {
@@ -420,18 +428,38 @@ public class EdgeInspectorDialog extends JDialog {
     private void unloadWidgets() {
         if (edge instanceof SchedulingEdge) {
             int idx = priorityCB.getSelectedIndex();
+            String s = null;
             if (idx < 0) {
-                String s = (String) priorityCB.getSelectedItem();
+                s = (String) priorityCB.getSelectedItem();
                 if (s.isEmpty()) {
-                    Priority p = priorityList.get(priorityDefaultIndex);
-                    ((SchedulingEdge) edge).priority = "" + p.getPriority();
+                    
+                    // Force default in this case (no information provided in EG)
+                    s = "DEFAULT";
                 } else {
-                    ((SchedulingEdge) edge).priority = s;
+                    if (s.contains("-3")) {
+                        s = "LOWEST";
+                    } else if (s.contains("-2")) {
+                        s = "LOWER";
+                    } else if (s.contains("-1")) {
+                        s = "LOW";
+                    } else if (s.contains("1")) {
+                        s = "HIGH";
+                    } else if (s.contains("2")) {
+                        s = "HIGHER";
+                    } else if (s.contains("3")) {
+                        s = "HIGHEST";
+                    } else {
+                        s = "DEFAULT";
+                    }                    
                 }
             } else {
-                Priority p = priorityList.get(priorityCB.getSelectedIndex());
-                ((SchedulingEdge) edge).priority = "" + p.getPriority();
+               Priority p = priorityList.get(idx);
+                
+                // Get the name of the Priority in this manner
+                s = p.toString().split("[\\ \\[]") [1];
             }
+            
+            ((SchedulingEdge) edge).priority = s;
         }
         String delaySt = delay.getText();
         edge.delay = (delaySt == null || delaySt.trim().isEmpty()) ? "0.0" : delay.getText();

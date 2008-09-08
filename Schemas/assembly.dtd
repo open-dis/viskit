@@ -1,4 +1,4 @@
-<!-- CVS ID: $Id$ -->
+<!-- CVS ID: $Id: assembly.dtd 2036 2008-08-21 18:01:17Z jmbailey $ -->
 <!ENTITY % DesignParameters "TerminalParameter">
 <!ENTITY % ValueRange "DoubleRange | IntegerRange">
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter">

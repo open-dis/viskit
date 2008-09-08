@@ -18,6 +18,7 @@ import javax.swing.*;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
@@ -25,6 +26,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
+import viskit.xsd.translator.SimkitXML2Java;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -119,7 +121,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 
         int ret = ((ViskitView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
-            VGlobals.instance().getAssemblyController().close();
+            VGlobals.instance().getAssemblyController().closeAll();
             ViskitConfig.instance().clearViskitConfig();
             VGlobals.instance().initProjectHome();
             VGlobals.instance().createWorkDirectory();            
@@ -139,7 +141,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         if (ret == JOptionPane.YES_OPTION) {
             int retv = jfc.showOpenDialog(egvf);
             if (retv == JFileChooser.APPROVE_OPTION) {
-                VGlobals.instance().getAssemblyController().close();
+                VGlobals.instance().getAssemblyController().closeAll();
                 ViskitConfig.instance().clearViskitConfig();
                 ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent();
                 ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -204,7 +206,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         switch (yn) {
             case JOptionPane.YES_OPTION:
                 save();
-                if (((Model) getModel()).isDirty()) {
+                if (((ViskitModel) getModel()).isDirty()) {
                     return false;
                 } // we cancelled
                 return true;
@@ -255,6 +257,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
         }
         if (mod.newModel(file) && !isOpenAlready) {
+            
+            // We found one or more simkit.Priority(s) with numeric values vice 
+            // eneumerations in the EG XML.  Modify and save the EG XML silently
+            if (mod.isNumericPriority()) {
+                save();
+                mod.setNumericPriority(false);
+            }
+            
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             adjustRecentList(file);
             fileWatchOpen(file);
@@ -265,6 +275,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     private static final int RECENTLISTSIZE = 15;
     private ArrayList<String> recentFileList;
 
+    /** TODO: This may be deprecated now due to below new method */
     public void openRecent() {
         ArrayList<String> v = getRecentFileList(true); // have a settings panel now ... false);
         if (v.size() <= 0) {
@@ -281,7 +292,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void openRecentEventGraph(String path) {
-      _doOpen(new File(path));
+        _doOpen(new File(path));
     }
     
     // Support for informing listeners about open eventgraphs
@@ -327,8 +338,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
         ViskitAssemblyView view = (ViskitAssemblyView) AssemblyController.inst.getView();
 
-        // not temporary, but use static method anyway
-        PkgAndFile paf = AssemblyController.createTemporaryEventGraphClass(f);
+        PkgAndFile paf = VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
         if (paf != null) {
             view.addToEventGraphPallette(f);
         } else {
@@ -733,15 +743,26 @@ public class EventGraphController extends mvcAbstractController implements Viski
         return true;
     }
 
-    public void generateJavaClass() {
-        File localLastFile = ((ViskitModel) getModel()).getLastFile();
+    public void generateJavaSource() {
+        ViskitModel mod = (ViskitModel) getModel();
+        File localLastFile = mod.getLastFile();
         if (!checkSave() || localLastFile == null) {
             return;
         }
-        String source = ((ViskitModel) getModel()).buildJavaSource();
+        
+        SimkitXML2Java x2j = null;
+        try {
+            x2j = new SimkitXML2Java(localLastFile);
+            x2j.unmarshal();        
+        } catch (FileNotFoundException fnfe) {
+            log.error(fnfe);
+        }
+        
+        String source = VGlobals.instance().getAssemblyController().buildJavaEventGraphSource(x2j);
         log.debug(source);
         if (source != null && source.length() > 0) {
-            String className = ((ViskitModel) getModel()).getMetaData().packageName + "." + ((ViskitModel) getModel()).getMetaData().name;
+            String className = mod.getMetaData().packageName + "." + 
+                    mod.getMetaData().name;
             ((ViskitView) getView()).showAndSaveSource(className, source, localLastFile.getName());
         }
     }

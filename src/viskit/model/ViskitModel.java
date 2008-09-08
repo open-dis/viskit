@@ -14,94 +14,102 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id$
  */
- public interface ViskitModel {
-    
-  /**
-   * Separate initialization from object construction.
-   */
-  void init();
+public interface ViskitModel {
 
-  /**
-   * Messaged by controller when a new Model should be loaded.
-   * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
-   * @return for good open
-   */
-  boolean newModel(File f);
+    /**
+     * Separate initialization from object construction.
+     */
+    void init();
 
-  /**
-   * Save existing model to specified file.  If null, save to last file.  If no last file, error.
-   * @param f File to save to.
-   */
-  void saveModel(File f);
+    /**
+     * Messaged by controller when a new Model should be loaded.
+     * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
+     * @return for good open
+     */
+    boolean newModel(File f);
 
-  /**
-   * @return A File object representing the last one passed to the two methods above.
-   */
-  File getLastFile();
-  
-  /**
-   * Reports saved state of model.  Becomes "clean" after a save.
-   * @return state of model
-   */
-  boolean isDirty();
+    /**
+     * Save existing model to specified file.  If null, save to last file.  If no last file, error.
+     * @param f File to save to.
+     */
+    void saveModel(File f);
 
-  /**
-   * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
-   * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
-   * @return Vector of EventNodes.
-   */
-  Vector<? extends ViskitElement> getAllNodes();
+    /**
+     * @return A File object representing the last one passed to the two methods above.
+     */
+    File getLastFile();
 
-  /**
-   * Messaged by controller to inst all defined StateVariables.
-   * @return Vector of StateVariables.
-   */
-  Vector<? extends ViskitElement> getStateVariables();
-  
-  /**
-   * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
-   * @return Vector of vParameter objects.
-   */
-  Vector<? extends ViskitElement> getSimParameters();
+    /**
+     * Reports saved state of model.  Becomes "clean" after a save.
+     * @return state of model
+     */
+    boolean isDirty();
 
+    /**
+     * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
+     * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
+     * @return Vector of EventNodes.
+     */
+    Vector<? extends ViskitElement> getAllNodes();
 
-  /**
-   * Message by the controller to create JavaSource from the model.
-   * @return The generated source as a String, or null if error.
-   */
-  String buildJavaSource();
+    /**
+     * Messaged by controller to inst all defined StateVariables.
+     * @return Vector of StateVariables.
+     */
+    Vector<? extends ViskitElement> getStateVariables();
 
-  // todo further comments...
-  void    newEvent      (String nodeName, Point p);
-  void    newEdge       (EventNode src, EventNode target);
-  void    newCancelEdge (EventNode src, EventNode target);
+    /**
+     * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
+     * @return Vector of vParameter objects.
+     */
+    Vector<? extends ViskitElement> getSimParameters();
 
-  void    deleteEvent      (EventNode node);
-  void    deleteEdge       (SchedulingEdge edge);
-   void    deleteCancelEdge (CancellingEdge edge);
+    // todo further comments...
+    void newEvent(String nodeName, Point p);
 
-   void    changeEdge       (SchedulingEdge e);
-   void    changeCancelEdge (CancellingEdge e);
-   void    changeMetaData   (GraphMetaData gmd);
-   boolean changeEvent      (EventNode en);
+    void newEdge(EventNode src, EventNode target);
 
-   void    newStateVariable    (String name, String type, String initVal, String comment);
-   void    newSimParameter     (String name, String type, String initVal, String comment);
-   boolean changeStateVariable (vStateVariable st);
-   boolean changeSimParameter  (vParameter p);
-   void    changeCodeBlock     (String s);
-   void    deleteStateVariable (vStateVariable sv);
-   void    deleteSimParameter  (vParameter p);
+    void newCancelEdge(EventNode src, EventNode target);
 
-   GraphMetaData getMetaData();
+    void deleteEvent(EventNode node);
 
-   void   setDirty (boolean dirty);
+    void deleteEdge(SchedulingEdge edge);
 
-   String generateLocalVariableName();
-   String generateIndexVariableName();
+    void deleteCancelEdge(CancellingEdge edge);
 
-   void   resetLVNameGenerator();
-   void   resetIdxNameGenerator();
-  
-   String generateStateVariableName();
+    void changeEdge(SchedulingEdge e);
+
+    void changeCancelEdge(CancellingEdge e);
+
+    void changeMetaData(GraphMetaData gmd);
+
+    boolean changeEvent(EventNode en);
+
+    void newStateVariable(String name, String type, String initVal, String comment);
+
+    void newSimParameter(String name, String type, String initVal, String comment);
+
+    boolean changeStateVariable(vStateVariable st);
+
+    boolean changeSimParameter(vParameter p);
+
+    void changeCodeBlock(String s);
+
+    void deleteStateVariable(vStateVariable sv);
+
+    void deleteSimParameter(vParameter p);
+
+    GraphMetaData getMetaData();
+
+    void setDirty(boolean dirty);
+
+    String generateLocalVariableName();
+
+    String generateIndexVariableName();
+
+    void resetLVNameGenerator();
+
+    void resetIdxNameGenerator();
+
+    String generateStateVariableName();
 }

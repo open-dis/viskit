@@ -25,7 +25,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-import viskit.AssemblyController;
+import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.Adapter;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
@@ -918,7 +918,7 @@ public class SimkitAssemblyXML2Java {
         // also write out the .java to a file and compile it
         // to a .class
         log.info("Generating Java Bytecode...");
-        if(AssemblyController.compileJavaClassFromString(dotJava) != null) {
+        if(VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
            log.info("Done.");   
         }
     }

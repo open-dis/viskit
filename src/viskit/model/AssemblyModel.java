@@ -19,6 +19,7 @@ import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
 import viskit.ViskitAssemblyController;
 import viskit.mvc.mvcAbstractModel;
+import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 
 /**
@@ -45,7 +46,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     /** We require specific order on this Map's contents */
     private Map<Object, AssemblyNode> nodeCache;
     private HashMap<Object, Object> assEdgeCache;
-    public static final String schemaLoc = "http://diana.nps.edu/Simkit/assembly.xsd";
+    private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point pointLess = new Point(100, 100);
     private ViskitAssemblyController controller;
 

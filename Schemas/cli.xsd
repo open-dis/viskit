@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="Config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Assembly"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="EventGraph"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ExtensionJar"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Assembly">
+    <xs:complexType>
+      <xs:attribute name="fileName" use="required"/>
+      <xs:attribute name="className" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EventGraph">
+    <xs:complexType>
+      <xs:attribute name="fileName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExtensionJar">
+    <xs:complexType>
+      <xs:attribute name="fileName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

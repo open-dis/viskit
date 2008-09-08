@@ -175,12 +175,15 @@
     <target name="build.schema"
             depends="build.init" 
             description="Create xsd Schemas from dtd">
-        <trang failonerror="true" input="${dir.src.simevg.util}/simkit.dtd" output="${dir.src.simevg.util}/simkit.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <trang failonerror="true" input="${dir.src.simasm.util}/assembly.dtd" output="${dir.src.simasm.util}/assembly.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <!-- useful for autogenerating stats schema and adding type validator -->
-        <!--trang failonerror="true" input="${dir.src.simasm.util}/statistics.dtd" output="${dir.src.simasm.util}/statistics.xsd" schemaIn="dtd" schemaOut="xsd"/>
-        <patch patchfile="${dir.src.simasm.util}/statistics.xsd.patch" originalfile="${dir.src.simasm.util}/statistics.xsd"/-->        
-        <trang failonerror="true" input="${dir.src.cli.util}/cli.dtd" output="${dir.src.cli.util}/cli.xsd" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
+        <trang failonerror="true" input="${assembly.dtd}" output="${assembly.xsd}" schemaIn="dtd" schemaOut="xsd"/>
+        
+	<!-- useful for autogenerating stats schema and adding type validator -->
+        <!--trang failonerror="true" input="${statistics.dtd}" output="${statistics.xsd}" schemaIn="dtd" schemaOut="xsd"/-->
+        
+	<!-- Requires GNU Patch on the %PATH% -->
+	<!--patch patchfile="${statistics.xsd.patch}" originalfile="${statistics.xsd}"/-->        
+        <trang failonerror="true" input="${cli.dtd}" output="${cli.xsd}" schemaIn="dtd" schemaOut="xsd"/>
     </target>
     
     <target name="bindings.simkit"
@@ -189,31 +192,31 @@
         
         <xjc extension="true" 
              package="viskit.xsd.bindings.eventgraph" 
-             schema="${dir.src.simevg.util}/simkit.xsd" 
+             schema="${simkit.xsd}" 
              destdir="${dir.src}">
             <produces dir="${dir.src.simevg}"/>
         </xjc>
         <xjc extension="true" 
              package="viskit.xsd.bindings.assembly" 
-             schema="${dir.src.simasm.util}/assembly.xsd" 
+             schema="${assembly.xsd}" 
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}"/>
         </xjc>
         <xjc extension="true" 
              package="viskit.xsd.bindings.assembly.stats" 
-             schema="${dir.src.simasm.util}/statistics.xsd" 
+             schema="${statistics.xsd}" 
              destdir="${dir.src}">
             <produces dir="${dir.src.simasm}/stats"/>
         </xjc>       
         <xjc extension="true" 
              package="viskit.xsd.bindings.cli" 
-             schema="${dir.src.cli.util}/cli.xsd" 
+             schema="${cli.xsd}" 
              destdir="${dir.src}">
             <produces dir="${dir.src.cli}"/>
         </xjc>
         <!--xjc extension="true"
                 package="viskit.xsd.bindings.sge.qstat" 
-                schema="${dir.src.sge.util}/qstat/qstat.xsd" 
+                schema="${qstat.xsd}" 
                 destdir="${dir.src}">
             <produces dir="${dir.src.sge.qstat}"/>
         </xjc-->
@@ -236,12 +239,8 @@
             </classpath>
             <src path="${dir.src.simevg}"/>
         </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/eventgraph">
-            <fileset dir="${dir.bindings}/eventgraph" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/eventgraph" includes="bgm.ser"/>
-        </copy>
         <javac destdir="${dir.build.classes}"
-               debug="on"
+               debug="off"
                source="1.5"
                target="1.5"
                includeAntRuntime="no">
@@ -252,12 +251,8 @@
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}"/>
         </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly">
-            <fileset dir="${dir.bindings}/assembly" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/assembly" includes="bgm.ser"/>
-        </copy>
         <javac destdir="${dir.build.classes}"
-               debug="on"
+               debug="off"
                source="1.5"
                target="1.5"
                includeAntRuntime="no">
@@ -268,12 +263,8 @@
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.simasm}/stats"/>
         </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/assembly/stats">
-            <fileset dir="${dir.bindings}/assembly/stats" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/assembly/stats" includes="bgm.ser"/>
-        </copy>
         <javac destdir="${dir.build.classes}"
-               debug="on"
+               debug="off"
                source="1.5"
                target="1.5"
                includeAntRuntime="no">
@@ -284,10 +275,6 @@
             <classpath refid="jaxb.classapth"/>
             <src path="${dir.src.cli}"/>
         </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/cli">
-            <fileset dir="${dir.bindings}/cli" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/cli" includes="bgm.ser"/>
-        </copy>
         <!--javac destdir="${dir.build.classes}"
             debug="on"
             source="1.5"
@@ -296,11 +283,7 @@
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
             <src path="${dir.src.sge.qstat}"/>
-        </javac>
-        <copy todir="${dir.build.classes}/viskit/xsd/bindings/sge/qstat">
-            <fileset dir="${dir.bindings}/sge/qstat" includes="jaxb.properties"/>
-            <fileset dir="${dir.bindings}/sge/qstat" includes="bgm.ser"/>
-        </copy-->
+        </javac-->
     </target>
     
     <target name="jar.stage1" depends="compile.bindings">
@@ -315,15 +298,14 @@
             depends="jar.stage1" 
             description="Build nps.edu.utils">
 
-        <javac destdir="${dir.build.classes}"
-               debug="true"
-               debugLevel="lines,vars,source"
+        <javac destdir="${dir.build.classes}"               
                source="1.5"
                target="1.5">
             
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
+	    <compilerarg value="${javac.debug}"/>
             <classpath>
                 <pathelement location="${log4j.jar}"/>
             </classpath>            
@@ -341,14 +323,13 @@
         <javac verbose="no" 
                destdir="${dir.build.classes}" 
                excludes="xsd/** */test/*"
-               debug="true"
-               debugLevel="lines,vars,source"
                source="1.5"
                target="1.5">
             
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
+	    <compilerarg value="${javac.debug}"/>
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -855,15 +836,11 @@
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions" 
-            depends="no.runtime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
+            depends="no.runtime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Build the installers with no runtime extensions">
-        <delete dir="${installer}/build"/>
         <mkdir dir="${installer}/build" />
-        <delete dir="${installer}/stage"/>
         <mkdir dir="${installer}/stage/lib"/>
-        <delete dir="${installer}/stage/images"/>
         <mkdir dir="${installer}/stage/images"/>
-        <delete dir="${installer}/stage/sources"/>
         <mkdir dir="${installer}/stage/sources"/>
         
         <copy todir="${installer}/stage/sources/Viskit">
@@ -871,7 +848,10 @@
                 <exclude name="${basedir}/viskit/xsd/bindings"/>
             </fileset>
         </copy>
-        <copy todir="${installer}/stage/images">
+        <copy todir="${installer}/stage/Schemas">
+            <fileset dir="${basedir}/Schemas"/>
+        </copy>
+	<copy todir="${installer}/stage/images">
             <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
@@ -908,7 +888,6 @@
         </copy>
         <copy todir="${installer}/stage">
             <fileset dir="${basedir}">
-                <include name="c_history_template.xml"/>
                 <include name="vconfig.xml"/>
                 <include name="c_app.xml"/>
                 <include name="c_gui.xml"/>
@@ -995,15 +974,11 @@
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions" 
-            depends="with.rutime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes"
+            depends="with.rutime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Builds the installers with runtime extension libraries included">
-        <delete dir="${installer}/build"/>
         <mkdir dir="${installer}/build" />
-        <delete dir="${installer}/stage"/>
         <mkdir dir="${installer}/stage/lib"/>
-        <delete dir="${installer}/stage/images"/>
         <mkdir dir="${installer}/stage/images"/>
-        <delete dir="${installer}/stage/sources"/>
         <mkdir dir="${installer}/stage/sources"/>
         
         <copy todir="${installer}/stage/sources/Viskit">
@@ -1014,7 +989,10 @@
         <copy todir="${installer}/stage/sources/DISKIT">
             <fileset dir="${basedir}/../DISKIT"/>
         </copy>
-        <copy todir="${installer}/stage/images">
+        <copy todir="${installer}/stage/Schemas">
+            <fileset dir="${basedir}/Schemas"/>
+        </copy>
+	<copy todir="${installer}/stage/images">
             <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
@@ -1054,7 +1032,6 @@
         </copy>
         <copy todir="${installer}/stage">
             <fileset dir="${basedir}">
-                <include name="c_history_template.xml"/>
                 <include name="vconfig.xml"/>
                 <include name="c_app.xml"/>
                 <include name="c_gui.xml"/>

@@ -107,6 +107,7 @@ public interface ViskitAssemblyController {
 
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
 
+    /** Generates Java source code from an Assembly file */
     void generateJavaSource();
 
     void compileAssemblyAndPrepSimRunner();

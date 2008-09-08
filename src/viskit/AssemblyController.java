@@ -26,6 +26,7 @@ import viskit.xsd.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.SimkitXML2Java;
 import viskit.util.Compiler;
+import viskit.util.XMLValidationTool;
 
 
 /**
@@ -63,14 +64,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             System.out.println("Initial file set: " + fil);
         }
         initialFile = fil;
-    }
-
-    /** @param assyPath an assembly file to compile */
-    public void compileAssembly(String assyPath) {
-        log.debug("Compiling assembly: " + assyPath);
-        File f = new File(assyPath);
-        _doOpen(f);
-        compileAssemblyAndPrepSimRunner();
     }
 
     /** Begin Viskit's initial state upon startup */
@@ -454,7 +447,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 n = n.substring(0, n.length() - 4);
             }
             gmd.name = n;
-
+            model.changeMetaData(gmd); // might have renamed
+            
             model.saveModel(saveFile);
             view.fileName(saveFile.getName());
             adjustRecentList(saveFile);
@@ -532,7 +526,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
-            close();
+            closeAll();
             ViskitConfig.instance().clearViskitConfig();
             VGlobals.instance().initProjectHome();
             VGlobals.instance().createWorkDirectory();
@@ -619,22 +613,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /** Clean up for closing Assembly models */
     public void postClose() {
-        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
+        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();        
+        ViskitAssemblyView view = (ViskitAssemblyView) getView();        
+        ViskitAssemblyModel[] modAr = view.getOpenModels();        
         
-        ViskitAssemblyView view = (ViskitAssemblyView) getView();
-        view.delTab(vmod);
-        if (view.getOpenModels().length == 0) {
+        if (modAr.length == 0) {
             return;
         }
 
-        // Close any currently open EGs because we don't yet know which ones
-        // to keep open until iterating through each remaining model
-        VGlobals.instance().getEventGraphEditor().controller.closeAll();
+        view.delTab(vmod);
                
         if (vmod.getLastFile() != null) {
             fileWatchClose(vmod.getLastFile());
         }
-        ViskitAssemblyModel[] modAr = ((ViskitAssemblyView) getView()).getOpenModels();
         
         // Keep the other Assembly's EGs open 
         if (!isCloseAll()) {
@@ -650,6 +641,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     
     private boolean closeAll = false;
     public void closeAll() {
+        
+        // Close any currently open EGs because we don't yet know which ones
+        // to keep open until iterating through each remaining model
+        VGlobals.instance().getEventGraphEditor().controller.closeAll();
         ViskitAssemblyModel[] modAr = ((ViskitAssemblyView) getView()).getOpenModels();
         for (ViskitAssemblyModel mod : modAr) {
             setModel((mvcModel) mod);                        
@@ -1159,33 +1154,41 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return true;
     }
 
-    /**
-     * 
-     */
     public void generateJavaSource() {
-        String source = produceJavaClass();
+        String source = produceJavaAssemblyClass();
+        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
         if (source != null && source.length() > 0) {
-            String className = ((ViskitAssemblyModel) getModel()).getMetaData().packageName + "." + ((ViskitAssemblyModel) getModel()).getMetaData().name;
+            String className = vmod.getMetaData().packageName + "." + vmod.getMetaData().name;
             ((ViskitAssemblyView) getView()).showAndSaveSource(className, source);
         }
     }
 
-    private String produceJavaClass() {
+    private String produceJavaAssemblyClass() {
         
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
         if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
             return null;
         }
-        return buildJavaAssemblySource(((ViskitAssemblyModel) getModel()).getLastFile());
+        return buildJavaAssemblySource(vmod.getLastFile());
     }
-
-    // above are routines to operate on current assembly
+ 
     /**
-     * 
-     * @param f
-     * @return
+     * Build the actual source code from the Assembly XML
+     * @param f the Assembly file to produce source from
+     * @return a string of Assembly source code
      */
-    public static String buildJavaAssemblySource(File f) {
+    public String buildJavaAssemblySource(File f) {
+        // Must validate XML first and handle any errors before compiling
+        XMLValidationTool xvt = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
+        
+        if ((xvt == null) || !xvt.isValidXML()) {
+
+            // TODO: implement a Dialog pointing to the validationErrors.log
+            return null;
+        } else {
+            log.info(f + " is valid XML");
+        }
+
         SimkitAssemblyXML2Java x2j = null;
         try {
             x2j = new SimkitAssemblyXML2Java(f);
@@ -1196,21 +1199,35 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return x2j.translate();
     }
 
+    // NOTE: above are routines to operate on current assembly
+   
     /**
-     * 
-     * @param x2j
-     * @return
+     * Build the actual source code from the Event Graph XML
+     * @param x2j the Event Graph initialized translator to produce source with
+     * @return a string of Event Graph source code
      */
-    public static String buildJavaEventGraphSource(SimkitXML2Java x2j) {
-        try {
-            return x2j.translate();
-        } catch (Exception e) {
-            if (viskit.Vstatics.debug) {
-                e.printStackTrace();
-            }
-            log.error("Error building Java from " + x2j.getFileBaseName() + ": " + e.getMessage() + ", erroneous event-graph xml found");
+    public String buildJavaEventGraphSource(SimkitXML2Java x2j) {
+        String eventGraphSource = null;
+        
+        // Must validate XML first and handle any errors before compiling
+        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(), 
+                new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
+        
+        if ((xvt == null) || !xvt.isValidXML()) {
+
+            // TODO: implement a Dialog pointing to the validationErrors.log
+            return null;
+        } else {
+            log.info(x2j.getEventGraphFile() + " is valid XML");
         }
-        return null;
+        
+        try {
+            eventGraphSource = x2j.translate();
+        } catch (Exception e) {
+            log.error("Error building Java from " + x2j.getFileBaseName() + 
+                    ": " + e.getMessage() + ", erroneous event-graph xml found");
+        }
+        return eventGraphSource;
     }   
     
     /** Create and test compile our EventGraphs and Assemblies from XML
@@ -1218,7 +1235,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to *.class files of our compiled sources
      */
-    public static File compileJavaClassFromString(String src) {
+    public File compileJavaClassFromString(String src) {
         String baseName = null;
 
         // Find the package subdirectory
@@ -1293,11 +1310,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     /**
-     * Know path for EventGraph compilation
+     * Known path for EventGraph compilation
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    static PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
+    public PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
         try {
             SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
             x2j.unmarshal();
@@ -1330,7 +1347,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param source the raw source to write to file
      * @return a package and file pair
      */
-    static PkgAndFile compileJavaClassAndSetPackage(String source) {
+    public PkgAndFile compileJavaClassAndSetPackage(String source) {
         String pkg = null;
         if (source != null && source.length() > 0) {
             Pattern p = Pattern.compile("package.*;");
@@ -1373,7 +1390,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /** Known path for Assy compilation */
     public void initAssemblyRun() {
-        String src = produceJavaClass(); // asks to save
+        String src = produceJavaAssemblyClass(); // asks to save
 
         PkgAndFile paf = compileJavaClassAndSetPackage(src);
         if (paf != null) {
@@ -1622,9 +1639,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private static final int RECENTLISTSIZE = 15;
     private ArrayList<String> recentFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
 
-    /**
-     * 
-     */
+    /** TODO: This may be deprecated now due to below new method */
     public void openRecent() {
 
         ArrayList<String> v = getRecentFileList(true); // have a settings panel now...false);
@@ -1769,6 +1784,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return historyConfig;
     }
 }
+
 class PkgAndFile {
 
     String pkg;

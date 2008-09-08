@@ -19,13 +19,14 @@ import javax.xml.bind.Unmarshaller;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import viskit.ModelEvent;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
+import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.bindings.eventgraph.Event;
-import viskit.xsd.translator.SimkitXML2Java;
 
 /**
  * This is the "master" model of an event graph.  It should hold the node, edge and assembly
@@ -44,22 +45,22 @@ import viskit.xsd.translator.SimkitXML2Java;
 public class Model extends mvcAbstractModel implements ViskitModel {
 
     static Logger log = Logger.getLogger(Model.class);
-    
     JAXBContext jc;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
     File currentFile;
-    public static final String schemaLoc = "http://diana.nps.edu/Simkit/simkit.xsd";
     HashMap<Event, EventNode> evNodeCache = new HashMap<Event, EventNode>();
     HashMap<Object, Object> edgeCache = new HashMap<Object, Object>();
     Vector<ViskitElement> stateVariables = new Vector<ViskitElement>();
     Vector<ViskitElement> simParameters = new Vector<ViskitElement>();
+    private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;    
     private String privateIdxVarPrefix = "_idxvar_";
     private String privateLocVarPrefix = "locvar_";
     private String stateVarPrefix = "state_";
     private GraphMetaData metaData;
     private ViskitController controller;
     private boolean modelDirty = false;
+    private boolean numericPriority;
     
     public Model(ViskitController controller) {
         this.controller = controller;        
@@ -221,12 +222,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                     "\n" + f.getName() +
                     "\n" + e.getMessage(),
                     "XML I/O Error", JOptionPane.ERROR_MESSAGE);
-            return;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage(),
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 
@@ -329,6 +328,15 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         return true;
     }
 
+    /** @return true if a simkit.Priority was found to have a numeric value */
+    public boolean isNumericPriority() {
+        return numericPriority;
+    }
+    
+    public void setNumericPriority(boolean b) {
+        numericPriority = b;
+    }
+
     private boolean stateVarParamNameCheck() {
         HashSet<String> hs = new HashSet<String>(10);
         for (ViskitElement sv : stateVariables) {
@@ -422,8 +430,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
     
-    private SchedulingEdge buildScheduleEdgeFromJaxb(EventNode src, Schedule ed) {
+    private void buildScheduleEdgeFromJaxb(EventNode src, Schedule ed) {
         SchedulingEdge se = new SchedulingEdge();
+        String s = null;
         se.opaqueModelObject = ed;
 
         se.from = src;
@@ -432,8 +441,42 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         src.getConnections().add(se);
         target.getConnections().add(se);
-        se.conditional = ed.getCondition();
-        se.priority = ed.getPriority();
+        se.conditional = ed.getCondition();        
+        
+        // Attempt to avoid NumberFormatException thrown on Double.parseDouble(String s)
+        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ed.getPriority())) {
+            s = ed.getPriority();
+            
+            setNumericPriority(true);
+            
+            // We have a FP number
+            // TODO: Deal with LOWEST or HIGHEST values containing exponents, i.e. (+/-) 1.06E8
+            if (s.contains("-3")) {
+                s = "LOWEST";
+            } else if (s.contains("-2")) {
+                s = "LOWER";
+            } else if (s.contains("-1")) {
+                s = "LOW";
+            } else if (s.contains("1")) {
+                s = "HIGH";
+            } else if (s.contains("2")) {
+                s = "HIGHER";
+            } else if (s.contains("3")) {
+                s = "HIGHEST";
+            } else {
+                s = "DEFAULT";
+            }
+        } else {
+
+            // We have an enumeration String
+            s = ed.getPriority();
+        }
+
+        se.priority = s;
+        
+        // Now set the JAXB Schedule to record the Priority enumeration to overwrite
+        // numeric Priority values
+        ed.setPriority(se.priority);
 
         List<String> cmt = ed.getComment();
         if (!cmt.isEmpty()) {
@@ -452,11 +495,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         setDirty(true);
 
         this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
-
-        return se;
     }
 
-    private CancellingEdge buildCancelEdgeFromJaxb(EventNode src, Cancel ed) {
+    private void buildCancelEdgeFromJaxb(EventNode src, Cancel ed) {
         CancellingEdge ce = new CancellingEdge();
         ce.opaqueModelObject = ed;
         ce.conditional = ed.getCondition();
@@ -484,7 +525,6 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         setDirty(true);
 
         notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Cancelling edge added"));
-        return ce;
     }
 
     private ArrayList<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
@@ -561,19 +601,6 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     @SuppressWarnings("unchecked")
     public Vector<ViskitElement> getSimParameters() {
         return (Vector<ViskitElement>) simParameters.clone();
-    }
-
-    // Source building
-    // ---------------
-    public String buildJavaSource() {
-        try {
-            SimkitXML2Java x2j = new SimkitXML2Java(currentFile);
-            x2j.unmarshal();
-            return x2j.translate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     // parameter mods
@@ -940,7 +967,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             se.parameters = edgeParameters;
         }
 
-        se.priority = "" + simkit.Priority.DEFAULT.getPriority();  // set default
+        se.priority = "DEFAULT";  // set default
 
         this.edgeCache.put(sch, se);
         setDirty(true);
@@ -1057,5 +1084,5 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             }
         }
         return s;
-    }
+    }    
 }

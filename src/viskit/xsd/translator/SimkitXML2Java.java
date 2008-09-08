@@ -21,7 +21,7 @@ import javax.xml.bind.Unmarshaller;
 // Application specific imports
 import viskit.xsd.bindings.eventgraph.*;
 import org.apache.log4j.Logger;
-import viskit.AssemblyController;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -57,6 +57,7 @@ public class SimkitXML2Java {
     
     private String extend = "";
     private String className = "";
+    private File eventGraphFile;
 
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
@@ -88,10 +89,10 @@ public class SimkitXML2Java {
         fileInputStream = stream;        
     }
 
-    public SimkitXML2Java(File f) throws Exception {
-        this();
+    public SimkitXML2Java(File f) throws FileNotFoundException {
+        this(new FileInputStream(f));
         fileBaseName = baseNameOf(f.getName());
-        fileInputStream = new FileInputStream(f);
+        setEventGraphFile(f);
     }
 
     public void unmarshal() {        
@@ -584,7 +585,7 @@ public class SimkitXML2Java {
             StateVariable sv = (StateVariable) st.getState();
             pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
             
-            // Give these FPC "getters" as argements
+            // Give these FPC "getters" as arguments
             String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
             String stateVariableGetter = "get" + stateVariableName + lp + rp;
             pw.println(cm + sp + stateVariableGetter + rp + sc);
@@ -753,27 +754,9 @@ public class SimkitXML2Java {
         // tags should be permitted:
         // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
         // however, historically these could be numbers.
-        // check if Number, assign TAG; tbd how these are scaled?
         
-        // Bugfix 1400
-        String pri = "";
-        if (s.getPriority().contains("-3")) {
-            pri = "LOWEST";
-        } else if (s.getPriority().contains("-2")) {
-            pri = "LOWER";
-        } else if (s.getPriority().contains("-1")) {
-            pri = "LOW";
-        } else if (s.getPriority().contains("1")) {
-            pri = "HIGH";
-        } else if (s.getPriority().contains("2")) {
-            pri = "HIGHER";
-        } else if (s.getPriority().contains("3")) {
-            pri = "HIGHEST";
-        } else {
-            pri = "DEFAULT";
-        }
-
-        pw.print(s.getDelay() + cm + " Priority" + pd + pri);
+        // Bugfix 1400: These should now be eneumerations instead of FP values
+        pw.print(s.getDelay() + cm + " Priority" + pd + s.getPriority());
         
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
@@ -852,6 +835,12 @@ public class SimkitXML2Java {
         return (type.contains("<") && type.contains(">"));
     }
 
+    public File getEventGraphFile() {return eventGraphFile;}
+    
+    public void setEventGraphFile(File f) {
+        eventGraphFile = f;
+    }
+    
     private String stripLength(String s) {
         int left, right;
         if (!isArray(s)) {
@@ -1032,7 +1021,7 @@ public class SimkitXML2Java {
         // also write out the .java to a file and compile it
         // to a .class
         log.info("Generating Java Bytecode...");
-        if(AssemblyController.compileJavaClassFromString(dotJava) != null) {
+        if (VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
            log.info("Done.");   
         }
     }
