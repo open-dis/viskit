@@ -28,6 +28,7 @@ public class SchedulingEdge extends Edge {
              "[+-]?(" +          // Optional sign character
              "NaN|" +            // "NaN" string
              "Infinity|" +       // "Infinity" string
+             DIGITS + "|" +      // Lone integers
 
              // A decimal floating-point string representing a finite positive
              // number without a leading sign has at most five basic pieces:
