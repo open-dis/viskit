@@ -612,9 +612,9 @@ public class SimkitAssemblyXML2Java {
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
             
-            if ( "replicationStats".equals(pclMode) ) {
+            if ("replicationStat".equals(pclMode) ) {
                 replicationStats.put(pcl.getName(), pcl);
-            } else if ( "designPointStats".equals(pclMode) ) {
+            } else if ("designPointStat".equals(pclMode) ) {
                 designPointStats.put(pcl.getName(), pcl);
             } else {
                 propertyChangeListeners.put(pcl.getName(), pcl);

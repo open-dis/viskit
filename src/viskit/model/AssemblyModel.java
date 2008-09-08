@@ -461,9 +461,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         if (pclNode.isSampleStats()) {
             if (pclNode.isClearStatsAfterEachRun()) {
-                jaxBPcl.setMode("replicationStats");
+                jaxBPcl.setMode("replicationStat");
             } else {
-                jaxBPcl.setMode("designPointStats");
+                jaxBPcl.setMode("designPointStat");
             }
         }
         
