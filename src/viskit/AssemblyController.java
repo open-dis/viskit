@@ -1218,7 +1218,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             // TODO: implement a Dialog pointing to the validationErrors.log
             return null;
         } else {
-            log.info(x2j.getEventGraphFile() + " is valid XML");
+            log.info(x2j.getEventGraphFile() + " is valid XML\n");
         }
         
         try {
