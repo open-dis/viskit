@@ -617,6 +617,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         ViskitAssemblyView view = (ViskitAssemblyView) getView();        
         ViskitAssemblyModel[] modAr = view.getOpenModels();        
         
+        // Close any currently open EGs because we don't yet know which ones
+        // to keep open until iterating through each remaining model
+        VGlobals.instance().getEventGraphEditor().controller.closeAll();
+        
         if (modAr.length == 0) {
             return;
         }
@@ -645,6 +649,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         // Close any currently open EGs because we don't yet know which ones
         // to keep open until iterating through each remaining model
         VGlobals.instance().getEventGraphEditor().controller.closeAll();
+        
         ViskitAssemblyModel[] modAr = ((ViskitAssemblyView) getView()).getOpenModels();
         for (ViskitAssemblyModel mod : modAr) {
             setModel((mvcModel) mod);                        
@@ -1212,7 +1217,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         // Must validate XML first and handle any errors before compiling
         XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(), 
                 new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
-        
+
         if ((xvt == null) || !xvt.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.log
@@ -1220,7 +1225,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         } else {
             log.info(x2j.getEventGraphFile() + " is valid XML\n");
         }
-        
+
         try {
             eventGraphSource = x2j.translate();
         } catch (Exception e) {
@@ -1337,7 +1342,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             FileBasedClassManager.instance().addCache(xmlFile, paf.f);
             return paf;
         } catch (Exception e) {
-            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
+            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
         return null;

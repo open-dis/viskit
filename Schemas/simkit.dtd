@@ -49,7 +49,6 @@
         description CDATA       #IMPLIED
 >
 
-
 <!ELEMENT Event	( Comment*, Argument*, LocalVariable*, StateTransition*, (Schedule|Cancel)*, Code?, Coordinate? ) >
 <!ATTLIST Event
 	name	    ID	        #REQUIRED

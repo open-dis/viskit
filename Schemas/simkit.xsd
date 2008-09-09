@@ -75,7 +75,7 @@
       <xs:attribute name="value"/>
       <xs:attribute name="description"/>
     </xs:complexType>
-  </xs:element>
+  </xs:element>  
   <xs:element name="Event">
     <xs:complexType>
       <xs:sequence>

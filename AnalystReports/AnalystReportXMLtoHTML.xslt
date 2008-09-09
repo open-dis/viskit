@@ -442,7 +442,7 @@
             </a>
         </b>
         <!--  TODO:  add uniquely identifying information for this header -->
-        <table border="1" width="75%" cellpadding="0" cellspacing="1">
+        <table border="1" width="95%" cellpadding="0" cellspacing="1">
 
             <!-- Classification Values -->
             <xsl:for-each select="Classification">
