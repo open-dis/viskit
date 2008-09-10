@@ -1,13 +1,5 @@
 <!ELEMENT SimEntity ( head?, Comment*, Parameter*, StateVariable*, Event*, Code? ) >
 
-<!ELEMENT head (meta*) >
-
-<!ELEMENT meta EMPTY >
-<!ATTLIST meta
-	name        CDATA       #REQUIRED
-	content     CDATA       #IMPLIED
->
-
 <!ATTLIST SimEntity
         name        CDATA       #REQUIRED
         package     CDATA       "examples"
@@ -18,34 +10,27 @@
         description CDATA       #IMPLIED
 >
 
+<!ELEMENT head (meta*) >
+
+<!ELEMENT meta EMPTY >
+<!ATTLIST meta
+	name        CDATA       #REQUIRED
+	content     CDATA       #IMPLIED
+>
+
 <!ELEMENT Comment ( #PCDATA ) >
-
-<!ELEMENT StateVariable  ( Comment*, Code* ) >
-<!ATTLIST StateVariable
-	type        CDATA	#REQUIRED
-	name        ID  	#REQUIRED
-        description CDATA       #IMPLIED
->
-
-<!ELEMENT Argument ( Comment )* >
-<!ATTLIST Argument
-	type	    CDATA	#REQUIRED
-        name        ID          #REQUIRED
-        description CDATA       #IMPLIED
->
 
 <!ELEMENT Parameter ( Comment )* >
 <!ATTLIST Parameter
-	type        CDATA	#REQUIRED
 	name        ID  	#REQUIRED
+	type        CDATA	#REQUIRED
         description CDATA       #IMPLIED
 >
 
-<!ELEMENT LocalVariable ( Comment*, Code* ) >
-<!ATTLIST LocalVariable
-        type        CDATA       #REQUIRED
-        name        ID          #REQUIRED
-        value       CDATA       #IMPLIED
+<!ELEMENT StateVariable  ( Comment*, Code* ) >
+<!ATTLIST StateVariable
+	name        ID  	#REQUIRED
+	type        CDATA	#REQUIRED
         description CDATA       #IMPLIED
 >
 
@@ -56,6 +41,21 @@
 >
 
 <!ELEMENT Code (#PCDATA) >
+
+<!ELEMENT Argument ( Comment )* >
+<!ATTLIST Argument
+        name        NMTOKEN     #REQUIRED
+	type	    CDATA	#REQUIRED
+	description CDATA       #IMPLIED
+>
+
+<!ELEMENT LocalVariable ( Comment*, Code* ) >
+<!ATTLIST LocalVariable
+        name        NMTOKEN     #REQUIRED
+        type        CDATA       #REQUIRED
+        value       CDATA       #IMPLIED
+        description CDATA       #IMPLIED
+>
 
 <!ELEMENT Coordinate EMPTY >
 <!ATTLIST Coordinate
@@ -75,7 +75,7 @@
         description CDATA       #IMPLIED
 >
 
-<!-- bux fix 1183 -->	
+<!-- bux fix 1183 -->
 <!ELEMENT StateTransition (( Assignment|Operation ),Code*) >
 <!ATTLIST StateTransition
         state       IDREF       #REQUIRED

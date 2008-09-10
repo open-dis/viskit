@@ -33,49 +33,27 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="Comment" type="xs:string"/>
+  <xs:element name="Parameter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="description"/>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="StateVariable">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
       </xs:sequence>
-      <xs:attribute name="type" use="required"/>
       <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="type" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="Argument">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-      </xs:sequence>
-      <xs:attribute name="type" use="required"/>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
-      <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Parameter">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-      </xs:sequence>
-      <xs:attribute name="type" use="required"/>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
-      <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="LocalVariable">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
-      </xs:sequence>
-      <xs:attribute name="type" use="required"/>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
-      <xs:attribute name="value"/>
-      <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>  
   <xs:element name="Event">
     <xs:complexType>
       <xs:sequence>
@@ -95,6 +73,28 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="Code" type="xs:string"/>
+  <xs:element name="Argument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="description"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LocalVariable">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="value"/>
+      <xs:attribute name="description"/>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Coordinate">
     <xs:complexType>
       <xs:attribute name="x" use="required"/>
