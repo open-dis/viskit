@@ -24,9 +24,9 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" ref="head"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEntity"/>
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="DesignParameters"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EventGraph"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEntity"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="PropertyChangeListener"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEventListenerConnection"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="PropertyChangeListenerConnection"/>
@@ -53,6 +53,18 @@
     <xs:complexType>
       <xs:attribute name="name" use="required"/>
       <xs:attribute name="content"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SimEntity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
+        <xs:element minOccurs="0" ref="Coordinate"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="url"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="TerminalParameter">
@@ -91,26 +103,14 @@
       <xs:attribute name="y" use="required"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SimEntity">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
-        <xs:element minOccurs="0" ref="Coordinate"/>
-      </xs:sequence>
-      <xs:attribute name="type" use="required"/>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
-      <xs:attribute name="url"/>
-      <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="PropertyChangeListener">
     <xs:complexType>
       <xs:sequence>
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="type" use="required"/>
       <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="type" use="required"/>
       <xs:attribute name="mode" default="listener">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -141,16 +141,16 @@
   </xs:element>
   <xs:element name="SimEventListenerConnection">
     <xs:complexType>
-      <xs:attribute name="listener" use="required" type="xs:IDREF"/>
-      <xs:attribute name="source" use="required" type="xs:IDREF"/>
+      <xs:attribute name="listener" use="required"/>
+      <xs:attribute name="source" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PropertyChangeListenerConnection">
     <xs:complexType>
       <xs:attribute name="property"/>
-      <xs:attribute name="listener" use="required" type="xs:IDREF"/>
-      <xs:attribute name="source" use="required" type="xs:IDREF"/>
+      <xs:attribute name="listener" use="required"/>
+      <xs:attribute name="source" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -228,6 +228,7 @@
   </xs:element>
   <xs:element name="SampleStatistics" substitutionGroup="Statistics">
     <xs:complexType>
+      <xs:attribute name="name"/>
       <xs:attribute name="mean" default="0.0"/>
       <xs:attribute name="variance" default="0.0"/>
       <xs:attribute name="standardDeviation" default="0.0"/>
@@ -243,7 +244,6 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="name"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IndexedSampleStatistics" substitutionGroup="Statistics">

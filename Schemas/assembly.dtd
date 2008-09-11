@@ -4,20 +4,28 @@
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter">
 <!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics">
 
-<!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, EventGraph*, SimEntity*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
+<!ELEMENT SimkitAssembly (head?, SimEntity*, (%DesignParameters;)*, EventGraph*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
 <!ATTLIST SimkitAssembly
-	name 	ID      #REQUIRED
-	version	CDATA	"1.0"
-	package CDATA   #REQUIRED
-        extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
+    name    ID      #REQUIRED
+    version CDATA   "1.0"
+    package CDATA   #REQUIRED
+    extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
 >
 
 <!ELEMENT head (meta*)>
 
 <!ELEMENT meta EMPTY>
 <!ATTLIST meta
-    name CDATA #REQUIRED
+    name    CDATA #REQUIRED
     content CDATA #IMPLIED
+>
+
+<!ELEMENT SimEntity ((%Parameters;)*, (Coordinate?))>
+<!ATTLIST SimEntity
+    name	CDATA #REQUIRED
+    type	CDATA #REQUIRED
+    url		CDATA #IMPLIED
+    description CDATA #IMPLIED
 >
 
 <!ELEMENT TerminalParameter (%ValueRange;)?>
@@ -57,22 +65,14 @@
 
 <!ELEMENT Coordinate EMPTY>
 <!ATTLIST Coordinate
-        x       CDATA   #REQUIRED
-        y       CDATA   #REQUIRED
->
-
-<!ELEMENT SimEntity ((%Parameters;)*, (Coordinate?))>
-<!ATTLIST SimEntity
-    type CDATA #REQUIRED
-    name ID    #REQUIRED
-    url  CDATA #IMPLIED
-    description CDATA #IMPLIED
+    x       CDATA #REQUIRED
+    y       CDATA #REQUIRED
 >
 
 <!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?))>
 <!ATTLIST PropertyChangeListener
-    type CDATA #REQUIRED
     name ID    #REQUIRED
+    type CDATA #REQUIRED
     mode (replicationStat|designPointStat|listener) "listener"
     meanStatistics (true|false) "false"
     countStatistics (true|false) "true"
@@ -81,16 +81,16 @@
 
 <!ELEMENT SimEventListenerConnection EMPTY>
 <!ATTLIST SimEventListenerConnection
-    listener IDREF #REQUIRED
-    source   IDREF #REQUIRED
+    listener	CDATA #REQUIRED
+    source	CDATA #REQUIRED
     description CDATA #IMPLIED
 >
 
 <!ELEMENT PropertyChangeListenerConnection EMPTY>
 <!ATTLIST PropertyChangeListenerConnection
-    property CDATA #IMPLIED
-    listener IDREF #REQUIRED
-    source   IDREF #REQUIRED
+    property	CDATA #IMPLIED
+    listener	CDATA #REQUIRED
+    source	CDATA #REQUIRED
     description CDATA #IMPLIED
 >
 
@@ -116,11 +116,11 @@
 
 <!ELEMENT Adapter (Coordinate?)>
 <!ATTLIST Adapter
-    name    CDATA    #REQUIRED
-    eventHeard CDATA #REQUIRED
-    eventSent  CDATA #REQUIRED
-    from    IDREF    #REQUIRED
-    to      IDREF    #REQUIRED
+    name	CDATA #REQUIRED
+    eventHeard  CDATA #REQUIRED
+    eventSent   CDATA #REQUIRED
+    from	IDREF #REQUIRED
+    to		IDREF #REQUIRED
     description CDATA #IMPLIED
 >
 
@@ -131,11 +131,12 @@
 <!ELEMENT PropertyChange (%Statistics;)*>
 <!ATTLIST PropertyChange
     listenerName CDATA #REQUIRED
-    property CDATA #IMPLIED
+    property	 CDATA #IMPLIED
 >
 
 <!ELEMENT SampleStatistics EMPTY>
 <!ATTLIST SampleStatistics
+    name CDATA #IMPLIED
     mean CDATA "0.0"
     variance CDATA "0.0"
     standardDeviation CDATA "0.0"
@@ -143,7 +144,6 @@
     minObs CDATA "0.0"
     maxObs CDATA "0.0"
     samplingType (TALLY|TIME_VARYING|LINEAR) "TALLY"
-    name CDATA #IMPLIED
 >
 
 <!ELEMENT IndexedSampleStatistics (SampleStatistics)*>
