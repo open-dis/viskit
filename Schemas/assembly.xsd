@@ -24,8 +24,8 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" ref="head"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEntity"/>
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="DesignParameters"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEntity"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EventGraph"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="PropertyChangeListener"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEventListenerConnection"/>
@@ -156,7 +156,7 @@
   </xs:element>
   <xs:element name="Output">
     <xs:complexType>
-      <xs:attribute name="entity" use="required" type="xs:IDREF"/>
+      <xs:attribute name="entity" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Verbose">
@@ -210,8 +210,8 @@
       <xs:attribute name="name" use="required"/>
       <xs:attribute name="eventHeard" use="required"/>
       <xs:attribute name="eventSent" use="required"/>
-      <xs:attribute name="from" use="required" type="xs:IDREF"/>
-      <xs:attribute name="to" use="required" type="xs:IDREF"/>
+      <xs:attribute name="from" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="to" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>

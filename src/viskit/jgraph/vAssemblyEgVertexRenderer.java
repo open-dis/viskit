@@ -8,6 +8,8 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
+import viskit.VGlobals;
+import viskit.model.AssemblyNode;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -210,7 +212,7 @@ public class vAssemblyEgVertexRenderer
         try {
             //if (preview && !isDoubleBuffered)
             //	setOpaque(false);
-            super.paint(g);   // jmb this will come down to paintCompoent
+            super.paint(g);   // jmb this will come down to paintComponent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
         // JDK Bug: Zero length string passed to TextLayout constructor
@@ -235,7 +237,9 @@ public class vAssemblyEgVertexRenderer
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
-        String nm = cell.getUserObject().toString();
+        
+        // Use the getName method instead of toString
+        String nm = ((AssemblyNode) cell.getUserObject()).getName();
         FontMetrics metrics = g2.getFontMetrics();
         nm = breakName(nm, 50, metrics);
         String[] lns = nm.split("\n");       // handle multi-line titles
@@ -290,7 +294,7 @@ public class vAssemblyEgVertexRenderer
             v.add(nuts[0]);
         } while (nuts[1] != null);
         String[] ra = new String[v.size()];
-        ra = (String[]) v.toArray(ra);
+        ra = v.toArray(ra);
         return ra;
     }
 
@@ -383,8 +387,8 @@ public class vAssemblyEgVertexRenderer
         int y = bounds.y;
         int width = bounds.width;
         int height = bounds.height;
-        int xCenter = (int) (x + width / 2);
-        int yCenter = (int) (y + height / 2);
+        int xCenter = (x + width / 2);
+        int yCenter = (y + height / 2);
         int dx = p.x - xCenter; // Compute Angle
         int dy = p.y - yCenter;
         double alpha = Math.atan2(dy, dx);

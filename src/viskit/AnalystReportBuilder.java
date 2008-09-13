@@ -98,7 +98,7 @@ public class AnalystReportBuilder {
     private JPanel aRPanel;
 
     /** Must have the order of the PCL as input from AssemblyModel */
-    private Map<Object, AssemblyNode> pclNodeCache;
+    private Map<String, AssemblyNode> pclNodeCache;
 
     /** Build a default AnalystReport object */
     public AnalystReportBuilder() {
@@ -112,7 +112,7 @@ public class AnalystReportBuilder {
      *        used by this Analyst Report
      * @param map the set of PCLs that have specific properties set for type statistic desired
      */
-    public AnalystReportBuilder(String statisticsReportPath, Map<Object, AssemblyNode> map) {
+    public AnalystReportBuilder(String statisticsReportPath, Map<String, AssemblyNode> map) {
         try {
             Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
             setStatsReportPath(statisticsReportPath);
@@ -675,27 +675,28 @@ public class AnalystReportBuilder {
             List<Element> dataPoints = simEntity.getChildren("DataPoint");
             for (Element dataPoint : dataPoints) {
                 String dataPointProperty = dataPoint.getAttributeValue("property");
-                for (Object node : getPclNodeCache().keySet()) {
-                    if (node.toString().contains("PropertyChangeListener")) {
-                        Object obj = getPclNodeCache().get(node);
-                            if (obj.toString().contains(dataPointProperty)) {
-                            try {
-                                log.debug("AR obj is: " + obj);
-                                isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                                typeStat = isCount ? "count" : "mean";
-                                log.debug("AR typeStat is: " + typeStat);
-                                break;
-                            } catch (IllegalAccessException ex) {
-                                log.error(ex);
-                            } catch (IllegalArgumentException ex) {
-                                log.error(ex);
-                            } catch (InvocationTargetException ex) {
-                                log.error(ex);
-                            } catch (NoSuchMethodException ex) {
-                                log.error(ex);
-                            } catch (SecurityException ex) {
-                                log.error(ex);
-                            }
+                for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+                    log.debug("entry is: " + entry);
+                    Object obj;
+                    if (entry.toString().contains("PropChangeListenerNode")) {
+
+                        obj = getPclNodeCache().get(entry.getKey());
+                        try {
+                            log.debug("AR obj is: " + obj);
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                            typeStat = isCount ? "count" : "mean";
+                            log.debug("AR typeStat is: " + typeStat);
+                            break;
+                        } catch (IllegalAccessException ex) {
+                            log.error(ex);
+                        } catch (IllegalArgumentException ex) {
+                            log.error(ex);
+                        } catch (InvocationTargetException ex) {
+                            log.error(ex);
+                        } catch (NoSuchMethodException ex) {
+                            log.error(ex);
+                        } catch (SecurityException ex) {
+                            log.error(ex);
                         }
                     }
                 }
@@ -1155,11 +1156,11 @@ public class AnalystReportBuilder {
     public List<Object> getStatsReplicationsList() {return unMakeReplicationList(statisticalResults);}
     public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults);}
 
-    public Map<Object, AssemblyNode> getPclNodeCache() {
+    public Map<String, AssemblyNode> getPclNodeCache() {
         return pclNodeCache;
     }
 
-    public void setPclNodeCache(Map<Object, AssemblyNode> pclNodeCache) {
+    public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
     }
 

@@ -447,8 +447,8 @@ public class SimkitAssemblyXML2Java {
         }
         
         for (SimEventListenerConnection sect : this.root.getSimEventListenerConnection()) {
-            pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + ((SimEntity) (sect.getListener())).getName() + qu);
-            pw.println(cm + qu + ((SimEntity) (sect.getSource())).getName() + qu + rp + sc);
+            pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + sect.getListener() + qu);
+            pw.println(cm + qu + sect.getSource() + qu + rp + sc);
         }
         
         if ( this.root.getAdapter().size() > 0 ) {
@@ -459,8 +459,8 @@ public class SimkitAssemblyXML2Java {
             pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm );
             pw.print(sp + qu + a.getEventHeard() + qu + cm );
             pw.print(sp + qu + a.getEventSent() + qu + cm );
-            pw.print(sp + qu + ((SimEntity) a.getFrom()).getName() + qu + cm );
-            pw.println(sp + qu + ((SimEntity) a.getTo()).getName() + qu + rp + sc );
+            pw.print(sp + qu + a.getFrom() + qu + cm );
+            pw.println(sp + qu + a.getTo() + qu + rp + sc );
         } 
         
         pw.println();
@@ -622,7 +622,7 @@ public class SimkitAssemblyXML2Java {
         }
                 
         for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
-            String name = ((PropertyChangeListener) pclc.getListener()).getName();
+            String name = pclc.getListener();
             ArrayList<PropertyChangeListenerConnection> connections = propertyChangeListenerConnections.get(name);
             if (connections == null) {
                 connections = new ArrayList<PropertyChangeListenerConnection>();
@@ -654,7 +654,7 @@ public class SimkitAssemblyXML2Java {
         for (String propChangeListener : propertyChangeListenerConnections.keySet()) {
             for (PropertyChangeListenerConnection pclc : propertyChangeListenerConnections.get(propChangeListener)) {
                 pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propChangeListener + qu + cm + qu + pclc.getProperty() + qu + cm);
-                pw.println(qu + ((SimEntity) pclc.getSource()).getName() + qu + rp + sc);
+                pw.println(qu + pclc.getSource() + qu + rp + sc);
                 pw.println();
             }
         }
@@ -689,7 +689,7 @@ public class SimkitAssemblyXML2Java {
             if (myConnections != null) {
                 for (PropertyChangeListenerConnection pclc : myConnections) {
                     pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + propChangeListener + qu + cm + qu + pclc.getProperty() + qu + cm);
-                    pw.println(qu + ((SimEntity) pclc.getSource()).getName() + qu + rp + sc);
+                    pw.println(qu + pclc.getSource() + qu + rp + sc);
                     pw.println();
                 }
             }

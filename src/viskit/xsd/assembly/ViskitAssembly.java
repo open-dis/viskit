@@ -31,10 +31,7 @@ public class ViskitAssembly extends BasicAssembly {
     private static boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
-    public ViskitAssembly() {}  
-    
-    @Override
-    public void createObjects() {
+    public ViskitAssembly() {
         entities = new LinkedHashMap<String, SimEntity>();
         replicationStatistics = new LinkedHashMap<String, PropertyChangeListener>();
         designPointStatistics = new LinkedHashMap<String, PropertyChangeListener>();
@@ -44,38 +41,63 @@ public class ViskitAssembly extends BasicAssembly {
         replicationStatsListenerConnections = new LinkedHashMap<String, LinkedList<PropertyConnector>>();
         simEventListenerConnections = new LinkedHashMap<String, LinkedList<String>>();
         adapters = new LinkedHashMap<String, Adapter>();
+    }  
+    
+    @Override
+    public void createObjects() {
         createSimEntities();
         createReplicationStats();
         createDesignPointStats();
         createPropertyChangeListeners();       
         
-        /**
-         * After all PCLs have been created pass the LHMap to the super so that the
+        /* After all PCLs have been created pass the LHMap to the super so that the
          * keys can be extracted for data output indexing. This method is used by 
          * the ReportStatisticsConfig.
          */
         setStatisticsKeyValues(replicationStatistics);
     }
     
-    @Override
-    public void performHookups() {
-        super.performHookups();
-    }
-    
-    public void hookupReplicationListeners() {        
-        String[] listeners = toArray(replicationStatsListenerConnections.keySet(), new String[0]);
-        for (String listener : listeners) {
-            LinkedList<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
-            if (repStatsConnects != null) {
-                for (PropertyConnector pc : repStatsConnects) {
-                    connectReplicationStats(listener, pc);
-                }
-            } else if (debug) {
-                log.info("No replicationListeners");
+    /** to be called after all entities have been added as a super() */
+    /*  note not using template version of ArrayList... */
+    protected void createSimEntities() {
+        if (entities != null) {
+            if (entities.values() != null) {
+                simEntity = toArray(entities.values(), new SimEntity[0]);
             }
         }
     }
     
+    protected void createReplicationStats() {
+        replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener sampleStats : replicationStats) {
+            log.debug(((SampleStatistics) sampleStats).getName() + " replicationStat created");
+        }
+    }
+    
+    @Override
+    protected void createDesignPointStats() {
+       
+        super.createDesignPointStats();
+
+        // the super.
+        for (SampleStatistics sampleStats : designPointStats) {
+//            log.debug(sampleStats.getName() + " designPointStat created");
+            designPointStatistics.put(sampleStats.getName(), sampleStats);
+        }
+    }
+    
+    protected void createPropertyChangeListeners() {
+        propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener pcl : propertyChangeListener) {
+            log.debug(pcl + " propertyChangeListener created");
+        }
+    }
+    
+    @Override
+    public void performHookups() {
+        super.performHookups();
+    }
+   
     public void hookupSimEventListeners() {
         String[] listeners = toArray(simEventListenerConnections.keySet(), new String[0]);
         if(debug) {
@@ -94,21 +116,20 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
-    @Override
-    protected void hookupPropertyChangeListeners() {
-        String[] listeners = toArray(propertyChangeListenerConnections.keySet(), new String[0]);
+     
+    public void hookupReplicationListeners() {        
+        String[] listeners = toArray(replicationStatsListenerConnections.keySet(), new String[0]);
         for (String listener : listeners) {
-            LinkedList<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
-            if (propertyConnects != null) {
-                for (PropertyConnector pc : propertyConnects) {
-                    connectPropertyChangeListener(listener, pc);
+            LinkedList<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
+            if (repStatsConnects != null) {
+                for (PropertyConnector pc : repStatsConnects) {
+                    connectReplicationStats(listener, pc);
                 }
             } else if (debug) {
-                log.info("No propertyConnectors");
+                log.info("No replicationListeners");
             }
         }
     }
-    
     @Override
     protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();
@@ -127,9 +148,24 @@ public class ViskitAssembly extends BasicAssembly {
         } else if ( debug ) {
             log.info("No external designPointListeners to add");
         }
+    }    
+   
+    @Override
+    protected void hookupPropertyChangeListeners() {
+        String[] listeners = toArray(propertyChangeListenerConnections.keySet(), new String[0]);
+        for (String listener : listeners) {
+            LinkedList<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
+            if (propertyConnects != null) {
+                for (PropertyConnector pc : propertyConnects) {
+                    connectPropertyChangeListener(listener, pc);
+                }
+            } else if (debug) {
+                log.info("No propertyConnectors");
+            }
+        }
     }
     
-    void connectSimEventListener(String listener, String source) {
+     void connectSimEventListener(String listener, String source) {
         getSimEntityByName(source).addSimEventListener(getSimEntityByName(listener));
     } 
     
@@ -187,50 +223,12 @@ public class ViskitAssembly extends BasicAssembly {
         }        
     }    
 
-    /** to be called after all entities have been added as a super() */
-    /*  note not using template version of ArrayList... */
-    protected void createSimEntities() {
-        if (entities != null) {
-            if (entities.values() != null) {
-                simEntity = toArray(entities.values(), new SimEntity[0]);
-            }
-        }
-    }
-    
-    @Override
-    protected void createDesignPointStats() {
-       
-        super.createDesignPointStats();
-
-        // the super.
-        for (SampleStatistics sampleStats : designPointStats) {
-//            log.debug(sampleStats.getName() + " designPointStat created");
-            designPointStatistics.put(sampleStats.getName(), sampleStats);
-        }
-    }
-    
-    @Override
-    protected void createReplicationStats() {
-        replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener sampleStats : replicationStats) {
-            log.debug(((SampleStatistics) sampleStats).getName() + " replicationStat created");
-        }
-    }
-    
-    @Override
-    protected void createPropertyChangeListeners() {
-        propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener pcl : propertyChangeListener) {
-            log.debug(pcl + " propertyChangeListener created");
-        }
-    }
-    
     public void addSimEntity(String name, SimEntity entity) {
         entity.setName(name);
         entities.put(name, entity);
         
         // TODO: This will throw an IllegalArgumentException?
-//        log.debug("ViskitAssembly addSimEntity " + entity);
+//        log.debug("entity is: " + entity);
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {

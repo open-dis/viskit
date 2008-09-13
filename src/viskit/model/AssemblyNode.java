@@ -3,6 +3,7 @@ package viskit.model;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.awt.Point;
+import viskit.VGlobals;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -30,28 +31,19 @@ public abstract class AssemblyNode extends ViskitElement {
         this.type = type;
         instantiator = new VInstantiator.FreeF(type, "");
     }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
+    
     public String getName() {
         return name;
     }
 
-    @Override
     public void setName(String s) {
         this.name = s;
     }
 
-    @Override
     public String getType() {
         return type;
     }
 
-    @Override
     public void setType(String typ) {
         this.type = typ;
     }

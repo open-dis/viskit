@@ -88,16 +88,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
-    
+
     /** Ordering is essential for this collection */
-    private Map<Object, AssemblyNode> pclNodeCache;
-    
+    private Map<String, AssemblyNode> pclNodeCache;
+
     /** where file gets written */
     private File analystReportFile;
-    
+
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = false;
-    
+
     /**
      * ***********************************************
      */
@@ -156,32 +156,34 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Create all the objects used.  This is called from the constructor.
-     * The <code>createSimEntities()</code> method is abstract and will
-     * be implemented in the concrete subclass.  The others are empty by
-     * default.  The <code>createReplicationStats()</code> method must be
-     * overridden if any replications stats are needed.
+     * Create all the objects used.  The <code>createSimEntities()</code> method
+     * is abstract and will be implemented in the concrete subclass.  The others
+     * are empty by default.  The <code>createReplicationStats()</code> method 
+     * must be overridden if any replications stats are needed.
      */
     protected void createObjects() {
+        log.info("I was called?");
         createSimEntities();
         createReplicationStats();
+        
+        // This is implemented in this class
         createDesignPointStats();
         createPropertyChangeListeners();
     }
 
-    /**
-     * Call all the hookup methods.
-     */
+    /** Call all the hookup methods */
     protected void performHookups() {
         hookupSimEventListeners();
         hookupReplicationListeners();
+                
+        // This is implemented in this class
         hookupDesignPointListeners();
         hookupPropertyChangeListeners();
         hookupsCalled = true;
     }
 
     /**
-     * Received the replicationStatistics Linked Hash Map from ViskitAssembly. This
+     * Received the replicationStatistics LinkedHashMap from ViskitAssembly. This
      * method extracts the key values and passes them to ReportStatisticsConfig. The
      * key set is in the order of the replication statistics object in this class.
      * The goal of this and related methods is to aid ReportStatisticsConfig in
@@ -192,9 +194,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * ReportStatistics config uses the underscore to extract the entity name
      * from the key values of the LinkedHashMap.
      * <p/>
-     * TODO: Remove the naming convention requirement and have the SimEntityName be
+     * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
-     * @param repStatistics 
+     * @param repStatistics
      */
     protected void setStatisticsKeyValues(LinkedHashMap<String, PropertyChangeListener> repStatistics) {
         Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
@@ -203,21 +205,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             String ent = entry.getKey();
             log.debug("Entry is: " + entry);
             entitiesWithStats.add(ent);
-        }        
+        }
     }
 
     protected abstract void createSimEntities();
-
-    protected abstract void hookupSimEventListeners();
-
-    protected abstract void hookupReplicationListeners();
-
-    /**
-     * This method is left concrete so subclasses don't have to worry about
-     * it if no additional PropertyChangeListeners are desired.
-     */
-    protected void hookupPropertyChangeListeners() {
-    }
+        
+    protected abstract void createReplicationStats();
 
     /**
      * The default behavior is to create a <code>SimplStatsTally</code>
@@ -232,31 +225,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (getReplicationStats().length == 0) {return;}
         designPointStats = new SampleStatistics[getReplicationStats().length];
         String typeStat = "";
-        int ix = 0; 
+        int ix = 0;
         boolean isCount = false;
-        for (Object node : getPclNodeCache().keySet()) {
-            if (node.toString().contains("PropertyChangeListener")) {
+        for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+            log.debug("entry is: " + entry);
+            Object obj;
+            if (entry.toString().contains("PropChangeListenerNode")) {
+                
+                // Since the pclNodeCache was created under a previous ClassLoader
+                // we must use reflection to invoke the methods on the AssemblyNodes
+                // that it contains, otherwise we will throw ClassCastExceptions
                 try {
-                    
-                    String nodeType = node.getClass().getMethod("getType").invoke(node).toString();
-                    
-                    /* in order to see PropChangeListenerNodes, this thread has 
-                     * to work via reflection since an instance from a different
-                     * ClassLoader was sent to this class via reflection in the
-                     * first place
-                     */
-                    Object obj = getPclNodeCache().get(node);
-                    
+                    obj = getPclNodeCache().get(entry.getKey());
+                    String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
+
                     // This is not a designPoint, so skip
                     if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
                         log.debug("SimplePropertyDumper encountered");
                         continue;
                     }
-                    log.debug("Reflected object is: " + obj);
                     isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                     log.debug("isGetCount: " + isCount);
                     typeStat = isCount ? ".count" : ".mean";
-                    log.debug("AssemblyNode key: " + node);
+                    log.debug("AssemblyNode key: " + entry.getKey());
                     log.debug("typeStat is: " + typeStat);
                     designPointStats[ix] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[ix]).getName() + typeStat);
                     log.debug(designPointStats[ix]);
@@ -276,22 +267,25 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
     }
 
-    // Overridden in ViskitAssembly
-    protected void createReplicationStats() {
-    }
+    protected abstract void createPropertyChangeListeners();
+    
+    protected abstract void hookupSimEventListeners();
 
-    protected void createPropertyChangeListeners() {
-    }
-
-    /**
-     * Set up all outer stats propertyChangeListeners
-     */
+    protected abstract void hookupReplicationListeners();
+    
+    /** Set up all outer stats propertyChangeListeners */
     protected void hookupDesignPointListeners() {
         for (SampleStatistics designPointStat : designPointStats) {
             this.addPropertyChangeListener(designPointStat);
         }
     }
 
+    /**
+     * This method is left concrete so subclasses don't have to worry about
+     * it if no additional PropertyChangeListeners are desired.
+     */
+    protected void hookupPropertyChangeListeners() {}
+    
     public void setStopTime(double time) {
         if (time < 0.0) {
             throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
@@ -309,7 +303,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     @Override
@@ -326,7 +320,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /** Causes simulation runs to halt
-     * 
+     *
      * @param b if true, stops further simulation runs
      */
     public void setStopRun(boolean b) {
@@ -335,7 +329,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             Schedule.stopSimulation();
         }
     }
-    
+
     public void pause() {
         Schedule.pause();
     }
@@ -354,9 +348,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void setEnableAnalystReports(boolean enable) {
         enableAnalystReports = enable;
     }
-    
+
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
-    
+
     public void setNumberReplications(int num) {
         if (num < 1) {
             throw new IllegalArgumentException("Number replications must be > 0: " + num);
@@ -407,28 +401,28 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * Empty, needed to implement SimEntity
-     * @param simEvent 
+     * @param simEvent
      */
     public void handleSimEvent(SimEvent simEvent) {
     }
 
     /**
      * Empty, needed to implement SimEntity
-     * @param simEvent 
+     * @param simEvent
      */
     public void processSimEvent(SimEvent simEvent) {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public SampleStatistics[] getDesignPointStats() {
         return designPointStats.clone();
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public PropertyChangeListener[] getReplicationStats() {
@@ -436,7 +430,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * 
+     *
      * @param id
      * @return
      */
@@ -510,18 +504,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             }
         }
     }
-    
+
     /**
-     * For each inner stats, print to console name, count, min, max, mean, 
+     * For each inner stats, print to console name, count, min, max, mean,
      * standard deviation and variance.  This can be done generically.
      *
      * @param rep The replication number for this report
      * @return a replication report section of the analyst report
      */
     protected String getReplicationReport(int rep) {
-        
+
         PropertyChangeListener[] clonedReplicationStats = getReplicationStats();
-        
+
         // Outputs raw replication statistics to XML report
         if (isSaveReplicationData()) {
             statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
@@ -529,7 +523,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         StringBuffer buf = new StringBuffer("Output Report for Replication #");
         buf.append(rep + 1);
-       
+
         for (int i = 0; i < clonedReplicationStats.length; i++) {
             buf.append(System.getProperty("line.separator"));
             buf.append(((SampleStatistics) clonedReplicationStats[i]).getName());
@@ -546,7 +540,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             buf.append('\t');
             buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMean()));            
+            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMean()));
             buf.append('\t');
             buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getStandardDeviation()));
             buf.append('\t');
@@ -557,17 +551,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * For each outer stats, print to console output name, count, min, max, 
+     * For each outer stats, print to console output name, count, min, max,
      * mean, standard deviation and fvariance.  This can be done generically.
      * @return the summary report section of the analyst report
      */
     protected String getSummaryReport() {
-        
+
         // Outputs raw summary statistics to XML report
         if (isSaveReplicationData()) {
             statsConfig.processSummaryReport(getDesignPointStats());
         }
-        
+
         StringBuffer buf = new StringBuffer("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());
@@ -591,15 +585,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void setOutputStream(OutputStream os) {
         PrintStream out = new PrintStream(os);
         this.printWriter = new PrintWriter(os);
-        
+
         // This OutputStream gets ported to the JScrollPane of the Assy Runner
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
         // send debug message directy to System.out.
         // ie, one thread sets System.out then another
-        // takes it mid thread.        
-        
+        // takes it mid thread.
+
         // This is possibly what causes output to dump to a console
         System.setOut(out);
     }
@@ -614,9 +608,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
         createObjects();
         performHookups();
-        
+
         printInfo();    // subclasses may display what they wish at the top of the run.
-        
+
         // reset the document with
         // existing parameters
         // might have run before
@@ -625,7 +619,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (!hookupsCalled) {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
-        
+
         System.out.println("\nStopping at time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
@@ -633,7 +627,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (isSingleStep()) {
             Schedule.setSingleStep(isSingleStep());
         }
-        
+
         // This should be unchecked if only listening with a SimplePropertyDumper
         if (isSaveReplicationData()) {
             replicationData.clear();
@@ -669,14 +663,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
                 } catch (NoSuchMethodException ex) {
-                    ;//ex.printStackTrace(); // nop, this is the default case
+                    //ex.printStackTrace(); // nop, this is the default case
                 }
             }
         }
         int runCount = runEntities.size();
         boolean clockChecker = false; // tbd hook this up and fix properly
         for (int replication = 0; replication < getNumberReplications(); replication++) {
-            firePropertyChange("replicationNumber", (replication + 1));               
+            firePropertyChange("replicationNumber", (replication + 1));
             if (clockChecker && getVerboseReplication() >= 0) {
                 timer.waitDelay("Stop", 0.0);
             }
@@ -690,7 +684,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Schedule.setVerbose(isVerbose());
                 Schedule.setReallyVerbose(isVerbose());
             }
-            
+
             int nextRunCount = Schedule.getReruns().size();
             if (nextRunCount != runCount) {
                 System.out.println("Reruns changed old: " + runCount + " new: " + nextRunCount);
@@ -744,23 +738,21 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 String typeStat = "";
                 int ix = 0;
-                boolean isCount = false;                
-                
+                boolean isCount = false;
+
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
                     // # of PropertyChangeListenerNodes is == to replicationStats.length
-                    for (Object node : getPclNodeCache().keySet()) {
-                        if (node.toString().contains("PropertyChangeListener")) {
-                            try {
+                    for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+                        Object obj;
+                        if (entry.toString().contains("PropChangeListenerNode")) {
 
-                                String nodeType = node.getClass().getMethod("getType").invoke(node).toString();
-                    
-                                /* in order to see PropChangeListenerNodes, this thread has 
-                                 * to work via reflection since an instance from a different
-                                 * ClassLoader was sent to this class via reflection in the
-                                 * first place
-                                 */
-                                Object obj = getPclNodeCache().get(node);
+                            // Since the pclNodeCache was created under a previous ClassLoader
+                            // we must use reflection to invoke the methods on the AssemblyNodes
+                            // that it contains, otherwise we will throw ClassCastExceptions
+                            try {
+                                obj = getPclNodeCache().get(entry.getKey());
+                                String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                                 // This is not a designPoint, so skip
                                 if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
@@ -795,7 +787,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     printWriter.println(getReplicationReport(replication));
                     printWriter.flush();
                 }
-                                
+
                 System.runFinalization();
                 System.gc();
             }
@@ -828,8 +820,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initReportFile();
 
-            /* Invoke the AnalystReportBuilder via reflection.  Reflection is used 
-             * due to the sequential building of Viskit where this class file gets 
+            /* Invoke the AnalystReportBuilder via reflection.  Reflection is used
+             * due to the sequential building of Viskit where this class file gets
              * compiled before the AnalystReportBuilder and therefore would throw a
              * compile time error.
              */
@@ -883,19 +875,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return verboseReplicationNumber;
     }
 
-    public Map<Object, AssemblyNode> getPclNodeCache() {
+    public Map<String, AssemblyNode> getPclNodeCache() {
         return pclNodeCache;
     }
 
-    public void setPclNodeCache(Map<Object, AssemblyNode> pclNodeCache) {
+    public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
     }
-    
+
     /**
-     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after 
+     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
      * createObject() at run time.
      */
     public void printInfo() {
     }
-
 }

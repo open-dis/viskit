@@ -86,52 +86,42 @@ public class PropChangeListenerNode extends AssemblyNode {
         getCount = b;
     }
 
-    @Override
     public ArrayList<String> getDescriptionArray() {
         return descriptionArray;
     }
 
-    @Override
     public void setDescriptionArray(ArrayList<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 
-    @Override
     public String getArrayType() {
         return arrayType;
     }
 
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
 
-    @Override
     public String getStateVarName() {
         return stateVarName;
     }
 
-    @Override
     public String getValue() {
         return value;
     }
 
-    @Override
     public String getComment() {
         return comment;
     }
 
-    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
 
-    @Override
     public boolean isOperation() {
         return operation;
     }
 
-    @Override
     public String getStateVarType() {
         return stateVarType;
     }

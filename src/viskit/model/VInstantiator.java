@@ -315,7 +315,7 @@ public abstract class VInstantiator {
                 if (Vstatics.debug) {
                     log.info("Trying to buildMultiParamter " + p.getType());
                 }
-                List tmp = p.getParameters();
+                List<Object> tmp = p.getParameters();
 
                 if (tmp.isEmpty()) {
                     tmp = Vstatics.resolveParameters(p.getType())[0];

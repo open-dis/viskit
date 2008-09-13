@@ -859,15 +859,16 @@ public class VGlobals {
     private ClassLoader workLoader;
 
     public ClassLoader getWorkClassLoader() {
-        URL[] urlArray = new URL[] {};
-        
-        URL[] arrayTmp = SettingsDialog.getExtraClassPathArraytoURLArray();
-        if (arrayTmp != null) {
-            urlArray = arrayTmp;
-        }
         if (workLoader == null) {
+            URL[] urlArray = new URL[]{};
+            URL[] arrayTmp = SettingsDialog.getExtraClassPathArraytoURLArray();
+            
+            if (arrayTmp != null) {
+                urlArray = arrayTmp;
+            }
+
             LocalBootLoader loader = new LocalBootLoader(urlArray,
-                    Thread.currentThread().getContextClassLoader(), 
+                    Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());
             workLoader = loader.init(true);
         }

@@ -829,18 +829,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
-        Class ca = findClass(a);
-        Class cb = findClass(b);
+        Class<?> ca = findClass(a);
+        Class<?> cb = findClass(b);
         return orderSELSrcAndLis(a, b, ca, cb);
     }
 
     AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b) {
-        Class ca = findClass(a);
-        Class cb = findClass(b);
+        Class<?> ca = findClass(a);
+        Class<?> cb = findClass(b);
         return orderPCLSrcAndLis(a, b, ca, cb);
     }
 
-    Class findClass(AssemblyNode o) {
+    Class<?> findClass(AssemblyNode o) {
         return Vstatics.classForName(o.getType());
     }
 

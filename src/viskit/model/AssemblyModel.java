@@ -9,8 +9,14 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Vector;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
@@ -44,8 +50,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     private GraphMetaData metaData;
     
     /** We require specific order on this Map's contents */
-    private Map<Object, AssemblyNode> nodeCache;
-    private HashMap<Object, Object> assEdgeCache;
+    private Map<String, AssemblyNode> nodeCache;
     private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point pointLess = new Point(100, 100);
     private ViskitAssemblyController controller;
@@ -53,8 +58,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     public AssemblyModel(ViskitAssemblyController cont) {
         controller = cont;
         metaData = new GraphMetaData(this);
-        setNodeCache(new LinkedHashMap<Object, AssemblyNode>());
-        assEdgeCache = new HashMap<Object, Object>();
+        setNodeCache(new LinkedHashMap<String, AssemblyNode>());
     }
 
     public void init() {
@@ -185,8 +189,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     private boolean nameCheck() {
         HashSet<String> hs = new HashSet<String>(10);
-        for (Object o : getNodeCache().values()) {
-            AssemblyNode n = (AssemblyNode) o;
+        for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
                 return false;
             }
@@ -195,8 +198,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
     
     public boolean nameExists(String name) {
-        for (Object o : getNodeCache().values()) {
-            AssemblyNode n = (AssemblyNode) o;
+        for (AssemblyNode n : getNodeCache().values()) {
             if (n.getName().equals(name)) {
                 return true;
             }           
@@ -234,7 +236,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         node.setInstantiator(vc);
 
-        getNodeCache().put(jaxbEG, node);   // key = ev
+        getNodeCache().put(node.getName(), node);   // key = ev
 
         if (!nameCheck()) {
             mangleEGName(node);
@@ -267,7 +269,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             manglePCLName(pcNode);
         }
 
-        // TODO: update with generic JWSDP
         jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
         modelDirty = true;
@@ -292,12 +293,11 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Adapter jaxbAdapter = oFactory.createAdapter();
 
         ae.opaqueModelObject = jaxbAdapter;
-        jaxbAdapter.setTo(target.opaqueModelObject);
-        jaxbAdapter.setFrom(src.opaqueModelObject);
+        jaxbAdapter.setTo(target.getName());
+        jaxbAdapter.setFrom(src.getName());
 
         jaxbAdapter.setName(adName);
 
-        assEdgeCache.put(jaxbAdapter, ae);
         jaxbRoot.getAdapter().add(jaxbAdapter);
 
         modelDirty = true;
@@ -306,8 +306,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return ae;
     }
 
-    public PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target) //EvGraphNode src, PropChangeListenerNode target)
-    {
+    public PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target) {
         PropChangeEdge pce = new PropChangeEdge();
         pce.setFrom(src);
         pce.setTo(target);
@@ -319,10 +318,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         pce.opaqueModelObject = pclc;
 
-        pclc.setListener(target.opaqueModelObject);
-        pclc.setSource(src.opaqueModelObject);
+        pclc.setListener(target.getName());
+        pclc.setSource(src.getName());
 
-        assEdgeCache.put(pclc, pce);
         jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
         modelDirty = true;
 
@@ -330,8 +328,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return pce;
     }
 
-    public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) //EvGraphNode src, EvGraphNode target){
-    {
+    public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) {
         SimEvListenerEdge sele = new SimEvListenerEdge();
         sele.setFrom(src);
         sele.setTo(target);
@@ -343,10 +340,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         sele.opaqueModelObject = selc;
 
-        selc.setListener(target.opaqueModelObject);
-        selc.setSource(src.opaqueModelObject);
+        selc.setListener(target.getName());
+        selc.setSource(src.getName());
 
-        assEdgeCache.put(selc, sele);
         jaxbRoot.getSimEventListenerConnection().add(selc);
 
         modelDirty = true;
@@ -378,7 +374,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     public void deletePropChangeEdge(PropChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
-        assEdgeCache.remove(pce);
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
 
         modelDirty = true;
@@ -388,7 +383,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     public void deleteSimEvLisEdge(SimEvListenerEdge sele) {
         SimEventListenerConnection sel_c = (SimEventListenerConnection) sele.opaqueModelObject;
 
-        assEdgeCache.remove(sele);
         jaxbRoot.getSimEventListenerConnection().remove(sel_c);
 
         modelDirty = true;
@@ -397,7 +391,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     public void deleteAdapterEdge(AdapterEdge ae) {
         Adapter j_adp = (Adapter) ae.opaqueModelObject;
-        assEdgeCache.remove(ae);
         jaxbRoot.getAdapter().remove(j_adp);
 
         modelDirty = true;
@@ -419,8 +412,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         Adapter jaxbAE = (Adapter) ae.opaqueModelObject;
 
-        jaxbAE.setFrom((SimEntity) src.opaqueModelObject);
-        jaxbAE.setTo((SimEntity) targ.opaqueModelObject);
+        jaxbAE.setFrom(src.getName());
+        jaxbAE.setTo(targ.getName());
 
         jaxbAE.setEventHeard(ae.getSourceEvent());
         jaxbAE.setEventSent(ae.getTargetEvent());
@@ -437,8 +430,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         EvGraphNode targ = (EvGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
 
-        selc.setListener(targ.opaqueModelObject);
-        selc.setSource(src.opaqueModelObject);
+        selc.setListener(targ.getName());
+        selc.setSource(src.getName());
         selc.setDescription(seEdge.getDescriptionString());
 
         modelDirty = true;
@@ -570,7 +563,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     private void removeFromOutputList(SimEntity se) {
         List<Output> outTL = jaxbRoot.getOutput();
         for (Output o : outTL) {
-            if (o.getEntity() == se) {
+            if (o.getEntity().equals(se.getName())) {
                 outTL.remove(o);
                 return;
             }
@@ -590,12 +583,12 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     private void addToOutputList(SimEntity se) {
         List<Output> outTL = jaxbRoot.getOutput();
         for (Output o : outTL) {
-            if (o.getEntity() == se) {
+            if (o.getEntity().equals(se.getName())) {
                 return;
             }
         }
         Output op = oFactory.createOutput();
-        op.setEntity(se);
+        op.setEntity(se.getName());
         outTL.add(op);
     }
 
@@ -704,16 +697,16 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     private Object buildParam(Object vi) {
         if (vi instanceof VInstantiator.FreeF) {
             return buildParmFromFreeF((VInstantiator.FreeF) vi);
-        }      //TerminalParm
+        } //TerminalParm
         if (vi instanceof VInstantiator.Constr) {
             return buildParmFromConstr((VInstantiator.Constr) vi);
-        }     // List of Parms
+        } // List of Parms
         if (vi instanceof VInstantiator.Factory) {
             return buildParmFromFactory((VInstantiator.Factory) vi);
-        }   // FactoryParam
+        } // FactoryParam
         if (vi instanceof VInstantiator.Array) {
             return buildParmFromArray((VInstantiator.Array) vi);
-        }       // MultiParam
+        } // MultiParam
 
         //assert false : AssemblyModel.buildJaxbParameter() received null;
         return null;
@@ -764,7 +757,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     public boolean newModel(File f) {
         getNodeCache().clear();
-        assEdgeCache.clear();
         pointLess = new Point(100, 100);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
         
@@ -837,11 +829,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             pce.setTo(toNode);
             pce.setFrom(frNode);
             pce.opaqueModelObject = pclc;
-
+            
             toNode.getConnections().add(pce);
             frNode.getConnections().add(pce);
 
-            assEdgeCache.put(pclc, pce);
             this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
         }
     }
@@ -858,7 +849,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
             toNode.getConnections().add(sele);
             frNode.getConnections().add(sele);
-            assEdgeCache.put(selc, sele);
             this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "Sim event listener connection added"));
         }
     }
@@ -878,7 +868,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
             toNode.getConnections().add(ae);
             frNode.getConnections().add(ae);
-            assEdgeCache.put(jaxbAdapter, ae);
             this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter connection added"));
         }
     }
@@ -896,8 +885,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
             for (Output o : outputList) {
-                SimEntity simE = (SimEntity) o.getEntity();
-                if (simE == se) {
+                String simE = o.getEntity();
+                if (simE.equals(se.getName())) {
                     isOutput = true;
                     break;
                 }
@@ -939,7 +928,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         pNode.opaqueModelObject = pcl;
         log.debug("pNode name: " + pNode.getName());
 
-        getNodeCache().put(pcl, pNode);   // key = se
+        getNodeCache().put(pNode.getName(), pNode);   // key = se
 
         if (!nameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
@@ -976,7 +965,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         en.opaqueModelObject = se;
 
-        getNodeCache().put(se, en);   // key = se
+        getNodeCache().put(en.getName(), en);   // key = se
 
         if (!nameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
@@ -1028,11 +1017,11 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return s;
     }
 
-    public Map<Object, AssemblyNode> getNodeCache() {
+    public Map<String, AssemblyNode> getNodeCache() {
         return nodeCache;
     }
 
-    public void setNodeCache(Map<Object, AssemblyNode> nodeCache) {
+    public void setNodeCache(Map<String, AssemblyNode> nodeCache) {
         this.nodeCache = nodeCache;
     }
 }

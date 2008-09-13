@@ -242,13 +242,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
         Runnable assemblyRunnable;
 
-        try {
+        try {          
             loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
             
             // Forcing the extra classpaths here bug fix 1237
             loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());            
-            loader = loader.init(true);
+            loader = loader.init(true);            
             Thread.currentThread().setContextClassLoader(loader);
             
             // Test for Bug 1237
@@ -267,9 +267,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports", boolean.class);
             Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
             Method setStopTime = targetClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);
+            Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);                
+            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);        
             Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
-            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);
             Class<?> RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
@@ -292,9 +292,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             
             setStopTime.invoke(assemblyObj, getStopTime());
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
-            setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
+            setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());                  
+            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());        
             addPropertyChangeListener.invoke(assemblyObj, this);
-            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
             assemblyRunnable = (Runnable) assemblyObj;              
             
             // Start the simulation run(s)

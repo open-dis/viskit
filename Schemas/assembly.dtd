@@ -1,10 +1,10 @@
 <!-- CVS ID: $Id: assembly.dtd 2036 2008-08-21 18:01:17Z jmbailey $ -->
 <!ENTITY % DesignParameters "TerminalParameter">
-<!ENTITY % ValueRange "DoubleRange | IntegerRange">
+<!ENTITY % ValueRange "DoubleRange|IntegerRange">
 <!ENTITY % Parameters "MultiParameter|FactoryParameter|TerminalParameter">
-<!ENTITY % Statistics "IndexedSampleStatistics | SampleStatistics">
+<!ENTITY % Statistics "IndexedSampleStatistics|SampleStatistics">
 
-<!ELEMENT SimkitAssembly (head?, SimEntity*, (%DesignParameters;)*, EventGraph*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
+<!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, SimEntity*, EventGraph*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
 <!ATTLIST SimkitAssembly
     name    ID      #REQUIRED
     version CDATA   "1.0"
@@ -96,7 +96,7 @@
 
 <!ELEMENT Output EMPTY>
 <!ATTLIST Output
-    entity   IDREF #REQUIRED
+    entity	NMTOKEN #REQUIRED
 >
 
 <!ELEMENT Verbose EMPTY>
@@ -119,8 +119,8 @@
     name	CDATA #REQUIRED
     eventHeard  CDATA #REQUIRED
     eventSent   CDATA #REQUIRED
-    from	IDREF #REQUIRED
-    to		IDREF #REQUIRED
+    from	NMTOKEN #REQUIRED
+    to		NMTOKEN #REQUIRED
     description CDATA #IMPLIED
 >
 
@@ -199,6 +199,6 @@
 
 <!ELEMENT User EMPTY>
 <!ATTLIST User
-        name    ID   #REQUIRED
+        name     ID   #REQUIRED
         password CDATA  #REQUIRED
 >

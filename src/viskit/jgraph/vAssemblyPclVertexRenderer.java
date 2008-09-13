@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
+import viskit.model.AssemblyNode;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -246,9 +247,11 @@ public class vAssemblyPclVertexRenderer
     // Draw the text in the circle
     g2.setFont(myfont);         // uses component's font if not specified
     DefaultGraphCell cell = (DefaultGraphCell)view.getCell();
-    String nm = cell.getUserObject().toString();
+    
+    // Use the getName method instead of toString
+    String nm = ((AssemblyNode) cell.getUserObject()).getName();
     FontMetrics metrics = g2.getFontMetrics();
- nm=breakName(nm,50,metrics);
+    nm=breakName(nm,50,metrics);
     String[] lns = nm.split("\n");       // handle multi-line titles
 
     int hgt = metrics.getHeight();  // height of a line of text
