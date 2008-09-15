@@ -571,9 +571,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
         JScrollPane jscrp = new JScrollPane(graphPane);
-        jscrp.setPreferredSize(new Dimension(500, 500));  // experiment to see if splitpane
         
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
+        
+        // This is the key to getting the jgraph half to come up appropriately 
+        // wide by giving the right component (JGraph side) most of the usable 
+        // extra space in this SplitPlane -> 25%
+        graphPane.drawingSplitPane.setResizeWeight(0.25);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         graphPane.addMouseListener(new vCursorHandler());
