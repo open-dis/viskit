@@ -509,6 +509,7 @@
             <link href="${jdom.api}"/>
 	    <link href="${commons.config.api}"/>
 	    <link href="${jfreechart.api}"/>
+	    <link href="${jgraph.api}"/>
         </javadoc>
     </target>
     

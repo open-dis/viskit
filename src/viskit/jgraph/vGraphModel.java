@@ -35,7 +35,7 @@ public class vGraphModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked")
     public void initViskitStyle() {
 
-        // TODO: JGraph produce Maps are not generic, need updated JGraph
+        // TODO: JGraph produced Maps are not generic, need updated JGraph
         viskitEdgeStyle = GraphConstants.createMap();
         GraphConstants.setDisconnectable(viskitEdgeStyle, false);
         GraphConstants.setLineEnd(viskitEdgeStyle, GraphConstants.ARROW_TECHNICAL);

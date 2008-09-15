@@ -42,8 +42,7 @@ import java.util.regex.Pattern;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphComponent extends JGraph implements GraphModelListener /**********************************************/
-{
+public class vGraphComponent extends JGraph implements GraphModelListener {
 
     vGraphModel model;
     EventGraphViewFrame parent;
@@ -54,7 +53,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
         ToolTipManager.sharedInstance().registerComponent(this);
         //super.setDoubleBuffered(false); // test for mac
         this.model = model;
-        this.setModel(model);
         this.setBendable(true);
         this.setSizeable(false);
         this.setGridVisible(true);
@@ -133,8 +131,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphUI(this));    // we use our own for node/edge inspector editting
-        //setUI(new BasicGraphUI());   // test
+        setUI(new vGraphUI(this));    // we use our own for node/edge inspector editing
+        //setUI(new BasicGraphUI());  // test
         invalidate();
     }
 
@@ -204,9 +202,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener /*****
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
         if (ch != null) {
-            for (int i = 0; i < ch.length; i++) {
-                if (ch[i] instanceof CircleCell) {
-                    CircleCell cc = (CircleCell) ch[i];
+            for (Object cell : ch) {
+                if (cell instanceof CircleCell) {
+                    CircleCell cc = (CircleCell) cell;
                     Map<String, Rectangle> m = cc.getAttributes();
                     Rectangle r = m.get("bounds");
                     if (r != null) {

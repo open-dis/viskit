@@ -22,6 +22,7 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
+import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
@@ -561,8 +562,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         vGraphAssemblyComponentWrapper graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
+        
         graphPane.model = mod;
-
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
@@ -571,14 +572,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
         JScrollPane jscrp = new JScrollPane(graphPane);
         jscrp.setPreferredSize(new Dimension(500, 500));  // experiment to see if splitpane
+        
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
-        } catch (Exception e) {
-            log.error("assert false : \"Drop target init. error\"");
+        } catch (TooManyListenersException tmle) {
+            log.error("Drop target init. error");
+            log.error(tmle);
         }
 
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);

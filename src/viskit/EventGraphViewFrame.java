@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TooManyListenersException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -54,7 +55,6 @@ import javax.swing.event.ChangeListener;
  * @since Mar 2, 2004
  * @since 12:52:59 PM
  * @version $Id$
- *
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements ViskitView {
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
@@ -129,10 +129,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return quitMenuItem;
     }
 
-    /**
-     * Returns the current mode--select, add, arc, cancelArc
-     * @return 
-     */
+    /** @return the current mode--select, add, arc, cancelArc */
     public int getCurrentMode() {
         // Use the button's selected status to figure out what mode
         // we are in.
@@ -156,7 +153,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Initialize the MCV connections
-     * @param ctrl 
+     * @param ctrl the EventGraphController
      */
     private void initMVC(EventGraphController ctrl) {
         setController(ctrl);
@@ -395,15 +392,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
         JScrollPane jsp = new JScrollPane(graphPane);
-        jsp.setPreferredSize(new Dimension(500, 100)); // this is the key to getting the jgraph half to come up appropriately wide
+        
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParamSplitPane);
-
+        
+        // This is the key to getting the jgraph half to come up appropriately 
+        // wide by giving the left component (JGraph side) most of the usable 
+        // extra space in this SplitPlane -> 75%
+        graphPane.drawingSplitPane.setResizeWeight(0.75);
+        
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
-        } catch (Exception e) {
-            //assert false : "Drop target init. error";
-            System.err.println("assert false : \"Drop target init. error\"");
+        } catch (TooManyListenersException tmle) {
+            log.error("Drop target init. error");
+            log.error(tmle);
         }
 
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);

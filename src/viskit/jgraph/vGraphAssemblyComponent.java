@@ -41,8 +41,7 @@ import viskit.model.*;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphAssemblyComponent extends JGraph implements GraphModelListener /**********************************************/
-{
+public class vGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
     vGraphAssemblyModel model;
     AssemblyViewFrame parent;
@@ -53,7 +52,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         ToolTipManager.sharedInstance().registerComponent(this);
         //super.setDoubleBuffered(false); // test for mac
         this.model = model;
-        this.setModel(model);
         this.setBendable(true);
         this.setSizeable(false);
         this.setGridVisible(true);
@@ -227,9 +225,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
         if (ch != null) {
-            for (int i = 0; i < ch.length; i++) {
-                if (ch[i] instanceof AssemblyCircleCell) {
-                    AssemblyCircleCell cc = (AssemblyCircleCell) ch[i];
+            for (Object cell : ch) {
+                if (cell instanceof AssemblyCircleCell) {
+                    AssemblyCircleCell cc = (AssemblyCircleCell) cell;
                     Map<String, Rectangle> m = cc.getAttributes();
                     Rectangle r = m.get("bounds");
                     if (r != null) {
@@ -239,8 +237,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
                         m.put("bounds", new Rectangle(en.getPosition().x, en.getPosition().y, r.width, r.height));
                     }
-                } else if (ch[i] instanceof AssemblyPropListCell) {
-                    AssemblyPropListCell plc = (AssemblyPropListCell) ch[i];
+                } else if (cell instanceof AssemblyPropListCell) {
+                    AssemblyPropListCell plc = (AssemblyPropListCell) cell;
                     Map<String, Rectangle> m = plc.getAttributes();
                     Rectangle r = m.get("bounds");
                     if (r != null) {
