@@ -87,7 +87,7 @@ public class XMLValidationTool {
     }
 
     /** Will report well-formedness and any validation errors encountered
-     * @return true if X3D scene file is well-formed XML 
+     * @return true if parsed XML file is well-formed XML 
      */
     public boolean isValidXML() {
 
