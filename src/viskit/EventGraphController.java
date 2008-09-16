@@ -151,6 +151,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
     
+    /** Create a new blank EventGraph model */
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
         ViskitModel viskitModel = (ViskitModel) getModel();
@@ -171,8 +172,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
             gmd.packageName = oldGmd.packageName;
         }
 
-        boolean modified = EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
-                VGlobals.instance().getMainAppWindow(), gmd);
+        boolean modified = 
+                EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
         if (modified) {
             ((ViskitModel) getModel()).changeMetaData(gmd);
 
@@ -565,7 +566,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             mod.changeMetaData(gmd); // might have renamed
 
             mod.saveModel(saveFile);
-            view.setSelectedEventGraphName(n);
+            view.setSelectedEventGraphName(gmd.name);
 
             fileWatchOpen(saveFile);
             adjustRecentList(saveFile);
@@ -834,8 +835,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     public void editGraphMetaData() {
         GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
-        boolean modified = EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
-                VGlobals.instance().getMainAppWindow(), gmd);
+        boolean modified = 
+                EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
         if (modified) {
             ((ViskitModel) getModel()).changeMetaData(gmd);
 

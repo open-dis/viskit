@@ -2,7 +2,6 @@ package viskit;
 
 import viskit.model.GraphMetaData;
 
-import java.awt.Component;
 import javax.swing.JFrame;
 
 /**
@@ -19,11 +18,11 @@ public class AssemblyMetaDataDialog extends MetaDataDialog {
 
     private static MetaDataDialog dialog;
     
-    public static boolean showDialog(JFrame f, Component comp, GraphMetaData gmd) {
+    public static boolean showDialog(JFrame f, GraphMetaData gmd) {
         if (dialog == null) {
-            dialog = new AssemblyMetaDataDialog(f, comp, gmd);
+            dialog = new AssemblyMetaDataDialog(f, gmd);
         } else {
-            dialog.setParams(comp, gmd);
+            dialog.setParams(f, gmd);
         }
 
         dialog.setVisible(true);
@@ -31,7 +30,7 @@ public class AssemblyMetaDataDialog extends MetaDataDialog {
         return modified;
     }
 
-    AssemblyMetaDataDialog(JFrame f, Component c, GraphMetaData gmd) {
-        super(f, c, gmd, "Assembly Properties");
+    AssemblyMetaDataDialog(JFrame f, GraphMetaData gmd) {
+        super(f, gmd, "Assembly Properties");
     }
 }

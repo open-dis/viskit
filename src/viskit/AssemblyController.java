@@ -260,10 +260,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
         }
 
-        boolean goodOpen = mod.newModel(file);
-        if (goodOpen && !isOpenAlready) {
-            GraphMetaData gmd = mod.getMetaData();
-            ((ViskitAssemblyView) getView()).fileName(gmd.name);
+        if (mod.newModel(file) && !isOpenAlready) {
+            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(mod.getMetaData().name);
             adjustRecentList(file);
 
             // replaces old fileWatchOpen(file);
@@ -449,18 +447,22 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             model.changeMetaData(gmd); // might have renamed
             
             model.saveModel(saveFile);
-            view.fileName(saveFile.getName());
+            view.setSelectedAssemblyName(gmd.name);
             adjustRecentList(saveFile);
         }
     }
 
-    /**
-     * 
-     */
+    /** Edit the properties (metadata) of the Assembly */
     public void editGraphMetaData() {
         GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
-        AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
-                VGlobals.instance().getMainAppWindow(), gmd);
+        boolean modified = 
+                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+        if (modified) {
+            ((ViskitAssemblyModel) getModel()).changeMetaData(gmd);
+
+            // update title bar
+            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+        }
     }
     private int egNodeCount = 0;
     private int adptrNodeCount = 0;
@@ -561,9 +563,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             return;
         }
         GraphMetaData oldGmd = null;        
-        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-        if (vmod != null) {
-            oldGmd = vmod.getMetaData();
+        ViskitAssemblyModel viskitAssemblyModel = (ViskitAssemblyModel) getModel();
+        if (viskitAssemblyModel != null) {
+            oldGmd = viskitAssemblyModel.getMetaData();
         }
 
         AssemblyModel mod = new AssemblyModel(this);
@@ -573,21 +575,20 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         
         // No model set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((ViskitAssemblyView) getView()).addTab(vmod);
+        ((ViskitAssemblyView) getView()).addTab(mod);
 
-        GraphMetaData gmd = new GraphMetaData(vmod);   // build a new one, specific to Assy
+        GraphMetaData gmd = new GraphMetaData(mod);   // build a new one, specific to Assy
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
 
-        AssemblyMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(),
-                VGlobals.instance().getMainAppWindow(),
-                gmd);
-        if (AssemblyMetaDataDialog.modified) {
+        boolean modified = 
+                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+        if (modified) {
             ((ViskitAssemblyModel) getModel()).changeMetaData(gmd);
-            ((ViskitAssemblyView) getView()).fileName(gmd.name);  // into title bar
+            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name);  // into title bar
         } else {
-            ((ViskitAssemblyView) getView()).delTab(vmod);
+            ((ViskitAssemblyView) getView()).delTab(mod);
         }
     }
 

@@ -15,28 +15,24 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  */
 public class GraphMetaData {
 
-    public String name = "EventGraphName";
-    public String packageName = "test";
+    public String name = "";
+    public String packageName = "";
     public String author = "";
     public String version = "1.0";
     public String description = ""; // originally called "comment"
-    public String stopTime = "100.0";
-    public boolean verbose = false;
+    public String stopTime = "100.0";    
     public String extendsPackageName = "";
+    
+    public boolean verbose = false;
 
     public GraphMetaData() {
-        author = System.getProperty("user.name");
-
-        /** get defaults from Schema */
-        viskit.xsd.bindings.eventgraph.ObjectFactory of =
-                new viskit.xsd.bindings.eventgraph.ObjectFactory();
-        SimEntity tmp = of.createSimEntity();
-        extendsPackageName = tmp.getExtend();
+        this(null);
     }
 
     public GraphMetaData(Object caller) {
         author = System.getProperty("user.name");
         packageName = "test";
+        
         if (caller instanceof AssemblyModel) {
             name = "AssemblyName";
             viskit.xsd.bindings.assembly.ObjectFactory of =
@@ -45,7 +41,7 @@ public class GraphMetaData {
             extendsPackageName = tmp.getExtend();
 
         } else {
-
+            name = "EventGraphName";
             viskit.xsd.bindings.eventgraph.ObjectFactory of =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tmp = of.createSimEntity();

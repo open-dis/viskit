@@ -64,7 +64,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     
     public Model(ViskitController controller) {
         this.controller = controller;        
-        metaData = new GraphMetaData();
+        metaData = new GraphMetaData(this);
     }
 
     public void init() {
@@ -117,13 +117,15 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         evNodeCache.clear();
         edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
+        
         if (f == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(f);
-                GraphMetaData mymetaData = new GraphMetaData();
+                
+                GraphMetaData mymetaData = new GraphMetaData(this);
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
@@ -154,7 +156,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                             "Wrong File Format", JOptionPane.ERROR_MESSAGE);
                 } catch (JAXBException e) {
                     JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
-                            "\n" + f +
+                            "\n" + f.getName() +
                             "\n" + e.getMessage() +
                             "\nin Model.newModel(File)",
                             "XML I/O Error", JOptionPane.ERROR_MESSAGE);
@@ -229,9 +231,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
-    /**
-     * @return A File object representing the last one passed to the two methods above.
-     */
+    /** @return a File object representing the last one passed to the two methods above */
     public File getLastFile() {
         return currentFile;
     }

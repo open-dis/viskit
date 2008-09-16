@@ -25,7 +25,6 @@ abstract public class MetaDataDialog extends JDialog {
     protected JComponent runtimePanel;
     private JButton canButt;
     private JButton okButt;
-    JFrame parentFrame;
     Component locationComp;
     GraphMetaData param;
     JTextField nameTf, packageTf, authorTf, versionTf, extendTf;
@@ -33,15 +32,14 @@ abstract public class MetaDataDialog extends JDialog {
     JCheckBox verboseCb;
     JTextArea descriptionTextArea;
 
-    public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd) {
-        this(f, comp, gmd, "Event Graph Properties");
+    public MetaDataDialog(JFrame f, GraphMetaData gmd) {
+        this(f, gmd, "Event Graph Properties");
     }
 
-    public MetaDataDialog(JFrame f, Component comp, GraphMetaData gmd, String title) {
+    public MetaDataDialog(JFrame f, GraphMetaData gmd, String title) {
         super(f, title, true);
         this.param = gmd;
-        this.locationComp = comp;
-        this.parentFrame = f;
+        this.locationComp = f;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 

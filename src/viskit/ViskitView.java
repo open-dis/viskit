@@ -38,7 +38,11 @@ public interface ViskitView
   File    openRecentFilesAsk(Collection<String> lis);
   File    saveFileAsk(String suggName,boolean showUniqueName);
 
-  void    setSelectedEventGraphName(String s);    // informative, tells view what we're working on //todo make sure this is called with each addTab
+  /** Tells view what we're working on
+   * @param s the name of the EventGraph
+   */
+  //todo make sure this is called with each addTab 
+  void    setSelectedEventGraphName(String s);    
 
   void    addTab(ViskitModel mod); // When a tab is added
   void    delTab(ViskitModel mod); // When a tab is removed

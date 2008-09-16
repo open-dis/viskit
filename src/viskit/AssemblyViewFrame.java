@@ -183,7 +183,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             vGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
 
             if (myVgacw == null) {     // last tab has been closed
-                fileName(null);
+                setSelectedAssemblyName(null);
                 return;
             }
 
@@ -203,7 +203,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
             GraphMetaData gmd = myVgacw.model.getMetaData();
             if (gmd != null) {
-                fileName(gmd.name);
+                setSelectedAssemblyName(gmd.name);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: AssemblyViewFrame gmd null..");
             }
@@ -925,7 +925,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
-    public void fileName(String s) {
+    public void setSelectedAssemblyName(String s) {
         boolean nullString = !(s != null && s.length() > 0);
         String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Assembly: " + s;
         setTitle(ttl);

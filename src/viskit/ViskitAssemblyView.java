@@ -60,7 +60,11 @@ public interface ViskitAssemblyView {
 
     File saveFileAsk(String suggName, boolean suggUniqueName);
 
-    void fileName(String s);    // informative, tells view what we're working on
+    /** Tells view what we're working on
+     * @param s the name of the Assembly
+     */
+    //todo make sure this is called with each addTab 
+    void setSelectedAssemblyName(String s);
     
     void showAndSaveSource(String className, String s);
 

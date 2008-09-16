@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,8 +72,95 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
-    public File getLastFile() {
-        return currentFile;
+    /**
+     * Boolean to signify whether the model has been changed since last disk save.
+     *
+     * @return true means changes have been made and it needs to be flushed.
+     */
+    public boolean isDirty() {
+        return modelDirty;
+    }
+
+    public void setDirty(boolean wh) {
+        modelDirty = wh;
+    }
+
+    public SimkitAssembly getJaxbRoot() {
+        return jaxbRoot;
+    }
+
+    public GraphMetaData getMetaData() {
+        return metaData;
+    }
+
+    public void changeMetaData(GraphMetaData gmd) {
+        metaData = gmd;
+        setDirty(true);
+    }
+    
+    /**
+     * Replace current model with one contained in the passed file.
+     *
+     * @param f the Assembly file to check open
+     * @return true for good open, else false
+     */
+    public boolean newModel(File f) {
+        getNodeCache().clear();
+        pointLess = new Point(100, 100);
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
+        
+        if (f == null) {
+            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
+        } else {
+            try {
+                Unmarshaller u = jc.createUnmarshaller();
+                jaxbRoot = (SimkitAssembly) u.unmarshal(f);
+                
+                GraphMetaData mymetaData = new GraphMetaData(this);
+                mymetaData.version = jaxbRoot.getVersion();
+                mymetaData.name = jaxbRoot.getName();
+                mymetaData.packageName = jaxbRoot.getPackage();
+
+                Schedule sch = jaxbRoot.getSchedule();
+                if (sch != null) {
+                    String stpTime = sch.getStopTime();
+                    if (stpTime != null && stpTime.trim().length() > 0) {
+                        mymetaData.stopTime = stpTime.trim();
+                    }
+                    mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+                }
+
+                changeMetaData(mymetaData);
+                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
+                buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
+                buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
+                buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
+                buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
+            } catch (JAXBException e) {
+                // want a clear way to know if they're trying to load an event graph
+                try {
+                    JAXBContext egCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+
+                    Unmarshaller um = egCtx.createUnmarshaller();
+                    um.unmarshal(f);
+                    // If we get here, they've tried to load an event graph.
+                    JOptionPane.showMessageDialog(null, "Use the event graph editor to" +
+                            "\n" + "work with this file.",
+                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
+                } catch (JAXBException ee) {
+                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
+                            "\n" + f.getName() +
+                            "\n" + e.getMessage() +
+                            "\nin AssemblyModel.newModel(File)",
+                            "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+                }
+                return false; // from both exceptions
+            } 
+        }
+        
+        currentFile = f;
+        setDirty(false);
+        return true;
     }
 
     public void saveModel(File f) {
@@ -141,6 +227,11 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+    }
+    
+    /** @return a File object representing the last one passed to the two methods above */
+    public File getLastFile() {
+        return currentFile;
     }
 
     /**
@@ -754,71 +845,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         return mp;
     }
-
-    public boolean newModel(File f) {
-        getNodeCache().clear();
-        pointLess = new Point(100, 100);
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
-        
-        if (f == null) {
-            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
-        } else {
-            try {
-                Unmarshaller u = jc.createUnmarshaller();
-                jaxbRoot = (SimkitAssembly) u.unmarshal(f);
-                
-                GraphMetaData mymetaData = new GraphMetaData(this);
-                mymetaData.version = jaxbRoot.getVersion();
-                mymetaData.name = jaxbRoot.getName();
-                mymetaData.packageName = jaxbRoot.getPackage();
-
-                Schedule sch = jaxbRoot.getSchedule();
-                if (sch != null) {
-                    String stpTime = sch.getStopTime();
-                    if (stpTime != null && stpTime.trim().length() > 0) {
-                        mymetaData.stopTime = stpTime.trim();
-                    }
-                    mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
-                }
-
-                changeMetaData(mymetaData);
-                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
-                buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
-                buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
-                buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
-                buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
-            } catch (JAXBException e) {
-                // want a clear way to know if they're trying to load an event graph
-                try {
-                    JAXBContext egCtx = JAXBContext.newInstance("viskit.xsd.bindings");
-
-                    Unmarshaller um = egCtx.createUnmarshaller();
-                    um.unmarshal(f);
-                    // If we get here, they've tried to load an event graph.
-                    JOptionPane.showMessageDialog(null, "Use the event graph editor to" +
-                            "\n" + "work with this file.",
-                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
-                } catch (JAXBException ee) {
-                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
-                            "\n" + f.getName() +
-                            "\n" + e.getMessage(),
-                            "XML I/O Error", JOptionPane.ERROR_MESSAGE);
-                }
-                return false; // from both exceptions
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Exception constructing assembly" +
-                        "\n" + f.getName(),
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
-        
-        currentFile = f;
-        setDirty(false);
-        return true;
-    }
-
+    
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
             PropChangeEdge pce = new PropChangeEdge();
@@ -976,31 +1003,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(en, ModelEvent.EVENTGRAPHADDED, "Event added"));
 
         return en;
-    }
-
-    /**
-     * Boolean to signify whether the model has been changed since last disk save.
-     *
-     * @return true means changes have been made and it needs to be flushed.
-     */
-    public boolean isDirty() {
-        return modelDirty;
-    }
-
-    public void setDirty(boolean wh) {
-        modelDirty = wh;
-    }
-
-    public SimkitAssembly getJaxbRoot() {
-        return jaxbRoot;
-    }
-
-    public GraphMetaData getMetaData() {
-        return metaData;
-    }
-
-    public void changeMetaData(GraphMetaData gmd) {
-        metaData = gmd;
     }
 
     /**

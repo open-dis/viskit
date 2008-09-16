@@ -222,6 +222,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 setSelectedEventGraphName(null);
                 return;
             }
+            
             setModel((Model) myVgcw.model);                  // hold on locally
             getController().setModel((Model) myVgcw.model);  // tell controller
             adjustMenus(myVgcw.model);                       // enable/disable menu items based on new EG
@@ -399,6 +400,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         // wide by giving the left component (JGraph side) most of the usable
         // extra space in this SplitPlane -> 75%
         graphPane.drawingSplitPane.setResizeWeight(0.75);
+        graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         graphPane.addMouseListener(new vCursorHandler());
         try {
@@ -1098,10 +1100,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     public boolean doEditStateVariable(vStateVariable var) {
         return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), var);
-    }
-
-    public boolean doMetaGraphEdit(GraphMetaData gmd) {
-        return EventGraphMetaDataDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), gmd);
     }
 
     public int genericAsk(String title, String msg) {
