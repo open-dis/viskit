@@ -239,7 +239,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
         mod.init();
 
         viskitView.addTab(mod);
-        ((EventGraphViewFrame) viskitView).getToolBar().setVisible(true);
         
         ViskitModel[] openAlready = null;
         if (viskitView != null) {

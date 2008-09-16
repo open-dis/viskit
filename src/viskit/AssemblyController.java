@@ -241,7 +241,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         VGlobals.instance().amod = mod;
         
         vaw.addTab(mod);
-        ((AssemblyViewFrame) vaw).getToolBar().setVisible(true);
 
         // these may init to null on startup, check
         // before doing any openAlready lookups

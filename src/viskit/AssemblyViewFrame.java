@@ -562,7 +562,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         vGraphAssemblyComponentWrapper graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
-        
+
         graphPane.model = mod;
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -571,11 +571,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
         JScrollPane jscrp = new JScrollPane(graphPane);
-        
+
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
-        
-        // This is the key to getting the jgraph half to come up appropriately 
-        // wide by giving the right component (JGraph side) most of the usable 
+
+        // This is the key to getting the jgraph half to come up appropriately
+        // wide by giving the right component (JGraph side) most of the usable
         // extra space in this SplitPlane -> 25%
         graphPane.drawingSplitPane.setResizeWeight(0.25);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
@@ -591,8 +591,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
-    // but this call serves also to register the view with the passed model
+        // the view holds only one model, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed model
+        setModel((mvcModel) mod);
+
+        // Now expose the Assembly toolbar
+        getToolBar().setVisible(true);
     }
 
     public void delTab(ViskitAssemblyModel mod) {
@@ -896,11 +900,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
             jfc.setDialogTitle("Open Assembly Files");
-            
+
             // Look for assembly in the filename, Bug 1247 fix
             FileFilter filter = new AssemblyFileFilter("assembly");
             jfc.setFileFilter(filter);
-            
+
             jfc.setMultiSelectionEnabled(true);
         }
 

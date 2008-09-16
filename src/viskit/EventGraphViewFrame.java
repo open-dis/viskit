@@ -31,19 +31,19 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame 
- * showing a jgraph on the left and state variables and sim parameters panels on 
- * the right, with menus and a toolbar.  To fully implement application-level 
- * MVC, events like the dragging and dropping of a node on the screen are first 
- * recognized in this class, but the GUI is not yet changed.  Instead, this 
- * class (the View) messages the controller class (EventGraphController -- by 
- * means of the ViskitController i/f).  The controller then informs the model 
+ * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
+ * showing a jgraph on the left and state variables and sim parameters panels on
+ * the right, with menus and a toolbar.  To fully implement application-level
+ * MVC, events like the dragging and dropping of a node on the screen are first
+ * recognized in this class, but the GUI is not yet changed.  Instead, this
+ * class (the View) messages the controller class (EventGraphController -- by
+ * means of the ViskitController i/f).  The controller then informs the model
  * (Model), which then updates itself and "broadcasts" that fact.  This class is
  * a model listener, so it gets the report, then updates the GUI.  A round trip.
  *
- * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is 
- * largely unchanged.  To understand the flow, understand that 
- * 1) The tab "ChangeListener" plays a key role; 
+ * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is
+ * largely unchanged.  To understand the flow, understand that
+ * 1) The tab "ChangeListener" plays a key role;
  * 2) When the ChangeListener is hit, the controller.setModel() method installs
  * the appropriate model for the newly-selected eventgraph.
  *
@@ -89,7 +89,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     /**
      * Constructor; lays out initial GUI objects
      * @param contentOnly
-     * @param ctrl 
+     * @param ctrl
      */
     public EventGraphViewFrame(boolean contentOnly, EventGraphController ctrl) {
         super(FRAME_DEFAULT_TITLE);
@@ -161,7 +161,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Initialize the user interface
-     * @param contentOnly 
+     * @param contentOnly
      */
     private void initUI(boolean contentOnly) {
         // Layout menus
@@ -229,7 +229,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             GraphMetaData gmd = myVgcw.model.getMetaData();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
-            
+
                 // TODO:  find description and display
                 descriptionTextArea.setText(gmd.description);
             } else if (viskit.Vstatics.debug) {
@@ -392,14 +392,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
         JScrollPane jsp = new JScrollPane(graphPane);
-        
+
         graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParamSplitPane);
-        
-        // This is the key to getting the jgraph half to come up appropriately 
-        // wide by giving the left component (JGraph side) most of the usable 
+
+        // This is the key to getting the jgraph half to come up appropriately
+        // wide by giving the left component (JGraph side) most of the usable
         // extra space in this SplitPlane -> 75%
         graphPane.drawingSplitPane.setResizeWeight(0.75);
-        
+
         graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
@@ -411,8 +411,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        setModel((mvcModel) mod); // the view holds only one model, so it gets overwritten with each tab
-    // but this call serves also to register the view with the passed model
+        // the view holds only one model, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed model
+        setModel((mvcModel) mod);
+
+        // Now expose the EventGraph toolbar
+        getToolBar().setVisible(true);
     }
 
     public void delTab(ViskitModel mod) {
@@ -454,7 +458,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         help.mainFrameLocated(this.getBounds());
     }
 
-    // TODO: This saves the size/shape of the EG Editor frame, but doesn't 
+    // TODO: This saves the size/shape of the EG Editor frame, but doesn't
     // load this config on next startup
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
@@ -466,7 +470,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * run the add parameter dialog
-     * @return 
+     * @return
      */
     public String addParameterDialog() {
 
@@ -492,9 +496,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * Do menu layout work here.  These menus, and the toggle buttons which 
+     * Do menu layout work here.  These menus, and the toggle buttons which
      * follow, make use of the "actions" package, which
-     * @param mod 
+     * @param mod
      */
     private void adjustMenus(ViskitModel mod) {
         //todo
@@ -1015,7 +1019,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /** Saves the current Event Graph "as" desired by the user
-     * 
+     *
      * @param suggName the package and file name of the EG
      * @param showUniqueName show EG name only
      * @return a File object of the saved EG
@@ -1152,7 +1156,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             case ModelEvent.NEWMODEL:
                 vp.setData(null);
                 pp.setData(null);
-            
+
             // Changes the graph needs to know about
             default:
                 vgcw.viskitModelChanged((ModelEvent) event);
@@ -1160,11 +1164,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * Called by the controller after source has been generated.  
+     * Called by the controller after source has been generated.
      * Show to the user and provide him with the option to save.
-     * @param className 
+     * @param className
      * @param s Java source
-     * @param filename 
+     * @param filename
      */
     public void showAndSaveSource(String className, String s, String filename) {
         JFrame f = new SourceWindow(this, className, s);
