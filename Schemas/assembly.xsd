@@ -103,6 +103,11 @@
       <xs:attribute name="y" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!--
+     The proper mode for a PropertyChangeListener is singular, however, for 
+    backwards compatibility with older EventGraphs, we allow both singular and 
+    plural modes (tdn 16 SEP 2008
+  -->
   <xs:element name="PropertyChangeListener">
     <xs:complexType>
       <xs:sequence>

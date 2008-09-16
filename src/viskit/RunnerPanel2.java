@@ -132,6 +132,7 @@ public class RunnerPanel2 extends JPanel {
         JLabel vcrSimTimeLab = new JLabel("Sim start time:");
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
+        // TODO:  can a user use this to advance to a certain time in the sim?
         vcrSimTime = new JTextField(10);
         vcrSimTime.setEditable(false);
         Vstatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);

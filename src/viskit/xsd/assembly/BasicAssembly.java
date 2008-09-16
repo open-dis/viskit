@@ -82,7 +82,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected int startRepNumber = 0;
     protected Set<SimEntity> runEntities;
     private double stopTime;
-    private boolean verbose;
     private boolean singleStep;
     private int numberReplications;
     private boolean printReplicationReports;
@@ -295,20 +294,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public double getStopTime() {
         return stopTime;
-    }
-
-    @Override
-    public void setVerbose(boolean b) {
-        verbose = b;
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public boolean isVerbose() {
-        return verbose;
     }
 
     public void setSingleStep(boolean b) {

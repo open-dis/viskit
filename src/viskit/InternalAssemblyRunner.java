@@ -68,7 +68,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     static Logger log = Logger.getLogger(InternalAssemblyRunner.class);
     static String lineSep = System.getProperty("line.separator");
     String targetClassName;
-    String targetClassPath;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;
     JMenuBar myMenuBar;
@@ -97,8 +96,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         inRegressionMode = false;
 
         saver = new saveListener();
-        
-        // ("Initialize using Assembly Edit tab, then Run button", true);        
+                
         runPanel = new RunnerPanel2(null, true);
         doMenus();
         runPanel.vcrStop.addActionListener(new stopListener());
@@ -112,7 +110,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         runPanel.vcrStep.setEnabled(false);
         seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
         twiddleButtons(OFF);
-        lastLoaderNoReset = Thread.currentThread().getContextClassLoader();
     }
 
     /**
@@ -168,26 +165,25 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     /**
      * Get param indices from AssemblyController statics
-     * @param parms
+     * @param params command line arguments to initialize the Assembly runner
      */
-    public void initParams(String[] parms) {
+    public void initParams(String[] params) {
 
-//        for (String s : parms) {
-//            log.info(s);
+//        for (String s : params) {
+//            log.info("VM argument is: " + s);
 //        }
-        targetClassName = parms[AssemblyController.EXEC_TARGET_CLASS_NAME];
+
+        targetClassName = params[AssemblyController.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
+        
+        // TODO: should this be editable?
+        runPanel.vcrSimTime.setText("0.0");
 
-        targetClassPath = parms[AssemblyController.EXEC_CLASSPATH];
-        boolean defaultVerbose = Boolean.valueOf(parms[AssemblyController.EXEC_VERBOSE_SWITCH]).booleanValue();
-        double defaultStopTime = Double.parseDouble(parms[AssemblyController.EXEC_STOPTIME_SWITCH]);
-
-        runPanel.vcrStopTime.setText("" + defaultStopTime);
-        runPanel.vcrSimTime.setText("0");
-        runPanel.vcrVerbose.setSelected(defaultVerbose);
-
+        boolean defaultVerbose = Boolean.valueOf(params[AssemblyController.EXEC_VERBOSE_SWITCH]).booleanValue();
+        double defaultStopTime = Double.parseDouble(params[AssemblyController.EXEC_STOPTIME_SWITCH]);
+        
         try {
-            fillRepWidgetsFromBasicAssemblyObject(targetClassName);
+            fillRepWidgetsFromBasicAssemblyObject(targetClassName, defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
             JOptionPane.showMessageDialog(runPanel, "Error initializing Assembly object:\n" + throwable.getMessage(), "Java Error", JOptionPane.ERROR_MESSAGE);
             twiddleButtons(OFF);
@@ -197,10 +193,11 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         twiddleButtons(InternalAssemblyRunner.REWIND);
     }
 
-    private void fillRepWidgetsFromBasicAssemblyObject(String clName) throws Throwable {
+    private void fillRepWidgetsFromBasicAssemblyObject(String clName, boolean verbose, double stopTime) throws Throwable {
         // Assembly has been compiled by now
         lastLoaderNoReset = VGlobals.instance().getResetWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+        
         targetClass = Vstatics.classForName(clName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
@@ -217,14 +214,18 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
         Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
         Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
+        Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
         Method isVerbose = targetClass.getMethod("isVerbose");
+        Method setStopTime = targetClass.getMethod("setStopTime", double.class);
         Method getStopTime = targetClass.getMethod("getStopTime");
 
         runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
         runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
         runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
+        setVerbose.invoke(targetObject, verbose);
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
+        setStopTime.invoke(targetObject, stopTime);
         runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
         
         Schedule.coldReset();

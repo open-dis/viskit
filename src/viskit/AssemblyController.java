@@ -1405,7 +1405,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             String classPath = getClassPathString();
 
-            execStrings = buildExecStrings(clNam, classPath);
+            execStrings = buildExecStrings(clNam, classPath);            
         } else {
             execStrings = null;
         }
@@ -1479,29 +1479,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * 
      */
     public static final int EXEC_FIRST_ENTITY_NAME = 9;    
-    // The following four match the previous four, but represent indices as seen by the main()
-    // method in the launched class:
-    /**
-     * 
-     */
-    public static final int APP_TARGET_CLASS_NAME = 0;
-    /**
-     * 
-     */
-    public static final int APP_VERBOSE_SWITCH = 1;
-    /**
-     * 
-     */
-    public static final int APP_STOPTIME_SWITCH = 2;
-    /**
-     * 
-     */
-    public static final int APP_FIRST_ENTITY_NAME = 3;
-
+    
     /** Prepare for the compilation of the loaded assembly file from java source
      * Maintain the above statics to match the order below.
-     * @param className
-     * @param classPath
+     * @param className the name of the Assembly file to compile
+     * @param classPath the current ClassLoader context
      * @return os exec array
      */
     private String[] buildExecStrings(String className, String classPath) {
@@ -1624,6 +1606,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
         }
     }
+    
     /** The default version of this.  Run assembly in external VM. */
     AssemblyRunnerPlug runner = new AssemblyRunnerPlug() {
 
