@@ -69,11 +69,14 @@
     y       CDATA #REQUIRED
 >
 
+<!-- The proper mode for a PropertyChangeListener is singular, however, for 
+     backwards compatibility with older EventGraphs, we allow both singular and 
+     plural modes (tdn 16 SEP 2008-->
 <!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?))>
 <!ATTLIST PropertyChangeListener
     name ID    #REQUIRED
     type CDATA #REQUIRED
-    mode (replicationStat|designPointStat|listener) "listener"
+    mode (replicationStat|replicationStats|designPointStat|designPointStats|listener) "listener"
     meanStatistics (true|false) "false"
     countStatistics (true|false) "true"
     description CDATA #IMPLIED

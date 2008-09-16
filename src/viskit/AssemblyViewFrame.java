@@ -292,7 +292,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", new Integer(KeyEvent.VK_I),
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Compile Assembly", new Integer(KeyEvent.VK_C),
+        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", new Integer(KeyEvent.VK_C),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
         if (contentOnly) {
@@ -468,7 +468,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("  Compile/initialize assembly runner: "));
+        getToolBar().add(new JLabel("  Initialize assembly runner: "));
         getToolBar().add(runButt);
 
         // Let the opening of Assembliess make this visible

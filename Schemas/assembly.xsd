@@ -115,7 +115,9 @@
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="replicationStat"/>
+            <xs:enumeration value="replicationStats"/>
             <xs:enumeration value="designPointStat"/>
+            <xs:enumeration value="designPointStats"/>
             <xs:enumeration value="listener"/>
           </xs:restriction>
         </xs:simpleType>

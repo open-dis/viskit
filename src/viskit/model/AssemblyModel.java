@@ -543,6 +543,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         jaxBPcl.setType(pclNode.getType());
         jaxBPcl.setDescription(pclNode.getDescriptionString());
 
+        // Modes should be singular.  All new Assemblies will be with singular mode
         if (pclNode.isSampleStats()) {
             if (pclNode.isClearStatsAfterEachRun()) {
                 jaxBPcl.setMode("replicationStat");
