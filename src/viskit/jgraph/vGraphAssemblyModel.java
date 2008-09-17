@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
+import viskit.VGlobals;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -177,6 +179,11 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
         this.insert(new Object[]{edge}, attributes, cs, null, null);
         this.toBack(new Object[]{edge});
+        
+        // If a user cancels this edge, it still needs be selected
+        Vector<Object> ev = new Vector<Object>();
+        ev.add(ae);
+        VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
     }
 
     public void deleteAdapterEdge(AdapterEdge ae) {
@@ -221,7 +228,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         attributes.put(edge, this.viskitAssySimEvLisEdgeStyle);
 
         this.insert(new Object[]{edge}, attributes, cs, null, null);
-        this.toBack(new Object[]{edge});
+        this.toBack(new Object[]{edge});        
     }
 
     public void deleteSimEvListEdge(SimEvListenerEdge sele) {
@@ -234,7 +241,6 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
     public void deletePclEdge(PropChangeEdge pce) {
         this.remove(new Object[]{pce.opaqueViewObject});
-
     }
 
     public void changePclEdge(PropChangeEdge pce) {
@@ -256,8 +262,13 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         Map<vAssemblyEdgeCell, Map> attributes = new Hashtable<vAssemblyEdgeCell, Map>();
         attributes.put(edge, this.viskitAssyPclEdgeStyle);
 
-        this.insert(new Object[]{edge}, attributes, cs, null, null);
-        this.toBack(new Object[]{edge});
+        this.insert(new Object[] {edge}, attributes, cs, null, null);
+        this.toBack(new Object[] {edge});
+        
+        // If a user cancels this edge, it still needs be selected
+        Vector<Object> ev = new Vector<Object>();
+        ev.add(pce);
+        VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
     }
 
     public Map createBounds(int x, int y, Color c) {

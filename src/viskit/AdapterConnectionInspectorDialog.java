@@ -72,18 +72,17 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     private static boolean modified = false;
     private EvGraphNode sourceEVG,  targetEVG;
     private AdapterEdge adapterEdge;
-    private Component locationComp;
     private JButton okButt,  canButt;
     private JPanel buttPan;
     private enableApplyButtonListener lis;
     public static String xnewProperty;
     public static String newTarget,  newTargetEvent,  newSource,  newSourceEvent;
 
-    public static boolean showDialog(JFrame f, Component comp, AdapterEdge parm) {
+    public static boolean showDialog(JFrame f, AdapterEdge parm) {
         if (dialog == null) {
-            dialog = new AdapterConnectionInspectorDialog(f, comp, parm);
+            dialog = new AdapterConnectionInspectorDialog(f, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -91,10 +90,9 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         return modified;
     }
 
-    private AdapterConnectionInspectorDialog(JFrame parent, Component comp, AdapterEdge ed) {
+    private AdapterConnectionInspectorDialog(JFrame parent, AdapterEdge ed) {
         super(parent, "Adapter Connection", true);
         adapterEdge = ed;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -176,7 +174,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         d.width = Math.max(d.width, 400);
         setSize(d);
 
-        this.setLocationRelativeTo(locationComp);
+        this.setLocationRelativeTo(parent);
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
@@ -196,7 +194,6 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     public void setParams(Component c, AdapterEdge ae) {
         adapterEdge = ae;
-        locationComp = c;
 
         fillWidgets();
 
@@ -266,7 +263,8 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     class cancelButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-            modified = false;    // for the caller
+            modified = false;    // for the caller            
+            VGlobals.instance().getAssemblyController().delete();
             dispose();
         }
     }

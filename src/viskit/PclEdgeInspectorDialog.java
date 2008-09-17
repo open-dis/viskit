@@ -37,17 +37,16 @@ public class PclEdgeInspectorDialog extends JDialog {
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeEdge pclEdge;
-    private Component locationComp;
     private JButton okButt,  canButt;
     private JButton propButt;
     private JPanel buttPan;
     private enableApplyButtonListener lis;
     //public static String newProperty;
-    public static boolean showDialog(JFrame f, Component comp, PropChangeEdge parm) {
+    public static boolean showDialog(JFrame f, PropChangeEdge parm) {
         if (dialog == null) {
-            dialog = new PclEdgeInspectorDialog(f, comp, parm);
+            dialog = new PclEdgeInspectorDialog(f, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -55,10 +54,9 @@ public class PclEdgeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclEdgeInspectorDialog(JFrame parent, Component comp, PropChangeEdge ed) {
+    private PclEdgeInspectorDialog(JFrame parent, PropChangeEdge ed) {
         super(parent, "Property Change Connection", true);
         this.pclEdge = ed;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -114,7 +112,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         d.width = Math.max(d.width, 400);
         setSize(d);
 
-        this.setLocationRelativeTo(locationComp);
+        this.setLocationRelativeTo(parent);
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
@@ -134,7 +132,6 @@ public class PclEdgeInspectorDialog extends JDialog {
 
     public void setParams(Component c, PropChangeEdge p) {
         pclEdge = p;
-        locationComp = c;
 
         fillWidgets();
 
@@ -187,17 +184,13 @@ public class PclEdgeInspectorDialog extends JDialog {
             pclEdge.setProperty(propertyTF.getText().trim());
             pclEdge.setDescriptionString(descTF.getText().trim());
         }
-    /*
-    else {
-    newProperty = propertyTF.getText().trim();
-    }
-     */
     }
 
     class cancelButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
+            VGlobals.instance().getAssemblyController().delete();
             dispose();
         }
     }

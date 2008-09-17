@@ -47,7 +47,7 @@ public interface ViskitAssemblyController {
     /* a component, e.g., model, wants to say something. */
     void messageUser(int typ, String msg);    // typ is one of JOptionPane types
 
-    void selectNodeOrEdge(Vector v);
+    void selectNodeOrEdge(Vector<Object> v);
 
     void newAdapterArc(Object[] nodes);
 
@@ -68,8 +68,12 @@ public interface ViskitAssemblyController {
     /* menu selections */
     void copy();
 
+    /** Ultimately performs a delete fuction for selected edges and nodes */
     void cut();        // to remove nodes and edges
-
+    
+    /** Performs a delete fuction for selected edges and nodes */
+    void delete();
+  
     void open();
 
     void openRecent();

@@ -49,6 +49,8 @@ public interface ViskitController {
   
   /* menu selections */
   void copy();
+  
+  /** Ultimately performs a delete fuction for selected edges and nodes */
   void cut();        // to remove nodes and edges
   
   /** Opens selected files from a FileChooser */

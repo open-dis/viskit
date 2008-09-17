@@ -820,11 +820,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public boolean doEditPclEdge(PropChangeEdge pclEdge) {
-        return PclEdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), pclEdge);
+        return PclEdgeInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), pclEdge);
     }
 
     public boolean doEditAdapterEdge(AdapterEdge aEdge) {
-        return AdapterConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), aEdge);
+        return AdapterConnectionInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), aEdge);
     }
 
     public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {

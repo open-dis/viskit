@@ -284,7 +284,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                         sb.append("</center>");
-                    } else /*if(vc.getUserObject() instanceof PropChangeEdge)*/ {
+                    } else {
                         String prop = ((PropChangeEdge) se).getProperty();
                         prop = (prop != null && prop.length() > 0) ? prop : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
@@ -740,19 +740,6 @@ class vAssemblyEdgeCell extends DefaultEdge {
     }
 }
 
-/*
-class vSelfEdgeCell extends vEdgeCell
-{
-public vSelfEdgeCell()
-{
-this(null);
-}
-public vSelfEdgeCell(Object userObject)
-{
-super(userObject);
-}
-}
- */
 class vAssemblyPortCell extends DefaultPort {
 
     public vAssemblyPortCell() {

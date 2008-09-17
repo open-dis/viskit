@@ -957,14 +957,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ((ViskitAssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
     }
-    private Vector selectionVector = new Vector();
+    private Vector<Object> selectionVector = new Vector<Object>();
 
     /**
      * 
      * @param v
      */
-    public void selectNodeOrEdge(Vector v) //------------------------------------
-    {
+    public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
         boolean ccbool = (selectionVector.size() > 0);
         ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
@@ -1056,11 +1055,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    /**
-     * 
-     */
-    public void cut() //---------------
-    {
+    public void cut() {
         if (selectionVector != null && selectionVector.size() > 0) {
             // first ask:
             String msg = "";
@@ -1073,27 +1068,31 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 s = s.replace('\n', ' ');
                 msg += ", \n" + s;
             }
-            String specialNodeMsg = (nodeCount > 0 ? "\n(All unselected but attached edges will also be deleted.)" : "");
+            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be deleted.)" : "";
             if (((ViskitAssemblyView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
                 // do edges first?
-                Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
-                for (Object elem : localV) {
-                    if (elem instanceof AssemblyEdge) {
-                        killEdge((AssemblyEdge) elem);
-                    } else if (elem instanceof EvGraphNode) {
-                        EvGraphNode en = (EvGraphNode) elem;
-                        for (AssemblyEdge ed : en.getConnections()) {
-                            killEdge(ed);
-                        }
-                        ((ViskitAssemblyModel) getModel()).deleteEvGraphNode(en);
-                    } else if (elem instanceof PropChangeListenerNode) {
-                        PropChangeListenerNode en = (PropChangeListenerNode) elem;
-                        for (AssemblyEdge ed : en.getConnections()) {
-                            killEdge(ed);
-                        }
-                        ((ViskitAssemblyModel) getModel()).deletePCLNode(en);
-                    }
+                delete();
+            }
+        }
+    }
+
+    public void delete() {
+        Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
+        for (Object elem : localV) {
+            if (elem instanceof AssemblyEdge) {
+                killEdge((AssemblyEdge) elem);
+            } else if (elem instanceof EvGraphNode) {
+                EvGraphNode en = (EvGraphNode) elem;
+                for (AssemblyEdge ed : en.getConnections()) {
+                    killEdge(ed);
                 }
+                ((ViskitAssemblyModel) getModel()).deleteEvGraphNode(en);
+            } else if (elem instanceof PropChangeListenerNode) {
+                PropChangeListenerNode en = (PropChangeListenerNode) elem;
+                for (AssemblyEdge ed : en.getConnections()) {
+                    killEdge(ed);
+                }
+                ((ViskitAssemblyModel) getModel()).deletePCLNode(en);
             }
         }
     }
