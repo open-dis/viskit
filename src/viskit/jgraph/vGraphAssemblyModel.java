@@ -180,7 +180,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         this.insert(new Object[]{edge}, attributes, cs, null, null);
         this.toBack(new Object[]{edge});
         
-        // If a user cancels this edge, it still needs be selected
+        // If a user cancels this edge, it needs to be counted as selected
+        // so that the AssemblyController can find it
         Vector<Object> ev = new Vector<Object>();
         ev.add(ae);
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
@@ -265,7 +266,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         this.insert(new Object[] {edge}, attributes, cs, null, null);
         this.toBack(new Object[] {edge});
         
-        // If a user cancels this edge, it still needs be selected
+        // If a user cancels this edge, it needs to be counted as selected
+        // so that the AssemblyController can find it        
         Vector<Object> ev = new Vector<Object>();
         ev.add(pce);
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
