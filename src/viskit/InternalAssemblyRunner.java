@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -664,7 +665,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
             String s = runPanel.soutTA.getText().trim();
             try {
-                f = File.createTempFile("ViskitOutput", ".txt");
+                f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
                 BufferedWriter bw = new BufferedWriter(new FileWriter(f));
                 bw.append(s);
