@@ -19,6 +19,9 @@ public class AssemblyMetaDataDialog extends MetaDataDialog {
     private static MetaDataDialog dialog;
     
     public static boolean showDialog(JFrame f, GraphMetaData gmd) {
+        gmd.description = "NOTE: The description field for this Assembly is not" +
+                " currently implemented.  Any text typed in this area will not" +
+                " be saved to XML";
         if (dialog == null) {
             dialog = new AssemblyMetaDataDialog(f, gmd);
         } else {
