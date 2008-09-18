@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Document   : ArrayTesterAssembly.xml
+    Created on : January 31, 2008, 1:57 PM
+    Author     : $Id:$
+    Description: Test Viskit's capability of creating primative array types
+-->
+<SimkitAssembly name="ArrayTestAssembly" package="examples" version="1.0" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" name="ArrayTester_3" type="examples.ArrayTester">
+        <MultiParameter type="int[]">
+            <TerminalParameter name="" type="int" value="17"/>
+            <TerminalParameter name="" type="int" value="52"/>
+        </MultiParameter>
+        <Coordinate x="160" y="60"/>
+    </SimEntity>
+    <PropertyChangeListener name="SimplePropertyDumper_4" type="simkit.util.SimplePropertyDumper">
+        <Coordinate x="170" y="190"/>
+    </PropertyChangeListener>
+    <PropertyChangeListenerConnection listener="SimplePropertyDumper_4" source="ArrayTester_3"/>
+    <Output entity="ArrayTester_3"/>
+    <Schedule stopTime="100." verbose="true"/>
+    <Experiment replicationsPerDesignPoint="1" timeout="5000" totalSamples="1"/>
+</SimkitAssembly>
+
