@@ -231,7 +231,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
 
-                // TODO:  find description and display
                 descriptionTextArea.setText(gmd.description);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");
