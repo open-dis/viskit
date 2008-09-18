@@ -82,16 +82,16 @@
             </fileset>
         </pack>    
         <!--    
-        <pack name="BehaviorLibraries" required="no">
-            <description>SavageDefenseTactics, SavageTactics</description>
+        <pack name="examples" required="no">
+            <description>OA3302 course examples</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="BehaviorLibraries/**/*"/>
+                <include name="examples/*"/>
             </fileset>
         </pack>
         <pack name="Sources" required="no">
             <description>Viskit source trees</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="sources/**/*"/>
+                <include name="src/**/*"/>
             </fileset>
         </pack>
         -->

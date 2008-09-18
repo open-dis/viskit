@@ -36,7 +36,7 @@
     
     <property description="Generated JAXB bindings for SGE qstat config" location="${dir.bindings}/sge/qstat" name="dir.src.sge.qstat"/>
     
-    <property description="Behavior Libraries Directory" location="BehaviorLibraries" name="behavior.lib" />
+    <property description="OA3302 Course Examples Directory" location="examples" name="examples.lib" />
     
     <property description="DISKIT directory" location="../DISKIT" name="dir.diskit"/>
     
@@ -517,15 +517,15 @@
     <target name="dist" depends="clean.all,jar,doc">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
-        <mkdir dir="${dir.dist}/BehaviorLibraries"/>
+        <mkdir dir="${dir.dist}/examples"/>
         <copy todir="${dir.dist}">
             <fileset dir="${dir.build.lib}"/>
         </copy>
         <copy todir="${dir.dist}/doc">
             <fileset dir="${dir.api.doc}"/>
         </copy>
-        <copy todir="${dir.dist}/BehaviorLibraries">
-            <fileset dir="${behavior.lib}">
+        <copy todir="${dir.dist}/examples">
+            <fileset dir="${examples.lib}">
                 <include name="**/*.xml"/>
             </fileset>
         </copy>
@@ -572,9 +572,9 @@
                 <include name="Launcher.class"/>
             </fileset>
         </copy>
-        <mkdir dir="${dir.dist}/gridkit-stage/BehaviorLibraries"/>
-        <copy todir="${dir.dist}/gridkit-stage/BehaviorLibraries">
-            <fileset dir="${behavior.lib}">
+        <mkdir dir="${dir.dist}/gridkit-stage/examples"/>
+        <copy todir="${dir.dist}/gridkit-stage/examples">
+            <fileset dir="${examples.lib}">
                 <include name="**/*.xml"/>
             </fileset>
         </copy>
@@ -871,11 +871,11 @@
         <delete>
             <fileset refid="runtime.viskit.exe"/>
         </delete>
-        <copy todir="${installer}/stage/BehaviorLibraries">
-            <fileset dir="${behavior.lib}"/>
+        <copy todir="${installer}/stage/examples">
+            <fileset dir="${examples.lib}"/>
         </copy>        
         <copy todir="${installer}/stage/license">
-            <fileset dir="./license"/>
+            <fileset dir="${basedir}/license"/>
         </copy>
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
@@ -884,7 +884,7 @@
         </copy>
         <copy todir="${installer}/stage">
             <fileset dir="${dir.src}">
-                <include name="*.xml"/>
+                <include name="*.*"/>
             </fileset>
         </copy>
         <copy todir="${installer}/stage">
@@ -1015,11 +1015,11 @@
         <delete>
             <fileset refid="runtime.viskit.exe"/>
         </delete>
-        <copy todir="${installer}/stage/BehaviorLibraries">
-            <fileset dir="${behavior.lib}"/>
+        <copy todir="${installer}/stage/examples">
+            <fileset dir="${examples.lib}"/>
         </copy>
         <copy todir="${installer}/stage/license">
-            <fileset dir="${dir.src}/license"/>
+            <fileset dir="${basedir}/license"/>
         </copy>
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
@@ -1028,7 +1028,7 @@
         </copy>
         <copy todir="${installer}/stage">
             <fileset dir="${dir.src}">
-                <include name="*.xml"/>
+                <include name="*.*"/>
             </fileset>
         </copy>
         <copy todir="${installer}/stage">
