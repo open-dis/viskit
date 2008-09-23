@@ -46,9 +46,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -305,13 +303,13 @@ public class VGlobals {
         interpreter = new Interpreter();
         interpreter.setStrictJava(true);       // no loose typeing
 
-        String[] extraCP = Vstatics.getExtraClassPathArray();
-        if (extraCP != null && extraCP.length > 0) {
-            for (String path : extraCP) {
+        String[] workCP = Vstatics.getExtraClassPathArray();
+        if (workCP != null && workCP.length > 0) {
+            for (String path : workCP) {
                 try {
                     interpreter.getClassManager().addClassPath(new URL("file", "localhost", path));
                 } catch (IOException e) {
-                    log.error("bad extra classpath: " + path);
+                    log.error("Working classpath component: " + path);
                 }
             }
         }
@@ -324,19 +322,17 @@ public class VGlobals {
         ns.importPackage("simkit.stat.*");
         ns.importPackage("simkit.util.*");
         ns.importPackage("diskit.*");         // 17 Nov 2004
-
     }
     String bshErr = "BeanShell eval error";
-    private Vector<String> nsSets = new Vector<String>();
 
-    public String parseCode(EventNode node, String s) {
+    public String parseCode(EventNode node, String interpretString) {
         initBeanShell();
         // Load the interpreter with the state variables and the sim parameters
         // Load up any local variables and event parameters for this particular node
         // Then, parse.
 
         // Lose the new lines
-        String noCRs = s.replace('\n', ' ');
+        String noCRs = interpretString.replace('\n', ' ');
         
         String name = null;
         String type = null;
@@ -357,7 +353,6 @@ public class VGlobals {
                     clearNamespace();
                     return bshErr + "\n" + result;
                 }
-                nsSets.add(name);
             }
             
             // Event arguments
@@ -369,7 +364,6 @@ public class VGlobals {
                     clearNamespace();
                     return bshErr + "\n" + result;
                 }
-                nsSets.add(name);
             }
         }
         
@@ -389,7 +383,6 @@ public class VGlobals {
                 clearNamespace();
                 return bshErr + "\n" + result;
             }
-            nsSets.add(name);
         }
         
         // Sim parameters
@@ -406,17 +399,16 @@ public class VGlobals {
                 clearNamespace();
                 return bshErr + "\n" + result;
             }
-            nsSets.add(name);
         }
         
         /* see if we can parse it.  We've initted all arrays to size = 1, so 
          * ignore outofbounds exceptions, bugfix 1183
          */
         try {
-            /* Ignore anything that is assigned from a "getter" as we are not
-             * giving beanShell the whole EG picture.
+            /* Ignore anything that is assigned from "getter" and setter as we 
+             * are not giving beanShell the whole EG picture.
              */
-            if(!noCRs.contains("get")) {
+            if(!noCRs.contains("get") && !noCRs.contains("set")) {
                 Object o = interpreter.eval(noCRs);
                 log.debug("Interpreter evaluation result: " + o);
             }            
@@ -436,20 +428,13 @@ public class VGlobals {
     
     // TODO: Fix the logic here, it doesn't seem to get used correctly
     private void clearNamespace() {
-        for (String ns : nsSets) {
-            try {
-                interpreter.unset(ns);
-            } catch (EvalError evalError) {
-                log.error(evalError);
-            }
-        }
-        nsSets.clear();
+        interpreter.getNameSpace().clear();
     }
 
     private String handleNameType(String name, String typ) {
         String returnString = null;
         if (!handlePrimitive(name, typ)) {
-            returnString = (findType(name, typ));
+            returnString = findType(name, typ);
         }
         
         // good if remains null
@@ -465,15 +450,8 @@ public class VGlobals {
             }
             Object o = instantiateType(type);
             
-            // At this time, only default, no argument contructors can be set
+            // At this time, only default no argument contructors can be set
             if (o != null) {
-                if (o instanceof Collection) {
-                    ((Collection) o).add("E");
-                }
-                if (o instanceof Map) {
-                    ((Map) o).put("K", "V");
-                }
-                
                 interpreter.set(name, o);
             } /*else {
                 returnString = "no error, but not null";
@@ -486,6 +464,7 @@ public class VGlobals {
         } catch (Exception ex) {
             clearNamespace();
             returnString =  ex.getMessage();
+            log.error(returnString);
         }
         
         // good if remains null
@@ -499,9 +478,7 @@ public class VGlobals {
     public void initProjectHome() {
         String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY).trim();
         log.debug(projectHome);
-        if (projectHome.isEmpty() || !(new File(projectHome).exists())) {            
-           // ViskitProjectGenerationDialog.instance();
-           // ViskitProjectGenerationDialog2.showDialog();
+        if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 
             ViskitProjectButtonPanel.showDialog();
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
