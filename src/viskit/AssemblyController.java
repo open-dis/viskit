@@ -65,6 +65,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
         initialFile = fil;
     }
+        
+    /** This method is for introducing Assemblies to compile from outside of 
+     * Viskit itself, i.e. from SavageStudio.  This method is not used from 
+     * Viskit and must be here for extenal use.
+     * @param assyPath an assembly file to compile
+     */
+    public void compileAssembly(String assyPath) {
+        log.debug("Compiling assembly: " + assyPath);
+        File f = new File(assyPath);
+        _doOpen(f);
+        compileAssemblyAndPrepSimRunner();
+    }
 
     /** Begin Viskit's initial state upon startup */
     public void begin() {
