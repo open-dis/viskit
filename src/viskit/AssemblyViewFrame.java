@@ -674,7 +674,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         File diskitJar = new File("lib/ext/diskit.jar");
         File disJar = new File("lib/ext/dis.jar");
         
-        // If we built diskit.jar, then include it and its sister dis.jar
+        // If we built diskit.jar, then include it and its sister dis.jar.  The 
+        // dis.jar contains no PCLs, so, Viskit will give a benign warning about
+        // this in the output console and debug.log.
         if (diskitJar.exists() && disJar.exists()) {
             pclTree.addContentRoot(diskitJar);
             pclTree.addContentRoot(disJar);
