@@ -645,19 +645,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        // Decouple diskit from vanilla Viskit operation
-        File diskitJar = new File("lib/ext/diskit.jar");
         String[] extraCP = SettingsDialog.getExtraClassPath();
         if (extraCP != null) {
             for (String path : extraCP) { // tbd same for pcls
                 if (new File(path).exists()) {
                     if (path.endsWith(".jar")) {
-                        if (diskitJar.getName().contains(new File(path).getName())) {
-                            continue;
-                        } else {
-                            lTree.addContentRoot(new File(path));
-                        }
-
+                        lTree.addContentRoot(new File(path));
+                        
                     // A new project may contain an empty EventGraphs directory
                     } else if (new File(path).listFiles().length == 0) {
                         continue;
@@ -676,11 +670,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // todo get from project
         pclTree.addContentRoot(new File("lib/simkit.jar"));
 
-        // If we built diskit.jar, then include it
+        // If we built diskit.jar, then include it and the dis.jar        
+        File diskitJar = new File("lib/ext/diskit.jar");
+        File disJar = new File("lib/ext/dis.jar");
+        
+        // If we built diskit.jar, then include it and its sister dis.jar
         if (diskitJar.exists()) {
             pclTree.addContentRoot(diskitJar);
+            pclTree.addContentRoot(disJar);
         }
         diskitJar = null;
+        disJar = null;
 
         PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
 
