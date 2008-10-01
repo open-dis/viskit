@@ -713,8 +713,8 @@
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
         
-    <!-- The Installer contains the JDK, a native wrapper around ${dist.jar} and its jars, 
-        and the actual installer. JDK, IzPack the installer generator, launch4j the wrapper
+    <!-- The Installer contains the JRE, a native wrapper around ${dist.jar} and its jars, 
+        and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
         maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
         To save time, all slow steps are checked if needed, including the build. -->
         
@@ -740,14 +740,14 @@
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
     <!-- it should be named manually though for what version has been tested -->
-    <property name="winJDKExe" value="jdk-6u10-windows-i586-p.exe"/>
-    <property name="winJDK" value="${user.home}${file.separator}${winJDKExe}" />
+    <property name="winJREExe" value="jdk-6u10-windows-i586-p.exe"/>
+    <property name="winJRE" value="${user.home}${file.separator}${winJREExe}" />
     
-    <target name="checkJDK" >
-        <available file="${winJDK}" property="winJDK.exists" />
+    <target name="checkJRE" >
+        <available file="${winJRE}" property="winJRE.exists" />
     </target>
-    <target name="getJDK" depends="checkJDK" unless="winJDK.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u10/promoted/b12/binaries/jdk-6u10-ea-bin-b12-windows-i586-p-19_feb_2008.exe" dest="${winJDK}" />
+    <target name="getJRE" depends="checkJRE" unless="winJRE.exists"  >
+        <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}" />
     </target>
     
     <target name="moveIzPack" if="build.host.windows">
@@ -837,7 +837,7 @@
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions" 
-            depends="no.runtime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="no.runtime.extensions,getJRE,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Build the installers with no runtime extensions">
         <mkdir dir="${installer}/build" />
         <mkdir dir="${installer}/stage/lib"/>
@@ -949,21 +949,21 @@
         
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
-            rem ${winJDKExe} /S /v/qn 
-            ${winJDKExe}
+            rem ${winJREExe} /S /v/qn 
+            ${winJREExe}
             ViskitInstall.exe
         </echo>
         
         <chmod perm="+x" file="${installer}/build/both.bat" />
         <!-- this would only work on Unix 
-        <symlink link="installer/build/${winJDK}" resource="../${winJDK}" />
+        <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
         plus the file is 16M, do we need that in CVS?
         -->
-        <copy file="${winJDK}" todir="${installer}/build" />
+        <copy file="${winJRE}" todir="${installer}/build" />
         
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJDKExe}" />
+             includes="both.bat,ViskitInstall.exe,${winJREExe}" />
         
         <sfx
             archive="${installer}/build/install.zip"
@@ -975,7 +975,7 @@
     
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions" 
-            depends="with.rutime.extensions,getJDK,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="with.rutime.extensions,getJRE,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Builds the installers with runtime extension libraries included">
         <mkdir dir="${installer}/build" />
         <mkdir dir="${installer}/stage/lib"/>
@@ -1093,21 +1093,21 @@
         
         <echo file="${installer}/build/both.bat" append="false">
             rem use the next line for a silent install. 
-            rem ${winJDKExe} /S /v/qn 
-            ${winJDKExe}
+            rem ${winJREExe} /S /v/qn 
+            ${winJREExe}
             ViskitInstall.exe
         </echo>
         
         <chmod perm="+x" file="${installer}/build/both.bat" />
         <!-- this would only work on Unix 
-        <symlink link="installer/build/${winJDK}" resource="../${winJDK}" />
+        <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
         plus the file is 16M, do we need that in CVS?
         -->
-        <copy file="${winJDK}" todir="${installer}/build" />
+        <copy file="${winJRE}" todir="${installer}/build" />
         
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJDKExe}" />
+             includes="both.bat,ViskitInstall.exe,${winJREExe}" />
         
         <sfx
             archive="${installer}/build/install.zip"
@@ -1132,7 +1132,7 @@
          <delete file="${launch4j}.zip"/>
          <delete file="${orangevolt}.jar"/>
          <delete file="${user.home}/roxes.jar"/>
-         <delete file="${winJDK}"/>
+         <delete file="${winJRE}"/>
     </target>
     
     <!--  === TARGET: clean === -->
