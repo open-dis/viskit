@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity extend="SimEntityBase" version="0.1" package="examples" name="SimpleServer" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter type="simkit.random.RandomVariate" name="serviceTime"/>
+    <Parameter type="int" name="totalNumberServers"/>
+    <StateVariable type="int" name="numberInQueue"/>
+    <StateVariable type="int" name="numberAvailableServers"/>
+    <Event name="Run">
+        <StateTransition state="numberInQueue">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="totalNumberServers"/>
+        </StateTransition>
+        <Coordinate y="0" x="10"/>
+    </Event>
+    <Event name="Arrival">
+        <StateTransition state="numberInQueue">
+            <Assignment value="numberInQueue + 1"/>
+        </StateTransition>
+        <Schedule priority="DEFAULT" condition="numberAvailableServers &gt; 0" event="StartService" delay="0.0">
+            <Comment></Comment>
+            <EdgeParameter value="numberAvailableServers"/>
+        </Schedule>
+        <Coordinate y="100" x="10"/>
+    </Event>
+    <Event name="StartService">
+        <Comment></Comment>
+        <Argument type="int" name="arg_0"/>
+        <StateTransition state="numberInQueue">
+            <Assignment value="numberInQueue - 1"/>
+        </StateTransition>
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="numberAvailableServers - 1"/>
+        </StateTransition>
+        <Schedule priority="DEFAULT" event="EndService" delay="serviceTime.generate()"/>
+        <Code>System.out.println("numberAvailableServers"+arg_0);</Code>
+        <Coordinate y="100" x="150"/>
+    </Event>
+    <Event name="EndService">
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="numberAvailableServers + 1"/>
+        </StateTransition>
+        <Schedule priority="HIGH" condition="numberInQueue &gt; 0" event="StartService" delay="0.0"/>
+        <Coordinate y="100" x="320"/>
+    </Event>
+</SimEntity>
