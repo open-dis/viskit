@@ -872,7 +872,7 @@ public class VGlobals {
     public String printCallerLog() {
         StringBuilder sb = new StringBuilder();
         sb.append("Calling class: " + new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
-        sb.append(" Calling method: " + new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
+        sb.append("\nCalling method: " + new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
         return sb.toString();
     }
     
