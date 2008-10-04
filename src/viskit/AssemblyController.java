@@ -1663,17 +1663,19 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param f the Assembly File to open EventGraphs for
      */
     private void openEventGraphs(File f) {
-
+        File tempFile = null;
         try {
 
             EventGraphCache.instance().makeEntityTable(f.getAbsolutePath());
-            for (File filePath : EventGraphCache.instance().getEventGraphFiles()) {
+            java.util.List<File> eGFiles = EventGraphCache.instance().getEventGraphFiles();
+            for (File file : eGFiles) {
 
+                tempFile = file;
                 // _doOpen checks if a tab is already opened
-                VGlobals.instance().getEventGraphEditor().controller._doOpen(filePath);
+                VGlobals.instance().getEventGraphEditor().controller._doOpen(file);
             }
         } catch (Exception ex) {
-            log.error(ex);
+            log.error("EventGraph file: " + tempFile + " caused error: " + ex);
         }
     }
 
