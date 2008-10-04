@@ -1676,6 +1676,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
         } catch (Exception ex) {
             log.error("EventGraph file: " + tempFile + " caused error: " + ex);
+            JOptionPane.showMessageDialog(VGlobals.instance().getEventGraphEditor(), 
+                    "EventGraph file: " + tempFile + " caused error: " + ex, 
+                    "EventGraph Opening Error", JOptionPane.WARNING_MESSAGE);
+            closeAll();
         }
     }
 
