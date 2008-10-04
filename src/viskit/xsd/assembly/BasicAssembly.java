@@ -161,7 +161,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * must be overridden if any replications stats are needed.
      */
     protected void createObjects() {
-        log.info("I was called?");
+//        log.info("I was called?");
         createSimEntities();
         createReplicationStats();
         
@@ -853,7 +853,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     public void setVerboseReplication(int i) {
-        this.verboseReplicationNumber = i;
+        verboseReplicationNumber = i;
     }
 
     public int getVerboseReplication() {
