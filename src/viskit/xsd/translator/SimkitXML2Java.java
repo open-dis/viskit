@@ -130,19 +130,23 @@ public class SimkitXML2Java {
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
         StringWriter vars = new StringWriter();
+        StringWriter accessorBlock = new StringWriter();
+        StringWriter toStringBlock = new StringWriter();
         StringWriter parameterMapAndConstructor = new StringWriter();
         StringWriter runBlock = new StringWriter();
         StringWriter eventBlock = new StringWriter();
-        StringWriter accessorBlock = new StringWriter();
         StringWriter tail = new StringWriter();
 
         buildHead(head);
         buildVars(vars, accessorBlock);
+        buildToString(toStringBlock);
         buildParameterMapAndConstructor(parameterMapAndConstructor);
         buildEventBlock(runBlock, eventBlock);
+        
+        // TODO: Rename?  This is actually the code block builder
         buildTail(tail);
 
-        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, tail);
+        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, toStringBlock, tail);
 
         return source.toString();
     }
@@ -322,6 +326,19 @@ public class SimkitXML2Java {
         pw.println(sp8 + "return" + sp + p.getName() + sc);
         pw.println(sp4 + cb);
         pw.println();
+    }
+
+    private void buildToString(StringWriter toStringBlock) {
+        PrintWriter pw = new PrintWriter(toStringBlock);
+        pw.println(sp4 + "/** Override the toString() method of java.lang.Object */");
+        pw.println(sp4 + "@Override");
+        pw.print(sp4 + "public String toString");
+        pw.println(lp + rp + sp + ob);
+//        pw.println(sp8 + "super.toString()" + sc);
+        pw.println(sp8 + "return" + sp + "this.getClass().getName()" + sc);
+//        pw.println(sp8 + "return" + sp + "super.toString()" + sp + "+" + sp + 
+//                qu + " :: " + qu + sp + "+" + sp + "this.getClass().getName()" + sc);
+        pw.println(sp4 + cb);
     }
 
     private int dims(String t) {
@@ -818,12 +835,13 @@ public class SimkitXML2Java {
 
     void buildSource(StringBuffer source, StringWriter head, StringWriter vars, 
             StringWriter parameterMapAndConstructor, StringWriter runBlock,
-            StringWriter eventBlock, StringWriter accessorBlock, StringWriter tail) {
+            StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter tail) {
 
         source.append(head.getBuffer()).append(vars.getBuffer());
         source.append(parameterMapAndConstructor.getBuffer());
         source.append(runBlock.getBuffer());
         source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer());
+        source.append(toStringBlock);
         source.append(tail.getBuffer());
     }
 
