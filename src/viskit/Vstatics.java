@@ -397,7 +397,7 @@ public class Vstatics {
             Class<?> c = classForName(type);
             if (c == null) {
                 log.info("Not yet resolving type: " + type + ".  Likely, an " +
-                        "Assembly is opening Viskit before a parse of the " +
+                        "Assembly is opening in Viskit before a parse of the " +
                         "EventGraph classpath");
                 return resolved;
             }
