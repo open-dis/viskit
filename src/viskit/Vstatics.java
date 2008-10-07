@@ -396,7 +396,9 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                log.error("Can't resolve type: " + type);
+                log.info("Not yet resolving type: " + type + ".  Likely, an " +
+                        "Assembly is opening Viskit before a parse of the " +
+                        "EventGraph classpath");
                 return resolved;
             }
             if (debug) {
@@ -520,7 +522,6 @@ public class Vstatics {
                     }
                 }
             }
-            //putParameterList(c.getName(),plist);
             putParameterList(type, plist);
             resolved = plist;
         }
