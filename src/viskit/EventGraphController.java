@@ -266,6 +266,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
             
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
+            viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
             adjustRecentList(file);
             fileWatchOpen(file);
         } else {

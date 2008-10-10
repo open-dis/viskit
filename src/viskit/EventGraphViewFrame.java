@@ -223,19 +223,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 return;
             }
             
-            setModel((Model) myVgcw.model);                  // hold on locally
-            getController().setModel((Model) myVgcw.model);  // tell controller
-            adjustMenus(myVgcw.model);                       // enable/disable menu items based on new EG
+            setModel((Model) myVgcw.model);        // hold on locally
+            getController().setModel(getModel());  // tell controller
+            adjustMenus((ViskitModel) getModel()); // enable/disable menu items based on new EG
 
-            GraphMetaData gmd = myVgcw.model.getMetaData();
+            GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
-
-                descriptionTextArea.setText(gmd.description);
+                setSelectedEventGraphDescription(gmd.description);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");
             }
-        }
+        }        
     }
 
     private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
@@ -286,7 +285,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
 
-        descriptionTextArea = new JTextArea(); //2, 40);
+        descriptionTextArea = new JTextArea();
         descriptionTextArea.setWrapStyleWord(true);
         descriptionTextArea.setLineWrap(true);
         descriptionTextArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -295,7 +294,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
-        parametersPanel.add(descriptionScrollPane); //descriptionTextArea); // TODO: descriptionScrollPane not working?
+        
+        // This works, you just have to have several lines of typed text to cause
+        // the etched scrollbar to appear
+        parametersPanel.add(descriptionScrollPane);
         parametersPanel.add(Box.createVerticalStrut(5));
 
         parametersPanel.setMinimumSize(new Dimension(20, 20));
@@ -338,10 +340,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(stateVariablesPanel),
                 new JScrollPane(buildCodeBlockComponent(codeblockPan)));
-        // Split pane that has parameters, state variables and code block.
+        stateCblockSplt.setResizeWeight(0.75);
+        
+        // Split pane that has description, parameters, state variables and code block.
         JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 parametersPanel,
                 stateCblockSplt);
+        spltPn.setResizeWeight(0.75);
 
         spltPn.setMinimumSize(new Dimension(20, 20));
 
@@ -369,6 +374,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         JLabel lab = new JLabel("Code Block");
+        lab.setToolTipText("Use of the code block will cause code to run first" +
+                " in the top of the Event's \"do\" method");
         lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         p.add(lab);
         cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -380,6 +387,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         return p;
     }
+    
+    public void setSelectedEventGraphDescription(String description) {
+        JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
+        JPanel jp = (JPanel) jsp.getTopComponent();
+        Component[] components = jp.getComponents();
+        for (Component c : components) {
+            if (c instanceof JScrollPane) {
+                c = ((JScrollPane) c).getViewport().getComponent(0);
+                ((JTextArea) c).setText(description);
+            }
+        }
+    }
+
     int untitledCount = 0;
 
     public void addTab(ViskitModel mod) {
@@ -409,12 +429,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             log.error(tmle);
         }
 
-        tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
-        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
-
         // the view holds only one model, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed model
         setModel((mvcModel) mod);
+        
+        tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);        
+        
+        // Bring the JGraph component to front  
+        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
 
         // Now expose the EventGraph toolbar
         getToolBar().setVisible(true);

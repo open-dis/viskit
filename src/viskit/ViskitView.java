@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
  * chosen view only as much as is described by this interface.
- * 
+ *
  * Created by IntelliJ IDEA.
  * @author Mike Bailey
  * @since Mar 18, 2004
@@ -25,9 +25,9 @@ public interface ViskitView
   boolean doEditStateVariable( vStateVariable var);
 
   /**
-   * @param title 
-   * @param prompt 
-   * @return yes, no or cancel constants 
+   * @param title
+   * @param prompt
+   * @return yes, no or cancel constants
    */
   int     genericAsk             ( String title, String prompt );
   int     genericAskYN           (String title, String msg);
@@ -39,10 +39,12 @@ public interface ViskitView
   File    saveFileAsk(String suggName,boolean showUniqueName);
 
   /** Tells view what we're working on
-   * @param s the name of the EventGraph
+   * @param name the name of the EventGraph
    */
-  //todo make sure this is called with each addTab 
-  void    setSelectedEventGraphName(String s);    
+  void    setSelectedEventGraphName(String name);
+  
+  /** @param description the description to set for the EventGraph */    
+  void    setSelectedEventGraphDescription(String description);
 
   void    addTab(ViskitModel mod); // When a tab is added
   void    delTab(ViskitModel mod); // When a tab is removed
@@ -52,7 +54,7 @@ public interface ViskitView
   void    displayXML(File f);
 
   void    prepareToQuit();
-  
+
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
   String addParameterDialog();          // returns param name
   String addStateVariableDialog();      // returns statevar name
