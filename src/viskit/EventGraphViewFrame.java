@@ -78,7 +78,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private JMenuItem quitMenuItem;
     private TitleListener titlList;
     private int titlKey;
-    private JTextArea descriptionTextArea;
     public EventGraphController controller;
     private final static String FRAME_DEFAULT_TITLE = "Viskit Event Graph Editor";
 
@@ -285,7 +284,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
 
-        descriptionTextArea = new JTextArea();
+        JTextArea descriptionTextArea = new JTextArea();
+        descriptionTextArea.setEditable(false);
         descriptionTextArea.setWrapStyleWord(true);
         descriptionTextArea.setLineWrap(true);
         descriptionTextArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
