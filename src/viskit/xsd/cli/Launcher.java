@@ -396,7 +396,6 @@ public class Launcher extends Thread implements Runnable {
                     File eventGraphJavaFile = new File(tempDir, eventGraphFileName + ".java");
                     FileWriter writer = new FileWriter(eventGraphJavaFile);
                     writer.write(eventGraphJava);
-                    writer.flush();
                     writer.close();
                     eventGraphJavaFiles.add(eventGraphJavaFile);
 
@@ -430,7 +429,6 @@ public class Launcher extends Thread implements Runnable {
                 assemblyJavaFile = new File(tempDir, assemblyFileName + ".java");
                 FileWriter writer = new FileWriter(assemblyJavaFile);
                 writer.write(assemblyJava);
-                writer.flush();
                 writer.close();
             }
             String[] cmd;
@@ -451,7 +449,6 @@ public class Launcher extends Thread implements Runnable {
             for (String s : cmdLine) {
                 argsWriter.write(s + "\n");
             }
-            argsWriter.flush();
             argsWriter.close();
             ArrayList<String> sourcePaths = new ArrayList<String>();
             // wish: allow javac to resolve potential interdependencies by
@@ -736,6 +733,7 @@ public class Launcher extends Thread implements Runnable {
             if (dir2jar.isDirectory()) {
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
             }
+            jos.flush();
             jos.close();
 
         } catch (IOException ex) {

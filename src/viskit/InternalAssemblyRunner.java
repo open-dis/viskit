@@ -495,7 +495,6 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 BufferedWriter bw = new BufferedWriter(new FileWriter(fil));
 
                 bw.write(runPanel.soutTA.getText());
-                bw.flush();
                 bw.close();
             } catch (IOException e1) {
                 JOptionPane.showMessageDialog(null, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);

@@ -129,6 +129,7 @@ public class HistogramChartDrawer {
         File outFile = new File(path);
         FileOutputStream fos = new FileOutputStream(outFile);
         ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
+        fos.flush();
         fos.close();
     }
 }

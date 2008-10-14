@@ -1299,7 +1299,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             FileWriter fw = new FileWriter(javaFile);
             fw.write(src);
-            fw.flush();
             fw.close();
 
             // Now create the build/classes directory to place bytecode

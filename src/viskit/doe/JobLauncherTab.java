@@ -610,6 +610,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             baos.write(buf, 0, rdRet);
         }
         fis.close();
+        baos.flush();
         baos.close();
         String egText = new String(baos.toByteArray());
 
@@ -670,6 +671,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 while ((line = br.readLine()) != null) {
                     out.println('\t' + line);
                 }
+                out.flush();
                 out.close();
 
                 String dataS = data.toString().trim();

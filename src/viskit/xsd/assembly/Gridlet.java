@@ -336,7 +336,6 @@ public class Gridlet extends Thread {
                 File eventGraphJavaFile = new File(tempDir,sx2j.getRoot().getName()+".java");
                 FileWriter writer = new FileWriter(eventGraphJavaFile);
                 writer.write(eventGraphJava);
-                writer.flush();
                 writer.close();
                 // since there may be some kind of event-graph interdependency, compile
                 // all .java's "at once"; javac should be able to resolve these if given
@@ -363,7 +362,6 @@ public class Gridlet extends Thread {
             File assemblyJavaFile = new File(tempDir, root.getName()+".java");
             FileWriter writer = new FileWriter(assemblyJavaFile);
             writer.write(assemblyJava);
-            writer.flush();
             writer.close();
             javaFiles.add(assemblyJavaFile);
             

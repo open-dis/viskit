@@ -302,6 +302,7 @@ public class LocalBootLoader extends URLClassLoader {
             if (dir2jar.isDirectory()) {
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
             }
+            jos.flush();
             jos.close();
 
         } catch (java.util.zip.ZipException ze) {

@@ -469,6 +469,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                 while ((line = br.readLine()) != null) {
                     out.println('\t' + line);
                 }
+                out.flush();
                 out.close();
 
                 Vector<String> parms = new Vector<String>();
