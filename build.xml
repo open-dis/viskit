@@ -78,14 +78,7 @@
     <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >        
         <include name="**/*.jar"/>
     </fileset>
-        
-    <!-- this path gets pathconverted for the native launcher in the jar target, see launch4j -->
-    <path id="launcher.classpath">
-        <fileset refid="runtime.lib"/>
-        <fileset refid="runtime.lib.ext"/>
-        <fileset refid="jaxb.classes"/>
-    </path>
-    
+            
     <path id="runtime.classpath">
     
         <!-- use local JDK for tools.jar -->
@@ -165,11 +158,13 @@
         <mkdir dir="${dir.api.doc}"/>
         <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
+	<mkdir dir="${dir.src.simasm}/stats"/>
         <mkdir dir="${dir.src.cli}"/>
         <mkdir dir="${dir.lib.ext}"/>       
         <mkdir dir="${event.graphs}"/>
         <mkdir dir="${assemblies}"/>
         <mkdir dir="${charts}"/>
+	<!-- TODO: create the jaxb directories to prevent jaxb dependency warning -->
     </target>
     
     <target name="build.schema"
@@ -452,7 +447,7 @@
             description="Build viskit jar(s)"/>
             
     <target name="jar.executable" depends="jar">
-        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="launcher.classpath">            
+        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="runtime.classpath">            
             <chainedmapper>
                 <flattenmapper/>
                 <globmapper from="*" to="lib/*"/>
