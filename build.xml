@@ -164,7 +164,6 @@
         <mkdir dir="${event.graphs}"/>
         <mkdir dir="${assemblies}"/>
         <mkdir dir="${charts}"/>
-	<!-- TODO: create the jaxb directories to prevent jaxb dependency warning -->
     </target>
     
     <target name="build.schema"
