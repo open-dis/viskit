@@ -37,7 +37,6 @@ import java.util.Properties;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.cli.Boot;
 
 
@@ -233,7 +232,7 @@ public class BshGridlet extends Thread {
             runner.start();
             try {
                 runner.join();
-            } catch (InterruptedException ie) {;} // done
+            } catch (InterruptedException ie) {} // done
             
             // finished running, collect some statistics
             // from the beanshell context to java

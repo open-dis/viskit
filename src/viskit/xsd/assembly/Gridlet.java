@@ -418,7 +418,7 @@ public class Gridlet extends Thread {
             runner.start();
             try {
                 runner.join();
-            } catch (InterruptedException ie) {;} // done
+            } catch (InterruptedException ie) {} // done
             
             // finished running, collect some statistics
             

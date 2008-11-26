@@ -611,7 +611,8 @@ public class SimkitAssemblyXML2Java {
         
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
-            
+
+            // For backwards compatibility
             if ("replicationStat".equals(pclMode) ) {
                 replicationStats.put(pcl.getName(), pcl);
             } else if ("replicationStats".equals(pclMode) ) {

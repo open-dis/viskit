@@ -936,7 +936,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             return pNode;
         }
         pNode = new PropChangeListenerNode(pcl.getName(), pcl.getType());
-        pNode.setClearStatsAfterEachRun(pcl.getMode().equals("replicationStats"));
+
+        // For backwards compatibility, bug 706
+        pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
         pNode.setGetMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
         pNode.setGetCount(Boolean.parseBoolean(pcl.getCountStatistics()));
         pNode.setDescriptionString(pcl.getDescription());
