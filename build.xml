@@ -626,7 +626,7 @@
 
     <!-- TARGET: Run w/Ant Splash @deprecated -->
     <target name="build.run"
-            depends="splashy,runtime.extensions,checkJAVA_HOME"
+            depends="splashy,jar,runtime.extensions,checkJAVA_HOME"
             description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.runtime.extensions)">
         <java classname="viskit.EventGraphAssemblyComboMain"
               classpathref="runtime.classpath"
