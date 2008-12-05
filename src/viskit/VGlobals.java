@@ -142,8 +142,8 @@ public class VGlobals {
     }
 
     public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
-        avf = new AssemblyViewFrame(contentOnly, cont);
         acont = cont;
+        avf = new AssemblyViewFrame(contentOnly, cont);
         cont.setView(avf);
         return avf;
     }

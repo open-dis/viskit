@@ -217,7 +217,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             return;
         }
 
-        JOptionPane.showMessageDialog(LegosTree.this, "Compile error in " + f.getName() + ",\n" +
+        // TODO: Move to where this actually could provide more useful info
+        JOptionPane.showMessageDialog(LegosTree.this, "Compile error in " + 
+                f.getPath() + ",\n" +
                 "or no classes of type " + targetClass.getName() +
                 " found,\n" +
                 "or duplicate class type(s) encountered.",

@@ -77,7 +77,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public AssemblyViewFrame(boolean contentOnly, AssemblyController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
-        initUI(contentOnly);          // build widgets
+        initUI(contentOnly);   // build widgets
 
         if (!contentOnly) {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
