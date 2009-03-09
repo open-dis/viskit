@@ -108,9 +108,7 @@ public class FileHandler {
     }
 
     public static Document unmarshallJdom(File f) throws Exception {
-        SAXBuilder builder;
-
-        builder = new SAXBuilder();
+        SAXBuilder builder = new SAXBuilder();
         return builder.build(f);
     }
 
