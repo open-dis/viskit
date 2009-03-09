@@ -131,7 +131,7 @@
             This is the Ant build file for the NPS Viskit and associated libraries.
             Third-party jar files are not compiled from source here, but they are
             copied as necessary for the simkit distribution.  This buildfile was created
-            and tested using Ant version 1.7.0.  Modified from Simkit's build.xml.
+            and tested using Ant version 1.7.1.  Modified from Simkit's build.xml.
         </echo>
     </target>
 
