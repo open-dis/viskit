@@ -130,7 +130,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();
-                mymetaData.extendsPackageName = jaxbRoot.getExtend();
+                mymetaData.extendsPackageName = jaxbRoot.getExtends();
+                mymetaData.implementsPackageName = jaxbRoot.getImplements();
                 List<String> lis = jaxbRoot.getComment();
                 StringBuffer sb = new StringBuffer("");
                 for (String comment : lis) {
@@ -203,7 +204,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             jaxbRoot.setVersion(nIe(metaData.version));
             jaxbRoot.setAuthor(nIe(metaData.author));
             jaxbRoot.setPackage(nIe(metaData.packageName));
-            jaxbRoot.setExtend(nIe(metaData.extendsPackageName));
+            jaxbRoot.setExtends(nIe(metaData.extendsPackageName));
+            jaxbRoot.setImplements(nIe(metaData.implementsPackageName));
             List<String> clis = jaxbRoot.getComment();
             clis.clear();
             String cmt = nIe(metaData.description);

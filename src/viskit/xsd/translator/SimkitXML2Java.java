@@ -55,7 +55,7 @@ public class SimkitXML2Java {
     private final String lb = "[";
     private final String rb = "]";
     
-    private String extend = "";
+    private String extendz = "";
     private String className = "";
     private File eventGraphFile;
 
@@ -186,14 +186,14 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(head);
         className = this.root.getName();
         String pkg = this.root.getPackage();
-        extend = this.root.getExtend();
-        String implement = this.root.getImplement();
+        extendz = this.root.getExtends();
+        String implementz = this.root.getImplements();
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
         // if none exists with template methods, and
         // Events for any "do" methods if none exists.
-        if (implement != null) {
-            extend += sp + "implements" + sp + implement;
+        if (implementz != null) {
+            extendz += sp + "implements" + sp + implementz;
         }
 
         pw.println("package " + pkg + sc);
@@ -208,7 +208,7 @@ public class SimkitXML2Java {
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
         pw.println();
-        pw.println("public class " + className + sp + "extends" + sp + extend + sp + ob);
+        pw.println("public class " + className + sp + "extends" + sp + extendz + sp + ob);
         pw.println();
     }
 
@@ -232,7 +232,7 @@ public class SimkitXML2Java {
                 pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
             }
 
-            if (!(extend.indexOf("SimEntityBase") < 0)) {
+            if (!(extendz.indexOf("SimEntityBase") < 0)) {
                 buildParameterAccessor(p, accessorBlock);
             } else if (!superParams.contains(p)) {
                 buildParameterAccessor(p, accessorBlock);
@@ -463,7 +463,7 @@ public class SimkitXML2Java {
 
         pw.println(rp + sp + ob);
 
-        if (extend.indexOf("SimEntityBase") < 0) {
+        if (extendz.indexOf("SimEntityBase") < 0) {
 
             pList = this.root.getParameter();
             superPList = resolveSuperParams(pList);
@@ -572,11 +572,11 @@ public class SimkitXML2Java {
         pw.println();        
 
         // check if super has a doRun()
-        if (extend.indexOf("SimEntityBase") < 0) {
+        if (extendz.indexOf("SimEntityBase") < 0) {
             
             Method doRun = null;
             try {
-                Class<?> sup = Class.forName(extend);
+                Class<?> sup = Class.forName(extendz);
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
             } catch (ClassNotFoundException cnfe) {                
                 
@@ -875,15 +875,15 @@ public class SimkitXML2Java {
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> superParams = new ArrayList<Parameter>();
-        if (extend.equals("simkit.SimEntityBase") || extend.equals("simkit.BasicSimEntity")) {
+        if (extendz.equals("simkit.SimEntityBase") || extendz.equals("simkit.BasicSimEntity")) {
             return superParams;
         }
 
         try {
-            // the extend field may also contain an implemnts
+            // the extendz field may also contain an implemnts
             // tail.
 
-            Class<?> c = Class.forName(extend.split("\\s")[0]);
+            Class<?> c = Class.forName(extendz.split("\\s")[0]);
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
@@ -912,8 +912,8 @@ public class SimkitXML2Java {
             superParams = Arrays.asList(parray);
 
         } catch (java.lang.ClassNotFoundException cnfe) {
-            if (extend.equals("simkit.SimEntityBase")) {
-                log.error(extend + " not in classpath ");
+            if (extendz.equals("simkit.SimEntityBase")) {
+                log.error(extendz + " not in classpath ");
             }
         }
         return superParams;

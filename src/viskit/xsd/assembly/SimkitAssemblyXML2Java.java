@@ -259,7 +259,8 @@ public class SimkitAssemblyXML2Java {
         PrintWriter pw = new PrintWriter(head);
         String name = this.root.getName();
         String pkg  = this.root.getPackage();
-        String extend = this.root.getExtend();
+        String extendz = this.root.getExtends();
+        String implementz = this.root.getImplements();
         Schedule schedule;
         
         pw.println("package " + pkg + sc);
@@ -269,12 +270,18 @@ public class SimkitAssemblyXML2Java {
 //        printImports(pw);        
 //        pw.println();
         
-        if ( extend.equals("java.lang.Object") ) {
-            extend = "";
+        if (extendz.equals("java.lang.Object")) {
+            extendz = "";
         } else {
-            extend = "extends" + sp + extend + sp;
+            extendz = "extends" + sp + extendz + sp;
         }
-        pw.println("public class " + name + sp + extend + ob);
+        if (!implementz.equals("")) {
+            implementz = "implements" + sp + implementz + sp;
+        } else {
+            implementz = "";
+        }
+
+        pw.println("public class " + name + sp + extendz + implementz + ob);
         pw.println();
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
         pw.println(sp8 + "super" + lp + rp + sc);
@@ -504,7 +511,7 @@ public class SimkitAssemblyXML2Java {
                 sret = new String(lp + type + rp);
             }
         } catch (ClassNotFoundException cnfe) {
-            ; //
+            // Do nothing
         }
         return sret;
     }
@@ -768,8 +775,7 @@ public class SimkitAssemblyXML2Java {
         
     }
     
-    private void dumpEntities(List<Output> lis, PrintWriter pw)
-    {
+    private void dumpEntities(List<Output> lis, PrintWriter pw) {
         for (Output output : lis) {
             Object elem = output.getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
@@ -784,13 +790,11 @@ public class SimkitAssemblyXML2Java {
                 error = true;
             }
             
-            if(!error)
-            //pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
-              pw.println(sp8 + "System.out.println" + lp +                    "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
-            else
-              ;  // todo what here?
-        }
-      
+            if (!error) {
+                //pw.println(sp8 + "System.out.println" + lp + nameAsm() + pd + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+                pw.println(sp8 + "System.out.println" + lp + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+            }
+        }      
     }
     
     void buildTail(StringWriter t) {

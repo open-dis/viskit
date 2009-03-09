@@ -27,7 +27,7 @@ abstract public class MetaDataDialog extends JDialog {
     private JButton okButt;
     Component locationComp;
     GraphMetaData param;
-    JTextField nameTf, packageTf, authorTf, versionTf, extendTf;
+    JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
     JCheckBox verboseCb;
     JTextArea descriptionTextArea;
@@ -76,17 +76,23 @@ abstract public class MetaDataDialog extends JDialog {
         textFieldPanel.add(versLab);
         textFieldPanel.add(versionTf);
 
-        JLabel extendLab = new JLabel("extends", JLabel.TRAILING);
-        extendTf = new JTextField(20);
-        extendLab.setLabelFor(extendTf);
-        textFieldPanel.add(extendLab);
-        textFieldPanel.add(extendTf);
+        JLabel extendsLab = new JLabel("extends", JLabel.TRAILING);
+        extendsTf = new JTextField(20);
+        extendsLab.setLabelFor(extendsTf);
+        textFieldPanel.add(extendsLab);
+        textFieldPanel.add(extendsTf);
+
+        JLabel implementsLab = new JLabel("implements", JLabel.TRAILING);
+        implementsTf = new JTextField(20);
+        implementsLab.setLabelFor(implementsTf);
+        textFieldPanel.add(implementsLab);
+        textFieldPanel.add(implementsTf);
 
         //Lay out the panel.
         SpringUtilities.makeCompactGrid(textFieldPanel,
-                5, 2, //rows, cols
-                0, 0, //initX, initY
-                6, 6);       //xPad, yPad
+                6, 2,   //rows, cols
+                0, 0,   //initX, initY
+                6, 6);  //xPad, yPad
 
         Dimension d = textFieldPanel.getPreferredSize();
         textFieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
@@ -170,7 +176,8 @@ abstract public class MetaDataDialog extends JDialog {
         authorTf.setText(param.author);
         versionTf.setText(param.version);
         descriptionTextArea.setText(param.description);
-        extendTf.setText(param.extendsPackageName);
+        extendsTf.setText(param.extendsPackageName);
+        implementsTf.setText(param.implementsPackageName);
         stopTimeTf.setText(param.stopTime);
         verboseCb.setSelected(param.verbose);
         nameTf.selectAll();
@@ -182,7 +189,8 @@ abstract public class MetaDataDialog extends JDialog {
         param.name = nameTf.getText().trim();
         param.packageName = packageTf.getText().trim();
         param.version = versionTf.getText().trim();
-        param.extendsPackageName = extendTf.getText().trim();
+        param.extendsPackageName = extendsTf.getText().trim();
+        param.implementsPackageName = implementsTf.getText().trim();
         param.stopTime = stopTimeTf.getText().trim();
         param.verbose = verboseCb.isSelected();
     }

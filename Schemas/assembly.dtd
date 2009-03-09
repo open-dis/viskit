@@ -6,10 +6,11 @@
 
 <!ELEMENT SimkitAssembly (head?, (%DesignParameters;)*, SimEntity*, EventGraph*, PropertyChangeListener*, SimEventListenerConnection*, PropertyChangeListenerConnection*, Adapter*, Output*, Verbose*, Schedule?, Experiment?)>
 <!ATTLIST SimkitAssembly
-    name    ID      #REQUIRED
-    version CDATA   "1.0"
-    package CDATA   #REQUIRED
-    extend  CDATA   "viskit.xsd.assembly.ViskitAssembly"
+    name        ID      #REQUIRED
+    version     CDATA   "1.0"
+    package     CDATA   #REQUIRED
+    extends     CDATA   "viskit.xsd.assembly.ViskitAssembly"
+    implements  CDATA   #IMPLIED
 >
 
 <!ELEMENT head (meta*)>

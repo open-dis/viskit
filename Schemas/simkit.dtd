@@ -5,8 +5,8 @@
         package     CDATA       "examples"
         version     CDATA       "1.0"
         author      CDATA       #IMPLIED
-        extend      CDATA       "SimEntityBase"
-        implement   CDATA       #IMPLIED
+        extends     CDATA       "SimEntityBase"
+        implements  CDATA       #IMPLIED
         description CDATA       #IMPLIED
 >
 

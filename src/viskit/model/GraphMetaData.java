@@ -22,6 +22,7 @@ public class GraphMetaData {
     public String description = ""; // originally called "comment"
     public String stopTime = "100.0";    
     public String extendsPackageName = "";
+    public String implementsPackageName = "";
     
     public boolean verbose = false;
 
@@ -38,22 +39,25 @@ public class GraphMetaData {
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tmp = of.createSimkitAssembly();
-            extendsPackageName = tmp.getExtend();
+            extendsPackageName = tmp.getExtends();
+            implementsPackageName = tmp.getImplements();
 
         } else {
             name = "EventGraphName";
             viskit.xsd.bindings.eventgraph.ObjectFactory of =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tmp = of.createSimEntity();
-            extendsPackageName = tmp.getExtend();
+            extendsPackageName = tmp.getExtends();
+            implementsPackageName = tmp.getImplements();
         }
     }
 
-    public GraphMetaData(String n, String p, String a, String v, String e) {
+    public GraphMetaData(String n, String p, String a, String v, String e, String i) {
         name = n;
         packageName = p;
         author = a;
         version = v;
         extendsPackageName = e;
+        implementsPackageName = i;
     }
 }

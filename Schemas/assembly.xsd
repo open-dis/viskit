@@ -39,7 +39,8 @@
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="package" use="required"/>
-      <xs:attribute name="extend" default="viskit.xsd.assembly.ViskitAssembly"/>
+      <xs:attribute name="extends" default="viskit.xsd.assembly.ViskitAssembly"/>
+      <xs:attribute name="implements"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="head">
