@@ -415,6 +415,7 @@ public class SettingsDialog extends JDialog {
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
             for (String s : sa) {
+                s = s.replaceAll("\\\\", "/");
                 if (!mod.contains(s)) {
                     mod.addElement(s);
                 }
@@ -522,7 +523,7 @@ public class SettingsDialog extends JDialog {
                 if (selFile.isDirectory() && !absPath.endsWith(sep)) {
                     absPath = absPath + sep;
                 }
-                ((DefaultListModel) classPathJlist.getModel()).addElement(absPath);
+                ((DefaultListModel) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
                 installClassPathIntoConfig();
             }
         }
