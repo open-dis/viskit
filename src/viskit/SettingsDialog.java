@@ -31,16 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Nov 2, 2005
- * @since 11:24:06 AM
- * @version $Id$
- */
 package viskit;
 
 import org.apache.commons.configuration.XMLConfiguration;
@@ -60,6 +50,15 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
+ * @author Mike Bailey
+ * @since Nov 2, 2005
+ * @since 11:24:06 AM
+ * @version $Id$
+ */
 public class SettingsDialog extends JDialog {
 
     static Logger log = Logger.getLogger(SettingsDialog.class);
@@ -412,11 +411,13 @@ public class SettingsDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        DefaultListModel mod = new DefaultListModel();
+        DefaultListModel mod = (DefaultListModel) classPathJlist.getModel();
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
             for (String s : sa) {
-                mod.addElement(s);
+                if (!mod.contains(s)) {
+                    mod.addElement(s);
+                }
             }
             classPathJlist.setModel(mod);
         }
@@ -544,7 +545,7 @@ public class SettingsDialog extends JDialog {
                 return;
             }
             for (int i = selected.length - 1; i >= 0; i--) {
-                ((DefaultListModel) classPathJlist.getModel()).removeElementAt(selected[i]);
+                ((DefaultListModel) classPathJlist.getModel()).remove(selected[i]);
             }
             installClassPathIntoConfig();
         }
@@ -564,11 +565,10 @@ public class SettingsDialog extends JDialog {
     private void moveLine(int idx, int polarity) {
         classPathJlist.clearSelection();
         DefaultListModel mod = (DefaultListModel) classPathJlist.getModel();
-        Object o = mod.getElementAt(idx);
-        mod.removeElementAt(idx);
-        mod.insertElementAt(o, idx + polarity);
+        Object o = mod.get(idx);
+        mod.remove(idx);
+        mod.add(idx + polarity, o);
         classPathJlist.setSelectedIndex(idx + polarity);
-
     }
 
     class downCPhandler implements ActionListener {
