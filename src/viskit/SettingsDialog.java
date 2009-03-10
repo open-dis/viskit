@@ -159,7 +159,7 @@ public class SettingsDialog extends JDialog {
     private void buildWidgets() {
         JPanel classpathP = new JPanel();
         classpathP.setLayout(new BoxLayout(classpathP, BoxLayout.Y_AXIS));
-        classPathJlist = new JList();
+        classPathJlist = new JList(new DefaultListModel());
         JScrollPane jsp = new JScrollPane(classPathJlist);
         jsp.setPreferredSize(new Dimension(70, 70));  // don't want it to control size of dialog
         classpathP.add(jsp);
@@ -411,7 +411,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        DefaultListModel mod = new DefaultListModel();
+        DefaultListModel mod = (DefaultListModel) classPathJlist.getModel();
+        mod.clear();
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
             for (String s : sa) {
@@ -569,6 +570,7 @@ public class SettingsDialog extends JDialog {
         Object o = mod.get(idx);
         mod.remove(idx);
         mod.add(idx + polarity, o);
+        installClassPathIntoConfig();
         classPathJlist.setSelectedIndex(idx + polarity);
     }
 
