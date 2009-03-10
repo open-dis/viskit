@@ -9,8 +9,8 @@
     name        ID      #REQUIRED
     version     CDATA   "1.0"
     package     CDATA   #REQUIRED
-    extends     CDATA   "viskit.xsd.assembly.ViskitAssembly"
-    implements  CDATA   #IMPLIED
+    extend      CDATA   "viskit.xsd.assembly.ViskitAssembly"
+    implement   CDATA   #IMPLIED
 >
 
 <!ELEMENT head (meta*)>

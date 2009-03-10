@@ -14,8 +14,8 @@
       <xs:attribute name="package" default="examples"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="author"/>
-      <xs:attribute name="extends" default="SimEntityBase"/>
-      <xs:attribute name="implements"/>
+      <xs:attribute name="extend" default="SimEntityBase"/>
+      <xs:attribute name="implement"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>

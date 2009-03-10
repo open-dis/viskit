@@ -23,7 +23,7 @@
             <ide-actions>
                 <action name="build">
                     <script>${ant.script}</script>
-                    <target>build.viskit.with.runtime.extensions</target>
+                    <target>build.viskit.no.runtime.extensions</target>
                 </action>
                 <action name="clean">
                     <script>${ant.script}</script>
@@ -44,7 +44,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean.all</target>
-                    <target>build.viskit.with.runtime.extensions</target>
+                    <target>build.viskit.no.runtime.extensions</target>
                 </action>
                 <action name="run.single">
                     <script>${ant.script}</script>

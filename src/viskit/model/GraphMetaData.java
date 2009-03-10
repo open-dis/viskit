@@ -39,16 +39,16 @@ public class GraphMetaData {
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tmp = of.createSimkitAssembly();
-            extendsPackageName = tmp.getExtends();
-            implementsPackageName = tmp.getImplements();
+            extendsPackageName = tmp.getExtend();
+            implementsPackageName = tmp.getImplement();
 
         } else {
             name = "EventGraphName";
             viskit.xsd.bindings.eventgraph.ObjectFactory of =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tmp = of.createSimEntity();
-            extendsPackageName = tmp.getExtends();
-            implementsPackageName = tmp.getImplements();
+            extendsPackageName = tmp.getExtend();
+            implementsPackageName = tmp.getImplement();
         }
     }
 

@@ -88,7 +88,7 @@ abstract public class MetaDataDialog extends JDialog {
         textFieldPanel.add(implementsLab);
         textFieldPanel.add(implementsTf);
 
-        //Lay out the panel.
+        // Lay out the panel.
         SpringUtilities.makeCompactGrid(textFieldPanel,
                 6, 2,   //rows, cols
                 0, 0,   //initX, initY

@@ -186,8 +186,8 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(head);
         className = this.root.getName();
         String pkg = this.root.getPackage();
-        extendz = this.root.getExtends();
-        String implementz = this.root.getImplements();
+        extendz = this.root.getExtend();
+        String implementz = this.root.getImplement();
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
         // if none exists with template methods, and

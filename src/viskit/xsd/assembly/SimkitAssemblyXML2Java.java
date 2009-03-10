@@ -259,8 +259,8 @@ public class SimkitAssemblyXML2Java {
         PrintWriter pw = new PrintWriter(head);
         String name = this.root.getName();
         String pkg  = this.root.getPackage();
-        String extendz = this.root.getExtends();
-        String implementz = this.root.getImplements();
+        String extendz = this.root.getExtend();
+        String implementz = this.root.getImplement();
         Schedule schedule;
         
         pw.println("package " + pkg + sc);
@@ -275,7 +275,7 @@ public class SimkitAssemblyXML2Java {
         } else {
             extendz = "extends" + sp + extendz + sp;
         }
-        if (!implementz.equals("")) {
+        if (implementz != null) {
             implementz = "implements" + sp + implementz + sp;
         } else {
             implementz = "";
