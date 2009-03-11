@@ -419,6 +419,7 @@
                 <section name="viskit.xsd.translator"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
+            <metainf file="license/license.txt"/>
         </jar>
         <delete file="${dir.build.lib}/visxml.jar"/>
     </target>

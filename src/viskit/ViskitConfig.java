@@ -41,6 +41,7 @@ public class ViskitConfig {
     public static final String EG_HISTORY_KEY = "history.EventGraphEditor.Recent.EventGraphFile";
     public static final String ASSY_HISTORY_KEY = "history.AssemblyEditor.Recent.AssemblyFile";
     public static final String X_CLASS_PATH_KEY = "extraClassPath.path";
+    public static final String X_CLASS_PATHS_KEY = X_CLASS_PATH_KEY + "[@value]";
     public static final String X_CLASS_PATH_CLEAR_KEY = "extraClassPath";
     public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
     public static final String RECENT_ASSY_CLEAR_KEY = "history.AssemblyEditor.Recent";
@@ -161,9 +162,8 @@ public class ViskitConfig {
         return cc.getString(key);
     }
 
-    public int getConfigValueCount(String key) {
-        String[] sa = cc.getStringArray(key);
-        return sa.length;
+    public String[] getConfigValues(String key) {
+        return cc.getStringArray(key);
     }
 
     /** @param f a Viskit project file */

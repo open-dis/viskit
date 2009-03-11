@@ -38,9 +38,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileView;
+
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -56,22 +62,22 @@ import org.jdom.output.XMLOutputter;
 public class ViskitProject {
 
     public static final Logger log = Logger.getLogger(viskit.ViskitProject.class);
-    
+
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project home space on the user's machine.  A default
      * home will be the user's profile, or home directory.
      */
-    public static final String DEFAULT_VISKIT_PROJECTS_DIR = 
+    public static final String DEFAULT_VISKIT_PROJECTS_DIR =
             System.getProperty("user.home") + Vstatics.getFileSeparator() +
             "MyViskitProjects";
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
-    
+
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine.  A default
      * location will be in the user's profile, or home directory.
      */
     public static String DEFAULT_PROJECT_NAME = "DefaultProject";
-    
+
     public static final String VISKIT_ROOT_NAME = "ViskitProject";
     public static final String PROJECT_FILE_NAME = "viskitProject.xml";
     public static final String EVENT_GRAPH_DIRECTORY_NAME = "EventGraphs";
@@ -103,30 +109,30 @@ public class ViskitProject {
     }
 
     public boolean initProject() {
-        
+
         if (!projectRoot.exists()) {
             projectRoot.mkdir();
         }
-        
+
         setEventGraphDir(new File(projectRoot, EVENT_GRAPH_DIRECTORY_NAME));
         if (!eventGraphDir.exists()) {
             getEventGraphDir().mkdir();
         }
-        
+
         setAssemblyDir(new File(projectRoot, ASSEMBLY_DIRECTORY_NAME));
         if (!assemblyDir.exists()) {
             getAssemblyDir().mkdir();
         }
-        
+
         setLibDir(new File(projectRoot, LIB_DIRECTORY_NAME));
         if (!libDir.exists()) {
             getLibDir().mkdir();
         }
-        
+
         buildDir = new File(projectRoot, BUILD_DIRECTORY_NAME);
         setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
         setClassDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
-        
+
         // Start with a fresh build directory
 //        if (buildDir.exists()) {
 //            clean();
@@ -135,7 +141,7 @@ public class ViskitProject {
         // NOTE: if we nuke the buildDir, then we cause ClassNotFoundExceptions
         // down the line.  Each class will be recompiled everytime we open an
         // assembly, or event graph file, so no real need to nuke it.
-        
+
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectRoot, PROJECT_FILE_NAME));
         if (!projectFile.exists()) {
@@ -303,19 +309,19 @@ public class ViskitProject {
     public File getSrcDir() {
         return srcDir;
     }
-    
+
     public void setSrcDir(File srcDir) {
         this.srcDir = srcDir;
     }
-    
+
     public File getClassDir() {
         return classDir;
     }
-    
+
     public void setClassDir(File classDir) {
         this.classDir = classDir;
     }
-    
+
     public String[] getProjectContents() {
         List<String> sa = new ArrayList<String>();
 
@@ -328,6 +334,11 @@ public class ViskitProject {
                 }
             }
             log.debug(getEventGraphDir().getCanonicalPath());
+            for (String s : ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY)) {
+                if (!s.contains(getEventGraphDir().getName())) {
+                    sa.add(s);
+                }
+            }
             sa.add(getEventGraphDir().getCanonicalPath());
 
         } catch (IOException ex) {
@@ -384,5 +395,117 @@ public class ViskitProject {
      */
     public void setProjectFile(File projectFile) {
         this.projectFile = projectFile;
+    }
+
+    private static JFileChooser projectChooser;
+
+    private static void initializeProjectChooser(String startPath) {
+        if (projectChooser == null) {
+            projectChooser = new JFileChooser(startPath);
+            projectChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+
+            // allow only dirs for selection
+            projectChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+            // show spec. icon for auvw projects
+            projectChooser.setFileView(new ViskitProjectFileView());
+            projectChooser.setMultiSelectionEnabled(false);
+        }
+    }
+
+    /** Not currently used
+     * @param parent the component to center the FileChooser against
+     * @param startingDirPath a path to start looking
+     * @return a selected file
+     */
+    public static File newProjectPath(JFrame parent, String startingDirPath) {
+        initializeProjectChooser(startingDirPath);
+
+        projectChooser.setDialogTitle("New Viskit Project Directory");
+        int ret = projectChooser.showSaveDialog(parent);
+        if (ret == JFileChooser.CANCEL_OPTION) {
+            return null;
+        }
+        return projectChooser.getSelectedFile();
+    }
+
+    /**
+     * @param parent the component parent for JOptionPane orientation
+     * @param startingDirPath a path to start looking from in dir chooser
+     * @return a path to a chosen project directory
+     */
+    public static File openProjectDir(JFrame parent, String startingDirPath) {
+        File projectDir = null;
+        boolean isProjectDir = false;
+
+        initializeProjectChooser(startingDirPath);
+        projectChooser.setDialogTitle("Open an Existing Viskit Project");
+
+        // TODO: Determine source of annoying delay in showing the dialog
+        int ret = projectChooser.showOpenDialog(parent);
+
+        if (ret != JFileChooser.APPROVE_OPTION) {
+            return null;
+        } // cancelled
+
+        do {
+
+            projectDir = projectChooser.getSelectedFile();
+
+            if (!isViskitProject(projectDir)) {
+                Object[] options = {"Select project", "Cancel"};
+                int retrn = JOptionPane.showOptionDialog(parent, "Selected directory is not a Viskit project.", "Unable to open project",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+
+                if (retrn != 0) {
+                    // 0th choice (Select project)
+                    return null; // cancelled
+                } // cancelled
+                isProjectDir = false;
+            } else {
+                isProjectDir = true;
+            }
+        } while (!isProjectDir);
+
+        projectChooser = null;
+
+        return projectDir;
+    }
+
+    /**
+     * @param f the project directory to test
+     * @return true when an viskitProject.xml file is found
+     */
+    public static boolean isViskitProject(File f) {
+
+        boolean foundProjectFile = false;
+        if (!f.exists() || !f.isDirectory()) {
+            return foundProjectFile;
+        }
+
+        File[] children = f.listFiles();
+
+        for (File c : children) {
+            if (c.getName().equals(PROJECT_FILE_NAME)) {
+                foundProjectFile = true;
+            }
+        }
+
+        return foundProjectFile;
+    }
+
+    private static class ViskitProjectFileView extends FileView {
+
+        Icon viskitProjIcon;
+
+        public ViskitProjectFileView() {
+            super();
+            viskitProjIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
+        }
+
+        @Override
+        public Icon getIcon(File f) {
+            return isViskitProject(f) ? viskitProjIcon : null;
+        }
     }
 }

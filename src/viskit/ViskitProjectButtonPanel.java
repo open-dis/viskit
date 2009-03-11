@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+ Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -155,7 +155,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             return;  // back to button panel
         }
         selectedFile = chooser.getSelectedFile();
-        foundProject = isViskitProject(selectedFile);
+        foundProject = ViskitProject.isViskitProject(selectedFile);
         if (!foundProject) {
             JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
         }
@@ -188,16 +188,6 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
     } while (true);
 
-    projF.mkdirs();
-
-    new File(projF, ViskitProject.EVENT_GRAPH_DIRECTORY_NAME).mkdir();
-    new File(projF, ViskitProject.ASSEMBLY_DIRECTORY_NAME).mkdir();
-    new File(projF, ViskitProject.LIB_DIRECTORY_NAME).mkdir();
-//      new File(projF,ViskitProject.BUILD_DIRECTORY_NAME).mkdir();
-//      new File(projF,ViskitProject.SOURCE_DIRECTORY_NAME).mkdir();
-//      new File(projF,ViskitProject.CLASSES_DIRECTORY_NAME).mkdir();
-//      new File(projF,ViskitProject.DIST_DIRECTORY_NAME).mkdir();
-
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
     setupViskitProject(projF);
@@ -213,47 +203,10 @@ private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     System.exit(0);
 }//GEN-LAST:event_exitButtActionPerformed
 
-    private boolean isViskitProject(File fil) {
-        boolean foundEG = false;
-        boolean foundAsemb = false;
-//      boolean foundLib     = false;
-//      boolean foundBuild   = false;
-//      boolean foundSrc     = false;
-//      boolean foundClasses = false;
-//      boolean foundDist    = false;
-        if (fil.isDirectory()) {
-            File[] lis = fil.listFiles();
-            for (File f : lis) {
-                if (f.isDirectory()) {
-                    if (f.getName().equals(ViskitProject.EVENT_GRAPH_DIRECTORY_NAME)) {
-                        foundEG = true;
-                    } else if (f.getName().equals(ViskitProject.ASSEMBLY_DIRECTORY_NAME)) {
-                        foundAsemb = true;
-                    }
-//                      else if(projectParentF.getName().equals(ViskitProject.LIB_DIRECTORY_NAME))
-//                          foundLib = true;
-//                      else if(projectParentF.getName().equals(ViskitProject.BUILD_DIRECTORY_NAME))
-//                          foundBuild = true;
-//                      else if(projectParentF.getName().equals(ViskitProject.SOURCE_DIRECTORY_NAME))
-//                          foundSrc = true;
-//                      else if(projectParentF.getName().equals(ViskitProject.CLASSES_DIRECTORY_NAME))
-//                          foundClasses = true;
-//                      else if(projectParentF.getName().equals(ViskitProject.DIST_DIRECTORY_NAME))
-//                          foundDist = true;
-
-                    if (foundEG && foundAsemb /*&& foundLib && foundBuild && foundSrc && foundClasses && foundDist*/) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     class ProjectFilter extends javax.swing.filechooser.FileFilter {
 
         public boolean accept(File fil) {
-            return isViskitProject(fil);
+            return ViskitProject.isViskitProject(fil);
         }
 
         public String getDescription() {

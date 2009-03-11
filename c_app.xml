@@ -13,6 +13,7 @@
             <FrameBounds h="600" w="800" x="400" y="212" />
         </AssemblyEditor>
         <projecthome>
+            <!-- These two MUST always be at least zero length Strings -->
             <path dir="" />
             <name value=""/>
         </projecthome>

@@ -176,7 +176,7 @@ public class FileBasedClassManager implements Runnable {
             return;
         }
         try {
-            List<String> cache = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+            List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
             if (viskit.Vstatics.debug) {
                 if (cache == null) {
                     log.debug("cache " + cache);
@@ -238,7 +238,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public boolean isCached(File file) {
-        List<String> cache = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
             if (viskit.Vstatics.debug) {
                 log.debug("isCached() " + file + " of cacheSize " + cache.size());
@@ -271,8 +271,8 @@ public class FileBasedClassManager implements Runnable {
      * @return a cached class file given its cached XML file
      */
     public File getCachedClass(File file) {
-        List<String> cacheXML = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath());
@@ -296,8 +296,8 @@ public class FileBasedClassManager implements Runnable {
      * @return an XML file given its cached class file
      */
     public File getCachedXML(File file) {
-        List<String> cacheXML = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath());
@@ -320,8 +320,8 @@ public class FileBasedClassManager implements Runnable {
      * @param file the XML, or class file to delete from the cache
      */
     public void deleteCache(File file) {
-        List<String> cacheXML = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         String filePath;
         File deletedCache = null;
         try {
@@ -355,8 +355,8 @@ public class FileBasedClassManager implements Runnable {
      * @return
      */
     public boolean isCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY));
-        List<String> digests = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_MISS_DIGEST_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
+        List<String> digests = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         int index;
         try {
             index = cacheMisses.lastIndexOf(file.getCanonicalPath());
@@ -376,7 +376,7 @@ public class FileBasedClassManager implements Runnable {
     public void addCacheMiss(File file) {
         deleteCache(file);
         removeCacheMiss(file); // remove any old ones
-        int index = projectConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY).length;
+        int index = ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY).length;
         try {
             projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath());
             projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
@@ -386,7 +386,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public void removeCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_MISS_FILE_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
         int index;
         try {
             if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath())) > -1) {
@@ -404,7 +404,7 @@ public class FileBasedClassManager implements Runnable {
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheDigest = Arrays.asList(projectConfig.getStringArray(ViskitConfig.CACHED_MISS_DIGEST_KEY));
+        List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         String filePath;
         try {
             filePath = egFile.getCanonicalPath();

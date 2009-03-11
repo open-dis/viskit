@@ -996,17 +996,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     public File[] openFilesAsk() {
-        if (jfc == null) {
-            jfc = buildOpenSaveChooser();
-            jfc.setDialogTitle("Open Event Graph Files");
+        jfc = buildOpenSaveChooser();
+        jfc.setDialogTitle("Open Event Graph Files");
 
-            // Bug fix: 1246
-            jfc.addChoosableFileFilter(new EventGraphFileFilter(
-                    new String[]{"assembly", "smal", "x3d", "x3dv", "java", "class"}));
+        // Bug fix: 1246
+        jfc.addChoosableFileFilter(new EventGraphFileFilter(
+                new String[] {"assembly", "smal", "x3d", "x3dv", "java", "class"}));
 
-            // Bug fix: 1249
-            jfc.setMultiSelectionEnabled(true);
-        }
+        // Bug fix: 1249
+        jfc.setMultiSelectionEnabled(true);
 
         int retv = jfc.showOpenDialog(this);
         return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;

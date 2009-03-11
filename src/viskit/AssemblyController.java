@@ -539,39 +539,28 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
-            closeAll();            
-            ViskitConfig.instance().clearViskitConfig();
-            VGlobals vGlobals = VGlobals.instance();
-            vGlobals.getCurrentViskitProject().closeProject();
-            vGlobals.initProjectHome();
+            doProjectCleanup();
+            VGlobals.instance().initProjectHome();
         }
     }
 
-    /** Opens an already existing Viskit Project
-     * @param jfc the JFileChooser from the EventGraphViewFrame to select 
-     * the project directory
-     * @param avf the JFrame for the JFileChooser's orientation
-     */
-    public void openProject(JFileChooser jfc, JFrame avf) {
-        String msg = "Are you sure you want to close your current Viskit Project?";
-        String title = "Close Current Project";
+    private void doProjectCleanup() {
+        closeAll();
+        ViskitConfig.instance().clearViskitConfig();
+        VGlobals.instance().getCurrentViskitProject().closeProject();
+    }
 
-        int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
-        if (ret == JOptionPane.YES_OPTION) {
-            int retv = jfc.showOpenDialog(avf);
-            if (retv == JFileChooser.APPROVE_OPTION) {
-                closeAll();
-                ViskitConfig vConfig = ViskitConfig.instance();
-                vConfig.clearViskitConfig();
-                VGlobals vGlobals = VGlobals.instance();
-                vGlobals.getCurrentViskitProject().closeProject();
-                ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent().replaceAll("\\\\", "/");
-                vConfig.setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-                ViskitProject.DEFAULT_PROJECT_NAME = jfc.getSelectedFile().getName();
-                vConfig.setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
-                vGlobals.createWorkDirectory();
-            }
-        }
+    /** Opens an already existing Viskit Project
+     * @param file the project root file for an existing Viskit project
+     */
+    public void openProject(File file) {
+        doProjectCleanup();
+        ViskitConfig vConfig = ViskitConfig.instance();
+        ViskitProject.MY_VISKIT_PROJECTS_DIR = file.getParent().replaceAll("\\\\", "/");
+        vConfig.setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        ViskitProject.DEFAULT_PROJECT_NAME = file.getName();
+        vConfig.setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+        VGlobals.instance().createWorkDirectory();
     }
 
     /** Create a new blank assembly graph model */

@@ -519,10 +519,6 @@ public class SettingsDialog extends JDialog {
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
-                String sep = Vstatics.getFileSeparator();
-                if (selFile.isDirectory() && !absPath.endsWith(sep)) {
-                    absPath = absPath + sep;
-                }
                 ((DefaultListModel) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
                 installClassPathIntoConfig();
             }

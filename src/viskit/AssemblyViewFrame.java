@@ -903,16 +903,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public File[] openFilesAsk() {
-        if (jfc == null) {
-            jfc = buildOpenSaveChooser();
-            jfc.setDialogTitle("Open Assembly Files");
+        jfc = buildOpenSaveChooser();
+        jfc.setDialogTitle("Open Assembly Files");
 
-            // Look for assembly in the filename, Bug 1247 fix
-            FileFilter filter = new AssemblyFileFilter("assembly");
-            jfc.setFileFilter(filter);
+        // Look for assembly in the filename, Bug 1247 fix
+        FileFilter filter = new AssemblyFileFilter("assembly");
+        jfc.setFileFilter(filter);
 
-            jfc.setMultiSelectionEnabled(true);
-        }
+        jfc.setMultiSelectionEnabled(true);
 
         int returnVal = jfc.showOpenDialog(this);
         return (returnVal == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
@@ -945,12 +943,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     /** Open an already existing Viskit Project */
     public void openProject() {
-        jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        jfc.setDialogTitle("Open an Existing Viskit Project");
-        jfc.setDialogType(JFileChooser.OPEN_DIALOG);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        ((AssemblyController) getController()).openProject(jfc, this);
-        jfc = null;
+        String msg = "Are you sure you want to close your current Viskit Project?";
+        String title = "Close Current Project";
+
+        int ret = genericAskYN(title, msg);
+        if (ret == JOptionPane.YES_OPTION) {
+            File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+            if (file != null) {
+                ((AssemblyController) getController()).openProject(file);
+            }
+        }        
     }
 
     private File getUniqueName(String suggName) {
