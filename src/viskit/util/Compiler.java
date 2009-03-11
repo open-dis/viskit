@@ -36,6 +36,7 @@ public class Compiler {
         CompilerDiagnosticsListener diag = new CompilerDiagnosticsListener(diagnosticMessages);
         JavaObjectFromString jofs = null;
         StringBuffer classPaths = null;
+        String cp = null;
 
         try {
             jofs = new JavaObjectFromString(pkg + "." + className, src);
@@ -48,21 +49,22 @@ public class Compiler {
             String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getResetWorkClassLoader(false))).getClassPath();
             classPaths = new StringBuffer();
             for (String cPath : workClassPath) {
-                classPaths.append(cPath + File.pathSeparator);
-                log.debug(cPath);
+                classPaths.append(cPath + File.pathSeparator);                
             }
+            cp = classPaths.toString();
+            log.debug("cp is: " + cp);
             String[] options = {"-Xlint:unchecked",
                     "-Xlint:deprecation",
                     "-cp", 
-                    classPaths.toString(), 
+                    cp,
                     "-d", 
                     workDirPath};
             java.util.List<String> optionsList = Arrays.asList(options);
             compiler.getTask(null, sjfm, diag, optionsList, null, fileObjects).call();
             sb.append(diag.messageString);
         } catch (Exception ex) {
-            VGlobals.log.error("Error: Compile JavaObjectFromString " + pkg + "." + className + " " + " " + jofs.toString());            
-            log.info("Classpath is: " + classPaths.toString());
+            VGlobals.log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+            log.error("Classpath is: " + cp);
             ex.printStackTrace();
         }
         return sb.toString();

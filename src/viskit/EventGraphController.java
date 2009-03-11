@@ -116,41 +116,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     /** Creates a new Viskit Project */
     public void newProject() {
-        String msg = "Are you sure you want to close your current Viskit Project?";
-        String title = "Close Current Project";
-                
-        int ret = ((ViskitView) getView()).genericAskYN(title, msg);
-        if (ret == JOptionPane.YES_OPTION) {
-            VGlobals.instance().getAssemblyController().closeAll();
-            ViskitConfig.instance().clearViskitConfig();
-            VGlobals.instance().initProjectHome();
-            VGlobals.instance().createWorkDirectory();            
-        }
+        VGlobals.instance().getAssemblyController().newProject();
     }
-    
-    /** Opens an already existing Viskit Project
-     * @param jfc the JFileChooser from the EventGraphViewFrame to select 
-     * the project directory
-     * @param egvf the EventGraphViewFrame for the JFileChooser's orientation
-     */
-    public void openProject(JFileChooser jfc, EventGraphViewFrame egvf) {
-        String msg = "Are you sure you want to close your current Viskit Project?";
-        String title = "Close Current Project";
-                
-        int ret = ((ViskitView) getView()).genericAskYN(title, msg);
-        if (ret == JOptionPane.YES_OPTION) {
-            int retv = jfc.showOpenDialog(egvf);
-            if (retv == JFileChooser.APPROVE_OPTION) {
-                VGlobals.instance().getAssemblyController().closeAll();
-                ViskitConfig.instance().clearViskitConfig();
-                ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent();
-                ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
-                VGlobals.instance().createWorkDirectory();
-            }
-        }
-    }
-    
+        
     /** Create a new blank EventGraph model */
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
@@ -1000,8 +968,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
         try {
             historyConfig = ViskitConfig.instance().getViskitConfig();
         } catch (Exception e) {
-            System.out.println("Error loading history file: " + e.getMessage());
-            System.out.println("Recent file saving disabled");
+            Vstatics.log.error("Error loading history file: " + e.getMessage());
+            Vstatics.log.error("Recent file saving disabled");
             historyConfig = null;
         }
     }

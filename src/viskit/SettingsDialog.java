@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -97,7 +97,7 @@ public class SettingsDialog extends JDialog {
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
-        initConfig();
+        initConfigs();
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -298,9 +298,11 @@ public class SettingsDialog extends JDialog {
       }
     }
     private static XMLConfiguration vConfig;
+    private static XMLConfiguration projectConfig;
     
-    private static void initConfig() {
+    private static void initConfigs() {
         vConfig = ViskitConfig.instance().getViskitConfig();
+        projectConfig = ViskitConfig.instance().getProjectXMLConfig();
     }
 
     class VisibilityHandler implements ActionListener {
@@ -332,8 +334,7 @@ public class SettingsDialog extends JDialog {
 
         public void actionPerformed(ActionEvent actionEvent) {
             ViskitController ctrlr = (ViskitController) VGlobals.instance().getEventGraphEditor().getController();
-            ctrlr.clearRecentFileList();             
-            //vConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY); gets done in controller
+            ctrlr.clearRecentFileList(); 
         }
     }
 
@@ -342,15 +343,13 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
             AssemblyController aCtrlr = VGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentFileList();
-            //vConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);  gets done in controller
         }
     }
 
-    public static void clearClassPathEntries() {
-        if (vConfig == null) {
-            initConfig();
-        }
-        vConfig.clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
+    private static void clearClassPathEntries() {
+        // Always reinitialize the config instances.  We may have changed projects
+        initConfigs();
+        projectConfig.clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
     }
     
     static JDialog progressDialog;
@@ -364,7 +363,7 @@ public class SettingsDialog extends JDialog {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
                 log.debug("lis[" + ix + "]: " + s);
-                vConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
+                projectConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
         }
@@ -589,10 +588,10 @@ public class SettingsDialog extends JDialog {
 
     /** @return a String array containing the extra classpaths to consider */
     public static String[] getExtraClassPath() {
-        if (vConfig == null) {
-            initConfig();
+        if ((vConfig == null) || (projectConfig == null)) {
+            initConfigs();
         }
-        return vConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
+        return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */

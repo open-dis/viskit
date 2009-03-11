@@ -539,19 +539,20 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
         if (ret == JOptionPane.YES_OPTION) {
-            closeAll();
+            closeAll();            
             ViskitConfig.instance().clearViskitConfig();
-            VGlobals.instance().initProjectHome();
-            VGlobals.instance().createWorkDirectory();
+            VGlobals vGlobals = VGlobals.instance();
+            vGlobals.getCurrentViskitProject().closeProject();
+            vGlobals.initProjectHome();
         }
     }
 
     /** Opens an already existing Viskit Project
      * @param jfc the JFileChooser from the EventGraphViewFrame to select 
      * the project directory
-     * @param avf the AssemblyViewFrame for the JFileChooser's orientation
+     * @param avf the JFrame for the JFileChooser's orientation
      */
-    public void openProject(JFileChooser jfc, AssemblyViewFrame avf) {
+    public void openProject(JFileChooser jfc, JFrame avf) {
         String msg = "Are you sure you want to close your current Viskit Project?";
         String title = "Close Current Project";
 
@@ -560,11 +561,15 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             int retv = jfc.showOpenDialog(avf);
             if (retv == JFileChooser.APPROVE_OPTION) {
                 closeAll();
-                ViskitConfig.instance().clearViskitConfig();
-                ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent();
-                ViskitConfig.instance().setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-                ViskitProject.DEFAULT_PROJECT = jfc.getSelectedFile().getName();
-                VGlobals.instance().createWorkDirectory();
+                ViskitConfig vConfig = ViskitConfig.instance();
+                vConfig.clearViskitConfig();
+                VGlobals vGlobals = VGlobals.instance();
+                vGlobals.getCurrentViskitProject().closeProject();
+                ViskitProject.MY_VISKIT_PROJECTS_DIR = jfc.getSelectedFile().getParent().replaceAll("\\\\", "/");
+                vConfig.setVal(ViskitConfig.PROJECT_HOME_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+                ViskitProject.DEFAULT_PROJECT_NAME = jfc.getSelectedFile().getName();
+                vConfig.setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+                vGlobals.createWorkDirectory();
             }
         }
     }
@@ -1742,7 +1747,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     private void markConfigAllClosed() {
         for (int i = 0; i < recentFileList.size(); i++) {
-            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@open]", "false");
+            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@open]", "false");
         }
     }
     
@@ -1778,8 +1783,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         try {
             historyConfig = ViskitConfig.instance().getViskitConfig();
         } catch (Exception e) {
-            System.out.println("Error loading history file: " + e.getMessage());
-            System.out.println("Recent file saving disabled");
+            Vstatics.log.error("Error loading history file: " + e.getMessage());
+            Vstatics.log.error("Recent file saving disabled");
             historyConfig = null;
         }
     }

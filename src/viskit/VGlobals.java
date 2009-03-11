@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -46,7 +46,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,6 +108,7 @@ public class VGlobals {
         myListener = new myTypeListener();
         buildTypePopup();
         initProjectHome();
+        createWorkDirectory();
     }
 
     /* routines to manage the singleton-aspect of the views. */
@@ -477,6 +477,7 @@ public class VGlobals {
 
     public void initProjectHome() {
         String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY).trim();
+        projectHome = projectHome.replaceAll("\\\\", "/");
         log.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 
             ViskitProjectButtonPanel.showDialog();
@@ -783,67 +784,45 @@ public class VGlobals {
     }
         
     /**
-     * TODO: this is not good behavior for a getter, which shoud simply
-     * return the desired thing, not create it.
      * @return a working directory which is now non null and exists in the
      * filesystem
      */
-    public File getWorkDirectory() {
-        if (workDirectory == null) {
-            createWorkDirectory();
-        }
+    public File getWorkDirectory() {        
         return workDirectory;
     }
-            
+
+    /**
+     * Not the best Java Bean convention, but performs as a no argument setter
+     * for the Viskit working directory
+     */
     public void createWorkDirectory() {
-        if (ViskitConfig.instance().getViskitConfig() == null) {
+        ViskitConfig vConfig = ViskitConfig.instance();
+        if (vConfig.getViskitConfig() == null) {
             return;
         }
-        List<String> cache =
-                Arrays.asList(ViskitConfig.instance().getViskitConfig().getStringArray(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        
+
+        String projectName = vConfig.getVal(ViskitConfig.PROJECT_NAME_KEY);
+        if ((projectName != null) && (!projectName.isEmpty())) {
+            ViskitProject.DEFAULT_PROJECT_NAME = projectName;
+        }
         projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
-        if (!projectsBaseDir.exists()) {
-            projectsBaseDir.mkdirs();
-        }
-        
-        if (cache.isEmpty()) {
-            newProjectDirectory();            
-            workDirectory = currentViskitProject.getClassDir();
-        } else {
-            workDirectory = 
-                    new File(ViskitConfig.instance().getViskitConfig().getString(ViskitConfig.CACHED_WORKING_DIR_KEY));
-            ViskitProject.DEFAULT_PROJECT = workDirectory.getParentFile().getParentFile().getName();
-            currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
-            currentViskitProject.setClassDir(workDirectory);
-            currentViskitProject.setSrcDir(new File(workDirectory.getParentFile(), ViskitProject.SOURCE_DIRECTORY_NAME));            
-            currentViskitProject.setEventGraphDir(new File(ViskitConfig.instance().getVal(ViskitConfig.X_CLASS_PATH_KEY + "[@value]")));
-            currentViskitProject.setAssemblyDir(new File(currentViskitProject.getProjectRoot(), ViskitProject.ASSEMBLY_DIRECTORY_NAME));
-        }
-    }
-
-    /** Creates a new Viskit project and automatically sets the extra classpath */
-    private void newProjectDirectory() {        
-        currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT));
-        if (currentViskitProject.createProject()) {
-            SettingsDialog.saveClassPathEntries(getCurrentViskitProject().getProjectContents());
+        if (currentViskitProject.initProject()) {
+            SettingsDialog.saveClassPathEntries(currentViskitProject.getProjectContents());
         } else {
             throw new RuntimeException("Unable to create project directory");
         }
+
+        workDirectory = currentViskitProject.getClassDir();
     }
     
     private ClassLoader workLoader;
 
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
-            URL[] urlArray = new URL[]{};
-            URL[] arrayTmp = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
             
-            if (arrayTmp != null) {
-                urlArray = arrayTmp;
-            }
-
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());

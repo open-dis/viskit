@@ -146,11 +146,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public void removeContentRoot(File f) {
         //System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
         if (_removeNode(root, f) != null) {
-            ;
+            // Do nothing?
         } // System.out.println("...success");
         else {
-            ;
-        } // System.out.println("...failure");
+             // Do nothing?
+        }
     }
 
     private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
@@ -185,7 +185,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     // with xml in it, it will show, but if its children have errors when marshalling,
     // they will not appear.
     public void addContentRoot(File f) {
-        if (!f.getName().equals("CVS")) {
+        if (!f.getName().contains(".svn")) {
             if (f.getName().toLowerCase().endsWith(".jar")) {
                 addJarFile(f.getPath());
             } else if (!f.getName().endsWith(".java")) {
@@ -290,7 +290,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     Class.forName(fban.loadedClass);
                     return;  // don't proceed
                 } catch (Exception e) { // expectecd
-                    ;//e.printStackTrace();
+                     // Do nothing?
                 }
 
             } catch (Throwable throwable) {
@@ -601,7 +601,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
                     new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
         } catch (java.awt.dnd.InvalidDnDOperationException dnde) {
-            ;// nop, it works, makes some complaint, but works, why? 
+             // Do nothing?
+            // nop, it works, makes some complaint, but works, why?
         }
     }
 

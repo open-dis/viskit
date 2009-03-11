@@ -76,21 +76,20 @@ public class EventGraphAssemblyComboMain {
         mainFrame.setVisible(true);
     }
     
-    public static void setLandFandFonts()
-    {
-      ViskitConfig cfg = ViskitConfig.instance();
-      String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
-      try {
-        if(s == null || s.length()<=0 || s.equalsIgnoreCase("default"))
-          setJGoodies();
-        else if(s.equalsIgnoreCase("platform"))
-          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        else 
-          UIManager.setLookAndFeel(s);
-      }
-      catch(Exception ex) {
-        System.err.println("Error setting Look and Feel to "+s);
-      }
+    public static void setLandFandFonts() {
+        ViskitConfig cfg = ViskitConfig.instance();
+        String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
+        try {
+            if (s == null || s.length() <= 0 || s.equalsIgnoreCase("default")) {
+                setJGoodies();
+            } else if (s.equalsIgnoreCase("platform")) {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } else {
+                UIManager.setLookAndFeel(s);
+            }
+        } catch (Exception ex) {
+            System.err.println("Error setting Look and Feel to " + s);
+        }
     }
     
     public static void setJGoodies() throws Exception{

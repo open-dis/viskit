@@ -647,16 +647,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
         if (extraCP != null) {
+            File file = null;
             for (String path : extraCP) { // tbd same for pcls
-                if (new File(path).exists()) {
+                file = new File(path);
+                File[] fileList = file.listFiles();
+                if (file.exists()) {
                     if (path.endsWith(".jar")) {
-                        lTree.addContentRoot(new File(path));
+                        lTree.addContentRoot(file);
                         
                     // A new project may contain an empty EventGraphs directory
-                    } else if (new File(path).listFiles().length == 0) {
+                    } else if (fileList.length == 0) {
                         continue;
+                    // Recurse the directory and locate appropriate lTree files
                     } else {
-                        lTree.addContentRoot(new File(path), true);
+                        lTree.addContentRoot(file, true);
                     }
                 }
             }

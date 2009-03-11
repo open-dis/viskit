@@ -2,33 +2,33 @@
 <!-- values in this file are retrieved by keys such as 'gui.beanshellerrordialog.title' -->
 <!-- the root element name is ignored when assembling keys -->
 <ViskitConfig>
-    <gui>
-	<beanshellerrordialog>
-	    <title>Warning</title>
-	    <label>Java language error:</label>
-	    <question>Ignore and continue?</question>
-	    <sessioncheckbox>Hide warnings for current session</sessioncheckbox>
-	    <preferencescheckbox>Hide warnings permanently</preferencescheckbox>
-	    <preferencestooltip>Set permanent options in File->Preferences</preferencestooltip>
-	</beanshellerrordialog>
-	<title>
-	    <projecthome>
-		<generation>Viskit Project Generation Dialog</generation>
-	    </projecthome>
-	</title>
-	<tooltip>
-	    <projecthome>Select a location for a Viskit project home</projecthome>
-	</tooltip>
-	<button>
-	    <projectgeneration>
-		<text>Generate Project</text>
-		<image>PlayGreen16.gif</image>
-		<tt>Generate your Viskit project</tt>
-	    </projectgeneration>
-	</button>
-	<projecttitles>
-	    <locationfilechoosertitle>Viskit Project Location</locationfilechoosertitle>
-	</projecttitles>
+  <gui>
+    <beanshellerrordialog>
+      <title>Warning</title>
+      <label>Java language error:</label>
+      <question>Ignore and continue?</question>
+      <sessioncheckbox>Hide warnings for current session</sessioncheckbox>
+      <preferencescheckbox>Hide warnings permanently</preferencescheckbox>
+      <preferencestooltip>Set permanent options in File-&gt;Preferences</preferencestooltip>
+    </beanshellerrordialog>
+    <title>
+      <projecthome>
+        <generation>Viskit Project Generation Dialog</generation>
+      </projecthome>
+    </title>
+    <tooltip>
+      <projecthome>Select a location for a Viskit project home</projecthome>
+    </tooltip>
+    <button>
+      <projectgeneration>
+        <text>Generate Project</text>
+        <image>PlayGreen16.gif</image>
+        <tt>Generate your Viskit project</tt>
+      </projectgeneration>
+    </button>
+    <projecttitles>
+      <locationfilechoosertitle>Viskit Project Location</locationfilechoosertitle>
+    </projecttitles>
     <lookandfeel>default</lookandfeel>
-    </gui>
+  </gui>
 </ViskitConfig>

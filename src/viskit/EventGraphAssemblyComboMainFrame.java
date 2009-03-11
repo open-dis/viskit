@@ -44,16 +44,12 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.SysExitHandler;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import viskit.doe.DoeMain;
 
 /* DIFF between OA3302 branch and trunk */
 import viskit.doe.DoeMainFrame;
 /* End DIFF between OA3302 branch and trunk */
 
-import viskit.doe.FileHandler;
 import viskit.doe.JobLauncherTab2;
 
 import javax.swing.*;
@@ -61,7 +57,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class EventGraphAssemblyComboMainFrame extends JFrame {
@@ -457,12 +452,13 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 }
                 /* End DIFF between OA3302 branch and trunk */
                 
-                //todo other postQuits here if needed
+                // TODO: other postQuits here if needed
 
-                thisClassCleanup();
+                // Pretty-fy all xml docs used for configuration
+                ViskitConfig.instance().cleanup();
                 
-                // TODO: What is setting this true when it's false?
-                // The Viskit Setting Dialog, third tab
+                // Q: What is setting this true when it's false?
+                // A: The Viskit Setting Dialog, third tab
                 if (viskit.Vstatics.debug) {
                     System.out.println("in actionPerformed of exit");
                 }
@@ -471,21 +467,6 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
             // Here if somebody cancelled.
             VGlobals.instance().setSysExitHandler(defaultHandler);
-        }
-    }
-
-    private void thisClassCleanup() {
-        // Lot of hoops to pretty-fy config xml files
-        Document doc;
-        Format form = Format.getPrettyFormat();
-        XMLOutputter xout = new XMLOutputter(form);
-        try {
-            
-            // For c_app.xml
-            doc = FileHandler.unmarshallJdom(ViskitConfig.C_APP_FILE);
-            xout.output(doc, new FileWriter(ViskitConfig.C_APP_FILE));            
-        } catch (Exception e) {
-            Vstatics.log.error("Bad jdom op: " + e.getMessage());
         }
     }
     

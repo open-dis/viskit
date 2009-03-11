@@ -92,7 +92,7 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                log.info("FindClassForInterface: findClass for " + name);
+                log.info("Attempting to find " + name);
 
                 Class<?> clz = defineClass(null, buf, 0, num); // do this to get proper name/pkg
 
@@ -101,7 +101,7 @@ public class FindClassesForInterface {
                 // bug here, a byte[] loaded class will not have its package set, but 
                 // has it in the name. this causes problems later on when trying to create
                 // a FileBasedAssemblyNode
-                log.info("FindClassForInterface: found Class " + clz.getPackage() + "." + clz.getName());
+                log.info("Found Class " + clz.getPackage() + "." + clz.getName());
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -253,7 +253,7 @@ public class FindClassesForInterface {
     }
 
     /**
-     * Determine if given class can be instantiated (ie is concrete).
+     * Determine if given class can be instantiated (i.e. is concrete).
      * @return true if class is concrete, false if class is abstract
      * @param c The class to be tested
      */

@@ -1,15 +1,22 @@
 package viskit;
 
-import edu.nps.util.FileIO;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
-import java.util.HashMap;
+import edu.nps.util.FileIO;
+import java.util.Map;
 import org.apache.commons.configuration.CombinedConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.DefaultConfigurationBuilder;
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import viskit.doe.FileHandler;
 
 /**
  * Viskit Discrete Event Simulation (DES) Tool
@@ -30,6 +37,7 @@ public class ViskitConfig {
     public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
 
     public static final String PROJECT_HOME_KEY = "app.projecthome.path[@dir]";
+    public static final String PROJECT_NAME_KEY = "app.projecthome.name[@value]";
     public static final String EG_HISTORY_KEY = "history.EventGraphEditor.Recent.EventGraphFile";
     public static final String ASSY_HISTORY_KEY = "history.AssemblyEditor.Recent.AssemblyFile";
     public static final String X_CLASS_PATH_KEY = "extraClassPath.path";
@@ -55,10 +63,11 @@ public class ViskitConfig {
     
     private static ViskitConfig me;
     
-    private HashMap<String, XMLConfiguration> configs = new HashMap<String, XMLConfiguration>();
-    private HashMap<String, String> sessionHM = new HashMap<String, String>();
+    private Map<String, XMLConfiguration> xmlConfigurations;
+    private Map<String, String> sessionHM;
     private CombinedConfiguration cc;
     private DefaultConfigurationBuilder builder;
+    private XMLConfiguration projectXMLConifg = null;
 
     static {
         logger.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
@@ -96,6 +105,8 @@ public class ViskitConfig {
         } catch (IOException ex) {
             logger.error(ex);
         }
+        setXmlConfigurations(new HashMap<String, XMLConfiguration>());
+        sessionHM = new HashMap<String, String>();
         setDefaultConfig();
     }
 
@@ -116,7 +127,7 @@ public class ViskitConfig {
                 xc.setAutoSave(true);
                 HierarchicalConfiguration.Node n = xc.getRoot();
                 for (Object o : n.getChildren()) {
-                    configs.put(((HierarchicalConfiguration.Node) o).getName(), xc);
+                    getXmlConfigurations().put(((HierarchicalConfiguration.Node) o).getName(), xc);
                 }
             }
         } catch (Exception e) {
@@ -133,7 +144,7 @@ public class ViskitConfig {
      */
     public void setVal(String key, String val) {
         String cfgKey = key.substring(0, key.indexOf('.'));
-        XMLConfiguration xc = configs.get(cfgKey);
+        XMLConfiguration xc = getXmlConfigurations().get(cfgKey);
         xc.setProperty(key, val);
     }
 
@@ -155,10 +166,27 @@ public class ViskitConfig {
         return sa.length;
     }
 
-    public XMLConfiguration getIndividualXMLConfig(String f) throws Exception {
-        XMLConfiguration xmlConfig = new XMLConfiguration(f);
-        xmlConfig.setAutoSave(true);
-        return xmlConfig;
+    /** @param f a Viskit project file */
+    public void setProjectXMLConfig(String f) {
+        try {
+            projectXMLConifg = new XMLConfiguration(f);
+        } catch (ConfigurationException ce) {
+            Vstatics.log.error(ce);
+        }
+        projectXMLConifg.setAutoSave(true);
+        cc.addConfiguration(projectXMLConifg);
+    }
+
+    /** @return a specific project's XMLConfiguration */
+    public XMLConfiguration getProjectXMLConfig() {
+        return projectXMLConifg;
+    }
+
+    /** Remove a project's XML configuration upon closing a Viskit project
+     * @param projConfig the project configuration to remove
+     */
+    public void removeProjectXMLConfig(XMLConfiguration projConfig) {
+        cc.removeConfiguration(projConfig);
     }
 
     /** @return the XMLConfiguration for Viskit */
@@ -170,14 +198,54 @@ public class ViskitConfig {
      * Viskit Project
      */
     public void clearViskitConfig() {
-        setVal(ViskitConfig.PROJECT_HOME_KEY, " ");
-        getViskitConfig().clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
-        getViskitConfig().clearTree(ViskitConfig.CACHED_CLEAR_KEY);
+        setVal(ViskitConfig.PROJECT_HOME_KEY, "");
+        setVal(ViskitConfig.PROJECT_NAME_KEY, "");
         getViskitConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         getViskitConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
     }
     
     public void resetViskitConfig() {
         me = null;
+    }
+
+    public void cleanup() {
+        // Lot of hoops to pretty-fy config xml files
+        Document doc;
+        Format form = Format.getPrettyFormat();
+        XMLOutputter xout = new XMLOutputter(form);
+        try {
+
+            // For c_app.xml
+            doc = FileHandler.unmarshallJdom(C_APP_FILE);
+            xout.output(doc, new FileWriter(C_APP_FILE));
+
+            // For c_gui.xml
+            doc = FileHandler.unmarshallJdom(C_GUI_FILE);
+            xout.output(doc, new FileWriter(C_GUI_FILE));
+
+            // For vconfig.xml
+            doc = FileHandler.unmarshallJdom(V_CONFIG_FILE);
+            xout.output(doc, new FileWriter(V_CONFIG_FILE));
+
+            // For the current Viskit project file
+            doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
+            xout.output(doc, new FileWriter(VGlobals.instance().getCurrentViskitProject().getProjectFile()));
+        } catch (Exception e) {
+            Vstatics.log.error("Bad jdom op: " + e.getMessage());
+        }
+    }
+
+    /**
+     * @return the xmlConfigurations
+     */
+    public Map<String, XMLConfiguration> getXmlConfigurations() {
+        return xmlConfigurations;
+    }
+
+    /**
+     * @param xmlConfigurations the xmlConfigurations to set
+     */
+    public void setXmlConfigurations(HashMap<String, XMLConfiguration> xmlConfigurations) {
+        this.xmlConfigurations = xmlConfigurations;
     }
 }

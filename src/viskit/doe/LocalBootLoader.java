@@ -1,9 +1,3 @@
-/*
- * LocalBootLoader.java
- *
- * Created on December 27, 2006, 11:47 AM
- *
- */
 package viskit.doe;
 
 import java.io.File;
@@ -79,6 +73,7 @@ import viskit.VGlobals;
  * as originally expected.
  *
  * @author Rick Goldberg
+ * @since December 27, 2006, 11:47 AM
  * @version $Id$
  */
 public class LocalBootLoader extends URLClassLoader {

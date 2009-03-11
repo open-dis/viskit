@@ -1014,12 +1014,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /** Open an already existing Viskit Project */
     public void openProject() {
-        jfc = new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        jfc.setDialogTitle("Open an Existing Viskit Project");
-        jfc.setDialogType(JFileChooser.OPEN_DIALOG);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        controller.openProject(jfc, this);
-        jfc = null;
+        ((AssemblyViewFrame) VGlobals.instance().getAssemblyController().getView()).openProject();
     }
 
     private File getUniqueName(String suggName) {

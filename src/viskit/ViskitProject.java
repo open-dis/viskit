@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -70,7 +70,7 @@ public class ViskitProject {
      * to determine a project location space on the user's machine.  A default
      * location will be in the user's profile, or home directory.
      */
-    public static String DEFAULT_PROJECT = "DefaultProject";
+    public static String DEFAULT_PROJECT_NAME = "DefaultProject";
     
     public static final String VISKIT_ROOT_NAME = "ViskitProject";
     public static final String PROJECT_FILE_NAME = "viskitProject.xml";
@@ -83,14 +83,14 @@ public class ViskitProject {
     public static final String DIST_DIRECTORY_NAME = "dist";
     private File projectRoot;
     private File projectFile;
-    private boolean dirty;
     private File eventGraphDir;
     private File assemblyDir;
     private File libDir;
     private File buildDir;
     private File srcDir;
     private File classDir;
-    private boolean canCreate = false;
+    private boolean projectFileExists = false;
+    private boolean dirty;
     private Document projectDocument;
 
     public ViskitProject(File projectRoot) {
@@ -102,19 +102,10 @@ public class ViskitProject {
         setProjectRoot(projectRoot);
     }
 
-    public boolean createProject() {
+    public boolean initProject() {
         
         if (!projectRoot.exists()) {
             projectRoot.mkdir();
-        }
-        
-        projectFile = new File(projectRoot, PROJECT_FILE_NAME);        
-        if (!projectFile.exists()) {
-            try {
-                projectFile.createNewFile();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
         }
         
         setEventGraphDir(new File(projectRoot, EVENT_GRAPH_DIRECTORY_NAME));
@@ -137,12 +128,30 @@ public class ViskitProject {
         setClassDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
         
         // Start with a fresh build directory
-        if (buildDir.exists()) {
-            clean();
+//        if (buildDir.exists()) {
+//            clean();
+//        }
+
+        // NOTE: if we nuke the buildDir, then we cause ClassNotFoundExceptions
+        // down the line.  Each class will be recompiled everytime we open an
+        // assembly, or event graph file, so no real need to nuke it.
+        
+        // If we already have a project file, then load it.  If not, create it
+        setProjectFile(new File(projectRoot, PROJECT_FILE_NAME));
+        if (!projectFile.exists()) {
+            try {
+                getProjectFile().createNewFile();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+            projectDocument = createProjectDocument();
+            writeProjectFile();
+        } else {
+            loadProjectFromFile(getProjectFile());
+            projectFileExists = true;
         }
-        projectDocument = createProjectDocument();
-        writeProjectFile();
-        return canCreate;
+        ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        return projectFileExists;
     }
 
     protected Document createProjectDocument() {
@@ -186,9 +195,9 @@ public class ViskitProject {
         FileOutputStream fileOutputStream = null;
         try {
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-            fileOutputStream = new FileOutputStream(projectFile);
+            fileOutputStream = new FileOutputStream(getProjectFile());
             xmlOutputter.output(projectDocument, fileOutputStream);
-            canCreate = true;
+            projectFileExists = true;
         } catch (FileNotFoundException ex) {
             log.error(ex);
         } catch (IOException ex) {
@@ -202,11 +211,15 @@ public class ViskitProject {
         }
     }
 
+    /**
+     * Load an existing Viskit project file
+     * @param inputProjectFile an existing Viskit project file
+     */
     public void loadProjectFromFile(File inputProjectFile) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
-            Document doc = saxBuilder.build(inputProjectFile);
-            Element root = doc.getRootElement();
+            projectDocument = saxBuilder.build(inputProjectFile);
+            Element root = projectDocument.getRootElement();
             if (!root.getName().equals(VISKIT_ROOT_NAME)) {
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }
@@ -259,6 +272,12 @@ public class ViskitProject {
 
     public void deleteProject() {
         deleteDirectoryContents(projectRoot);
+    }
+
+    public void closeProject() {
+        ViskitConfig vConfig = ViskitConfig.instance();
+        vConfig.cleanup();
+        vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
     }
 
     public File getProjectRoot() {
@@ -351,5 +370,19 @@ public class ViskitProject {
             log.error(e.getMessage());
         }
         return stringWriter.toString();
+    }
+
+    /**
+     * @return the projectFile
+     */
+    public File getProjectFile() {
+        return projectFile;
+    }
+
+    /**
+     * @param projectFile the projectFile to set
+     */
+    public void setProjectFile(File projectFile) {
+        this.projectFile = projectFile;
     }
 }

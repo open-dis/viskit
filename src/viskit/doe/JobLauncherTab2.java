@@ -1365,7 +1365,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     publish(dp);
                 }
             } catch (InterruptedException ie) {
-                ;
+                // Do nothing
             }
 
             return null;
