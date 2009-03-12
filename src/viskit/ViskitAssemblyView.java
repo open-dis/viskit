@@ -56,9 +56,15 @@ public interface ViskitAssemblyView {
      */
     File[] openFilesAsk();
 
+    /** @param lis a list of recently open files
+     * @return a recently opened file
+     */
     File openRecentFilesAsk(Collection<String> lis);
 
     File saveFileAsk(String suggName, boolean suggUniqueName);
+
+    /** Open an already existing Viskit Project */
+    void openProject();
 
     /** Tells view what we're working on
      * @param s the name of the Assembly

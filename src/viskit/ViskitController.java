@@ -55,7 +55,6 @@ public interface ViskitController {
   
   /** Opens selected files from a FileChooser */
   void open();
-  void openRecent();
   void openRecentEventGraph(String path);
   void close();
   void closeAll();

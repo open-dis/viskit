@@ -150,8 +150,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
-    JMenu openRecentMenu;
-    private _RecentFileListener myFileListener;
+    JMenu openRecentAssyMenu, openRecentProjMenu;
+    private _RecentAssyFileListener myAssyFileListener;
+    private _RecentProjFileListener myProjFileListener;
 
     private vGraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -210,38 +211,67 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    class _RecentFileListener implements ViskitAssemblyController.RecentFileListener {
+    class _RecentAssyFileListener implements ViskitAssemblyController.RecentFileListener {
 
         public void listChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-            java.util.List<String> lis = acontroller.getRecentFileList();
-            openRecentMenu.removeAll();
+            java.util.List<String> lis = acontroller.getRecentAssyFileList();
+            openRecentAssyMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
                 if (!f.exists()) {
                     continue;
                 }
                 String nameOnly = f.getName();
-                Action act = new ParameterizedAction(nameOnly);
+                Action act = new ParameterizedAssyAction(nameOnly);
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
-                openRecentMenu.add(mi);
+                openRecentAssyMenu.add(mi);
             }
             if (lis.size() > 0) {
-                openRecentMenu.add(new JSeparator());
-                Action act = new ParameterizedAction("clear");
+                openRecentAssyMenu.add(new JSeparator());
+                Action act = new ParameterizedAssyAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                openRecentMenu.add(mi);
+                openRecentAssyMenu.add(mi);
             }
         }
     }
 
-    class ParameterizedAction extends javax.swing.AbstractAction {
+    class _RecentProjFileListener implements ViskitAssemblyController.RecentFileListener {
 
-        ParameterizedAction(String s) {
+        public void listChanged() {
+            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            java.util.List<String> lis = acontroller.getRecentProjFileList();
+            openRecentProjMenu.removeAll();
+            for (String fullPath : lis) {
+                File f = new File(fullPath);
+                if (!f.exists()) {
+                    continue;
+                }
+                String nameOnly = f.getName();
+                Action act = new ParameterizedProjAction(nameOnly);
+                act.putValue(FULLPATH, fullPath);
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText(fullPath);
+                openRecentProjMenu.add(mi);
+            }
+            if (lis.size() > 0) {
+                openRecentProjMenu.add(new JSeparator());
+                Action act = new ParameterizedProjAction("clear");
+                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText("Clear this list");
+                openRecentProjMenu.add(mi);
+            }
+        }
+    }
+
+    class ParameterizedAssyAction extends javax.swing.AbstractAction {
+
+        ParameterizedAssyAction(String s) {
             super(s);
         }
 
@@ -249,9 +279,26 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentFileList();
+                acontroller.clearRecentAssyFileList();
             } else {
-                acontroller.openRecentAssembly(fullPath);
+                acontroller.openRecent(fullPath);
+            }
+        }
+    }
+
+    class ParameterizedProjAction extends javax.swing.AbstractAction {
+
+        ParameterizedProjAction(String s) {
+            super(s);
+        }
+
+        public void actionPerformed(ActionEvent ev) {
+            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            String fullPath = (String) getValue(FULLPATH);
+            if (fullPath.equals(CLEARPATHFLAG)) {
+                acontroller.clearRecentProjFileList();
+            } else {
+                acontroller.openProject(new File(fullPath));
             }
         }
     }
@@ -259,8 +306,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private void buildMenus(boolean contentOnly) {
         ViskitAssemblyController controller = (ViskitAssemblyController) getController();
 
-        myFileListener = new _RecentFileListener();
-        controller.addRecentFileListListener(myFileListener);
+        myAssyFileListener = new _RecentAssyFileListener();
+        controller.addRecentFileListListener(myAssyFileListener);
+
+        myProjFileListener = new _RecentProjFileListener();
+        controller.addRecentFileListListener(myProjFileListener);
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -275,9 +325,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentMenu = buildMenu("Open Recent Assembly"));
+        fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P),
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
+        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
@@ -941,7 +992,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    /** Open an already existing Viskit Project */
     public void openProject() {
         String msg = "Are you sure you want to close your current Viskit Project?";
         String title = "Close Current Project";

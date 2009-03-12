@@ -815,7 +815,6 @@ public class VGlobals {
         } else {
             throw new RuntimeException("Unable to create project directory");
         }
-
         workDirectory = currentViskitProject.getClassDir();
     }
     

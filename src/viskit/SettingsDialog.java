@@ -342,7 +342,7 @@ public class SettingsDialog extends JDialog {
 
         public void actionPerformed(ActionEvent actionEvent) {
             AssemblyController aCtrlr = VGlobals.instance().getAssemblyController();
-            aCtrlr.clearRecentFileList();
+            aCtrlr.clearRecentAssyFileList();
         }
     }
 

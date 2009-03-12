@@ -55,14 +55,14 @@ import viskit.xsd.bindings.assembly.ObjectFactory;
 public class OpenAssembly {
 
     private static OpenAssembly instance;
-    private static Object syncer = new Object();
+    private static final Object SYNCHER = new Object();
 
     public static OpenAssembly inst() {
         if (instance != null) {
             return instance;
         }
 
-        synchronized (syncer) {
+        synchronized (SYNCHER) {
             if (instance == null) {
                 instance = new OpenAssembly();
             }

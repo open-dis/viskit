@@ -5,6 +5,7 @@ import java.util.Vector;
 import javax.swing.JComponent;
 
 import edu.nps.util.DirectoryWatch;
+import java.io.File;
 import viskit.model.*;
 
 /**
@@ -34,9 +35,14 @@ public interface ViskitAssemblyController {
 
     void newPropChangeListenerNode(String name, Point p);
 
+    /** Edit the properties (metadata) of the Assembly */
     void editGraphMetaData();
 
+    /** Create a new blank assembly graph model */
     void newAssembly();
+
+    /** Creates a new Viskit Project */
+    void newProject();
 
     void setRunTabbedPane(JComponent runTabbedPane, int idx);
 
@@ -65,7 +71,7 @@ public interface ViskitAssemblyController {
 
     void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);
 
-    /* menu selections */
+    /** menu selections */
     void copy();
 
     /** Ultimately performs a delete fuction for selected edges and nodes */
@@ -76,9 +82,12 @@ public interface ViskitAssemblyController {
   
     void open();
 
-    void openRecent();
+    /** Opens an already existing Viskit Project
+     * @param file the project root file for an existing Viskit project
+     */
+    void openProject(File file);
 
-    void openRecentAssembly(String fullPath);
+    void openRecent(String fullPath);
     
     void paste();
 
@@ -123,12 +132,18 @@ public interface ViskitAssemblyController {
     void captureWindow();
     
     void addRecentFileListListener(RecentFileListener lis);
-    void removeRecentFileListListener(RecentFileListener lis);
-    java.util.List<String> getRecentFileList();
-    void clearRecentFileList();
 
-    public static interface RecentFileListener
-    {
-      public void listChanged();
+    void removeRecentFileListListener(RecentFileListener lis);
+
+    java.util.List<String> getRecentAssyFileList();
+
+    void clearRecentAssyFileList();
+
+    java.util.List<String> getRecentProjFileList();
+
+    void clearRecentProjFileList();
+
+    static interface RecentFileListener {
+        void listChanged();
     }
 }
