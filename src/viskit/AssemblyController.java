@@ -520,6 +520,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private void doProjectCleanup() {
         closeAll();
         ViskitConfig.instance().clearViskitConfig();
+        clearRecentAssyFileList();
+        ((EventGraphController) VGlobals.instance().getEventGraphEditor().getController()).clearRecentFileList();
         VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
@@ -1647,7 +1649,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
-    public void adjustRecentProjList(File file) {
+    private void adjustRecentProjList(File file) {
         String s = file.getAbsolutePath().replaceAll("\\\\", "/");
         recentProjFileList.remove(s);
         recentProjFileList.add(s); // to the top
@@ -1693,7 +1695,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     private void saveAssyHistoryXML(Set<String> recentFiles) {
-        getHistoryConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
 
         int ix = 0;
         for (String value : recentFiles) {
@@ -1705,7 +1706,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     private void saveProjHistoryXML(Set<String> recentFiles) {
-        getHistoryConfig().clearTree(ViskitConfig.RECENT_PROJ_CLEAR_KEY);
 
         int ix = 0;
         for (String value : recentFiles) {
