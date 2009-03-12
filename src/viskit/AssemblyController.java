@@ -97,8 +97,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
         }
 
-        // Add our currently opened project to the recently opened projects list
-        adjustRecentProjList(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        _setProjFileLists();
 
         // The following comments were an attempt to solve classloader issues that needed to be solved
         // a different way
@@ -305,7 +304,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return assyChgListener;
     }
     private boolean localDirty = false;
-    private HashSet<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<OpenAssembly.AssyChangeListener>();
+    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<OpenAssembly.AssyChangeListener>();
     OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
 
         public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
@@ -377,7 +376,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     {
         OpenAssembly.inst().removeListener(lis);
     }
-    HashSet<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    Set<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
 
     public void addRecentFileListListener(RecentFileListener lis) {
         recentListeners.add(lis);
@@ -1596,11 +1595,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         runner = plug;
     }
 
-    /** Recent open file support */
-    private static final int RECENTLISTSIZE = 15;
-    private java.util.List<String> recentAssyFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
-    private java.util.List<String> recentProjFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
-
     public void openRecent(String path) {
         _doOpen(new File(path));
     }
@@ -1629,22 +1623,21 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
+    /** Recent open file support */
+    private static final int RECENTLISTSIZE = 15;
+    private Set<String> recentAssyFileList = new LinkedHashSet<String>(RECENTLISTSIZE + 1);
+    private Set<String> recentProjFileList = new LinkedHashSet<String>(RECENTLISTSIZE + 1);
+
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an assembly file to add to the list
      */
     private void adjustRecentAssyList(File file) {
-        String s = file.getAbsolutePath();
-        int idx;
-        if ((idx = recentAssyFileList.indexOf(s)) != -1) {
-            recentAssyFileList.remove(idx);
-        }
-        recentAssyFileList.add(0, s);      // to the top
+        String s = file.getAbsolutePath().replaceAll("\\\\", "/");
+        recentAssyFileList.remove(s);
+        recentAssyFileList.add(s); // to the top
 
-        while (recentAssyFileList.size() > RECENTLISTSIZE) {
-            recentAssyFileList.remove(recentAssyFileList.size() - 1);
-        }
         saveAssyHistoryXML(recentAssyFileList);
         notifyRecentFileListeners();
     }
@@ -1655,16 +1648,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param file a project file to add to the list
      */
     public void adjustRecentProjList(File file) {
-        String s = file.getAbsolutePath();
-        int idx;
-        if ((idx = recentProjFileList.indexOf(s)) != -1) {
-            recentProjFileList.remove(idx);
-        }
-        recentProjFileList.add(0, s);      // to the top
+        String s = file.getAbsolutePath().replaceAll("\\\\", "/");
+        recentProjFileList.remove(s);
+        recentProjFileList.add(s); // to the top
 
-        while (recentProjFileList.size() > RECENTLISTSIZE) {
-            recentProjFileList.remove(recentProjFileList.size() - 1);
-        }
         saveProjHistoryXML(recentProjFileList);
         notifyRecentFileListeners();
     }
@@ -1677,73 +1664,66 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
         String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
         log.debug("_setAssyFileLists() valueAr size is: " + valueAr.length);
-        for (int i = 0; i < valueAr.length; i++) {
+        int i = 0;
+        for (String s : valueAr) {
+            s.replaceAll("\\\\", "/");
+            if (recentAssyFileList.add(s)) {
+                String op = getHistoryConfig().getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@open]");
 
-            // Attempt to prevent dupicate entries
-            if (recentAssyFileList.contains(valueAr[i])) {
-                continue;
+                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
+                    openV.add(s);
+                }
             }
-            recentAssyFileList.add(valueAr[i]);
-            String op = getHistoryConfig().getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@open]");
-
-            if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                openV.add(valueAr[i]);
-            }
+            i++;
         }
         notifyRecentFileListeners();
     }
 
-    private java.util.List<String> openP;
-
     private void _setProjFileLists() {
-        openP = new ArrayList<String>(4);
         if (getHistoryConfig() == null) {
             return;
         }
         String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
         log.debug("_setProjFileLists() valueAr size is: " + valueAr.length);
-        for (int i = 0; i < valueAr.length; i++) {
-
-            // Attempt to prevent dupicate entries
-            if (recentProjFileList.contains(valueAr[i])) {
-                continue;
-            }
-            recentProjFileList.add(valueAr[i]);
-            String op = getHistoryConfig().getString(ViskitConfig.PROJ_HISTORY_KEY + "(" + i + ")[@open]");
-
-            if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                openP.add(valueAr[i]);
-            }
+        for (String value : valueAr) {
+            value = value.replaceAll("\\\\", "/");
+            recentProjFileList.add(value);
         }
         notifyRecentFileListeners();
     }
 
-    private void saveAssyHistoryXML(java.util.List<String> recentFiles) {
+    private void saveAssyHistoryXML(Set<String> recentFiles) {
         getHistoryConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
 
-        for (int i = 0; i < recentFiles.size(); i++) {
-            String value = recentFiles.get(i);
-            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@value]", value);
+        int ix = 0;
+        for (String value : recentFiles) {
+            value = value.replaceAll("\\\\", "/");
+            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            ix++;
         }
         getHistoryConfig().getDocument().normalize();
     }
 
-    private void saveProjHistoryXML(java.util.List<String> recentFiles) {
+    private void saveProjHistoryXML(Set<String> recentFiles) {
         getHistoryConfig().clearTree(ViskitConfig.RECENT_PROJ_CLEAR_KEY);
 
-        for (int i = 0; i < recentFiles.size(); i++) {
-            String value = recentFiles.get(i);
-            getHistoryConfig().setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + i + ")[@value]", value);
+        int ix = 0;
+        for (String value : recentFiles) {
+            value = value.replaceAll("\\\\", "/");
+            getHistoryConfig().setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            ix++;
         }
         getHistoryConfig().getDocument().normalize();
     }
 
+    // Not used
     private void markAssyConfigAllClosed() {
         for (int i = 0; i < recentAssyFileList.size(); i++) {
             getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + i + ")[@open]", "false");
         }
     }
 
+    // Not used
     private void markProjConfigAllClosed() {
         for (int i = 0; i < recentProjFileList.size(); i++) {
             getHistoryConfig().setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + i + ")[@open]", "false");
@@ -1751,18 +1731,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     private void markAssyConfigOpen(File f) {
-        int idx = recentAssyFileList.indexOf(f.getAbsolutePath());
-        if (idx != -1) {
-            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-        }
-
-    // The open attribute is zeroed out for all recent files the first time a file is opened
-    }
-
-    private void markProjConfigOpen(File f) {
-        int idx = recentProjFileList.indexOf(f.getAbsolutePath());
-        if (idx != -1) {
-            getHistoryConfig().setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+        int idx = 0;
+        for (String key : recentAssyFileList) {
+            if (key.contains(f.getName())) {
+                getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+            }
+            idx++;
         }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
@@ -1774,11 +1748,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         notifyRecentFileListeners();
     }
 
-    public java.util.List<String> getRecentAssyFileList() {
+    public Set<String> getRecentAssyFileList() {
         return getRecentAssyFileList(false);
     }
 
-    private java.util.List<String> getRecentAssyFileList(boolean refresh) {
+    private Set<String> getRecentAssyFileList(boolean refresh) {
         if (refresh || recentAssyFileList == null) {
             _setAssyFileLists();
         }
@@ -1791,11 +1765,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         notifyRecentFileListeners();
     }
 
-    public java.util.List<String> getRecentProjFileList() {
+    public Set<String> getRecentProjFileList() {
         return getRecentProjFileList(false);
     }
 
-    private java.util.List<String> getRecentProjFileList(boolean refresh) {
+    private Set<String> getRecentProjFileList(boolean refresh) {
         if (refresh || recentProjFileList == null) {
             _setProjFileLists();
         }

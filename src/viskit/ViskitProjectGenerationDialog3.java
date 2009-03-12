@@ -44,7 +44,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         locationTF.getDocument().addDocumentListener(lis);
 
         nameTF.setText("MyNewViskitProject");
-        locationTF.setText(System.getProperty("user.home"));
+        locationTF.setText(System.getProperty("user.home").replaceAll("\\\\", "/"));
     }
 
     class myDocListener implements DocumentListener {
@@ -76,7 +76,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
 
             sb.append("/");
             sb.append(nameTF.getText().trim());
-            pathTF.setText(sb.toString());
+            pathTF.setText(sb.toString().replaceAll("\\\\", "/"));
         }
     }
 
@@ -206,7 +206,7 @@ private void cancelButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
     cancelled = false;
-    projectPath = pathTF.getText().trim();
+    projectPath = pathTF.getText().trim().replaceAll("\\\\", "/");
     dialog.dispose();
 }//GEN-LAST:event_createButtActionPerformed
     JFileChooser chooser;
@@ -227,7 +227,7 @@ private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         return;
     }
 
-    locationTF.setText(chooser.getSelectedFile().getAbsolutePath());
+    locationTF.setText(chooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/"));
 }//GEN-LAST:event_browseButtActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton browseButt;

@@ -1,11 +1,12 @@
 package viskit;
 
-import java.awt.*;
+import java.awt.Point;
+import java.io.File;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.JComponent;
 
 import edu.nps.util.DirectoryWatch;
-import java.io.File;
 import viskit.model.*;
 
 /**
@@ -135,11 +136,11 @@ public interface ViskitAssemblyController {
 
     void removeRecentFileListListener(RecentFileListener lis);
 
-    java.util.List<String> getRecentAssyFileList();
+    Set<String> getRecentAssyFileList();
 
     void clearRecentAssyFileList();
 
-    java.util.List<String> getRecentProjFileList();
+    Set<String> getRecentProjFileList();
 
     void clearRecentProjFileList();
 

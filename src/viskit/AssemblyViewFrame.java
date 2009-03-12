@@ -22,6 +22,7 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
+import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -215,7 +216,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         public void listChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-            java.util.List<String> lis = acontroller.getRecentAssyFileList();
+            Set<String> lis = acontroller.getRecentAssyFileList();
             openRecentAssyMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
@@ -244,7 +245,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         public void listChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-            java.util.List<String> lis = acontroller.getRecentProjFileList();
+            Set<String> lis = acontroller.getRecentProjFileList();
             openRecentProjMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);

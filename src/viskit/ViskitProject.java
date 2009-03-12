@@ -39,7 +39,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -323,28 +325,33 @@ public class ViskitProject {
     }
 
     public String[] getProjectContents() {
-        List<String> sa = new ArrayList<String>();
+
+        // Prevent duplicate entries
+        Set<String> cp = new HashSet<String>();
 
         // Always list JARs and ZIPs before EventGraphs
         try {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
                     log.debug(f.getCanonicalPath());
-                    sa.add(f.getCanonicalPath());
+                    cp.add(f.getCanonicalPath().replaceAll("\\\\", "/"));
                 }
             }
             log.debug(getEventGraphDir().getCanonicalPath());
-            for (String s : ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY)) {
-                if (!s.contains(getEventGraphDir().getName())) {
-                    sa.add(s);
-                }
+            
+            // Now list any paths outside of the project space, i.e. ${other path}/build/classes
+            String[] classPaths = ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY);
+            for (String classPath : classPaths) {
+                cp.add(classPath.replaceAll("\\\\", "/"));
             }
-            sa.add(getEventGraphDir().getCanonicalPath());
+
+            // Then always include our project's EventGraphs path
+            cp.add(getEventGraphDir().getCanonicalPath().replaceAll("\\\\", "/"));
 
         } catch (IOException ex) {
             log.error(ex);
         }
-        return sa.toArray(new String[sa.size()]);
+        return cp.toArray(new String[cp.size()]);
     }
 
     public File getEventGraphDir() {

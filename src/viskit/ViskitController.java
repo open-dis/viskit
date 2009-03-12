@@ -4,6 +4,7 @@ import edu.nps.util.DirectoryWatch;
 import viskit.model.*;
 
 import java.awt.*;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -87,11 +88,10 @@ public interface ViskitController {
   
   void addRecentFileListListener(RecentFileListener lis);
   void removeRecentFileListListener(RecentFileListener lis);
-  java.util.List<String> getRecentFileList();
+  Set<String> getRecentFileList();
   void clearRecentFileList();
   
-  public static interface RecentFileListener
-  {
-    public void listChanged();
+  static interface RecentFileListener {
+      void listChanged();
   }
 }

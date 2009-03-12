@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Vector;
 import javax.imageio.ImageIO;
@@ -20,6 +19,8 @@ import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
@@ -55,7 +56,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void begin() {
-        ArrayList<String> lis = getOpenFileList(false);
+        java.util.List<String> lis = getOpenFileList(false);
 
         // don't default to new event graph
         if (lis.size() <= 0) {
@@ -241,8 +242,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
             viskitView.delTab(mod);   // Not a good open, tell view
         }
     }
-    private static final int RECENTLISTSIZE = 15;
-    private ArrayList<String> recentFileList;
 
     public void openRecentEventGraph(String path) {
         _doOpen(new File(path));
@@ -315,7 +314,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         dirWatch.removeListener(lis);
     }
 
-    HashSet<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    Set<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
     public void addRecentFileListListener(RecentFileListener lis)
     {
       recentListeners.add(lis);
@@ -333,53 +332,50 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
     
+    private static final int RECENTLISTSIZE = 15;
+    private Set<String> recentFileList = new LinkedHashSet<String>(RECENTLISTSIZE + 1);;
+
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file
      */
     private void adjustRecentList(File file) {
-        String s = file.getAbsolutePath();
-        int idx;
-        if ((idx = recentFileList.indexOf(s)) != -1) {
-            recentFileList.remove(idx);
-        }
-        recentFileList.add(0, s);      // to the top
+        String s = file.getAbsolutePath().replaceAll("\\\\", "/");
+        recentFileList.remove(s);
+        recentFileList.add(s);      // to the top
 
-        while (recentFileList.size() > RECENTLISTSIZE) {
-            recentFileList.remove(recentFileList.size() - 1);
-        }
         saveHistoryXML(recentFileList);
         notifyRecentFileListeners();
     }
 
-    private ArrayList<String> openV;
+    private java.util.List<String> openV;
     private void _setFileLists() {
-        recentFileList = new ArrayList<String>(RECENTLISTSIZE + 1);
         openV = new ArrayList<String>(4);
         if (historyConfig == null) {return;}
         String[] valueAr = historyConfig.getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
+            s.replaceAll("\\\\", "/");
+            if (recentFileList.add(s)) {
+                String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
-            // Attempt to prevent dupicate entries
-            if (recentFileList.contains(s)) {continue;}
-            recentFileList.add(s);
-            String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
-            if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                openV.add(s);
+                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
+                    openV.add(s);
+                }
             }
             i++;
         }
         notifyRecentFileListeners();
     }
 
-    private void saveHistoryXML(java.util.List<String> recentFiles) {
+    private void saveHistoryXML(Set<String> recentFiles) {
         historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
-
-        for (int i = 0; i < recentFiles.size(); i++) {
-            String value = recentFiles.get(i);
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@value]", value);
+        int ix = 0;
+        for (String value : recentFiles) {
+            value = value.replaceAll("\\\\", "/");
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            ix++;
         }
         historyConfig.getDocument().normalize();
     }
@@ -391,34 +387,35 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     private void markConfigOpen(File f) {
-        int idx = recentFileList.indexOf(f.getAbsolutePath());
-        if (idx != -1) {
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+        int idx = 0;
+        for (String key : recentFileList) {
+            if (key.contains(f.getName())) {
+                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+            }
+            idx++;
         }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
     }
     
-    public void clearRecentFileList()
-    {
+    public void clearRecentFileList() {
         recentFileList.clear();
         saveHistoryXML(recentFileList);
         notifyRecentFileListeners();
     }
 
-    public java.util.List<String> getRecentFileList()  // implement interface
-    {
+    public Set<String> getRecentFileList() {
         return getRecentFileList(false);
     }
     
-    private ArrayList<String> getRecentFileList(boolean refresh) {
+    private Set<String> getRecentFileList(boolean refresh) {
         if (refresh || recentFileList == null) {
             _setFileLists();
         }
         return recentFileList;
     }
 
-    private ArrayList<String> getOpenFileList(boolean refresh) {
+    private java.util.List<String> getOpenFileList(boolean refresh) {
         if (refresh || openV == null) {
             _setFileLists();
         }
@@ -853,7 +850,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
      * @param eventGraphs a list of Event Graph paths to image capture
      * @param eventGraphImages a list of Event Graph image paths to write .png files
      */
-    public void captureEventGraphImages(LinkedList<File> eventGraphs, LinkedList<String> eventGraphImages) {
+    public void captureEventGraphImages(java.util.List<File> eventGraphs, java.util.List<String> eventGraphImages) {
         ListIterator<String> itr = eventGraphImages.listIterator(0);
         
         String eventGraphImage;

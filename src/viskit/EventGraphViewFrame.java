@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,10 +48,10 @@ import javax.swing.event.ChangeListener;
  * 2) When the ChangeListener is hit, the controller.setModel() method installs
  * the appropriate model for the newly-selected eventgraph.
  *
- * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey CA
- * www.nps.edu
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects</p>
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey CA</p>
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM
@@ -533,7 +534,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         public void listChanged() {
             ViskitController vcontroller = (ViskitController) getController();
-            java.util.List<String> lis = vcontroller.getRecentFileList();
+            Set<String> lis = vcontroller.getRecentFileList();
             openRecentMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);

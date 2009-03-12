@@ -195,8 +195,8 @@ public class FileBasedClassManager implements Runnable {
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
             }
-            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEg.getCanonicalPath());
-            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath());
+            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEg.getCanonicalPath().replaceAll("\\\\", "/"));
+            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
             projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEg, classFile));
             // if used to miss, unmiss it
             removeCacheMiss(xmlEg);
@@ -378,7 +378,7 @@ public class FileBasedClassManager implements Runnable {
         removeCacheMiss(file); // remove any old ones
         int index = ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY).length;
         try {
-            projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath());
+            projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
             projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
         } catch (IOException ex) {
             ex.printStackTrace();
