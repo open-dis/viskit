@@ -617,26 +617,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void postClose() {
-//        ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-//        ViskitAssemblyView view = (ViskitAssemblyView) getView();
-//        ViskitAssemblyModel[] modAr = view.getOpenModels();
-//
-//        // Close any currently open EGs because we don't yet know which ones
-//        // to keep open until iterating through each remaining vAMod
-//        VGlobals.instance().getEventGraphEditor().controller.closeAll();
-//        markAssyConfigClosed(vmod.getLastFile());
-//        view.delTab(vmod);
-//
-//        // Keep the other Assembly's EGs open
-//        if (!isCloseAll()) {
-//            for (ViskitAssemblyModel mod : modAr) {
-//                if (!mod.equals(vmod)) {
-//                    openEventGraphs(mod.getLastFile());
-//                }
-//            }
-//        }
-//
-//        runTabbedPane.setEnabledAt(runTabbedPaneIdx, false);
         OpenAssembly.inst().doSendCloseAssy();
     }
 
