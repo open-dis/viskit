@@ -32,6 +32,7 @@ public interface ViskitController {
 
   void editGraphMetaData  ();
 
+  /** Create a new blank EventGraph model */
   void newEventGraph();
 
   void runAssemblyEditor();
@@ -62,6 +63,8 @@ public interface ViskitController {
   void paste();
   void quit();
   void save();
+  
+  /** Save the current EventGraph "as" desired by user */
   void saveAs();
   void selectNodeOrEdge(Vector v);
 
@@ -88,8 +91,8 @@ public interface ViskitController {
   
   void addRecentFileListListener(RecentFileListener lis);
   void removeRecentFileListListener(RecentFileListener lis);
-  Set<String> getRecentFileList();
-  void clearRecentFileList();
+  Set<String> getRecentFileSet();
+  void clearRecentFileSet();
   
   static interface RecentFileListener {
       void listChanged();

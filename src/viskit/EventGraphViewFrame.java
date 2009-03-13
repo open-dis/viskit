@@ -534,7 +534,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         public void listChanged() {
             ViskitController vcontroller = (ViskitController) getController();
-            Set<String> lis = vcontroller.getRecentFileList();
+            Set<String> lis = vcontroller.getRecentFileSet();
             openRecentMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
@@ -569,7 +569,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             ViskitController vcontroller = (ViskitController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
-                vcontroller.clearRecentFileList();
+                vcontroller.clearRecentFileSet();
             } else {
                 vcontroller.openRecentEventGraph(fullPath);
             }

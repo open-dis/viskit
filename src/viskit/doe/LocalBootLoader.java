@@ -277,7 +277,7 @@ public class LocalBootLoader extends URLClassLoader {
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
             stage1.addURL(currentDir.toURI().toURL());
-            // make a clean version of the dir in jar form
+            // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
             newJar = makeJarFileFromDir(currentDir, newDir);
 
@@ -314,34 +314,23 @@ public class LocalBootLoader extends URLClassLoader {
         File[] dirList = newDir.listFiles();
         FileInputStream fis;
         JarEntry je;
-        for (int i = 0; i < dirList.length; i++) {
-            if (dirList[i].isDirectory()) {
-                makeJarFileFromDir(baseDir, dirList[i], jos);
+        for (File file : dirList) {
+
+            // Recurse until we get to .class files
+            if (file.isDirectory()) {
+                makeJarFileFromDir(baseDir, file, jos);
             } else {
 
-                String entryName = " ? ";
-                String entryClass = entryName;
-                try {
-                    entryName = dirList[i].getCanonicalPath().substring(baseDir.getCanonicalPath().length() + 1);
-                    //System.out.println("JarEntry started out as "+entryName);
-                    // WINDOWS bug: jar entries are / not \, but String.replace doesn't seem to work as expected with \\
-                    char[] entryChars = new char[entryName.length()];
-                    entryName.getChars(0, entryChars.length, entryChars, 0);
-                    for (int ind = 0; ind < entryName.length(); ind++) {
-                        if (entryChars[ind] == File.separatorChar) {
-                            entryChars[ind] = '/'; // this should be redundant on non-windows
-                        }
-                    }
-                    entryName = new String(entryChars);
-                //System.out.println("JarEntry name "+entryName);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                String entryName = "";
+                String entryClass = "";
+                entryName = file.getParentFile().getName() + "/" + file.getName();
                 entryClass = entryName.replace('/', '.');
+                
                 //System.out.println("Entry Class "+entryClass);
-                if (entryClass.endsWith(".class")) { // else do nothing
+                String dotClass = ".class";
+                if (entryClass.endsWith(dotClass)) { // else do nothing
 
-                    entryClass = entryClass.substring(0, entryClass.length() - 6);
+                    entryClass = entryClass.substring(0, entryClass.indexOf(dotClass));
                     //if (tab!=null) tab.writeStatus("Entry: " + entryClass);
                     // it is possible, if one ran an Assembly before going to the
                     // DoE panel to create an Experiment, that a compiled version of
@@ -360,7 +349,7 @@ public class LocalBootLoader extends URLClassLoader {
                             isEventGraph = false;
                         }
                     } catch (Exception ex) {
-                        System.out.println("Check viskit.jar has jaxb bindings, or that entryClass "+entryClass);
+                        System.err.println("Check viskit.jar has jaxb bindings, or: " + entryClass);
                         ex.printStackTrace();
                     }
 
@@ -368,7 +357,7 @@ public class LocalBootLoader extends URLClassLoader {
                         try {
                             je = new JarEntry(entryName);
                             jos.putNextEntry(je);
-                            fis = new FileInputStream(dirList[i]);
+                            fis = new FileInputStream(file);
                             byte[] buf = new byte[256];
                             int c;
                             while ((c = fis.read(buf)) > 0) {

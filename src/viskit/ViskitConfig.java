@@ -36,28 +36,29 @@ public class ViskitConfig {
     public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
 
-    public static final String PROJECT_HOME_KEY = "app.projecthome.path[@dir]";
-    public static final String PROJECT_NAME_KEY = "app.projecthome.name[@value]";
-    public static final String EG_HISTORY_KEY = "history.EventGraphEditor.Recent.EventGraphFile";
-    public static final String ASSY_HISTORY_KEY = "history.AssemblyEditor.Recent.AssemblyFile";
-    public static final String PROJ_HISTORY_KEY = "history.ProjectEditor.Recent.ProjectFile";
-    public static final String X_CLASS_PATH_KEY = "extraClassPath.path";
-    public static final String X_CLASS_PATHS_KEY = X_CLASS_PATH_KEY + "[@value]";
-    public static final String X_CLASS_PATH_CLEAR_KEY = "extraClassPath";
+    public static final String PROJECT_HOME_KEY = "app.projecthome";
+    public static final String PROJECT_PATH_KEY = PROJECT_HOME_KEY + ".path[@dir]";
+    public static final String PROJECT_NAME_KEY = PROJECT_HOME_KEY + ".name[@value]";
+    public static final String X_CLASS_PATHS_CLEAR_KEY = "extraClassPaths";
+    public static final String X_CLASS_PATHS_PATH_KEY = X_CLASS_PATHS_CLEAR_KEY + ".path";
+    public static final String X_CLASS_PATHS_KEY = X_CLASS_PATHS_PATH_KEY + "[@value]";
     public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
     public static final String RECENT_ASSY_CLEAR_KEY = "history.AssemblyEditor.Recent";
     public static final String RECENT_PROJ_CLEAR_KEY = "history.ProjectEditor.Recent";
+    public static final String EG_HISTORY_KEY = RECENT_EG_CLEAR_KEY + ".EventGraphFile";
+    public static final String ASSY_HISTORY_KEY = RECENT_ASSY_CLEAR_KEY + ".AssemblyFile";
+    public static final String PROJ_HISTORY_KEY = RECENT_PROJ_CLEAR_KEY + ".Project";
     public static final String EG_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
     public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
-    public static final String CACHED_EVENTGRAPHS_KEY = "Cached.EventGraphs[@xml]";
-    public static final String CACHED_EVENTGRAPHS_CLASS_KEY = "Cached.EventGraphs[@class]";
-    public static final String CACHED_WORKING_DIR_KEY = "Cached[@workDir]";
-    public static final String CACHED_MISS_FILE_KEY = "Cached.Miss[@file]";
-    public static final String CACHED_MISS_DIGEST_KEY = "Cached.Miss[@digest]";
     public static final String CACHED_CLEAR_KEY = "Cached";
+    public static final String CACHED_EVENTGRAPHS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@xml]";
+    public static final String CACHED_EVENTGRAPHS_CLASS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@class]";
+    public static final String CACHED_WORKING_DIR_KEY = CACHED_CLEAR_KEY + "[@workDir]";
+    public static final String CACHED_MISS_FILE_KEY = CACHED_CLEAR_KEY + ".Miss[@file]";
+    public static final String CACHED_MISS_DIGEST_KEY = CACHED_CLEAR_KEY + ".Miss[@digest]";
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
     public static final String ASSY_EDITOR_FRAME_BOUNDS_KEY = "app.AssemblyEditor.FrameBounds";
     public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";    
@@ -200,10 +201,12 @@ public class ViskitConfig {
      * Viskit Project
      */
     public void clearViskitConfig() {
-        setVal(ViskitConfig.PROJECT_HOME_KEY, "");
+        setVal(ViskitConfig.PROJECT_PATH_KEY, "");
         setVal(ViskitConfig.PROJECT_NAME_KEY, "");
         getViskitConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         getViskitConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+
+        // TODO: Other clears?
     }
     
     public void resetViskitConfig() {

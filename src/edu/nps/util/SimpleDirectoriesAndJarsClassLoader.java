@@ -67,9 +67,9 @@ import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
 
 /**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since Oct 24, 2005
  * @since 9:42:57 AM

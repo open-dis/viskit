@@ -185,8 +185,7 @@ public class FileBasedClassManager implements Runnable {
                 }
             }
             if (cache.isEmpty()) {
-                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath();
-                s = s.replace('\\', '/');
+                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
                 if (viskit.Vstatics.debug) {
                     log.debug("Cache is empty, creating workDir entry at " + s);
                 }                
@@ -240,15 +239,16 @@ public class FileBasedClassManager implements Runnable {
     public boolean isCached(File file) {
         List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
+            String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
             if (viskit.Vstatics.debug) {
                 log.debug("isCached() " + file + " of cacheSize " + cache.size());
-                if (cache.contains(file.getCanonicalPath())) {
+                if (cache.contains(filePath)) {
                     log.debug("cached true");
                 } else {
                     log.debug("cached false");
                 }
             }
-            if (cache.contains(file.getCanonicalPath())) {
+            if (cache.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);
                     return false;
@@ -275,7 +275,7 @@ public class FileBasedClassManager implements Runnable {
         List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
-            index = cacheXML.lastIndexOf(file.getCanonicalPath());
+            index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (viskit.Vstatics.debug) {
                 log.debug("getCached index at " + index);
                 log.debug("will return " + cacheClass.get(index));
@@ -300,7 +300,7 @@ public class FileBasedClassManager implements Runnable {
         List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
-            index = cacheClass.lastIndexOf(file.getCanonicalPath());
+            index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (viskit.Vstatics.debug) {
                 log.debug("getCachedXml index at " + index);
                 log.debug("will return " + cacheXML.get(index));
@@ -325,13 +325,13 @@ public class FileBasedClassManager implements Runnable {
         String filePath;
         File deletedCache = null;
         try {
-            filePath = file.getCanonicalPath();
+            filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
 
             int index = - 1;
             if (cacheXML.contains(filePath)) {
                 index = cacheXML.lastIndexOf(filePath);
                 deletedCache = new File(cacheClass.get(index));
-            } else if (cacheClass.contains(file.getCanonicalPath())) {
+            } else if (cacheClass.contains(filePath)) {
                 index = cacheClass.lastIndexOf(filePath);
                 deletedCache = file;
             }
@@ -359,7 +359,7 @@ public class FileBasedClassManager implements Runnable {
         List<String> digests = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         int index;
         try {
-            index = cacheMisses.lastIndexOf(file.getCanonicalPath());
+            index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (index >= 0) {
                 String digest = digests.get(index);
                 String compare = createMessageDigest(file);
@@ -389,7 +389,7 @@ public class FileBasedClassManager implements Runnable {
         List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
         int index;
         try {
-            if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath())) > -1) {
+            if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"))) > -1) {
                 projectConfig.clearProperty("Cached.Miss(" + index + ")[@file]");
                 projectConfig.clearProperty("Cached.Miss(" + index + ")[@digest]");
             }
@@ -399,15 +399,15 @@ public class FileBasedClassManager implements Runnable {
     }
 
     /** if either the egFile changed, or the classFile, the cache is stale
-     * @param egFile
-     * @return
+     * @param egFile the EventGraph file to compare digests with
+     * @return an indication EG state change
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
         List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         String filePath;
         try {
-            filePath = egFile.getCanonicalPath();
+            filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");
             int index = -1;
             index = cacheDigest.lastIndexOf(filePath);
             if (index >= 0) {

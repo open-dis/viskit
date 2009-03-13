@@ -334,7 +334,7 @@ public class SettingsDialog extends JDialog {
 
         public void actionPerformed(ActionEvent actionEvent) {
             ViskitController ctrlr = (ViskitController) VGlobals.instance().getEventGraphEditor().getController();
-            ctrlr.clearRecentFileList(); 
+            ctrlr.clearRecentFileSet();
         }
     }
 
@@ -349,7 +349,7 @@ public class SettingsDialog extends JDialog {
     private static void clearClassPathEntries() {
         // Always reinitialize the config instances.  We may have changed projects
         initConfigs();
-        projectConfig.clearTree(ViskitConfig.X_CLASS_PATH_CLEAR_KEY);
+        projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
     
     static JDialog progressDialog;
@@ -363,7 +363,7 @@ public class SettingsDialog extends JDialog {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
                 log.debug("lis[" + ix + "]: " + s);
-                projectConfig.setProperty(ViskitConfig.X_CLASS_PATH_KEY + "(" + ix + ")[@value]", s);
+                projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
         }
@@ -587,7 +587,7 @@ public class SettingsDialog extends JDialog {
         if ((vConfig == null) || (projectConfig == null)) {
             initConfigs();
         }
-        return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATH_KEY + "[@value]");
+        return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATHS_KEY);
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */

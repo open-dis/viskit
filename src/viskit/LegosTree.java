@@ -28,10 +28,10 @@ import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects</p>
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:31 AM
@@ -53,6 +53,13 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     private Vector<String> recurseNogoList;
     private String genericTableToolTip = "Drag onto canvas";
 
+    /** Constructor for Listener Event Graph Object Tree
+     *
+     * @param className a class to evaluate as LEGO
+     * @param iconPath path to a LEGO icon
+     * @param dslis a DragStartListener
+     * @param tooltip description for this LEGO tree
+     */
     LegosTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
         this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, tooltip);
     }
@@ -68,7 +75,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         try {
             targetClass = Class.forName(targetClassName, false, this.getClass().getClassLoader()); //"simkit.BasicSimEntity");
         } catch (ClassNotFoundException e) {
-            System.out.println("Error:  Need simkit classes in classpath");
+            log.error("Error:  Need simkit classes in classpath");
             e.printStackTrace();
             return;
         }
@@ -154,24 +161,22 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
-        if (dmtn.getChildCount() > 0) {
-            for (int i = 0; i < dmtn.getChildCount(); i++) {
-                DefaultMutableTreeNode n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
-                if (n != null) {
-                    Object uo = n.getUserObject();
-                    if (!(uo instanceof FileBasedAssyNode)) {
-                        continue;
+        for (int i = 0; i < dmtn.getChildCount(); i++) {
+            DefaultMutableTreeNode n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
+            if (n != null) {
+                Object uo = n.getUserObject();
+                if (!(uo instanceof FileBasedAssyNode)) {
+                    continue;
+                }
+                FileBasedAssyNode fban = (FileBasedAssyNode) uo;
+                try {
+                    if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
+                        mod.removeNodeFromParent(n);
+                        FileBasedClassManager.instance().unloadFile(fban);
+                        return n;
                     }
-                    FileBasedAssyNode fban = (FileBasedAssyNode) uo;
-                    try {
-                        if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
-                            mod.removeNodeFromParent(n);
-                            FileBasedClassManager.instance().unloadFile(fban);
-                            return n;
-                        }
-                    } catch (IOException e) {
-                        System.out.println("getCanonicalPath in LegosTree : " + e.getMessage());
-                    }
+                } catch (IOException e) {
+                    log.error("getCanonicalPath in LegosTree : " + e.getMessage());
                 }
             }
         }
@@ -185,7 +190,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     // with xml in it, it will show, but if its children have errors when marshalling,
     // they will not appear.
     public void addContentRoot(File f) {
-        if (!f.getName().contains(".svn")) {
+        if (!f.getName().contains("svn")) {
             if (f.getName().toLowerCase().endsWith(".jar")) {
                 addJarFile(f.getPath());
             } else if (!f.getName().endsWith(".java")) {
@@ -263,7 +268,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         rootVector.add(myNode); // for later pruning
                         directoryRoots.put(f.getPath(), myNode);
                         int idx = root.getIndex(myNode);
-                        mod.nodesWereInserted(root, new int[]{idx});
+                        mod.nodesWereInserted(root, new int[] {idx});
                     }
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
@@ -308,7 +313,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             if (par != null) {
                 par.add(myNode);
                 int idx = par.getIndex(myNode);
-                mod.nodesWereInserted(par, new int[]{idx});
+                mod.nodesWereInserted(par, new int[] {idx});
             } else {
                 root.add(myNode);
                 int idx = root.getIndex(myNode);
@@ -322,7 +327,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     DefaultMutableTreeNode rootNode;
     HashMap<String, DefaultMutableTreeNode> packagesHM = new HashMap<String, DefaultMutableTreeNode>();
 
-    private void hookToParent(Class c, DefaultMutableTreeNode myroot) {
+    private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
         String pkg = c.getPackage().getName();
         DefaultMutableTreeNode dmtn = getParent(pkg, myroot);
         dmtn.add(new DefaultMutableTreeNode(c));
@@ -473,16 +478,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         if (list == null || list.size() <= 0) {
             log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
             log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
-            
-            // TODO: should just be safe to return here without annoying warning popup dialog
-            return;
-        }
+        } else {
 
-        DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
-        mod.insertNodeInto(localRoot, root, 0);
+            DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
+            mod.insertNodeInto(localRoot, root, 0);
 
-        for (Class<?> c : list) {
-            hookToParent(c, localRoot);
+            for (Class<?> c : list) {
+                hookToParent(c, localRoot);
+            }
         }
     }
 
@@ -552,16 +555,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     return false;
                 }
                 // TBD add an ignore in SettingsDialog, and in history file
-                if (f.getName().equals("CVS") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 || f.getName().indexOf("Locations") > -1) {
+                if (f.getName().equals("svn") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 || f.getName().indexOf("Locations") > -1) {
                     return false;
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
-                if (fa == null || fa.length <= 0) {
-                    return false;
-                } // don't include empty dirs.
-                else {
-                    return true;
-                }
+                return (fa != null || fa.length != 0);
             }
 
             return f.isFile() &&

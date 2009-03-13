@@ -79,23 +79,22 @@ public class OpenAssembly {
 
     public void setFile(File f, SimkitAssembly jaxb) throws Exception {
         if (file != null) {
-            doSendCloseAssy();
+
+            file = f;
+            jaxbRoot = jaxb;
+            jaxbFactory = new ObjectFactory();
+
+            SAXBuilder builder;
+            try {
+                builder = new SAXBuilder();
+                jdomDoc = builder.build(f);
+            } catch (Exception e) {
+                jdomDoc = null;
+                throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
+            }
+
+            doSendNewAssy(f);
         }
-
-        file = f;
-        jaxbRoot = jaxb;
-        jaxbFactory = new ObjectFactory();
-
-        SAXBuilder builder;
-        try {
-            builder = new SAXBuilder();
-            jdomDoc = builder.build(f);
-        } catch (Exception e) {
-            jdomDoc = null;
-            throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
-        }
-
-        doSendNewAssy(f);
     }
     private HashSet<AssyChangeListener> listeners = new HashSet<AssyChangeListener>();
 
@@ -146,6 +145,12 @@ public class OpenAssembly {
         public final static int CLOSE_ASSY = 3;
         public final static int PARAM_LOCALLY_EDITTED = 4;
 
+        /**
+         * Notify the assembly listeners of a change
+         * @param action the change taking place
+         * @param source the AssyChangeListener
+         * @param param the object that changes
+         */
         public void assyChanged(int action, AssyChangeListener source, Object param);
 
         public String getHandle();

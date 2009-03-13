@@ -38,9 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -324,6 +322,7 @@ public class ViskitProject {
         this.classDir = classDir;
     }
 
+    /** @return an array of a project's external resources */
     public String[] getProjectContents() {
 
         // Prevent duplicate entries
@@ -333,8 +332,9 @@ public class ViskitProject {
         try {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
-                    log.debug(f.getCanonicalPath());
-                    cp.add(f.getCanonicalPath().replaceAll("\\\\", "/"));
+                    String file = f.getCanonicalPath().replaceAll("\\\\", "/");
+                    log.debug(file);
+                    cp.add(file);
                 }
             }
             log.debug(getEventGraphDir().getCanonicalPath());
@@ -345,7 +345,7 @@ public class ViskitProject {
                 cp.add(classPath.replaceAll("\\\\", "/"));
             }
 
-            // Then always include our project's EventGraphs path
+            // Then always include our project's EventGraphs path for convenience
             cp.add(getEventGraphDir().getCanonicalPath().replaceAll("\\\\", "/"));
 
         } catch (IOException ex) {

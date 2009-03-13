@@ -24,17 +24,19 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
    void newPropChangeListener(String widgetName, String className, Point p);
    void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
   
-  /**
-   *  Reports saved state of model.  Becomes "clean" after a save.
-   * @return 
-   */
-   boolean isDirty       ();
+   /**
+    * Boolean to signify whether the model has been changed since last disk save.
+    *
+    * @return true means changes have been made and it needs to be flushed.
+    */
+   boolean isDirty();
    void    setDirty      (boolean tf);  // to force save
-  /**
-   * Messaged by controller when a new Model should be loaded.
-   * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
-   * @return 
-   */
+
+   /**
+    * Messaged by controller when a new Model should be loaded.
+    * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
+    * @return indication of succes
+    */
    boolean newModel      (File f);
    void    saveModel     (File f);
    File    getLastFile   ();

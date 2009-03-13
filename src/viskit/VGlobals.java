@@ -478,7 +478,7 @@ public class VGlobals {
     public void initProjectHome() {
 
         // TODO: if vConfig ever returns a null, need to gracefully handle
-        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_HOME_KEY).trim();
+        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_PATH_KEY).trim();
         projectHome = projectHome.replaceAll("\\\\", "/");
         log.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 

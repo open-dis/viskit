@@ -212,11 +212,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    class _RecentAssyFileListener implements ViskitAssemblyController.RecentFileListener {
+    class _RecentAssyFileListener implements ViskitAssemblyController.RecentAssyFileListener {
 
-        public void listChanged() {
+        public void assySetChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-            Set<String> lis = acontroller.getRecentAssyFileList();
+            Set<String> lis = acontroller.getRecentAssyFileSet();
             openRecentAssyMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
@@ -241,11 +241,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    class _RecentProjFileListener implements ViskitAssemblyController.RecentFileListener {
+    class _RecentProjFileListener implements ViskitAssemblyController.RecentProjFileListener {
 
-        public void listChanged() {
+        public void projSetChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
-            Set<String> lis = acontroller.getRecentProjFileList();
+            Set<String> lis = acontroller.getRecentProjFileSet();
             openRecentProjMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
@@ -267,6 +267,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 mi.setToolTipText("Clear this list");
                 openRecentProjMenu.add(mi);
             }
+        }
+
+        public void assyProjChanged() {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -297,7 +301,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentProjFileList();
+                acontroller.clearRecentProjFileSet();
             } else {
                 acontroller.openProject(new File(fullPath));
             }
@@ -308,10 +312,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         ViskitAssemblyController controller = (ViskitAssemblyController) getController();
 
         myAssyFileListener = new _RecentAssyFileListener();
-        controller.addRecentFileListListener(myAssyFileListener);
+        controller.addRecentAssyFileSetListener(myAssyFileListener);
 
         myProjFileListener = new _RecentProjFileListener();
-        controller.addRecentFileListListener(myProjFileListener);
+        controller.addRecentProjFileSetListener(myProjFileListener);
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -706,7 +710,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 if (file.exists()) {
                     if (path.endsWith(".jar")) {
                         lTree.addContentRoot(file);
-                        
+
                     // A new project may contain an empty EventGraphs directory
                     } else if (fileList.length == 0) {
                         continue;
@@ -726,11 +730,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // todo get from project
         pclTree.addContentRoot(new File("lib/simkit.jar"));
 
-        // If we built diskit.jar, then include it and the dis.jar        
+        // If we built diskit.jar, then include it and the dis.jar for convenience
         File diskitJar = new File("lib/ext/diskit.jar");
         File disJar = new File("lib/ext/dis.jar");
-        
-        // If we built diskit.jar, then include it and its sister dis.jar.  The 
+
+        // If we built diskit.jar, then include it and its sister dis.jar.  The
         // dis.jar contains no PCLs, so, Viskit will give a benign warning about
         // this in the output console and debug.log.
         if (diskitJar.exists() && disJar.exists()) {
@@ -907,7 +911,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return getLeafUO(pclTree);
     }
 
-    // For auto load of open eventgraphs
     public void addToEventGraphPallette(File f) {
         lTree.addContentRoot(f);
     }

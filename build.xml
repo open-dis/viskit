@@ -154,7 +154,6 @@
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
         <mkdir dir="${dir.build.classes}/${analyst.reports.dir}"/>
-        <mkdir dir="${dir.api.doc}"/>
         <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
 	<mkdir dir="${dir.src.simasm}/stats"/>
@@ -467,6 +466,9 @@
     <target name="doc"
             depends="build.init,compile"
             description="Create the javadoc for Viskit.">
+
+        <delete dir="${dir.api.doc}"/>
+        <mkdir dir="${dir.api.doc}"/>
         <javadoc access="public"
                  author="true"
                  destdir="${dir.api.doc}"
@@ -1134,7 +1136,6 @@
             description="Deletes build directory, javadoc and dist directories, and lib/ext/diskit.jar">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
-        <delete dir="${dir.api.doc}"/>
         <delete dir="${dir.dist}"/>
         <delete file="${dir.lib.ext}/dis.jar"/>
         <delete file="${dir.lib.ext}/diskit.jar"/>

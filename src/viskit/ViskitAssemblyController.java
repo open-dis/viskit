@@ -81,6 +81,7 @@ public interface ViskitAssemblyController {
     /** Performs a delete fuction for selected edges and nodes */
     void delete();
   
+    /** Opens a Viskit Project Assembly File */
     void open();
 
     /** Opens an already existing Viskit Project
@@ -92,29 +93,41 @@ public interface ViskitAssemblyController {
     
     void paste();
 
+    /** Perform shutdown operations */
     void quit();
 
+    /** Save the current Assy file as is */
     void save();
 
+    /** Save the current Assembly File "as" desired by user */
     void saveAs();
 
     // Bug fix: 1195
+    /** Calls both pre and post closing actions */
     void close();
     
     void closeAll();
 
+    /** @return indication of completion */
     boolean preClose();
 
+    /** Clean up for closing Assembly models */
     void postClose();
 
     void settings();
 
+    /**
+     * Perform Assembly Editor shutdown duties
+     * @return true if Assembly was dirty (modified)
+     */
     boolean preQuit();
 
     void postQuit();
 
+    /** @param lis the AssyChangeListener to add as a listener */
     void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
+    /** @param lis the AssyChangeListener to remove as a listener */
     void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
     OpenAssembly.AssyChangeListener getAssemblyChangeListener();
@@ -132,19 +145,27 @@ public interface ViskitAssemblyController {
 
     void captureWindow();
     
-    void addRecentFileListListener(RecentFileListener lis);
+    void addRecentAssyFileSetListener(RecentAssyFileListener lis);
 
-    void removeRecentFileListListener(RecentFileListener lis);
+    void removeRecentAssyFileSetListener(RecentAssyFileListener lis);
 
-    Set<String> getRecentAssyFileList();
+    static interface RecentAssyFileListener {
+        void assySetChanged();
+    }
+
+    Set<String> getRecentAssyFileSet();
 
     void clearRecentAssyFileList();
 
-    Set<String> getRecentProjFileList();
+    void addRecentProjFileSetListener(RecentProjFileListener lis);
 
-    void clearRecentProjFileList();
+    void removeRecentProjFileSetListener(RecentProjFileListener lis);
 
-    static interface RecentFileListener {
-        void listChanged();
+    Set<String> getRecentProjFileSet();
+
+    void clearRecentProjFileSet();
+
+    static interface RecentProjFileListener {
+        void projSetChanged();
     }
 }

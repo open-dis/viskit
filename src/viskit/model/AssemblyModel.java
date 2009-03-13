@@ -72,11 +72,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
-    /**
-     * Boolean to signify whether the model has been changed since last disk save.
-     *
-     * @return true means changes have been made and it needs to be flushed.
-     */
     public boolean isDirty() {
         return modelDirty;
     }

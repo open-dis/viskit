@@ -52,11 +52,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
     public EventGraphController() {
         initConfig();
         initFileWatch();
-        this._setFileLists();
+        this._setFileSet();
     }
 
     public void begin() {
-        java.util.List<String> lis = getOpenFileList(false);
+        java.util.List<String> lis = getOpenFileSet(false);
 
         // don't default to new event graph
         if (lis.size() <= 0) {
@@ -68,7 +68,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             // file open, then open them upon Viskit starting, else, let the
             // Assembly file tell which EGs to open
             if (VGlobals.instance().getAssemblyController() != null) {
-                java.util.List<String> al = VGlobals.instance().getAssemblyController().getOpenFileList(false);
+                java.util.List<String> al = VGlobals.instance().getAssemblyController().getOpenAssyFileList(false);
                 if (al.size() == 0) {
                     log.debug("In begin() (else) of EventGraphController");
                     for (String s : lis) {
@@ -86,41 +86,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
         // placeholder for multi-tabbed combo app.
     }
 
-    public void quit() {
-        if (preQuit()) {
-            postQuit();
-        }
-    }
-
-    public boolean preQuit() {
-        markConfigAllClosed();
-        ViskitModel[] mods = ((ViskitView) getView()).getOpenModels();
-        for (ViskitModel mod : mods) {
-            setModel((mvcModel) mod);
-            File f = mod.getLastFile();
-            if (f != null) {
-                markConfigOpen(f);
-            }
-            if (preClose()) {
-                postClose();
-            } else {
-                return false;
-            } // cancelled
-        }
-        return true;
-    }
-
-    public void postQuit() {
-        ((ViskitView) getView()).prepareToQuit();
-        VGlobals.instance().quitEventGraphEditor();
-    }
-
     /** Creates a new Viskit Project */
     public void newProject() {
         VGlobals.instance().getAssemblyController().newProject();
     }
         
-    /** Create a new blank EventGraph model */
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
         ViskitModel viskitModel = (ViskitModel) getModel();
@@ -203,6 +173,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    
+    public void openRecentEventGraph(String path) {
+        _doOpen(new File(path));
+    }
+
+    // Protected for the AssemblyController's access to open EventGraphs
     protected void _doOpen(File file) {
         ViskitView viskitView = (ViskitView) getView();
         Model mod = new Model(this);
@@ -227,7 +203,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
         if (mod.newModel(file) && !isOpenAlready) {
             
-            // We found one or more simkit.Priority(s) with numeric values vice 
+            // We may find one or more simkit.Priority(s) with numeric values vice
             // eneumerations in the EG XML.  Modify and save the EG XML silently
             if (mod.isNumericPriority()) {
                 save();
@@ -237,18 +213,23 @@ public class EventGraphController extends mvcAbstractController implements Viski
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
             adjustRecentList(file);
+
+            // Mark every vAMod opened as "open"
+            openAlready = viskitView.getOpenModels();
+            for (ViskitModel vMod : openAlready) {
+                if (vMod.getLastFile() != null) {
+                    String modelPath = vMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
+                    markConfigOpen(modelPath);
+                }
+            }
             fileWatchOpen(file);
         } else {
             viskitView.delTab(mod);   // Not a good open, tell view
         }
     }
 
-    public void openRecentEventGraph(String path) {
-        _doOpen(new File(path));
-    }
-    
     // Support for informing listeners about open eventgraphs
-    // Methods to implement a scheme where other modules will be informed of file changes //
+    // Methods to implement a scheme where other modules will be informed of file changes
     // (Would Java Beans do this with more or less effort?
     private DirectoryWatch dirWatch;
     private File watchDir;
@@ -262,7 +243,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             watchDir.mkdir();
 
             dirWatch = new DirectoryWatch(watchDir);
-            dirWatch.setLoopSleepTime(1 * 1000); // 1 secs
+            dirWatch.setLoopSleepTime(1000); // 1 sec
             dirWatch.startWatcher();
         } catch (IOException e) {
             e.printStackTrace();
@@ -294,7 +275,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         if (paf != null) {
             view.addToEventGraphPallette(f);
         } else {
-            view.removeFromEventGraphPallette(f);
+            fileWatchClose(f);
         }
     }
 
@@ -333,7 +314,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
     
     private static final int RECENTLISTSIZE = 15;
-    private Set<String> recentFileList = new LinkedHashSet<String>(RECENTLISTSIZE + 1);;
+    private Set<String> recentFileSet = new LinkedHashSet<String>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -342,84 +323,67 @@ public class EventGraphController extends mvcAbstractController implements Viski
      */
     private void adjustRecentList(File file) {
         String s = file.getAbsolutePath().replaceAll("\\\\", "/");
-        recentFileList.remove(s);
-        recentFileList.add(s);      // to the top
+        recentFileSet.remove(s);
+        recentFileSet.add(s);      // to the top
 
-        saveHistoryXML(recentFileList);
+        saveHistoryXML(recentFileSet);
         notifyRecentFileListeners();
     }
 
-    private java.util.List<String> openV;
-    private void _setFileLists() {
-        openV = new ArrayList<String>(4);
+    private java.util.List<String> openEventGraphs;
+    private void _setFileSet() {
+        openEventGraphs = new ArrayList<String>(4);
         if (historyConfig == null) {return;}
-        String[] valueAr = historyConfig.getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
+        String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
-            s.replaceAll("\\\\", "/");
-            if (recentFileList.add(s)) {
-                String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
+            if (recentFileSet.add(s)) {
+                String op = getHistoryConfig().getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openV.add(s);
+                    openEventGraphs.add(s);
                 }
+
+                notifyRecentFileListeners();
             }
             i++;
         }
-        notifyRecentFileListeners();
     }
 
     private void saveHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+        getHistoryConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         int ix = 0;
+
+        // The value's modelPath is already delimited with "/"
         for (String value : recentFiles) {
-            value = value.replaceAll("\\\\", "/");
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
             ix++;
         }
-        historyConfig.getDocument().normalize();
+        getHistoryConfig().getDocument().normalize();
     }
 
-    private void markConfigAllClosed() {
-        for (int i = 0; i < recentFileList.size(); i++) {
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]", "false");
-        }
-    }
-
-    private void markConfigOpen(File f) {
-        int idx = 0;
-        for (String key : recentFileList) {
-            if (key.contains(f.getName())) {
-                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-            }
-            idx++;
-        }
-
-    // The open attribute is zeroed out for all recent files the first time a file is opened
-    }
-    
-    public void clearRecentFileList() {
-        recentFileList.clear();
-        saveHistoryXML(recentFileList);
+    public void clearRecentFileSet() {
+        recentFileSet.clear();
+        saveHistoryXML(recentFileSet);
         notifyRecentFileListeners();
     }
 
-    public Set<String> getRecentFileList() {
-        return getRecentFileList(false);
+    public Set<String> getRecentFileSet() {
+        return getRecentFileSet(false);
     }
     
-    private Set<String> getRecentFileList(boolean refresh) {
-        if (refresh || recentFileList == null) {
-            _setFileLists();
+    private Set<String> getRecentFileSet(boolean refresh) {
+        if (refresh || recentFileSet == null) {
+            _setFileSet();
         }
-        return recentFileList;
+        return recentFileSet;
     }
 
-    private java.util.List<String> getOpenFileList(boolean refresh) {
-        if (refresh || openV == null) {
-            _setFileLists();
+    private java.util.List<String> getOpenFileSet(boolean refresh) {
+        if (refresh || openEventGraphs == null) {
+            _setFileSet();
         }
-        return openV;
+        return openEventGraphs;
     }
 
     /* a component, e.g., model, wants to say something. */
@@ -444,6 +408,37 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
         ((ViskitView) getView()).genericErrorReport(title, msg);
     }
+    
+    public void quit() {
+        if (preQuit()) {
+            postQuit();
+        }
+    }
+
+    public boolean preQuit() {
+
+        // Check for dirty models before exiting
+        ViskitModel[] mods = ((ViskitView) getView()).getOpenModels();
+        for (ViskitModel mod : mods) {
+            setModel((mvcModel) mod);
+            preClose();
+        }
+        return true;
+    }
+
+    public void postQuit() {
+        ((ViskitView) getView()).prepareToQuit();
+        VGlobals.instance().quitEventGraphEditor();
+    }
+
+    public void closeAll() {
+        
+        ViskitModel[] mods = ((ViskitView) getView()).getOpenModels();
+        for (ViskitModel mod : mods) {
+            setModel((mvcModel) mod);
+            close();
+        }
+    }
 
     public void close() {
         if (preClose()) {
@@ -456,27 +451,44 @@ public class EventGraphController extends mvcAbstractController implements Viski
         if (mod == null) {
             return false;
         }
+
         if (mod.isDirty()) {
             return askToSaveAndContinue();
         }
+
         return true;
     }
 
     public void postClose() {
+
         Model mod = (Model) getModel();
-
-        ((ViskitView) getView()).delTab(mod);
-
         if (mod.getLastFile() != null) {
             fileWatchClose(mod.getLastFile());
+            markConfigClosed(mod.getLastFile());
+        }
+
+        ((ViskitView) getView()).delTab(mod);
+    }
+
+    private void markConfigClosed(File f) {
+        int idx = 0;
+        for (String key : recentFileSet) {
+            if (key.contains(f.getName())) {
+                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+            }
+            idx++;
         }
     }
 
-    public void closeAll() {
-        ViskitModel[] modAr = ((ViskitView) getView()).getOpenModels();
-        for (ViskitModel mod : modAr) {
-            setModel((mvcModel) mod);
-            close();
+    // The open attribute is zeroed out for all recent files the first time a file is opened
+    private void markConfigOpen(String path) {
+        int idx = 0;
+        for (String key : recentFileSet) {
+            if (key.contains(path)) {
+                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", path);
+            }
+            idx++;
         }
     }
 
@@ -491,7 +503,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
-    /** Save the current Event Graph "as" desired by user */        
     public void saveAs() {
         ViskitModel mod = (ViskitModel) getModel();
         ViskitView view = (ViskitView) getView();
@@ -514,7 +525,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             mod.saveModel(saveFile);
             view.setSelectedEventGraphName(gmd.name);
 
-            fileWatchOpen(saveFile);
+            fileWatchSave(saveFile);
             adjustRecentList(saveFile);
         }
     }
@@ -714,7 +725,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void showXML() {
-        if (checkSave() == false || ((ViskitModel) getModel()).getLastFile() == null) {
+        if (!checkSave() || ((ViskitModel) getModel()).getLastFile() == null) {
             return;
         }
 
@@ -949,5 +960,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
             Vstatics.log.error("Recent file saving disabled");
             historyConfig = null;
         }
+    }
+
+    private XMLConfiguration getHistoryConfig() {
+        return historyConfig;
     }
 }

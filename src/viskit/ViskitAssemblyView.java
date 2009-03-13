@@ -32,12 +32,19 @@ public interface ViskitAssemblyView {
 
     Object getSelectedEventGraph();
 
+    /** For auto load of open eventgraphs
+     * @param f the EventGraph to add to the LEGO tree
+     */
     void addToEventGraphPallette(File f);
 
     void removeFromEventGraphPallette(File f);
 
     void addToPropChangePallette(File f);
 
+    /** Not currently used
+     *
+     * @param f the PCL to remove from the node tree
+     */
     void removeFromPropChangePallette(File f);
 
     int genericAsk(String title, String prompt);      // returns JOptionPane constants

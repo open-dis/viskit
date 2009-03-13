@@ -3,10 +3,10 @@ package viskit;
 import java.io.File;
 
 /**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects</p>
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since Jul 21, 2004
  * @since 3:26:42 PM
