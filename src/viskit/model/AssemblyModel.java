@@ -22,6 +22,7 @@ import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
+import viskit.VGlobals;
 import viskit.ViskitAssemblyController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -112,6 +113,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                 jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 
                 GraphMetaData mymetaData = new GraphMetaData(this);
+                mymetaData.projectName =
+                        mymetaData.projectName +
+                        VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();

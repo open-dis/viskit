@@ -23,6 +23,7 @@ public class GraphMetaData {
     public String stopTime = "100.0";    
     public String extendsPackageName = "";
     public String implementsPackageName = "";
+    public String projectName = " of Project: ";
     
     public boolean verbose = false;
 
@@ -52,12 +53,13 @@ public class GraphMetaData {
         }
     }
 
-    public GraphMetaData(String n, String p, String a, String v, String e, String i) {
+    public GraphMetaData(String n, String p, String a, String v, String e, String i, String pn) {
         name = n;
         packageName = p;
         author = a;
         version = v;
         extendsPackageName = e;
         implementsPackageName = i;
+        projectName = pn;
     }
 }

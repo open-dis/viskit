@@ -229,7 +229,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
             GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
             if (gmd != null) {
-                setSelectedEventGraphName(gmd.name);
+                setSelectedEventGraphName(gmd.name + gmd.projectName);
                 setSelectedEventGraphDescription(gmd.description);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");

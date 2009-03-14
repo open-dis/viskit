@@ -22,6 +22,7 @@ import edu.nps.util.TempFileManager;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import viskit.ModelEvent;
+import viskit.VGlobals;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -126,6 +127,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 jaxbRoot = (SimEntity) u.unmarshal(f);
                 
                 GraphMetaData mymetaData = new GraphMetaData(this);
+                mymetaData.projectName =
+                        mymetaData.projectName +
+                        VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();

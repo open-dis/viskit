@@ -205,7 +205,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
             GraphMetaData gmd = myVgacw.model.getMetaData();
             if (gmd != null) {
-                setSelectedAssemblyName(gmd.name);
+                setSelectedAssemblyName(gmd.name + gmd.projectName);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: AssemblyViewFrame gmd null..");
             }

@@ -230,7 +230,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         if (mod.newModel(file) && !isOpenAlready) {
 
-            vaw.setSelectedAssemblyName(mod.getMetaData().name);
+            vaw.setSelectedAssemblyName(mod.getMetaData().name + mod.getMetaData().projectName);
 
             // TODO: Implement an Assembly descrition block set here
             adjustRecentAssySet(file);
@@ -423,7 +423,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             model.changeMetaData(gmd); // might have renamed
 
             model.saveModel(saveFile);
-            view.setSelectedAssemblyName(gmd.name);
+            view.setSelectedAssemblyName(gmd.name + gmd.projectName);
             adjustRecentAssySet(saveFile);
         }
     }
@@ -436,7 +436,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ((ViskitAssemblyModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name + gmd.projectName);
         }
     }
     private int egNodeCount = 0;
@@ -557,7 +557,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ((ViskitAssemblyModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((ViskitAssemblyView) getView()).setSelectedAssemblyName(gmd.name + gmd.projectName);
         } else {
             ((ViskitAssemblyView) getView()).delTab(mod);
         }
