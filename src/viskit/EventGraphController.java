@@ -254,10 +254,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
         fileWatchOpen(f);
     }
 
-    /** Create a temporary location to store copies of EventGraphs in XML form.
+    /** A temporary location to store copies of EventGraphs in XML form.
      * This is to compare against any changes to and whether to re-cache the
-     * MD5 hash generated elsewhere for this EG.
-     * This is a known EventGraph compilation path
+     * MD5 hash generated for this EG.
      * @param f the EventGraph file to generate MD5 hash for
      */
     private void fileWatchOpen(File f) {
@@ -268,14 +267,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
             FileIO.copyFile(f, ofile, true);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        ViskitAssemblyView view = (ViskitAssemblyView) VGlobals.instance().getAssemblyController().getView();
-
-        PkgAndFile paf = VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
-        if (paf != null) {
-            view.addToEventGraphPallette(f);
-        } else {
-            fileWatchClose(f);
         }
     }
 
