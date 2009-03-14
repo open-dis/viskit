@@ -39,7 +39,7 @@ import viskit.xsd.bindings.assembly.*;
  * @version $Id$
  */
 public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyModel {
-    
+
     static Logger log = Logger.getLogger(AssemblyModel.class);
 
     private JAXBContext jc;
@@ -48,7 +48,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     private File currentFile;
     private boolean modelDirty = false;
     private GraphMetaData metaData;
-    
+
     /** We require specific order on this Map's contents */
     private Map<String, AssemblyNode> nodeCache;
     private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
@@ -93,7 +93,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         metaData = gmd;
         setDirty(true);
     }
-    
+
     /**
      * Replace current model with one contained in the passed file.
      *
@@ -104,18 +104,15 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         getNodeCache().clear();
         pointLess = new Point(100, 100);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
-        
+
         if (f == null) {
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimkitAssembly) u.unmarshal(f);
-                
+
                 GraphMetaData mymetaData = new GraphMetaData(this);
-                mymetaData.projectName =
-                        mymetaData.projectName +
-                        VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();
@@ -154,9 +151,9 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                             "XML I/O Error", JOptionPane.ERROR_MESSAGE);
                 }
                 return false; // from both exceptions
-            } 
+            }
         }
-        
+
         currentFile = f;
         setDirty(false);
         return true;
@@ -227,14 +224,14 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             return;
         }
     }
-    
+
     /** @return a File object representing the last one passed to the two methods above */
     public File getLastFile() {
         return currentFile;
     }
 
     /**
-     * 
+     *
      * @param v
      */
     public void externalClassesChanged(Vector<String> v) {
@@ -286,16 +283,16 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         return true;
     }
-    
+
     public boolean nameExists(String name) {
         for (AssemblyNode n : getNodeCache().values()) {
             if (n.getName().equals(name)) {
                 return true;
-            }           
+            }
         }
         return false;
     }
-    
+
     public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
@@ -319,7 +316,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         jaxbEG.setType(className);
 
         VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
-        
+
         // Don't allow placement of a bad SimEntity on the Assembly palette
         if (!vc.isArgNameFound()) {
             return;
@@ -459,7 +456,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     /**
      * Assembly nodes don't hold onto edges.
-     * @param pce 
+     * @param pce
      */
     public void deletePropChangeEdge(PropChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
@@ -550,10 +547,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                 jaxBPcl.setMode("designPointStat");
             }
         }
-        
+
         String statistics = pclNode.isGetCount() ? "true" : "false";
         jaxBPcl.setCountStatistics(statistics);
-        
+
         statistics = pclNode.isGetMean() ? "true" : "false";
         jaxBPcl.setMeanStatistics(statistics);
 
@@ -694,7 +691,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         op.setEntity(se);
         vTL.add(op);
     }
-    
+
     public Vector<String> getDetailedOutputEntityNames() {
         Vector<String> v = new Vector<String>();
         for (Output ot : jaxbRoot.getOutput()) {
@@ -845,7 +842,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         return mp;
     }
-    
+
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
             PropChangeEdge pce = new PropChangeEdge();
@@ -856,7 +853,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             pce.setTo(toNode);
             pce.setFrom(frNode);
             pce.opaqueModelObject = pclc;
-            
+
             toNode.getConnections().add(pce);
             frNode.getConnections().add(pce);
 
@@ -1010,7 +1007,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     /**
      * "nullIfEmpty" Return the passed string if non-zero length, else null
      * @param s
-     * @return 
+     * @return
      */
     private String nIe(String s) {
         if (s != null) {

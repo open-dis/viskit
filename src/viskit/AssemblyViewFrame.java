@@ -56,7 +56,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     public static final int ADAPTER_MODE = 1;
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
-    private final static String FRAME_DEFAULT_TITLE = "Viskit Assembly Editor";
+    private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
     /** Toolbar for dropping icons, connecting, etc. */
@@ -205,7 +205,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
             GraphMetaData gmd = myVgacw.model.getMetaData();
             if (gmd != null) {
-                setSelectedAssemblyName(gmd.name + gmd.projectName);
+                setSelectedAssemblyName(gmd.name);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: AssemblyViewFrame gmd null..");
             }
@@ -985,8 +985,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public void setSelectedAssemblyName(String s) {
-        boolean nullString = !(s != null && s.length() > 0);
-        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Assembly: " + s;
+        boolean nullString = !(s != null && !s.isEmpty());
+        String ttl =
+                nullString ? FRAME_DEFAULT_TITLE :
+                    " Project: " + VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
         setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);

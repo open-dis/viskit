@@ -38,7 +38,7 @@ public interface ViskitView
   File    openRecentFilesAsk(Collection<String> lis);
   File    saveFileAsk(String suggName,boolean showUniqueName);
 
-  /** Tells view what we're working on
+  /** Update the name of the EventGraph in the component title bar
    * @param name the name of the EventGraph
    */
   void    setSelectedEventGraphName(String name);

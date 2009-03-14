@@ -117,7 +117,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             ((ViskitModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name + gmd.projectName);
+            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
         
             // Bugfix 1398
             String msg = 
@@ -210,7 +210,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 mod.setNumericPriority(false);
             }
             
-            viskitView.setSelectedEventGraphName(mod.getMetaData().name + mod.getMetaData().projectName);
+            viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
             adjustRecentList(file);
 
@@ -514,7 +514,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             mod.changeMetaData(gmd); // might have renamed
 
             mod.saveModel(saveFile);
-            view.setSelectedEventGraphName(gmd.name + gmd.projectName);
+            view.setSelectedEventGraphName(gmd.name);
 
             fileWatchSave(saveFile);
             adjustRecentList(saveFile);
@@ -789,7 +789,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             ((ViskitModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name + gmd.projectName);
+            ((ViskitView) getView()).setSelectedEventGraphName(gmd.name);
         }
     }
 

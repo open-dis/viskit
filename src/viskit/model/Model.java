@@ -127,9 +127,6 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 jaxbRoot = (SimEntity) u.unmarshal(f);
                 
                 GraphMetaData mymetaData = new GraphMetaData(this);
-                mymetaData.projectName =
-                        mymetaData.projectName +
-                        VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();

@@ -80,7 +80,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private TitleListener titlList;
     private int titlKey;
     public EventGraphController controller;
-    private final static String FRAME_DEFAULT_TITLE = "Viskit Event Graph Editor";
+    private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
 
     public EventGraphViewFrame(EventGraphController ctrl) {
         this(false, ctrl);
@@ -229,7 +229,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
             GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
             if (gmd != null) {
-                setSelectedEventGraphName(gmd.name + gmd.projectName);
+                setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");
@@ -1084,7 +1084,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     public void setSelectedEventGraphName(String s) {
         boolean nullString = !(s != null && s.length() > 0);
-        String ttl = nullString ? FRAME_DEFAULT_TITLE : "Viskit Event Graph: " + s;
+        String ttl =
+                nullString ? FRAME_DEFAULT_TITLE :
+                    " Project: " + VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
         setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);

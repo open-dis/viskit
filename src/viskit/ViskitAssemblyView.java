@@ -73,10 +73,9 @@ public interface ViskitAssemblyView {
     /** Open an already existing Viskit Project */
     void openProject();
 
-    /** Tells view what we're working on
+    /** Update the name of the Assembly in the component title bar
      * @param s the name of the Assembly
      */
-    //todo make sure this is called with each addTab 
     void setSelectedAssemblyName(String s);
     
     void showAndSaveSource(String className, String s);
