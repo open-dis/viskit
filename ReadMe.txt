@@ -20,4 +20,4 @@ viskit.EventGraphAssemblyComboMainFrame
 viskit.InternalAssemblyRunner
 viskit.RunnerPanel2
 
-As seach on the above comments will expose where in the source these are.
+A search on the above comments will expose where in the source these are.
