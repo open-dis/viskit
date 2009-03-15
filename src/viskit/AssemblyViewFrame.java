@@ -714,13 +714,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     // A new project may contain an empty EventGraphs directory
                     } else if (fileList.length == 0) {
                         continue;
-                    // Recurse the directory and locate appropriate lTree files
+
+                    // Recurse a directory and locate appropriate SimEntity class files
                     } else {
                         lTree.addContentRoot(file, true);
                     }
                 }
             }
         }
+
+        // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
+        VGlobals vGlobals = VGlobals.instance();
+        ViskitProject vkp = vGlobals.getCurrentViskitProject();
+        addToEventGraphPallette(new File(vkp.getProjectRoot(),
+                vkp.getEventGraphDir().getName()), true);
 
         LegosPanel lPan = new LegosPanel(lTree);
 
@@ -911,12 +918,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return getLeafUO(pclTree);
     }
 
-    public void addToEventGraphPallette(File f) {
-        lTree.addContentRoot(f);
+    public void addToEventGraphPallette(File f, boolean b) {
+        lTree.addContentRoot(f, b);
     }
 
-    public void addToPropChangePallette(File f) {
-        pclTree.addContentRoot(f);
+    public void addToPropChangePallette(File f, boolean b) {
+        pclTree.addContentRoot(f, b);
     }
 
     public void removeFromEventGraphPallette(File f) {

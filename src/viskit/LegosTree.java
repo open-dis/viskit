@@ -183,12 +183,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         return null;
     }
 
-    // 2do if no valid leaves are found, remove the directory...as it is, it is represented in
-    // the tree with the node icon.
-
-    // 4 May 06 JMB The filter down below checks for empty dirs.  If there is a directory
-    // with xml in it, it will show, but if its children have errors when marshalling,
-    // they will not appear.
+    // 4 May 06 JMB The filter down below checks for empty dirs.  
+    /** If there is a directory with xml in it, it will show in the LEGO tree,
+     * but if its children have errors when marshalling they will not appear.
+     * @param f the path to evaluate for SimEntities
+     */
     public void addContentRoot(File f) {
         if (!f.getName().contains("svn")) {
             if (f.getName().toLowerCase().endsWith(".jar")) {

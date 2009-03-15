@@ -355,7 +355,7 @@ public class SettingsDialog extends JDialog {
     static JDialog progressDialog;
     static JProgressBar progress = new JProgressBar(0, 100);
 
-    public static void saveClassPathEntries(String[] lis) {
+    public static void saveExtraClassPathEntries(String[] lis) {
         clearClassPathEntries();
         
         int ix = 0;
@@ -392,7 +392,7 @@ public class SettingsDialog extends JDialog {
                 progressDialog.setVisible(true);
                 progressDialog.toFront();
             }
-            
+
             // Incase we have custom jars, need to add these to the ClassLoader
             VGlobals.instance().resetWorkClassLoader();
             VGlobals.instance().rebuildTreePanels();
@@ -520,18 +520,18 @@ public class SettingsDialog extends JDialog {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
                 ((DefaultListModel) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
-                installClassPathIntoConfig();
+                installExtraClassPathIntoConfig();
             }
         }
     }
 
-    private void installClassPathIntoConfig() {
+    private void installExtraClassPathIntoConfig() {
         Object[] oa = ((DefaultListModel) classPathJlist.getModel()).toArray();
         String[] sa = new String[oa.length];
         
         System.arraycopy(oa, 0, sa, 0, oa.length);
 
-        saveClassPathEntries(sa);
+        saveExtraClassPathEntries(sa);
     }
 
     class delCPhandler implements ActionListener {
@@ -544,7 +544,7 @@ public class SettingsDialog extends JDialog {
             for (int i = selected.length - 1; i >= 0; i--) {
                 ((DefaultListModel) classPathJlist.getModel()).remove(selected[i]);
             }
-            installClassPathIntoConfig();
+            installExtraClassPathIntoConfig();
         }
     }
 
@@ -565,7 +565,7 @@ public class SettingsDialog extends JDialog {
         Object o = mod.get(idx);
         mod.remove(idx);
         mod.add(idx + polarity, o);
-        installClassPathIntoConfig();
+        installExtraClassPathIntoConfig();
         classPathJlist.setSelectedIndex(idx + polarity);
     }
 

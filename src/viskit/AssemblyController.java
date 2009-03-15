@@ -23,10 +23,10 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.xsd.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.SimkitXML2Java;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 
 /**
@@ -259,11 +259,16 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         _doOpen(new File(path));
     }
 
+    /** Tell the Assembly File listener our new name
+     *
+     * @param f the XML Assembly file
+     * @param jaxbroot the JAXB root of this XML file
+     */
     protected void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
         try {
             OpenAssembly.inst().setFile(f, jaxbroot);
         } catch (Exception e) {
-            e.printStackTrace();
+            Vstatics.log.error(e);
         }
     }
 
@@ -1610,8 +1615,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         File tempFile = null;
         try {
 
-            EventGraphCache.instance().makeEntityTable(f.getAbsolutePath());
-            java.util.List<File> eGFiles = EventGraphCache.instance().getEventGraphFiles();
+            EventGraphCache.instance().makeEntityTable(f);
+            java.util.List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
             for (File file : eGFiles) {
 
                 tempFile = file;

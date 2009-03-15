@@ -24,7 +24,7 @@
  *
  * TODO:
  *
- * Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+ * Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -61,8 +61,6 @@ package viskit;
 import java.io.File;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -100,7 +98,6 @@ import org.jdom.input.SAXBuilder;
  */
 public class EventGraphCache {
 
-
     static Logger log = Logger.getLogger(EventGraphCache.class);
     
     /** The jdom.Document object of the assembly file */
@@ -110,9 +107,11 @@ public class EventGraphCache {
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
-    private LinkedList<String> eventGraphNames  = new LinkedList<String>();
-    private LinkedList<File> eventGraphFiles  = new LinkedList<File>();
-    private LinkedList<String> eventGraphImagePaths = new LinkedList<String>();
+    private LinkedList<String> eventGraphNamesList  = new LinkedList<String>();
+    private LinkedList<File> eventGraphFilesList  = new LinkedList<File>();
+    private LinkedList<String> eventGraphImagePathsList = new LinkedList<String>();
+
+    private final String EVENT_GRAPH_IMAGE_DIR = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
 
     private static EventGraphCache me;
     
@@ -124,9 +123,9 @@ public class EventGraphCache {
     }
 
     private EventGraphCache() {
-        eventGraphNames  = new LinkedList<String>();
-        eventGraphFiles  = new LinkedList<File>();
-        eventGraphImagePaths = new LinkedList<String>();
+        eventGraphNamesList  = new LinkedList<String>();
+        eventGraphFilesList  = new LinkedList<File>();
+        eventGraphImagePathsList = new LinkedList<String>();
     }
     
     /**
@@ -137,18 +136,18 @@ public class EventGraphCache {
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public Element makeEntityTable(String assemblyFile) {
+    public Element makeEntityTable(File assemblyFile) {
         Element entityTable = new Element("EntityTable");
 
         // Clear the cache if currently full
-        if (getEventGraphNames().size() > 0) {
-            getEventGraphNames().clear();
+        if (getEventGraphNamesList().size() > 0) {
+            getEventGraphNamesList().clear();
         }
-        if (getEventGraphFiles().size() > 0) {
-            getEventGraphFiles().clear();
+        if (getEventGraphFilesList().size() > 0) {
+            getEventGraphFilesList().clear();
         }
-        if (getEventGraphImagePaths().size() > 0) {
-            getEventGraphImagePaths().clear();
+        if (getEventGraphImagePathsList().size() > 0) {
+            getEventGraphImagePathsList().clear();
         }
         setAssemblyDocument(loadXML(assemblyFile));
 
@@ -156,12 +155,12 @@ public class EventGraphCache {
         List<Element> simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
 
         // Conduct a test for a diskit package which is native java
-        String isJAVAfile = "diskit";
+        String isDiskitFile = "diskit";
         for (Element temp : simEntityList) {
-            String javaTest = temp.getAttributeValue("type").substring(0, 6);
+            String javaTest = temp.getAttributeValue("type").substring(0, isDiskitFile.length());
 
             // If it's not a java file process it
-            if (!javaTest.equals(isJAVAfile)) {
+            if (!javaTest.equals(isDiskitFile)) {
                 Element tableEntry = new Element("SimEntity");
                 tableEntry.setAttribute("name", temp.getAttributeValue("name"));
                 tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
@@ -169,6 +168,8 @@ public class EventGraphCache {
                 entityTable.addContent(tableEntry);
             }
         }
+
+        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphDir());
         return entityTable;
     }
 
@@ -205,7 +206,8 @@ public class EventGraphCache {
      */
     private void saveEventGraphReferences(String fileType) {
         log.debug("Parameter fileType: " + fileType);
-
+        eventGraphNamesList.add(fileType);
+        
         // find the package seperator
         char letter;
         int idx = 0;
@@ -218,49 +220,32 @@ public class EventGraphCache {
         }
 
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
-
-        String eventGraphImageDir = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
-
+        
+        // TODO: Move ARs to project folders.  That's where they should be
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
-        log.debug("Event Graph Name: " + eventGraphName);
-
-        String eventGraphPath = "";
-        File eventGraphDir = null;
-
-        // Why does this only process the last one?? -AB
-        // Locate the URL of the event graph directory
-        // TODO: resolve case when several classpaths are registered
-        for (URL eventGraphURL : SettingsDialog.getExtraClassPathArraytoURLArray()) {
-            try {
-                eventGraphPath = eventGraphURL.toString();
-
-                // Don't care about jar files here
-                if (eventGraphPath.contains("jar")) {
-                    continue;
-                }
-                log.debug("EventGraph Path: " + eventGraphPath);
-                eventGraphDir = new File(eventGraphURL.toURI().getPath());
-                eventGraphDir = new File(eventGraphDir, fileTypePackageToPath);
-                log.debug("EventGraph dir: " + eventGraphDir);
-            } catch (URISyntaxException ex) {
-                log.error(ex);
-            }
-        }
-
-        log.debug("Event Graph Directory: " + eventGraphDir);
-
-        File eventGraphFile = new File(eventGraphDir, eventGraphName + ".xml");
-        log.debug("Event Graph File: " + eventGraphFile);
-
-        String imgFile = eventGraphImageDir + fileTypePackageToPath + eventGraphName + ".xml.png";
+        log.debug("EventGraph Name: " + eventGraphName);
+        
+        String imgFile = EVENT_GRAPH_IMAGE_DIR + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
         log.debug("Event Graph Image location: " + imgFile);
+        
+        eventGraphImagePathsList.add(imgFile);
+    }
 
-        // These get cleared when makeEntityTable gets called, so they start fresh
-        eventGraphNames.add(fileType);
-        eventGraphFiles.add(eventGraphFile);
-        log.debug("Event Graph added to cache: " + eventGraphFile);
-        eventGraphImagePaths.add(imgFile);
+    /** Use recursion to find EventGraph XML files
+     *
+     * @param f the path to begin evaluation
+     */
+    private void setEventGraphFiles(File f) {
+
+        File[] files = f.listFiles();
+        for (File file : files) {        
+            if (file.isDirectory()) {
+                setEventGraphFiles(file);
+            } else {
+                eventGraphFilesList.add(file);
+            }
+        }
     }
 
     /** @param pDoc the JDOM Document to set */
@@ -271,8 +256,8 @@ public class EventGraphCache {
     /** @return a JDOM document (Assembly XML file) */
     public Document getAssemblyDocument() {return assemblyDocument;}
 
-    public LinkedList<String> getEventGraphNames() {return eventGraphNames;}
-    public LinkedList<File> getEventGraphFiles() {return eventGraphFiles;}
-    public LinkedList<String> getEventGraphImagePaths() {return eventGraphImagePaths;}
+    public LinkedList<String> getEventGraphNamesList() {return eventGraphNamesList;}
+    public LinkedList<File> getEventGraphFilesList() {return eventGraphFilesList;}
+    public LinkedList<String> getEventGraphImagePathsList() {return eventGraphImagePathsList;}
     
 } // end class file EventGraphCache.java

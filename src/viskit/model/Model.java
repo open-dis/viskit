@@ -157,9 +157,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                             "\n" + "work with this file.",
                             "Wrong File Format", JOptionPane.ERROR_MESSAGE);
                 } catch (JAXBException e) {
-                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
+                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
-                            "\n" + e.getMessage() +
+                            "\nError is: " + e.getMessage() +
                             "\nin Model.newModel(File)",
                             "XML I/O Error", JOptionPane.ERROR_MESSAGE);
                 }

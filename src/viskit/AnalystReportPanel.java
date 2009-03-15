@@ -117,16 +117,16 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     File currentAssyFile;
 
     /** Captures the name of the assembly file
-     * @param action
-     * @param source
-     * @param param 
+     * @param action the action that led us here
+     * @param source the listener source
+     * @param param the object to act upon
      */
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;
                 if (arb != null) {
-                    arb.setAssemblyFile(currentAssyFile.getAbsolutePath());
+                    arb.setAssemblyFile(currentAssyFile);
                 }
                 break;
 
@@ -184,10 +184,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         log.debug("TargetFile is: " + targetFile);
         AnalystReportBuilder arbLocal = null;
         try {
-            String assyFile = (currentAssyFile != null) ? currentAssyFile.getAbsolutePath() : null;
-            log.debug("Current Assembly file: " + assyFile);
-            arbLocal = new AnalystReportBuilder(this, targetFile, assyFile);
-            log.debug("arbLocal is: " + arbLocal);
+            arbLocal = new AnalystReportBuilder(this, targetFile, currentAssyFile);
         } catch (Exception e) {
             log.error("Error parsing analyst report: " + e.getMessage());
             e.printStackTrace();

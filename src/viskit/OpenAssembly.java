@@ -33,14 +33,14 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 
 import java.io.File;
 import java.util.HashSet;
 
-import viskit.xsd.bindings.assembly.SimkitAssembly;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**
  * MOVES Institute
@@ -69,17 +69,21 @@ public class OpenAssembly {
             return instance;
         }
     }
+    
     public File file;
     public Document jdomDoc;
     public SimkitAssembly jaxbRoot;
     public ObjectFactory jaxbFactory;
 
-    private OpenAssembly() {
-    }
+    /** Singleton class */
+    private OpenAssembly() {}
 
+    /** @param f the Assembly XML file to announce to all the Assy Listeners
+     * @param jaxb the JAXB root of this XML file
+     * @throws Exception if the Assembly file is null
+     */
     public void setFile(File f, SimkitAssembly jaxb) throws Exception {
-        if (file != null) {
-
+        if (f != null) {
             file = f;
             jaxbRoot = jaxb;
             jaxbFactory = new ObjectFactory();

@@ -22,7 +22,6 @@ import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
-import viskit.VGlobals;
 import viskit.ViskitAssemblyController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;

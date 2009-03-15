@@ -32,14 +32,21 @@ public interface ViskitAssemblyView {
 
     Object getSelectedEventGraph();
 
-    /** For auto load of open eventgraphs
-     * @param f the EventGraph to add to the LEGO tree
+    /**
+     * Add a path to SimEntities in the LEGO tree
+     * @param f the path to evaluate for SimEntites
+     * @param b flag to indicate recursion checking of the given path
      */
-    void addToEventGraphPallette(File f);
+    void addToEventGraphPallette(File f, boolean b);
 
     void removeFromEventGraphPallette(File f);
 
-    void addToPropChangePallette(File f);
+    /**
+     * Add a path to PropertyChangeListeners in the LEGO tree
+     * @param f the path to evaluate for PropertyChangeListeners
+     * @param b flag to indicate recursion checking of the given path
+     */
+    void addToPropChangePallette(File f, boolean b);
 
     /** Not currently used
      *

@@ -72,7 +72,7 @@ public class AnalystReportBuilder {
     private boolean debug = false;
 
     /** UTH - Assembly file */
-    private String assemblyFile;
+    private File assemblyFile;
 
     /** The viskit.xsd.assembly.ReportStatisticsDOM object for this report */
     private Document statsReport;
@@ -135,7 +135,7 @@ public class AnalystReportBuilder {
      * @param assyFile the current assembly file to process a report from
      * @throws java.lang.Exception
      */
-    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, String assyFile) throws Exception {
+    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, File assyFile) throws Exception {
         this.aRPanel = aRPanel;
         parseXML(xmlFile);
         log.debug("Successful parseXML");
@@ -211,7 +211,7 @@ public class AnalystReportBuilder {
     }
 
     private void parseXML(File fil) throws Exception {
-        reportJdomDocument = EventGraphCache.instance().loadXML(fil.getPath());
+        reportJdomDocument = EventGraphCache.instance().loadXML(fil);
         rootElement = reportJdomDocument.getRootElement();
         execSummary = rootElement.getChild("ExecutiveSummary");
         simulationLocation = rootElement.getChild("Location");
@@ -421,15 +421,15 @@ public class AnalystReportBuilder {
     @SuppressWarnings("unchecked")
     private Element processBehaviors(boolean descript, boolean image, boolean details) /*throws Exception*/ {
         Element behaviorList = new Element("BehaviorList");
-        if (EventGraphCache.instance().getEventGraphNames() != null) {
-            for (int i = 0; i < EventGraphCache.instance().getEventGraphNames().size(); i++) {
+        if (EventGraphCache.instance().getEventGraphNamesList() != null) {
+            for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) {
                 Element behavior = new Element("Behavior");
                 Element localRootElement = null;
                 String descriptText = "";
-                behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNames().get(i));
+                behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNamesList().get(i));
 
                 if (descript) {
-                    Document tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFiles().get(i));
+                    Document tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
                     localRootElement = tmp.getRootElement();
 
                     // prevent returning a null if there was no attribute value
@@ -464,7 +464,7 @@ public class AnalystReportBuilder {
                 }
                 if (image) {
                     Element evtGraphImage = new Element("EventGraphImage");
-                    evtGraphImage.setAttribute("dir", EventGraphCache.instance().getEventGraphImagePaths().get(i));
+                    evtGraphImage.setAttribute("dir", EventGraphCache.instance().getEventGraphImagePathsList().get(i));
                     behavior.addContent(evtGraphImage);
                 }
                 behaviorList.addContent(behavior);
@@ -958,14 +958,14 @@ public class AnalystReportBuilder {
     public Document   getStatsReport()           { return statsReport; }
     public Element    getRootElement()           { return rootElement; }
     public String     getFileName()              { return fileName; }
-    public String     getAssemblyFile()          { return assemblyFile; }
+    public File       getAssemblyFile()          { return assemblyFile; }
 
     public String     getAuthor()                { return rootElement.getAttributeValue("author"); }
     public String     getClassification()        { return rootElement.getAttributeValue("classification");}
     public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
     public String     getReportName()            { return rootElement.getAttributeValue("name"); }
 
-    public void setAssemblyFile(String assyFile) {
+    public void setAssemblyFile(File assyFile) {
         assemblyFile = assyFile;
         simConfig.addContent(EventGraphCache.instance().makeEntityTable(assyFile));
         entityParameters.addContent(makeParameterTables());
@@ -1002,7 +1002,9 @@ public class AnalystReportBuilder {
      * PNGs will be dropped into ./AnalystReports/images/EventGraphs </p>
      */
     private void captureEventGraphImages() {
-        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(EventGraphCache.instance().getEventGraphFiles(), EventGraphCache.instance().getEventGraphImagePaths());
+        EventGraphCache evc = EventGraphCache.instance();
+        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(evc.getEventGraphFilesList(),
+                evc.getEventGraphImagePathsList());
     }
 
     /** Utility method used here to invoke the capability to capture the
@@ -1012,7 +1014,7 @@ public class AnalystReportBuilder {
     private void captureAssemblyImage() {
         String assemblyImageDir = System.getProperty("user.dir") + "/AnalystReports/images/Assemblies/";
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
-        String assyFileName = new File(getAssemblyFile()).getName();
+        String assyFileName = getAssemblyFile().getName();
         setAssemblyImageLocation(assemblyImageDir + assyFileName + ".png");
         VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
     }
@@ -1028,7 +1030,7 @@ public class AnalystReportBuilder {
      *  this location
      */
     private void captureLocationImage() {
-        String assyFile = getAssemblyFile().replaceAll("\\\\", "/");
+        String assyFile = getAssemblyFile().getAbsolutePath().replaceAll("\\\\", "/");
         String baseName = assyFile.substring(assyFile.lastIndexOf("/"));
         if (baseName.contains("_")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("_"));

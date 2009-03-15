@@ -118,7 +118,7 @@ public class ViskitProject {
         if (!eventGraphDir.exists()) {
             getEventGraphDir().mkdir();
         }
-
+        
         setAssemblyDir(new File(projectRoot, ASSEMBLY_DIRECTORY_NAME));
         if (!assemblyDir.exists()) {
             getAssemblyDir().mkdir();
@@ -328,7 +328,7 @@ public class ViskitProject {
         // Prevent duplicate entries
         Set<String> cp = new HashSet<String>();
 
-        // Always list JARs and ZIPs before EventGraphs
+        // Find and list JARs and ZIPs from the project's lib directory in the extra classpath widget
         try {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
@@ -344,9 +344,6 @@ public class ViskitProject {
             for (String classPath : classPaths) {
                 cp.add(classPath.replaceAll("\\\\", "/"));
             }
-
-            // Then always include our project's EventGraphs path for convenience
-            cp.add(getEventGraphDir().getCanonicalPath().replaceAll("\\\\", "/"));
 
         } catch (IOException ex) {
             log.error(ex);
