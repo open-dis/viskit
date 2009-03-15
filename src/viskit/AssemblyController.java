@@ -247,6 +247,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             // replaces old fileWatchOpen(file);
             initOpenAssyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
+
             if (runTabbedPane.isEnabledAt(this.runTabbedPaneIdx)) {
                 runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, false);
             }
@@ -265,11 +266,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param jaxbroot the JAXB root of this XML file
      */
     protected void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
-        try {
-            OpenAssembly.inst().setFile(f, jaxbroot);
-        } catch (Exception e) {
-            Vstatics.log.error(e);
-        }
+        OpenAssembly.inst().setFile(f, jaxbroot);        
     }
 
     /**
@@ -1614,8 +1611,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private void openEventGraphs(File f) {
         File tempFile = null;
         try {
-
-            EventGraphCache.instance().makeEntityTable(f);
             java.util.List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
             for (File file : eGFiles) {
 

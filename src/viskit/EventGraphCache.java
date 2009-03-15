@@ -112,7 +112,7 @@ public class EventGraphCache {
     private LinkedList<String> eventGraphImagePathsList = new LinkedList<String>();
 
     private final String EVENT_GRAPH_IMAGE_DIR = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
-
+    private Element entityTable;
     private static EventGraphCache me;
     
     public static synchronized EventGraphCache instance() {
@@ -132,12 +132,11 @@ public class EventGraphCache {
      * Creates the entity table for this analyst xml object
      *
      * @param assemblyFile the assembly file loaded into the Assembly Runner
-     * @return the entityTable for the simConfig portion of the analyst report
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public Element makeEntityTable(File assemblyFile) {
-        Element entityTable = new Element("EntityTable");
+    public void makeEntityTable(File assemblyFile) {
+        setEntityTable(new Element("EntityTable"));
 
         // Clear the cache if currently full
         if (getEventGraphNamesList().size() > 0) {
@@ -165,12 +164,11 @@ public class EventGraphCache {
                 tableEntry.setAttribute("name", temp.getAttributeValue("name"));
                 tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
                 saveEventGraphReferences(temp.getAttributeValue("type"));
-                entityTable.addContent(tableEntry);
+                getEntityTable().addContent(tableEntry);
             }
         }
 
         setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphDir());
-        return entityTable;
     }
 
     /**
@@ -243,7 +241,14 @@ public class EventGraphCache {
             if (file.isDirectory()) {
                 setEventGraphFiles(file);
             } else {
-                eventGraphFilesList.add(file);
+                
+                // Check against the eventGraphNamesList obtained from the Assembly
+                for (String eventGraphName : eventGraphNamesList) {
+                    eventGraphName = eventGraphName.substring(eventGraphName.lastIndexOf(".") + 1) + ".xml";
+                    if (file.getName().equals(eventGraphName)) {
+                        eventGraphFilesList.add(file);
+                    }
+                }
             }
         }
     }
@@ -259,5 +264,19 @@ public class EventGraphCache {
     public LinkedList<String> getEventGraphNamesList() {return eventGraphNamesList;}
     public LinkedList<File> getEventGraphFilesList() {return eventGraphFilesList;}
     public LinkedList<String> getEventGraphImagePathsList() {return eventGraphImagePathsList;}
+
+    /**
+     * @return the entityTable
+     */
+    public Element getEntityTable() {
+        return entityTable;
+    }
+
+    /**
+     * @param entityTable the entityTable to set
+     */
+    public void setEntityTable(Element entityTable) {
+        this.entityTable = entityTable;
+    }
     
 } // end class file EventGraphCache.java

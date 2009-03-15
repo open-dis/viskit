@@ -38,7 +38,6 @@ import java.io.File;
 import java.util.HashSet;
 
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
@@ -80,24 +79,15 @@ public class OpenAssembly {
 
     /** @param f the Assembly XML file to announce to all the Assy Listeners
      * @param jaxb the JAXB root of this XML file
-     * @throws Exception if the Assembly file is null
      */
-    public void setFile(File f, SimkitAssembly jaxb) throws Exception {
+    public void setFile(File f, SimkitAssembly jaxb) {
         if (f != null) {
             file = f;
             jaxbRoot = jaxb;
             jaxbFactory = new ObjectFactory();
-
-            SAXBuilder builder;
-            try {
-                builder = new SAXBuilder();
-                jdomDoc = builder.build(f);
-            } catch (Exception e) {
-                jdomDoc = null;
-                throw new Exception("Error parsing or finding XML file " + f.getAbsolutePath());
-            }
-
-            doSendNewAssy(f);
+            EventGraphCache.instance().makeEntityTable(file);
+            jdomDoc = EventGraphCache.instance().getAssemblyDocument();
+            doSendNewAssy(file);
         }
     }
     private HashSet<AssyChangeListener> listeners = new HashSet<AssyChangeListener>();

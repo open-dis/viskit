@@ -264,7 +264,7 @@ public class AnalystReportBuilder {
         makeConclusions(simConfig, "SC", "");
         if(assemblyFile != null) {
             try {
-                simConfig.addContent(EventGraphCache.instance().makeEntityTable(assemblyFile));
+                simConfig.addContent(EventGraphCache.instance().getEntityTable());
             } catch (Exception e) {
                 log.error("Error reading assembly file: " + e.getMessage());
             }
@@ -965,9 +965,14 @@ public class AnalystReportBuilder {
     public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
     public String     getReportName()            { return rootElement.getAttributeValue("name"); }
 
+    /**
+     * Called twice.  Once for preliminary AR, then for full integration AR.
+     * @param assyFile the Assembly File to parse for information
+     */
     public void setAssemblyFile(File assyFile) {
         assemblyFile = assyFile;
-        simConfig.addContent(EventGraphCache.instance().makeEntityTable(assyFile));
+        EventGraphCache.instance().makeEntityTable(assemblyFile);
+        simConfig.addContent(EventGraphCache.instance().getEntityTable());
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
     }
