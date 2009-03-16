@@ -180,7 +180,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = tabbedPaneIdx;
         
         // Analyst report
-        if (SettingsDialog.isAnalystReportVisible()) {
+        boolean analystReportVisible = SettingsDialog.isAnalystReportVisible();
+        if (analystReportVisible) {
             tabbedPane.add(reportPanel = new AnalystReportPanel());
             int idx = tabbedPane.indexOfComponent(reportPanel);
             tabbedPane.setTitleAt(idx, "Analyst Report");
@@ -259,7 +260,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         /* End DIFF between OA3302 branch and trunk */
         
         assyCntlr.addAssemblyFileListener(runGridComponent);
-        if (SettingsDialog.isAnalystReportVisible()) {
+        if (analystReportVisible) {
             assyCntlr.addAssemblyFileListener(reportPanel);
         }
         

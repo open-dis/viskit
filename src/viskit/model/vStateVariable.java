@@ -104,7 +104,7 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Returns an object that represents the current value of the object.
-     * @return 
+     * @return the current value of this state variable
      */
     public Object getCurrentValue() {
         return currentValue;

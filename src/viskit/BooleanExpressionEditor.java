@@ -37,10 +37,10 @@ public class BooleanExpressionEditor extends JDialog {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
-     * @param f
-     * @param comp
-     * @param node
-     * @return 
+     * @param f the main frame to orient this dialog
+     * @param comp the main frame to orient this dialog
+     * @param node the EventNode to edit
+     * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Component comp, EventNode node) {
         if (dialog == null) {

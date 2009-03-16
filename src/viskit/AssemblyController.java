@@ -269,10 +269,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         OpenAssembly.inst().setFile(f, jaxbroot);        
     }
 
-    /**
-     *
-     * @return
-     */
+    /** @return the listener for this AssemblyController */
     public OpenAssembly.AssyChangeListener getAssemblyChangeListener() {
         return assyChgListener;
     }
@@ -335,10 +332,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     };
 
-    /**
-     *
-     * @return
-     */
     public String getHandle() {
         return assyChgListener.getHandle();
     }
@@ -1760,7 +1753,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     private void initConfig() {
         try {
-            historyConfig = ViskitConfig.instance().getViskitConfig();
+            historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
             Vstatics.log.error("Error loading history file: " + e.getMessage());
             Vstatics.log.error("Recent file saving disabled");

@@ -30,6 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
@@ -482,19 +483,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         help.mainFrameLocated(this.getBounds());
     }
 
-    // TODO: This saves the size/shape of the EG Editor frame, but doesn't
-    // load this config on next startup
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
-        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
-        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
-        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
-        ViskitConfig.instance().setVal(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
+        XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
+        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
+        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
+        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }
 
     /**
      * run the add parameter dialog
-     * @return
+     * @return the String representation of this parameter
      */
     public String addParameterDialog() {
 
@@ -1086,7 +1086,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         boolean nullString = !(s != null && s.length() > 0);
         String ttl =
                 nullString ? FRAME_DEFAULT_TITLE :
-                    " Project: " + VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
+                    " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
         setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);

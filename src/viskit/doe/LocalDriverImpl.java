@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**Implements a Local Doe Driver, to be interchangeable with the
  * Remote (Grid Engine) Driver
@@ -152,15 +153,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         //return runner.getResultByTaskID(taskID);
     }
     
-    /** Users of the getTaskQueue() through DoeRunDriver, in local
-     * mode need a copy, not the same Vector; users of it in remote
-     * mode automatically get a copy. Since we don't actually need
-     * any of the internals, simple Booleans get copied in here
-     * 
-     * @return
-     * @throws viskit.doe.DoeException
-     */
-    public synchronized ArrayList<Object> getTaskQueue() throws DoeException {
+    public synchronized List<Object> getTaskQueue() throws DoeException {
         try {
             ArrayList queue = (ArrayList) methods.get("getTaskQueue").invoke(runner,new Object[]{});
             ArrayList<Object> cloneQueue = new ArrayList<Object>();

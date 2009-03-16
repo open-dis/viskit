@@ -193,10 +193,7 @@ public class DoeFileModel {
         }
     }
 
-    /**
-     * 
-     * @return
-     */
+    /** @return a List of SimEntities for this experiment */
     public List<SimEntity> getSimEntities() {
         return simEntities;
     }

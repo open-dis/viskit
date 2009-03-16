@@ -56,8 +56,8 @@ public class LocalTaskQueue extends ArrayList<Object> {
     /** 
      * Activate Gridlet indexed at i
      *
-     * @param i
-     * @return 
+     * @param i an index for this Gridlet
+     * @return an indication of success
      */
     public boolean activate(int i) {
         Object o = super.get(i);

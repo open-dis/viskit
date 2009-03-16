@@ -279,19 +279,19 @@ public class SettingsDialog extends JDialog {
       public void actionPerformed(ActionEvent e)
       {
         if(e.getSource() == otherTF) {
-          vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+          guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
         }
         else {
          if(defaultLafRB.isSelected()) {
-           vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_DEFAULT);
+           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_DEFAULT);
            otherTF.setEnabled(false);
          }
          else if(platformLafRB.isSelected()) {
-           vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_PLATFORM);
+           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_PLATFORM);
            otherTF.setEnabled(false);
         }
          else if(otherLafRB.isSelected()) {
-           vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
            otherTF.setEnabled(true);
          }
         } 
@@ -299,10 +299,12 @@ public class SettingsDialog extends JDialog {
     }
     private static XMLConfiguration vConfig;
     private static XMLConfiguration projectConfig;
+    private static XMLConfiguration guiConfig;
     
     private static void initConfigs() {
-        vConfig = ViskitConfig.instance().getViskitConfig();
+        vConfig = ViskitConfig.instance().getViskitAppConfig();
         projectConfig = ViskitConfig.instance().getProjectXMLConfig();
+        guiConfig = ViskitConfig.instance().getViskitGuiConfig();
     }
 
     class VisibilityHandler implements ActionListener {
@@ -444,7 +446,7 @@ public class SettingsDialog extends JDialog {
     private void unloadWidgets() {
       // most everything gets instantly updated;  check for pending text entry
       if(otherLafRB.isSelected()) {
-          vConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+          guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
       }
     }
 

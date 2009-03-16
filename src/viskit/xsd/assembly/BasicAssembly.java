@@ -71,7 +71,7 @@ import static edu.nps.util.GenericConversion.toArray;
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
-    static Logger log = Logger.getLogger(BasicAssembly.class);
+    static Logger bAlogger = Logger.getLogger(BasicAssembly.class);
     protected LinkedHashMap<Integer, ArrayList<SavedStats>> replicationData;
     protected PropertyChangeListener[] replicationStats;
     protected SampleStatistics[] designPointStats;
@@ -161,7 +161,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * must be overridden if any replications stats are needed.
      */
     protected void createObjects() {
-//        log.info("I was called?");
+//        bAlogger.info("I was called?");
         createSimEntities();
         createReplicationStats();
         
@@ -202,7 +202,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         entitiesWithStats = new LinkedList<String>();
         for (Map.Entry<String, PropertyChangeListener> entry : entrySet) {
             String ent = entry.getKey();
-            log.debug("Entry is: " + entry);
+            bAlogger.debug("Entry is: " + entry);
             entitiesWithStats.add(ent);
         }
     }
@@ -227,7 +227,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         int ix = 0;
         boolean isCount = false;
         for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
-            log.debug("entry is: " + entry);
+            bAlogger.debug("entry is: " + entry);
             Object obj;
             if (entry.toString().contains("PropChangeListenerNode")) {
                 
@@ -240,27 +240,27 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                     // This is not a designPoint, so skip
                     if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
-                        log.debug("SimplePropertyDumper encountered");
+                        bAlogger.debug("SimplePropertyDumper encountered");
                         continue;
                     }
                     isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                    log.debug("isGetCount: " + isCount);
+                    bAlogger.debug("isGetCount: " + isCount);
                     typeStat = isCount ? ".count" : ".mean";
-                    log.debug("AssemblyNode key: " + entry.getKey());
-                    log.debug("typeStat is: " + typeStat);
+                    bAlogger.debug("AssemblyNode key: " + entry.getKey());
+                    bAlogger.debug("typeStat is: " + typeStat);
                     designPointStats[ix] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[ix]).getName() + typeStat);
-                    log.debug(designPointStats[ix]);
+                    bAlogger.debug(designPointStats[ix]);
                     ix++;
                 } catch (NoSuchMethodException ex) {
-                    log.error(ex);
+                    bAlogger.error(ex);
                 } catch (SecurityException ex) {
-                    log.error(ex);
+                    bAlogger.error(ex);
                 } catch (IllegalAccessException ex) {
-                    log.error(ex);
+                    bAlogger.error(ex);
                 } catch (IllegalArgumentException ex) {
-                    log.error(ex);
+                    bAlogger.error(ex);
                 } catch (InvocationTargetException ex) {
-                    log.error(ex);
+                    bAlogger.error(ex);
                 }
             }
         }
@@ -386,38 +386,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * Empty, needed to implement SimEntity
-     * @param simEvent
+     * @param simEvent the sim event to handle
      */
     public void handleSimEvent(SimEvent simEvent) {
     }
 
     /**
      * Empty, needed to implement SimEntity
-     * @param simEvent
+     * @param simEvent the sim event to process
      */
-    public void processSimEvent(SimEvent simEvent) {
-    }
+    public void processSimEvent(SimEvent simEvent) {}
 
-    /**
-     *
-     * @return
-     */
+    /** @return an array of design point statistics for this Assembly */
     public SampleStatistics[] getDesignPointStats() {
         return designPointStats.clone();
     }
 
-    /**
-     *
-     * @return
-     */
+    /** @return an array of ProperChangeListeners for this Assembly  */
     public PropertyChangeListener[] getReplicationStats() {
         return replicationStats.clone();
     }
 
-    /**
-     *
-     * @param id
-     * @return
+    /** @param id the ID of this replication statistic
+     * @return an array of SampleStatistic for this Assembly
      */
     public SampleStatistics[] getReplicationStats(int id) {
         SampleStatistics[] stats = null;
@@ -685,7 +676,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 System.out.println();
             }
             if (stopRun) {
-                log.info("Stopped in Replication # " + (replication + 1));
+                bAlogger.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
                 Long seed = new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed());
@@ -741,7 +732,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                                 // This is not a designPoint, so skip
                                 if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
-                                    log.debug("SimplePropertyDumper encountered");
+                                    bAlogger.debug("SimplePropertyDumper encountered");
                                     continue;
                                 }
                                 isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
@@ -755,15 +746,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 }
                                 ix++;
                             } catch (NoSuchMethodException ex) {
-                                log.error(ex);
+                                bAlogger.error(ex);
                             } catch (SecurityException ex) {
-                                log.error(ex);
+                                bAlogger.error(ex);
                             } catch (IllegalAccessException ex) {
-                                log.error(ex);
+                                bAlogger.error(ex);
                             } catch (IllegalArgumentException ex) {
-                                log.error(ex);
+                                bAlogger.error(ex);
                             } catch (InvocationTargetException ex) {
-                                log.error(ex);
+                                bAlogger.error(ex);
                             }
                         }
                     }
@@ -818,19 +809,19 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);
             } catch (ClassNotFoundException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (InstantiationException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (IllegalAccessException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (SecurityException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (NoSuchMethodException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (IllegalArgumentException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
             } catch (InvocationTargetException ex) {
-                log.error(ex);
+                bAlogger.error(ex);
                 ex.printStackTrace();
             }
         }

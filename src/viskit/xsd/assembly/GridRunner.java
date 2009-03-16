@@ -148,8 +148,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     /**
      * hook for gridkit.setAssembly XML-RPC call, used to initialize
      * From DOE panel. Accepts raw XML String of Assembly.
-     * @param assembly
-     * @return 
+     * @param assembly the Assembly to set
+     * @return an indication of success
      */    
     public Boolean setAssembly(String assembly) {
         Unmarshaller u;
@@ -267,8 +267,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     /**
      * hook for gridkit.addResult XML-RPC call, used to report
      * back results from grid node run. Accepts raw XML String of Report.
-     * @param report 
-     * @return
+     * @param report the report to add to these results
+     * @return an indication of success
      */
     public Boolean addResult(String report) {
         boolean error = false;
@@ -338,9 +338,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      * comes in handy if the client was single threaded in sequence,
      * see TestReader.java in gridkit.tests. If no value for timeout
      * is supplied in the XML-GRD, then it waits indefinitely.
-     * @param sample
-     * @param designPt
-     * @return 
+     * @param sample a index for a sample
+     * @param designPt and index for a design point
+     * @return a String representation for the result
      */
     public synchronized String getResult(int sample, int designPt) {
         try {
@@ -353,7 +353,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 try {
                     notifier.wait();
                 } catch (InterruptedException ie) {
-                    ;
+                    // do nothing
                 }
                 r = designPoint.getResults();
             }
@@ -390,7 +390,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 try {
                     notifier.wait();
                 } catch (InterruptedException ie) {
-                    ;//System.out.println("getDesignPointStats has size  "+stats.size());
+                    //System.out.println("getDesignPointStats has size  "+stats.size());
                 }
             }
         }
@@ -428,7 +428,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             try {
                 notifier.wait();
             } catch (InterruptedException ex) {
-                ;
+                // do nothing
             }
         }
         
@@ -560,7 +560,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     try {
                         notifier.wait();
                     } catch (InterruptedException ex) {
-                        ;
+                        // do nothing
                     }
                     
                 }
@@ -575,7 +575,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                         try {
                             notifier.wait();
                         } catch (InterruptedException ex) {
-                            ;
+                            // do nothing
                         }
                         
                     }
@@ -587,7 +587,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     try {
                         notifier.wait();
                     } catch (InterruptedException ex) {
-                        ;
+                        // do nothing
                     }
                     
                 }
@@ -668,7 +668,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     //else
                         //queue.wait(timeout);
                 } catch (InterruptedException ie) {
-                    ;
+                    // do nothing
                 } 
                 queueClean = true;
             } 
@@ -686,7 +686,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      * XML-RPC handler for clearing the experiment from memory,
      * could be used in cases where you want to flush the queue
      * and also the accumulated state so far.
-     * @return 
+     * @return an indication of success
      */
     public Boolean clear() {
         flushQueue();

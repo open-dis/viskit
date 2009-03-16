@@ -942,10 +942,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
     XMLConfiguration historyConfig;
 
-    /** This is the very first caller for getViskitConfig() upon Viskit startup */
+    /** This is the very first caller for getViskitAppConfig() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = ViskitConfig.instance().getViskitConfig();
+            historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
             Vstatics.log.error("Error loading history file: " + e.getMessage());
             Vstatics.log.error("Recent file saving disabled");

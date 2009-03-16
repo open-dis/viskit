@@ -147,6 +147,7 @@ public class OpenAssembly {
          */
         public void assyChanged(int action, AssyChangeListener source, Object param);
 
+        /** @return the handle for this Assembly ChangeListener */
         public String getHandle();
     }
 }

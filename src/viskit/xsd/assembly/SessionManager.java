@@ -133,11 +133,10 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
      * uid encrypted with uid. To bootstrap a password file,
      * addUser will check if file exists, enabling if it doesn't
      * without a valid usid, once.
-     * @param usid
-     * @param newUser
-     * @return 
-     */
-    
+     * @param usid the user ID
+     * @param newUser the name of the new user
+     * @return an indication of success
+     */    
     public Boolean addUser(String usid, String newUser) {
         if ( isAdmin(usid) ) {
             

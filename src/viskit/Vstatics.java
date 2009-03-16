@@ -529,8 +529,8 @@ public class Vstatics {
     }
 
     /** Checks if primitive type in Viskit format ie not Clazz format
-     * @param type 
-     * @return
+     * @param type the type to evaluate as a primitive
+     * @return an indication of success
      */
     public static boolean isPrimitive(String type) {
         return type.equals("byte") | type.equals("boolean") | type.equals("char") | type.equals("double") | type.equals("float") | type.equals("int") | type.equals("short");

@@ -204,8 +204,8 @@ public class ReportStatisticsConfig {
 
     /**
      * File I/O that saves the report in XML format
-     * @param report
-     * @return 
+     * @param report a data report to save
+     * @return the String representation of this report
      */
     public String saveData(Document report) {
 

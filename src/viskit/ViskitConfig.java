@@ -36,6 +36,14 @@ public class ViskitConfig {
     public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
 
+    public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
+    public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";
+    public static final String BEANSHELL_ERROR_DIALOG_LABEL = GUI_BEANSHELL_ERROR_DIALOG + ".label";
+    public static final String BEANSHELL_ERROR_DIALOG_QUESTION = GUI_BEANSHELL_ERROR_DIALOG + ".question";
+    public static final String BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX = GUI_BEANSHELL_ERROR_DIALOG + ".sessioncheckbox";
+    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX = GUI_BEANSHELL_ERROR_DIALOG + ".preferencescheckbox";
+    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP = GUI_BEANSHELL_ERROR_DIALOG + ".preferencestooltip";
+    public static final String BEANSHELL_WARNING = "app.beanshell.warning";
     public static final String PROJECT_HOME_KEY = "app.projecthome";
     public static final String PROJECT_PATH_KEY = PROJECT_HOME_KEY + ".path[@dir]";
     public static final String PROJECT_NAME_KEY = PROJECT_HOME_KEY + ".name[@value]";
@@ -61,12 +69,13 @@ public class ViskitConfig {
     public static final String CACHED_MISS_DIGEST_KEY = CACHED_CLEAR_KEY + ".Miss[@digest]";
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
     public static final String ASSY_EDITOR_FRAME_BOUNDS_KEY = "app.AssemblyEditor.FrameBounds";
-    public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";    
+    public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
+    public static final String PROJECT_TITLE_NAME = "gui.projecttitle.name[@value]";
     public static final String LAF_DEFAULT = "default";
     public static final String LAF_PLATFORM = "platform";
-    
+
     private static ViskitConfig me;
-    
+
     private Map<String, XMLConfiguration> xmlConfigurations;
     private Map<String, String> sessionHM;
     private CombinedConfiguration cc;
@@ -122,7 +131,8 @@ public class ViskitConfig {
             cc = builder.getConfiguration(true);
 
             // Save off the indiv XML config for each prefix so we can write back
-            for (int i = 0; i < cc.getNumberOfConfigurations(); i++) {
+            int numConfigs = cc.getNumberOfConfigurations();
+            for (int i = 0; i < numConfigs; i++) {
                 Object obj = cc.getConfiguration(i);
                 if (!(obj instanceof XMLConfiguration)) {
                     continue;
@@ -143,8 +153,8 @@ public class ViskitConfig {
      * Rather screwy.  A decent design would allow the CompositeConfiguration obj
      * to do the saving, but it won't.
      *
-     * @param key
-     * @param val
+     * @param key the ViskitConfig named key to set
+     * @param val the value of this key
      */
     public void setVal(String key, String val) {
         String cfgKey = key.substring(0, key.indexOf('.'));
@@ -192,9 +202,14 @@ public class ViskitConfig {
         cc.removeConfiguration(projConfig);
     }
 
-    /** @return the XMLConfiguration for Viskit */
-    public XMLConfiguration getViskitConfig() {
+    /** @return the XMLConfiguration for Viskit app */
+    public XMLConfiguration getViskitAppConfig() {
         return (XMLConfiguration) cc.getConfiguration("app");
+    }
+
+    /** @return the XMLConfiguration for Viskit app */
+    public XMLConfiguration getViskitGuiConfig() {
+        return (XMLConfiguration) cc.getConfiguration("gui");
     }
 
     /** Used to clear all Viskit Configuration information to create a new
@@ -203,12 +218,12 @@ public class ViskitConfig {
     public void clearViskitConfig() {
         setVal(ViskitConfig.PROJECT_PATH_KEY, "");
         setVal(ViskitConfig.PROJECT_NAME_KEY, "");
-        getViskitConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
-        getViskitConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
 
         // TODO: Other clears?
     }
-    
+
     public void resetViskitConfig() {
         me = null;
     }
@@ -240,9 +255,7 @@ public class ViskitConfig {
         }
     }
 
-    /**
-     * @return the xmlConfigurations
-     */
+    /** @return a Map of XMLConfigurations */
     public Map<String, XMLConfiguration> getXmlConfigurations() {
         return xmlConfigurations;
     }

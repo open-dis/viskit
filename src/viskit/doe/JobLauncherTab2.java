@@ -898,7 +898,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             int samples = Integer.parseInt(exp.getTotalSamples());
             int designPoints = jaxbRoot.getDesignParameters().size();
 
-            ArrayList<Object> lastQueue;
+            List<Object> lastQueue;
 
             try {
 
@@ -916,7 +916,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         // this will block until a task ends which could be
                         // because it died, or because it completed, either way
                         // check the logs returned by getResults will tell.
-                        ArrayList<Object> queue = doe.getTaskQueue();
+                        List<Object> queue = doe.getTaskQueue();
                         List<Object> sQueue = Collections.synchronizedList(queue);
                         synchronized (sQueue) {
                             ListIterator li = sQueue.listIterator();
@@ -1287,7 +1287,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private void initConfig() {
         try {
-            vConfig = ViskitConfig.instance().getViskitConfig();
+            vConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
             System.out.println("Error loading config file: " + e.getMessage());
             vConfig = null;

@@ -462,8 +462,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         protected PortView port,  firstPort;
 
         /** Override to Gain Control (for PopupMenu and ConnectMode)
-         * @param e
-         * @return 
+         * @param e the event to evaluate
+         * @return an indication of forcing the marquee event
          */
         @Override
         public boolean isForceMarqueeEvent(MouseEvent e) {

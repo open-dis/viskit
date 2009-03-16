@@ -715,8 +715,8 @@ public class VGlobals {
     /**
      * This is messaged by dialogs and others when a user has selected a type for a new variable.  We look
      * around to see if we've already got it covered.  If not, we add it to the end of the list.
-     * @param ty
-     * @return 
+     * @param ty the type to evaluate
+     * @return the String representation of this type if found
      */
     public String typeChosen(String ty) {
         ty = ty.replaceAll("\\s", "");              // every whitespace removed
@@ -799,7 +799,7 @@ public class VGlobals {
      */
     public void createWorkDirectory() {
         ViskitConfig vConfig = ViskitConfig.instance();
-        if (vConfig.getViskitConfig() == null) {
+        if (vConfig.getViskitAppConfig() == null) {
             return;
         }
 

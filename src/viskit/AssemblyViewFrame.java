@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangeListenerIcon;
@@ -830,14 +831,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     private boolean firstShown = false;
 
-    // TODO: This saves the size/shape of the EG Editor frame, but doesn't
-    // load this config on next startup
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
-        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
-        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
-        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
-        ViskitConfig.instance().setVal(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
+        XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
+        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
+        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
+        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }
 
     // Some private classes to implement dnd and dynamic cursor update
@@ -877,11 +877,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     /** permits user to edit existing entities
-     * @param evNode
-     * @return
+     * @param evNode the event graph node to edit
+     * @return an indication of success
      */
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
-        return EventGraphNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), evNode);
+        JFrame frame = VGlobals.instance().getMainAppWindow();
+        return EventGraphNodeInspectorDialog.showDialog(frame, frame, evNode);
     }
 
     public boolean doEditPclNode(PropChangeListenerNode pclNode) {
@@ -995,7 +996,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         boolean nullString = !(s != null && !s.isEmpty());
         String ttl =
                 nullString ? FRAME_DEFAULT_TITLE :
-                    " Project: " + VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
+                    " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
         setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);

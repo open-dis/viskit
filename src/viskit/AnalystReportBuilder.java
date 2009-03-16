@@ -797,11 +797,9 @@ public class AnalystReportBuilder {
         replaceChild(parent, _makeContent(commentTag, "Comments", commentText));
     }
 
-    /**
-     *
-     * @param commentTag
-     * @param commentText
-     * @return
+    /** @param commentTag the comment Element
+     * @param commentText the comment text
+     * @return the Comments Element
      */
     public Element xmakeComments(String commentTag, String commentText) {
         return _makeContent(commentTag, "Comments", commentText);
@@ -827,13 +825,11 @@ public class AnalystReportBuilder {
         replaceChild(parent,_makeContent(commentTag,"Conclusions",conclusionText));
     }
 
-    /**
-     *
-     * @param e
-     * @return
+    /** @param e the Element to extract information from
+     * @return a String object of the Element's contents
      */
     public String unMakeConclusions(Element e) {
-        return _unMakeContent(e,"Conclusions");
+        return _unMakeContent(e, "Conclusions");
     }
 
     /**
@@ -842,7 +838,7 @@ public class AnalystReportBuilder {
      *
      * @param productionNotesTag the tag used to identify unique Production Notes (used by XSLT)
      * @param productionNotesText
-     * @return
+     * @return the ProductionNotes Element
      */
     public Element xmakeProductionNotes(String productionNotesTag, String productionNotesText) {
         return _makeContent(productionNotesTag, "ProductionNotes", productionNotesText);

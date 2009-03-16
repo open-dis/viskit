@@ -173,10 +173,7 @@ public class SimkitXML2Java {
         out.println(data);
     }
     
-    /**
-     * 
-     * @return
-     */
+    /** @return the XML root of this SimEntity */
     public SimEntity getRoot() {
         return root;
     }

@@ -206,8 +206,8 @@ public class FileBasedClassManager implements Runnable {
 
     /** Creates an MD5 message digest composed of files, if either changes
      * there will be a mismatch in the new digest, so delete cache etc.
-     * @param files
-     * @return
+     * @param files the varargs containing files to evaluate
+     * @return a String representation of the message digest
      */
     public String createMessageDigest(File... files) {
         try {
@@ -351,8 +351,8 @@ public class FileBasedClassManager implements Runnable {
 
     /** Check if digests match as well as being on list, if no digest match
      * file changed since being a miss, so do updates etc.
-     * @param file
-     * @return
+     * @param file the file to evaluate
+     * @return an indication of miss caching
      */
     public boolean isCacheMiss(File file) {
         List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));

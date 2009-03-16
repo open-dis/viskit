@@ -26,9 +26,9 @@
         <tt>Generate your Viskit project</tt>
       </projectgeneration>
     </button>
-    <projecttitles>
-      <locationfilechoosertitle>Viskit Project Location</locationfilechoosertitle>
-    </projecttitles>
+    <projecttitle>
+        <name value=""/>
+    </projecttitle>
     <lookandfeel>default</lookandfeel>
   </gui>
 </ViskitConfig>

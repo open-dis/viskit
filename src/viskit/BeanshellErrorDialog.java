@@ -37,7 +37,7 @@ public class BeanshellErrorDialog extends JDialog {
     private BeanshellErrorDialog() {
         ViskitConfig cfg = ViskitConfig.instance();
 
-        setTitle(cfg.getVal("gui.beanshellerrordialog.title")); //"Warning"
+        setTitle(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_TITLE)); //"Warning"
         setModal(true);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
@@ -52,7 +52,7 @@ public class BeanshellErrorDialog extends JDialog {
         leftPan.setLayout(new BoxLayout(leftPan, BoxLayout.Y_AXIS));
 
         Icon ic = UIManager.getIcon("OptionPane.warningIcon");
-        JLabel lab = new JLabel(cfg.getVal("gui.beanshellerrordialog.label"), ic, JLabel.LEFT);//"Java language error:"
+        JLabel lab = new JLabel(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_LABEL), ic, JLabel.LEFT);//"Java language error:"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
         errorMsg = new JTextArea(4, 40);
@@ -65,7 +65,7 @@ public class BeanshellErrorDialog extends JDialog {
         jsp.setAlignmentX(JTextArea.LEFT_ALIGNMENT);
         leftPan.add(jsp);
         leftPan.add(Box.createVerticalStrut(3));
-        lab = new JLabel(cfg.getVal("gui.beanshellerrordialog.question")); //"Ignore and continue?"
+        lab = new JLabel(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_QUESTION)); //"Ignore and continue?"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
         topPan.add(leftPan);
@@ -74,8 +74,8 @@ public class BeanshellErrorDialog extends JDialog {
 
         p.add(Box.createVerticalStrut(10));
 
-        current = new JCheckBox(cfg.getVal("gui.beanshellerrordialog.sessioncheckbox")); //"Hide warnings for current session"
-        permanent = new JCheckBox(cfg.getVal("gui.beanshellerrordialog.preferencescheckbox")); //"Hide warnings permanently"
+        current = new JCheckBox(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX)); //"Hide warnings for current session"
+        permanent = new JCheckBox(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX)); //"Hide warnings permanently"
         nullCB = new JCheckBox("hidden");
         current.setSelected(false);
         permanent.setSelected(false);
@@ -86,7 +86,7 @@ public class BeanshellErrorDialog extends JDialog {
         bg.add(permanent);
         bg.add(nullCB);
 
-        permanent.setToolTipText(cfg.getVal("gui.beanshellerrordialog.preferencestooltip")); //"Set permanent options in File->Preferences"
+        permanent.setToolTipText(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP)); //"Set permanent options in File->Preferences"
 
         current.addActionListener(new cbTweeker(current));
         permanent.addActionListener(new cbTweeker(permanent));
@@ -130,9 +130,9 @@ public class BeanshellErrorDialog extends JDialog {
 
             public void actionPerformed(ActionEvent e) {
                 if (current.isSelected()) {
-                    ViskitConfig.instance().setSessionVal("app.beanshell.warning", "false");
+                    ViskitConfig.instance().setSessionVal(ViskitConfig.BEANSHELL_WARNING, "false");
                 } else if (permanent.isSelected()) {
-                    ViskitConfig.instance().setVal("app.beanshell.warning", "false");
+                    ViskitConfig.instance().setVal(ViskitConfig.BEANSHELL_WARNING, "false");
                 }
                 returnBool = true;
                 dispose();

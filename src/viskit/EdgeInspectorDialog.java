@@ -72,10 +72,10 @@ public class EdgeInspectorDialog extends JDialog {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
-     * @param f
-     * @param comp
-     * @param edge
-     * @return 
+     * @param f the frame to orient this dialog
+     * @param comp the frame to orient this dialog
+     * @param edge the Edge node to edit
+     * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Component comp, Edge edge) {
         if (dialog == null) {

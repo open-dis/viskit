@@ -8,7 +8,7 @@ package viskit.doe;
 
 import java.io.File;
 import java.util.Hashtable;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -26,6 +26,7 @@ public interface DoeRunDriver {
      * handler for clearing the experiment from memory,
      * could be used in cases where you want to flush the queue
      * and also the accumulated state so far.
+     * @throws DoeException
      */
     public void clear() throws DoeException;
 
@@ -34,6 +35,7 @@ public interface DoeRunDriver {
      * 
      * @return number of remaining tasks still in the queue
      * that will be terminated.
+     * @throws DoeException
      */
     public int flushQueue() throws DoeException;
 
@@ -45,6 +47,7 @@ public interface DoeRunDriver {
      * handler for returning number of remaining tasks in queue.
      * 
      * @return number of remaining tasks in the queue still running.
+     * @throws DoeException
      */
     public int getRemainingTasks() throws DoeException;
 
@@ -69,12 +72,24 @@ public interface DoeRunDriver {
      * comes in handy if the client was single threaded in sequence,
      * see TestReader.java in gridkit.tests. If no value for timeout
      * is supplied in the XML-GRD, then it waits indefinitely.
+     * @param sample
+     * @param designPt
+     * @return
+     * @throws DoeException
      */
     public String getResult(int sample, int designPt) throws DoeException;
 
     public String getResultByTaskID(int taskID) throws DoeException;
 
-    public ArrayList<Object> getTaskQueue() throws DoeException;
+    /** Users of the getTaskQueue() through DoeRunDriver, in local
+     * mode need a copy, not the same Vector; users of it in remote
+     * mode automatically get a copy. Since we don't actually need
+     * any of the internals, simple Booleans get copied in here
+     *
+     * @return a List of queued tasks
+     * @throws viskit.doe.DoeException
+     */
+    public List<Object> getTaskQueue() throws DoeException;
 
     public String qstat() throws DoeException;
 
@@ -87,6 +102,8 @@ public interface DoeRunDriver {
     /**
      * hook for gridkit.setAssembly XML-RPC call, used to initialize
      * From DOE panel. Accepts raw XML String of Assembly.
+     * @param assembly
+     * @throws DoeException
      */
     public void setAssembly(String assembly) throws DoeException;
 

@@ -107,7 +107,7 @@ public class LocalBootLoader extends URLClassLoader {
      * done by setting threads' contextClassLoaders to
      * their own LocalBootLoaders
      * @param allowAssembly 
-     * @return
+     * @return a LocalBootLoader instance
      */
     public LocalBootLoader init(boolean allowAssembly) {
         this.allowAssembly = allowAssembly;
@@ -189,18 +189,12 @@ public class LocalBootLoader extends URLClassLoader {
     //System.out.println("Adding url "+u);
     }
 
-    /**
-     * 
-     * @return
-     */
+    /** @return the working class directory for this project */
     public File getWorkDir() {
         return workDir;
     }
 
-    /**
-     * 
-     * @return
-     */
+    /** @return an indication for allowing an Assembly to be jared up */
     public boolean getAllowAssemby() {
         return allowAssembly;
     }

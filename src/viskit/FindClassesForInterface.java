@@ -47,9 +47,9 @@ public class FindClassesForInterface {
 
     /**
      * Added by Mike Bailey.  Same test as above.
-     * @param questionable
-     * @param target
-     * @return 
+     * @param questionable the class to evaluate
+     * @param target the class assignable from the questionable class
+     * @return an indication of success
      */
     public static boolean matchClass(Class<?> questionable, Class<?> target) {
         return (!questionable.isInterface() && target.isAssignableFrom(questionable) && isConcrete(questionable));
@@ -57,9 +57,9 @@ public class FindClassesForInterface {
 
     /**
      * Simple method to try to load a .class file
-     * @param f
-     * @return
-     * @throws java.lang.Throwable 
+     * @param f the file to evaluate
+     * @return the class representation of this file
+     * @throws java.lang.Throwable if the class can not be found
      */
     public static Class<?> classFromFile(File f) throws java.lang.Throwable {
         return new MyClassLoader().buildIt(f);

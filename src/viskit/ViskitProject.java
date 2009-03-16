@@ -47,6 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileView;
 
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -292,6 +293,8 @@ public class ViskitProject {
 
     public void setProjectRoot(File projectRoot) {
         this.projectRoot = projectRoot;
+        XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
+        guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
     }
 
     public boolean isDirty() {

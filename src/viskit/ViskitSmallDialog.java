@@ -14,13 +14,12 @@ import java.lang.reflect.Constructor;
  * which are all used the same way.  This class puts the common code in a single
  * super class.
  * 
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects</p>
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
  * @author Mike Bailey
- * @since May 3, 2004
- * @since: 2:39:34 PM
+ * @since May 3, 2004 : 2:39:34 PM
  * @version $Id$
  */
 public abstract class ViskitSmallDialog extends JDialog {
