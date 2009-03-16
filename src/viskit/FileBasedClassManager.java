@@ -82,14 +82,17 @@ public class FileBasedClassManager implements Runnable {
     /** Known path for EventGraph Compilation
      *
      * @param f an event graph to compile
+     * @param implementsClass to test for implementation of simkit.BasicSimEntity
      * @return a node tree for viewing in the Assembly Editor
      * @throws java.lang.Throwable
      */
-    public FileBasedAssyNode loadFile(File f) throws Throwable {
+    public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
         FileBasedAssyNode fban = null;
         Class<?> fclass = null;
         // if it is cached, cache directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
+            JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+            Unmarshaller um = jaxbCtx.createUnmarshaller();
             if (!isCached(f)) {
                 if (!isCacheMiss(f)) {
                     PkgAndFile paf =
@@ -103,8 +106,6 @@ public class FileBasedClassManager implements Runnable {
                     ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
 
                     // since we're here, cache the parameter names
-                    JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
-                    Unmarshaller um = jaxbCtx.createUnmarshaller();
                     try {
                         SimEntity simEntity = (SimEntity) um.unmarshal(f);
                         fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
@@ -130,8 +131,6 @@ public class FileBasedClassManager implements Runnable {
                 // And, definitely need a reset ClassLoader here (Bugfix 1407)
                 ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
 
-                JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
-                Unmarshaller um = jaxbCtx.createUnmarshaller();
                 try {
                     SimEntity simEntity = (SimEntity) um.unmarshal(fXml);
                     fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
@@ -153,7 +152,10 @@ public class FileBasedClassManager implements Runnable {
                 }
             }
         } else if (f.getName().toLowerCase().endsWith(".class")) {
-            fclass = FindClassesForInterface.classFromFile(f);   // Throwable from here possibly
+            fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
+            if (fclass == null) {
+                return (FileBasedAssyNode) null;
+            }
             String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
             fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
             Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));

@@ -42,7 +42,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     static Logger log = Logger.getLogger(LegosTree.class);
 
     private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-    private Class targetClass;
+    private Class<?> targetClass;
     private String targetClassName;
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private ImageIcon myLeafIcon;
@@ -132,7 +132,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         return s == null ? genericTableToolTip : s;
     }
 
-    public Class getTargetClass() {
+    /** @return a class of type simkit.BasicSimEntity */
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
@@ -206,7 +207,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     public void addContentRoot(File f, boolean recurse) {
         Vector<DefaultMutableTreeNode> v = new Vector<DefaultMutableTreeNode>();
         directoryRoots = new HashMap<String, DefaultMutableTreeNode>();
-        classNodeCount = 0;
 
         if (recurse) {
             recurseNogoList = new Vector<String>();
@@ -215,19 +215,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
         if (!f.getName().endsWith(".java")) {
             addContentRoot(f, recurse, v);
-        }
-        
-        if (classNodeCount != 0) {
-            return;
-        }
-
-        // TODO: Move to where this actually could provide more useful info
-        JOptionPane.showMessageDialog(LegosTree.this, "Compile error in " + 
-                f.getPath() + ",\n" +
-                "or no classes of type " + targetClass.getName() +
-                " found,\n" +
-                "or duplicate class type(s) encountered.",
-                "Error", JOptionPane.WARNING_MESSAGE);
+        }        
     }
 
     // The two above are the public ones.
@@ -241,7 +229,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 rootVector.add(myNode); // for later pruning
                 directoryRoots.put(f.getPath(), myNode);
                 int idx = root.getIndex(myNode);
-                mod.nodesWereInserted(root, new int[]{idx});
+                mod.nodesWereInserted(root, new int[] {idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa) {
@@ -260,7 +248,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         parent.add(myNode);
                         directoryRoots.put(f.getPath(), myNode);
                         int idx = parent.getIndex(myNode);
-                        mod.nodesWereInserted(parent, new int[]{idx});
+                        mod.nodesWereInserted(parent, new int[] {idx});
                     } else {
                         myNode = new DefaultMutableTreeNode(f.getPath());
                         root.add(myNode);
@@ -280,23 +268,39 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         else {
             FileBasedAssyNode fban;
             try {
-                fban = FileBasedClassManager.instance().loadFile(f);
+                fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
                 
-                // If an Assembly was encountered by the FBCM, just return
-                if (fban == null) {
-                    return;
-                }
-                
-                // Check here for duplicates of the classes which have been 
-                // loaded on the classpath (simkit.jar);
-                // No dups accepted, should throw exception upon success
-                try {
-                    Class.forName(fban.loadedClass);
-                    return;  // don't proceed
-                } catch (Exception e) { // expectecd
-                     // Do nothing?
-                }
+                // If an Assembly, or non simkit.BasicSimEntity type class was
+                // encountered by the FBCM, just return for convenience
+                if (fban != null) {
 
+                    // TODO: investigate the need for this
+
+                    // Check here for duplicates of the classes which have been
+                    // loaded on the classpath (i.e. simkit.jar);
+                    // No dups accepted, should throw exception upon success
+                    try {
+                        Class.forName(fban.loadedClass);
+                        return;  // don't proceed
+                    } catch (ClassNotFoundException e) { // expectecd
+                        // Do nothing?
+                    }
+                    myNode = new DefaultMutableTreeNode(fban);
+                    DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
+                    if (par != null) {
+                        par.add(myNode);
+                        int idx = par.getIndex(myNode);
+                        mod.nodesWereInserted(par, new int[]{idx});
+                    } else {
+                        root.add(myNode);
+                        int idx = root.getIndex(myNode);
+                        mod.nodesWereInserted(root, new int[]{idx});
+                    }
+                } else {
+                    clear();
+                    log.warn("No implementation of " + targetClassName + " found in " + f.getName());
+                    log.info(f.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+                }
             } catch (Throwable throwable) {
                 if (viskit.Vstatics.debug) {
                     throwable.printStackTrace();
@@ -306,22 +310,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     recurseNogoList.add(f.getName());
                 }
                 return;
-            }
-            myNode = new DefaultMutableTreeNode(fban);
-            DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
-            if (par != null) {
-                par.add(myNode);
-                int idx = par.getIndex(myNode);
-                mod.nodesWereInserted(par, new int[] {idx});
-            } else {
-                root.add(myNode);
-                int idx = root.getIndex(myNode);
-                mod.nodesWereInserted(root, new int[]{idx});
-            }
-            classNodeCount++;
-        }  // directory
+            }            
+        } // directory
     }
-    private int classNodeCount;
     HashMap<String, DefaultMutableTreeNode> directoryRoots;
     DefaultMutableTreeNode rootNode;
     HashMap<String, DefaultMutableTreeNode> packagesHM = new HashMap<String, DefaultMutableTreeNode>();
@@ -385,7 +376,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             }
             
             for (int i = 0; i < constr.length; i++) {
-                Class[] ptypes = constr[i].getParameterTypes();
+                Class<?>[] ptypes = constr[i].getParameterTypes();
                 plist[i] = new ArrayList<Object>();
                 if (viskit.Vstatics.debug) {
                     System.out.println("\t # params " + ptypes.length + " in constructor " + i);
@@ -474,7 +465,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             Vstatics.putParameterList(c.getName(), plist);
         }
 
-        if (list == null || list.size() <= 0) {
+        if (list == null || list.isEmpty()) {
             log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
             log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
         } else {

@@ -1,12 +1,14 @@
 package viskit;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -27,8 +29,8 @@ public class FindClassesForInterface {
     /**
      * Added by Mike Bailey
      * @param f Class file to read from
-     * @param implementing
-     * @return Class object
+     * @param implementing possibly a class of type simkit.BasicSimEntity
+     * @return Class object iif of type simkit.BasicSimEntity
      */
     public static Class<?> classFromFile(File f, Class<?> implementing) {
         Class<?> c = null;
@@ -41,6 +43,7 @@ public class FindClassesForInterface {
                 c = null;
             }
         } catch (Throwable t) {
+            // do nothing
         }
         return c;
     }
@@ -71,6 +74,8 @@ public class FindClassesForInterface {
     static class MyClassLoader extends ClassLoader {
 
         private File f;
+        private ByteBuffer buffer;
+        private RandomAccessFile classFile;
         private Hashtable<String, Class<?>> found = new Hashtable<String, Class<?>>();
 
         Class<?> buildIt(File fil) throws java.lang.Throwable {
@@ -80,32 +85,33 @@ public class FindClassesForInterface {
 
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
-            if (found.get(name) != null) {
-                return (Class<?>) found.get(name);
+            Class<?> clazz = found.get(name);
+            if (clazz != null) {
+                return clazz;
             }
-            byte[] buf = new byte[128 * 1024];        // todo make dynamically sized
-            int num = 0;
             try {
-                DataInputStream dis = new DataInputStream(new FileInputStream(f));
-                num = dis.read(buf);
+                classFile = new RandomAccessFile(f, "r");
+                FileChannel fc = classFile.getChannel();
+                buffer = ByteBuffer.allocate((int) fc.size());
+                fc.read(buffer);
             } catch (Throwable thr) {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
                 log.info("Attempting to find " + name);
 
-                Class<?> clz = defineClass(null, buf, 0, num); // do this to get proper name/pkg
+                Class<?> clz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
 
-                //clz = defineClass(clz.getName(),buf,0,num);
                 found.put(name, clz);
-                // bug here, a byte[] loaded class will not have its package set, but 
-                // has it in the name. this causes problems later on when trying to create
-                // a FileBasedAssemblyNode
-                log.info("Found Class " + clz.getPackage() + "." + clz.getName());
+                log.info("Found Class: " + clz.getName() + "\n");
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();
                 return (Class<?>) null;
+            } finally {
+                try {
+                    classFile.close();
+                } catch (IOException ioe) {}
             }
         }
     }
@@ -119,7 +125,7 @@ public class FindClassesForInterface {
      * desired interface
      */
     public static List<Class<?>> findClasses(JarFile jarFile, Class<?> implementing) {
-        ArrayList<Class<?>> found = new ArrayList<Class<?>>();
+        List<Class<?>> found = new ArrayList<Class<?>>();
         URLClassLoader loader = null;
         try {
             loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
@@ -140,8 +146,7 @@ public class FindClassesForInterface {
                     found.add(c);
                 }
             } catch (ClassNotFoundException e) {
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                // do nothing
             }
         }
         return found;

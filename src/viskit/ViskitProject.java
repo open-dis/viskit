@@ -130,19 +130,27 @@ public class ViskitProject {
             getLibDir().mkdir();
         }
 
-        buildDir = new File(projectRoot, BUILD_DIRECTORY_NAME);
-        setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
-        setClassDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
+        setBuildDir(new File(projectRoot, BUILD_DIRECTORY_NAME));
 
         // Start with a fresh build directory
-//        if (buildDir.exists()) {
+//        if (getBuildDir().exists()) {
 //            clean();
 //        }
 
         // NOTE: if we nuke the buildDir, then we cause ClassNotFoundExceptions
         // down the line.  Each class will be recompiled everytime we open an
-        // assembly, or event graph file, so no real need to nuke it.
+        // assembly, or event graph file, so no real need to nuke it.  We also
+        // disable our EventGraph caching capability (reduction of multiple compiles)
 
+        setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
+        if (!srcDir.exists()) {
+            getSrcDir().mkdirs();
+        }
+        setClassDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
+        if (!classDir.exists()) {
+            getClassDir().mkdirs();
+        }
+        
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectRoot, PROJECT_FILE_NAME));
         if (!projectFile.exists()) {
@@ -499,6 +507,13 @@ public class ViskitProject {
         }
 
         return foundProjectFile;
+    }
+
+    /**
+     * @param buildDir the buildDir to set
+     */
+    public void setBuildDir(File buildDir) {
+        this.buildDir = buildDir;
     }
 
     private static class ViskitProjectFileView extends FileView {
