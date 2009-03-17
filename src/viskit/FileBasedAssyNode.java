@@ -23,21 +23,16 @@ public class FileBasedAssyNode {
     public long lastModified;
 
     public FileBasedAssyNode(File classFile, String loadedClass, File xml, String pkg) {
-        this.xmlSource = xml;
         this.classFile = classFile;
         this.loadedClass = loadedClass;
+        this.xmlSource = xml;
         this.pkg = pkg;
-        isXML = true;
-        lastModified = xml.lastModified();
+        isXML = (xml == null) ? false : true;
+        lastModified = (isXML) ? xml.lastModified() : classFile.lastModified();
     }
 
     public FileBasedAssyNode(File classFile, String loadedClass, String pkg) {
-        this.xmlSource = null;
-        this.classFile = classFile;
-        this.loadedClass = loadedClass;
-        this.pkg = pkg;
-        isXML = false;
-        lastModified = classFile.lastModified();
+        this(classFile, loadedClass, null, pkg);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     /** Constructor for Listener Event Graph Object Tree
      *
-     * @param className a class to evaluate as LEGO
+     * @param className a class to evaluate as a LEGO
      * @param iconPath path to a LEGO icon
      * @param dslis a DragStartListener
      * @param tooltip description for this LEGO tree
@@ -290,26 +290,26 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     if (par != null) {
                         par.add(myNode);
                         int idx = par.getIndex(myNode);
-                        mod.nodesWereInserted(par, new int[]{idx});
+                        mod.nodesWereInserted(par, new int[] {idx});
                     } else {
                         root.add(myNode);
                         int idx = root.getIndex(myNode);
-                        mod.nodesWereInserted(root, new int[]{idx});
+                        mod.nodesWereInserted(root, new int[] {idx});
                     }
                 } else {
                     clear();
-                    log.warn("No implementation of " + targetClassName + " found in " + f.getName());
-                    log.info(f.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+                    log.warn("No extension of " + targetClassName + " found in " + f.getName());
+                    log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
-                if (viskit.Vstatics.debug) {
+                if (/*true*/viskit.Vstatics.debug) {
                     throwable.printStackTrace();
                 }
-                log.error("Couldn't handle " + f + ". " + throwable.getMessage());
+                log.error("Could not process " + f.getName() + ": " 
+                        + throwable.getCause() + " " + throwable.getMessage());
                 if (recurseNogoList != null) {
                     recurseNogoList.add(f.getName());
                 }
-                return;
             }            
         } // directory
     }

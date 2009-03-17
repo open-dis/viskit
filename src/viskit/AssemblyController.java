@@ -76,7 +76,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         compileAssemblyAndPrepSimRunner();
     }
 
-    /** Begin Viskit's initial state upon startup */
+    /** Begin this Controller's initial state upon startup */
     public void begin() {
 
         File f;
@@ -98,20 +98,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
 
         _setProjFileSet();
-
-        // The following comments were an attempt to solve classloader issues that needed to be solved
-        // a different way
-        try {
-            simEvSrcClass = Vstatics.classForName("simkit.SimEventSource");
-            simEvLisClass = Vstatics.classForName("simkit.SimEventListener");
-            propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
-            propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
-            if (simEvSrcClass == null || simEvLisClass == null || propChgSrcClass == null || propChgLisClass == null) {
-                throw new ClassNotFoundException();
-            }
-        } catch (ClassNotFoundException e) {
-            ((ViskitAssemblyView) getView()).genericErrorReport("Internal error", "simkit.jar not in classpath");
-        }
     }
 
     /**
@@ -1254,9 +1240,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             // Should always have a live ViskitProject
             ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
-            File workingDir = VGlobals.instance().getWorkDirectory().getParentFile();
 
-            // Create, or find the project's java source
+            // Create, or find the project's java source and package
             File srcPkg = new File(viskitProj.getSrcDir(), pkg);
             if (!srcPkg.isDirectory()) {
                 srcPkg.mkdirs();
@@ -1268,14 +1253,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             fw.write(src);
             fw.close();
 
-            // Now create the build/classes directory to place bytecode
-            File classesDir = (viskitProj != null) ? viskitProj.getClassDir() : new File(workingDir, ViskitProject.CLASSES_DIRECTORY_NAME);
-            if (!classesDir.isDirectory()) {
-                classesDir.mkdirs();
-            }
+            File classesDir = viskitProj.getClassDir();
 
             log.info("Test compiling " + javaFile.getCanonicalPath());
 
+            // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             if (diagnostic != null) {
                 if (diagnostic.isEmpty()) {
@@ -1315,9 +1297,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 FileBasedClassManager.instance().addCacheMiss(xmlFile);
                 return null;
             }
-            PkgAndFile paf = compileJavaClassAndSetPackage(src);
-            FileBasedClassManager.instance().addCache(xmlFile, paf.f);
-            return paf;
+            return compileJavaClassAndSetPackage(src);
         } catch (Exception e) {
             log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
@@ -1331,7 +1311,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public PkgAndFile compileJavaClassAndSetPackage(String source) {
         String pkg = null;
-        if (source != null && source.length() > 0) {
+        if (source != null && !source.isEmpty()) {
             Pattern p = Pattern.compile("package.*;");
             Matcher m = p.matcher(source);
             if (m.find()) {

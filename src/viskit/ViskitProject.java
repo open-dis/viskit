@@ -133,14 +133,9 @@ public class ViskitProject {
         setBuildDir(new File(projectRoot, BUILD_DIRECTORY_NAME));
 
         // Start with a fresh build directory
-//        if (getBuildDir().exists()) {
-//            clean();
-//        }
-
-        // NOTE: if we nuke the buildDir, then we cause ClassNotFoundExceptions
-        // down the line.  Each class will be recompiled everytime we open an
-        // assembly, or event graph file, so no real need to nuke it.  We also
-        // disable our EventGraph caching capability (reduction of multiple compiles)
+        if (getBuildDir().exists()) {
+            clean();
+        }
 
         setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
         if (!srcDir.exists()) {

@@ -94,7 +94,7 @@ public class LocalBootLoader extends URLClassLoader {
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[] {}, parent);
         extUrls = classes;
-        this.workDir = (workDir != null) ? new File(workDir.toURI()) : workDir;
+        this.workDir = workDir;
         log.debug(VGlobals.instance().printCallerLog());
     }
 
@@ -284,23 +284,24 @@ public class LocalBootLoader extends URLClassLoader {
 
     private File makeJarFileFromDir(File dir2jar, File destDir) {
         File jarOut = dir2jar;
+        JarOutputStream jos = null;
         try {
             jarOut = File.createTempFile("eventGraphs", ".jar", destDir);
             FileOutputStream fos = new FileOutputStream(jarOut);
-            JarOutputStream jos = new JarOutputStream(fos);
+            jos = new JarOutputStream(fos);
             if (dir2jar.isDirectory()) {
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
             }
+
             jos.flush();
             jos.close();
-
         } catch (java.util.zip.ZipException ze) {
             return dir2jar;
             
         // could be first time through
         } catch (IOException ex) {
             ex.printStackTrace();
-        }
+        } 
         return jarOut;
     }
 

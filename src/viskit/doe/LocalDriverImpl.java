@@ -25,7 +25,7 @@ public class LocalDriverImpl implements DoeRunDriver {
     
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        loader = new LocalBootLoader(new URL[]{}, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
+        loader = new LocalBootLoader(new URL[] {}, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
         initGridRunner(loader);
     }
     
@@ -41,8 +41,8 @@ public class LocalDriverImpl implements DoeRunDriver {
             gridRunnerz = loader.loadClass("viskit.xsd.assembly.GridRunner");
             try {
                 Class<?> loaderz = loader.loadClass("viskit.doe.LocalBootLoader");
-                Constructor lconstr = loaderz.getConstructor(URL[].class,ClassLoader.class,File.class);
-                Object rloader = lconstr.newInstance(loader.getExtUrls(),ClassLoader.getSystemClassLoader(),loader.getWorkDir());
+                Constructor lconstr = loaderz.getConstructor(URL[].class, ClassLoader.class, File.class);
+                Object rloader = lconstr.newInstance(loader.getExtUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDir());
                 Method initr = loaderz.getMethod("init");
                 rloader = initr.invoke(rloader);
                 Constructor constr = gridRunnerz.getConstructor(loader.loadClass("viskit.doe.LocalBootLoader")); //yep

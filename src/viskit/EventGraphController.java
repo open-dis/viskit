@@ -59,7 +59,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         java.util.List<String> lis = getOpenFileSet(false);
 
         // don't default to new event graph
-        if (lis.size() <= 0) {
+        if (lis.isEmpty()) {
             log.debug("In begin() (if) of EventGraphController");
             return;
         } else {
@@ -69,7 +69,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             // Assembly file tell which EGs to open
             if (VGlobals.instance().getAssemblyController() != null) {
                 java.util.List<String> al = VGlobals.instance().getAssemblyController().getOpenAssyFileList(false);
-                if (al.size() == 0) {
+                if (al.isEmpty()) {
                     log.debug("In begin() (else) of EventGraphController");
                     for (String s : lis) {
                         File f = new File(s);

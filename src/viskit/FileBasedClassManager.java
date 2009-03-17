@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import viskit.xsd.bindings.eventgraph.*;
@@ -78,100 +79,113 @@ public class FileBasedClassManager implements Runnable {
         removeFileClass(fban.loadedClass);
         fileMap.remove(fban.loadedClass);
     }
+    FileBasedAssyNode fban = null;
+    Class<?> fclass = null;
+    JAXBContext jaxbCtx = null;
+    Unmarshaller um = null;
+    PkgAndFile paf = null;
+    File fXml = null;
+    SimEntity simEntity = null;
 
     /** Known path for EventGraph Compilation
      *
      * @param f an event graph to compile
-     * @param implementsClass to test for implementation of simkit.BasicSimEntity
+     * @param implementsClass to test for extention of simkit.BasicSimEntity
      * @return a node tree for viewing in the Assembly Editor
-     * @throws java.lang.Throwable
+     * @throws java.lang.Throwable for a problem finding a class
      */
     public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
-        FileBasedAssyNode fban = null;
-        Class<?> fclass = null;
+        
         // if it is cached, cache directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
-            JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
-            Unmarshaller um = jaxbCtx.createUnmarshaller();
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+            um = jaxbCtx.createUnmarshaller();
+
+            // Did we cache the EventGraph XML and Class?
             if (!isCached(f)) {
+
+                // Make sure it's not a Cached Miss
                 if (!isCacheMiss(f)) {
-                    PkgAndFile paf =
-                            VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
+
+                    // This will compile first time found EGs via an external JVM compile run
+                    paf = VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
+
                     // Tried to compile an Assembly as an EventGraph, so just return here
                     if (paf == null) {
-                        return null;
+                        return fban;
                     }
 
-                    // Definitely need a reset ClassLoader here (Bugfix 1407)
-                    ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
+                    setFileBasedAssemblyNode(f);
 
-                    // since we're here, cache the parameter names
-                    try {
-                        SimEntity simEntity = (SimEntity) um.unmarshal(f);
-                        fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
-                        fban = new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg);
-                        List<Object>[] pa = newListObjectTypeArray(List.class, 1);
-                        pa[0].addAll(simEntity.getParameter());
-                        Vstatics.putParameterList(fclass.getName(), pa);
-
-                        if (viskit.Vstatics.debug) {
-                            log.debug("Put " + fclass.getName() + simEntity.getParameter());
-                        }
-                    } catch (Exception e) {
-                        if (viskit.Vstatics.debug) {
-                            e.printStackTrace();
-                        }
-                    }
-                    addCache(f, fban.classFile);
+                    // Cacheing good files is more trouble than it's worth right now
+                    // We'll suffer with startup recompilations; they're quick now
+//                    addCache(f, fban.classFile);
                 }
+
+            // It's cached
             } else {
                 f = getCachedClass(f);
-                File fXml = getCachedXML(f);
-
-                // And, definitely need a reset ClassLoader here (Bugfix 1407)
-                ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(true);
-
-                try {
-                    SimEntity simEntity = (SimEntity) um.unmarshal(fXml);
-                    fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
-                    fban = new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
-                    List<Object>[] pa = newListObjectTypeArray(List.class, 1);
-                    pa[0].addAll(simEntity.getParameter());
-                    Vstatics.putParameterList(fclass.getName(), pa);
-
-                    if (viskit.Vstatics.debug) {
-                        log.debug("Put " + fclass.getName() + simEntity.getParameter());
-                    }
-                } catch (Exception e) {
-                    if (viskit.Vstatics.debug) {
-                        e.printStackTrace();
-                    }
-                }
-                if (viskit.Vstatics.debug) {
-                    log.debug(f + " loaded " + fclass.getPackage() + "." + fclass);
-                }
+                fXml = getCachedXML(f);
+                setFileBasedAssemblyNode(f);
             }
+
+        // Check, but don't cache other .class files
         } else if (f.getName().toLowerCase().endsWith(".class")) {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
-            if (fclass == null) {
-                return (FileBasedAssyNode) null;
-            }
-            String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-            fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
-            Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
+            if (fclass != null) {
+                String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
+                fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
+                Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
+            }        
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
             throw new Exception("Unsupported file type.");
         }
-        if (fclass == null) {
-            return (FileBasedAssyNode) null;
-        }
-        addFileClass(fclass);
-        synchronized (fileMap) {
-            fileMap.put(fclass.getName(), fban);
+        if (fclass != null) {
+            addFileClass(fclass);
+            synchronized (fileMap) {
+                fileMap.put(fclass.getName(), fban);
+            }
         }
         return fban;
     }
 
+    private void setFileBasedAssemblyNode(File f) {
+
+        // bug fix 1407
+        ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
+
+        // since we're here, cache the parameter names
+        try {
+            simEntity = (fXml == null) ? (SimEntity) um.unmarshal(f) : (SimEntity) um.unmarshal(fXml);
+            
+            // NOTE: If the project's build directory got nuked and we have
+            // cached our EGs and classes with MD5 hash, we'll throw a
+            // ClassNotFoundException.  
+            // TODO: Check for this and recompile the EGs before loading their classes
+            fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
+            
+            fban =  (fXml == null) ? 
+                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) : 
+                new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
+            
+            List<Object>[] pa = newListObjectTypeArray(List.class, 1);
+            pa[0].addAll(simEntity.getParameter());
+            Vstatics.putParameterList(fclass.getName(), pa);
+
+            log.debug("Put " + fclass.getName() + simEntity.getParameter());
+        
+        } catch (JAXBException e) {
+            Vstatics.log.error(e);
+        } catch (ClassNotFoundException e) {
+            Vstatics.log.error(e);
+        }
+    }
+
+    /**
+     * Cache the EG and it's .class file with good MD5 hash
+     * @param xmlEg the EG to cache
+     * @param classFile the classfile of this EG
+     */
     public void addCache(File xmlEg, File classFile) {
         // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cache
         if (isCached(xmlEg)) {
@@ -185,13 +199,6 @@ public class FileBasedClassManager implements Runnable {
                 } else {
                     log.debug("cache size " + cache.size());
                 }
-            }
-            if (cache.isEmpty()) {
-                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
-                if (viskit.Vstatics.debug) {
-                    log.debug("Cache is empty, creating workDir entry at " + s);
-                }                
-                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
             }
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
@@ -495,11 +502,11 @@ public class FileBasedClassManager implements Runnable {
         while (true) { // forever
             v.clear();
             synchronized (fileMap) {
-                for (FileBasedAssyNode fban : fileMap.values()) {
-                    File f = fban.isXML ? fban.xmlSource : fban.classFile;
-                    if (f.lastModified() != fban.lastModified) {
-                        v.add(fban.loadedClass);
-                        fban.lastModified = f.lastModified();
+                for (FileBasedAssyNode localFban : fileMap.values()) {
+                    File f = localFban.isXML ? localFban.xmlSource : localFban.classFile;
+                    if (f.lastModified() != localFban.lastModified) {
+                        v.add(localFban.loadedClass);
+                        localFban.lastModified = f.lastModified();
                     }
 
                     if (v.size() > 0) {

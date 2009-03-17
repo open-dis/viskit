@@ -12,10 +12,11 @@ import org.apache.log4j.Logger;
 /** Using the java compiler now part of javax, we no longer have to 
  * either ship tools.jar or require a jdk environment variable.
  * This class was taken from viskit.SourceWindow.
- * TBD refactor out from SourceWindow, the main difference being Compiler actaully 
+ * TBD refactor out from SourceWindow, the main difference being Compiler actually
  * creates .class Files, where SourceWindow did in memory.
  *
  * @author Rick Goldberg
+ * @version $Id$
  */
 public class Compiler {
 
@@ -32,10 +33,10 @@ public class Compiler {
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StringBuffer diagnosticMessages = new StringBuffer();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         CompilerDiagnosticsListener diag = new CompilerDiagnosticsListener(diagnosticMessages);
         JavaObjectFromString jofs = null;
-        StringBuffer classPaths = null;
+        StringBuilder classPaths = null;
         String cp = null;
 
         try {
@@ -45,12 +46,18 @@ public class Compiler {
             Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
             String workDirPath = workDir.getCanonicalPath();
             
-            // TODO: Lessen the amount of resetting the LBL
-            String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getResetWorkClassLoader(false))).getClassPath();
-            classPaths = new StringBuffer();
+            // This is would be the first instance of obtaining a LBL if
+            // beginning fresh, so, it is reset on the first instantiation
+            String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
+            int wkpLength = workClassPath.length;
+            classPaths = new StringBuilder(wkpLength);
+
             for (String cPath : workClassPath) {
-                classPaths.append(cPath + File.pathSeparator);                
+                classPaths.append(cPath + File.pathSeparator);
             }
+
+            // Get rid of the last ";" on the cp
+            classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
             cp = classPaths.toString();
             log.debug("cp is: " + cp);
             String[] options = {"-Xlint:unchecked",
@@ -69,6 +76,4 @@ public class Compiler {
         }
         return sb.toString();
     }
-}
-
-
+} // end class file Compiler.java

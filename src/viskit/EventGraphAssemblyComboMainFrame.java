@@ -272,14 +272,15 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
         
-        // Start the controllers
-        runLater(0, new Runnable() {
+        // let the assebmly controller establish the Viskit classpath and open
+        // EventGraphs first
+        runLater(3000, new Runnable() {
             public void run() {
                 egCntlr.begin();
             }
         });
 
-        runLater(3000, new Runnable() {
+        runLater(0, new Runnable() {
             public void run() {
                 assyCntlr.begin();
             }

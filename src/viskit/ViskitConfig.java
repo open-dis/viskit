@@ -64,7 +64,6 @@ public class ViskitConfig {
     public static final String CACHED_CLEAR_KEY = "Cached";
     public static final String CACHED_EVENTGRAPHS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@xml]";
     public static final String CACHED_EVENTGRAPHS_CLASS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@class]";
-    public static final String CACHED_WORKING_DIR_KEY = CACHED_CLEAR_KEY + "[@workDir]";
     public static final String CACHED_MISS_FILE_KEY = CACHED_CLEAR_KEY + ".Miss[@file]";
     public static final String CACHED_MISS_DIGEST_KEY = CACHED_CLEAR_KEY + ".Miss[@digest]";
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";

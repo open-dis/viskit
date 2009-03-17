@@ -17,6 +17,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
+import viskit.doe.LocalBootLoader;
 
 /**
  * @version $Id$
@@ -128,7 +129,7 @@ public class FindClassesForInterface {
         List<Class<?>> found = new ArrayList<Class<?>>();
         URLClassLoader loader = null;
         try {
-            loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
+            loader = new URLClassLoader(new URL[] {new File(jarFile.getName()).toURI().toURL()});
         } catch (MalformedURLException e) {
             e.printStackTrace(System.err);
         }
