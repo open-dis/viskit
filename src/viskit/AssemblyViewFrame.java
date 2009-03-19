@@ -22,12 +22,14 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
+import java.net.URL;
 import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
@@ -734,9 +736,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
-        // todo get from project
-        pclTree.addContentRoot(new File("lib/simkit.jar"));
-
+        // Now load the simkit.jar from where ever it is located on the classpath
+        String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
+        for (String simkitPath : classPath) {
+            if (simkitPath.contains("simkit.jar")) {
+                pclTree.addContentRoot(new File(simkitPath));
+            }
+        }
+        
         // If we built diskit.jar, then include it and the dis.jar for convenience
         File diskitJar = new File("lib/ext/diskit.jar");
         File disJar = new File("lib/ext/dis.jar");
