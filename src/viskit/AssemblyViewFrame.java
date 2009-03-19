@@ -735,29 +735,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
-
+        
         // Now load the simkit.jar from where ever it is located on the classpath
+        // and the diskit.jar (if it can be found as well).
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
-        for (String simkitPath : classPath) {
-            if (simkitPath.contains("simkit.jar")) {
-                pclTree.addContentRoot(new File(simkitPath));
+        for (String path : classPath) {
+            if ((path.contains("simkit.jar")) || (path.contains("diskit.jar"))) {
+                pclTree.addContentRoot(new File(path));
             }
         }
         
-        // If we built diskit.jar, then include it and the dis.jar for convenience
-        File diskitJar = new File("lib/ext/diskit.jar");
-        File disJar = new File("lib/ext/dis.jar");
-
-        // If we built diskit.jar, then include it and its sister dis.jar.  The
-        // dis.jar contains no PCLs, so, Viskit will give a benign warning about
-        // this in the output console and debug.log.
-        if (diskitJar.exists() && disJar.exists()) {
-            pclTree.addContentRoot(diskitJar);
-            pclTree.addContentRoot(disJar);
-        }
-        diskitJar = null;
-        disJar = null;
-
         PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
 
         lTree.setBackground(background);
