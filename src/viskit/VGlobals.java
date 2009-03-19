@@ -81,21 +81,21 @@ public class VGlobals {
     private JPopupMenu popup;
     private myTypeListener myListener;
     private JFrame mainAppWindow;
-    
+
     private ViskitProject currentViskitProject;
-    
+
     /** Need hold of the Enable Analyst Reports checkbox */
     private RunnerPanel2 runPanel;
-    
+
     /** Flag to denote called sysExit only once */
     private boolean sysExitCalled = false;
-    
+
     /** The current project working directory */
     private File workDirectory;
-    
-    /** The current project base directory */    
-    private File projectsBaseDir;       
-    
+
+    /** The current project base directory */
+    private File projectsBaseDir;
+
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -202,9 +202,9 @@ public class VGlobals {
     public void setAssemblyQuitHandler(ActionListener lis) {
         assyQuitHandler = lis;
     }
-    
+
     /* EventGraphViewFrame / EventGraphController */
-    
+
     EventGraphViewFrame egvf;
 
     public EventGraphViewFrame getEventGraphEditor() {
@@ -221,14 +221,14 @@ public class VGlobals {
         return egvf;
     }
 
-    /** This method starts the chain of various Viskit startup steps.  By 
+    /** This method starts the chain of various Viskit startup steps.  By
      * calling for a new EventGraphController(), in its constructor is a call
      * to initConfig() which is the first time that the viskitConfig.xml is
      * looked for, or if one is not there, to create one from the template.  The
      * viskitConfig.xml is an important file that holds information on recent
      * assembly and event graph openings, gui sizes and cacheing of compiled
      * source from EventGraphs.
-     *  
+     *
      * @param contentOnly
      * @return an instance of the EventGraphViewFrame
      */
@@ -245,7 +245,7 @@ public class VGlobals {
     public ViskitModel getActiveEventGraphModel() {
         return (ViskitModel) egvf.getModel();
     }
-    
+
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
@@ -333,12 +333,12 @@ public class VGlobals {
 
         // Lose the new lines
         String noCRs = interpretString.replace('\n', ' ');
-        
+
         String name = null;
         String type = null;
 
-        if (node != null) {            
-            
+        if (node != null) {
+
             // Event local variables
             for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
                 String result;
@@ -354,7 +354,7 @@ public class VGlobals {
                     return bshErr + "\n" + result;
                 }
             }
-            
+
             // Event arguments
             for (ViskitElement ea : node.getArguments()) {
                 type = ea.getType();
@@ -366,7 +366,7 @@ public class VGlobals {
                 }
             }
         }
-        
+
         // state variables
         for (ViskitElement stateVariable : getStateVarsList()) {
             String result;
@@ -384,7 +384,7 @@ public class VGlobals {
                 return bshErr + "\n" + result;
             }
         }
-        
+
         // Sim parameters
         for (ViskitElement par : getSimParmsList()) {
             String result;
@@ -400,19 +400,19 @@ public class VGlobals {
                 return bshErr + "\n" + result;
             }
         }
-        
-        /* see if we can parse it.  We've initted all arrays to size = 1, so 
+
+        /* see if we can parse it.  We've initted all arrays to size = 1, so
          * ignore outofbounds exceptions, bugfix 1183
          */
         try {
-            /* Ignore anything that is assigned from "getter" and setter as we 
+            /* Ignore anything that is assigned from "getter" and setter as we
              * are not giving beanShell the whole EG picture.
              */
             if(!noCRs.contains("get") && !noCRs.contains("set")) {
                 Object o = interpreter.eval(noCRs);
                 log.debug("Interpreter evaluation result: " + o);
-            }            
-        } catch (EvalError evalError) {                    
+            }
+        } catch (EvalError evalError) {
             if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
                 clearNamespace();
                 return bshErr + "\n" + evalError.getMessage();
@@ -421,11 +421,11 @@ public class VGlobals {
         clearNamespace();
         return null;    // null means good parse!
     }
-    
+
     public boolean isArray(String ty) {
         return ty.contains("[") && ty.contains("]");
     }
-    
+
     // TODO: Fix the logic here, it doesn't seem to get used correctly
     private void clearNamespace() {
         interpreter.getNameSpace().clear();
@@ -436,50 +436,49 @@ public class VGlobals {
         if (!handlePrimitive(name, typ)) {
             returnString = findType(name, typ);
         }
-        
+
         // good if remains null
         return returnString;
     }
 
     @SuppressWarnings("unchecked")
-    private String findType(String name, String type) {        
+    private String findType(String name, String type) {
         String returnString = null;
         try {
             if (isGeneric(type)) {
                 type = type.substring(0, type.indexOf("<"));
             }
             Object o = instantiateType(type);
-            
+
             // At this time, only default no argument contructors can be set
             if (o != null) {
                 interpreter.set(name, o);
             } /*else {
                 returnString = "no error, but not null";
             }*/
-            
+
             /* TODO: the above else is a placeholder for when we implement full
              * beahshell checking
              */
-              
+
         } catch (Exception ex) {
             clearNamespace();
             returnString =  ex.getMessage();
             log.error(returnString);
         }
-        
+
         // good if remains null
         return returnString;
     }
-    
+
     public boolean isGeneric(String type) {
         return (type.contains("<") && type.contains(">"));
     }
 
     public void initProjectHome() {
 
-        // TODO: if vConfig ever returns a null, need to gracefully handle
-        String projectHome = ViskitConfig.instance().getVal(ViskitConfig.PROJECT_PATH_KEY).trim();
-        projectHome = projectHome.replaceAll("\\\\", "/");
+        ViskitConfig vConfig = ViskitConfig.instance();
+        String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
         log.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 
             ViskitProjectButtonPanel.showDialog();
@@ -487,24 +486,24 @@ public class VGlobals {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
         }
     }
-    
+
     private Object instantiateType(String type) throws Exception {
         Object o = null;
         boolean isArr = false;
-        
+
         // TODO: Have to get viskit.VsimkitObjects to work first
         if (isSimkitDotRandom(type)) {return o;}
-        
+
         if (type.contains("[")) {
             type = type.substring(0, type.length() - "[]".length());
             isArr = true;
         }
         try {
-            Class<?> c = Vstatics.classForName(type);           
+            Class<?> c = Vstatics.classForName(type);
             if (c == null) {throw new Exception("Class not found: " + type);}
-            
+
             Constructor<?>[] constructors = c.getConstructors();
-            
+
             // The first constructor should be the default, no argument one
             for (Constructor constructor : constructors) {
                 if (constructor.getParameterTypes().length == 0) {
@@ -518,7 +517,7 @@ public class VGlobals {
         } catch (Exception e) {
             log.error(e);
         }
-        
+
         // TODO: Fix the call to VsimkitObjects someday
 //        if (o == null) {
 //            try {
@@ -627,7 +626,7 @@ public class VGlobals {
             {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
             {"RandomNumber", "RandomVariate"}, {}
     };
-    
+
     /** @param ty the type to check if primitive or array
      * @return true if primitive or array
      */
@@ -638,7 +637,7 @@ public class VGlobals {
         }
         return isPrimitive(ty);
     }
-    
+
     /** @param ty the type to check if primitive type
      * @return true if primitive type
      */
@@ -650,7 +649,7 @@ public class VGlobals {
         }
         return false;
     }
-    
+
     /** @param ty the type to check if member of java.lang.*
      * @return true if member of java.lang.*
      */
@@ -662,7 +661,7 @@ public class VGlobals {
         }
         return false;
     }
-    
+
     /** The simple (basic) class name is required for this
      * @param ty the type to check if member of java.util.*
      * @return true if member of java.util.*
@@ -674,8 +673,8 @@ public class VGlobals {
             }
         }
         return false;
-    }    
-    
+    }
+
     /**@param ty the type to check if member of simkit.random.*
      * @return true if member of simkit.random.*
      */
@@ -687,7 +686,7 @@ public class VGlobals {
         }
         return false;
     }
-    
+
     Pattern bracketsPattern = Pattern.compile("\\[.*?\\]");
     Pattern spacesPattern = Pattern.compile("\\s");
 
@@ -744,7 +743,7 @@ public class VGlobals {
         popup = new JPopupMenu();
         JMenu m;
         JMenuItem mi;
-       
+
         for (int i = 0; i < morePackages.length; i++) {
             if (moreClasses[i].length <= 0) {           // if no classes, make the "package selectable
                 mi = new MyJMenuItem(morePackages[i], null);
@@ -776,7 +775,7 @@ public class VGlobals {
     public void setRunPanel(RunnerPanel2 runPanel) {
         this.runPanel = runPanel;
     }
-    
+
     public ViskitProject getCurrentViskitProject() {
         return currentViskitProject;
     }
@@ -784,12 +783,12 @@ public class VGlobals {
     public void setCurrentViskitProject(ViskitProject currentViskitProject) {
         this.currentViskitProject = currentViskitProject;
     }
-        
+
     /**
      * @return a working directory which is now non null and exists in the
      * filesystem
      */
-    public File getWorkDirectory() {        
+    public File getWorkDirectory() {
         return workDirectory;
     }
 
@@ -817,13 +816,13 @@ public class VGlobals {
         }
         workDirectory = currentViskitProject.getClassDir();
     }
-    
+
     private ClassLoader workLoader;
 
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
             URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
-            
+
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());
@@ -837,17 +836,17 @@ public class VGlobals {
     }
 
     /**
-     * Returns a reset classloader.  Use very carefully.  
-     * Warning - Can cause unwanted recursive jar creation for every EG found 
+     * Returns a reset classloader.  Use very carefully.
+     * Warning - Can cause unwanted recursive jar creation for every EG found
      * if reset causing JVM bog down.
      * @param reboot if true, reset the working class loader
      * @return a reset classloader
      */
-    public ClassLoader getResetWorkClassLoader(boolean reboot) {        
+    public ClassLoader getResetWorkClassLoader(boolean reboot) {
         if (reboot) {resetWorkClassLoader();}
         return getWorkClassLoader();
     }
-    
+
     /** @return a model to print a stack trace of calling classes and their methods */
     public String printCallerLog() {
         StringBuilder sb = new StringBuilder();
@@ -855,7 +854,7 @@ public class VGlobals {
         sb.append("\nCalling method: " + new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
         return sb.toString();
     }
-    
+
     private SysExitHandler sysexithandler = new SysExitHandler() {
 
         public void doSysExit(int status) {
@@ -863,7 +862,7 @@ public class VGlobals {
             log.debug("Viskit is exiting with status: " + status);
 
             /* If an application launched a JVM, and is still running, this will
-             * only make Viskit disappear.  If Viskit is running standalone, 
+             * only make Viskit disappear.  If Viskit is running standalone,
              * then then all JFrames created by Viskit will dispose, and the JVM
              * will then cease.
              * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
@@ -873,29 +872,29 @@ public class VGlobals {
             int count = 0;
             for (Frame f : frames) {
                 log.debug("Frame count in Viskit: " + (++count));
-                
-                /* Prevent non-viskit created components from disposing if 
-                 * launched from another application.  SwingUtilities is a 
-                 * little "ify" though as it's not Viskit specific.  Viskit, 
-                 * however, spawns a lot of anonymous Runnables with 
+
+                /* Prevent non-viskit created components from disposing if
+                 * launched from another application.  SwingUtilities is a
+                 * little "ify" though as it's not Viskit specific.  Viskit,
+                 * however, spawns a lot of anonymous Runnables with
                  * SwingUtilities
                  */
                 if (f.toString().toLowerCase().contains("viskit")) {
                     log.debug("Frame is: " + f);
                     f.dispose();
                 }
-                if (f.toString().contains("SwingUtilities")) {                    
+                if (f.toString().contains("SwingUtilities")) {
                     log.debug("Frame is: " + f);
                     f.dispose();
                 }
-                
+
                 // Case for XMLTree JFrames
                 if (f.getTitle().contains("xml")) {
                     log.debug("Frame is: " + f);
                     f.dispose();
                 }
             }
-            
+
             /* The SwingWorker Thread is active when the assembly runner is
              * running and will subsequently block a JVM exit due to its "wait"
              * state.  Must interrupt it in order to cause the JVM to exit
@@ -910,8 +909,8 @@ public class VGlobals {
                 }
                 // Now attempt to release the URLClassLoader's file lock on open JARs
                 t.setContextClassLoader(ClassLoader.getSystemClassLoader());
-            }            
-        }        
+            }
+        }
     };
 
     public void setSysExitHandler(SysExitHandler handler) {
@@ -923,7 +922,7 @@ public class VGlobals {
     }
 
     /** Called to perform proper thread shutdown without calling System.exit(0)
-     * 
+     *
      * @param status the status of JVM shutdown
      */
     public void sysExit(int status) {
@@ -948,7 +947,7 @@ public class VGlobals {
     public void setSysExitCalled(boolean sysExitCalled) {
         this.sysExitCalled = sysExitCalled;
     }
-    
+
     /**
      * Small class to hold on to the fully-qualified class name, while displaying only the
      * un-qualified name;
@@ -966,7 +965,7 @@ public class VGlobals {
             return fullName;
         }
     }
-    
+
     class myTypeListener implements ActionListener, ItemListener {
 
         public void itemStateChanged(ItemEvent e) {
@@ -998,7 +997,7 @@ public class VGlobals {
     class myTypeListRenderer extends JLabel implements ListCellRenderer {
         //Font specialFont = getFont().deriveFont(Font.ITALIC);
 
-        public Component getListCellRendererComponent(JList list, Object value, 
+        public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             JLabel lab = new JLabel(value.toString());
             if (value.toString().equals(moreTypesString)) {

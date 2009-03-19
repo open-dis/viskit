@@ -477,20 +477,24 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void newProject() {
-        String msg = "Are you sure you want to close your current Viskit Project?";
-        String title = "Close Current Project";
+        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+            String msg = "Are you sure you want to close your current Viskit Project?";
+            String title = "Close Current Project";
 
-        int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
-        if (ret == JOptionPane.YES_OPTION) {
-            doProjectCleanup();
-            VGlobals.instance().initProjectHome();
+            int ret = ((ViskitAssemblyView) getView()).genericAskYN(title, msg);
+            if (ret == JOptionPane.YES_OPTION) {
+                doProjectCleanup();
+            } else {
+                return;
+            }
         }
+        VGlobals.instance().initProjectHome();
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
     }
 
-    private void doProjectCleanup() {
+    public void doProjectCleanup() {
         closeAll();
         ViskitConfig.instance().clearViskitConfig();
         clearRecentAssyFileList();
@@ -499,7 +503,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void openProject(File file) {
-        doProjectCleanup();
         ViskitConfig vConfig = ViskitConfig.instance();
         ViskitProject.MY_VISKIT_PROJECTS_DIR = file.getParent().replaceAll("\\\\", "/");
         vConfig.setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -1298,7 +1301,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 return null;
             }
             return compileJavaClassAndSetPackage(src);
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }

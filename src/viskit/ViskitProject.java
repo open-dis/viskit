@@ -98,6 +98,7 @@ public class ViskitProject {
     private File classDir;
     private boolean projectFileExists = false;
     private boolean dirty;
+    private boolean projectOpen = false;
     private Document projectDocument;
 
     public ViskitProject(File projectRoot) {
@@ -133,9 +134,14 @@ public class ViskitProject {
         setBuildDir(new File(projectRoot, BUILD_DIRECTORY_NAME));
 
         // Start with a fresh build directory
-        if (getBuildDir().exists()) {
-            clean();
-        }
+//        if (getBuildDir().exists()) {
+//            clean();
+//        }
+
+        // NOTE: If the project's build directory got nuked and we have
+        // cached our EGs and classes with MD5 hash, we'll throw a
+        // ClassNotFoundException.  Caching of EGs is a convenience for large
+        // directorys of EGs that take time to compile the first time
 
         setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
         if (!srcDir.exists()) {
@@ -161,6 +167,7 @@ public class ViskitProject {
             projectFileExists = true;
         }
         ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        setProjectOpen(true);
         return projectFileExists;
     }
 
@@ -288,6 +295,7 @@ public class ViskitProject {
         ViskitConfig vConfig = ViskitConfig.instance();
         vConfig.cleanup();
         vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
+        setProjectOpen(false);
     }
 
     public File getProjectRoot() {
@@ -353,6 +361,8 @@ public class ViskitProject {
 
         } catch (IOException ex) {
             log.error(ex);
+        } catch (NullPointerException npe) {
+            return null;
         }
         return cp.toArray(new String[cp.size()]);
     }
@@ -509,6 +519,20 @@ public class ViskitProject {
      */
     public void setBuildDir(File buildDir) {
         this.buildDir = buildDir;
+    }
+
+    /**
+     * @return indication of the projectOpen
+     */
+    public boolean isProjectOpen() {
+        return projectOpen;
+    }
+
+    /**
+     * @param projectOpen the projectOpen to set
+     */
+    public void setProjectOpen(boolean projectOpen) {
+        this.projectOpen = projectOpen;
     }
 
     private static class ViskitProjectFileView extends FileView {

@@ -44,9 +44,9 @@ public class ViskitConfig {
     public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX = GUI_BEANSHELL_ERROR_DIALOG + ".preferencescheckbox";
     public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP = GUI_BEANSHELL_ERROR_DIALOG + ".preferencestooltip";
     public static final String BEANSHELL_WARNING = "app.beanshell.warning";
-    public static final String PROJECT_HOME_KEY = "app.projecthome";
-    public static final String PROJECT_PATH_KEY = PROJECT_HOME_KEY + ".path[@dir]";
-    public static final String PROJECT_NAME_KEY = PROJECT_HOME_KEY + ".name[@value]";
+    public static final String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
+    public static final String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
+    public static final String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
     public static final String X_CLASS_PATHS_CLEAR_KEY = "extraClassPaths";
     public static final String X_CLASS_PATHS_PATH_KEY = X_CLASS_PATHS_CLEAR_KEY + ".path";
     public static final String X_CLASS_PATHS_KEY = X_CLASS_PATHS_PATH_KEY + "[@value]";
@@ -62,6 +62,9 @@ public class ViskitConfig {
     public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
     public static final String CACHED_CLEAR_KEY = "Cached";
+
+    /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
+    public static final String CACHED_WORKING_DIR_KEY = CACHED_CLEAR_KEY + "[@workDir]";
     public static final String CACHED_EVENTGRAPHS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@xml]";
     public static final String CACHED_EVENTGRAPHS_CLASS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@class]";
     public static final String CACHED_MISS_FILE_KEY = CACHED_CLEAR_KEY + ".Miss[@file]";

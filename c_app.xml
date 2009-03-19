@@ -14,7 +14,7 @@
         </AssemblyEditor>
         <projecthome>
             <!-- These two attributes MUST always be at least zero length Strings -->
-            <path dir="" />
+            <path dir=""/>
             <name value=""/>
         </projecthome>
         <tabs>

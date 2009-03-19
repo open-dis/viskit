@@ -36,12 +36,11 @@ package viskit;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-/** 
+/**
  * Edit this GUI with Netbeans Matisse
- * 
+ *
  * @author Mike Bailey
  * @since Aug 2008
  * @version $Id: $
@@ -142,28 +141,8 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
   }// </editor-fold>//GEN-END:initComponents
 
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
-    JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle("Open Viskit Project (directory)");
-    //chooser.addChoosableFileFilter(new ProjectFilter());
-    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    chooser.setCurrentDirectory(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-    boolean foundProject = false;
-    File selectedFile;
-    do {
-        int ret = chooser.showOpenDialog(null);
-        if (ret != JFileChooser.APPROVE_OPTION) {
-            return;  // back to button panel
-        }
-        selectedFile = chooser.getSelectedFile();
-        foundProject = ViskitProject.isViskitProject(selectedFile);
-        if (!foundProject) {
-            JOptionPane.showMessageDialog(dialog, "Not a Viskit project (directory)");
-        }
-    } while (!foundProject);
-
-    // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
-    setupViskitProject(selectedFile);
+    ((ViskitAssemblyView) VGlobals.instance().getAssemblyController().getView()).openProject();
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
@@ -197,7 +176,7 @@ private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     defaultButtActionPerformed(null);
 
     // I don't like the idea of a SysExit call right here, but the way each
-    // frame component needs to develop while starting Viskit; each has to 
+    // frame component needs to develop while starting Viskit; each has to
     // finish before the VGlobals.instance().sysExit(0) call will work
     // properly, so, reluctantly...
     System.exit(0);

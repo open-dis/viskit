@@ -22,7 +22,6 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
-import java.net.URL;
 import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
@@ -1000,16 +999,24 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public void openProject() {
-        String msg = "Are you sure you want to close your current Viskit Project?";
-        String title = "Close Current Project";
+        int ret = -1;
+        AssemblyController aController = ((AssemblyController) getController());
+        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+            String msg = "Are you sure you want to close your current Viskit Project?";
+            String title = "Close Current Project";
 
-        int ret = genericAskYN(title, msg);
-        if (ret == JOptionPane.YES_OPTION) {
-            File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-            if (file != null) {
-                ((AssemblyController) getController()).openProject(file);
+            ret = genericAskYN(title, msg);
+            if (ret == JOptionPane.YES_OPTION) {
+                aController.doProjectCleanup();
+            } else {
+                return;
             }
-        }        
+        }
+
+        File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        if (file != null) {
+            aController.openProject(file);
+        }
     }
 
     private File getUniqueName(String suggName) {

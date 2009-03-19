@@ -117,31 +117,55 @@ public class LocalBootLoader extends URLClassLoader {
     /** @return a custom ClassLoader */
     public LocalBootLoader init() {
         File jar;
+
         //System.out.println("Stage1 start init ");
         initStage1();
+
         stage1.allowAssembly = this.allowAssembly;
+
         jar = buildCleanWorkJar();
         
         //stage1 gets dirty during bring up of clean jar
         //reboot it with cleanWorkJar
         //System.out.println("Stage1 reinit ");
-        initStage1();
+//        initStage1();
         //System.out.println("Adding cleaned jar "+jar);
+
+        // Now add any external classpaths
         for (URL ext : extUrls) {
             stage1.addURL(ext);
             String[] tmp = new String[getClassPath().length + 1];
             System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
             try {
-                tmp[tmp.length - 1] = new File(ext.toURI()).getCanonicalPath();
+                tmp[tmp.length - 1] = ext.toURI().getPath();
                 classPath = tmp;
-            } catch (IOException ex) {
-                ex.printStackTrace();
             } catch (URISyntaxException ex) {
                 ex.printStackTrace();
             }
         }
+        
+        // Now add our project's working directory, i.e. build/classes
+        try {
+
+            stage1.addURL(getWorkDir().toURI().toURL());
+            String[] tmp = new String[getClassPath().length + 1];
+            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            try {
+                tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
+                classPath = tmp;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+
+        // Now add our tmp jars containing compiled EGs and Assemblies
         try {
             if (jar != null)  {
+
+                // If this is the first time through, and no cached EGs, we are
+                // now adding our project's build/classes path here
                 stage1.addURL(jar.toURI().toURL());
                 String[] tmp = new String[getClassPath().length + 1];
                 System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
@@ -155,7 +179,16 @@ public class LocalBootLoader extends URLClassLoader {
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         }
-        stage1.classPath = getClassPath();
+
+        // Now normalize all the paths in the classpath variable[]
+        String[] tempClasspath = new String[getClassPath().length];
+        int idx = 0;
+        for (String path : classPath) {
+            tempClasspath[idx] = path.replaceAll("\\\\", "/");
+            idx++;
+        }
+
+        stage1.classPath = tempClasspath;
         return stage1;
     }
 
@@ -215,7 +248,7 @@ public class LocalBootLoader extends URLClassLoader {
         this.reloadSimkit = reload;
     }
 
-    /** Recursively creates new instances of LocalBootLoader */
+    /** Creates new instances of the stage1 LocalBootLoader */
     private void initStage1() {
         String classPathProp = System.getProperty("java.class.path");
         String pathSep = System.getProperty("path.separator");
@@ -223,7 +256,7 @@ public class LocalBootLoader extends URLClassLoader {
         ClassLoader parentClassLoader = getParent();
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
 
-        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, workDir);
+        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -240,7 +273,7 @@ public class LocalBootLoader extends URLClassLoader {
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, workDir);
+                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
             } catch (Exception e) { // should probably be class not found exception
                 loop = false;
             }
@@ -252,7 +285,7 @@ public class LocalBootLoader extends URLClassLoader {
             //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
-            }
+            } 
             stage1.classPath = getClassPath();
         }
     }
@@ -260,8 +293,9 @@ public class LocalBootLoader extends URLClassLoader {
     private File buildCleanWorkJar() {
         File newJar = null;
         try {
-            File currentDir = workDir;
-            if (currentDir == null) {return null;}
+
+            // Don't jar up an empty build/classes directory
+            if (getWorkDir().listFiles().length == 0) {return null;}
             
             // This will for sure delete the temp "cruf" that we generate
             File newDir = TempFileManager.createTempFile("viskit", "working");
@@ -270,10 +304,10 @@ public class LocalBootLoader extends URLClassLoader {
                         
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
-            stage1.addURL(currentDir.toURI().toURL());
+            stage1.addURL(getWorkDir().toURI().toURL());
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
-            newJar = makeJarFileFromDir(currentDir, newDir);
+            newJar = makeJarFileFromDir(getWorkDir(), newDir);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -296,9 +330,9 @@ public class LocalBootLoader extends URLClassLoader {
             jos.flush();
             jos.close();
         } catch (java.util.zip.ZipException ze) {
+
+            // could be first time through; caused by no entries in the jar
             return dir2jar;
-            
-        // could be first time through
         } catch (IOException ex) {
             ex.printStackTrace();
         } 

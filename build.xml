@@ -426,8 +426,13 @@
     <target name="fresh.diskit" description="diskit module">
         <echo message="Building Diskit:"/>
         <ant dir="${dir.diskit}" target="jar" inheritAll="false"/>
-        <copy file="${dir.diskit}/lib/dis.jar" todir="${dir.lib.ext}"/>
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/>
+        <copy todir="${dir.lib.ext}">
+            <fileset dir="${dir.diskit}/lib">
+                <include name="open-dis.jar"/>
+                <include name="dis-enums.jar"/>
+            </fileset>
+        </copy>
     </target>
 
     <!-- just add new modules to the depends variable here -->
@@ -549,8 +554,7 @@
                 <include name="jdom.jar"/>
             </fileset>
             <fileset dir="${dir.lib.ext}">
-                <include name="diskit.jar"/>
-                <include name="dis.jar"/>
+                <include name="*.jar"/>
             </fileset>
             <!--fileset refid="jaxb.classes"/-->
             <fileset dir="${env.JAVA_HOME}/lib">
@@ -1133,12 +1137,13 @@
     <!--  === TARGET: clean === -->
     <target name="clean"
             depends="init"
-            description="Deletes build directory, javadoc and dist directories, and lib/ext/diskit.jar">
+            description="Deletes build directory, javadoc and dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
         <delete dir="${dir.dist}"/>
-        <delete file="${dir.lib.ext}/dis.jar"/>
-        <delete file="${dir.lib.ext}/diskit.jar"/>
+        <delete dir="${dir.lib.ext}">
+            <include name="*.jar"/>
+        </delete>
     </target>
 
     <!--target name="delete.temps.cache" depends="init"-->

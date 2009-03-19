@@ -117,9 +117,10 @@ public class FileBasedClassManager implements Runnable {
 
                     setFileBasedAssemblyNode(f);
 
-                    // Cacheing good files is more trouble than it's worth right now
-                    // We'll suffer with startup recompilations; they're quick now
-//                    addCache(f, fban.classFile);
+                    // TODO: work situtation where another build/classes gets added
+                    // to the classpath as it won't readily been seen before the
+                    // project's build/classes is.  This causes ClassNotFoundExceptions
+                    addCache(f, fban.classFile);
                 }
 
             // It's cached
@@ -200,6 +201,15 @@ public class FileBasedClassManager implements Runnable {
                     log.debug("cache size " + cache.size());
                 }
             }
+
+            // TODO: Not used right now, but may be useful for other build/classes paths
+//            if (cache.isEmpty()) {
+//                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                if (viskit.Vstatics.debug) {
+//                    log.debug("Cache is empty, creating workDir entry at " + s);
+//                }
+//                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
+//            }
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
             }
