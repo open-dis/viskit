@@ -305,6 +305,7 @@ public class LocalBootLoader extends URLClassLoader {
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
             stage1.addURL(getWorkDir().toURI().toURL());
+            
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
             newJar = makeJarFileFromDir(getWorkDir(), newDir);

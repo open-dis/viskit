@@ -825,6 +825,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 ex.printStackTrace();
             }
         }
+
+        // TODO: Determine if these actually work they way you intend them too?
         System.runFinalization();
         System.gc();
     }
