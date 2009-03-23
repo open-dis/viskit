@@ -110,7 +110,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             try {
                 Unmarshaller u = jc.createUnmarshaller();
 
-                // Check for inadvertant opening of an EG, tough to do, yet possible
+                // Check for inadvertant opening of an EG, tough to do, yet possible (bugfix 1248)
                 try {
                     jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 } catch (ClassCastException cce) {
