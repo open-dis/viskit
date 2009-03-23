@@ -109,7 +109,17 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
-                jaxbRoot = (SimkitAssembly) u.unmarshal(f);
+
+                // Check for inadvertant opening of an EG, tough to do, yet possible
+                try {
+                    jaxbRoot = (SimkitAssembly) u.unmarshal(f);
+                } catch (ClassCastException cce) {
+                    // If we get here, they've tried to load an event graph.
+                    JOptionPane.showMessageDialog(null, "Use the event graph editor to" +
+                            "\n" + "work with this file.",
+                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
 
                 GraphMetaData mymetaData = new GraphMetaData(this);
                 mymetaData.version = jaxbRoot.getVersion();
@@ -132,24 +142,13 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
             } catch (JAXBException e) {
-                // want a clear way to know if they're trying to load an event graph
-                try {
-                    JAXBContext egCtx = JAXBContext.newInstance("viskit.xsd.bindings");
-
-                    Unmarshaller um = egCtx.createUnmarshaller();
-                    um.unmarshal(f);
-                    // If we get here, they've tried to load an event graph.
-                    JOptionPane.showMessageDialog(null, "Use the event graph editor to" +
-                            "\n" + "work with this file.",
-                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
-                } catch (JAXBException ee) {
-                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling" +
+                JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
                             "\n" + e.getMessage() +
                             "\nin AssemblyModel.newModel(File)",
                             "XML I/O Error", JOptionPane.ERROR_MESSAGE);
-                }
-                return false; // from both exceptions
+
+                return false;
             }
         }
 
