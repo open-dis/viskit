@@ -22,7 +22,6 @@ import edu.nps.util.TempFileManager;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import viskit.ModelEvent;
-import viskit.VGlobals;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
