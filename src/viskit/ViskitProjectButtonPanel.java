@@ -37,6 +37,7 @@ import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import viskit.mvc.mvcController;
 
 /**
  * Edit this GUI with Netbeans Matisse
@@ -142,7 +143,15 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
     defaultButtActionPerformed(null);
-    ((ViskitAssemblyView) VGlobals.instance().getAssemblyController().getView()).openProject();
+    ViskitAssemblyView vaw = null;
+    mvcController vac = VGlobals.instance().getAssemblyController();
+    if (vac != null) {
+        vaw =  (ViskitAssemblyView) vac.getView();
+        
+        if (vaw != null) {
+            vaw.openProject();
+        }
+    }
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
