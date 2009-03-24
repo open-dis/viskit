@@ -712,7 +712,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     if (path.endsWith(".jar")) {
                         lTree.addContentRoot(file);
 
-                    // A new project may contain an empty EventGraphs directory
+                    // f may be an empty directory
                     } else if (file.listFiles().length == 0) {
                         continue;
 
@@ -912,7 +912,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     public void addToEventGraphPallette(File f, boolean b) {
-        lTree.addContentRoot(f, b);
+        // f may be an empty directory
+        if (f.exists() && !f.isDirectory()) {
+            lTree.addContentRoot(f, b);
+        }
     }
 
     public void addToPropChangePallette(File f, boolean b) {
