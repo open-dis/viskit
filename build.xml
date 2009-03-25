@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Seems to render in Mozilla Firefox the best.  Broken in IE7 -->
+<?xml-stylesheet type="text/xsl" href="./ant2html.xsl"?>
+
 <project basedir="." default="build.run.no.runtime.extensions" name="Viskit">
     <description>
         Ant build file for the NPS Viskit and associated libraries. Third-party
