@@ -487,9 +487,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
         }
         VGlobals.instance().initProjectHome();
-
-        // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
     }
 
     public void doProjectCleanup() {
