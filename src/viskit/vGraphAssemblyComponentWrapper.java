@@ -64,8 +64,6 @@ import viskit.jgraph.vGraphAssemblyComponent;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.ViskitAssemblyModel;
 
-import org.apache.log4j.Logger;
-
 /**
  * A class to serve as the jgraph object, while carrying other objects needed 
  * for the gui
@@ -84,8 +82,6 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class vGraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
-
-    static Logger log = Logger.getLogger(vGraphAssemblyComponentWrapper.class);
     
     public ViskitAssemblyModel model;
     public JSplitPane drawingSplitPane;

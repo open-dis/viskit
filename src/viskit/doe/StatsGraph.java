@@ -39,8 +39,6 @@ import java.util.Hashtable;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import org.apache.log4j.Logger;
-//import org.jfree.util.SortOrder;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -69,10 +67,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * @since April 20, 2006, 11:19 AM
  */
 public class StatsGraph extends JPanel {
-    
-    /** instance of the log4j Logger */
-    static Logger log = Logger.getLogger(StatsGraph.class);
-    
+        
     String[] properties;
     int designPoints;
     int samples;

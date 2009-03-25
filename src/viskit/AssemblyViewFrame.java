@@ -22,12 +22,12 @@ import javax.swing.tree.TreePath;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.AssemblyFileFilter;
+import edu.nps.util.LogUtils;
 import java.util.Set;
 import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangeListenerIcon;
@@ -51,8 +51,6 @@ import viskit.mvc.mvcModelEvent;
  */
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener {
 
-    /** log4j log instance */
-    static Logger log = Logger.getLogger(AssemblyViewFrame.class);
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
     public static final int ADAPTER_MODE = 1;
@@ -463,7 +461,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         if (propChangeListenerMode.isSelected()) {
             return PCL_MODE;
         }
-        log.error("assert false : \"getCurrentMode()\"");
+        LogUtils.getLogger().error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -642,8 +640,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            log.error("Drop target init. error");
-            log.error(tmle);
+            LogUtils.getLogger().error("Drop target init. error");
+            LogUtils.getLogger().error(tmle);
         }
 
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
@@ -727,8 +725,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
         VGlobals vGlobals = VGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
-        addToEventGraphPallette(new File(vkp.getProjectRoot(),
-                vkp.getEventGraphDir().getName()), true);
+        addToEventGraphPallette(vkp.getEventGraphsDir(), true);
 
         LegosPanel lPan = new LegosPanel(lTree);
 
@@ -913,7 +910,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public void addToEventGraphPallette(File f, boolean b) {
         // f may be an empty directory
-        if (f.exists() && !f.isDirectory()) {
+        if (f.exists() && f.listFiles().length > 0) {
             lTree.addContentRoot(f, b);
         }
     }
@@ -954,7 +951,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         // Try to open in the current project directory for Assemblies
         if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssemblyDir());
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
@@ -1053,7 +1050,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
 
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssemblyDir(), suggName);
+        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }

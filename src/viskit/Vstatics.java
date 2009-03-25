@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.LogUtils;
 import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -44,7 +45,6 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
-import org.apache.log4j.Logger;
 import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 
 import viskit.doe.LocalBootLoader;
@@ -63,7 +63,6 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class Vstatics {
     
-    static Logger log = Logger.getLogger(Vstatics.class);
     public static boolean debug = false;
 
     /**
@@ -396,7 +395,7 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                log.info("Not yet resolving type: " + type + ".  Likely, an " +
+                LogUtils.getLogger().info("Not yet resolving type: " + type + ".  Likely, an " +
                         "Assembly is opening in Viskit before a parse of the " +
                         "EventGraph classpath");
                 return resolved;

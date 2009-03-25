@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.FileWriter;
@@ -47,7 +48,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -68,7 +68,6 @@ import viskit.xsd.assembly.ScatterPlotChartDrawer;
  */
 public class AnalystReportBuilder {
 
-    static Logger log = Logger.getLogger(AnalystReportBuilder.class);
     private boolean debug = false;
 
     /** UTH - Assembly file */
@@ -118,7 +117,7 @@ public class AnalystReportBuilder {
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
-            log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
+            LogUtils.getLogger().error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
         initDocument();
@@ -138,12 +137,12 @@ public class AnalystReportBuilder {
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, File assyFile) throws Exception {
         this.aRPanel = aRPanel;
         parseXML(xmlFile);
-        log.debug("Successful parseXML");
+        LogUtils.getLogger().debug("Successful parseXML");
         if (assyFile != null) {
             setAssemblyFile(assyFile);
-            log.debug("Successful setting of assembly file");
+            LogUtils.getLogger().debug("Successful setting of assembly file");
             postProcessing();
-            log.debug("Successful post processing of Analyst Report");
+            LogUtils.getLogger().debug("Successful post processing of Analyst Report");
         }
     }
 
@@ -155,7 +154,7 @@ public class AnalystReportBuilder {
         try {
             parseXML(fullReport);
         } catch (Exception ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         }
     }
 
@@ -266,7 +265,7 @@ public class AnalystReportBuilder {
             try {
                 simConfig.addContent(EventGraphCache.instance().getEntityTable());
             } catch (Exception e) {
-                log.error("Error reading assembly file: " + e.getMessage());
+                LogUtils.getLogger().error("Error reading assembly file: " + e.getMessage());
             }
         }
 
@@ -676,27 +675,27 @@ public class AnalystReportBuilder {
             for (Element dataPoint : dataPoints) {
                 String dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
-                    log.debug("entry is: " + entry);
+                    LogUtils.getLogger().debug("entry is: " + entry);
                     Object obj;
                     if (entry.toString().contains("PropChangeListenerNode")) {
 
                         obj = getPclNodeCache().get(entry.getKey());
                         try {
-                            log.debug("AR obj is: " + obj);
+                            LogUtils.getLogger().debug("AR obj is: " + obj);
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStat = isCount ? "count" : "mean";
-                            log.debug("AR typeStat is: " + typeStat);
+                            LogUtils.getLogger().debug("AR typeStat is: " + typeStat);
                             break;
                         } catch (IllegalAccessException ex) {
-                            log.error(ex);
+                            LogUtils.getLogger().error(ex);
                         } catch (IllegalArgumentException ex) {
-                            log.error(ex);
+                            LogUtils.getLogger().error(ex);
                         } catch (InvocationTargetException ex) {
-                            log.error(ex);
+                            LogUtils.getLogger().error(ex);
                         } catch (NoSuchMethodException ex) {
-                            log.error(ex);
+                            LogUtils.getLogger().error(ex);
                         } catch (SecurityException ex) {
-                            log.error(ex);
+                            LogUtils.getLogger().error(ex);
                         }
                     }
                 }
@@ -731,7 +730,7 @@ public class AnalystReportBuilder {
                         entity.addContent(repRecord);
 
                         // Add the raw count, or mean of replication data to the chart generators
-                        log.debug(replication.getAttributeValue(typeStat));
+                        LogUtils.getLogger().debug(replication.getAttributeValue(typeStat));
                         data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
                         idx++;
                     }
@@ -739,14 +738,12 @@ public class AnalystReportBuilder {
                     histogramChartURL = new Element("HistogramChartURL");
                     scatterPlotChartURL = new Element("ScatterPlotChartURL");
 
-                    String filename = axisLabel;
-
-                    histogramChartURL.setAttribute("dir", histogramChart.createHistogram(chartTitle, axisLabel, data, filename));
+                    histogramChartURL.setAttribute("dir", histogramChart.createHistogram(chartTitle, axisLabel, data));
                     entity.addContent(histogramChartURL);
                     
                     // data[] must be > than length 1 for scatter regression
                     if (data.length > 1) {
-                        scatterPlotChartURL.setAttribute("dir", scatterPlotChart.createScatterPlot(chartTitle, axisLabel, data, filename));
+                        scatterPlotChartURL.setAttribute("dir", scatterPlotChart.createScatterPlot(chartTitle, axisLabel, data));
                         entity.addContent(scatterPlotChartURL);
                     }
 
@@ -983,14 +980,14 @@ public class AnalystReportBuilder {
         aRPanel.add(jpb);
         aRPanel.validate();
 
-        log.debug("JProgressBar set");
+        LogUtils.getLogger().debug("JProgressBar set");
 
         captureEventGraphImages();
-        log.debug("EGs captured");
+        LogUtils.getLogger().debug("EGs captured");
         captureAssemblyImage();
-        log.debug("Assembly captured");
+        LogUtils.getLogger().debug("Assembly captured");
         captureLocationImage();
-        log.debug("Location Image captured");
+        LogUtils.getLogger().debug("Location Image captured");
 
         jpb.setIndeterminate(false);
         jpb.setStringPainted(false);
@@ -1000,7 +997,7 @@ public class AnalystReportBuilder {
 
     /** Utility method used here to invoke the capability to capture all Event
      * Graph images of which are situated in a particular Assembly File.  These
-     * PNGs will be dropped into ./AnalystReports/images/EventGraphs </p>
+     * PNGs will be dropped into ${viskitProject}/AnalystReports/images/EventGraphs </p>
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
@@ -1010,13 +1007,14 @@ public class AnalystReportBuilder {
 
     /** Utility method used here to invoke the capability to capture the
      * Assembly image of the loaded Assembly File.  This PNG will be dropped
-     * into ./AnalystReports/images/Assemblies </p>
+     * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
-        String assemblyImageDir = System.getProperty("user.dir") + "/AnalystReports/images/Assemblies/";
+        String assemblyImageDir = 
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportAssemblyImagesDir().getAbsolutePath();
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
         String assyFileName = getAssemblyFile().getName();
-        setAssemblyImageLocation(assemblyImageDir + assyFileName + ".png");
+        setAssemblyImageLocation(assemblyImageDir + "/" + assyFileName + ".png");
         VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
     }
 
@@ -1036,13 +1034,15 @@ public class AnalystReportBuilder {
         if (baseName.contains("_")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("_"));
         }
-        String locationImagePath = System.getProperty("user.dir") + "/AnalystReports/images" + baseName + ".png";
+        String locationImagePath = 
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir() +
+                baseName + ".png";
         locationImagePath = locationImagePath.replaceAll("\\\\", "/");
-        log.debug(locationImagePath);
+        LogUtils.getLogger().debug(locationImagePath);
         if (new File(locationImagePath).exists()) {
             setLocationImage(locationImagePath);
         }
-        log.debug(getLocationImage());
+        LogUtils.getLogger().debug(getLocationImage());
     }
 
     public void setFileName          (String fileName)           { this.fileName = fileName; }
@@ -1132,11 +1132,11 @@ public class AnalystReportBuilder {
     public String  getSimConfigProductionNotes() {return unMakeProductionNotes(simConfig);}
     public String  getAssemblyImageLocation()    {return unMakeImage(simConfig, "Assembly");}
 
-    public void    setSimConfigurationDescription       (String s) { makeComments(simConfig, "SC", s); }
-    public void    setSimConfigEntityTable    (String s) { }; //todo
-    public void    setSimConfigurationConclusions       (String s) { makeConclusions(simConfig, "SC", s); }
+    public void    setSimConfigurationDescription  (String s) { makeComments(simConfig, "SC", s); }
+    public void    setSimConfigEntityTable         (String s) { }; //todo
+    public void    setSimConfigurationConclusions  (String s) { makeConclusions(simConfig, "SC", s); }
     public void    setSimConfigationProductionNotes(String s) {makeProductionNotes(simConfig, "SC", s);}
-    public void    setAssemblyImageLocation   (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
+    public void    setAssemblyImageLocation        (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
 
     // stat results:
     // good

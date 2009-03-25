@@ -14,12 +14,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import edu.nps.util.LogUtils;
+import java.io.IOException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import simkit.stat.SampleStatistics;
+import viskit.VGlobals;
+import viskit.ViskitProject;
 
 /** 
  * This class serves as the intermediate step between viskit.xsd.BasicAssembly and
@@ -41,8 +44,6 @@ import simkit.stat.SampleStatistics;
  * @version $Id$
  */
 public class ReportStatisticsConfig {
-
-    static Logger log = Logger.getLogger(ReportStatisticsConfig.class);
 
     /**
      * The ordered list of Entities in the simulation that have property change
@@ -91,8 +92,7 @@ public class ReportStatisticsConfig {
      * index of entities and properties
      * @param keyValues 
      */
-    public void setEntityIndex(LinkedList<String> keyValues)
-    {
+    public void setEntityIndex(LinkedList<String> keyValues) {
         entityIndex = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
       
@@ -124,7 +124,7 @@ public class ReportStatisticsConfig {
      * EntityName and the Property Name
      *
      * @param str the string entry for the name of a property change listener
-     * @return 
+     * @return the index of the underscore
      */
     private int findUnderscore(String str) {
         char letter;
@@ -145,7 +145,7 @@ public class ReportStatisticsConfig {
      * @param repStats 
      */
     public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
-        log.debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+        LogUtils.getLogger().debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[repStats.length];
 
@@ -217,27 +217,31 @@ public class ReportStatisticsConfig {
         today = new Date();
         output = formatter.format(today);
 
+        FileWriter writer = null;
         try {
             XMLOutputter outputter = new XMLOutputter();
             Format fmt = Format.getPrettyFormat();
             outputter.setFormat(fmt);
             
             // Create a unique file name for each DTG/Location Pair
-            File anStatDir = new File("./AnalystReports/statistics");
-            anStatDir.mkdirs();
+            ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+            File anStatDir = vkp.getAnalystReportStatisticsDir();
 
             String outputFile = (author + assemblyName + "_" + output + ".xml");
             File f = new File(anStatDir, outputFile);
-            FileWriter writer = new FileWriter(f);
+            writer = new FileWriter(f);
 
             outputter.output(report, writer);
 
-            writer.close();
             return f.getAbsolutePath();
 
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
             return null;
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException ioe) {}
         }
     }
 }

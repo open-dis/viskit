@@ -1,5 +1,6 @@
 package viskit.doe;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +13,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 import edu.nps.util.TempFileManager;
-import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implememnts 
@@ -78,7 +78,6 @@ import viskit.VGlobals;
  */
 public class LocalBootLoader extends URLClassLoader {
 
-    static Logger log = Logger.getLogger(LocalBootLoader.class);
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
@@ -95,7 +94,7 @@ public class LocalBootLoader extends URLClassLoader {
         super(new URL[] {}, parent);
         extUrls = classes;
         this.workDir = workDir;
-        log.debug(VGlobals.instance().printCallerLog());
+        LogUtils.getLogger().debug(VGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with

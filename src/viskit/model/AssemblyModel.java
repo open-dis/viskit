@@ -18,8 +18,8 @@ import java.util.Random;
 import java.util.Vector;
 
 import edu.nps.util.FileIO;
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
-import org.apache.log4j.Logger;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
 import viskit.ViskitAssemblyController;
@@ -38,8 +38,6 @@ import viskit.xsd.bindings.assembly.*;
  * @version $Id$
  */
 public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyModel {
-
-    static Logger log = Logger.getLogger(AssemblyModel.class);
 
     private JAXBContext jc;
     private ObjectFactory oFactory;
@@ -950,7 +948,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         pNode.setInstantiator(vc);
 
         pNode.opaqueModelObject = pcl;
-        log.debug("pNode name: " + pNode.getName());
+        LogUtils.getLogger().debug("pNode name: " + pNode.getName());
 
         getNodeCache().put(pNode.getName(), pNode);   // key = se
 

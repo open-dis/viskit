@@ -2,8 +2,6 @@ package edu.nps.util;
 
 import java.io.*;
 
-import org.apache.log4j.Logger;
-
 /**
  *  Generates and properly cleans up temporary files. Similar to {@link
  *  File#createTempFile(java.lang.String, java.lang.String)}, this class
@@ -30,8 +28,6 @@ import org.apache.log4j.Logger;
  */
 public class TempFileManager {
 
-    static Logger log = Logger.getLogger(TempFileManager.class);
-    
     /**
      *  Creates a temporary file in the proper directory to allow for cleanup
      *  after execution. This method delegates to {@link
@@ -183,23 +179,23 @@ public class TempFileManager {
             if (!lockFile.exists()) {
                 // Delete the contents of the directory since
                 // it is no longer locked.
-                log.debug("Deleting old temp directory " + tmpFile);
+                LogUtils.getLogger().debug("Deleting old temp directory " + tmpFile);
 
                 try {
                     recursiveDelete(tmpFile);
                 } catch (IOException ex) {
-                    // You log at a fine level since not being able to delete
+                    // You LogUtils.getLogger() at a fine level since not being able to delete
                     // the temp directory should not stop the application
                     // from performing correctly. However, if the application
                     // generates a lot of temp files, this could become
                     // a disk space problem and the level should be raised.
-                    log.error("Unable to delete " + tmpFile.getAbsolutePath());
+                    LogUtils.getLogger().error("Unable to delete " + tmpFile.getAbsolutePath());
 
                     // Print the exception.
                     ByteArrayOutputStream ostream = new ByteArrayOutputStream();
                     ex.printStackTrace(new PrintStream(ostream));
 
-                    log.error(ostream.toString());
+                    LogUtils.getLogger().error(ostream.toString());
                 }
             }
         }

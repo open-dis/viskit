@@ -58,13 +58,13 @@
  */
 package viskit;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -97,8 +97,6 @@ import org.jdom.input.SAXBuilder;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
-
-    static Logger log = Logger.getLogger(EventGraphCache.class);
     
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;
@@ -111,7 +109,8 @@ public class EventGraphCache {
     private LinkedList<File> eventGraphFilesList  = new LinkedList<File>();
     private LinkedList<String> eventGraphImagePathsList = new LinkedList<String>();
 
-    private final String EVENT_GRAPH_IMAGE_DIR = System.getProperty("user.dir") + "/AnalystReports/images/EventGraphs/";
+    private final String EVENT_GRAPH_IMAGE_DIR = 
+            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir() + "/";
     private Element entityTable;
     private static EventGraphCache me;
     
@@ -168,7 +167,7 @@ public class EventGraphCache {
             }
         }
 
-        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphDir());
+        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
     }
 
     /**
@@ -187,9 +186,9 @@ public class EventGraphCache {
             SAXBuilder builder = new SAXBuilder();
             doc = builder.build(xmlFile);
         } catch (JDOMException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (IOException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         }
         return doc;
     }
@@ -203,7 +202,7 @@ public class EventGraphCache {
      * name
      */
     private void saveEventGraphReferences(String fileType) {
-        log.debug("Parameter fileType: " + fileType);
+        LogUtils.getLogger().debug("Parameter fileType: " + fileType);
         eventGraphNamesList.add(fileType);
         
         // find the package seperator
@@ -221,11 +220,11 @@ public class EventGraphCache {
         
         // TODO: Move ARs to project folders.  That's where they should be
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
-        log.debug("EventGraph Name: " + eventGraphName);
+        LogUtils.getLogger().debug("EventGraph Name: " + eventGraphName);
         
         String imgFile = EVENT_GRAPH_IMAGE_DIR + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
-        log.debug("Event Graph Image location: " + imgFile);
+        LogUtils.getLogger().debug("Event Graph Image location: " + imgFile);
         
         eventGraphImagePathsList.add(imgFile);
     }

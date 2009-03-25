@@ -33,8 +33,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.LogUtils;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -61,7 +61,6 @@ import java.net.URL;
  */
 public class SettingsDialog extends JDialog {
 
-    static Logger log = Logger.getLogger(SettingsDialog.class);
     private static SettingsDialog dialog;
     private static boolean modified = false;
     private JFrame mother;
@@ -364,7 +363,7 @@ public class SettingsDialog extends JDialog {
         if (lis != null) {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
-                log.debug("lis[" + ix + "]: " + s);
+                LogUtils.getLogger().debug("lis[" + ix + "]: " + s);
                 projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
@@ -603,7 +602,7 @@ public class SettingsDialog extends JDialog {
             try {
                 extClassPathsUrls[i++] = extFile.toURI().toURL();
             } catch (MalformedURLException ex) {
-                log.error(ex);
+                LogUtils.getLogger().error(ex);
             }
         }
         return extClassPathsUrls;

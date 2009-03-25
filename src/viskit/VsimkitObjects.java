@@ -1,9 +1,9 @@
 package viskit;
 
+import edu.nps.util.LogUtils;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import simkit.random.*;
 
 /**
@@ -23,8 +23,6 @@ import simkit.random.*;
  * @version $Id$
  */
 public class VsimkitObjects {
-
-    static Logger log = Logger.getLogger(VsimkitObjects.class);
     
     /**
      * VGlobals uses this field, which combines all the methods below.
@@ -54,12 +52,12 @@ public class VsimkitObjects {
                 // TODO: this breaks on AR1Variate instance "getting" 
                 Object m = method.invoke(null, (Object[]) null);
                 Object o = new FullNameAndInstance(name, m);
-                log.info("name is: " + name + " noPackageName is: " + noPackageName);
+                LogUtils.getLogger().debug("name is: " + name + " noPackageName is: " + noPackageName);
                 hashmap.put(name, o);
                 hashmap.put(noPackageName, o);
             }
         } catch (Exception e) {
-            log.error(e);
+            LogUtils.getLogger().error(e);
             e.printStackTrace();
         }
     }

@@ -62,8 +62,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 /**
  * Converter for a Collection to an Array using reification
  * @version $Id$
@@ -85,8 +83,6 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class GenericConversion {
-    
-    static Logger log = Logger.getLogger(GenericConversion.class);
     
     /** Method to convert a "Collection" to an array.  Will warn of an 
      * "unchecked cast," but this is a known cast to us, therefore permissible.

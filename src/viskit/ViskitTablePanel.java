@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import viskit.model.ViskitElement;
 
 /**
@@ -32,7 +31,6 @@ import viskit.model.ViskitElement;
  * @version $Id$
  */
 public abstract class ViskitTablePanel extends JPanel {
-    static Logger log = Logger.getLogger(ViskitTablePanel.class);
     
     protected JTable tab;
     private JScrollPane jsp;

@@ -60,11 +60,10 @@ package viskit.xsd.assembly;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import edu.nps.util.LogUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartUtilities;
@@ -79,6 +78,8 @@ import org.jfree.data.statistics.Regression;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import viskit.VGlobals;
+import viskit.ViskitProject;
 
 /**
  * Create Scatter Plots from statistical data collected from experimental 
@@ -99,32 +100,23 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class ScatterPlotChartDrawer {
 
-    static Logger log = Logger.getLogger(ScatterPlotChartDrawer.class);
-        
     /** Creates a new instance of ScatterPlotChartDrawer */
     public ScatterPlotChartDrawer() {}
 
     /**
      * Creates a scatterplot image in PNG format based on the parameters provided
      *
-     * @param title 
-     * @param label 
+     * @param title the title of the ScatterPlot
+     * @param label the name of the ScatterPlot
      * @param data an array of doubles that are to be plotted
-     * @param fileName the name of the file to save the image out to
      * @return the path url of the created object
      */
-    public String createScatterPlot(String title, String label, double[] data, String fileName) {
-        String baseUrl = "charts/" + fileName + "ScatterPlot.png";
-        String chartUrl = "./" + baseUrl;
-        String fileLocation = "./AnalystReports/" + baseUrl;
+    public String createScatterPlot(String title, String label, double[] data) {
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "ScatterPlot.png");
         XYDataset dataset = createDataset(label, data);
-        try {
-            saveChart(createChart(dataset, title, "Value"), fileLocation);
-        } catch (IOException ioe) {
-            log.error("Unable to create chart image: " + ioe.getMessage());
-            ioe.printStackTrace();
-        }
-        return chartUrl;
+        saveChart(createChart(dataset, title, "Value"), fileLocation);
+        return fileLocation.getAbsolutePath().replaceAll("\\\\", "/");
     }
 
     /**
@@ -191,16 +183,21 @@ public class ScatterPlotChartDrawer {
     /**
      * Saves a chart to PNG format
      * @param chart the created JFreeChart instance
-     * @param path the path to save the generated PNG to
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException 
+     * @param outFile the path to save the generated PNG to
      */
-    private void saveChart(JFreeChart chart, String path) throws FileNotFoundException, IOException {
+    private void saveChart(JFreeChart chart, File outFile) {
 
-        File outFile = new File(path);
-        FileOutputStream fos = new FileOutputStream(outFile);
-        ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
-        fos.flush();
-        fos.close();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(outFile);
+            ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
+        } catch (IOException ioe) {
+            LogUtils.getLogger().error(ioe);
+        } finally {
+            try {
+                fos.flush();
+                fos.close();
+            } catch (IOException ioe) {}
+        }
     }
 }

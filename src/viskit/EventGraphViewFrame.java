@@ -3,7 +3,7 @@ package viskit;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.EventGraphFileFilter;
-import org.apache.log4j.Logger;
+import edu.nps.util.LogUtils;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
@@ -65,7 +65,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public final static int ARC_MODE = 2;
     public final static int CANCEL_ARC_MODE = 3;
     public final static int SELF_REF_MODE = 4;
-    static Logger log = Logger.getLogger(EventGraphViewFrame.class);
+
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar
     private JLabel addEvent;
@@ -427,8 +427,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            log.error("Drop target init. error");
-            log.error(tmle);
+            LogUtils.getLogger().error(tmle);
         }
 
         // the view holds only one model, so it gets overwritten with each tab
@@ -990,7 +989,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // Try to open in the current project directory for EventGraphs
         if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphDir());
+            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
@@ -1046,7 +1045,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             jfc = buildOpenSaveChooser();
         }
 
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphDir(), suggName);
+        File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }

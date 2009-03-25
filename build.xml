@@ -153,15 +153,11 @@
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
-        <mkdir dir="${dir.build.classes}/${analyst.reports.dir}"/>
         <mkdir dir="${dir.src.simevg}"/>
         <mkdir dir="${dir.src.simasm}"/>
-	<mkdir dir="${dir.src.simasm}/stats"/>
+        <mkdir dir="${dir.src.simasm}/stats"/>
         <mkdir dir="${dir.src.cli}"/>
         <mkdir dir="${dir.lib.ext}"/>
-        <mkdir dir="${event.graphs}"/>
-        <mkdir dir="${assemblies}"/>
-        <mkdir dir="${charts}"/>
     </target>
 
     <target name="build.schema"
@@ -353,8 +349,8 @@
                 <include name="viskit/images/*.jpg"/>
             </fileset>
             <fileset dir="${basedir}">
-                <include name="log4j.properties"/>
-                <include name="${analyst.reports.stylesheet}"/>
+                <include name="${configuration.dir}/log4j.properties"/>
+                <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
     </target>
@@ -1162,9 +1158,6 @@ ${delete.temps.cache}</echo>
         <delete includeemptydirs="true" dir="${images}"/>
         <delete includeemptydirs="true" dir="${charts}"/>
         <delete includeemptydirs="true" dir="${statistics}"/>
-        <delete>
-            <fileset dir="${analyst.reports.dir}" includes="*.xml,*.html"/>
-        </delete>
     </target>
 
 </project>

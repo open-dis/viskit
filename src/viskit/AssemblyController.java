@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.lang.reflect.Field;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -41,8 +41,6 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  */
 public class AssemblyController extends mvcAbstractController implements ViskitAssemblyController, OpenAssembly.AssyChangeListener {
 
-    /** Static instance of this Controller */
-    static Logger log = Logger.getLogger(AssemblyController.class);
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
     private JTabbedPane runTabbedPane;
@@ -70,7 +68,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param assyPath an assembly file to compile
      */
     public void compileAssembly(String assyPath) {
-        log.debug("Compiling assembly: " + assyPath);
+        LogUtils.getLogger().debug("Compiling assembly: " + assyPath);
         File f = new File(assyPath);
         _doOpen(f);
         compileAssemblyAndPrepSimRunner();
@@ -81,14 +79,14 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         File f;
         if (initialFile != null) {
-            log.debug("Loading initial file: " + initialFile);
+            LogUtils.getLogger().debug("Loading initial file: " + initialFile);
             f = new File(initialFile);
 
             _doOpen(f);
             compileAssemblyAndPrepSimRunner();
         } else {
             java.util.List<String> lis = getOpenAssyFileList(false);
-            log.debug("Inside begin() and lis.size() is: " + lis.size());
+            LogUtils.getLogger().debug("Inside begin() and lis.size() is: " + lis.size());
 
             for (String assyFile : lis) {
 
@@ -1155,10 +1153,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.log
+            // TODO: implement a Dialog pointing to the validationErrors.LogUtils.getLogger()
             return null;
         } else {
-            log.info(f + " is valid XML\n");
+            LogUtils.getLogger().info(f + " is valid XML\n");
         }
 
         SimkitAssemblyXML2Java x2j = null;
@@ -1187,16 +1185,16 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.log
+            // TODO: implement a Dialog pointing to the validationErrors.LogUtils.getLogger()
             return null;
         } else {
-            log.info(x2j.getEventGraphFile() + " is valid XML\n");
+            LogUtils.getLogger().info(x2j.getEventGraphFile() + " is valid XML\n");
         }
 
         try {
             eventGraphSource = x2j.translate();
         } catch (Exception e) {
-            log.error("Error building Java from " + x2j.getFileBaseName() +
+            LogUtils.getLogger().error("Error building Java from " + x2j.getFileBaseName() +
                     ": " + e.getMessage() + ", erroneous event-graph xml found");
         }
         return eventGraphSource;
@@ -1256,18 +1254,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             fw.write(src);
             fw.close();
 
-            File classesDir = viskitProj.getClassDir();
+            File classesDir = viskitProj.getClassesDir();
 
-            log.info("Test compiling " + javaFile.getCanonicalPath());
+            LogUtils.getLogger().info("Test compiling " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             if (diagnostic != null) {
                 if (diagnostic.isEmpty()) {
-                    log.info("No compile errors\n");
+                    LogUtils.getLogger().info("No compile errors\n");
                     return new File(classesDir, packagePath + baseName + ".class");
                 } else {
-                    log.info(diagnostic);
+                    LogUtils.getLogger().info(diagnostic);
                 }
             }
         } catch (Exception e) {
@@ -1288,7 +1286,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph) {
-                log.debug("Is an Assembly: " + !isEventGraph);
+                LogUtils.getLogger().debug("Is an Assembly: " + !isEventGraph);
                 return null;
             }
 
@@ -1302,7 +1300,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             }
             return compileJavaClassAndSetPackage(src);
         } catch (FileNotFoundException e) {
-            log.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
+            LogUtils.getLogger().error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
         return null;
@@ -1380,7 +1378,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void compileAssemblyAndPrepSimRunner() {
         initAssemblyRun();
         if (execStrings == null) {
-            JOptionPane.showMessageDialog(null, "Compile not attempted, check log for details",
+            JOptionPane.showMessageDialog(null, "Compile not attempted, check LogUtils.getLogger() for details",
                     "Assembly Source Generation Error",
                     JOptionPane.WARNING_MESSAGE); //todo, more information
         } else {
@@ -1595,7 +1593,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 VGlobals.instance().getEventGraphEditor().controller._doOpen(file);
             }
         } catch (Exception ex) {
-            log.error("EventGraph file: " + tempFile + " caused error: " + ex);
+            LogUtils.getLogger().error("EventGraph file: " + tempFile + " caused error: " + ex);
             JOptionPane.showMessageDialog(VGlobals.instance().getEventGraphEditor(),
                     "EventGraph file: " + tempFile + " caused error: " + ex,
                     "EventGraph Opening Error", JOptionPane.WARNING_MESSAGE);
@@ -1643,7 +1641,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             return;
         }
         String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
-        log.debug("_setAssyFileLists() valueAr size is: " + valueAr.length);
+        LogUtils.getLogger().debug("_setAssyFileLists() valueAr size is: " + valueAr.length);
         int idx = 0;
         for (String s : valueAr) {
             if (recentAssyFileSet.add(s)) {
@@ -1664,7 +1662,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             return;
         }
         String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
-        log.debug("_setProjFileLists() valueAr size is: " + valueAr.length);
+        LogUtils.getLogger().debug("_setProjFileLists() valueAr size is: " + valueAr.length);
         for (String value : valueAr) {
             value = value.replaceAll("\\\\", "/");
             recentProjFileSet.add(value);
@@ -1738,8 +1736,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            Vstatics.log.error("Error loading history file: " + e.getMessage());
-            Vstatics.log.error("Recent file saving disabled");
+            LogUtils.getLogger().error("Error loading history file: " + e.getMessage());
+            LogUtils.getLogger().warn("Recent file saving disabled");
             historyConfig = null;
         }
     }

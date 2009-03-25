@@ -1,5 +1,6 @@
 package viskit;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -16,17 +17,12 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.log4j.Logger;
-import viskit.doe.LocalBootLoader;
-
 /**
  * @version $Id$
  * @author  ahbuss
  */
 public class FindClassesForInterface {
     
-    static Logger log = Logger.getLogger(FindClassesForInterface.class);
-
     /**
      * Added by Mike Bailey
      * @param f Class file to read from
@@ -99,12 +95,12 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                log.info("Attempting to find " + name);
+                LogUtils.getLogger().info("Attempting to find " + name);
 
                 Class<?> clz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
 
                 found.put(name, clz);
-                log.info("Found Class: " + clz.getName() + "\n");
+                LogUtils.getLogger().info("Found Class: " + clz.getName() + "\n");
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();

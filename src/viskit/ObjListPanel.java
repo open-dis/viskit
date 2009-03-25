@@ -25,8 +25,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import org.apache.log4j.Logger;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -39,7 +37,6 @@ import org.apache.log4j.Logger;
  */
 public class ObjListPanel extends JPanel implements ActionListener, CaretListener {
 
-    static Logger log = Logger.getLogger(ObjListPanel.class);
     private JDialog parent;
     private JLabel typeLab[];
     private JTextField entryTF[];

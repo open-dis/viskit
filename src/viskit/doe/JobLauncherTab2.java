@@ -300,8 +300,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JLabel analystReportLab = new JLabel("Analyst report each run");
         doAnalystReports = new JCheckBox((String) null, false);
-        //JLabel doGraphLab = new JLabel("Graph job output");
-        //JLabel doGraphLab = new JLabel("AnalystReports each run");
         doGraphOutput = new JCheckBox((String) null, false);
 
         numDPsTF.setEditable(false);

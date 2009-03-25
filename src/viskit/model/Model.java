@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
@@ -19,8 +20,6 @@ import javax.xml.bind.Unmarshaller;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
-import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
 import viskit.ModelEvent;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
@@ -44,7 +43,6 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class Model extends mvcAbstractModel implements ViskitModel {
 
-    static Logger log = Logger.getLogger(Model.class);
     JAXBContext jc;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;

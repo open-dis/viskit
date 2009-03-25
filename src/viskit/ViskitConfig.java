@@ -8,11 +8,11 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 
 import edu.nps.util.FileIO;
+import edu.nps.util.LogUtils;
 import java.util.Map;
 import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.DefaultConfigurationBuilder;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -28,8 +28,6 @@ import viskit.doe.FileHandler;
  * @version $Id$
  */
 public class ViskitConfig {
-
-    public static final Logger logger = Logger.getLogger(ViskitConfig.class);
 
     public static final File VISKIT_HOME_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File V_CONFIG_FILE = new File(VISKIT_HOME_DIR, "vconfig.xml");
@@ -85,8 +83,8 @@ public class ViskitConfig {
     private XMLConfiguration projectXMLConifg = null;
 
     static {
-        logger.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
-        logger.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
+        LogUtils.getLogger().info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
+        LogUtils.getLogger().info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
     }
 
     public static synchronized ViskitConfig instance() {
@@ -100,25 +98,25 @@ public class ViskitConfig {
         try {
             if (!VISKIT_HOME_DIR.exists()) {
                 VISKIT_HOME_DIR.mkdirs();
-                logger.info("Created dir: " + VISKIT_HOME_DIR);
+                LogUtils.getLogger().info("Created dir: " + VISKIT_HOME_DIR);
             }
-            File vconfigSrc = new File(V_CONFIG_FILE.getName());
+            File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
             if (!V_CONFIG_FILE.exists()) {
                 V_CONFIG_FILE.createNewFile();
                 FileIO.copyFile(vconfigSrc, V_CONFIG_FILE, true);
             }
-            File cAppSrc = new File(C_APP_FILE.getName());
+            File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists()) {
                 C_APP_FILE.createNewFile();
                 FileIO.copyFile(cAppSrc, C_APP_FILE, true);
             }
-            File cGuiSrc = new File(C_GUI_FILE.getName());
+            File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists()) {
                 C_GUI_FILE.createNewFile();
                 FileIO.copyFile(cGuiSrc, C_GUI_FILE, true);
             }
         } catch (IOException ex) {
-            logger.error(ex);
+            LogUtils.getLogger().error(ex);
         }
         setXmlConfigurations(new HashMap<String, XMLConfiguration>());
         sessionHM = new HashMap<String, String>();
@@ -186,7 +184,7 @@ public class ViskitConfig {
         try {
             projectXMLConifg = new XMLConfiguration(f);
         } catch (ConfigurationException ce) {
-            Vstatics.log.error(ce);
+            LogUtils.getLogger().error(ce);
         }
         projectXMLConifg.setAutoSave(true);
         cc.addConfiguration(projectXMLConifg);
@@ -253,7 +251,7 @@ public class ViskitConfig {
             doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
             xout.output(doc, new FileWriter(VGlobals.instance().getCurrentViskitProject().getProjectFile()));
         } catch (Exception e) {
-            Vstatics.log.error("Bad jdom op: " + e.getMessage());
+            LogUtils.getLogger().error("Bad jdom op: " + e.getMessage());
         }
     }
 

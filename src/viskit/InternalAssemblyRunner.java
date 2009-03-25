@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -49,7 +50,6 @@ import javax.swing.*;
 
 import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
-import org.apache.log4j.Logger;
 import viskit.xsd.assembly.BasicAssembly;
 import viskit.doe.LocalBootLoader;
 
@@ -66,7 +66,6 @@ import viskit.doe.LocalBootLoader;
  */
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
 
-    static Logger log = Logger.getLogger(InternalAssemblyRunner.class);
     static String lineSep = System.getProperty("line.separator");
     String targetClassName;
     RunnerPanel2 runPanel;
@@ -171,7 +170,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     public void initParams(String[] params) {
 
 //        for (String s : params) {
-//            log.info("VM argument is: " + s);
+//            LogUtils.getLogger().info("VM argument is: " + s);
 //        }
 
         targetClassName = params[AssemblyController.EXEC_TARGET_CLASS_NAME];
@@ -255,7 +254,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             
             // Test for Bug 1237
 //            for (String s : loader.getClassPath()) {
-//                log.info(s);
+//                LogUtils.getLogger().info(s);
 //            }
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
@@ -306,21 +305,21 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (InterruptedException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (IllegalAccessException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (IllegalArgumentException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (InvocationTargetException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (NoSuchMethodException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (SecurityException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         } catch (InstantiationException ex) {
-           log.error(ex);
+           LogUtils.getLogger().error(ex);
         } catch (ClassNotFoundException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         }
     }
 
@@ -348,15 +347,15 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
             } catch (SecurityException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             } catch (NoSuchMethodException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             } catch (IllegalArgumentException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             } catch (IllegalAccessException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             } catch (InvocationTargetException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             }
             signalReportReady();
         }
@@ -709,7 +708,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
     
     public void propertyChange(PropertyChangeEvent evt) {
-        log.debug(evt.getPropertyName());
+        LogUtils.getLogger().debug(evt.getPropertyName());
         
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();

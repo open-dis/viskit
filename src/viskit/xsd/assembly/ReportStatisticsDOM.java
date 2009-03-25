@@ -7,7 +7,6 @@ package viskit.xsd.assembly;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -21,7 +20,6 @@ import org.jdom.Element;
  */
 public class ReportStatisticsDOM {
 
-    static Logger log = Logger.getLogger(ReportStatisticsDOM.class);
     /**
      * The DOM object which is created and saved for use by the analyst report
      */

@@ -1,5 +1,6 @@
 package viskit.util;
 
+import edu.nps.util.LogUtils;
 import viskit.*;
 import java.io.File;
 import java.util.Arrays;
@@ -7,7 +8,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import org.apache.log4j.Logger;
 
 /** Using the java compiler now part of javax, we no longer have to 
  * either ship tools.jar or require a jdk environment variable.
@@ -19,8 +19,6 @@ import org.apache.log4j.Logger;
  * @version $Id$
  */
 public class Compiler {
-
-    static Logger log = Logger.getLogger(Compiler.class);
     
     /** Call the java compiler to test compile our event graph java source
      * 
@@ -59,7 +57,7 @@ public class Compiler {
             // Get rid of the last ";" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
             cp = classPaths.toString();
-            log.debug("cp is: " + cp);
+            LogUtils.getLogger().debug("cp is: " + cp);
             String[] options = {"-Xlint:unchecked",
                     "-Xlint:deprecation",
                     "-cp", 
@@ -70,8 +68,8 @@ public class Compiler {
             compiler.getTask(null, sjfm, diag, optionsList, null, fileObjects).call();
             sb.append(diag.messageString);
         } catch (Exception ex) {
-            VGlobals.log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
-            log.error("Classpath is: " + cp);
+            LogUtils.getLogger().error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+            LogUtils.getLogger().info("Classpath is: " + cp);
             ex.printStackTrace();
         }
         return sb.toString();

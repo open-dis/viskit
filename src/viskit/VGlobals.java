@@ -53,8 +53,8 @@ import java.util.regex.Pattern;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
+import edu.nps.util.LogUtils;
 import edu.nps.util.SysExitHandler;
-import org.apache.log4j.Logger;
 import static edu.nps.util.GenericConversion.toArray;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AssemblyModel;
@@ -74,7 +74,6 @@ import viskit.model.ViskitModel;
  */
 public class VGlobals {
 
-    public static Logger log = Logger.getLogger(VGlobals.class);
     private static VGlobals me;
     private Interpreter interpreter;
     private DefaultComboBoxModel cbMod;
@@ -309,7 +308,7 @@ public class VGlobals {
                 try {
                     interpreter.getClassManager().addClassPath(new URL("file", "localhost", path));
                 } catch (IOException e) {
-                    log.error("Working classpath component: " + path);
+                    LogUtils.getLogger().error("Working classpath component: " + path);
                 }
             }
         }
@@ -410,7 +409,7 @@ public class VGlobals {
              */
             if(!noCRs.contains("get") && !noCRs.contains("set")) {
                 Object o = interpreter.eval(noCRs);
-                log.debug("Interpreter evaluation result: " + o);
+                LogUtils.getLogger().debug("Interpreter evaluation result: " + o);
             }
         } catch (EvalError evalError) {
             if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
@@ -464,7 +463,7 @@ public class VGlobals {
         } catch (Exception ex) {
             clearNamespace();
             returnString =  ex.getMessage();
-            log.error(returnString);
+            LogUtils.getLogger().error(returnString);
         }
 
         // good if remains null
@@ -479,7 +478,7 @@ public class VGlobals {
 
         ViskitConfig vConfig = ViskitConfig.instance();
         String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
-        log.debug(projectHome);
+        LogUtils.getLogger().debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 
             ViskitProjectButtonPanel.showDialog();
         } else {
@@ -515,7 +514,7 @@ public class VGlobals {
                 }
             }
         } catch (Exception e) {
-            log.error(e);
+            LogUtils.getLogger().error(e);
         }
 
         // TODO: Fix the call to VsimkitObjects someday
@@ -597,7 +596,7 @@ public class VGlobals {
                 return true;
             }
         } catch (EvalError evalError) {
-            log.error(bshErr);
+            LogUtils.getLogger().error(bshErr);
             evalError.printStackTrace();
         }
         return false;
@@ -814,7 +813,7 @@ public class VGlobals {
         } else {
             throw new RuntimeException("Unable to create project directory");
         }
-        workDirectory = currentViskitProject.getClassDir();
+        workDirectory = currentViskitProject.getClassesDir();
     }
 
     private ClassLoader workLoader;
@@ -859,7 +858,7 @@ public class VGlobals {
 
         public void doSysExit(int status) {
 
-            log.debug("Viskit is exiting with status: " + status);
+            LogUtils.getLogger().debug("Viskit is exiting with status: " + status);
 
             /* If an application launched a JVM, and is still running, this will
              * only make Viskit disappear.  If Viskit is running standalone,
@@ -871,7 +870,7 @@ public class VGlobals {
             Frame[] frames = Frame.getFrames();
             int count = 0;
             for (Frame f : frames) {
-                log.debug("Frame count in Viskit: " + (++count));
+                LogUtils.getLogger().debug("Frame count in Viskit: " + (++count));
 
                 /* Prevent non-viskit created components from disposing if
                  * launched from another application.  SwingUtilities is a
@@ -880,17 +879,17 @@ public class VGlobals {
                  * SwingUtilities
                  */
                 if (f.toString().toLowerCase().contains("viskit")) {
-                    log.debug("Frame is: " + f);
+                    LogUtils.getLogger().debug("Frame is: " + f);
                     f.dispose();
                 }
                 if (f.toString().contains("SwingUtilities")) {
-                    log.debug("Frame is: " + f);
+                    LogUtils.getLogger().debug("Frame is: " + f);
                     f.dispose();
                 }
 
                 // Case for XMLTree JFrames
                 if (f.getTitle().contains("xml")) {
-                    log.debug("Frame is: " + f);
+                    LogUtils.getLogger().debug("Frame is: " + f);
                     f.dispose();
                 }
             }
@@ -903,7 +902,7 @@ public class VGlobals {
             Thread[] threads = new Thread[Thread.activeCount()];
             Thread.enumerate(threads);
             for (Thread t : threads) {
-                log.debug("Thread is: " + t);
+                LogUtils.getLogger().debug("Thread is: " + t);
                 if (t.getName().contains("SwingWorker")) {
                     t.interrupt();
                 }

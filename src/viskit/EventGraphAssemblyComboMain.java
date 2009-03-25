@@ -43,7 +43,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit;
 
-import org.apache.log4j.Logger;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
@@ -52,8 +51,6 @@ import javax.swing.*;
 
 public class EventGraphAssemblyComboMain {
     
-    static Logger log = Logger.getLogger(EventGraphAssemblyComboMain.class);
-
     public static void main(String[] args) {        
                     
         String initialFile = null;

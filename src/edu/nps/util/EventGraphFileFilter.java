@@ -49,9 +49,6 @@ package edu.nps.util;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
-// Application specific imports
-import org.apache.log4j.Logger;
-
 /**
  * Filters files whose names contain a given String, case insensitive
  *
@@ -73,10 +70,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphFileFilter">Terry Norbraten</a>
  */
 public final class EventGraphFileFilter extends FileFilter {
-    
-    /** log4j logger instance */
-    static Logger log = Logger.getLogger(EventGraphFileFilter.class);
-    
+        
     /** we filter to accept only files starting with the contents of this [] */
     private final String[] contents;
     

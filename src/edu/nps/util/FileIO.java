@@ -53,6 +53,13 @@ public class FileIO {
         copyFile(is, pw, close);
     }
 
+    /**
+     * Copy a source file to a destination
+     * @param infile the source file
+     * @param outfile the destination file
+     * @param close the FileWriter after the copy operation
+     * @throws java.io.IOException if something goes wrong during the copy
+     */
     public static void copyFile(File infile, File outfile, boolean close) throws IOException {
         copyFile(infile, new PrintWriter(new BufferedWriter(new FileWriter(outfile))), close);
     }

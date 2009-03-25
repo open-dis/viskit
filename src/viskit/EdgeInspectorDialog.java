@@ -14,9 +14,9 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import edu.nps.util.BoxLayoutUtils;
+import edu.nps.util.LogUtils;
 import java.util.regex.Pattern;
 import simkit.Priority;
-import org.apache.log4j.Logger;
 import viskit.model.EventNode;
 import viskit.model.Edge;
 import viskit.model.Model;
@@ -36,7 +36,6 @@ import viskit.model.vEdgeParameter;
  */
 public class EdgeInspectorDialog extends JDialog {
 
-    static Logger log = Logger.getLogger(EdgeInspectorDialog.class);
     private static EdgeInspectorDialog dialog;
     private Edge edge;
     private static boolean modified = false;
@@ -329,7 +328,7 @@ public class EdgeInspectorDialog extends JDialog {
             jcb.setEditable(true); // this allows anything to be intered
             return jcb;
         } catch (Exception e) {
-            Vstatics.log.error(e);
+            LogUtils.getLogger().error(e);
             return new JComboBox(new String[] {"simkit package not in class path"});
         }
     }
@@ -360,7 +359,7 @@ public class EdgeInspectorDialog extends JDialog {
                 i++;
             }
 
-            log.error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
+            LogUtils.getLogger().error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
             priorityCB.setSelectedIndex(priorityDefaultIndex);
         }
     }

@@ -1,5 +1,6 @@
 package viskit.xsd.assembly;
 
+import edu.nps.util.LogUtils;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -24,7 +25,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
 
-import org.apache.log4j.Logger;
 import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.Adapter;
 import viskit.xsd.bindings.assembly.FactoryParameter;
@@ -47,8 +47,6 @@ import viskit.xsd.bindings.assembly.Verbose;
  */
 public class SimkitAssemblyXML2Java {
     
-    static Logger log = Logger.getLogger(SimkitAssemblyXML2Java.class);
-
     SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
@@ -129,7 +127,7 @@ public class SimkitAssemblyXML2Java {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
             ex.printStackTrace();
         }
     }
@@ -162,7 +160,7 @@ public class SimkitAssemblyXML2Java {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.marshal(this.root, System.out);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         }
     }
     
@@ -341,7 +339,7 @@ public class SimkitAssemblyXML2Java {
                 String clazz = listI.next();
                 if (exList.contains(clazz)) {
                     listI.remove();
-                    log.debug("Removed type \"" + clazz + "\" from the TreeSet");
+                    LogUtils.getLogger().debug("Removed type \"" + clazz + "\" from the TreeSet");
                 }
             }
         }
@@ -892,8 +890,8 @@ public class SimkitAssemblyXML2Java {
             }
         }
         
-        log.info("Assembly file is: " + fileName);
-        log.info("Generating Java Source...");
+        LogUtils.getLogger().info("Assembly file is: " + fileName);
+        LogUtils.getLogger().info("Generating Java Source...");
         
         if (port == 0) {
             if ( fileName == null ) {
@@ -901,7 +899,7 @@ public class SimkitAssemblyXML2Java {
             } else {
                 try {
                     sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
-                } catch (FileNotFoundException ex) {log.error(ex);}
+                } catch (FileNotFoundException ex) {LogUtils.getLogger().error(ex);}
                 sax2j.unmarshal();               
             }            
         } else {
@@ -912,7 +910,7 @@ public class SimkitAssemblyXML2Java {
                 try {
                     is = new FileInputStream(fileName);
                 } catch (FileNotFoundException fnfe) {
-                    log.error(fnfe);
+                    LogUtils.getLogger().error(fnfe);
                 }
                 sax2j = new SimkitAssemblyXML2Java(is);                
             }
@@ -922,13 +920,13 @@ public class SimkitAssemblyXML2Java {
         sax2j.setFileBaseName(baseName.getName());
         sax2j.unmarshal();
         String dotJava = sax2j.translate();
-        log.info("Done.");
+        LogUtils.getLogger().info("Done.");
 
         // also write out the .java to a file and compile it
         // to a .class
-        log.info("Generating Java Bytecode...");
+        LogUtils.getLogger().info("Generating Java Bytecode...");
         if(VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
-           log.info("Done.");   
+           LogUtils.getLogger().info("Done.");
         }
     }
     

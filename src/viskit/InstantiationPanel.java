@@ -1,10 +1,10 @@
 package viskit;
 
+import edu.nps.util.LogUtils;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import org.apache.log4j.Logger;
 import viskit.model.VInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -45,8 +44,6 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
     
-    static Logger log = Logger.getLogger(InstantiationPanel.class);
-
     private JLabel typeLab,  methodLab;
     private JTextField typeTF;
     private JComboBox methodCB;
@@ -294,7 +291,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         String typ;
 
         public void setType(String clName) throws ClassNotFoundException {
-            log.debug("Constructor for class " + clName);
+            LogUtils.getLogger().debug("Constructor for class " + clName);
             List<Object>[] parameters = Vstatics.resolveParameters(clName);
             typ = clName;
             removeAll();

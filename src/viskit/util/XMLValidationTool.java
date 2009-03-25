@@ -15,6 +15,7 @@
 package viskit.util;
 
 // Standard Library Imports
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 // Applcation Specific Local Imports
-import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -61,8 +61,6 @@ public class XMLValidationTool {
     public static final String LOCAL_EVENT_GRAPH_SCHEMA = 
             System.getProperty("user.dir") + "/Schemas/simkit.xsd.";
     
-    /** log4j logger instance */
-    static Logger log = Logger.getLogger(XMLValidationTool.class);
     private FileWriter fWriter;
     private File xmlFile, schema;
     private boolean valid = true;
@@ -82,7 +80,7 @@ public class XMLValidationTool {
          */
         System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema",
                 "org.apache.xerces.jaxp.validation.XMLSchemaFactory");
-        log.debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
+        LogUtils.getLogger().debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
                 System.getProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema"));
     }
 
@@ -101,7 +99,7 @@ public class XMLValidationTool {
         try {
             schemaDoc = factory.newSchema(getSchema());
         } catch (SAXException ex) {
-            log.fatal("Unable to create Schema object: " + ex);
+            LogUtils.getLogger().fatal("Unable to create Schema object: " + ex);
         }
 
         // 3. Get a validator from the schema object.
@@ -117,12 +115,12 @@ public class XMLValidationTool {
 
         // 6. Parse, validate and report any errors.
         try {
-            log.info("Validating: " + source.getSystemId());
+            LogUtils.getLogger().info("Validating: " + source.getSystemId());
 
             // Prepare error errorsLog with current DTG
-            File errorsLog = new File(System.getProperty("user.home") + "/.viskit/validationErrors.log");
+            File errorsLog = new File(System.getProperty("user.home") + "/.viskit/validationErrors.LogUtils.getLogger()");
             
-            // New log each Viskit startup
+            // New LogUtils.getLogger() each Viskit startup
             if (errorsLog.exists()) {errorsLog.delete();}
             fWriter = new FileWriter(errorsLog, true);
             Calendar cal = Calendar.getInstance();
@@ -133,17 +131,17 @@ public class XMLValidationTool {
             validator.validate(source);
             
         } catch (SAXException ex) {
-            log.fatal(source.getSystemId() + " is not well-formed XML");
-            log.fatal(ex);
+            LogUtils.getLogger().fatal(source.getSystemId() + " is not well-formed XML");
+            LogUtils.getLogger().fatal(ex);
         } catch (IOException ex) {
-            log.fatal(ex);
+            LogUtils.getLogger().fatal(ex);
         } finally {
             try {
                 // Space between file entries
                 fWriter.write("\n");
                 fWriter.close();
             } catch (IOException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             }
         }
         return valid;
@@ -193,7 +191,7 @@ public class XMLValidationTool {
             try {
                 fWriter.write(level + msg + "\n");
             } catch (IOException ex) {
-                log.fatal(ex);
+                LogUtils.getLogger().fatal(ex);
             }
             
             // if we got here, there is something wrong
@@ -203,7 +201,7 @@ public class XMLValidationTool {
         public void warning(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Warning: ");
-            log.warn(msg);
+            LogUtils.getLogger().warn(msg);
         }
 
         /** Recoverable errors such as violations of validity contraints are
@@ -213,7 +211,7 @@ public class XMLValidationTool {
         public void error(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Error: ");
-            log.error(msg);
+            LogUtils.getLogger().error(msg);
         }
 
         /**
@@ -222,7 +220,7 @@ public class XMLValidationTool {
         public void fatalError(SAXParseException ex) throws SAXParseException {
             setMessage(ex);
             writeMessage("Fatal: ");
-            log.fatal(msg);
+            LogUtils.getLogger().fatal(msg);
             throw ex;
         }
     }

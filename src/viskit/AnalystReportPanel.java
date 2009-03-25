@@ -86,12 +86,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import edu.nps.util.FileIO;
-import org.apache.log4j.Logger;
+import edu.nps.util.LogUtils;
 import viskit.xsd.assembly.XsltUtility;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
 
-    static Logger log = Logger.getLogger(AnalystReportPanel.class);
     private AnalystReportBuilder arb;
     private File reportFile;
 
@@ -136,7 +135,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 break;
 
             default:
-                log.error("Program error InternalAssemblyRunner.assyChanged");
+                LogUtils.getLogger().error("Program error InternalAssemblyRunner.assyChanged");
         }
     }
 
@@ -154,13 +153,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
      */
     public void setReportXML(String path) {
 
-        log.debug("Path of temp Analyst Report: " + path);
+        LogUtils.getLogger().debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File aRDir = new File("./AnalystReports");
-        if (!aRDir.exists()) {
-            aRDir.mkdirs();
-        }
+        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -173,7 +169,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             FileIO.copyFile(srcFil, targetFile, true);
             srcFil.deleteOnExit();
         } catch (IOException ioe) {
-            log.fatal(ioe);
+            LogUtils.getLogger().fatal(ioe);
         }
 
         doTitle(targetFile.getName());
@@ -181,12 +177,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
 
     private void buildArb(File targetFile) {
-        log.debug("TargetFile is: " + targetFile);
+        LogUtils.getLogger().debug("TargetFile is: " + targetFile);
         AnalystReportBuilder arbLocal = null;
         try {
             arbLocal = new AnalystReportBuilder(this, targetFile, currentAssyFile);
         } catch (Exception e) {
-            log.error("Error parsing analyst report: " + e.getMessage());
+            LogUtils.getLogger().error("Error parsing analyst report: " + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -918,7 +914,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             arb.writeToXMLFile(f);
             dirty = false;
         } catch (Exception e) {
-            log.error(e);
+            LogUtils.getLogger().error(e);
         }
     }
 
@@ -959,7 +955,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                     }
                 }
 
-                JFileChooser openChooser = new JFileChooser("./AnalystReports");
+                File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+                JFileChooser openChooser = new JFileChooser(aRDir);
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
                 openChooser.setFileFilter(filter);
                 openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -996,7 +993,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
                 outFile = outFile.substring(0, idx) + ".html";
                 XsltUtility.runXslt(reportFile.getAbsolutePath(),
-                        outFile, "AnalystReports/AnalystReportXMLtoHTML.xslt");
+                        outFile, "configuration/AnalystReportXMLtoHTML.xslt");
 
             }
         };
@@ -1026,7 +1023,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 //                                    "Confirm", JOptionPane.WARNING_MESSAGE);
 //                            switch (result) {
 //                                case JOptionPane.YES_OPTION:
-//                                    log.info ("saving analyst report data from generateViewHtmlListener()...");
+//                                    LogUtils.getLogger().info ("saving analyst report data from generateViewHtmlListener()...");
 //                                    saveReport();
 //                                    break;
 //                                case JOptionPane.CANCEL_OPTION:
@@ -1040,7 +1037,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
                 outFile = outFile.substring(0, idx) + ".html";
 
-                JFileChooser genChooser = new JFileChooser("./AnalystReports");
+                File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+                JFileChooser genChooser = new JFileChooser(aRDir);
                 genChooser.setSelectedFile(new File(outFile));
                 genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
@@ -1055,7 +1053,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 // TODO:  change XML input to temp file, rather than final file, if possible
                 XsltUtility.runXslt(reportFile.getAbsolutePath(),       // XML  input
                         genChooser.getSelectedFile().getAbsolutePath(), // HTML output
-                        "AnalystReports/AnalystReportXMLtoHTML.xslt");  // stylesheet
+                        "configuration/AnalystReportXMLtoHTML.xslt");  // stylesheet
 
                 // always show latest report, they asked for it
                 showHtmlViewer(genChooser.getSelectedFile());

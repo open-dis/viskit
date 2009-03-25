@@ -1,5 +1,6 @@
 package viskit.xsd.translator;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,7 +21,6 @@ import javax.xml.bind.Unmarshaller;
 
 // Application specific imports
 import viskit.xsd.bindings.eventgraph.*;
-import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
 /**
@@ -30,7 +30,6 @@ import viskit.VGlobals;
  */
 public class SimkitXML2Java {
 
-    static Logger log = Logger.getLogger(SimkitXML2Java.class);
     private SimEntity root;
     InputStream fileInputStream;
     private String fileBaseName;
@@ -64,7 +63,7 @@ public class SimkitXML2Java {
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         } catch (JAXBException ex) {
-            log.error(ex);
+            LogUtils.getLogger().error(ex);
         }       
     }
     
@@ -80,7 +79,7 @@ public class SimkitXML2Java {
             fileBaseName = baseNameOf(xmlFile);
             fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
         } catch (ClassNotFoundException cnfe) {
-            log.error(cnfe);
+            LogUtils.getLogger().error(cnfe);
         }
     }
 
@@ -103,7 +102,7 @@ public class SimkitXML2Java {
         } catch (JAXBException ex) {
             
             // Silence attempting to unmarshal an Assembly here
-            log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
+            LogUtils.getLogger().debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
         }
     }
     
@@ -217,7 +216,7 @@ public class SimkitXML2Java {
         List<Parameter> superParams = resolveSuperParams(this.root.getParameter());
 
         // Logger instantiation
-//        pw.println(sp4 + "static Logger log " + eq + " Logger" + pd + 
+//        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
         pw.println(sp4 + "/* Simulation Parameters */");
@@ -254,7 +253,7 @@ public class SimkitXML2Java {
                 try {
                     c = Class.forName(s.getType());
                 } catch (ClassNotFoundException cnfe) {
-//                log.error(cnfe);
+//                LogUtils.getLogger().error(cnfe);
                     pw.println(sp4 + "protected" + sp + stripLength(s.getType()) + sp + s.getName() + sc);
                 }
             }
@@ -265,7 +264,7 @@ public class SimkitXML2Java {
                 try {
                     cst = c.getConstructor(new Class<?>[] {});
                 } catch (NoSuchMethodException nsme) {
-//                    log.error(nsme);
+//                    LogUtils.getLogger().error(nsme);
                 }
 
                 if (cst != null) {
@@ -579,10 +578,10 @@ public class SimkitXML2Java {
                 
                 // If using plain Vanilla Viskit, don't report on diskit extended EGs
                 if (!cnfe.getMessage().contains("diskit")) {
-//                    log.error(cnfe);
+//                    LogUtils.getLogger().error(cnfe);
                 }
             } catch (NoSuchMethodException cnfe) {
-//                log.error(cnfe);
+//                LogUtils.getLogger().error(cnfe);
             }
             if (doRun != null) {
                 pw.println(sp4 + "@Override");
@@ -627,7 +626,7 @@ public class SimkitXML2Java {
      * @param eventBlock the StringWriter assigned to write the Event
      */
     void doEventBlock(Event e, StringWriter eventBlock) {
-        log.debug("Event is: " + e.getName());
+        LogUtils.getLogger().debug("Event is: " + e.getName());
         PrintWriter pw = new PrintWriter(eventBlock);
         List<StateTransition> liStateT = e.getStateTransition();
         List<Argument> liArgs = e.getArgument();
@@ -910,7 +909,7 @@ public class SimkitXML2Java {
 
         } catch (java.lang.ClassNotFoundException cnfe) {
             if (extendz.equals("simkit.SimEntityBase")) {
-                log.error(extendz + " not in classpath ");
+                LogUtils.getLogger().error(extendz + " not in classpath ");
             }
         }
         return superParams;
@@ -984,7 +983,7 @@ public class SimkitXML2Java {
         try {
             aClass = Thread.currentThread().getContextClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
-//            log.error(cnfe);
+//            LogUtils.getLogger().error(cnfe);
         }
 
         if (aClass != null) {
@@ -1018,26 +1017,26 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        log.info("Event Graph (EG) file is: " + xmlFile);
-        log.info("Generating Java Source...");
+        LogUtils.getLogger().info("Event Graph (EG) file is: " + xmlFile);
+        LogUtils.getLogger().info("Generating Java Source...");
         
         InputStream is = null;
         try {
             is = new FileInputStream(xmlFile);
-        } catch (FileNotFoundException fnfe) {log.error(fnfe);}
+        } catch (FileNotFoundException fnfe) {LogUtils.getLogger().error(fnfe);}
 
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
         sx2j.setFileBaseName(baseName.getName());
         sx2j.unmarshal();
         String dotJava = sx2j.translate();
-        log.info("Done.");
+        LogUtils.getLogger().info("Done.");
 
         // also write out the .java to a file and compile it
         // to a .class
-        log.info("Generating Java Bytecode...");
+        LogUtils.getLogger().info("Generating Java Bytecode...");
         if (VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
-           log.info("Done.");   
+           LogUtils.getLogger().info("Done.");
         }
     }
 }

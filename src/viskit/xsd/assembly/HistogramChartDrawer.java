@@ -2,12 +2,11 @@ package viskit.xsd.assembly;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import edu.nps.util.LogUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -17,6 +16,8 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
+import viskit.VGlobals;
+import viskit.ViskitProject;
 
 /**
  *
@@ -27,8 +28,6 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
  * @since August 3, 2006, 10:21 AM
  */
 public class HistogramChartDrawer {
-
-    static Logger log = Logger.getLogger(HistogramChartDrawer.class);
     
     /** Creates a new instance of HistogramChartDrawer */
     public HistogramChartDrawer() {}
@@ -36,24 +35,17 @@ public class HistogramChartDrawer {
     /**
      * Creates a histogram image in PNG format based on the parameters provided
      *
-     * @param title 
-     * @param label 
+     * @param title the title of the Histogram
+     * @param label the name of the Histogram
      * @param data an array of doubles that are to be plotted
-     * @param fileName the name of the file to save the image out to
      * @return the path url of the created object
      */
-    public String createHistogram(String title, String label, double[] data, String fileName) {
-        String baseUrl = "charts/" + fileName + "Histogram.png";
-        String chartUrl = "./" + baseUrl;
-        String fileLocation = "./AnalystReports/" + baseUrl;
+    public String createHistogram(String title, String label, double[] data) {
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
         IntervalXYDataset dataset = createIntervalXYDataset(label, data);
-        try {
-            saveChart(createChart(dataset, title, "Value"), fileLocation);
-        } catch (IOException ioe) {
-            log.error("Unable to create chart image: " + ioe.getMessage());
-            ioe.printStackTrace();
-        }
-        return chartUrl;
+        saveChart(createChart(dataset, title, "Value"), fileLocation);
+        return fileLocation.getAbsolutePath().replaceAll("\\\\", "/");
     }
 
     /**
@@ -120,16 +112,21 @@ public class HistogramChartDrawer {
     /**
      * Saves a chart to PNG format
      * @param chart the created JFreeChart instance
-     * @param path the path to save the generated PNG to
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException 
+     * @param outFile the path to save the generated PNG to
      */
-    private void saveChart(JFreeChart chart, String path) throws FileNotFoundException, IOException {
+    private void saveChart(JFreeChart chart, File outFile) {
 
-        File outFile = new File(path);
-        FileOutputStream fos = new FileOutputStream(outFile);
-        ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
-        fos.flush();
-        fos.close();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(outFile);
+            ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
+        } catch (IOException ioe) {
+            LogUtils.getLogger().error(ioe);
+        } finally {
+            try {
+                fos.flush();
+                fos.close();
+            } catch (IOException ioe) {}
+        }
     }
 }

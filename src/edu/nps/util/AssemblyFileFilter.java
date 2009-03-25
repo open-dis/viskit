@@ -49,9 +49,6 @@ package edu.nps.util;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
-// Application specific imports
-import org.apache.log4j.Logger;
-
 /**
  * Filters files whose names contain a given String, case insensitive
  *
@@ -68,10 +65,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten</a>
  */
 public final class AssemblyFileFilter extends FileFilter {
-    
-    /** log4j logger instance */
-    static Logger log = Logger.getLogger(AssemblyFileFilter.class);
-    
+        
     /** we filter to accept only files starting with this string */
     private final String contains;
     
