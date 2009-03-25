@@ -32,6 +32,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import viskit.ViskitConfig;
 
 /**
  * Utility class to validate XML files against provided Schema and 
@@ -118,7 +119,7 @@ public class XMLValidationTool {
             LogUtils.getLogger().info("Validating: " + source.getSystemId());
 
             // Prepare error errorsLog with current DTG
-            File errorsLog = new File(System.getProperty("user.home") + "/.viskit/validationErrors.LogUtils.getLogger()");
+            File errorsLog = new File(ViskitConfig.VISKIT_HOME_DIR + "/validationErrors.log");
             
             // New LogUtils.getLogger() each Viskit startup
             if (errorsLog.exists()) {errorsLog.delete();}

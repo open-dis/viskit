@@ -1150,7 +1150,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.LogUtils.getLogger()
+            // TODO: implement a Dialog pointing to the validationErrors.log
             return null;
         } else {
             LogUtils.getLogger().info(f + " is valid XML\n");
@@ -1182,7 +1182,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.LogUtils.getLogger()
+            // TODO: implement a Dialog pointing to the validationErrors.log
             return null;
         } else {
             LogUtils.getLogger().info(x2j.getEventGraphFile() + " is valid XML\n");
