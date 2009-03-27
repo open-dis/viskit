@@ -84,6 +84,9 @@ public interface ViskitAssemblyController {
     /** Opens a Viskit Project Assembly File */
     void open();
 
+    /** Performs project clean up tasks before closing out the project */
+    void doProjectCleanup();
+
     /** Opens an already existing Viskit Project
      * @param file the project root file for an existing Viskit project
      */

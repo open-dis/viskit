@@ -303,6 +303,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             if (fullPath.equals(CLEARPATHFLAG)) {
                 acontroller.clearRecentProjFileSet();
             } else {
+                acontroller.doProjectCleanup();
                 acontroller.openProject(new File(fullPath));
             }
         }
@@ -700,18 +701,44 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
+        
+        pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
+                this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");       
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
+        
+        // Special handling if the Diskit library is found in the project's lib
+//        StringBuilder javaCp = new StringBuilder(System.getProperty("java.class.path"));
+//        String pathSep = System.getProperty("path.separator");
+//
+//        for (String path : extraCP) {
+//            if (path.contains("diskit.jar")) {
+//                javaCp.append(pathSep + path);
+//            } else if (path.contains("dis-enums.jar")) {
+//                javaCp.insert(0, pathSep + path);
+//            } else if (path.contains("open-dis.jar")) {
+//                javaCp.append(pathSep + path);
+//            }
+//        }
+//
+//        System.setProperty("java.class.path", javaCp.toString());
+
         if (extraCP != null) {
             File file = null;
             for (String path : extraCP) { // tbd same for pcls
                 file = new File(path);
                 if (file.exists()) {
-                    if (path.endsWith(".jar")) {
+                    if ((path.endsWith(".jar"))) {
                         lTree.addContentRoot(file);
+                        // Only added once if first from here to the PCL node tree
+//                        if (path.contains("diskit.jar")) {
+//                            pclTree.addContentRoot(file);
+//                        } else {
+//                            lTree.addContentRoot(file);
+//                        }
 
-                    // f may be an empty directory
-                    } else if (file.listFiles().length == 0) {
+                    // ${file} may be an empty directory
+                    } else if (file.isDirectory() && file.listFiles().length == 0) {
                         continue;
 
                     // Recurse a directory and locate appropriate SimEntity class files
@@ -725,18 +752,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
         VGlobals vGlobals = VGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
+
+        // The viskit.util.Compiler will call a fresh (reset) LocalBootLoader
+        // here when compiling EGs for the first time
         addToEventGraphPallette(vkp.getEventGraphsDir(), true);
 
         LegosPanel lPan = new LegosPanel(lTree);
-
-        pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
-                this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
-        
-        // Now load the simkit.jar from where ever it is located on the classpath
-        // and the diskit.jar (if it can be found as well).
+         
+        // Now load the simkit.jar and diskit.jar from where ever they happen to
+        // be located on the classpath
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
-            if ((path.contains("simkit.jar")) || (path.contains("diskit.jar"))) {
+            if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 pclTree.addContentRoot(new File(path));
             }
         }

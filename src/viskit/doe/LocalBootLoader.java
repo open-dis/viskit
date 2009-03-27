@@ -210,6 +210,11 @@ public class LocalBootLoader extends URLClassLoader {
         return classPath;
     }
 
+    /** @param cp our java classpath in String[] form */
+    public void setClassPath(String[] cp) {
+        classPath = cp;
+    }
+
     /** @return a URL[] of External ClassPath paths */
     public URL[] getExtUrls() {
         return extUrls;
@@ -231,18 +236,12 @@ public class LocalBootLoader extends URLClassLoader {
         return allowAssembly;
     }
 
-    /**
-     * 
-     * @param enable
-     */
+    /** @param enable if true allows Assembly inclusion in temp jars */
     public void setAllowAssemby(boolean enable) {
         this.allowAssembly = enable;
     }
 
-    /**
-     * 
-     * @param reload
-     */
+    /** @param reload if true, reloads the simkit.jar on the java classpath */
     public void setReloadSimkit(boolean reload) {
         this.reloadSimkit = reload;
     }
@@ -251,7 +250,7 @@ public class LocalBootLoader extends URLClassLoader {
     private void initStage1() {
         String classPathProp = System.getProperty("java.class.path");
         String pathSep = System.getProperty("path.separator");
-        classPath = classPathProp.split(pathSep);
+        setClassPath(classPathProp.split(pathSep));
         ClassLoader parentClassLoader = getParent();
         //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
 

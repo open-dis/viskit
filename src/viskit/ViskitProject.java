@@ -309,7 +309,7 @@ public class ViskitProject {
         // Prevent duplicate entries
         Set<String> cp = new HashSet<String>();
 
-        // Find and list JARs and ZIPs from the project's lib directory in the extra classpath widget
+        // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
