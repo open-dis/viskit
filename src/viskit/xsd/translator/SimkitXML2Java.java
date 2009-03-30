@@ -761,7 +761,7 @@ public class SimkitXML2Java {
             pw.println(sp8 + "if" + sp + lp + s.getCondition() + rp + sp + ob);
         }
 
-        pw.print(sp8 + condent + "waitDelay" + lp + qu + ((Event) s.getEvent()).getName() + qu + cm);
+        pw.print(sp8 + condent + "waitDelay" + lp + qu + ((Event) s.getEvent()).getName() + qu + cm + sp);
 
         // according to schema to meet Priority class definition, the following 
         // tags should be permitted:
