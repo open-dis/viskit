@@ -1542,8 +1542,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             try {
                 ImageIO.write(image, "png", fil);
             } catch (IOException e) {
-                System.out.println("AssemblyController Exception in capturing screen: " + e.getMessage());
-                return;
+                LogUtils.getLogger().error(e);
             }
 
             // display a scaled version

@@ -804,16 +804,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
         } while (!done);
     }
 
-    public void arcEdit(viskit.model.SchedulingEdge ed) //------------------------------------
-    {
+    public void arcEdit(viskit.model.SchedulingEdge ed) {
         boolean modified = ((ViskitView) getView()).doEditEdge(ed);
         if (modified) {
             ((viskit.model.ViskitModel) getModel()).changeEdge(ed);
         }
     }
 
-    public void canArcEdit(viskit.model.CancellingEdge ed) //---------------------------------------
-    {
+    public void canArcEdit(viskit.model.CancellingEdge ed) {
         boolean modified = ((ViskitView) getView()).doEditCancelEdge(ed);
         if (modified) {
             ((viskit.model.ViskitModel) getModel()).changeCancelEdge(ed);
@@ -825,6 +823,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
     /** Screen capture a snapshot of the Event Graph View Frame */
     public void captureWindow() {
         String fileName = "ViskitScreenCapture";
+
+        // create and save the image
+        EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
+
+        // Get only the jgraph part
+        Component component = egvf.getCurrentJgraphComponent();
         File localLastFile = ((ViskitModel) getModel()).getLastFile();
         if (localLastFile != null) {
             fileName = localLastFile.getName();
@@ -836,7 +840,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             return;
         }
 
-        final Timer tim = new Timer(100, new TimerCallback(fil, true));
+        final Timer tim = new Timer(100, new TimerCallback(fil, true, egvf, component));
         tim.setRepeats(false);
         tim.start();
 
@@ -857,6 +861,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
         File eventGraphImageFile;
         TimerCallback tcb;
 
+        // create and save the image
+        EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
+
+        // Get only the jgraph part
+        Component component = egvf.getCurrentJgraphComponent();
+
         /* If another run is to be performed with the intention of generating
          * an Analyst Report, prevent the last Event Graph open (from prior group
          * if any open) from being the dominant (only) screen shot taken.  In
@@ -876,7 +886,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
                 eventGraphImage = itr.next();
                 eventGraphImageFile = new File(eventGraphImage);
                 LogUtils.getLogger().debug("eventGraphImage is: " + eventGraphImage);
-                tcb = new TimerCallback(eventGraphImageFile, false);
+                tcb = new TimerCallback(eventGraphImageFile, false, egvf, component);
 
                 // Make sure we have a directory ready to receive these images
                 if (!eventGraphImageFile.getParentFile().isDirectory()) {
@@ -895,19 +905,17 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
         File fil;
         boolean display;
+        JFrame frame;
+        Component component;
 
-        TimerCallback(File f, boolean b) {
+        TimerCallback(File f, boolean b, JFrame frame, Component component) {
             fil = f;
             display = b;
+            this.frame = frame;
+            this.component = component;
         }
 
-        public void actionPerformed(ActionEvent ev) {
-
-            // create and save the image
-            EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
-
-            // Get only the jgraph part
-            Component component = egvf.getCurrentJgraphComponent();
+        public void actionPerformed(ActionEvent ev) {            
 
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
@@ -921,20 +929,19 @@ public class EventGraphController extends mvcAbstractController implements Viski
             try {
                 ImageIO.write(image, "png", fil);
             } catch (IOException e) {
-                System.out.println("Controller Exception in capturing screen: " + e.getMessage());
-                return;
+                LogUtils.getLogger().error(e);
             }
 
             // display a scaled version
             if (display) {
-                JFrame frame = new JFrame("Saved as " + fil.getName());
+                JFrame localFrame = new JFrame("Saved as " + fil.getName());
                 ImageIcon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
-                frame.getContentPane().setLayout(new BorderLayout());
-                frame.getContentPane().add(lab, BorderLayout.CENTER);
-                frame.pack();
-                frame.setLocationRelativeTo((Component) getView());
-                frame.setVisible(true);
+                localFrame.getContentPane().setLayout(new BorderLayout());
+                localFrame.getContentPane().add(lab, BorderLayout.CENTER);
+                localFrame.pack();
+                localFrame.setLocationRelativeTo((Component) getView());
+                localFrame.setVisible(true);
             }
         }
     }
