@@ -514,7 +514,7 @@
     </target>
 
     <!-- === TARGET: dist === -->
-    <target name="dist" depends="clean.all,jar,doc">
+    <target name="dist" depends="clean,jar,doc">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/examples"/>
@@ -1153,15 +1153,5 @@
 ${delete.temps.cache}</echo>
         <exec executable="deleteTempsCache.bat" resolveexecutable="true"/>
     </target-->
-
-    <!-- Clean everything -->
-    <target name="clean.all"
-            depends="clean"
-            description="This will also delete all Analyst Report generated materials">
-
-        <delete includeemptydirs="true" dir="${images}"/>
-        <delete includeemptydirs="true" dir="${charts}"/>
-        <delete includeemptydirs="true" dir="${statistics}"/>
-    </target>
 
 </project>
