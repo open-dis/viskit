@@ -177,6 +177,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // file on a marshal error.
 
         File tmpF = null;
+        FileWriter fw = null;
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
@@ -187,7 +188,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
 
         try {
-            FileWriter fw = new FileWriter(tmpF);
+            fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
@@ -228,6 +229,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage(),
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ioe) {}
         }
     }
 

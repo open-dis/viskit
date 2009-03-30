@@ -163,6 +163,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         // file on a marshal error.
 
         File tmpF = null;
+        FileWriter fw = null;
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
@@ -173,7 +174,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
 
         try {
-            FileWriter fw = new FileWriter(tmpF);
+            fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
@@ -199,7 +200,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);
-            fw.close();
 
             // OK, made it through the marshal, overwrite the "real" file
             FileIO.copyFile(tmpF, f, true);
@@ -218,6 +218,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     "\n" + ex.getMessage(),
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
             return;
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ioe) {}
         }
     }
 
