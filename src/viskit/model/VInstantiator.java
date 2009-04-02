@@ -394,17 +394,11 @@ public abstract class VInstantiator {
          * @return true if arg names have been found
          */
         private boolean findArgNames(String type, List<Object> args) {
-            boolean found = false;
             if (args == null) {
                 setArgs(getDefaultArgs(type));
                 args = getArgs();
             }
-            if (indexOfArgNames(type, args) < 0) {
-                LogUtils.getLogger().warn(type + " was not loaded");
-            } else {
-                found = true;
-            }
-            return found;
+            return (indexOfArgNames(type, args) < 0);
         }
 
         /** Find a constructor match in the ClassLoader of the given EG's parameters
