@@ -623,6 +623,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         for (SimEntity entity : runEntities) {
             if (entity.getName().equals("Clock") || entity.getName().equals("DISPinger")) {
                 timer = entity;
+
+            // Convenience for Diskit
             } else if (entity.getName().indexOf("ScenarioManager") > -1) {
                 scenarioManager = entity;
                 // access the SM's numberOfReplications parameter setter
@@ -665,14 +667,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 System.out.println("Reruns changed old: " + runCount + " new: " + nextRunCount);
                 firePropertyChange("rerunCount", runCount, nextRunCount);
                 runCount = nextRunCount;
+
                 // print out new reRuns
-                System.out.println("ReRun entities added since startup: ");
-                for (SimEntity entity : Schedule.getDefaultEventList().getRerun()) {
-                    if (!runEntities.contains(entity)) {
-                        System.out.print(entity.getName() + " ");
-                    }
-                }
-                System.out.println();
+                // Note: too many Sysouts for multiple replications.  Comment
+                // in for debugging only.
+//                System.out.println("ReRun entities added since startup: ");
+//                Set<SimEntity> entitiesWithRunEvents = Schedule.getDefaultEventList().getRerun();
+//                for (SimEntity entity : entitiesWithRunEvents) {
+//                    if (!runEntities.contains(entity)) {
+//                        System.out.print(entity.getName() + " ");
+//                    }
+//                }
+//                System.out.println();
             }
             if (stopRun) {
                 LogUtils.getLogger().info("Stopped in Replication # " + (replication + 1));
