@@ -1,2 +1,2 @@
 #!/bin/bash
-java simkit.xsd.translator.SimkitXML2Java $1
+java viskit.xsd.translator.SimkitXML2Java $1

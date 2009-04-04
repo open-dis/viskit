@@ -1,6 +1,5 @@
 package viskit.xsd.translator;
 
-import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,8 +19,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Application specific imports
+import edu.nps.util.LogUtils;
+import viskit.AssemblyController;
 import viskit.xsd.bindings.eventgraph.*;
-import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -1017,7 +1017,7 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        LogUtils.getLogger().info("Event Graph (EG) file is: " + xmlFile);
+        LogUtils.getLogger().info("EventGraph (EG) file is: " + xmlFile);
         LogUtils.getLogger().info("Generating Java Source...");
         
         InputStream is = null;
@@ -1030,13 +1030,23 @@ public class SimkitXML2Java {
         sx2j.setFileBaseName(baseName.getName());
         sx2j.unmarshal();
         String dotJava = sx2j.translate();
-        LogUtils.getLogger().info("Done.");
+        if (dotJava != null && !dotJava.isEmpty()) {
+            LogUtils.getLogger().info("Done.");
+        } else {
+            LogUtils.getLogger().warn("Compile error on: " + xmlFile);
+            return;
+        }
 
         // also write out the .java to a file and compile it
         // to a .class
         LogUtils.getLogger().info("Generating Java Bytecode...");
-        if (VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
-           LogUtils.getLogger().info("Done.");
+        try {
+            if (AssemblyController.compileJavaClassFromString(dotJava) != null) {
+                LogUtils.getLogger().info("Done.");
+            }
+        } catch (NullPointerException npe) {
+            LogUtils.getLogger().error(npe);
+            npe.printStackTrace();
         }
     }
 }

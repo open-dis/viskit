@@ -1,16 +1,12 @@
-/*
- * ParameterMap.java
- *
- * Created on April 3, 2007, 7:47 PM
- *
- * Annotation type for classes compiled from XML
- */
-
 package viskit;
+
 import java.lang.annotation.*;
-/**
- *
+
+/** Used for the Viskit UI population of fields
+ * 
+ * @since April 3, 2007, 7:47 PM
  * @author Rick Goldberg
+ * @version $Id$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR})

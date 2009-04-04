@@ -1202,7 +1202,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to *.class files of our compiled sources
      */
-    public File compileJavaClassFromString(String src) {
+    public static File compileJavaClassFromString(String src) {
         String baseName = null;
 
         // Find the package subdirectory
@@ -1234,6 +1234,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
         baseName = sa[0];
 
+        FileWriter fw = null;
         try {
 
             // Should always have a live ViskitProject
@@ -1247,9 +1248,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             File javaFile = new File(srcPkg, baseName + ".java");
             javaFile.createNewFile();
 
-            FileWriter fw = new FileWriter(javaFile);
+            fw = new FileWriter(javaFile);
             fw.write(src);
-            fw.close();
 
             File classesDir = viskitProj.getClassesDir();
 
@@ -1265,8 +1265,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                     LogUtils.getLogger().info(diagnostic);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            LogUtils.getLogger().error(ioe);
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ioe) {}
         }
         return null;
     }
