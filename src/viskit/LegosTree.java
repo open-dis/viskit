@@ -543,7 +543,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     return false;
                 }
                 // TBD add an ignore in SettingsDialog, and in history file
-                if (f.getName().equals("svn") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 || f.getName().indexOf("Locations") > -1) {
+                if (f.getName().contains("svn") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 || f.getName().indexOf("Locations") > -1) {
                     return false;
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
