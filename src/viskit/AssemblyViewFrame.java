@@ -707,22 +707,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
         
-        // Special handling if the Diskit library is found in the project's lib
-//        StringBuilder javaCp = new StringBuilder(System.getProperty("java.class.path"));
-//        String pathSep = System.getProperty("path.separator");
-//
-//        for (String path : extraCP) {
-//            if (path.contains("diskit.jar")) {
-//                javaCp.append(pathSep + path);
-//            } else if (path.contains("dis-enums.jar")) {
-//                javaCp.insert(0, pathSep + path);
-//            } else if (path.contains("open-dis.jar")) {
-//                javaCp.append(pathSep + path);
-//            }
-//        }
-//
-//        System.setProperty("java.class.path", javaCp.toString());
-
         if (extraCP != null) {
             File file = null;
             for (String path : extraCP) { // tbd same for pcls
@@ -730,13 +714,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 if (file.exists()) {
                     if ((path.endsWith(".jar"))) {
                         lTree.addContentRoot(file);
-                        // Only added once if first from here to the PCL node tree
-//                        if (path.contains("diskit.jar")) {
-//                            pclTree.addContentRoot(file);
-//                        } else {
-//                            lTree.addContentRoot(file);
-//                        }
-
+                        
                     // ${file} may be an empty directory
                     } else if (file.isDirectory() && file.listFiles().length == 0) {
                         continue;
@@ -757,17 +735,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // here when compiling EGs for the first time
         addToEventGraphPallette(vkp.getEventGraphsDir(), true);
 
-        LegosPanel lPan = new LegosPanel(lTree);
-         
         // Now load the simkit.jar and diskit.jar from where ever they happen to
-        // be located on the classpath
+        // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
+                lTree.addContentRoot(new File(path));
                 pclTree.addContentRoot(new File(path));
             }
         }
-        
+
+        LegosPanel lPan = new LegosPanel(lTree);
         PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
 
         lTree.setBackground(background);
