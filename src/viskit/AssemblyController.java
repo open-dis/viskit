@@ -19,6 +19,7 @@ import edu.nps.util.TempFileManager;
 import java.lang.reflect.Field;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.jgraph.graph.DefaultGraphCell;
+import viskit.doe.LocalBootLoader;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -1281,6 +1282,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @return a package and file pair
      */
     public PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
+        PkgAndFile paf = null;
         try {
             SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
             x2j.unmarshal();
@@ -1295,16 +1297,27 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             // If using plain Vanilla Viskit, don't compile diskit extended EGs
             // as diskit.jar won't be available
-            if (src.contains("diskit") && !new File("lib/ext/diskit.jar").exists()) {
-                FileBasedClassManager.instance().addCacheMiss(xmlFile);
-                return null;
+            String[] classPath = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader()).getClassPath();
+            boolean foundDiskit = false;
+            for (String path : classPath) {
+                if (path.contains("diskit.jar")) {
+                    foundDiskit = !foundDiskit;
+                    break;
+                }
             }
-            return compileJavaClassAndSetPackage(src);
+            if (src.contains("diskit") && !foundDiskit) {
+                FileBasedClassManager.instance().addCacheMiss(xmlFile);
+
+                // TODO: Need to announce/recommend to the user to place
+                // diskit.jar in the classpath, then restart Viskit
+            } else {               
+                paf = compileJavaClassAndSetPackage(src);
+            }
         } catch (FileNotFoundException e) {
             LogUtils.getLogger().error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
-        return null;
+        return paf;
     }
 
     /** Path for EG and Assy compilation

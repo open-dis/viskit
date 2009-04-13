@@ -1,8 +1,3 @@
-/*
- * XsltUtility.java
- *
- * Created on March 11, 2004, 4:55 PM 
- */
 package viskit.xsd.assembly;
 
 import javax.xml.transform.*;
@@ -16,6 +11,7 @@ import java.io.FileOutputStream;
  * It was copied to this application to perform XSLT conversions.
  *
  * @author Duane Davis
+ * @since March 11, 2004, 4:55 PM
  * @version $Id$
  */
 public class XsltUtility {
@@ -31,8 +27,7 @@ public class XsltUtility {
      */
     public static boolean runXslt(String inFile, String outFile, String xslFile) {
         
-        try // FileNotFoundException, TransformerConfigurationException, TransformerException
-        {
+        try {
             // Force Xalan for this TransformerFactory
             System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -43,23 +38,20 @@ public class XsltUtility {
             Source source = new StreamSource(new FileInputStream(inFile));
             Result result = new StreamResult(new FileOutputStream(outFile));
             xFormer.transform(source, result);
-        } // try
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("Unable to load file for XSL Transformation\n" +
                     "   Input file : " + inFile + "\n" +
                     "   Output file: " + outFile + "\n" +
                     "   XSLT file  : " + xslFile);
             return false;
-        } // catch (FileNotFoundException e)
-        catch (TransformerConfigurationException e) {
+        } catch (TransformerConfigurationException e) {
             System.out.println("Unable to configure transformer for XSL Transformation");
             return false;
-        } // catch (TransformerConfigurationException e)
-        catch (TransformerException e) {
+        } catch (TransformerException e) {
             System.out.println("Exception during XSL Transformation");
             return false;
-        } // catch (TransformerException e)
-
+        } 
         return true;
     }
-}
+
+} // end class file XsltUtility.java
