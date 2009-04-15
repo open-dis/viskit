@@ -317,10 +317,11 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
         VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
 
-        // Don't allow placement of a bad SimEntity on the Assembly palette
-        if (!vc.isArgNameFound()) {
-            return;
-        }
+        // TODO: Don't allow placement of a bad SimEntity on the Assembly palette
+        // Bad check here b/c the types are null, of course an arg name won't be found, duh!
+//        if (!vc.isArgNameFound()) {
+//            return;
+//        }
         node.setInstantiator(vc);
 
         getNodeCache().put(node.getName(), node);   // key = ev
