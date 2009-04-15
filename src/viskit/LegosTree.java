@@ -62,6 +62,13 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
+    /** Constructor for Listener Event Graph Object Tree
+     *
+     * @param className a class to evaluate as a LEGO
+     * @param icon a LEGO icon
+     * @param dslis a DragStartListener
+     * @param tooltip description for this LEGO tree
+     */
     LegosTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip) {
         super();
         setModel(mod = new DefaultTreeModel(root));
@@ -116,8 +123,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         collapseRow(0);
         bugHack = false;
     }
-
     // end of hack to hide the tree root
+
     /**
      * Override to provide a global tooltip for entire table..not just for nodes
      *
@@ -495,8 +502,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             Object uo = ((DefaultMutableTreeNode) value).getUserObject();
             setLeafIcon(LegosTree.this.myLeafIcon); // default
 
-            if (uo instanceof Class) {
-                Class c = (Class) uo;
+            if (uo instanceof Class<?>) {
+                Class<?> c = (Class<?>) uo;
                 String nm = c.getName();
 
                 setToolTipText(nm);
@@ -509,10 +516,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 String nm = xn.loadedClass;
                 nm = nm.substring(nm.lastIndexOf('.') + 1);
                 if (xn.isXML) {
-                    nm = nm + "(XML)";
+                    nm += "(XML)";
                     setToolTipText(nm + " (loaded from XML)");
                 } else {
-                    nm = nm + "(C)";
+                    nm += "(C)";
                     setToolTipText(nm + " (loaded from .class)");
                 }
                 value = nm;
@@ -560,29 +567,30 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         if (lis == null) {
             return;
         }
+
         Object o = getUO();
         if (o == null) {
             return;
         }
-        Transferable xfer;
 
+        Transferable xfer;
+        StringSelection ss = null;
+        
         if (o instanceof FileBasedAssyNode) {
             FileBasedAssyNode xn = (FileBasedAssyNode) o;
-
-            StringSelection ss = new StringSelection(targetClassName + "\t" + xn.toString());
-            lis.startingDrag(ss);
-            xfer = ss;
-        } else if (o instanceof Class) {
+            ss = new StringSelection(targetClassName + "\t" + xn.toString());
+        } else if (o instanceof Class<?>) {
             String s = getClassName(o);
             if (s == null) {
                 return;
             }
-            StringSelection ss = new StringSelection(targetClassName + "\t" + s);
-            lis.startingDrag(ss);
-            xfer = ss;
+            ss = new StringSelection(targetClassName + "\t" + s);
         } else {
             return;
         } // 24 Nov 04
+
+        lis.startingDrag(ss);
+        xfer = ss;
         try {
             e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
                     new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
@@ -620,8 +628,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         if (o == null) {
             return null;
         }
-        if (o instanceof Class) {
-            return ((Class) o).getName();
+        if (o instanceof Class<?>) {
+            return ((Class<?>) o).getName();
         }
         if (o instanceof FileBasedAssyNode) {
             return ((FileBasedAssyNode) o).loadedClass;
@@ -635,4 +643,5 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             directoryRoots.clear();
         }
     }
-}
+
+} // end class file LegosTree.java

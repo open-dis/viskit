@@ -658,7 +658,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public void newEventGraphNode(String typeName, Point p) {
         String shName = shortEgName(typeName);
-        ((viskit.model.AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
+        ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
     /**
@@ -668,7 +668,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
-        ((viskit.model.ViskitAssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
+        ((ViskitAssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
     /**
@@ -698,7 +698,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public void newPropChangeListenerNode(String name, Point p) {
         String shName = shortPCLName(name);
-        ((viskit.model.AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
+        ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
     /**
@@ -708,7 +708,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
-        ((viskit.model.AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
+        ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
 
     }
 

@@ -90,7 +90,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    ((AssemblyController) getController()).quit();
+                    ((ViskitAssemblyController) getController()).quit();
                 }
             });
 
@@ -804,14 +804,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     }
 
                     dragged = null;
-                    return;
                 } catch (UnsupportedFlavorException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+                } 
             }
         }
     }
@@ -1005,7 +1002,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     public void openProject() {
         int ret = -1;
-        AssemblyController aController = ((AssemblyController) getController());
+        ViskitAssemblyController aController = ((ViskitAssemblyController) getController());
         if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";

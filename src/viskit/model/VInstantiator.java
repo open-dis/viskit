@@ -122,7 +122,11 @@ public abstract class VInstantiator {
         private List<Object> args;
         private boolean argNameFound = false;
 
-        // takes List of Assembly parameters and args for type
+        /** Takes a List of Assembly parameters and args for type
+         *
+         * @param params a list of Assembly parameters
+         * @param type a paramater type
+         */
         public Constr(List<Object> params, String type) {
             super(type);
 
@@ -234,7 +238,8 @@ public abstract class VInstantiator {
 
         /**
          * @param assemblyParameters 
-         * @return a List of VInstantiators given a List of Assembly Parameters */
+         * @return a List of VInstantiators given a List of Assembly Parameters
+         */
         List<Object> buildInstantiators(List<Object> assemblyParameters) {
 
             ArrayList<Object> instr = new ArrayList<Object>();

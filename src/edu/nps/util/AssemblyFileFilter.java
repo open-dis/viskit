@@ -88,7 +88,9 @@ public final class AssemblyFileFilter extends FileFilter {
      *         false otherwise.
      */
     public boolean accept(File f) {
-        if (f.isDirectory()) {return true;}
+        if (f.isDirectory()) {
+            return !f.getName().contains("svn");
+        }
         return f.getName().toLowerCase().contains(contains);        
     }
     
