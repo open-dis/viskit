@@ -383,6 +383,7 @@ public class ViskitProject {
         setProjectOpen(false);
     }
 
+    /** @return the root directory of this ViskitProject */
     public File getProjectRoot() {
         return projectRoot;
     }
