@@ -77,6 +77,7 @@
         </javac>
         <echo message="${files}"/>
         <jar basedir="${dir.build.classes}" compress="false" destfile="${dist.jar}" update="true"/>
+        <copy todir="/javaapis/xmsf/SavageStudio/lib/viskit" file="${dist.jar}"/>
     </target>
     <!-- To update the viskit.jar with AnalystReportXMLtoHTML.xslt -->
     <!-- (more info: http://www.netbeans.org/kb/41/freeform-config.html#compilesingle) -->
@@ -129,5 +130,9 @@
             <classpath refid="debug.classpath"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
+    </target>
+    <target name="post.jar" description="Copy viskit.jar to SavageStudio workspace">
+        <antcall target="jar"/>
+        <copy todir="/javaapis/xmsf/SavageStudio/lib/viskit" file="${dist.jar}"/>
     </target>
  </project>

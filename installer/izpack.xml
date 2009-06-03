@@ -51,7 +51,7 @@
     
     <resources>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
-	<res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
+        <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
         <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
     </resources>
     
@@ -72,13 +72,16 @@
         <pack name="Core" required="yes">
             <description>Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-		<include name="Schemas/**/*"/>
+                <include name="Schemas/**/*"/>
+                <include name="configuration/**/*"/>
+                <include name="examples/**/*"/>
                 <include name="images/**/*"/>
                 <include name="lib/**/*" />
+                <include name="license/**/*" />
+                <include name="viskit/**/*"/>
                 <include name="Viskit.exe"/>
-		<include name="viskit-exe.jar"/>
-                <include name="viskit/javahelp/**/*"/>
-                <include name="*.xml"/>
+                <include name="viskit-exe.jar"/>
+                <include name="intro_no_diskit.html"/>
             </fileset>
         </pack>    
         <!--    

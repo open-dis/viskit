@@ -56,6 +56,7 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
         dialog.setContentPane(panel);
         dialog.pack();
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
         // Dialog will appear in center screen
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -67,7 +68,10 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
     }
 
     private void setupViskitProject(File projFile) {
-        VGlobals.instance().getAssemblyController().openProject(projFile);
+        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
+        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
+        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }
 
     /** This method is called from within the constructor to

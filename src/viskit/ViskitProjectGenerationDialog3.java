@@ -43,8 +43,8 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         nameTF.getDocument().addDocumentListener(lis);
         locationTF.getDocument().addDocumentListener(lis);
 
-        nameTF.setText("MyNewViskitProject");
-        locationTF.setText(System.getProperty("user.home").replaceAll("\\\\", "/"));
+        nameTF.setText(ViskitProject.DEFAULT_PROJECT_NAME);
+        locationTF.setText(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR);
     }
 
     class myDocListener implements DocumentListener {
@@ -209,7 +209,8 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     projectPath = pathTF.getText().trim().replaceAll("\\\\", "/");
     dialog.dispose();
 }//GEN-LAST:event_createButtActionPerformed
-    JFileChooser chooser;
+
+JFileChooser chooser;
 private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtActionPerformed
     if (chooser == null) {
         chooser = new JFileChooser();

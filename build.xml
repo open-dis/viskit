@@ -732,21 +732,33 @@
     <property name="izpack" value="${user.home}/IzPack" />
     <property name="launch4j" value="${user.home}/launch4j" />
     <property name="orangevolt" value="${user.home}/orangevolt"/>
-    <!-- it could be the case from a cvs checkout that asks for a pruned tree,
+    <!-- it could be the case from an svn checkout that asks for a pruned tree,
         in which case, this would get set before build.init can complete the path
         which will break runtime.jars below -->
     <mkdir dir="${dir.lib.ext}" />
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
     <!-- it should be named manually though for what version has been tested -->
-    <property name="winJREExe" value="jdk-6u10-windows-i586-p.exe"/>
+    <property name="winJREExe" value="jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe"/>
     <property name="winJRE" value="${user.home}${file.separator}${winJREExe}" />
 
     <target name="checkJRE" >
         <available file="${winJRE}" property="winJRE.exists" />
     </target>
+    
     <target name="getJRE" depends="checkJRE" unless="winJRE.exists"  >
         <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}" />
+    </target>
+
+    <target name="checkIzPack" if="build.host.windows">
+        <available file="/Program Files/IzPack/lib/compiler.jar" property="izPack.exists" />
+    </target>
+    <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
+        <get src="http://dist.codehaus.org/izpack/releases/3.11.0/IzPack-install-3.11.0.jar" dest="${user.home}/izpack-install.jar" />
+        <echo>When installing IzPack from web, please use default install options when prompted.</echo>
+        <echo>If you wish to then immediately uninstall, when prompted, force the deletion of </echo>
+        <echo>/Program Files/IzPack.  If you wish to keep IzPack, then just quit.</echo>
+        <java fork="true" jar="${user.home}/izpack-install.jar" />
     </target>
 
     <target name="moveIzPack" if="build.host.windows">
@@ -758,26 +770,6 @@
         </copy>
         <!-- This should delete /Program Files/IzPack and any registry entries after moving -->
         <java jar="/Program Files/IzPack/Uninstaller/uninstaller.jar" fork="true"/>
-    </target>
-    <target name="checkIzPack">
-        <available file="${izpack}/lib/compiler.jar" property="izPack.exists" />
-    </target>
-    <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
-        <get src="http://dist.codehaus.org/izpack/releases/3.11.0/IzPack-install-3.11.0.jar" dest="${user.home}/izpack-install.jar" />
-        <echo>Installing IzPack from web, please just use default install path when prompted </echo>
-        <echo>and unselect the placing of shortcuts in your Start-Menu.</echo>
-        <echo>Perform an unistall when prompted and force the deletion of </echo>
-        <echo>/Program Files/IzPack.  This is being copied elsewhere to complete </echo>
-        <echo>the Viskit installer building process.</echo>
-        <java fork="true" jar="${user.home}/izpack-install.jar" />
-        <ant target="moveIzPack"/>
-        <copy todir="${izpack}/bin/langpacks/flags">
-            <fileset dir="${installer}/images">
-                <include name="american-flag.gif"/>
-            </fileset>
-        </copy>
-        <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
-        <move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
     </target>
 
     <target name="checkLaunch4j">
@@ -836,22 +828,19 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions"
-            depends="no.runtime.extensions,getJRE,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="no.runtime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Build the installers with no runtime extensions">
         <mkdir dir="${installer}/build" />
         <mkdir dir="${installer}/stage/lib"/>
         <mkdir dir="${installer}/stage/images"/>
-        <mkdir dir="${installer}/stage/sources"/>
 
-        <copy todir="${installer}/stage/sources/Viskit">
-            <fileset dir="${basedir}">
-                <exclude name="${basedir}/viskit/xsd/bindings"/>
-            </fileset>
-        </copy>
         <copy todir="${installer}/stage/Schemas">
-            <fileset dir="${basedir}/Schemas"/>
+            <fileset dir="${schema.dir}"/>
         </copy>
-	<copy todir="${installer}/stage/images">
+        <copy todir="${installer}/stage/configuration">
+            <fileset dir="${configuration.dir}"/>
+        </copy>
+        <copy todir="${installer}/stage/images">
             <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
@@ -881,30 +870,17 @@
                 <include name="intro_no_diskit.html"/>
             </fileset>
         </copy>
-        <copy todir="${installer}/stage">
+        <!--copy todir="${installer}/stage">
             <fileset dir="${dir.src}">
                 <include name="*.*"/>
             </fileset>
-        </copy>
-        <copy todir="${installer}/stage">
-            <fileset dir="${basedir}">
-                <include name="vconfig.xml"/>
-                <include name="c_app.xml"/>
-                <include name="c_gui.xml"/>
-            </fileset>
-        </copy>
+        </copy-->
         <delete file="${installer}/stage/build.xml"/>
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
-        <!-- do this again just in case IzPack was installed previously -->
-        <copy todir="${izpack}/bin/langpacks/flags">
-            <fileset dir="${installer}/images">
-                <include name="american-flag.gif"/>
-            </fileset>
-        </copy>
         <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
-        <move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
+        <copy file="${installer}/images/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
 
         <taskdef name="izpack"
                  classpath="${izpack}/lib/compiler.jar"
@@ -914,9 +890,8 @@
                  classname="net.sf.launch4j.ant.Launch4jTask"
                  classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
 
-        <taskdef
-            classpath="${orangevolt}.jar:${user.home}/roxes.jar"
-            resource="com/orangevolt/tools/ant/taskdefs.properties"/>
+        <taskdef classpath="${orangevolt}.jar:${user.home}/roxes.jar"
+                 resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
 
@@ -930,13 +905,12 @@
 
         <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
         <launch4j>
-            <config
-                chdir="."
-                dontwrapjar="false"
-                jar="${installer}/build/ViskitInstall.jar"
-                outfile="${installer}/build/ViskitInstall.exe"
-                headertype="gui"
-                icon="${installer}/images/ViskitIcon.ico" >
+            <config chdir="."
+                    dontwrapjar="false"
+                    jar="${installer}/build/ViskitInstall.jar"
+                    outfile="${installer}/build/ViskitInstall.exe"
+                    headertype="gui"
+                    icon="${installer}/images/ViskitIcon.ico" >
                 <jre minVersion="1.6.0"/>
             </config>
         </launch4j>
@@ -956,7 +930,7 @@
         <chmod perm="+x" file="${installer}/build/both.bat" />
         <!-- this would only work on Unix
         <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
-        plus the file is 16M, do we need that in CVS?
+        plus the file is 16M, do we need that in SVN?
         -->
         <copy file="${winJRE}" todir="${installer}/build" />
 
@@ -964,35 +938,31 @@
              basedir="${installer}/build/."
              includes="both.bat,ViskitInstall.exe,${winJREExe}" />
 
-        <sfx
-            archive="${installer}/build/install.zip"
-            mode="win32"
-            execute="both.bat"
-            icon="${installer}/images/ViskitIcon.ico"
-            output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
+        <sfx archive="${installer}/build/install.zip"
+             mode="win32"
+             execute="both.bat"
+             icon="${installer}/images/ViskitIcon.ico"
+             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
     </target>
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions"
-            depends="with.rutime.extensions,getJRE,getIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="with.rutime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Builds the installers with runtime extension libraries included">
         <mkdir dir="${installer}/build" />
         <mkdir dir="${installer}/stage/lib"/>
         <mkdir dir="${installer}/stage/images"/>
-        <mkdir dir="${installer}/stage/sources"/>
 
-        <copy todir="${installer}/stage/sources/Viskit">
-            <fileset dir="${basedir}">
-                <exclude name="${basedir}/viskit/xsd/bindings"/>
-            </fileset>
-        </copy>
         <copy todir="${installer}/stage/sources/DISKIT">
             <fileset dir="${basedir}/../DISKIT"/>
         </copy>
         <copy todir="${installer}/stage/Schemas">
             <fileset dir="${basedir}/Schemas"/>
         </copy>
-	<copy todir="${installer}/stage/images">
+        <copy todir="${installer}/stage/configuration">
+            <fileset dir="${configuration.dir}"/>
+        </copy>
+        <copy todir="${installer}/stage/images">
             <fileset dir="${installer}/images"/>
         </copy>
         <copy todir="${installer}/stage/lib" >
@@ -1025,18 +995,6 @@
                 <include name="intro.html"/>
             </fileset>
         </copy>
-        <copy todir="${installer}/stage">
-            <fileset dir="${dir.src}">
-                <include name="*.*"/>
-            </fileset>
-        </copy>
-        <copy todir="${installer}/stage">
-            <fileset dir="${basedir}">
-                <include name="vconfig.xml"/>
-                <include name="c_app.xml"/>
-                <include name="c_gui.xml"/>
-            </fileset>
-        </copy>
         <delete file="${installer}/stage/build.xml"/>
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
@@ -1048,7 +1006,7 @@
             </fileset>
         </copy>
         <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
-        <move file="${izpack}/bin/langpacks/flags/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
+        <copy file="${installer}/images/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
 
         <taskdef name="izpack"
                  classpath="${izpack}/lib/compiler.jar"
@@ -1058,9 +1016,8 @@
                  classname="net.sf.launch4j.ant.Launch4jTask"
                  classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
 
-        <taskdef
-            classpath="${orangevolt}.jar:${user.home}/roxes.jar"
-            resource="com/orangevolt/tools/ant/taskdefs.properties"/>
+        <taskdef classpath="${orangevolt}.jar:${user.home}/roxes.jar"
+                 resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
 
@@ -1074,13 +1031,12 @@
 
         <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
         <launch4j>
-            <config
-                chdir="."
-                dontwrapjar="false"
-                jar="${installer}/build/ViskitInstall.jar"
-                outfile="${installer}/build/ViskitInstall.exe"
-                headertype="gui"
-                icon="${installer}/images/ViskitIcon.ico" >
+            <config chdir="."
+                    dontwrapjar="false"
+                    jar="${installer}/build/ViskitInstall.jar"
+                    outfile="${installer}/build/ViskitInstall.exe"
+                    headertype="gui"
+                    icon="${installer}/images/ViskitIcon.ico" >
                 <jre minVersion="1.6.0"/>
             </config>
         </launch4j>
@@ -1108,12 +1064,11 @@
              basedir="${installer}/build/."
              includes="both.bat,ViskitInstall.exe,${winJREExe}" />
 
-        <sfx
-            archive="${installer}/build/install.zip"
-            mode="win32"
-            execute="both.bat"
-            icon="${installer}/images/ViskitIcon.ico"
-            output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
+        <sfx archive="${installer}/build/install.zip"
+             mode="win32"
+             execute="both.bat"
+             icon="${installer}/images/ViskitIcon.ico"
+             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
     </target>
 
     <target name="clean.installers">
