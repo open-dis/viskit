@@ -134,7 +134,7 @@ public class Splash2 extends JFrame {
         spl.setVisible(true);
 
         if (args.length == 0) {
-            args = new String[]{"viskit.EventGraphAssemblyComboMain"};
+            args = new String[] {"viskit.EventGraphAssemblyComboMain"};
         }
 
         // First argument is main class
@@ -145,10 +145,11 @@ public class Splash2 extends JFrame {
             newArgs[i] = args[i + 1];
         }
 
+        // this is used to give us some min splash viewing
         try {
             Thread.sleep(1000);
         } catch (Exception e) {
-        }  // this is used to give us some min splash viewing
+        }  
         progressBar.setString("Starting Viskit...");
         try {
             // Call the main() method of the application using reflection

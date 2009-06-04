@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -31,53 +31,69 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Sep 22, 2005
- * @since 3:23:52 PM
- * @version $Id$
- */
 package viskit;
+
+import javax.swing.*;
 
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 
-import javax.swing.*;
+import edu.nps.util.LogUtils;
 
+/**
+ * MOVES Institute</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
+ * @author Mike Bailey
+ * @since Sep 22, 2005 : 3:23:52 PM
+ * @version $Id$
+ */
 public class EventGraphAssemblyComboMain {
-    
-    public static void main(String[] args) {        
-                    
-        String initialFile = null;
 
-        if (args.length > 0) {
-            initialFile = args[0];
+    /**
+     * Viskit entry point from the command line, or introspection
+     * @param args command line arguments if any
+     */
+    public static void main(final String[] args) {
+
+        // Launch all GUI stuff on the EDT
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                public void run() {
+
+                    String initialFile = null;
+
+                    if (args.length > 0) {
+                        initialFile = args[0];
+                    }
+
+                    if (viskit.Vstatics.debug) {
+                        System.out.println("***Inside EventGraphAssembly main: " + args.length);
+                    }
+                    setLandFandFonts();
+
+                    // Leave tooltips on the screen until mouse movement causes removal
+                    ToolTipManager ttm = ToolTipManager.sharedInstance();
+                    ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+
+                    JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
+                    VGlobals.instance().setMainAppWindow(mainFrame);
+                    mainFrame.setVisible(true);
+                }
+            });
+
+        } catch (Exception e) {
+            LogUtils.getLogger().error(e);
         }
-
-        if (viskit.Vstatics.debug) {
-            System.out.println("***Inside EventGraphAssembly main: " + args.length);
-        }
-        setLandFandFonts();
-
-        // Leave tooltips on the screen until mouse movement causes removal
-        ToolTipManager ttm = ToolTipManager.sharedInstance();
-        ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
-
-        JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
-        VGlobals.instance().setMainAppWindow(mainFrame);
-        mainFrame.setVisible(true);
     }
-    
+
     public static void setLandFandFonts() {
         ViskitConfig cfg = ViskitConfig.instance();
         String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
         try {
-            if (s == null || s.length() <= 0 || s.equalsIgnoreCase("default")) {
+            if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
                 setJGoodies();
             } else if (s.equalsIgnoreCase("platform")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -88,7 +104,7 @@ public class EventGraphAssemblyComboMain {
             System.err.println("Error setting Look and Feel to " + s);
         }
     }
-    
+
     public static void setJGoodies() throws Exception{
         LookAndFeel laf = new PlasticLookAndFeel();
         Options.setUseNarrowButtons(true);
@@ -98,4 +114,5 @@ public class EventGraphAssemblyComboMain {
         UIManager.setLookAndFeel(laf);
         ShadowPopupFactory.uninstall();
     }
-}
+
+} // end class file EventGraphAssemblyComboMain.java
