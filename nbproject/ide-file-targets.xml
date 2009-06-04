@@ -131,7 +131,7 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target name="post.jar" description="Copy viskit.jar to SavageStudio workspace">
+    <target name="my.build" description="Copy viskit.jar to SavageStudio workspace">
         <antcall target="jar"/>
         <copy todir="/javaapis/xmsf/SavageStudio/lib/viskit" file="${dist.jar}"/>
     </target>

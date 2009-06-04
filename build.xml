@@ -164,6 +164,7 @@
         <mkdir dir="${dir.lib.ext}"/>
     </target>
 
+    <!-- Now a legacy target as we are no longer building schema from DTD -->
     <target name="build.schema"
             depends="build.init"
             description="Create xsd Schemas from dtd">
@@ -179,7 +180,7 @@
     </target>
 
     <target name="bindings.simkit"
-            depends="build.schema"
+            depends="build.init"
             description="Create bindings to the simkit XML Schema" >
 
         <xjc extension="true"
