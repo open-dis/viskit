@@ -40,6 +40,7 @@ import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 
 import edu.nps.util.LogUtils;
+import java.awt.EventQueue;
 
 /**
  * MOVES Institute</p>
@@ -57,36 +58,48 @@ public class EventGraphAssemblyComboMain {
      */
     public static void main(final String[] args) {
 
-        // Launch all GUI stuff on the EDT
+        // Launch all GUI stuff on, or within the EDT
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
+            if (!EventQueue.isDispatchThread()) {
+                SwingUtilities.invokeAndWait(new Runnable() {
 
-                public void run() {
-
-                    String initialFile = null;
-
-                    if (args.length > 0) {
-                        initialFile = args[0];
+                    public void run() {
+                        createGUI(args);
                     }
+                });
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                    if (viskit.Vstatics.debug) {
-                        System.out.println("***Inside EventGraphAssembly main: " + args.length);
+                    public void run() {
+                        createGUI(args);
                     }
-                    setLandFandFonts();
-
-                    // Leave tooltips on the screen until mouse movement causes removal
-                    ToolTipManager ttm = ToolTipManager.sharedInstance();
-                    ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
-
-                    JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
-                    VGlobals.instance().setMainAppWindow(mainFrame);
-                    mainFrame.setVisible(true);
-                }
-            });
+                });
+            }
 
         } catch (Exception e) {
             LogUtils.getLogger().error(e);
         }
+    }
+
+    private static void createGUI(String[] args) {
+        String initialFile = null;
+
+        if (args.length > 0) {
+            initialFile = args[0];
+        }
+
+        if (viskit.Vstatics.debug) {
+            System.out.println("***Inside EventGraphAssembly main: " + args.length);
+        }
+        setLandFandFonts();
+
+        // Leave tooltips on the screen until mouse movement causes removal
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+
+        JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
+        VGlobals.instance().setMainAppWindow(mainFrame);
+        mainFrame.setVisible(true);
     }
 
     public static void setLandFandFonts() {
