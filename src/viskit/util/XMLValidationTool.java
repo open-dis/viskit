@@ -15,7 +15,6 @@
 package viskit.util;
 
 // Standard Library Imports
-import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 // Applcation Specific Local Imports
+import edu.nps.util.LogUtils;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,24 +56,24 @@ public class XMLValidationTool {
     
     /** The locally resolved location for assembly.xsd */
     public static final String LOCAL_ASSEMBLY_SCHEMA = 
-            System.getProperty("user.dir") + "/Schemas/assembly.xsd.";
+            System.getProperty("user.dir") + "/Schemas/assembly.xsd";
     
-    /** The locally resolved location for assembly.xsd */
+    /** The locally resolved location for simkit.xsd */
     public static final String LOCAL_EVENT_GRAPH_SCHEMA = 
-            System.getProperty("user.dir") + "/Schemas/simkit.xsd.";
+            System.getProperty("user.dir") + "/Schemas/simkit.xsd";
     
     private FileWriter fWriter;
-    private File xmlFile, schema;
+    private File xmlFile, schemaFile;
     private boolean valid = true;
 
     /**
      * Creates a new instance of XMLValidationTool
      * @param xmlFile the scene file to validate
-     * @param schema the schema to validate the xmlFile against
+     * @param schemaFile the schemaFile to validate the xmlFile against
      */
     public XMLValidationTool(File xmlFile, File schema) {
         setXmlFile(xmlFile);
-        setSchema(schema);
+        setSchemaFile(schema);
 
         /* Through trial and error, found how to set this property by 
          * deciphering the JAXP debug readout using the -Djaxp.debug=1 JVM arg.
@@ -93,22 +93,21 @@ public class XMLValidationTool {
         // 1. Lookup a factory for the W3C XML Schema language
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-        // 2. Compile the schema. 
-        // Here the schema is loaded from a java.io.File, but you could use 
+        // 2. Compile the schemaFile.
+        // Here the schemaFile is loaded from a java.io.File, but you could use
         // a java.net.URL or a javax.xml.transform.Source instead.
         Schema schemaDoc = null;
         try {
-            schemaDoc = factory.newSchema(getSchema());
+            schemaDoc = factory.newSchema(getSchemaFile());
         } catch (SAXException ex) {
             LogUtils.getLogger().fatal("Unable to create Schema object: " + ex);
         }
 
-        // 3. Get a validator from the schema object.
+        // 3. Get a validator from the schemaFile object.
         Validator validator = schemaDoc.newValidator();
 
         // 4. Designate an error handler and an LSResourceResolver
-        MyHandler mh = new MyHandler();
-        validator.setErrorHandler(mh);
+        validator.setErrorHandler(new MyHandler());
 
         // 5. Prepare to parse the document to be validated.
         InputSource src = new InputSource(getXmlFile().getAbsolutePath());
@@ -159,12 +158,12 @@ public class XMLValidationTool {
         xmlFile = file;
     }
     
-    public File getSchema() {
-        return schema;
+    public File getSchemaFile() {
+        return schemaFile;
     }
 
-    public void setSchema(File schema) {
-        this.schema = schema;
+    public void setSchemaFile(File schema) {
+        this.schemaFile = schema;
     }
 
     /** Inner utility class to report errors in <(file: row, column): error> 
