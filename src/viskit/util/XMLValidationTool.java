@@ -69,7 +69,7 @@ public class XMLValidationTool {
     /**
      * Creates a new instance of XMLValidationTool
      * @param xmlFile the scene file to validate
-     * @param schemaFile the schemaFile to validate the xmlFile against
+     * @param schema the XML schema to validate the xmlFile against
      */
     public XMLValidationTool(File xmlFile, File schema) {
         setXmlFile(xmlFile);
