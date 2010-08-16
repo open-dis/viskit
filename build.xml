@@ -825,7 +825,7 @@
     <target name="no.runtime.extensions" depends="check.viskit" unless="viskit.built" >
         <ant target="jar.executable"/>
     </target>
-    <target name="with.rutime.extensions" depends="no.runtime.extensions" unless="extensions.built">
+    <target name="with.runtime.extensions" depends="no.runtime.extensions" unless="extensions.built">
         <ant target="runtime.extensions"/>
     </target>
 
@@ -950,7 +950,7 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions"
-            depends="with.rutime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="with.runtime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Builds the installers with runtime extension libraries included">
         <mkdir dir="${installer}/build" />
         <mkdir dir="${installer}/stage/lib"/>
