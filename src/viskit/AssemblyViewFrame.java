@@ -462,7 +462,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         if (propChangeListenerMode.isSelected()) {
             return PCL_MODE;
         }
-        LogUtils.getLogger().error("assert false : \"getCurrentMode()\"");
+        LogUtils.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -641,8 +641,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger().error("Drop target init. error");
-            LogUtils.getLogger().error(tmle);
+            LogUtils.getLogger(AssemblyViewFrame.class).error(tmle);
         }
 
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);

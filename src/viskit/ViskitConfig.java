@@ -13,6 +13,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -76,6 +77,8 @@ public class ViskitConfig {
 
     private static ViskitConfig me;
 
+    static final Logger LOG = LogUtils.getLogger(ViskitConfig.class);
+
     private Map<String, XMLConfiguration> xmlConfigurations;
     private Map<String, String> sessionHM;
     private CombinedConfiguration cc;
@@ -83,8 +86,8 @@ public class ViskitConfig {
     private XMLConfiguration projectXMLConifg = null;
 
     static {
-        LogUtils.getLogger().info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
-        LogUtils.getLogger().info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
+        LOG.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
+        LOG.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
     }
 
     public static synchronized ViskitConfig instance() {
@@ -98,7 +101,7 @@ public class ViskitConfig {
         try {
             if (!VISKIT_HOME_DIR.exists()) {
                 VISKIT_HOME_DIR.mkdirs();
-                LogUtils.getLogger().info("Created dir: " + VISKIT_HOME_DIR);
+                LOG.info("Created dir: " + VISKIT_HOME_DIR);
             }
             File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
             if (!V_CONFIG_FILE.exists()) {
@@ -116,7 +119,7 @@ public class ViskitConfig {
                 FileIO.copyFile(cGuiSrc, C_GUI_FILE, true);
             }
         } catch (IOException ex) {
-            LogUtils.getLogger().error(ex);
+            LOG.error(ex);
         }
         setXmlConfigurations(new HashMap<String, XMLConfiguration>());
         sessionHM = new HashMap<String, String>();
@@ -145,7 +148,8 @@ public class ViskitConfig {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e);
+//            e.printStackTrace();
         }
     }
 
@@ -184,7 +188,7 @@ public class ViskitConfig {
         try {
             projectXMLConifg = new XMLConfiguration(f);
         } catch (ConfigurationException ce) {
-            LogUtils.getLogger().error(ce);
+            LOG.error(ce);
         }
         projectXMLConifg.setAutoSave(true);
         cc.addConfiguration(projectXMLConifg);
@@ -251,7 +255,7 @@ public class ViskitConfig {
             doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
             xout.output(doc, new FileWriter(VGlobals.instance().getCurrentViskitProject().getProjectFile()));
         } catch (Exception e) {
-            LogUtils.getLogger().error("Bad jdom op: " + e.getMessage());
+            LOG.error("Bad jdom op: " + e.getMessage());
         }
     }
 
@@ -263,7 +267,7 @@ public class ViskitConfig {
     /**
      * @param xmlConfigurations the xmlConfigurations to set
      */
-    public void setXmlConfigurations(HashMap<String, XMLConfiguration> xmlConfigurations) {
+    public final void setXmlConfigurations(HashMap<String, XMLConfiguration> xmlConfigurations) {
         this.xmlConfigurations = xmlConfigurations;
     }
 }

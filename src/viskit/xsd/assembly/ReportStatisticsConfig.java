@@ -16,6 +16,7 @@ import java.util.LinkedList;
 
 import edu.nps.util.LogUtils;
 import java.io.IOException;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -45,6 +46,7 @@ import viskit.ViskitProject;
  */
 public class ReportStatisticsConfig {
 
+    static Logger log = LogUtils.getLogger(ReportStatisticsConfig.class);
     /**
      * The ordered list of Entities in the simulation that have property change
      * listeners
@@ -145,7 +147,7 @@ public class ReportStatisticsConfig {
      * @param repStats 
      */
     public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
-        LogUtils.getLogger().debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+        LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[repStats.length];
 
@@ -236,7 +238,8 @@ public class ReportStatisticsConfig {
             return f.getAbsolutePath();
 
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            log.error(ioe);
+//            ioe.printStackTrace();
             return null;
         } finally {
             try {

@@ -47,6 +47,7 @@ import java.lang.reflect.Method;
 import java.io.*;
 import java.util.Map;
 import javax.swing.*;
+import org.apache.log4j.Logger;
 
 import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
@@ -67,6 +68,7 @@ import viskit.doe.LocalBootLoader;
 public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
 
     static String lineSep = System.getProperty("line.separator");
+    static Logger log = LogUtils.getLogger(InternalAssemblyRunner.class);
     String targetClassName;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;
@@ -170,7 +172,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     public void initParams(String[] params) {
 
 //        for (String s : params) {
-//            LogUtils.getLogger().info("VM argument is: " + s);
+//            log.info("VM argument is: " + s);
 //        }
 
         targetClassName = params[AssemblyController.EXEC_TARGET_CLASS_NAME];
@@ -187,7 +189,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         } catch (Throwable throwable) {
             JOptionPane.showMessageDialog(runPanel, "Error initializing Assembly object:\n" + throwable.getMessage(), "Java Error", JOptionPane.ERROR_MESSAGE);
             twiddleButtons(OFF);
-            throwable.printStackTrace();
+//            throwable.printStackTrace();
             return;
         }
         twiddleButtons(InternalAssemblyRunner.REWIND);
@@ -254,7 +256,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             
             // Test for Bug 1237
 //            for (String s : loader.getClassPath()) {
-//                LogUtils.getLogger().info(s);
+//                log.info(s);
 //            }
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
@@ -305,21 +307,21 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (InterruptedException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (IllegalAccessException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (IllegalArgumentException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (InvocationTargetException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (NoSuchMethodException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (SecurityException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (InstantiationException ex) {
-           LogUtils.getLogger().error(ex);
+           log.error(ex);
         } catch (ClassNotFoundException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         }
     }
 
@@ -337,7 +339,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             try {
                 waitOn.join();
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             }
 
             end();
@@ -347,15 +350,15 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
             } catch (SecurityException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             } catch (NoSuchMethodException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             } catch (IllegalArgumentException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             } catch (IllegalAccessException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             } catch (InvocationTargetException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             }
             signalReportReady();
         }
@@ -372,15 +375,20 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 Schedule.coldReset();
                 Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
             } catch (SecurityException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (InvocationTargetException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (IllegalAccessException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             }
             mutex--;
             
@@ -430,15 +438,20 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 setStopRun = targetClass.getMethod("setStopRun", boolean.class);
                 setStopRun.invoke(assemblyObj, true);
             } catch (SecurityException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (InvocationTargetException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (IllegalAccessException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             }
                     
             twiddleButtons(InternalAssemblyRunner.STOP);
@@ -678,7 +691,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                   Runtime.getRuntime().exec(tool + " " + filePath);
               }
               catch (IOException ex1) {
-                  ex1.printStackTrace();
+                  log.error(ex1);
+//                  ex1.printStackTrace();
               }
             }
         }
@@ -708,11 +722,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
     
     public void propertyChange(PropertyChangeEvent evt) {
-        LogUtils.getLogger().debug(evt.getPropertyName());
+        log.debug(evt.getPropertyName());
         
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
-            npsString.append(evt.getNewValue() + " of " + Integer.parseInt(runPanel.numRepsTF.getText()) + "</b>\n");
+            npsString.append(evt.getNewValue());
+            npsString.append(" of ");
+            npsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
+            npsString.append("</b>\n");
             npsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(npsString.toString());
             

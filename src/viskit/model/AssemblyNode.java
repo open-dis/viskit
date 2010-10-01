@@ -3,7 +3,6 @@ package viskit.model;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.awt.Point;
-import viskit.VGlobals;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

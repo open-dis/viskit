@@ -40,11 +40,11 @@ import viskit.xsd.bindings.assembly.*;
  * back to the AssemblyServer their Reports via the 
  * XML-RPC port, which in turn via usid is updated
  * in the associated GridRunner; this reduces the 
- * number of ports required from upto infinity to 
+ * number of ports required from up to infinity to
  * just 1.
  *
  * GridRunner implements the back end of each XML-RPC
- * call related to running an experiment, It prepares
+ * call related to running an experiment, it prepares
  * the DesignPoints, saves the experiment file, and
  * qsubs the Gridlets. 
  * 
@@ -186,11 +186,11 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         this.status = new ArrayList<String>();
         for ( int i = 0; i < totalSamples * designPointCount; i ++) {
             queue.add(Boolean.TRUE);
-            designPointStatsNotifiers.add(new Boolean(false));
+            designPointStatsNotifiers.add(false);
             for (int j = 0; j < this.replicationsPerDesignPoint; j++) {
-                replicationStatsNotifiers.add(new Boolean(false));
+                replicationStatsNotifiers.add(false);
             }
-            resultsNotifiers.add(new Boolean(false));
+            resultsNotifiers.add(false);
             status.add("Pending");
         }
         
@@ -301,14 +301,14 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 // notice these get swapped, the Boolean
                 // being waited on is no longer the one in 
                 // the Vector, however it only waits if FALSE
-                resultsNotifiers.set(index,new Boolean(true)); 
+                resultsNotifiers.set(index,true);
                 notifier.notifyAll();
                 
             }
             
         } catch (Exception e) { error = true; e.printStackTrace(); }
         
-        return new Boolean(error);
+        return error;
     }
     
     public synchronized String getResultByTaskID(int taskID) {
@@ -465,7 +465,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                         
             synchronized(notifier) {
                 designPoint.getStatistics().add(stats);
-                designPointStatsNotifiers.set(index,new Boolean(true));
+                designPointStatsNotifiers.set(index,true);
                 notifier.notify();
                     
                 //System.out.println("addDesignPointStat "+stat);
@@ -489,7 +489,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             
             synchronized(notifier) {
                 rep.getStatistics().add(stats);
-                replicationStatsNotifiers.set(index,new Boolean(true));
+                replicationStatsNotifiers.set(index,true);
                 notifier.notify();
                 
                 System.out.println("addReplicationStat "+stat);
@@ -548,7 +548,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 li.next();
                 
                 // TODO: fix generics
-                li.set(new Boolean(Boolean.FALSE));
+                li.set(Boolean.FALSE);
                 
                 queueClean = false;
                 
@@ -692,7 +692,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         flushQueue();
         this.root = null;
         System.gc();
-        return new Boolean(true);
+        return true;
     }
     
     public String qstat() {
@@ -893,7 +893,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         ArrayList<Object> q = new ArrayList<Object>();
         //synchronized (localQ) {
             for ( int i = 0; i < localQ.size(); i++ ) {
-                q.add(new Boolean((Boolean)localQ.get(i)));
+                q.add((Boolean) localQ.get(i));
             }
         //}
         return q;
@@ -1041,7 +1041,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      * probability bins to select from, not interpolated values of the ranges.
      * For small number of variates, more samples, as controlled from the
      * Experiment tag's totalsSamples attribute, from each Latin square, should
-     * be run per per Experiment. If a script for the Runs as described above is
+     * be run per Experiment. If a script for the Runs as described above is
      * used then several different results can occur for designs where a
      * RandomVariate is seeded, otherwise they are the same.
      *

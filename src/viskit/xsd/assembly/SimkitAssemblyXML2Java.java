@@ -24,6 +24,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
+import org.apache.log4j.Logger;
+import viskit.AssemblyController;
 
 import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.Adapter;
@@ -52,7 +54,8 @@ public class SimkitAssemblyXML2Java {
     private String fileBaseName;
     File inputFile;
     JAXBContext jaxbCtx;
-    static final boolean debug = false;
+//    static final boolean debug = false;
+    static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
  
     /* convenience Strings for formatting */
     
@@ -127,8 +130,8 @@ public class SimkitAssemblyXML2Java {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
-            LogUtils.getLogger().error(ex);
-            ex.printStackTrace();
+            log.error(ex);
+//            ex.printStackTrace();
         }
     }
     
@@ -157,10 +160,10 @@ public class SimkitAssemblyXML2Java {
     public void marshalRoot() {
         try {
             Marshaller m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(this.root, System.out);
         } catch (JAXBException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         }
     }
     
@@ -177,13 +180,16 @@ public class SimkitAssemblyXML2Java {
         }
         try {
             m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
-            m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             m.marshal(jaxb,pw);
             s = sw.toString();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            log.error(e);
+//            e.printStackTrace();
+        }
         return s;
     }
     
@@ -200,13 +206,16 @@ public class SimkitAssemblyXML2Java {
         }
         try {
             m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
-            m.setProperty(Marshaller.JAXB_FRAGMENT,new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             m.marshal(jaxb,pw);
             s = sw.toString();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            log.error(e);
+//            e.printStackTrace();
+        }
         return s;
     }    
     
@@ -215,16 +224,22 @@ public class SimkitAssemblyXML2Java {
         try {
             fos = new FileOutputStream(f);
             marshal((javax.xml.bind.Element) root, (OutputStream)fos);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            log.error(e);
+//            e.printStackTrace();
+        }
     }
     
     public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
         Marshaller m;
         try {
             m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(node,o);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            log.error(e);
+//            e.printStackTrace();
+        }
     }
     
     public SimkitAssembly getRoot() {
@@ -339,7 +354,7 @@ public class SimkitAssemblyXML2Java {
                 String clazz = listI.next();
                 if (exList.contains(clazz)) {
                     listI.remove();
-                    LogUtils.getLogger().debug("Removed type \"" + clazz + "\" from the TreeSet");
+                    log.debug("Removed type \"" + clazz + "\" from the TreeSet");
                 }
             }
         }
@@ -506,7 +521,7 @@ public class SimkitAssemblyXML2Java {
             if ((Class.forName("simkit.SimEntityBase")).isAssignableFrom(Class.forName(type))
                     ||
                     (Class.forName("simkit.SimEntity")).isAssignableFrom(Class.forName(type))) {
-                sret = new String(lp + type + rp);
+                sret = lp + type + rp;
             }
         } catch (ClassNotFoundException cnfe) {
             // Do nothing
@@ -894,8 +909,8 @@ public class SimkitAssemblyXML2Java {
             }
         }
         
-        LogUtils.getLogger().info("Assembly file is: " + fileName);
-        LogUtils.getLogger().info("Generating Java Source...");
+        log.info("Assembly file is: " + fileName);
+        log.info("Generating Java Source...");
         
         if (port == 0) {
             if ( fileName == null ) {
@@ -903,7 +918,7 @@ public class SimkitAssemblyXML2Java {
             } else {
                 try {
                     sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
-                } catch (FileNotFoundException ex) {LogUtils.getLogger().error(ex);}
+                } catch (FileNotFoundException ex) {log.error(ex);}
                 sax2j.unmarshal();               
             }            
         } else {
@@ -914,7 +929,7 @@ public class SimkitAssemblyXML2Java {
                 try {
                     is = new FileInputStream(fileName);
                 } catch (FileNotFoundException fnfe) {
-                    LogUtils.getLogger().error(fnfe);
+                    log.error(fnfe);
                 }
                 sax2j = new SimkitAssemblyXML2Java(is);                
             }
@@ -924,13 +939,13 @@ public class SimkitAssemblyXML2Java {
         sax2j.setFileBaseName(baseName.getName());
         sax2j.unmarshal();
         String dotJava = sax2j.translate();
-        LogUtils.getLogger().info("Done.");
+        log.info("Done.");
 
         // also write out the .java to a file and compile it
         // to a .class
-        LogUtils.getLogger().info("Generating Java Bytecode...");
-        if(VGlobals.instance().getAssemblyController().compileJavaClassFromString(dotJava) != null) {
-           LogUtils.getLogger().info("Done.");
+        log.info("Generating Java Bytecode...");
+        if(AssemblyController.compileJavaClassFromString(dotJava) != null) {
+           log.info("Done.");
         }
     }
     

@@ -121,7 +121,7 @@ public class HistogramChartDrawer {
             fos = new FileOutputStream(outFile);
             ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger().error(ioe);
+            LogUtils.getLogger(HistogramChartDrawer.class).error(ioe);
         } finally {
             try {
                 fos.flush();

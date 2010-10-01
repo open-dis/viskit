@@ -326,12 +326,12 @@ public class EventInspectorDialog extends JDialog {
                     
                     // and, this SchedulingEdge is going to this node
                     if (((SchedulingEdge) ve).to.getName().equals(en.getName())) {
-                        LogUtils.getLogger().debug("Found the SE's 'to' Node that matches this EventNode");
+                        LogUtils.getLogger(EventInspectorDialog.class).debug("Found the SE's 'to' Node that matches this EventNode");
                         
                         // The lower key values signal when it was connected to
                         // to this event node.  We're interested in the first
                         // SchedulingEdge to this EventNode
-                        LogUtils.getLogger().debug("SE ID is: " + ((SchedulingEdge) ve).getModelKey());
+                        LogUtils.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) ve).getModelKey());
                         ((SchedulingEdge) ve).parameters.clear();
                         
                         // We match EventArgument count to EdgeParameter count
@@ -357,7 +357,7 @@ public class EventInspectorDialog extends JDialog {
         if (lis == null) {
             return "";
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String str : lis) {
             sb.append(str);
             sb.append(" ");
@@ -389,7 +389,7 @@ public class EventInspectorDialog extends JDialog {
                 unloadWidgets(evn);  // put our pending edits in place
 
                 // Parse the state transitions
-                StringBuffer parseThis = new StringBuffer();
+                StringBuilder parseThis = new StringBuilder();
                 for (ViskitElement transition : transitions.getTransitions()) {
                     EventStateTransition est = (EventStateTransition) transition;
                     parseThis.append(est.toString());

@@ -427,7 +427,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger().error(tmle);
+            LogUtils.getLogger(EventGraphViewFrame.class).error(tmle);
         }
 
         // the view holds only one model, so it gets overwritten with each tab

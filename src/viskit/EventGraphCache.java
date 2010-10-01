@@ -64,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -98,6 +99,8 @@ import org.jdom.input.SAXBuilder;
  */
 public class EventGraphCache {
     
+    static Logger log = LogUtils.getLogger(EventGraphCache.class);
+
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;
 
@@ -186,9 +189,9 @@ public class EventGraphCache {
             SAXBuilder builder = new SAXBuilder();
             doc = builder.build(xmlFile);
         } catch (JDOMException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (IOException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         }
         return doc;
     }
@@ -202,7 +205,7 @@ public class EventGraphCache {
      * name
      */
     private void saveEventGraphReferences(String fileType) {
-        LogUtils.getLogger().debug("Parameter fileType: " + fileType);
+        log.debug("Parameter fileType: " + fileType);
         eventGraphNamesList.add(fileType);
         
         // find the package seperator
@@ -220,11 +223,11 @@ public class EventGraphCache {
         
         // TODO: Move ARs to project folders.  That's where they should be
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
-        LogUtils.getLogger().debug("EventGraph Name: " + eventGraphName);
+        log.debug("EventGraph Name: " + eventGraphName);
         
         String imgFile = EVENT_GRAPH_IMAGE_DIR + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
-        LogUtils.getLogger().debug("Event Graph Image location: " + imgFile);
+        log.debug("Event Graph Image location: " + imgFile);
         
         eventGraphImagePathsList.add(imgFile);
     }

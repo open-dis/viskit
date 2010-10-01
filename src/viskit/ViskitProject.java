@@ -50,6 +50,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileView;
 
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -97,6 +98,9 @@ public class ViskitProject {
     public static final String SOURCE_DIRECTORY_NAME = "src";
     public static final String DIST_DIRECTORY_NAME = "dist";
     public static final String LIB_DIRECTORY_NAME = "lib";
+
+    static Logger log = LogUtils.getLogger(ViskitProject.class);
+
     private File projectRoot;
     private File projectFile;
     private File analystReportsDir;
@@ -137,7 +141,7 @@ public class ViskitProject {
             getAnalystReportsDir().mkdir();
             try {FileIO.copyFile(new File(VISKIT_ICON_SOURCE), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME), true);
             } catch (IOException ex) {
-                LogUtils.getLogger().error(ex);
+                log.error(ex);
             }
         }
 
@@ -206,7 +210,7 @@ public class ViskitProject {
             try {
                 getProjectFile().createNewFile();
             } catch (IOException e) {
-                LogUtils.getLogger().error(e.getMessage());
+                log.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
             writeProjectFile();
@@ -269,14 +273,14 @@ public class ViskitProject {
             xmlOutputter.output(projectDocument, fileOutputStream);
             projectFileExists = true;
         } catch (FileNotFoundException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (IOException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } finally {
             try {
                 fileOutputStream.close();
             } catch (IOException ex) {
-                LogUtils.getLogger().error(ex);
+                log.error(ex);
             }
         }
     }
@@ -294,10 +298,10 @@ public class ViskitProject {
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }
         } catch (JDOMException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
             throw new RuntimeException(ex);
         } catch (IOException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
             throw new RuntimeException(ex);
         }
     }
@@ -313,11 +317,11 @@ public class ViskitProject {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
                     String file = f.getCanonicalPath().replaceAll("\\\\", "/");
-                    LogUtils.getLogger().debug(file);
+                    log.debug(file);
                     cp.add(file);
                 }
             }
-            LogUtils.getLogger().debug(getEventGraphsDir().getCanonicalPath());
+            log.debug(getEventGraphsDir().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY);
@@ -326,7 +330,7 @@ public class ViskitProject {
             }
 
         } catch (IOException ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         } catch (NullPointerException npe) {
             return null;
         }
@@ -387,7 +391,7 @@ public class ViskitProject {
         return projectRoot;
     }
 
-    public void setProjectRoot(File projectRoot) {
+    public final void setProjectRoot(File projectRoot) {
         this.projectRoot = projectRoot;
         XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
         guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
@@ -565,7 +569,7 @@ public class ViskitProject {
         try {
             xmlOutputter.output(projectDocument, stringWriter);
         } catch (IOException e) {
-            LogUtils.getLogger().error(e.getMessage());
+            log.error(e.getMessage());
         }
         return stringWriter.toString();
     }

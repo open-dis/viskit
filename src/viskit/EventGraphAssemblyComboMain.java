@@ -77,7 +77,7 @@ public class EventGraphAssemblyComboMain {
             }
 
         } catch (Exception e) {
-            LogUtils.getLogger().error(e);
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
         }
     }
 

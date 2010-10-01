@@ -176,7 +176,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         try {
             fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 
             String nm = f.getName();
@@ -252,7 +252,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     private String mangleName(String name) {
         int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
-        StringBuffer sb = new StringBuffer(name);
+        StringBuilder sb = new StringBuilder(name);
         if (sb.charAt(sb.length() - 1) == '_') {
             sb.setLength(sb.length() - 6);
         }
@@ -953,7 +953,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         pNode.setInstantiator(vc);
 
         pNode.opaqueModelObject = pcl;
-        LogUtils.getLogger().debug("pNode name: " + pNode.getName());
+        LogUtils.getLogger(AssemblyModel.class).debug("pNode name: " + pNode.getName());
 
         getNodeCache().put(pNode.getName(), pNode);   // key = se
 
@@ -1023,7 +1023,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return nodeCache;
     }
 
-    public void setNodeCache(Map<String, AssemblyNode> nodeCache) {
+    public final void setNodeCache(Map<String, AssemblyNode> nodeCache) {
         this.nodeCache = nodeCache;
     }
 }

@@ -363,7 +363,7 @@ public class SettingsDialog extends JDialog {
         if (lis != null) {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
-                LogUtils.getLogger().debug("lis[" + ix + "]: " + s);
+                LogUtils.getLogger(SettingsDialog.class).debug("lis[" + ix + "]: " + s);
                 projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
@@ -602,7 +602,7 @@ public class SettingsDialog extends JDialog {
             try {
                 extClassPathsUrls[i++] = extFile.toURI().toURL();
             } catch (MalformedURLException ex) {
-                LogUtils.getLogger().error(ex);
+                LogUtils.getLogger(SettingsDialog.class).error(ex);
             }
         }
         return extClassPathsUrls;

@@ -1,5 +1,6 @@
 package viskit.xsd.assembly;
 
+import org.apache.log4j.Logger;
 import edu.nps.util.LogUtils;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
@@ -20,6 +21,7 @@ import static edu.nps.util.GenericConversion.toArray;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
+    static Logger log = LogUtils.getLogger(ViskitAssembly.class);
     protected LinkedHashMap<String, SimEntity> entities;
     protected LinkedHashMap<String, PropertyChangeListener> replicationStatistics;
     protected LinkedHashMap<String, PropertyChangeListener> designPointStatistics;
@@ -71,7 +73,7 @@ public class ViskitAssembly extends BasicAssembly {
     protected void createReplicationStats() {
         replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener sampleStats : replicationStats) {
-            LogUtils.getLogger().debug(((SampleStatistics) sampleStats).getName() + " replicationStat created");
+            log.debug(((SampleStatistics) sampleStats).getName() + " replicationStat created");
         }
     }
     
@@ -82,7 +84,7 @@ public class ViskitAssembly extends BasicAssembly {
 
         // the super.
         for (SampleStatistics sampleStats : designPointStats) {
-//            LogUtils.getLogger().debug(sampleStats.getName() + " designPointStat created");
+//            log.debug(sampleStats.getName() + " designPointStat created");
             designPointStatistics.put(sampleStats.getName(), sampleStats);
         }
     }
@@ -90,7 +92,7 @@ public class ViskitAssembly extends BasicAssembly {
     protected void createPropertyChangeListeners() {
         propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener pcl : propertyChangeListener) {
-            LogUtils.getLogger().debug(pcl + " propertyChangeListener created");
+            log.debug(pcl + " propertyChangeListener created");
         }
     }
     
@@ -102,7 +104,7 @@ public class ViskitAssembly extends BasicAssembly {
     public void hookupSimEventListeners() {
         String[] listeners = toArray(simEventListenerConnections.keySet(), new String[0]);
         if(debug) {
-            LogUtils.getLogger().info("hookupSimEventListeners called " + listeners.length);
+            log.info("hookupSimEventListeners called " + listeners.length);
         }
         for (String listener : listeners) {
             LinkedList<String> simEventListenerConnects = simEventListenerConnections.get(listener);
@@ -110,7 +112,7 @@ public class ViskitAssembly extends BasicAssembly {
                 for(String source : simEventListenerConnects) {
                     connectSimEventListener(listener, source);
                     if (debug) {
-                        LogUtils.getLogger().info("hooking up SimEvent source " + source + " to listener " + listener);
+                        log.info("hooking up SimEvent source " + source + " to listener " + listener);
                     }
                 }
             }            
@@ -127,7 +129,7 @@ public class ViskitAssembly extends BasicAssembly {
                     connectReplicationStats(listener, pc);
                 }
             } else if (debug) {
-                LogUtils.getLogger().info("No replicationListeners");
+                log.info("No replicationListeners");
             }
         }
     }
@@ -147,7 +149,7 @@ public class ViskitAssembly extends BasicAssembly {
                 }
             }
         } else if ( debug ) {
-            LogUtils.getLogger().info("No external designPointListeners to add");
+            log.info("No external designPointListeners to add");
         }
     }    
    
@@ -161,7 +163,7 @@ public class ViskitAssembly extends BasicAssembly {
                     connectPropertyChangeListener(listener, pc);
                 }
             } else if (debug) {
-                LogUtils.getLogger().info("No propertyConnectors");
+                log.info("No propertyConnectors");
             }
         }
     }
@@ -178,7 +180,7 @@ public class ViskitAssembly extends BasicAssembly {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
         }
         if ( debug ) {
-            LogUtils.getLogger().info("connecting entity " + pc.source + " to " + listener + " property " + pc.property);
+            log.info("connecting entity " + pc.source + " to " + listener + " property " + pc.property);
         }        
     }
     
@@ -187,23 +189,23 @@ public class ViskitAssembly extends BasicAssembly {
             pc.property = "";
         }
         if ( debug ) {
-            LogUtils.getLogger().info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
+            log.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
         }
         if ( "".equals(pc.property) ) {
             pc.property = getReplicationStatsByName(listener).getName().trim();
             if ( debug ) {
-                LogUtils.getLogger().info("Property unspecified, attempting with lookup " + pc.property);
+                log.info("Property unspecified, attempting with lookup " + pc.property);
             }
         }
         
         if ( "".equals(pc.property) ) {
             if ( debug ) {
-                LogUtils.getLogger().info("Null property, replicationStats connecting "+pc.source+" to "+listener);
+                log.info("Null property, replicationStats connecting "+pc.source+" to "+listener);
             }
             getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatsByName(listener));
         } else {
             if ( debug ) {
-                LogUtils.getLogger().info("Connecting replicationStats from "+pc.source+" to "+listener);
+                log.info("Connecting replicationStats from "+pc.source+" to "+listener);
             }
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatsByName(listener));
         }
@@ -229,7 +231,7 @@ public class ViskitAssembly extends BasicAssembly {
         entities.put(name, entity);
         
         // TODO: This will throw an IllegalArgumentException?
-//        LogUtils.getLogger().debug("entity is: " + entity);
+//        log.debug("entity is: " + entity);
     }
     
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
@@ -241,7 +243,7 @@ public class ViskitAssembly extends BasicAssembly {
      * @param pcl type of PropertyChangeListener
      */
     public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
-        LogUtils.getLogger().debug("Adding to replicationStatistics " + listenerName + " " + pcl);
+        log.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
         replicationStatistics.put(listenerName, pcl);
     }
     
@@ -284,7 +286,7 @@ public class ViskitAssembly extends BasicAssembly {
             simEventListenerConnections.put(listener, simEventListenerConnects);
         }
         if ( debug ) {
-            LogUtils.getLogger().info("addSimEventListenerConnection source " + source + " to listener " + listener );
+            log.info("addSimEventListenerConnection source " + source + " to listener " + listener );
         }
         simEventListenerConnects.add(source);
     }
@@ -310,7 +312,7 @@ public class ViskitAssembly extends BasicAssembly {
     
     public SimEntity getSimEntityByName(String name) {
         if (debug) {
-            LogUtils.getLogger().info("getSimEntityByName for " + name + " " + entities.get(name));
+            log.info("getSimEntityByName for " + name + " " + entities.get(name));
         }
         return entities.get(name);
     }

@@ -47,6 +47,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import org.apache.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -66,7 +67,9 @@ import viskit.xsd.assembly.ScatterPlotChartDrawer;
  * @since July 18, 2006, 7:04 PM
  * @version $Id$
  */
-public class AnalystReportBuilder {
+public final class AnalystReportBuilder {
+
+    static Logger log = LogUtils.getLogger(AnalystReportBuilder.class);
 
     private boolean debug = false;
 
@@ -117,7 +120,7 @@ public class AnalystReportBuilder {
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
-            LogUtils.getLogger().error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
+            log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
         initDocument();
@@ -137,12 +140,12 @@ public class AnalystReportBuilder {
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, File assyFile) throws Exception {
         this.aRPanel = aRPanel;
         parseXML(xmlFile);
-        LogUtils.getLogger().debug("Successful parseXML");
+        log.debug("Successful parseXML");
         if (assyFile != null) {
             setAssemblyFile(assyFile);
-            LogUtils.getLogger().debug("Successful setting of assembly file");
+            log.debug("Successful setting of assembly file");
             postProcessing();
-            LogUtils.getLogger().debug("Successful post processing of Analyst Report");
+            log.debug("Successful post processing of Analyst Report");
         }
     }
 
@@ -154,7 +157,7 @@ public class AnalystReportBuilder {
         try {
             parseXML(fullReport);
         } catch (Exception ex) {
-            LogUtils.getLogger().error(ex);
+            log.error(ex);
         }
     }
 
@@ -180,7 +183,7 @@ public class AnalystReportBuilder {
     /**
      * File I/O that saves the report in XML format
      * @param fil the initial temp file to save for further post-processing
-     * @return the initial temp file to saveed for further post-processing
+     * @return the initial temp file to saved for further post-processing
      * @throws java.lang.Exception
      */
     public File writeToXMLFile(File fil) throws Exception {
@@ -190,7 +193,7 @@ public class AnalystReportBuilder {
         return fil;
     }
 
-    /** @return the initial temp file to saved for further post-processing
+    /** @return the initial temp file to be saved for further post-processing
      * @throws java.lang.Exception
      */
     public File writeToXMLFile() throws Exception {
@@ -265,7 +268,7 @@ public class AnalystReportBuilder {
             try {
                 simConfig.addContent(EventGraphCache.instance().getEntityTable());
             } catch (Exception e) {
-                LogUtils.getLogger().error("Error reading assembly file: " + e.getMessage());
+                log.error("Error reading assembly file: " + e.getMessage());
             }
         }
 
@@ -405,8 +408,8 @@ public class AnalystReportBuilder {
     private void createConclusionsRecommendations() {
         concRec = new Element("ConclusionsRecommendations");
         concRec.setAttribute("comments", "true");
-        makeComments(concRec,"CR", "");
-        makeConclusions(concRec,"CR", "");
+        makeComments(concRec, "CR", "");
+        makeConclusions(concRec, "CR", "");
         rootElement.addContent(concRec);
     }
 
@@ -675,27 +678,27 @@ public class AnalystReportBuilder {
             for (Element dataPoint : dataPoints) {
                 String dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
-                    LogUtils.getLogger().debug("entry is: " + entry);
+                    log.debug("entry is: " + entry);
                     Object obj;
                     if (entry.toString().contains("PropChangeListenerNode")) {
 
                         obj = getPclNodeCache().get(entry.getKey());
                         try {
-                            LogUtils.getLogger().debug("AR obj is: " + obj);
+                            log.debug("AR obj is: " + obj);
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStat = isCount ? "count" : "mean";
-                            LogUtils.getLogger().debug("AR typeStat is: " + typeStat);
+                            log.debug("AR typeStat is: " + typeStat);
                             break;
                         } catch (IllegalAccessException ex) {
-                            LogUtils.getLogger().error(ex);
+                            log.error(ex);
                         } catch (IllegalArgumentException ex) {
-                            LogUtils.getLogger().error(ex);
+                            log.error(ex);
                         } catch (InvocationTargetException ex) {
-                            LogUtils.getLogger().error(ex);
+                            log.error(ex);
                         } catch (NoSuchMethodException ex) {
-                            LogUtils.getLogger().error(ex);
+                            log.error(ex);
                         } catch (SecurityException ex) {
-                            LogUtils.getLogger().error(ex);
+                            log.error(ex);
                         }
                     }
                 }
@@ -730,7 +733,7 @@ public class AnalystReportBuilder {
                         entity.addContent(repRecord);
 
                         // Add the raw count, or mean of replication data to the chart generators
-                        LogUtils.getLogger().debug(replication.getAttributeValue(typeStat));
+                        log.debug(replication.getAttributeValue(typeStat));
                         data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
                         idx++;
                     }
@@ -980,14 +983,14 @@ public class AnalystReportBuilder {
         aRPanel.add(jpb);
         aRPanel.validate();
 
-        LogUtils.getLogger().debug("JProgressBar set");
+        log.debug("JProgressBar set");
 
         captureEventGraphImages();
-        LogUtils.getLogger().debug("EGs captured");
+        log.debug("EGs captured");
         captureAssemblyImage();
-        LogUtils.getLogger().debug("Assembly captured");
+        log.debug("Assembly captured");
         captureLocationImage();
-        LogUtils.getLogger().debug("Location Image captured");
+        log.debug("Location Image captured");
 
         jpb.setIndeterminate(false);
         jpb.setStringPainted(false);
@@ -1038,11 +1041,11 @@ public class AnalystReportBuilder {
                 VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir() +
                 baseName + ".png";
         locationImagePath = locationImagePath.replaceAll("\\\\", "/");
-        LogUtils.getLogger().debug(locationImagePath);
+        log.debug(locationImagePath);
         if (new File(locationImagePath).exists()) {
             setLocationImage(locationImagePath);
         }
-        LogUtils.getLogger().debug(getLocationImage());
+        log.debug(getLocationImage());
     }
 
     public void setFileName          (String fileName)           { this.fileName = fileName; }

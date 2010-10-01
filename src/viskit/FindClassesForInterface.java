@@ -95,12 +95,12 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                LogUtils.getLogger().info("Attempting to find " + name);
+                LogUtils.getLogger(FindClassesForInterface.class).info("Attempting to find " + name);
 
                 Class<?> clz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
 
                 found.put(name, clz);
-                LogUtils.getLogger().info("Found Class: " + clz.getName() + "\n");
+                LogUtils.getLogger(FindClassesForInterface.class).info("Found Class: " + clz.getName() + "\n");
                 return clz;
             } catch (Exception e) {
                 e.printStackTrace();

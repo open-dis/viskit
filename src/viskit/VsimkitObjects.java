@@ -28,7 +28,7 @@ public class VsimkitObjects {
      * VGlobals uses this field, which combines all the methods below.
      * It does not use the individual methods.
      */
-    private static HashMap<String, Object> hashmap = new HashMap<String, Object>();
+    private static final HashMap<String, Object> HASH_MAP = new HashMap<String, Object>();
 
     static {
         try {
@@ -52,18 +52,18 @@ public class VsimkitObjects {
                 // TODO: this breaks on AR1Variate instance "getting" 
                 Object m = method.invoke(null, (Object[]) null);
                 Object o = new FullNameAndInstance(name, m);
-                LogUtils.getLogger().debug("name is: " + name + " noPackageName is: " + noPackageName);
-                hashmap.put(name, o);
-                hashmap.put(noPackageName, o);
+                LogUtils.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
+                HASH_MAP.put(name, o);
+                HASH_MAP.put(noPackageName, o);
             }
         } catch (Exception e) {
-            LogUtils.getLogger().error(e);
-            e.printStackTrace();
+            LogUtils.getLogger(VsimkitObjects.class).error(e);
+//            e.printStackTrace();
         }
     }
 
     public static Object getInstance(String nm) throws Exception {
-        Object o = hashmap.get(nm);
+        Object o = HASH_MAP.get(nm);
         if (o == null) {
             throw new Exception("Class not found: " + nm);
         }
@@ -71,7 +71,7 @@ public class VsimkitObjects {
     }
 
     public static Object getFullName(String nm) {
-        FullNameAndInstance fnai = (FullNameAndInstance) hashmap.get(nm);
+        FullNameAndInstance fnai = (FullNameAndInstance) HASH_MAP.get(nm);
         if (fnai == null) {
             return null;
         }

@@ -94,7 +94,7 @@ public class LocalBootLoader extends URLClassLoader {
         super(new URL[] {}, parent);
         extUrls = classes;
         this.workDir = workDir;
-        LogUtils.getLogger().debug(VGlobals.instance().printCallerLog());
+        LogUtils.getLogger(LocalBootLoader.class).debug(VGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with

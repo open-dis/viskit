@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -47,6 +48,8 @@ import viskit.xsd.translator.SimkitXML2Java;
  */
 public class EventGraphController extends mvcAbstractController implements ViskitController {
 
+    static Logger log = LogUtils.getLogger(EventGraphController.class);
+
     public EventGraphController() {
         initConfig();
         initFileWatch();
@@ -58,7 +61,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
         // don't default to new event graph
         if (lis.isEmpty()) {
-            LogUtils.getLogger().debug("In begin() (if) of EventGraphController");
+            log.debug("In begin() (if) of EventGraphController");
             return;
         } else {
 
@@ -68,7 +71,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             if (VGlobals.instance().getAssemblyController() != null) {
                 java.util.List<String> al = VGlobals.instance().getAssemblyController().getOpenAssyFileList(false);
                 if (al.isEmpty()) {
-                    LogUtils.getLogger().debug("In begin() (else) of EventGraphController");
+                    log.debug("In begin() (else) of EventGraphController");
                     for (String s : lis) {
                         File f = new File(s);
                         if (f.exists()) {
@@ -260,11 +263,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
     private void fileWatchOpen(File f) {
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
-        LogUtils.getLogger().debug("f is: " + f + " and ofile is: " + ofile);
+        log.debug("f is: " + f + " and ofile is: " + ofile);
         try {
             FileIO.copyFile(f, ofile, true);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
+//            e.printStackTrace();
         }
     }
 
@@ -701,11 +705,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
             x2j = new SimkitXML2Java(localLastFile);
             x2j.unmarshal();        
         } catch (FileNotFoundException fnfe) {
-            LogUtils.getLogger().error(fnfe);
+            log.error(fnfe);
         }
         
         String source = VGlobals.instance().getAssemblyController().buildJavaEventGraphSource(x2j);
-        LogUtils.getLogger().debug(source);
+        log.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." + 
                     mod.getMetaData().name;
@@ -879,13 +883,13 @@ public class EventGraphController extends mvcAbstractController implements Viski
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) {
             _doOpen(eventGraph);
-            LogUtils.getLogger().debug("eventGraph: " + eventGraph);
+            log.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
             if (itr.hasNext()) {
                 eventGraphImage = itr.next();
                 eventGraphImageFile = new File(eventGraphImage);
-                LogUtils.getLogger().debug("eventGraphImage is: " + eventGraphImage);
+                log.debug("eventGraphImage is: " + eventGraphImage);
                 tcb = new TimerCallback(eventGraphImageFile, false, egvf, component);
 
                 // Make sure we have a directory ready to receive these images
@@ -919,7 +923,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
-                LogUtils.getLogger().debug("CurrentJgraphComponent is a JScrollPane: " + component);
+                log.debug("CurrentJgraphComponent is a JScrollPane: " + component);
             }
             Rectangle reg = component.getBounds();
             BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
@@ -929,7 +933,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             try {
                 ImageIO.write(image, "png", fil);
             } catch (IOException e) {
-                LogUtils.getLogger().error(e);
+                log.error(e);
             }
 
             // display a scaled version
@@ -952,8 +956,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            LogUtils.getLogger().error("Error loading history file: " + e.getMessage());
-            LogUtils.getLogger().warn("Recent file saving disabled");
+            log.error("Error loading history file: " + e.getMessage());
+            log.warn("Recent file saving disabled");
             historyConfig = null;
         }
     }

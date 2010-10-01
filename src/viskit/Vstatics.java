@@ -76,7 +76,7 @@ public class Vstatics {
         }
 
         int dim = 0;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '[') {
                 dim++;
@@ -197,7 +197,7 @@ public class Vstatics {
     static String getClassPathAsString() {
         // The order of the class path is 1) existing classpath, 2) extra paths, 3) work dir
         String sep = getPathSeparator();
-        StringBuffer cPath = new StringBuffer();
+        StringBuilder cPath = new StringBuilder();
 
         LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
         for (String path : loader.getClassPath()) {
@@ -343,7 +343,7 @@ public class Vstatics {
             }
 
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (isArray) {
             for (int i = 0; i < (spl.length - 1); i++) {
                 sb.append('[');
@@ -395,7 +395,7 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                LogUtils.getLogger().info("Not yet resolving type: " + type + ".  Likely, an " +
+                LogUtils.getLogger(Vstatics.class).info("Not yet resolving type: " + type + ".  Likely, an " +
                         "Assembly is opening in Viskit before a parse of the " +
                         "EventGraph classpath");
                 return resolved;

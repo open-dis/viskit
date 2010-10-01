@@ -328,7 +328,7 @@ public class EdgeInspectorDialog extends JDialog {
             jcb.setEditable(true); // this allows anything to be intered
             return jcb;
         } catch (Exception e) {
-            LogUtils.getLogger().error(e);
+            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
             return new JComboBox(new String[] {"simkit package not in class path"});
         }
     }
@@ -359,7 +359,7 @@ public class EdgeInspectorDialog extends JDialog {
                 i++;
             }
 
-            LogUtils.getLogger().error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
+            LogUtils.getLogger(EdgeInspectorDialog.class).error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
             priorityCB.setSelectedIndex(priorityDefaultIndex);
         }
     }

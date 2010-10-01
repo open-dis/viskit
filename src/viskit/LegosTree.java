@@ -24,6 +24,7 @@ import java.util.Vector;
 import java.util.jar.JarFile;
 
 import static edu.nps.util.GenericConversion.newListObjectTypeArray;
+import org.apache.log4j.Logger;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -39,6 +40,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener {
     
+    static Logger log = LogUtils.getLogger(LegosTree.class);
     private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     private Class<?> targetClass;
     private String targetClassName;
@@ -80,8 +82,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         try {
             targetClass = Class.forName(targetClassName, false, this.getClass().getClassLoader()); //"simkit.BasicSimEntity");
         } catch (ClassNotFoundException e) {
-            LogUtils.getLogger().error("Error:  Need simkit classes in classpath");
-            e.printStackTrace();
+            log.error("Need simkit classes in classpath");
+//            e.printStackTrace();
             return;
         }
 
@@ -182,7 +184,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         return n;
                     }
                 } catch (IOException e) {
-                    LogUtils.getLogger().error("getCanonicalPath in LegosTree : " + e.getMessage());
+                    log.error("getCanonicalPath in LegosTree : " + e.getMessage());
                 }
             }
         }
@@ -303,14 +305,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     }
                 } else {
                     clear();
-                    LogUtils.getLogger().warn("No extension of " + targetClassName + " found in " + f.getName());
-                    LogUtils.getLogger().info(f.getName() + " will not be listed in the Event Graphs node tree\n");
+                    log.warn("No extension of " + targetClassName + " found in " + f.getName());
+                    log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
                 if (/*true*/viskit.Vstatics.debug) {
                     throwable.printStackTrace();
                 }
-                LogUtils.getLogger().error("Could not process " + f.getName() + ": "
+                log.error("Could not process " + f.getName() + ": "
                         + throwable.getCause() + " " + throwable.getMessage());
                 if (recurseNogoList != null) {
                     recurseNogoList.add(f.getName());
@@ -370,7 +372,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             try {
                 f = c.getField("parameterMap");
             } catch (SecurityException ex) {
-                ex.printStackTrace();
+                log.error(ex);
+//                ex.printStackTrace();
             } catch (NoSuchFieldException ex) {}
             
             if (viskit.Vstatics.debug) {
@@ -387,7 +390,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                 }
 
-                ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
+                ParameterMap param = (ParameterMap) constr[i].getAnnotation(viskit.ParameterMap.class);
                 // possible that a class inherited a parameterMap, check if annotated first
                 if (param != null) {
                     String[] names = param.names();
@@ -434,17 +437,20 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                                         if (viskit.Vstatics.debug) {
                                             System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                                         }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                    } catch (Exception ex) {
+                                        log.error(ex);
+//                                        ex.printStackTrace();
                                     }
                                 }
                             }
                         }
                         break; // fix this up, should index along with i not n
                     } catch (IllegalArgumentException ex) {
-                        ex.printStackTrace();
+                        log.error(ex);
+//                        ex.printStackTrace();
                     } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
+                        log.error(ex);
+//                        ex.printStackTrace();
                     }
                 } else {// unknonws
                     for (int k = 0; k < ptypes.length; k++) {
@@ -461,8 +467,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                             if (viskit.Vstatics.debug) {
                                 System.out.println("\t " + p.getName() + p.getType());
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        } catch (Exception ex) {
+                            log.error(ex);
+//                            ex.printStackTrace();
                         }
                     }
                 }
@@ -471,8 +478,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
 
         if (list == null || list.isEmpty()) {
-            LogUtils.getLogger().warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
-            LogUtils.getLogger().info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+            log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
+            log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());

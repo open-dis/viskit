@@ -1,6 +1,7 @@
 package edu.nps.util;
 
 import java.io.*;
+import org.apache.log4j.Logger;
 
 /**
  *  Generates and properly cleans up temporary files. Similar to {@link
@@ -27,6 +28,8 @@ import java.io.*;
  *  @version $Id:$
  */
 public class TempFileManager {
+
+    static final Logger LOG = LogUtils.getLogger(TempFileManager.class);
 
     /**
      *  Creates a temporary file in the proper directory to allow for cleanup
@@ -101,7 +104,8 @@ public class TempFileManager {
             // any old temp files.
             Class.forName(TempFileManager.class.getName());
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            LOG.error(ex);
+//            ex.printStackTrace();
         }
     }
 
@@ -179,25 +183,26 @@ public class TempFileManager {
             if (!lockFile.exists()) {
                 // Delete the contents of the directory since
                 // it is no longer locked.
-                LogUtils.getLogger().debug("Deleting old temp directory " + tmpFile);
+                LOG.debug("Deleting old temp directory " + tmpFile);
 
                 try {
                     recursiveDelete(tmpFile);
                 } catch (IOException ex) {
-                    // You LogUtils.getLogger() at a fine level since not being able to delete
+                    // Use the logger at a fine level since not being able to delete
                     // the temp directory should not stop the application
                     // from performing correctly. However, if the application
                     // generates a lot of temp files, this could become
                     // a disk space problem and the level should be raised.
-                    LogUtils.getLogger().error("Unable to delete " + tmpFile.getAbsolutePath());
+                    LOG.error("Unable to delete " + tmpFile.getAbsolutePath());
 
                     // Print the exception.
                     ByteArrayOutputStream ostream = new ByteArrayOutputStream();
                     ex.printStackTrace(new PrintStream(ostream));
 
-                    LogUtils.getLogger().error(ostream.toString());
+                    LOG.error(ostream.toString());
                 }
             }
         }
     }
-}
+
+} // end class file TempFileManager.java

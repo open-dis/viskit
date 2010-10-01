@@ -1,14 +1,10 @@
 package edu.nps.util;
 
+import java.io.File;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Log4j Logging utilities.
@@ -42,7 +38,7 @@ public class LogUtils {
     /**
      * This is a utility to configure the Log4J logger.
      * <p/>
-     * If requested configuration file can not be read, the default bahavior
+     * If requested configuration file can not be read, the default behavior
      * will be to use BasicConfigurator and set the debug level to INFO.
      *
      * @param configFileFname The file name to configure the logger with.
@@ -50,28 +46,20 @@ public class LogUtils {
      * @return true if successful, false if failed to find/use the file
      */
     public static boolean configureLog4j(String configFileFname, boolean watch) {
-        InputStream inStream = LogUtils.class.getClassLoader().getResourceAsStream(configFileFname);
-        Properties props = new Properties();
-        if (inStream != null) {
-            try {
-                props.load(inStream);
-                inStream.close();
-            } catch (IOException ioe) {
-                LogLog.error("" + ioe);
-            } finally {
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (IOException ioe) {}
-                }
-            }
+        File f = new File(configFileFname);
 
-            PropertyConfigurator.configure(props);
+        if (f.canRead()) {
+            if (watch) {
+                PropertyConfigurator.configureAndWatch(configFileFname);
+            } else {
+                PropertyConfigurator.configure(configFileFname);
+            }
 
             // The following is useful early on when developers are starting to
             // use log4j to know what is going on.  We can remove this printout
             // in the future, or turn it into a log4j message!
-            LOG.debug(configFileFname + " is used to configure log4j.");
+            LOG.debug(f.getAbsolutePath() + " was used to configure log4j.");
+
             return true;
         } else {
             // Set up a simple configuration that logs on the console
@@ -89,14 +77,23 @@ public class LogUtils {
         }
     }
 
-    /** @return synchronized method for multiple threads to use single run-time logger */
-    public static synchronized Logger getLogger() {return LOG;}
+    /** Provide a synchronized method for multiple threads to use single
+     * run-time logger
+     * @param clazz the class type of the caller
+     * @return synchronized method for multiple threads to use single run-time logger
+     */
+    public static synchronized Logger getLogger(Class clazz) {
+        return Logger.getLogger(clazz);
+    }
 
     /** @return a model to print a stack trace of calling classes and their methods */
     public static String printCallerLog() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(" + new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
-        sb.append(" :" + new Throwable().fillInStackTrace().getStackTrace()[4].getLineNumber() + ")");
+        sb.append("(");
+        sb.append(new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
+        sb.append(" :");
+        sb.append(new Throwable().fillInStackTrace().getStackTrace()[4].getLineNumber());
+        sb.append(")");
         return sb.toString();
     }
 

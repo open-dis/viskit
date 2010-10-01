@@ -28,6 +28,7 @@ import javax.xml.validation.Validator;
 
 // Applcation Specific Local Imports
 import edu.nps.util.LogUtils;
+import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -61,6 +62,8 @@ public class XMLValidationTool {
     /** The locally resolved location for simkit.xsd */
     public static final String LOCAL_EVENT_GRAPH_SCHEMA = 
             System.getProperty("user.dir") + "/Schemas/simkit.xsd";
+
+    static Logger log = LogUtils.getLogger(XMLValidationTool.class);
     
     private FileWriter fWriter;
     private File xmlFile, schemaFile;
@@ -81,7 +84,7 @@ public class XMLValidationTool {
          */
         System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema",
                 "org.apache.xerces.jaxp.validation.XMLSchemaFactory");
-        LogUtils.getLogger().debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
+        log.debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
                 System.getProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema"));
     }
 
@@ -100,7 +103,7 @@ public class XMLValidationTool {
         try {
             schemaDoc = factory.newSchema(getSchemaFile());
         } catch (SAXException ex) {
-            LogUtils.getLogger().fatal("Unable to create Schema object: " + ex);
+            log.fatal("Unable to create Schema object: " + ex);
         }
 
         // 3. Get a validator from the schemaFile object.
@@ -115,7 +118,7 @@ public class XMLValidationTool {
 
         // 6. Parse, validate and report any errors.
         try {
-            LogUtils.getLogger().info("Validating: " + source.getSystemId());
+            log.info("Validating: " + source.getSystemId());
 
             // Prepare error errorsLog with current DTG
             File errorsLog = new File(ViskitConfig.VISKIT_HOME_DIR + "/validationErrors.log");
@@ -131,17 +134,17 @@ public class XMLValidationTool {
             validator.validate(source);
             
         } catch (SAXException ex) {
-            LogUtils.getLogger().fatal(source.getSystemId() + " is not well-formed XML");
-            LogUtils.getLogger().fatal(ex);
+            log.fatal(source.getSystemId() + " is not well-formed XML");
+            log.fatal(ex);
         } catch (IOException ex) {
-            LogUtils.getLogger().fatal(ex);
+            log.fatal(ex);
         } finally {
             try {
                 // Space between file entries
                 fWriter.write("\n");
                 fWriter.close();
             } catch (IOException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             }
         }
         return valid;
@@ -154,7 +157,7 @@ public class XMLValidationTool {
     /** Mutator method to change the X3D file to validate
      * @param file the file to set for this validator to validate
      */
-    public void setXmlFile(File file) {
+    public final void setXmlFile(File file) {
         xmlFile = file;
     }
     
@@ -162,7 +165,7 @@ public class XMLValidationTool {
         return schemaFile;
     }
 
-    public void setSchemaFile(File schema) {
+    public final void setSchemaFile(File schema) {
         this.schemaFile = schema;
     }
 
@@ -191,7 +194,7 @@ public class XMLValidationTool {
             try {
                 fWriter.write(level + msg + "\n");
             } catch (IOException ex) {
-                LogUtils.getLogger().fatal(ex);
+                log.fatal(ex);
             }
             
             // if we got here, there is something wrong
@@ -201,7 +204,7 @@ public class XMLValidationTool {
         public void warning(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Warning: ");
-            LogUtils.getLogger().warn(msg);
+            log.warn(msg);
         }
 
         /** Recoverable errors such as violations of validity contraints are
@@ -211,7 +214,7 @@ public class XMLValidationTool {
         public void error(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Error: ");
-            LogUtils.getLogger().error(msg);
+            log.error(msg);
         }
 
         /**
@@ -220,7 +223,7 @@ public class XMLValidationTool {
         public void fatalError(SAXParseException ex) throws SAXParseException {
             setMessage(ex);
             writeMessage("Fatal: ");
-            LogUtils.getLogger().fatal(msg);
+            log.fatal(msg);
             throw ex;
         }
     }

@@ -87,10 +87,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
+import org.apache.log4j.Logger;
 import viskit.xsd.assembly.XsltUtility;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
 
+    static Logger log = LogUtils.getLogger(AnalystReportPanel.class);
     private AnalystReportBuilder arb;
     private File reportFile;
 
@@ -135,7 +137,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 break;
 
             default:
-                LogUtils.getLogger().error("Program error InternalAssemblyRunner.assyChanged");
+                log.error("Program error InternalAssemblyRunner.assyChanged");
         }
     }
 
@@ -153,7 +155,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
      */
     public void setReportXML(String path) {
 
-        LogUtils.getLogger().debug("Path of temp Analyst Report: " + path);
+        log.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
         File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
@@ -169,7 +171,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             FileIO.copyFile(srcFil, targetFile, true);
             srcFil.deleteOnExit();
         } catch (IOException ioe) {
-            LogUtils.getLogger().fatal(ioe);
+            log.fatal(ioe);
         }
 
         doTitle(targetFile.getName());
@@ -177,12 +179,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
 
     private void buildArb(File targetFile) {
-        LogUtils.getLogger().debug("TargetFile is: " + targetFile);
+        log.debug("TargetFile is: " + targetFile);
         AnalystReportBuilder arbLocal = null;
         try {
             arbLocal = new AnalystReportBuilder(this, targetFile, currentAssyFile);
         } catch (Exception e) {
-            LogUtils.getLogger().error("Error parsing analyst report: " + e.getMessage());
+            log.error("Error parsing analyst report: " + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -914,7 +916,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             arb.writeToXMLFile(f);
             dirty = false;
         } catch (Exception e) {
-            LogUtils.getLogger().error(e);
+            log.error(e);
         }
     }
 
@@ -1023,7 +1025,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 //                                    "Confirm", JOptionPane.WARNING_MESSAGE);
 //                            switch (result) {
 //                                case JOptionPane.YES_OPTION:
-//                                    LogUtils.getLogger().info ("saving analyst report data from generateViewHtmlListener()...");
+//                                    log.info ("saving analyst report data from generateViewHtmlListener()...");
 //                                    saveReport();
 //                                    break;
 //                                case JOptionPane.CANCEL_OPTION:

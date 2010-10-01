@@ -8,6 +8,7 @@ import java.net.URL;
 import static javax.swing.event.HyperlinkEvent.EventType.ACTIVATED;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import org.apache.log4j.Logger;
 
 /**
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $
@@ -17,6 +18,7 @@ public class BrowserLauncher implements HyperlinkListener {
     
     public static final String WINDOWS = "Windows";
     public static final String MAC = "Mac OS X";
+    static Logger log = LogUtils.getLogger(BrowserLauncher.class);
     
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == ACTIVATED) {
@@ -35,23 +37,23 @@ public class BrowserLauncher implements HyperlinkListener {
                 }
             } 
             catch (IOException ex ){
-                LogUtils.getLogger().info(ex);
+                log.info(ex);
                 throw new RuntimeException(ex);
             }
             catch (ClassNotFoundException ex) {
-                LogUtils.getLogger().error(ex);
+                log.error(ex);
                 throw new RuntimeException(ex);
             }
             catch (NoSuchMethodException ex) {
-                LogUtils.getLogger().error(ex);
+                log.error(ex);
                 throw new RuntimeException(ex);
             }
             catch (IllegalAccessException ex) {
-                LogUtils.getLogger().error(ex);
+                log.error(ex);
                 throw new RuntimeException(ex);
             }
             catch (InvocationTargetException ex) {
-                LogUtils.getLogger().error(ex.getTargetException());
+                log.error(ex.getTargetException());
                 throw new RuntimeException(ex.getTargetException());
             }
 
