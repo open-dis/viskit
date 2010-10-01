@@ -1,4 +1,5 @@
 package viskit;
+import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import javax.help.HelpBroker;
 import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import org.apache.log4j.Priority;
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 /**
@@ -74,8 +76,8 @@ public class Help {
     
     private static HelpBroker hb;
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private static Component      tutorialComponent;
-    private static ActionListener tutListenerLauncher;
+    private static final Component      TUTORIAL_COMPONENT;
+    private static final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     static
     {
@@ -87,13 +89,14 @@ public class Help {
         hb = hs.createHelpBroker();
       }
       catch (HelpSetException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
+          LogUtils.getLogger(Help.class).error(e);
       }
 
       // Here we're setting up the action event peripherals for the tutorial menu selection
-      tutorialComponent = new Button();
-      tutListenerLauncher = new CSH.DisplayHelpFromSource(hb);
-      CSH.setHelpIDString(tutorialComponent, "hTutorial");
+      TUTORIAL_COMPONENT = new Button();
+      TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(hb);
+      CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
     }
   
     /** Creates a new instance of Help */
@@ -149,8 +152,8 @@ public class Help {
     }
     public void doTutorial()
     {
-      ActionEvent ae = new ActionEvent(tutorialComponent,0,"tutorial");
-      tutListenerLauncher.actionPerformed(ae);
+      ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT,0,"tutorial");
+      TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }
 /*
     public void help() {
