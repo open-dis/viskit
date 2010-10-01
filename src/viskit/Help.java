@@ -10,7 +10,6 @@ import javax.help.HelpBroker;
 import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
-import org.apache.log4j.Priority;
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 /**
