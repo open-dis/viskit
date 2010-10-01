@@ -1,14 +1,15 @@
 package viskit.util;
 
+import edu.nps.util.LogUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 
 /**
  * Reads a file assumed to be in the following form (2 lines):
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public class Version {
     
-    public static Logger log = Logger.getLogger("viskit.util");
+    static Logger log = LogUtils.getLogger(Version.class);
     
     protected String versionString;
     
@@ -60,14 +61,14 @@ public class Version {
             svnRevisionNumber = parseRevisionString(revisionString);
             versionString += "." + svnRevisionNumber;
         } catch (IOException e) {
-            log.fine("Problem reading " + fileName + ": " + e);
+            log.error("Problem reading " + fileName + ": " + e);
         }
     }
     
     protected static int[] parseVersionString(String versionString) {
         String[] versions = versionString.split("\\.");
 //        if (versions.length != 4) {
-//            log.fine("Expected w.x.y.z: " + versionString);
+//            log.warn("Expected w.x.y.z: " + versionString);
 //            throw new IllegalArgumentException("Expected w.x.y.z: " + versionString +
 //                    " length = " + versions.length);
 //        }
@@ -88,7 +89,7 @@ public class Version {
                 date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matcher.group());
             }
         } catch (Throwable t) {
-            log.fine("Problem parsing date string " + dateString + ": " + t);
+            log.error("Problem parsing date string " + dateString + ": " + t);
         }
         return date;
     }
