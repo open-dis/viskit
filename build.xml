@@ -26,7 +26,7 @@
 
     <property description="Where the distribution files wind up." location="dist" name="dir.dist"/>
 
-    <property description="Where all the JAXB 2.1 extensions are." location="${dir.lib}/jaxb-2.1" name="dir.lib.xml"/>
+    <property description="Where all the JAXB 2.1 extensions are." location="${dir.lib}/jaxb" name="dir.lib.xml"/>
 
     <property description="Runtime module extension libraries." location="${dir.lib}/ext" name="dir.lib.ext"/>
 
@@ -64,14 +64,16 @@
     </path>
 
     <path id="jaxb.classes.path">
-        <fileset dir="${java.endorsed}" includes="jaxb-api.jar" id="jaxb.api"/>
         <fileset dir="${dir.lib.xml}" includes="*.jar" id="jaxb.classes"/>
     </path>
 
-    <!-- pathconvert?, path refid can be used in classpath, but not copy -->
-    <fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
+    <!-- This convention will not work on Mac OS X as tools.jar does not exist
+         in its Java installation, however, an encapsulating
+         classes.jar does exist that is already on the Bootclasspath.  I move
+         for insistance on installing a JDK to run Viskit on Win/Unix boxes. -->
+    <!--fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
         <include name="tools.jar"/>
-    </fileset>
+    </fileset-->
     <fileset dir="${dir.build}/lib" id="runtime.viskit.exe">
         <include name="viskit-exe.jar"/>
     </fileset>
@@ -85,11 +87,8 @@
 
     <path id="runtime.classpath">
 
-        <!-- use local JDK for tools.jar -->
-        <!-- remember to override your environment variable for -->
-        <!-- JAVA_HOME to point to the JDK version you are building -->
-        <!-- against. Netbeans sets this in the NETBEANS_HOME/etc/netbeans.conf file -->
-        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <!-- See note above id="runtime.javac" -->
+        <!--pathelement location="${env.JAVA_HOME}/lib/tools.jar"/-->
         <pathelement location="${dist.jar}"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -293,7 +292,8 @@
 
         <javac destdir="${dir.build.classes}"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeantruntime="false">
 
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
@@ -317,7 +317,8 @@
                destdir="${dir.build.classes}"
                excludes="xsd/** */test/*"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeantruntime="false">
 
             <!-- Reveals generics and deprecation warings -->
             <compilerarg value="${javac.unchecked}"/>
@@ -558,9 +559,7 @@
                 <include name="*.jar"/>
             </fileset>
             <!--fileset refid="jaxb.classes"/-->
-            <fileset dir="${env.JAVA_HOME}/lib">
-                <include name="tools.jar"/>
-            </fileset>
+            <!--fileset refid="runtime.javac"/-->
             <fileset dir="${dir.src.cli.util}">
                 <include name="config.properties"/>
             </fileset>
@@ -849,12 +848,11 @@
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
         </copy>
-        <copy todir="${installer}/stage/lib" >
+        <!--copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.javac"/>
-        </copy>
-        <copy todir="${installer}/stage/lib/jaxb-2.1">
+        </copy-->
+        <copy todir="${installer}/stage/lib/jaxb">
             <fileset refid="jaxb.classes"/>
-            <fileset refid="jaxb.api"/>
         </copy>
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
@@ -971,15 +969,14 @@
         <copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.lib"/>
         </copy>
-        <copy todir="${installer}/stage/lib" >
+        <!--copy todir="${installer}/stage/lib" >
             <fileset refid="runtime.javac"/>
-        </copy>
+        </copy-->
         <copy todir="${installer}/stage/lib/ext">
             <fileset refid="runtime.lib.ext"/>
         </copy>
-        <copy todir="${installer}/stage/lib/jaxb-2.1">
+        <copy todir="${installer}/stage/lib/jaxb">
             <fileset refid="jaxb.classes"/>
-            <fileset refid="jaxb.api"/>
         </copy>
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
