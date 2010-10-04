@@ -223,12 +223,10 @@
                target="1.5"
                includeAntRuntime="no">
 
-            <!-- Reveals generics and deprecation warings -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
-            <classpath id="jaxb.classapth">
-                <fileset refid="jaxb.classes"/>
-            </classpath>
+            <classpath refid="jaxb.classes.path"/>
             <src path="${dir.src.simevg}"/>
         </javac>
         <javac destdir="${dir.build.classes}"
@@ -237,10 +235,10 @@
                target="1.5"
                includeAntRuntime="no">
 
-            <!-- Reveals generics and deprecation warins -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
-            <classpath refid="jaxb.classapth"/>
+            <classpath refid="jaxb.classes.path"/>
             <src path="${dir.src.simasm}"/>
         </javac>
         <javac destdir="${dir.build.classes}"
@@ -249,10 +247,10 @@
                target="1.5"
                includeAntRuntime="no">
 
-            <!-- Reveals generics and deprecation warings -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
-            <classpath refid="jaxb.classapth"/>
+            <classpath refid="jaxb.classes.path"/>
             <src path="${dir.src.simasm}/stats"/>
         </javac>
         <javac destdir="${dir.build.classes}"
@@ -261,10 +259,10 @@
                target="1.5"
                includeAntRuntime="no">
 
-            <!-- Reveals generics and deprecation warings -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
-            <classpath refid="jaxb.classapth"/>
+            <classpath refid="jaxb.classes.path"/>
             <src path="${dir.src.cli}"/>
         </javac>
         <!--javac destdir="${dir.build.classes}"
@@ -359,6 +357,9 @@
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
+
+        <!-- For some reason, viskit.doe.package-info.java makes its own directory in classes -->
+        <delete dir="${dir.build.classes}/doe"/>
     </target>
 
     <target name="javahelp"
@@ -489,8 +490,8 @@
                 <fileset refid="jaxb.classes"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
             </classpath>
-            <package name="viskit"/>
             <package name="edu.nps.util"/>
+            <package name="viskit"/>
             <package name="viskit.doe"/>
             <package name="viskit.images"/>
             <package name="viskit.jgraph"/>
