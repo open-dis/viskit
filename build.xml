@@ -137,6 +137,9 @@
         </echo>
     </target>
 
+    <!--  === TARGET: hudson === -->
+    <target name="hudson" depends="clean,dist"/>
+
     <!--  === TARGET: init === -->
     <target name="init"
             description="Preparatory actions required for all targets">
