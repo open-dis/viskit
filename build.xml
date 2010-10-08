@@ -138,7 +138,9 @@
     </target>
 
     <!--  === TARGET: hudson === -->
-    <target name="hudson" depends="clean,dist"/>
+    <target name="hudson" description="hudson server-side continuous integration" depends="clean,dist">
+        <echo message="https://savage.nps.edu/hudson/Viskit"/>
+    </target>
 
     <!--  === TARGET: init === -->
     <target name="init"
