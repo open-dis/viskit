@@ -37,7 +37,7 @@ public class Help {
     public static final String VISKIT_URL = "http://diana.nps.edu/Viskit/";
     public static final String BUGZILLA_URL = "https://diana.nps.edu/bugzilla/";
     public static final String DEVELOPERS =
-            "(c) 2004-2008 under the Lesser GNU License" + CR + CR
+            "Copyright &copy; 2004-2010 under the Lesser GNU License" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
