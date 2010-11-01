@@ -46,29 +46,35 @@ import viskit.ViskitProject;
  */
 public class ReportStatisticsConfig {
 
-    static Logger log = LogUtils.getLogger(ReportStatisticsConfig.class);
+    static final Logger LOG = LogUtils.getLogger(ReportStatisticsConfig.class);
+
     /**
      * The ordered list of Entities in the simulation that have property change
      * listeners
      */
     private String[] entityIndex;
+
     /**
      * The name of the property, as typed in the assembly
      */
     private String[] propertyIndex;
+
     /**
      * Used to truncate the precision of statistical results
      */
     private DecimalFormat form;
+
     /**
      * The DOM object this class uses to create an XML record of the simulation
      * statistics
      */
     private ReportStatisticsDOM reportStats;
+
     /**
      * Report author (system username)
      */
     private String author = System.getProperty("user.name");
+
     /**
      * Assembly name
      */
@@ -238,7 +244,7 @@ public class ReportStatisticsConfig {
             return f.getAbsolutePath();
 
         } catch (IOException ioe) {
-            log.error(ioe);
+            LOG.error(ioe);
 //            ioe.printStackTrace();
             return null;
         } finally {
