@@ -529,7 +529,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * For each outer stats, print to console output name, count, min, max,
-     * mean, standard deviation and fvariance.  This can be done generically.
+     * mean, standard deviation and variance.  This can be done generically.
      * @return the summary report section of the analyst report
      */
     protected String getSummaryReport() {
