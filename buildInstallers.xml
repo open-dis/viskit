@@ -11,7 +11,7 @@
     <!-- magic properties, do not change or delete -->
 
     <!-- ID properties (this file) -->
-    <property name="SVNId" value="$Id: $"/>
+    <property name="SVNId" value="$Id$"/>
 
     <!-- The Installer contains the JRE, a native wrapper around ${dist.jar} and its jars,
         and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
