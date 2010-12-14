@@ -3,7 +3,7 @@
 <!-- Seems to render in Mozilla Firefox the best.  Broken in IE7 -->
 <?xml-stylesheet type="text/xsl" href="./ant2html.xsl"?>
 
-<project basedir="." default="build.run.no.runtime.extensions" name="Viskit">
+<project basedir="." default="build.run.no.extensions" name="Viskit">
     <description>
         Ant build file for the NPS Viskit and associated libraries. Third-party
         jar files are not compiled from source here, but they are copied as
@@ -171,7 +171,7 @@
     <!-- Now a legacy target as we are no longer building schema from DTD -->
     <target name="build.schema"
             depends="build.init"
-            description="Create xsd Schemas from dtd">
+            description="Create xsd Schemas from dtd @deprecated">
         <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${assembly.dtd}" output="${assembly.xsd}" schemaIn="dtd" schemaOut="xsd"/>
 
@@ -448,11 +448,11 @@
             depends="fresh.diskit"
             description="compile application specific modules, like diskit"/>
 
-    <target name="build.viskit.with.runtime.extensions"
+    <target name="build.viskit.with.extensions"
             depends="jar,runtime.extensions"
-            description="Build viskit and diskit jars"/>
+            description="Build viskit and any extension jars"/>
 
-    <target name="build.viskit.no.runtime.extensions"
+    <target name="build.viskit.no.extensions"
             depends="jar"
             description="Build viskit jar(s)"/>
 
@@ -594,8 +594,8 @@
     </target>
 
     <!-- TARGET: Run w/Viskit custom splash -->
-    <target name="build.run.with.runtime.extensions"
-            depends="build.viskit.with.runtime.extensions,checkJAVA_HOME"
+    <target name="build.run.with.extensions"
+            depends="build.viskit.with.extensions,checkJAVA_HOME"
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
@@ -606,7 +606,7 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
-    <target name="build.run.no.runtime.extensions"
+    <target name="build.run.no.extensions"
             depends="jar"
             description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
         <java classname="viskit.Splash2"
@@ -620,7 +620,7 @@
     </target>
     <target name="build.run.default.orig"
             depends="jar"
-            description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated (Use build.run.no.runtime.extensions)">
+            description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated (Use build.run.no.extensions)">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
@@ -631,14 +631,14 @@
         </java>
     </target>
 
-     <target name="splashy" description="@deprecated">
+    <target name="splashy" description="@deprecated">
         <splash imageurl="file:///${basedir}/${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
     </target>
 
     <!-- TARGET: Run w/Ant Splash @deprecated -->
     <target name="build.run"
             depends="splashy,jar,runtime.extensions,checkJAVA_HOME"
-            description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.runtime.extensions)">
+            description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.extensions)">
         <java classname="viskit.EventGraphAssemblyComboMain"
               classpathref="runtime.classpath"
               fork="true">
@@ -649,7 +649,7 @@
     </target>
     <target name="build.run.orig"
             depends="splashy,jar"
-            description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated (Use build.run.no.runtime.extensions)">
+            description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated (Use build.run.no.extensions)">
         <java classname="viskit.Main"
               classpathref="runtime.classpath"
               fork="true">
@@ -720,381 +720,6 @@
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
 
-    <!-- The Installer contains the JRE, a native wrapper around ${dist.jar} and its jars,
-        and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
-        maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
-        To save time, all slow steps are checked if needed, including the build. -->
-
-    <!-- get all izpack related packages -->
-    <condition property="build.host.linux">
-        <os family="unix"/>
-    </condition>
-    <condition property="build.host.windows">
-        <os family="windows"/>
-    </condition>
-    <condition property="build.host.mac">
-        <os family="mac"/>
-    </condition>
-
-    <property name="installer" value="${basedir}/installer" />
-    <property name="izpack" value="${user.home}/IzPack" />
-    <property name="launch4j" value="${user.home}/launch4j" />
-    <property name="orangevolt" value="${user.home}/orangevolt"/>
-    <!-- it could be the case from an svn checkout that asks for a pruned tree,
-        in which case, this would get set before build.init can complete the path
-        which will break runtime.jars below -->
-    <mkdir dir="${dir.lib.ext}" />
-    <property name="runtime.jars" refid="runtime.classpath" />
-    <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
-    <!-- it should be named manually though for what version has been tested -->
-    <property name="winJREExe" value="jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe"/>
-    <property name="winJRE" value="${user.home}${file.separator}${winJREExe}" />
-
-    <target name="checkJRE" >
-        <available file="${winJRE}" property="winJRE.exists" />
-    </target>
-    
-    <target name="getJRE" depends="checkJRE" unless="winJRE.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}" />
-    </target>
-
-    <target name="checkIzPack" if="build.host.windows">
-        <available file="/Program Files/IzPack/lib/compiler.jar" property="izPack.exists" />
-    </target>
-    <target name="getIzPack" depends="checkIzPack" unless="izPack.exists" >
-        <get src="http://dist.codehaus.org/izpack/releases/3.11.0/IzPack-install-3.11.0.jar" dest="${user.home}/izpack-install.jar" />
-        <echo>When installing IzPack from web, please use default install options when prompted.</echo>
-        <echo>If you wish to then immediately uninstall, when prompted, force the deletion of </echo>
-        <echo>/Program Files/IzPack.  If you wish to keep IzPack, then just quit.</echo>
-        <java fork="true" jar="${user.home}/izpack-install.jar" />
-    </target>
-
-    <target name="moveIzPack" if="build.host.windows">
-        <copy todir="${user.home}/IzPack">
-            <!-- for 64 bit windows only
-            <fileset dir="C:\Program Files (x86)\IzPack"/>
-            -->
-            <fileset dir="/Program Files/IzPack"/>
-        </copy>
-        <!-- This should delete /Program Files/IzPack and any registry entries after moving -->
-        <java jar="/Program Files/IzPack/Uninstaller/uninstaller.jar" fork="true"/>
-    </target>
-
-    <target name="checkLaunch4j">
-        <available file="${launch4j}/launch4j/launch4j.jar" property="launch4j.exists" />
-    </target>
-    <target name="getLaunch4j" depends="checkLaunch4j" unless="launch4j.exists" >
-        <!-- only one of these should pass -->
-        <ant target="getLaunch4jWin32"/>
-        <ant target="getLaunch4jLinux"/>
-        <ant target="getLaunch4jMac"/>
-    </target>
-
-    <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-win32.zip" dest="${user.home}/launch4j.zip" />
-        <unzip src="${user.home}/launch4j.zip" dest="${user.home}/launch4j"/>
-    </target>
-
-    <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-linux.tgz" dest="${user.home}/launch4j.tgz" />
-        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
-        <chmod file="${user.home}/launch4j/launch4j/bin/windres" perm="a+x"/>
-        <chmod file="${user.home}/launch4j/launch4j/bin/ld" perm="a+x"/>
-    </target>
-
-    <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-macosx.tgz" dest="${user.home}/launch4j.tgz" />
-        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
-    </target>
-
-    <target name="checkOrangevolt">
-        <available file="${orangevolt}.jar" property="orangevolt.exists" />
-    </target>
-    <target name="getOrangevolt" depends="checkOrangevolt" unless="orangevolt.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${orangevolt}.jar" />
-    </target>
-
-    <target name="checkRoxes" >
-        <available file="${user.home}/roxes.jar" property="roxes.exists" />
-    </target>
-    <target name="getRoxes" depends="checkRoxes" unless="roxes.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/roxes-win32forjava-1.0.4.jar" dest="${user.home}/roxes.jar" />
-    </target>
-
-    <target name="check.viskit">
-        <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built"/>
-    </target>
-    <target name="check.extensions">
-        <available file="${dir.lib.ext}/*.jar" property="extensions.built"/>
-    </target>
-    <target name="no.runtime.extensions" depends="check.viskit" unless="viskit.built" >
-        <ant target="jar.executable"/>
-    </target>
-    <target name="with.runtime.extensions" depends="no.runtime.extensions" unless="extensions.built">
-        <ant target="runtime.extensions"/>
-    </target>
-
-    <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
-    <target name="build.installers.no.extensions"
-            depends="no.runtime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
-            description="Build the installers with no runtime extensions">
-        <mkdir dir="${installer}/build" />
-        <mkdir dir="${installer}/stage/lib"/>
-        <mkdir dir="${installer}/stage/images"/>
-
-        <copy todir="${installer}/stage/Schemas">
-            <fileset dir="${schema.dir}"/>
-        </copy>
-        <copy todir="${installer}/stage/configuration">
-            <fileset dir="${configuration.dir}"/>
-        </copy>
-        <copy todir="${installer}/stage/images">
-            <fileset dir="${installer}/images"/>
-        </copy>
-        <copy todir="${installer}/stage/lib" >
-            <fileset refid="runtime.lib"/>
-        </copy>
-        <!--copy todir="${installer}/stage/lib" >
-            <fileset refid="runtime.javac"/>
-        </copy-->
-        <copy todir="${installer}/stage/lib/jaxb">
-            <fileset refid="jaxb.classes"/>
-        </copy>
-        <copy todir="${installer}/stage">
-            <fileset refid="runtime.viskit.exe"/>
-        </copy>
-        <delete>
-            <fileset refid="runtime.viskit.exe"/>
-        </delete>
-        <copy todir="${installer}/stage/examples">
-            <fileset dir="${examples.lib}"/>
-        </copy>
-        <copy todir="${installer}/stage/license">
-            <fileset dir="${basedir}/license"/>
-        </copy>
-        <copy todir="${installer}/stage/">
-            <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-                <include name="intro_no_diskit.html"/>
-            </fileset>
-        </copy>
-        <!--copy todir="${installer}/stage">
-            <fileset dir="${dir.src}">
-                <include name="*.*"/>
-            </fileset>
-        </copy-->
-        <delete file="${installer}/stage/build.xml"/>
-        <copy todir="${installer}/stage/viskit/javahelp">
-            <fileset dir="${dir.src}/viskit/javahelp"/>
-        </copy>
-        <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
-        <copy file="${installer}/images/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
-
-        <taskdef name="izpack"
-                 classpath="${izpack}/lib/compiler.jar"
-                 classname="com.izforge.izpack.ant.IzPackTask"/>
-
-        <taskdef name="launch4j"
-                 classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
-
-        <taskdef classpath="${orangevolt}.jar:${user.home}/roxes.jar"
-                 resource="com/orangevolt/tools/ant/taskdefs.properties"/>
-
-        <launch4j configFile="${installer}/launch4jConfig.xml"/>
-
-        <!-- create executable jar file that installs Viskit and related files, assumes java exists,
-            however once Viskit.exe actually runs it should check and download latest 1.5.0 -->
-        <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstall.jar"
-                installerType="standard"
-                basedir="${installer}"
-                izPackDir="${izpack}" />
-
-        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
-        <launch4j>
-            <config chdir="."
-                    dontwrapjar="false"
-                    jar="${installer}/build/ViskitInstall.jar"
-                    outfile="${installer}/build/ViskitInstall.exe"
-                    headertype="gui"
-                    icon="${installer}/images/ViskitIcon.ico" >
-                <jre minVersion="1.6.0"/>
-            </config>
-        </launch4j>
-
-        <!-- since above should have already made something that checks and installs JRE, the following
-            should not be needed... in which case ViskitInstall.exe is already the deployable, unless CD only -->
-
-        <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
-
-        <echo file="${installer}/build/both.bat" append="false">
-            rem use the next line for a silent install.
-            rem ${winJREExe} /S /v/qn
-            ${winJREExe}
-            ViskitInstall.exe
-        </echo>
-
-        <chmod perm="+x" file="${installer}/build/both.bat" />
-        <!-- this would only work on Unix
-        <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
-        plus the file is 16M, do we need that in SVN?
-        -->
-        <copy file="${winJRE}" todir="${installer}/build" />
-
-        <zip destfile="${installer}/build/install.zip"
-             basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJREExe}" />
-
-        <sfx archive="${installer}/build/install.zip"
-             mode="win32"
-             execute="both.bat"
-             icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
-    </target>
-
-    <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
-    <target name="build.installers.with.extensions"
-            depends="with.runtime.extensions,getJRE,getIzPack,moveIzPack,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
-            description="Builds the installers with runtime extension libraries included">
-        <mkdir dir="${installer}/build" />
-        <mkdir dir="${installer}/stage/lib"/>
-        <mkdir dir="${installer}/stage/images"/>
-
-        <copy todir="${installer}/stage/sources/DISKIT">
-            <fileset dir="${basedir}/../DISKIT"/>
-        </copy>
-        <copy todir="${installer}/stage/Schemas">
-            <fileset dir="${basedir}/Schemas"/>
-        </copy>
-        <copy todir="${installer}/stage/configuration">
-            <fileset dir="${configuration.dir}"/>
-        </copy>
-        <copy todir="${installer}/stage/images">
-            <fileset dir="${installer}/images"/>
-        </copy>
-        <copy todir="${installer}/stage/lib" >
-            <fileset refid="runtime.lib"/>
-        </copy>
-        <!--copy todir="${installer}/stage/lib" >
-            <fileset refid="runtime.javac"/>
-        </copy-->
-        <copy todir="${installer}/stage/lib/ext">
-            <fileset refid="runtime.lib.ext"/>
-        </copy>
-        <copy todir="${installer}/stage/lib/jaxb">
-            <fileset refid="jaxb.classes"/>
-        </copy>
-        <copy todir="${installer}/stage">
-            <fileset refid="runtime.viskit.exe"/>
-        </copy>
-        <delete>
-            <fileset refid="runtime.viskit.exe"/>
-        </delete>
-        <copy todir="${installer}/stage/examples">
-            <fileset dir="${examples.lib}"/>
-        </copy>
-        <copy todir="${installer}/stage/license">
-            <fileset dir="${basedir}/license"/>
-        </copy>
-        <copy todir="${installer}/stage/">
-            <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-                <include name="intro.html"/>
-            </fileset>
-        </copy>
-        <delete file="${installer}/stage/build.xml"/>
-        <copy todir="${installer}/stage/viskit/javahelp">
-            <fileset dir="${dir.src}/viskit/javahelp"/>
-        </copy>
-        <!-- do this again just in case IzPack was installed previously -->
-        <copy todir="${izpack}/bin/langpacks/flags">
-            <fileset dir="${installer}/images">
-                <include name="american-flag.gif"/>
-            </fileset>
-        </copy>
-        <copy file="${izpack}/bin/langpacks/installer/eng.xml" tofile="${izpack}/bin/langpacks/installer/usa.xml"/>
-        <copy file="${installer}/images/american-flag.gif" tofile="${izpack}/bin/langpacks/flags/usa.gif"/>
-
-        <taskdef name="izpack"
-                 classpath="${izpack}/lib/compiler.jar"
-                 classname="com.izforge.izpack.ant.IzPackTask"/>
-
-        <taskdef name="launch4j"
-                 classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
-
-        <taskdef classpath="${orangevolt}.jar:${user.home}/roxes.jar"
-                 resource="com/orangevolt/tools/ant/taskdefs.properties"/>
-
-        <launch4j configFile="${installer}/launch4jConfig.xml"/>
-
-        <!-- create executable jar file that installs Viskit and related files, assumes java exists,
-            however once Viskit.exe actually runs it should check and download latest 1.5.0 -->
-        <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstall.jar"
-                installerType="standard"
-                basedir="${installer}"
-                izPackDir="${izpack}" />
-
-        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
-        <launch4j>
-            <config chdir="."
-                    dontwrapjar="false"
-                    jar="${installer}/build/ViskitInstall.jar"
-                    outfile="${installer}/build/ViskitInstall.exe"
-                    headertype="gui"
-                    icon="${installer}/images/ViskitIcon.ico" >
-                <jre minVersion="1.6.0"/>
-            </config>
-        </launch4j>
-
-        <!-- since above should have already made something that checks and installs JRE, the following
-            should not be needed... in which case ViskitInstall.exe is already the deployable, unless CD only -->
-
-        <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
-
-        <echo file="${installer}/build/both.bat" append="false">
-            rem use the next line for a silent install.
-            rem ${winJREExe} /S /v/qn
-            ${winJREExe}
-            ViskitInstall.exe
-        </echo>
-
-        <chmod perm="+x" file="${installer}/build/both.bat" />
-        <!-- this would only work on Unix
-        <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
-        plus the file is 16M, do we need that in CVS?
-        -->
-        <copy file="${winJRE}" todir="${installer}/build" />
-
-        <zip destfile="${installer}/build/install.zip"
-             basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJREExe}" />
-
-        <sfx archive="${installer}/build/install.zip"
-             mode="win32"
-             execute="both.bat"
-             icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
-    </target>
-
-    <target name="clean.installers">
-        <delete dir="${installer}/build"/>
-        <delete dir="${installer}/stage"/>
-    </target>
-
-    <target name="clean.installer.materials"
-            depends="clean.installers"
-            description="Clean up all materials from building a Viskit installation executable">
-
-         <delete dir="${izpack}"/>
-         <delete file="${user.home}/izpack-install.jar"/>
-         <delete dir="${launch4j}"/>
-         <delete file="${launch4j}.zip"/>
-         <delete file="${orangevolt}.jar"/>
-         <delete file="${user.home}/roxes.jar"/>
-         <delete file="${winJRE}"/>
-    </target>
-
     <!--  === TARGET: clean === -->
     <target name="clean"
             depends="init"
@@ -1114,5 +739,8 @@
 ${delete.temps.cache}</echo>
         <exec executable="deleteTempsCache.bat" resolveexecutable="true"/>
     </target-->
+
+    <!-- add izpack installer task -->
+    <import file="buildInstallers.xml"/>
 
 </project>
