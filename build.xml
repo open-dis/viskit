@@ -80,6 +80,7 @@
     <fileset dir="${dir.lib}" id="runtime.lib" >
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
+        <exclude name="izpack/**"/>
     </fileset>
     <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >
         <include name="**/*.jar"/>
