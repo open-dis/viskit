@@ -10,9 +10,14 @@
 
 <installation version="1.0">
     
+    <variables>
+        <variable name="JDKPathPanel.minVersion" value="1.6.0" />
+        <variable name="JDKPathPanel.maxVersion" value="1.6.0_99" />
+        <variable name="JDKPathPanel.skipIfValid" value="yes" />
+    </variables>
     <info>
-        <appname>Viskit-0.5.4</appname>
-        <appversion>0.5.4</appversion>
+        <appname>Viskit-0.6.0</appname>
+        <appversion>0.6.0</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
@@ -27,6 +32,7 @@
         </authors>
         <url>http://diana.nps.edu/Viskit</url>
         <javaversion>1.6</javaversion>
+        <requiresjdk>yes</requiresjdk>
     </info>
     
     <guiprefs height="600" width="800" resizable="yes">
@@ -40,7 +46,6 @@
             <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
     </variables>
     <locale>
-        <langpack iso3="usa"/>
         <langpack iso3="eng"/>
         <langpack iso3="fra"/>
         <langpack iso3="deu"/>
@@ -82,6 +87,7 @@
                 <include name="Viskit.exe"/>
                 <include name="viskit-exe.jar"/>
                 <include name="intro_no_diskit.html"/>
+                <exclude name="lib/izpack/**/*"/>
             </fileset>
         </pack>    
         <!--    
