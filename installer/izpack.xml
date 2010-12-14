@@ -33,6 +33,7 @@
         <url>http://diana.nps.edu/Viskit</url>
         <javaversion>1.6</javaversion>
         <requiresjdk>yes</requiresjdk>
+        <writeinstallationinformation>yes</writeinstallationinformation>
     </info>
     
     <guiprefs height="600" width="800" resizable="yes">
@@ -75,19 +76,18 @@
     </listeners>
     <packs>
         <pack name="Core" required="yes">
-            <description>Viskit Application Files</description>
+            <description>Core Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="Schemas/**/*"/>
-                <include name="configuration/**/*"/>
-                <include name="examples/**/*"/>
-                <include name="images/**/*"/>
-                <include name="lib/**/*" />
-                <include name="license/**/*" />
-                <include name="viskit/**/*"/>
+                <include name="Schemas/**"/>
+                <include name="configuration/**"/>
+                <include name="examples/**"/>
+                <include name="images/**"/>
+                <include name="lib/**" />
+                <include name="license/**" />
+                <include name="viskit/**"/>
                 <include name="Viskit.exe"/>
-                <include name="viskit-exe.jar"/>
                 <include name="intro_no_diskit.html"/>
-                <exclude name="lib/izpack/**/*"/>
+                <include name="viskit-exe.jar"/>
             </fileset>
         </pack>    
         <!--    
