@@ -4,7 +4,7 @@
 
   <skipIfNotSupported />
 
-  <programGroup defaultName="Viskit\Viskit-0.5.4" location="applications"/>
+  <programGroup defaultName="Viskit\Viskit-0.6.0" location="applications"/>
 
   <shortcut
      name="Viskit"
@@ -25,7 +25,7 @@
    </shortcut>
 
    <shortcut
-     name="Viskit-0.5.4 Uninstaller"
+     name="Viskit-0.6.0 Uninstaller"
      programGroup="yes"
      desktop="no"
      applications="no"
@@ -35,7 +35,7 @@
      commandLine=""
 	 iconFile="%SystemRoot%\system32\SHELL32.dll"
      iconIndex="31" 
-     description="This uninstalls Viskit 0.5.4">
+     description="This uninstalls Viskit 0.6.0">
      
      <createForPack name="Core" />
    </shortcut>
