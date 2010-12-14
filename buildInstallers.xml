@@ -105,7 +105,6 @@
             depends="no.extensions,getJRE,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
             description="Build the installers with no runtime extensions">
 
-
         <copy todir="${installer}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
                 <include name="intro_no_diskit.html"/>
