@@ -60,7 +60,7 @@
     <property environment="env"/>
 
     <path id="runtime.extension.classes.path">
-        <fileset dir="${dir.lib.ext}" includes="*.jar" id="runtime.extension.classes" />
+        <fileset dir="${dir.lib.ext}" includes="*.jar"/>
     </path>
 
     <path id="jaxb.classes.path">
