@@ -17,7 +17,7 @@
         <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
     </variables>
     <info>
-        <appname>Viskit-0.6.0</appname>
+        <appname>Viskit</appname>
         <appversion>0.6.0</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
