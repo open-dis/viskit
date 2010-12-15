@@ -474,7 +474,6 @@
                 <attribute name="Class-Path" value="${launcher.jar.internal.classpath}" />
             </manifest>
         </jar>
-        <!--delete file="${dist.jar}"/-->
     </target>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
