@@ -5,7 +5,7 @@
     Created on : September 3, 2006, 2:29 PM
     Author     : rmgold
     Description:
-        IzPack Installer builder for Viskit
+        IzPack Installer builder for Win 32 / Unix Viskit
 -->
 
 <installation version="1.0">
@@ -40,7 +40,7 @@
     <guiprefs height="600" width="800" resizable="yes">
         
         <laf name="liquid">
-            <os family="mac,unix,windows"/>
+            <os family="unix,windows"/>
         </laf>
         
     </guiprefs>
@@ -59,6 +59,7 @@
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
         <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
+        <res src="Unix_shortcutSpec.xml" id="Unix_shortcutSpec.xml"/>
     </resources>
     
     <panels>
@@ -78,6 +79,7 @@
         <pack name="Core" required="yes">
             <description>Core Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
+                <os family="windows"/>
                 <include name="Schemas/**"/>
                 <include name="configuration/**"/>
                 <include name="examples/**"/>
@@ -85,25 +87,23 @@
                 <include name="lib/**" />
                 <include name="license/**" />
                 <include name="viskit/**"/>
-                <include name="Viskit.exe"/>
-                <include name="intro_no_diskit.html"/>
                 <include name="viskit-exe.jar"/>
+                <include name="intro_no_diskit.html"/>
+                <include name="Viskit.exe"/>
             </fileset>
-        </pack>    
-        <!--    
-        <pack name="examples" required="no">
-            <description>OA3302 course examples</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="examples/*"/>
+                <os family="unix"/>
+                <include name="Schemas/**"/>
+                <include name="configuration/**"/>
+                <include name="examples/**"/>
+                <include name="images/**"/>
+                <include name="lib/**" />
+                <include name="license/**" />
+                <include name="viskit/**"/>
+                <include name="viskit-exe.jar"/>
+                <include name="intro_no_diskit.html"/>
             </fileset>
         </pack>
-        <pack name="Sources" required="no">
-            <description>Viskit source trees</description>
-            <fileset dir="stage" targetdir="$INSTALL_PATH">
-                <include name="src/**/*"/>
-            </fileset>
-        </pack>
-        -->
     </packs>
     <native type="izpack" name="ShellLink.dll"/>
     <native type="3rdparty" name="COIOSHelper.dll" stage="both">
