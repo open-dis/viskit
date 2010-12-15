@@ -32,10 +32,10 @@
      startMenu="no"
      startup="no"
      target="$INSTALL_PATH\Uninstaller\uninstaller.jar"     
-     commandLine=""
-	 iconFile="%SystemRoot%\system32\SHELL32.dll"
-     iconIndex="31" 
-     description="This uninstalls Viskit 0.6.0">
+     commandLine="" 
+     description="This uninstalls Viskit 0.6.0"
+     iconFile="%SystemRoot%\system32\SHELL32.dll"
+     iconIndex="31">
      
      <createForPack name="Core" />
    </shortcut>
