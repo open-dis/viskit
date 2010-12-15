@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-    Document   : izpack.xml
-    Created on : September 3, 2006, 2:29 PM
-    Author     : rmgold
+    Document   : izpackMac.xml
+    Created on : December 15, 2010, 0223
+    Author     : tdnorbra
     Description:
-        IzPack Installer builder for Viskit
+        IzPack Installer builder for Viskit - Mac
 -->
 
 <installation version="1.0">
