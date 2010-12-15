@@ -25,13 +25,16 @@
     <condition property="build.host.windows">
         <os family="windows"/>
     </condition>
+
+    <!-- Because os family will match both unix and mac, lanuch4j will be downloaded twice on Macs -->
     <condition property="build.host.mac">
         <os family="mac"/>
     </condition>
 
     <property name="installer" value="${basedir}/installer" />
     <property name="launch4j" value="${user.home}/launch4j" />
-    <property name="orangevolt" value="${user.home}/orangevolt"/>
+    <property name="orangevolt.jar" value="${dir.lib}/izpack/orangevolt-ant-tasks-1.3.8.jar"/>
+    <property name="roxes.jar" value="${dir.lib}/izpack/roxes-win32forjava-1.1.1.jar"/>
     <property name="runtime.jars" refid="runtime.classpath" />
     <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
     <!-- it should be named manually though for what version has been tested -->
@@ -47,7 +50,7 @@
     </target>
 
     <target name="checkLaunch4j">
-        <available file="${launch4j}/launch4j/launch4j.jar" property="launch4j.exists" />
+        <available file="${launch4j}/launch4j.jar" property="launch4j.exists" />
     </target>
     <target name="getLaunch4j" depends="checkLaunch4j" unless="launch4j.exists" >
         <!-- only one of these should pass -->
@@ -57,34 +60,20 @@
     </target>
 
     <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-win32.zip" dest="${user.home}/launch4j.zip" />
-        <unzip src="${user.home}/launch4j.zip" dest="${user.home}/launch4j"/>
+        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-win32.zip" dest="${user.home}/launch4j.zip" />
+        <unzip src="${user.home}/launch4j.zip" dest="${user.home}"/>
     </target>
 
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-linux.tgz" dest="${user.home}/launch4j.tgz" />
-        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
-        <chmod file="${user.home}/launch4j/launch4j/bin/windres" perm="a+x"/>
-        <chmod file="${user.home}/launch4j/launch4j/bin/ld" perm="a+x"/>
+        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-linux.tgz" dest="${user.home}/launch4j.tgz" />
+        <untar src="${user.home}/launch4j.tgz" dest="${user.home}" compression="gzip"/>
+        <chmod file="${user.home}/launch4j/bin/windres" perm="a+x"/>
+        <chmod file="${user.home}/launch4j/bin/ld" perm="a+x"/>
     </target>
 
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/launch4j/launch4j-3.0.0-pre1-macosx.tgz" dest="${user.home}/launch4j.tgz" />
-        <untar src="${user.home}/launch4j.tgz" dest="${user.home}/launch4j" compression="gzip"/>
-    </target>
-
-    <target name="checkOrangevolt">
-        <available file="${orangevolt}.jar" property="orangevolt.exists" />
-    </target>
-    <target name="getOrangevolt" depends="checkOrangevolt" unless="orangevolt.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/orangevolt-ant-tasks-1.3.5.jar" dest="${orangevolt}.jar" />
-    </target>
-
-    <target name="checkRoxes" >
-        <available file="${user.home}/roxes.jar" property="roxes.exists" />
-    </target>
-    <target name="getRoxes" depends="checkRoxes" unless="roxes.exists" >
-        <get src="http://easynews.dl.sourceforge.net/sourceforge/ovanttasks/roxes-win32forjava-1.0.4.jar" dest="${user.home}/roxes.jar" />
+        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-macosx.tgz" dest="${user.home}/launch4j.tgz" />
+        <untar src="${user.home}/launch4j.tgz" dest="${user.home}" compression="gzip"/>
     </target>
 
     <target name="check.viskit">
@@ -102,7 +91,7 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions"
-            depends="no.extensions,getJRE,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="no.extensions,getJRE,getLaunch4j,clean.installers"
             description="Build the installers with no runtime extensions">
 
         <copy todir="${installer}/stage/">
@@ -116,7 +105,7 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions"
-            depends="with.extensions,getJRE,getLaunch4j,getOrangevolt,getRoxes,clean.installers"
+            depends="with.extensions,getJRE,getLaunch4j,clean.installers"
             description="Builds the installers with runtime extension libraries included">
 
         <copy todir="${installer}/stage/sources/DISKIT">
@@ -174,14 +163,14 @@
 
     <target name="make.installers">
         <taskdef name="izpack"
-                 classpath="lib/izpack/standalone-compiler.jar"
+                 classpath="${dir.lib}/izpack/standalone-compiler.jar"
                  classname="com.izforge.izpack.ant.IzPackTask"/>
 
         <taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${launch4j}/launch4j/launch4j.jar:${launch4j}/launch4j/lib/xstream.jar"/>
+                 classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
 
-        <taskdef classpath="${orangevolt}.jar:${user.home}/roxes.jar"
+        <taskdef classpath="${orangevolt.jar}:${roxes.jar}"
                  resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
@@ -211,8 +200,8 @@
         <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
 
         <echo file="${installer}/build/both.bat" append="false">
-            rem use the next line for a silent install.
-            rem ${winJREExe} /S /v/qn
+            @rem use the next line for a silent install.
+            @rem ${winJREExe} /S /v/qn
             ${winJREExe}
             ViskitInstall.exe
         </echo>
@@ -247,8 +236,6 @@
          <delete dir="${launch4j}"/>
          <delete file="${launch4j}.zip"/>
          <delete file="${launch4j}.tgz"/>
-         <delete file="${orangevolt}.jar"/>
-         <delete file="${user.home}/roxes.jar"/>
          <delete file="${winJRE}"/>
     </target>
 
