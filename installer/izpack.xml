@@ -14,6 +14,7 @@
         <variable name="JDKPathPanel.minVersion" value="1.6.0" />
         <variable name="JDKPathPanel.maxVersion" value="1.6.0_99" />
         <variable name="JDKPathPanel.skipIfValid" value="yes" />
+        <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
     </variables>
     <info>
         <appname>Viskit-0.6.0</appname>
@@ -43,9 +44,7 @@
         </laf>
         
     </guiprefs>
-    <variables>
-            <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
-    </variables>
+
     <locale>
         <langpack iso3="eng"/>
         <langpack iso3="fra"/>
