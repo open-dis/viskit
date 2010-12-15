@@ -20,7 +20,6 @@
     <property name="launch4j" value="${user.home}/launch4j"/>
     <property name="orangevolt.jar" value="${dir.lib}/izpack/orangevolt-ant-tasks-1.3.8.jar"/>
     <property name="roxes.jar" value="${dir.lib}/izpack/roxes-win32forjava-1.1.1.jar"/>
-    <property name="runtime.jars" refid="runtime.classpath"/>
 
     <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
     <!-- it should be named manually though for what version has been tested -->
@@ -116,7 +115,7 @@
             </fileset>
         </copy>
         <ant target="installers.common"/>
-        <ant target="make.win.installer"/>
+        <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
     </target>
 
@@ -134,7 +133,7 @@
             </fileset>
         </copy>
         <ant target="installers.common"/>
-        <ant target="make.win.installer"/>
+        <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
     </target>
     
@@ -162,7 +161,7 @@
         </copy>
     </target>
 
-    <target name="make.win.installer">
+    <target name="make.win.unix.installer">
         <mkdir dir="${installer}/build" />
 
         <taskdef name="launch4j"
@@ -173,6 +172,7 @@
         <taskdef classpath="${orangevolt.jar}:${roxes.jar}"
                  resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
+        <!-- Wrap the viskit-exe.jar in a native win32 executable -->
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
 
         <copy todir="${installer}/stage">
@@ -184,10 +184,14 @@
 
         <echo message="Running IzPack to build the installers..."/>
 
-        <!-- create an executable jar file that installs Viskit and related files, assumes java exists,
-            however once Viskit.exe actually runs it should check and download latest 1.5.0 -->
+        <!-- create an executable out of the jar file that installs Viskit and related files, assumes java exists,
+            however once Viskit.exe actually runs it should check and download latest JDK -->
         <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstall.jar"
+                output="${installer}/build/ViskitInstallWin32.jar"
+                installerType="standard"
+                basedir="${installer}"/>
+        <izpack input="${installer}/izpack.xml"
+                output="${installer}/build/ViskitInstallUnix.jar"
                 installerType="standard"
                 basedir="${installer}"/>
 
@@ -195,61 +199,58 @@
         <launch4j>
             <config chdir="."
                     dontwrapjar="false"
-                    jar="${installer}/build/ViskitInstall.jar"
-                    outfile="${installer}/build/ViskitInstall.exe"
+                    jar="${installer}/build/ViskitInstallWin32.jar"
+                    outfile="${installer}/build/ViskitInstallWin32.exe"
                     headertype="gui"
                     icon="${installer}/images/ViskitIcon.ico" >
                 <jre minVersion="1.6.0"/>
             </config>
         </launch4j>
 
-        <!-- since above should have already made something that checks and installs JRE, the following
-            should not be needed... in which case ViskitInstall.exe is already the deployable, unless CD only -->
+        <!-- since above should have already made something that checks and installs JDK, the following
+            should not be needed... in which case ViskitInstallWin32.exe is already the deployable, unless CD only -->
 
-        <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
+        <!-- build Install-Viskit-Win32-JDK.exe, contains JDK and its installer -->
 
-        <echo file="${installer}/build/both.bat" append="false">@rem use the next lines for a silent install.
+        <!--echo file="${installer}/build/both.bat" append="false">@rem use the next lines for a silent install.
 @rem ${winJREExe} /S /v/qn
 @rem ${winJDKExe} /S /v/qn
 @rem ${winJREExe}
 @rem ${winJDKExe}
-ViskitInstall.exe
-        </echo>
+ViskitInstallWin32.exe
+        </echo-->
 
-        <chmod perm="+x" file="${installer}/build/both.bat" />
-        <!-- this would only work on Unix
-        <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
-        plus the file is 16M, do we need that in CVS?
-        -->
+        <!--chmod perm="+x" file="${installer}/build/both.bat" /-->
+
+        <!-- this would only work on Unix, plus the file is 16M, do we need that in CVS?
+        <symlink link="installer/build/${winJRE}" resource="../${winJRE}"/-->
+
         <!--copy file="${winJRE}" todir="${installer}/build"/>
         <copy file="${winJDK}" todir="${installer}/build"/-->
 
         <!--zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJREExe}"/>
+             includes="both.bat,ViskitInstallWin32.exe,${winJREExe}"/>
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJDKExe}"/-->
-        <zip destfile="${installer}/build/install.zip"
-             basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe"/>
+             includes="both.bat,ViskitInstallWin32.exe,${winJDKExe}"/-->
 
         <!--sfx archive="${installer}/build/install.zip"
              mode="win32"
              execute="both.bat"
              icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/-->
+             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
         <sfx archive="${installer}/build/install.zip"
              mode="win32"
              execute="both.bat"
              icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32.exe"/>
+             output="${installer}/build/Install-Viskit-Win32-JDK.exe"/-->
     </target>
 
     <target name="make.mac.installer">
         <copy file="${dist.jar}" todir="${installer}/stage/lib"/>
         <izpack input="${installer}/izpackMac.xml"
-                output="${installer}/build/ViskitInstall.jar"
+                output="${installer}/build/ViskitInstallMac.jar"
                 installerType="standard"
                 basedir="${installer}"/>
         <echo message="IzPack installer builds complete"/>
@@ -266,6 +267,7 @@ ViskitInstall.exe
 
          <delete dir="${launch4j}"/>
          <!--delete file="${winJRE}"/-->
+         <!--delete file="${winJDK}"/-->
     </target>
 
 </project>
