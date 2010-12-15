@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<shortcuts>
+    <skipIfNotSupported/>
+    <programGroup defaultName="Viskit"
+                  location="applications"/>
+    <shortcut
+        name="Viskit"
+        target="$INSTALL_PATH/viskit-exe.jar"
+        commandLine=""
+        workingDirectory="$INSTALL_PATH"
+        description="Viskit DES Application"
+        iconFile="$INSTALL_PATH/images/ViskitIcon.ico"
+        iconIndex="0"
+        initialState="normal"
+        programGroup="yes"
+        desktop="yes"
+        applications="yes"
+        startMenu="no"
+        startup="no"
+        type="Application"
+        terminal="true">
+
+        <createForPack name="Core"/>
+    </shortcut>
+
+</shortcuts>
