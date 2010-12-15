@@ -77,6 +77,8 @@
     <fileset dir="${dir.build.lib}" id="runtime.viskit.exe">
         <include name="viskit-exe.jar"/>
     </fileset>
+
+    <!-- Used for the IzPack installer routine -->
     <fileset dir="${dir.lib}" id="runtime.lib" >
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
