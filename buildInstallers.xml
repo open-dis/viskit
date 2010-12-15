@@ -27,6 +27,9 @@
     <property name="winJREExe" value="jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe"/>
     <property name="winJRE" value="${user.home}${file.separator}${winJREExe}" />
 
+    <property name="winJDKExe" value="jdk-6u22-windows-i586.exe"/>
+    <property name="winJDK" value="${user.home}/${winJDKExe}"/>
+
     <!-- get all izpack related packages -->
     <condition property="build.host.linux">
         <os family="unix"/>
@@ -47,11 +50,18 @@
     <target name="checkJRE" >
         <available file="${winJRE}" property="winJRE.exists" />
     </target>
-    
     <target name="getJRE" depends="checkJRE" unless="winJRE.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}" />
+        <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}"/>
+    </target>
+    
+    <target name="checkJDK" >
+        <available file="${winJDK}" property="winJDK.exists" />
+    </target>
+    <target name="getJDK" depends="checkJDK" unless="winJDK.exists"  >
+        <!--get src="http://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/VerifyItem-Start/jdk-6u22-windows-i586.exe?BundledLineItemUUID=KpuJ_hCyJxUAAAEsrlBKPumv&OrderID=KgOJ_hCyJs0AAAEsoFBKPumv&ProductID=c66J_hCwkI4AAAErIFJuIQy3&FileName=/jdk-6u22-windows-i586.exe" dest="${winJDK}"/-->
     </target>
 
+    <!-- No good way of getting around this as we need the binary for the particular platform -->
     <target name="checkLaunch4j">
         <available file="${launch4j}/launch4j.jar" property="launch4j.exists" />
     </target>
@@ -97,7 +107,7 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.no.extensions"
-            depends="no.extensions,getJRE,getLaunch4j,clean.installers"
+            depends="no.extensions,getLaunch4j,clean.installers"
             description="Build the installers with no runtime extensions">
 
         <copy todir="${installer}/stage/">
@@ -112,7 +122,7 @@
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
     <target name="build.installers.with.extensions"
-            depends="with.extensions,getJRE,getLaunch4j,clean.installers"
+            depends="with.extensions,getLaunch4j,clean.installers"
             description="Builds the installers with runtime extension libraries included">
 
         <copy todir="${installer}/stage/lib/ext">
@@ -198,9 +208,11 @@
 
         <!-- build Install-Viskit-Win32-JRE.exe, contains JRE and its installer -->
 
-        <echo file="${installer}/build/both.bat" append="false">@rem use the next line for a silent install.
+        <echo file="${installer}/build/both.bat" append="false">@rem use the next lines for a silent install.
 @rem ${winJREExe} /S /v/qn
-${winJREExe}
+@rem ${winJDKExe} /S /v/qn
+@rem ${winJREExe}
+@rem ${winJDKExe}
 ViskitInstall.exe
         </echo>
 
@@ -209,17 +221,29 @@ ViskitInstall.exe
         <symlink link="installer/build/${winJRE}" resource="../${winJRE}" />
         plus the file is 16M, do we need that in CVS?
         -->
-        <copy file="${winJRE}" todir="${installer}/build" />
+        <!--copy file="${winJRE}" todir="${installer}/build"/>
+        <copy file="${winJDK}" todir="${installer}/build"/-->
 
+        <!--zip destfile="${installer}/build/install.zip"
+             basedir="${installer}/build/."
+             includes="both.bat,ViskitInstall.exe,${winJREExe}"/>
         <zip destfile="${installer}/build/install.zip"
              basedir="${installer}/build/."
-             includes="both.bat,ViskitInstall.exe,${winJREExe}" />
+             includes="both.bat,ViskitInstall.exe,${winJDKExe}"/-->
+        <zip destfile="${installer}/build/install.zip"
+             basedir="${installer}/build/."
+             includes="both.bat,ViskitInstall.exe"/>
 
+        <!--sfx archive="${installer}/build/install.zip"
+             mode="win32"
+             execute="both.bat"
+             icon="${installer}/images/ViskitIcon.ico"
+             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/-->
         <sfx archive="${installer}/build/install.zip"
              mode="win32"
              execute="both.bat"
              icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
+             output="${installer}/build/Install-Viskit-Win32.exe"/>
     </target>
 
     <target name="make.mac.installer">
