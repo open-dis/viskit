@@ -56,6 +56,7 @@
     </locale>
     
     <resources>
+        <res id="Installer.image" src="images/ViskitLogo.png"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
         <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
