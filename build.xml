@@ -83,6 +83,7 @@
         <exclude name="izpack/**"/>
         <exclude name="trang*.jar"/>
         <exclude name="junit.jar"/>
+        <exclude name="jaxb/jaxb-xjc.jar"/>
     </fileset>
     <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >
         <include name="**/*.jar"/>
