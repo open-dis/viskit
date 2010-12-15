@@ -60,7 +60,7 @@
     <property environment="env"/>
 
     <path id="runtime.extension.classes.path">
-        <fileset dir="${dir.lib.ext}" includes="*.jar"/>
+        <fileset dir="${dir.lib.ext}" includes="**/*.jar"/>
     </path>
 
     <path id="jaxb.classes.path">
@@ -74,7 +74,7 @@
     <!--fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
         <include name="tools.jar"/>
     </fileset-->
-    <fileset dir="${dir.build}/lib" id="runtime.viskit.exe">
+    <fileset dir="${dir.build.lib}" id="runtime.viskit.exe">
         <include name="viskit-exe.jar"/>
     </fileset>
     <fileset dir="${dir.lib}" id="runtime.lib" >
@@ -227,8 +227,8 @@
             description="Build bindings to Schemas" >
         <javac destdir="${dir.build.classes}"
                debug="off"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeAntRuntime="no">
 
             <!-- Reveals generics and deprecation warnings -->
@@ -239,8 +239,8 @@
         </javac>
         <javac destdir="${dir.build.classes}"
                debug="off"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeAntRuntime="no">
 
             <!-- Reveals generics and deprecation warnings -->
@@ -251,8 +251,8 @@
         </javac>
         <javac destdir="${dir.build.classes}"
                debug="off"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeAntRuntime="no">
 
             <!-- Reveals generics and deprecation warnings -->
@@ -263,8 +263,8 @@
         </javac>
         <javac destdir="${dir.build.classes}"
                debug="off"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeAntRuntime="no">
 
             <!-- Reveals generics and deprecation warnings -->
@@ -275,8 +275,8 @@
         </javac>
         <!--javac destdir="${dir.build.classes}"
             debug="on"
-            source="1.5"
-            target="1.5">
+            source="${javac.source}"
+            target="${javac.target}">
 
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
@@ -297,8 +297,8 @@
             description="Build nps.edu.utils">
 
         <javac destdir="${dir.build.classes}"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeantruntime="false">
 
             <!-- Reveals generics and deprecation warings -->
@@ -322,8 +322,8 @@
         <javac verbose="no"
                destdir="${dir.build.classes}"
                excludes="xsd/** */test/*"
-               source="1.5"
-               target="1.5"
+               source="${javac.source}"
+               target="${javac.target}"
                includeantruntime="false">
 
             <!-- Reveals generics and deprecation warings -->
@@ -474,8 +474,7 @@
                 <attribute name="Class-Path" value="${launcher.jar.internal.classpath}" />
             </manifest>
         </jar>
-        <delete file="${dist.jar}"/>
-        <delete file="${dir.build.lib}/visxml.jar"/>
+        <!--delete file="${dist.jar}"/-->
     </target>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
@@ -717,9 +716,9 @@
         </java>
     </target>
 
-    <target  name="runDOE"
-             depends="jar, runtime.extensions"
-             description="Run Design-Of-Experiments">
+    <target name="runDOE"
+            depends="jar, runtime.extensions"
+            description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
 
