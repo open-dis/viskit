@@ -43,7 +43,8 @@
     </guiprefs>
 
     <locale>
-        <langpack iso3="eng"/>
+        <!-- The English will have to live with USA version -->
+        <langpack iso3="usa"/>
         <langpack iso3="fra"/>
         <langpack iso3="deu"/>
         <langpack iso3="spa"/>
