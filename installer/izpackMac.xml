@@ -16,8 +16,8 @@
         <variable name="JDKPathPanel.skipIfValid" value="yes" />
     </variables>
     <info>
-        <appname>Viskit</appname>
-        <appversion>0.6.0</appversion>
+        <appname>@{product.Name}</appname>
+        <appversion>@{product.Version}</appversion>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
@@ -30,7 +30,7 @@
             <author name="Terry Norbraten" email="tdnorbra@nps.edu"/>
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
-        <url>http://diana.nps.edu/Viskit</url>
+        <url>@{product.url}</url>
         <javaversion>1.6</javaversion>
         <requiresjdk>yes</requiresjdk>
         <writeinstallationinformation>yes</writeinstallationinformation>

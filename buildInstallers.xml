@@ -189,11 +189,17 @@
         <izpack input="${installer}/izpack.xml"
                 output="${installer}/build/ViskitInstallWin32.jar"
                 installerType="standard"
-                basedir="${installer}"/>
+                basedir="${installer}"
+                inheritAll="true"
+                compression="deflate"
+                compressionlevel="9"/>
         <izpack input="${installer}/izpack.xml"
                 output="${installer}/build/ViskitInstallUnix.jar"
                 installerType="standard"
-                basedir="${installer}"/>
+                basedir="${installer}"
+                inheritAll="true"
+                compression="deflate"
+                compressionlevel="9"/>
 
         <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
         <launch4j>
