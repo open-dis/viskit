@@ -258,7 +258,10 @@ ViskitInstallWin32.exe
         <izpack input="${installer}/izpackMac.xml"
                 output="${installer}/build/ViskitInstallMac.jar"
                 installerType="standard"
-                basedir="${installer}"/>
+                basedir="${installer}"
+                inheritAll="true"
+                compression="deflate"
+                compressionlevel="9"/>
         <echo message="IzPack installer builds complete"/>
     </target>
 

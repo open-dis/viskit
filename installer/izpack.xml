@@ -19,6 +19,7 @@
     <info>
         <appname>@{product.Name}</appname>
         <appversion>@{product.Version}</appversion>
+        <appsubpath>Viskit</appsubpath>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
