@@ -1,6 +1,8 @@
 package edu.nps.util;
 
-import java.io.File;
+//import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,8 +27,8 @@ public class LogUtils {
     /**
      * This is a utility to configure the Log4j logger.
      * <p/>
-     * If requested configuration file can not be read, the default bahavior
-     * will be to use BasicConfigurator and set the debug lefvl to INFO.
+     * If requested configuration file can not be read, the default behavior
+     * will be to use BasicConfigurator and set the debug level to INFO.
      *
      * @param configFileFname The file name to configure the logger with.
      * @return true if successful, false if failed to find/use the file
@@ -46,19 +48,30 @@ public class LogUtils {
      * @return true if successful, false if failed to find/use the file
      */
     public static boolean configureLog4j(String configFileFname, boolean watch) {
-        File f = new File(configFileFname);
+//        File f = new File(configFileFname);
 
-        if (f.canRead()) {
+//        if (f.canRead()) {
+        if (!configFileFname.isEmpty()) {
+            Properties props = new Properties();
+
+            // Use the class loader to find the path in a jar file
+            try {
+                props.load(ClassLoader.getSystemResourceAsStream(configFileFname));
+            } catch (IOException e) {
+                LOG.error(e);
+            }
+
             if (watch) {
                 PropertyConfigurator.configureAndWatch(configFileFname);
             } else {
-                PropertyConfigurator.configure(configFileFname);
+//                PropertyConfigurator.configure(configFileFname);
+                PropertyConfigurator.configure(props);
             }
 
             // The following is useful early on when developers are starting to
             // use log4j to know what is going on.  We can remove this printout
             // in the future, or turn it into a log4j message!
-            LOG.debug(f.getAbsolutePath() + " was used to configure log4j.");
+//            LOG.debug(f.getAbsolutePath() + " was used to configure log4j.");
 
             return true;
         } else {
