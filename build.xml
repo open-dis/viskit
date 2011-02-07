@@ -157,9 +157,7 @@
         <echo message="Base directory: ${basedir}"/>
         <echo message="Source directory: ${dir.src}"/>
         <echo message="Build directory: ${dir.build}"/>
-
-        <!-- On MACs, if run from NetBeans, will not show JAVA_HOME -->
-        <echo message="JAVA_HOME: ${env.JAVA_HOME}"/>
+        <echo message="JAVA_HOME: ${java.home}"/>
     </target>
 
     <!--  === TARGET: build.init === -->
