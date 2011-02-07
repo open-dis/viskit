@@ -10,28 +10,21 @@
 
     <!-- ID properties (this file) -->
     <property name="SVNId" value="$Id$"/>
-
-    <!-- The Installer contains the JRE, a native wrapper around ${dist.jar} and its jars,
-        and the actual installer. JRE, IzPack the installer generator, launch4j the wrapper
-        maker, and orangevolt/roxes the sfx for win32 registries are downloaded if needed.
-        To save time, all slow steps are checked if needed, including the build. -->
-
     <property name="installer" value="${basedir}/installer"/>
     <property name="launch4j" value="${user.home}/launch4j"/>
     <property name="orangevolt.jar" value="${dir.lib}/izpack/orangevolt-ant-tasks-1.3.8.jar"/>
     <property name="roxes.jar" value="${dir.lib}/izpack/roxes-win32forjava-1.1.1.jar"/>
 
-    <!-- the following name can be anything, the url link to download returns the latest jdk for windows -->
-    <!-- it should be named manually though for what version has been tested -->
-    <property name="winJREExe" value="jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe"/>
-    <property name="winJRE" value="${user.home}${file.separator}${winJREExe}" />
-
-    <property name="winJDKExe" value="jdk-6u22-windows-i586.exe"/>
-    <property name="winJDK" value="${user.home}/${winJDKExe}"/>
-
     <!-- get all izpack related packages -->
     <condition property="build.host.linux">
-        <os family="unix"/>
+        <and>
+            <os family="unix"/>
+
+            <not>
+                <equals arg1="${os.name}" arg2="Mac OS X"/>
+            </not>
+
+        </and>
     </condition>
     <condition property="build.host.windows">
         <os family="windows"/>
@@ -45,20 +38,6 @@
     <taskdef name="izpack"
              classpath="${dir.lib}/izpack/standalone-compiler.jar"
              classname="com.izforge.izpack.ant.IzPackTask"/>
-
-    <target name="checkJRE" >
-        <available file="${winJRE}" property="winJRE.exists" />
-    </target>
-    <target name="getJRE" depends="checkJRE" unless="winJRE.exists"  >
-        <get src="http://www.java.net/download/jdk6/6u10/promoted/b32/binaries/jre-6u10-rc2-bin-b32-windows-i586-p-12_sep_2008.exe" dest="${winJRE}"/>
-    </target>
-    
-    <target name="checkJDK" >
-        <available file="${winJDK}" property="winJDK.exists" />
-    </target>
-    <target name="getJDK" depends="checkJDK" unless="winJDK.exists"  >
-        <!--get src="http://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/VerifyItem-Start/jdk-6u22-windows-i586.exe?BundledLineItemUUID=KpuJ_hCyJxUAAAEsrlBKPumv&OrderID=KgOJ_hCyJs0AAAEsoFBKPumv&ProductID=c66J_hCwkI4AAAErIFJuIQy3&FileName=/jdk-6u22-windows-i586.exe" dest="${winJDK}"/-->
-    </target>
 
     <!-- No good way of getting around this as we need the binary for the particular platform -->
     <target name="checkLaunch4j">
@@ -94,9 +73,6 @@
     <target name="check.viskit">
         <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built"/>
     </target>
-    <!--target name="check.extensions">
-        <available file="${dir.lib.ext}/*.jar" property="extensions.built"/>
-    </target-->
     <target name="no.extensions" depends="check.viskit" unless="viskit.built" >
         <ant target="jar.executable"/>
     </target>
@@ -172,6 +148,10 @@
         <taskdef classpath="${orangevolt.jar}:${roxes.jar}"
                  resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
+        <!-- The last d/l gave me a fit about permissions -->
+        <chmod file="${launch4j}/bin/windres" perm="ugo+rx"/>
+        <chmod file="${launch4j}/bin/ld"      perm="ugo+rx"/>
+
         <!-- Wrap the viskit-exe.jar in a native win32 executable -->
         <launch4j configFile="${installer}/launch4jConfig.xml"/>
 
@@ -212,45 +192,6 @@
                 <jre minVersion="1.6.0"/>
             </config>
         </launch4j>
-
-        <!-- since above should have already made something that checks and installs JDK, the following
-            should not be needed... in which case ViskitInstallWin32.exe is already the deployable, unless CD only -->
-
-        <!-- build Install-Viskit-Win32-JDK.exe, contains JDK and its installer -->
-
-        <!--echo file="${installer}/build/both.bat" append="false">@rem use the next lines for a silent install.
-@rem ${winJREExe} /S /v/qn
-@rem ${winJDKExe} /S /v/qn
-@rem ${winJREExe}
-@rem ${winJDKExe}
-ViskitInstallWin32.exe
-        </echo-->
-
-        <!--chmod perm="+x" file="${installer}/build/both.bat" /-->
-
-        <!-- this would only work on Unix, plus the file is 16M, do we need that in CVS?
-        <symlink link="installer/build/${winJRE}" resource="../${winJRE}"/-->
-
-        <!--copy file="${winJRE}" todir="${installer}/build"/>
-        <copy file="${winJDK}" todir="${installer}/build"/-->
-
-        <!--zip destfile="${installer}/build/install.zip"
-             basedir="${installer}/build/."
-             includes="both.bat,ViskitInstallWin32.exe,${winJREExe}"/>
-        <zip destfile="${installer}/build/install.zip"
-             basedir="${installer}/build/."
-             includes="both.bat,ViskitInstallWin32.exe,${winJDKExe}"/-->
-
-        <!--sfx archive="${installer}/build/install.zip"
-             mode="win32"
-             execute="both.bat"
-             icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JRE.exe"/>
-        <sfx archive="${installer}/build/install.zip"
-             mode="win32"
-             execute="both.bat"
-             icon="${installer}/images/ViskitIcon.ico"
-             output="${installer}/build/Install-Viskit-Win32-JDK.exe"/-->
     </target>
 
     <target name="make.mac.installer">
@@ -275,8 +216,6 @@ ViskitInstallWin32.exe
             description="Clean up all materials from building a Viskit installation executable">
 
          <delete dir="${launch4j}"/>
-         <!--delete file="${winJRE}"/-->
-         <!--delete file="${winJDK}"/-->
     </target>
 
 </project>
