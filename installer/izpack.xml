@@ -81,6 +81,7 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="windows"/>
                 <include name="Schemas/**"/>
+                <exclude name="Schemas/*.patch"/>
                 <include name="configuration/**"/>
                 <include name="MyViskitProjects/**"/>
                 <include name="images/**"/>
@@ -94,6 +95,7 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="unix"/>
                 <include name="Schemas/**"/>
+                <exclude name="Schemas/*.patch"/>
                 <include name="configuration/**"/>
                 <include name="MyViskitProjects/**"/>
                 <include name="images/**"/>
