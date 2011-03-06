@@ -17,5 +17,5 @@ do
 done
 
 
-java -classpath $CLASSPATH viskit.Splash2
+java -cp $CLASSPATH viskit.Splash2
 
