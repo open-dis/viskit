@@ -48,9 +48,7 @@ public class LogUtils {
      * @return true if successful, false if failed to find/use the file
      */
     public static boolean configureLog4j(String configFileFname, boolean watch) {
-//        File f = new File(configFileFname);
 
-//        if (f.canRead()) {
         if (!configFileFname.isEmpty()) {
             Properties props = new Properties();
 
@@ -64,14 +62,8 @@ public class LogUtils {
             if (watch) {
                 PropertyConfigurator.configureAndWatch(configFileFname);
             } else {
-//                PropertyConfigurator.configure(configFileFname);
                 PropertyConfigurator.configure(props);
             }
-
-            // The following is useful early on when developers are starting to
-            // use log4j to know what is going on.  We can remove this printout
-            // in the future, or turn it into a log4j message!
-//            LOG.debug(f.getAbsolutePath() + " was used to configure log4j.");
 
             return true;
         } else {
@@ -93,7 +85,7 @@ public class LogUtils {
     /** Provide a synchronized method for multiple threads to use single
      * run-time logger
      * @param clazz the class type of the caller
-     * @return synchronized method for multiple threads to use single run-time logger
+     * @return synchronized method for multiple threads to use a single run-time logger
      */
     public static synchronized Logger getLogger(Class clazz) {
         return Logger.getLogger(clazz);
