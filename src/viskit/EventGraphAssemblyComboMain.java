@@ -78,6 +78,22 @@ public class EventGraphAssemblyComboMain {
 
         } catch (Exception e) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
+
+            // if we got here, then we need to nuke the ${user.home}/.viskit dir
+            // it will be recreated on next start up
+            java.io.File viskitDir = new java.io.File(System.getProperty("user.home") + "/.viskit");
+            if (viskitDir.exists()) {
+
+                // Can't delete .viskit dir unless it's empty
+                java.io.File[] files = viskitDir.listFiles();
+                for (java.io.File file : files) {
+                    file.delete();
+                }
+                boolean success = viskitDir.delete();
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getName() + " was found to be corrupted and will be deleted");
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(".viskit was found and deleted = " + success);
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("The next start attempt will be successful and a new " + viskitDir.getName() + " will be created");
+            }
         }
     }
 
