@@ -19,5 +19,5 @@ done
 echo $CLASSPATH | sed 's/\//\\/g' | sed 's/:/;/g' | sed 's/+/:/g' > classpath
 export CLASSPATH=`cat ./classpath`
 
-java -classpath $CLASSPATH viskit.Splash2
+java -cp $CLASSPATH viskit.Splash2
 
