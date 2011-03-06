@@ -3,6 +3,9 @@
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>Viskit</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!-- Do not use Project Properties customizer when editing this file manually. -->
             <name>Viskit</name>
             <properties>
@@ -19,9 +22,9 @@
                     <type>java</type>
                     <location>test</location>
                 </source-folder>
-                <build-folder>
-                    <location>../DISKIT/build/classes</location>
-                </build-folder>
+                <build-file>
+                    <location>C:\javaapis\wcm\DISKIT\build\classes</location>
+                </build-file>
             </folders>
             <ide-actions>
                 <action name="build">
@@ -84,13 +87,13 @@
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>build.viskit.no.runtime.extensions</build-target>
+                <build-target>jar</build-target>
             </export>
             <export>
                 <type>folder</type>
-                <location>../DISKIT/build/classes</location>
+                <location>C:\javaapis\wcm\DISKIT\build\classes</location>
                 <script>${ant.script}</script>
-                <build-target>build.viskit.no.runtime.extensions</build-target>
+                <build-target>jar</build-target>
             </export>
             <view>
                 <items>
@@ -121,16 +124,16 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/jaxb/jaxb-impl.jar:lib/jaxb/jaxb-xjc.jar:lib/actions.jar:lib/bsh-2.0b4.jar:lib/commons-beanutils-1.7.0.jar:lib/commons-codec-1.3.jar:lib/commons-collections-3.1.jar:lib/commons-digester-1.6.jar:lib/commons-logging-1.1.jar:lib/jcommon.jar:lib/jdom.jar:lib/jedit.jar:lib/jfreechart.jar:lib/jgraph.jar:lib/jhall.jar:lib/junit.jar:lib/log4j.jar:lib/looks-1.3.1.jar:lib/serializer.jar:lib/simkit.jar:lib/trang.jar:lib/trangtask.jar:lib/xalan.jar:lib/xercesImpl.jar:lib/xmlrpc-2.0.jar:lib/commons-configuration-1.5.jar:lib/commons-lang-2.4.jar</classpath>
+                <classpath mode="compile">lib/jaxb/jaxb-impl.jar;lib/actions.jar;lib/bsh-2.0b4.jar;lib/commons-beanutils-1.7.0.jar;lib/commons-codec-1.3.jar;lib/commons-collections-3.1.jar;lib/commons-digester-1.6.jar;lib/commons-logging-1.1.jar;lib/jcommon.jar;lib/jdom.jar;lib/jedit.jar;lib/jfreechart.jar;lib/jgraph.jar;lib/jhall.jar;lib/log4j.jar;lib/looks-1.3.1.jar;lib/serializer.jar;lib/simkit.jar;lib/xalan.jar;lib/xercesImpl.jar;lib/xmlrpc-2.0.jar;lib/commons-configuration-1.5.jar;lib/commons-lang-2.4.jar</classpath>
                 <built-to>build/classes</built-to>
-                <built-to>../DISKIT/build/classes</built-to>
+                <built-to>C:\javaapis\wcm\DISKIT\build\classes</built-to>
                 <javadoc-built-to>doc/api</javadoc-built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">lib/simkit.jar:build/classes:lib/xmlrpc-2.0.jar</classpath>
+                <classpath mode="compile">lib/simkit.jar;build/classes;lib/xmlrpc-2.0.jar;lib/support/junit.jar</classpath>
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
