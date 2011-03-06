@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly package="examples" version="$Id: TestServerGenericAssembly.xml 1590 2007-10-07 05:41:19Z tdnorbra $" name="TestServerGenericAssembly" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" type="examples.ServerGeneric" name="ServerGeneric_0">
+        <TerminalParameter type="int" value="1" name="totalNumberServers"/>
+        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
+            <TerminalParameter type="java.lang.String" value="Constant" name=""/>
+            <MultiParameter type="java.lang.Object[]">
+                <TerminalParameter type="java.lang.Object" value="1.1" name=""/>
+            </MultiParameter>
+        </FactoryParameter>
+        <Coordinate y="200" x="390"/>
+    </SimEntity>
+    <SimEntity description="" type="examples.ArrivalProcess" name="ArrivalProcess_1">
+        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory">
+            <TerminalParameter type="java.lang.String" value="Exponential" name=""/>
+            <MultiParameter type="java.lang.Object[]">
+                <TerminalParameter type="java.lang.Object" value="1.2" name=""/>
+            </MultiParameter>
+        </FactoryParameter>
+        <Coordinate y="210" x="140"/>
+    </SimEntity>
+    <SimEntity description="" type="examples.EntityCreator" name="EntityCreator_2">
+        <Coordinate y="200" x="260"/>
+    </SimEntity>
+    <SimEventListenerConnection source="ArrivalProcess_1" listener="EntityCreator_2"/>
+    <Adapter description="" to="ServerGeneric_0" from="EntityCreator_2" eventSent="Arrival" eventHeard="EntityArrival" name="adptr_3"/>
+    <Schedule verbose="true" stopTime="100."/>
+    <Experiment timeout="5000" totalSamples="1" replicationsPerDesignPoint="1"/>
+</SimkitAssembly>

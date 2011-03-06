@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimkitAssembly package="examples" version="1.0" name="ArrayTestAssembly" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SimEntity description="" type="examples.ArrayTester" name="ArrayTester_3">
+        <MultiParameter type="int[]">
+            <TerminalParameter type="int" value="17" name=""/>
+            <TerminalParameter type="int" value="52" name=""/>
+        </MultiParameter>
+        <Coordinate y="60" x="160"/>
+    </SimEntity>
+    <PropertyChangeListener type="simkit.util.SimplePropertyDumper" name="SimplePropertyDumper_4">
+        <Coordinate y="190" x="170"/>
+    </PropertyChangeListener>
+    <PropertyChangeListenerConnection source="ArrayTester_3" listener="SimplePropertyDumper_4"/>
+    <Output entity="ArrayTester_3"/>
+    <Schedule verbose="true" stopTime="100."/>
+    <Experiment timeout="5000" totalSamples="1" replicationsPerDesignPoint="1"/>
+</SimkitAssembly>
