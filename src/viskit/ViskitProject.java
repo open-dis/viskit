@@ -579,14 +579,16 @@ public class ViskitProject {
     private static void initializeProjectChooser(String startPath) {
         if (projectChooser == null) {
             projectChooser = new JFileChooser(startPath);
-            projectChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-
-            // allow only dirs for selection
-            projectChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
             // show spec. icon for auvw projects
             projectChooser.setFileView(new ViskitProjectFileView());
+
+            // allow only dirs for selection
+            projectChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             projectChooser.setMultiSelectionEnabled(false);
+            projectChooser.setFileFilter(new ProjectFilter());
+        } else {
+            projectChooser.setCurrentDirectory(new File(startPath));
         }
     }
 
@@ -606,30 +608,24 @@ public class ViskitProject {
         return projectChooser.getSelectedFile();
     }
 
-    /**
+    /** Provide file chooser to select project directory
      * @param parent the component parent for JOptionPane orientation
      * @param startingDirPath a path to start looking from in dir chooser
      * @return a path to a chosen project directory
      */
     public static File openProjectDir(JFrame parent, String startingDirPath) {
         File projectDir = null;
-        boolean isProjectDir = false;
-
         initializeProjectChooser(startingDirPath);
+
         projectChooser.setDialogTitle("Open an Existing Viskit Project");
-
-        // TODO: Determine source of annoying delay in showing the dialog
-        int ret = projectChooser.showOpenDialog(parent);
-
-        if (ret != JFileChooser.APPROVE_OPTION) {
-            return null;
-        } // cancelled
-
         do {
-
+            int ret = projectChooser.showOpenDialog(parent);
+            if (ret != JFileChooser.APPROVE_OPTION) {
+                return null;
+            }
             projectDir = projectChooser.getSelectedFile();
 
-            if (!isViskitProject(projectDir)) {
+            if (!isProjectDir) {
                 Object[] options = {"Select project", "Cancel"};
                 int retrn = JOptionPane.showOptionDialog(parent, "Selected directory is not a Viskit project.", "Unable to open project",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
@@ -638,37 +634,40 @@ public class ViskitProject {
                     // 0th choice (Select project)
                     return null; // cancelled
                 } // cancelled
-                isProjectDir = false;
-            } else {
-                isProjectDir = true;
             }
         } while (!isProjectDir);
-
-        projectChooser = null;
 
         return projectDir;
     }
 
-    /**
+    /** Report if directory f is a Viskit Project
      * @param f the project directory to test
-     * @return true when an viskitProject.xml file is found
+     * @return true when a viskitProject.xml file is found
      */
     public static boolean isViskitProject(File f) {
 
-        boolean foundProjectFile = false;
-        if (!f.exists() || !f.isDirectory()) {
-            return foundProjectFile;
+        if ((f == null) || !f.exists() || !f.isDirectory()) {
+            return false;
         }
 
-        File[] children = f.listFiles();
+        // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
+        File[] files = f.listFiles(new java.io.FilenameFilter() {
 
-        for (File c : children) {
-            if (c.getName().equals(PROJECT_FILE_NAME)) {
-                foundProjectFile = true;
+            @Override
+            public boolean accept(File dir, String name) {
+
+                // Be brutally specific to reduce looking for any *.xml
+                return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             }
-        }
+        });
 
-        return foundProjectFile;
+        // This can happen on Win machines when parsing "My Computer" directory
+        if (files == null) return false;
+
+        java.util.List<File> dirList = java.util.Arrays.asList(files);
+
+        // If this List is not empty, we found a project file
+        return !dirList.isEmpty();
     }
 
     /**
@@ -678,6 +677,7 @@ public class ViskitProject {
         this.analystReportStatisticsDir = analystReportStatisticsDir;
     }
 
+    static boolean isProjectDir = false;
     private static class ViskitProjectFileView extends FileView {
 
         Icon viskitProjIcon;
@@ -689,7 +689,19 @@ public class ViskitProject {
 
         @Override
         public Icon getIcon(File f) {
-            return isViskitProject(f) ? viskitProjIcon : null;
+            isProjectDir = isViskitProject(f);
+            return isProjectDir ? viskitProjIcon : null;
+        }
+    }
+
+    private static class ProjectFilter extends javax.swing.filechooser.FileFilter {
+
+        public boolean accept(File pathname) {
+            return !pathname.getName().contains("svn");
+        }
+
+        public String getDescription() {
+            return "Viskit projects";
         }
     }
 }
