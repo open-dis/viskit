@@ -1,6 +1,5 @@
 package viskit.xsd.assembly;
 
-import edu.nps.util.LogUtils;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -24,10 +23,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
+
+import edu.nps.util.LogUtils;
 import org.apache.log4j.Logger;
 import viskit.AssemblyController;
-
-import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.Adapter;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
@@ -882,7 +881,7 @@ public class SimkitAssemblyXML2Java {
         String fileName = null;
         SimkitAssemblyXML2Java sax2j = null;
         List<String> args = java.util.Arrays.asList(arg);
-        ListIterator lit = args.listIterator();
+        ListIterator<String> lit = args.listIterator();
         
         for (String a : args) {
             //FIXME Remove port stuff
@@ -891,7 +890,7 @@ public class SimkitAssemblyXML2Java {
                 // Dummy forward looking next()
                 lit.next();
                 if (lit.hasNext()) {
-                    a = (String) lit.next();
+                    a = lit.next();
                     port = Integer.parseInt(a);
                 } else {
                     usage();
@@ -901,7 +900,7 @@ public class SimkitAssemblyXML2Java {
                 // Dummy forward looking next()
                 lit.next();
                 if (lit.hasNext()) {
-                    fileName = (String) lit.next();                    
+                    fileName = lit.next();                    
                     fileName = fileName.replaceAll("\\\\", "/");
                 } else {
                     usage();
