@@ -200,16 +200,6 @@ private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     System.exit(0);
 }//GEN-LAST:event_exitButtActionPerformed
 
-    class ProjectFilter extends javax.swing.filechooser.FileFilter {
-
-        public boolean accept(File fil) {
-            return ViskitProject.isViskitProject(fil);
-        }
-
-        public String getDescription() {
-            return "Viskit Projects";
-        }
-    }
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton createButt;
   private javax.swing.JButton defaultButt;
