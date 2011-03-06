@@ -82,7 +82,7 @@
                 <os family="windows"/>
                 <include name="Schemas/**"/>
                 <include name="configuration/**"/>
-                <include name="examples/**"/>
+                <include name="MyViskitProjects/**"/>
                 <include name="images/**"/>
                 <include name="lib/**" />
                 <include name="license/**" />
@@ -95,7 +95,7 @@
                 <os family="unix"/>
                 <include name="Schemas/**"/>
                 <include name="configuration/**"/>
-                <include name="examples/**"/>
+                <include name="MyViskitProjects/**"/>
                 <include name="images/**"/>
                 <include name="lib/**" />
                 <include name="license/**" />

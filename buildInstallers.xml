@@ -29,8 +29,6 @@
     <condition property="build.host.windows">
         <os family="windows"/>
     </condition>
-
-    <!-- Because os family will match both unix and mac, lanuch4j will be downloaded twice on Macs -->
     <condition property="build.host.mac">
         <os family="mac"/>
     </condition>
@@ -120,7 +118,7 @@
         <copy todir="${installer}/stage/configuration">
             <fileset dir="${configuration.dir}"/>
         </copy>
-        <copy todir="${installer}/stage/examples">
+        <copy todir="${installer}/stage/MyViskitProjects">
             <fileset dir="${examples.lib}"/>
         </copy>
         <copy todir="${installer}/stage/images">

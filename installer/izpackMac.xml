@@ -85,8 +85,8 @@
           <fileset dir="stage"               targetdir="$INSTALL_PATH">
               <include name="Schemas/**"/>
               <include name="configuration/**"/>
-              <include name="examples/**"/>
-              <include name="images/ViskitLogo.png"/>
+              <include name="MyViskitProjects/**"/>
+              <include name="images/**"/>
               <include name="license/**"/>
               <include name="viskit/**"/>
           </fileset>
