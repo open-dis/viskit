@@ -137,8 +137,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator itr = isLocalDirty.iterator(); itr.hasNext();) {
-                sb.append(((OpenAssembly.AssyChangeListener) itr.next()).getHandle());
+            for (Iterator<OpenAssembly.AssyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+                sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
             sb.setLength(sb.length() - 2); // last comma-space
@@ -641,8 +641,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         Object o = ((ViskitAssemblyView) getView()).getSelectedEventGraph();
 
         if (o != null) {
-            if (o instanceof Class) {
-                newEventGraphNode(((Class) o).getName(), getNextPoint());
+            if (o instanceof Class<?>) {
+                newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
                 return;
             } else if (o instanceof FileBasedAssyNode) {
                 newFileBasedEventGraphNode((FileBasedAssyNode) o, getNextPoint());
@@ -681,8 +681,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         Object o = ((ViskitAssemblyView) getView()).getSelectedPropChangeListener();
 
         if (o != null) {
-            if (o instanceof Class) {
-                newPropChangeListenerNode(((Class) o).getName(), getNextPoint());
+            if (o instanceof Class<?>) {
+                newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
             } else if (o instanceof FileBasedAssyNode) {
                 newFileBasedPropChangeListenerNode((FileBasedAssyNode) o, getNextPoint());
@@ -945,7 +945,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ActionIntrospector.getAction(this, "edit").setEnabled(false);
         }
     }
-    private Vector copyVector = new Vector();
+    private Vector<EvGraphNode> copyVector = new Vector<EvGraphNode>();
 
     /**
      *
@@ -954,7 +954,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (selectionVector.size() <= 0) {
             return;
         }
-        copyVector = (Vector) selectionVector.clone();
+        copyVector = (Vector<EvGraphNode>) selectionVector.clone();
         for (Object o : copyVector) {
             if (!(o instanceof EvGraphNode)) {
                 JOptionPane.showMessageDialog(null, "Please select an Event Graph");
@@ -986,7 +986,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         if (selectionVector.size() <= 0) {
             return;
         }
-        copyVector = (Vector) selectionVector.clone();
+        copyVector = (Vector<EvGraphNode>) selectionVector.clone();
         ActionIntrospector.getAction(this, "paste").setEnabled(true);
     }
     int copyCount = 0;
@@ -1003,7 +1003,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 y = 100;
         int n = 0;
         // We only paste un-attached nodes (at first)
-        for (Iterator itr = copyVector.iterator(); itr.hasNext();) {
+        for (Iterator<EvGraphNode> itr = copyVector.iterator(); itr.hasNext();) {
             Object o = itr.next();
             if (o instanceof AssemblyEdge) {
                 continue;
@@ -1043,7 +1043,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void delete() {
-        Vector localV = (Vector) selectionVector.clone();   // avoid concurrent update
+        Vector<Object> localV = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
         for (Object elem : localV) {
             if (elem instanceof AssemblyEdge) {
                 killEdge((AssemblyEdge) elem);
@@ -1464,7 +1464,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         Vector<String> v = new Vector<String>();
         String fsep = Vstatics.getFileSeparator();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(System.getProperty("java.home"));
         sb.append(fsep);
         sb.append("bin");
