@@ -35,7 +35,9 @@
         <url>@{product.url}</url>
         <javaversion>1.6</javaversion>
         <requiresjdk>yes</requiresjdk>
-        <writeinstallationinformation>yes</writeinstallationinformation>
+        <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
+        <!-- Hopefully helps with Win Vista/7 installs -->
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
     </info>
     
     <guiprefs height="600" width="800" resizable="yes">
