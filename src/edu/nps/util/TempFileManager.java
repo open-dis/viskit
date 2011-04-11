@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  *  Code adapted from article titled "Clean Up Your Mess: Managing Temp Files in Java Apps"
  *  @link http://www.devx.com/Java/Article/22018/1954
  *  @author Michael Pilone
- *  @version $Id:$
+ *  @version $Id$
  */
 public class TempFileManager {
 
