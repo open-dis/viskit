@@ -115,6 +115,8 @@ public final class AnalystReportBuilder {
      * @param map the set of PCLs that have specific properties set for type statistic desired
      */
     public AnalystReportBuilder(String statisticsReportPath, Map<String, AssemblyNode> map) {
+
+        this();
         try {
             Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
             setStatsReportPath(statisticsReportPath);
@@ -123,8 +125,6 @@ public final class AnalystReportBuilder {
             log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
-        initDocument();
-        setDefaultValues();
     }
 
     /**
@@ -138,8 +138,8 @@ public final class AnalystReportBuilder {
      * @throws java.lang.Exception
      */
     public AnalystReportBuilder(JPanel aRPanel, File xmlFile, File assyFile) throws Exception {
+        this(xmlFile);
         this.aRPanel = aRPanel;
-        parseXML(xmlFile);
         log.debug("Successful parseXML");
         if (assyFile != null) {
             setAssemblyFile(assyFile);
@@ -151,7 +151,7 @@ public final class AnalystReportBuilder {
 
     /** This constructor for opening a fully annotated report for further
      * annotations, or as required from the analyst/user.
-     * @param fullReport an exisiting fully annotated report to reopen
+     * @param fullReport an existing fully annotated report to reopen
      */
     public AnalystReportBuilder(File fullReport) {
         try {
