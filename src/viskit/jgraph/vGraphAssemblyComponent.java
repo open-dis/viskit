@@ -259,7 +259,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         if (event != null) {
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
             if (c != null) {
-                StringBuffer sb = new StringBuffer("<html>");
+                StringBuilder sb = new StringBuilder("<html>");
                 if (c instanceof vAssemblyEdgeCell) {
                     vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
                     AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
@@ -345,7 +345,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
     private String wrapAtPos(String s, int len) {
         String[] sa = s.split(" ");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int idx = 0;
         do {
             int ll = 0;
@@ -440,12 +440,12 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             if (oa == null || oa.length <= 0) {
                 return;
             }
-            for (int i = 0; i < oa.length; i++) {
-                if (e.isAddedCell(i)) // TODO: Fix generics
+            for (Object o : oa) {
+                if (e.isAddedCell(o)) // TODO: Fix generics
                 {
-                    selected.add(((DefaultGraphCell) oa[i]).getUserObject());
+                    selected.add(((DefaultGraphCell) o).getUserObject());
                 } else {
-                    selected.remove(((DefaultGraphCell) oa[i]).getUserObject());
+                    selected.remove(((DefaultGraphCell) o).getUserObject());
                 }
             }
             ((ViskitAssemblyController) parent.getController()).selectNodeOrEdge(selected);
