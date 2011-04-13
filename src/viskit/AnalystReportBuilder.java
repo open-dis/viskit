@@ -105,7 +105,6 @@ public final class AnalystReportBuilder {
     /** Build a default AnalystReport object */
     public AnalystReportBuilder() {
         initDocument();
-        setDefaultValues();
     }
 
     /** Build an AnalystReport object from an existing statisticsReport
@@ -125,6 +124,7 @@ public final class AnalystReportBuilder {
             log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
+        initDocument();
     }
 
     /**
@@ -167,6 +167,7 @@ public final class AnalystReportBuilder {
         reportJdomDocument.setRootElement(rootElement);
 
         fillDocument();
+        setDefaultValues();
     }
 
     private void fillDocument() {
