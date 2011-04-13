@@ -27,10 +27,10 @@ import viskit.ViskitProject;
  * @version $Id$
  * @since August 3, 2006, 10:21 AM
  */
-public class HistogramChartDrawer {
+public class HistogramChart {
     
-    /** Creates a new instance of HistogramChartDrawer */
-    public HistogramChartDrawer() {}
+    /** Creates a new instance of HistogramChart */
+    public HistogramChart() {}
 
     /**
      * Creates a histogram image in PNG format based on the parameters provided
@@ -40,10 +40,10 @@ public class HistogramChartDrawer {
      * @param data an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createHistogram(String title, String label, double[] data) {
+    public String createChart(String title, String label, double[] data) {
         ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
-        IntervalXYDataset dataset = createIntervalXYDataset(label, data);
+        IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
         return fileLocation.getAbsolutePath().replaceAll("\\\\", "/");
     }
@@ -54,7 +54,7 @@ public class HistogramChartDrawer {
      * @param data
      * @return
      */
-    private IntervalXYDataset createIntervalXYDataset(String label, double[] data) {
+    private IntervalXYDataset createDataset(String label, double[] data) {
 
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
@@ -121,7 +121,7 @@ public class HistogramChartDrawer {
             fos = new FileOutputStream(outFile);
             ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger(HistogramChartDrawer.class).error(ioe);
+            LogUtils.getLogger(HistogramChart.class).error(ioe);
         } finally {
             try {
                 fos.flush();

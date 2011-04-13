@@ -6,7 +6,7 @@
  *
  * Created:      09 MAR 2008
  *
- * Filename:     ScatterPlotChartDrawer.java
+ * Filename:     LinearRegressionChart.java
  *
  * Compiler:     JDK1.6
  * O/S:          Windows XP Home Ed. (SP2)
@@ -91,17 +91,17 @@ import viskit.ViskitProject;
  *   <pre><b>
  *     Date:     10 MAR 2008
  *     Time:     0120Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.ScatterPlotChartDrawer">Terry Norbraten, NPS MOVES</a>
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.LinearRegressionChart">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
  * 
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class ScatterPlotChartDrawer {
+public class LinearRegressionChart {
 
-    /** Creates a new instance of ScatterPlotChartDrawer */
-    public ScatterPlotChartDrawer() {}
+    /** Creates a new instance of LinearRegressionChart */
+    public LinearRegressionChart() {}
 
     /**
      * Creates a scatterplot image in PNG format based on the parameters provided
@@ -111,7 +111,7 @@ public class ScatterPlotChartDrawer {
      * @param data an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createScatterPlot(String title, String label, double[] data) {
+    public String createChart(String title, String label, double[] data) {
         ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "ScatterPlot.png");
         XYDataset dataset = createDataset(label, data);
@@ -192,7 +192,7 @@ public class ScatterPlotChartDrawer {
             fos = new FileOutputStream(outFile);
             ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger(ScatterPlotChartDrawer.class).error(ioe);
+            LogUtils.getLogger(LinearRegressionChart.class).error(ioe);
         } finally {
             try {
                 fos.flush();

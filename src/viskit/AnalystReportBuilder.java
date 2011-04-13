@@ -55,8 +55,8 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 import viskit.model.AssemblyNode;
-import viskit.xsd.assembly.HistogramChartDrawer;
-import viskit.xsd.assembly.ScatterPlotChartDrawer;
+import viskit.xsd.assembly.HistogramChart;
+import viskit.xsd.assembly.LinearRegressionChart;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -667,8 +667,8 @@ public final class AnalystReportBuilder {
         List<Element> simEntities = (List<Element>) statsReport.getRootElement().getChildren("SimEntity");
 
         // variables for JFreeChart construction
-        HistogramChartDrawer histogramChart = new HistogramChartDrawer();
-        ScatterPlotChartDrawer scatterPlotChart = new ScatterPlotChartDrawer();
+        HistogramChart histogramChart = new HistogramChart();
+        LinearRegressionChart linearRegressionChart = new LinearRegressionChart();
         String chartTitle = "";
         String axisLabel  = "";
         String typeStat = "";
@@ -712,7 +712,7 @@ public final class AnalystReportBuilder {
                 axisLabel  = dataPoint.getAttributeValue("property") ;
 
                 Element histogramChartURL = null;
-                Element scatterPlotChartURL = null;
+                Element linearRegressionChartURL = null;
                 double[] data = null;
                 Element repRecord = null;
                 for (Element replicationReport : replicationReports) {
@@ -738,16 +738,16 @@ public final class AnalystReportBuilder {
                         idx++;
                     }
 
-                    histogramChartURL = new Element("HistogramChartURL");
-                    scatterPlotChartURL = new Element("ScatterPlotChartURL");
+                    histogramChartURL = new Element("HistogramChart");
+                    linearRegressionChartURL = new Element("LinearRegressionChart");
 
-                    histogramChartURL.setAttribute("dir", histogramChart.createHistogram(chartTitle, axisLabel, data));
+                    histogramChartURL.setAttribute("dir", histogramChart.createChart(chartTitle, axisLabel, data));
                     entity.addContent(histogramChartURL);
                     
                     // data[] must be > than length 1 for scatter regression
                     if (data.length > 1) {
-                        scatterPlotChartURL.setAttribute("dir", scatterPlotChart.createScatterPlot(chartTitle, axisLabel, data));
-                        entity.addContent(scatterPlotChartURL);
+                        linearRegressionChartURL.setAttribute("dir", linearRegressionChart.createChart(chartTitle, axisLabel, data));
+                        entity.addContent(linearRegressionChartURL);
                     }
 
                     repReports.addContent(entity);

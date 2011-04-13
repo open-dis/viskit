@@ -743,7 +743,7 @@
         <p align="left">Property:
             <xsl:value-of select="@property"/>
         </p>
-        <xsl:for-each select="HistogramChartURL">
+        <xsl:for-each select="HistogramChart">
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -772,7 +772,7 @@
                 <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Histogram for <xsl:value-of select="$entityProperty"/></p>
             </div>
         </xsl:for-each>
-        <xsl:for-each select="ScatterPlotChartURL">
+        <xsl:for-each select="LinearRegressionChart">
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -798,7 +798,7 @@
 
                 <!-- add an index to the array -->
                 <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>
-                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Scatter Plot for <xsl:value-of select="$entityProperty"/></p>
+                <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Regression Plot for <xsl:value-of select="$entityProperty"/></p>
             </div>
         </xsl:for-each>
         <div align="center">
