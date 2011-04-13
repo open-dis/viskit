@@ -931,7 +931,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
-        boolean ccbool = (selectionVector.size() > 0);
+        boolean ccbool = (!selectionVector.isEmpty());
         ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
         ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
         int egCount = 0;
@@ -950,8 +950,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     /**
      *
      */
+    @SuppressWarnings("unchecked") // JGraph
     public void edit() {
-        if (selectionVector.size() <= 0) {
+        if (selectionVector.isEmpty()) {
             return;
         }
         copyVector = (Vector<EvGraphNode>) selectionVector.clone();
@@ -982,8 +983,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     /**
      *
      */
+    @SuppressWarnings("unchecked") // JGraph
     public void copy() {
-        if (selectionVector.size() <= 0) {
+        if (selectionVector.isEmpty()) {
             return;
         }
         copyVector = (Vector<EvGraphNode>) selectionVector.clone();
@@ -1022,7 +1024,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void cut() {
-        if (selectionVector != null && selectionVector.size() > 0) {
+        if (selectionVector != null && !selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
             int nodeCount = 0;  // different msg for edge delete
@@ -1042,6 +1044,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
+    @SuppressWarnings("unchecked") // JGraph
     public void delete() {
         Vector<Object> localV = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
         for (Object elem : localV) {
