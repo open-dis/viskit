@@ -69,7 +69,7 @@ public class ViskitProject {
      * home will be the user's working directory where Viskit is installed.
      */
     public static final String DEFAULT_VISKIT_PROJECTS_DIR =
-            System.getProperty("user.dir").replaceAll("\\\\", "/") + "/MyViskitProjects";
+            System.getProperty("user.home").replaceAll("\\\\", "/") + "/MyViskitProjects";
     
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
