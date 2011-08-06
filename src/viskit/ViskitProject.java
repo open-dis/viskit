@@ -580,7 +580,7 @@ public class ViskitProject {
         if (projectChooser == null) {
             projectChooser = new JFileChooser(startPath);
 
-            // show spec. icon for auvw projects
+            // show spec. icon for viskit projects
             projectChooser.setFileView(new ViskitProjectFileView());
 
             // allow only dirs for selection
