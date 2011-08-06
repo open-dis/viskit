@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViskitProject name="DefaultProject">
+  <AnalystReports name="AnalystReports" />
+  <AssembliesDirectory name="Assemblies" />
+  <EventGraphsDirectory name="EventGraphs" />
+  <BuildDirectory name="build">
+    <ClassesDirectory name="classes" />
+    <SourceDirectory name="src" />
+  </BuildDirectory>
+  <DistDirectory name="dist" />
+  <LibDirectory name="lib" />
+</ViskitProject>
+
