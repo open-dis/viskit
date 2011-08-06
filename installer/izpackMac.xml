@@ -86,14 +86,21 @@
               <include name="Schemas/**"/>
               <exclude name="Schemas/*.patch"/>
               <include name="configuration/**"/>
-              <include name="MyViskitProjects/**"/>
               <include name="images/**"/>
               <include name="license/**"/>
               <include name="viskit/**"/>
+              <include name="intro_no_diskit.html"/>
           </fileset>
-
-          <file src="stage/intro_no_diskit.html"   targetdir="$INSTALL_PATH"/>
-
+          
+          <fileset dir="stage"               targetdir="$USER_HOME">
+              <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
+              <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
+          </fileset>
+          
+          <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">
+              <include name="viskitProject.xml"/>
+          </fileset>
+          
           <!-- Apple specific files -->
           <file src="macosx/Info.plist"          targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/PkgInfo"             targetdir="$INSTALL_PATH/Viskit.app/Contents"/>

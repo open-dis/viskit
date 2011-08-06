@@ -82,30 +82,31 @@
             <description>Core Viskit Application Files</description>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="windows"/>
-                <include name="Schemas/**"/>
-                <exclude name="Schemas/*.patch"/>
-                <include name="configuration/**"/>
-                <include name="MyViskitProjects/**"/>
-                <include name="images/**"/>
-                <include name="lib/**" />
-                <include name="license/**" />
-                <include name="viskit/**"/>
-                <include name="viskit-exe.jar"/>
-                <include name="intro_no_diskit.html"/>
                 <include name="Viskit.exe"/>
             </fileset>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
+                <os family="windows"/>
                 <os family="unix"/>
                 <include name="Schemas/**"/>
                 <exclude name="Schemas/*.patch"/>
                 <include name="configuration/**"/>
-                <include name="MyViskitProjects/**"/>
                 <include name="images/**"/>
                 <include name="lib/**" />
                 <include name="license/**" />
                 <include name="viskit/**"/>
                 <include name="viskit-exe.jar"/>
                 <include name="intro_no_diskit.html"/>
+            </fileset>
+            <fileset dir="stage"               targetdir="$USER_HOME">
+              <os family="windows"/>
+              <os family="unix"/>
+              <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
+              <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
+            </fileset>
+            <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">
+                <os family="windows"/>
+                <os family="unix"/>
+                <include name="viskitProject.xml"/>
             </fileset>
         </pack>
     </packs>
