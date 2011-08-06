@@ -40,7 +40,7 @@
 
     <property description="Generated JAXB bindings for SGE qstat config" location="${dir.bindings}/sge/qstat" name="dir.src.sge.qstat"/>
 
-    <property description="OA3302 Course Examples Directory" location="MyViskitProjects" name="examples.lib" />
+    <property description="OA3302 Course Examples Directory" location="MyViskitProjects/DefaultProject" name="examples.lib" />
 
     <property description="DISKIT directory" location="../DISKIT" name="dir.diskit"/>
 

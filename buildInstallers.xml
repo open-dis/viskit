@@ -118,7 +118,7 @@
         <copy todir="${installer}/stage/configuration">
             <fileset dir="${configuration.dir}"/>
         </copy>
-        <copy todir="${installer}/stage/MyViskitProjects">
+        <copy todir="${installer}/stage/MyViskitProjects/DefaultProject">
             <fileset dir="${examples.lib}"/>
         </copy>
         <copy todir="${installer}/stage/images">
@@ -133,10 +133,10 @@
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
+        <mkdir dir="${installer}/build" />
     </target>
 
     <target name="make.win.unix.installer">
-        <mkdir dir="${installer}/build" />
 
         <taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
