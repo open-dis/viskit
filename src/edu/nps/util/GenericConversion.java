@@ -23,7 +23,7 @@
  *
  * TODO:         
  *
- * Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+ * Copyright (c) 1995-2011 held by the author(s).  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -114,14 +114,14 @@ public class GenericConversion {
      * @param <T> the type to cast this array
      * @param type a Class&lt;? extends T&gt; type
      * @param length the desired length of the type array
-     * @throws IllegalArgumentException if a primative class type is given
+     * @throws IllegalArgumentException if a primitive class type is given
      * @return a List&lt;Object&gt;[]
      */
-    @SuppressWarnings("unchecked")
     public static <T> List<Object>[] newListObjectTypeArray(Class<? extends T> type, int length) {
         if (type.isPrimitive()) {
-            throw new IllegalArgumentException("Argument cannont be primitave: " + type);
+            throw new IllegalArgumentException("Argument cannot be primitive: " + type);
         }
+        @SuppressWarnings("unchecked")
         // known unchecked cast
         List<Object>[] lis = (List<Object>[]) Array.newInstance(type, length);
         for (int ix = 0; ix < lis.length; ix++) {
