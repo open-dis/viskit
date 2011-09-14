@@ -147,9 +147,7 @@ public class FileBasedClassManager implements Runnable {
         }
         if (fclass != null) {
             addFileClass(fclass);
-            synchronized (fileMap) {
-                fileMap.put(fclass.getName(), fban);
-            }
+            fileMap.put(fclass.getName(), fban);
         }
         return fban;
     }
@@ -511,11 +509,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public Collection<FileBasedAssyNode> getFileLoadedClasses() {
-        Collection<FileBasedAssyNode> c;
-        synchronized (fileMap) {
-            c = fileMap.values();
-        }
-        return c;
+        return fileMap.values();
     }
 
     public File getFile(String className) {
@@ -527,22 +521,20 @@ public class FileBasedClassManager implements Runnable {
 
         while (true) { // forever
             v.clear();
-            synchronized (fileMap) {
-                for (FileBasedAssyNode localFban : fileMap.values()) {
-                    File f = localFban.isXML ? localFban.xmlSource : localFban.classFile;
-                    if (f.lastModified() != localFban.lastModified) {
-                        v.add(localFban.loadedClass);
-                        localFban.lastModified = f.lastModified();
-                    }
+            Collection<FileBasedAssyNode> c = getFileLoadedClasses();
+            for (FileBasedAssyNode localFban : c) {
+                File f = localFban.isXML ? localFban.xmlSource : localFban.classFile;
+                if (f.lastModified() != localFban.lastModified) {
+                    v.add(localFban.loadedClass);
+                    localFban.lastModified = f.lastModified();
+                }
 
-                    if (v.size() > 0) {
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                VGlobals.instance().getAssemblyModel().externalClassesChanged(v);
-                            }
-                        });
-                    }
+                if (v.size() > 0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            VGlobals.instance().getAssemblyModel().externalClassesChanged(v);
+                        }
+                    });
                 }
             }
             // Goal: sleep for the max estimated between when a user edits and saves an
