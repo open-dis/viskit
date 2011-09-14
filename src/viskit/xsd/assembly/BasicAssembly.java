@@ -198,7 +198,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * an automated key value
      * @param repStatistics
      */
-    protected void setStatisticsKeyValues(LinkedHashMap<String, PropertyChangeListener> repStatistics) {
+    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> repStatistics) {
         Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
         entitiesWithStats = new LinkedList<String>();
         for (Map.Entry<String, PropertyChangeListener> entry : entrySet) {

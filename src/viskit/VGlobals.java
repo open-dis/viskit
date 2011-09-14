@@ -851,8 +851,8 @@ public class VGlobals {
     /** @return a model to print a stack trace of calling classes and their methods */
     public String printCallerLog() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Calling class: " + new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
-        sb.append("\nCalling method: " + new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
+        sb.append("Calling class: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
+        sb.append("\nCalling method: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
         return sb.toString();
     }
 

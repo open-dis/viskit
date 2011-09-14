@@ -12,10 +12,12 @@ import java.util.Arrays;
 import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,8 +45,8 @@ public class FileBasedClassManager implements Runnable {
     // Singleton:
     protected static FileBasedClassManager me;
     private static XMLConfiguration projectConfig;
-    private HashMap<String, FileBasedAssyNode> fileMap;
-    private HashMap<String, Class<?>> classMap;
+    private Map<String, FileBasedAssyNode> fileMap;
+    private Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
         if (me == null) {
@@ -58,7 +60,7 @@ public class FileBasedClassManager implements Runnable {
 
     private FileBasedClassManager() {
         classMap = new HashMap<String, Class<?>>();
-        fileMap = new HashMap<String, FileBasedAssyNode>();
+        fileMap = Collections.synchronizedMap(new HashMap<String, FileBasedAssyNode>());
     }
 
     public void addFileClass(Class<?> c) {
@@ -457,7 +459,7 @@ public class FileBasedClassManager implements Runnable {
 
     protected List<Object>[] listOfParamNames(Class<?> c) {
         ObjectFactory of = new ObjectFactory();
-        Constructor[] constr = c.getConstructors();
+        Constructor<?>[] constr = c.getConstructors();
         Annotation[] paramAnnots;
         List<Object>[] l = newListObjectTypeArray(ArrayList.class, constr.length);
         for (int j = 0; j < constr.length; j++) {
@@ -484,7 +486,7 @@ public class FileBasedClassManager implements Runnable {
                     throw new RuntimeException("Only one Annotation per constructor");
                 }
                 l = newListObjectTypeArray(ArrayList.class, 1);
-                ParameterMap param = (ParameterMap) constr[j].getAnnotation(viskit.ParameterMap.class);
+                ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
 
                 if (param != null) {
                     String[] names = param.names();

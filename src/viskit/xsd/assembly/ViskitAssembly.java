@@ -3,6 +3,7 @@ package viskit.xsd.assembly;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import simkit.Adapter;
 import simkit.SimEntity;
@@ -19,15 +20,15 @@ import static edu.nps.util.GenericConversion.toArray;
  */
 public class ViskitAssembly extends BasicAssembly { 
     
-    protected LinkedHashMap<String, SimEntity> entities;
-    protected LinkedHashMap<String, PropertyChangeListener> replicationStatistics;
-    protected LinkedHashMap<String, PropertyChangeListener> designPointStatistics;
-    protected LinkedHashMap<String, PropertyChangeListener> propertyChangeListeners;
-    protected LinkedHashMap<String, LinkedList<PropertyConnector>> propertyChangeListenerConnections;
-    protected LinkedHashMap<String, LinkedList<PropertyConnector>> designPointStatsListenerConnections;
-    protected LinkedHashMap<String, LinkedList<PropertyConnector>> replicationStatsListenerConnections;
-    protected LinkedHashMap<String, LinkedList<String>> simEventListenerConnections;
-    protected LinkedHashMap<String, Adapter> adapters;
+    protected Map<String, SimEntity> entities;
+    protected Map<String, PropertyChangeListener> replicationStatistics;
+    protected Map<String, PropertyChangeListener> designPointStatistics;
+    protected Map<String, PropertyChangeListener> propertyChangeListeners;
+    protected Map<String, LinkedList<PropertyConnector>> propertyChangeListenerConnections;
+    protected Map<String, LinkedList<PropertyConnector>> designPointStatsListenerConnections;
+    protected Map<String, LinkedList<PropertyConnector>> replicationStatsListenerConnections;
+    protected Map<String, LinkedList<String>> simEventListenerConnections;
+    protected Map<String, Adapter> adapters;
     private static boolean debug = false;
     
     /** Creates a new instance of ViskitAssembly */
