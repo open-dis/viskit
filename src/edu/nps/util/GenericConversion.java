@@ -109,8 +109,8 @@ public class GenericConversion {
     }
   
     /** Method to return a generic List&lt;Object&gt; array initialized based 
-     * on runtime type information.  Will warn of an unchecked cast, which in
-     * this case is permissible
+     * on runtime type information.  Will warn of an unchecked cast which, in
+     * this case, is permissible
      * @param <T> the type to cast this array
      * @param type a Class&lt;? extends T&gt; type
      * @param length the desired length of the type array
