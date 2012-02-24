@@ -63,7 +63,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Converter for a Collection to an Array using reification
+ * Converter for a Collection of Type to an Array of Type using reification
  * @version $Id$
  * <p>
  *   <b>History:</b>
@@ -89,7 +89,7 @@ public class GenericConversion {
      * @param <T> the type to cast this array
      * @param c the Collection of Type to convert
      * @param a the Array Type to convert the Collection into
-     * @return an Array Type with contents from a Collection given
+     * @return an Array Type with contents from a given Collection
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] toArray(Collection<T> c, T[] a) {
@@ -115,7 +115,7 @@ public class GenericConversion {
      * @param type a Class&lt;? extends T&gt; type
      * @param length the desired length of the type array
      * @throws IllegalArgumentException if a primitive class type is given
-     * @return a List&lt;Object&gt;[]
+     * @return a initialized List&lt;Object&gt;[] of length length
      */
     public static <T> List<Object>[] newListObjectTypeArray(Class<? extends T> type, int length) {
         if (type.isPrimitive()) {
