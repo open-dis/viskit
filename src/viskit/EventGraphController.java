@@ -784,7 +784,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     public void editGraphMetaData() {
-        GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
+        ViskitModel mod = (ViskitModel) getModel();
+        if (mod == null) {return;}
+        GraphMetaData gmd = mod.getMetaData();
         boolean modified = 
                 EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
         if (modified) {

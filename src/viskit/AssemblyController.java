@@ -411,7 +411,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     public void editGraphMetaData() {
-        GraphMetaData gmd = ((ViskitAssemblyModel) getModel()).getMetaData();
+        ViskitAssemblyModel mod = (ViskitAssemblyModel) getModel();
+        if (mod == null) {return;}
+        GraphMetaData gmd = mod.getMetaData();
         boolean modified =
                 AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
