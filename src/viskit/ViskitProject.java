@@ -35,20 +35,11 @@ package viskit;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileView;
-
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -86,7 +77,8 @@ public class ViskitProject {
     
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
     public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
-    public static final String VISKIT_ICON_SOURCE = "configuration/" + VISKIT_ICON_FILE_NAME;
+    public static final String VISKIT_CONFIG_DIR = "configuration";
+    public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIG_DIR + "/" + VISKIT_ICON_FILE_NAME;
     public static final String ANALYST_REPORT_CHARTS_DIRECTORY_NAME = "charts";
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
     public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
@@ -216,21 +208,20 @@ public class ViskitProject {
             writeProjectFile();
         } else {
             loadProjectFromFile(getProjectFile());
-            projectFileExists = true;
         }
         ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
         setProjectOpen(true);
         return projectFileExists;
     }
 
-    protected Document createProjectDocument() {
+    private Document createProjectDocument() {
         Document document = new Document();
         
-        Element root = new Element("ViskitProject");
+        Element root = new Element(VISKIT_ROOT_NAME);
         root.setAttribute("name", projectRoot.getName());
         document.setRootElement(root);
 
-        Element element = new Element("AnalystReports");
+        Element element = new Element(ANALYST_REPORTS_DIRECTORY_NAME);
         element.setAttribute("name", ANALYST_REPORTS_DIRECTORY_NAME);
         root.addContent(element);
         
@@ -265,7 +256,7 @@ public class ViskitProject {
         return document;
     }
 
-    protected void writeProjectFile() {
+    private void writeProjectFile() {
         FileOutputStream fileOutputStream = null;
         try {
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
@@ -289,14 +280,16 @@ public class ViskitProject {
      * Load an existing Viskit project file
      * @param inputProjectFile an existing Viskit project file
      */
-    public void loadProjectFromFile(File inputProjectFile) {
+    private void loadProjectFromFile(File inputProjectFile) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
             projectDocument = saxBuilder.build(inputProjectFile);
             Element root = projectDocument.getRootElement();
             if (!root.getName().equals(VISKIT_ROOT_NAME)) {
+                projectDocument = null;
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }
+            projectFileExists = true;
         } catch (JDOMException ex) {
             log.error(ex);
             throw new RuntimeException(ex);
@@ -644,7 +637,7 @@ public class ViskitProject {
      * @param f the project directory to test
      * @return true when a viskitProject.xml file is found
      */
-    public static boolean isViskitProject(File f) {
+    private static boolean isViskitProject(File f) {
 
         if ((f == null) || !f.exists() || !f.isDirectory()) {
             return false;
@@ -655,6 +648,10 @@ public class ViskitProject {
 
             @Override
             public boolean accept(File dir, String name) {
+                
+                // configuration/ contains the template viskitProject.xml file
+                // so, don't show this directory as a potential Viskit project
+                if (dir.getName().equals(VISKIT_CONFIG_DIR)) {return false;}
 
                 // Be brutally specific to reduce looking for any *.xml
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
