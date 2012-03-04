@@ -38,6 +38,7 @@ import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import edu.nps.util.LogUtils;
 import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;
 
 /**
@@ -61,6 +62,7 @@ public class EventGraphAssemblyComboMain {
             if (!EventQueue.isDispatchThread()) {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
+                    @Override
                     public void run() {
                         createGUI(args);
                     }
@@ -68,6 +70,7 @@ public class EventGraphAssemblyComboMain {
             } else {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         createGUI(args);
                     }
@@ -76,6 +79,13 @@ public class EventGraphAssemblyComboMain {
 
         } catch (Exception e) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
+            
+            // If we encounter this case, then uncomment printStackTrace() to 
+            // drill down on the cause.  Easier than setting a breakpoint and
+            // debugging!
+            if (e instanceof InvocationTargetException) {
+//                e.printStackTrace();
+            }
 
             // if we got here, then we need to nuke the ${user.home}/.viskit dir
             // it will be recreated on next start up
@@ -89,7 +99,7 @@ public class EventGraphAssemblyComboMain {
                 }
                 boolean success = viskitDir.delete();
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getName() + " was found to be corrupted and will be deleted");
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(".viskit was found and deleted = " + success);
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(viskitDir.getName() + " was found and deleted = " + success);
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("The next start attempt will be successful and a new " + viskitDir.getName() + " will be created");
             }
         }
