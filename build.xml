@@ -70,7 +70,7 @@
     <!-- This convention will not work on Mac OS X as tools.jar does not exist
          in its Java installation, however, an encapsulating
          classes.jar does exist that is already on the Bootclasspath.  I move
-         for insistance on installing a JDK to run Viskit on Win/Unix boxes. -->
+         for insistence on installing a JDK to run Viskit on Win/Unix boxes. -->
     <!--fileset dir="${env.JAVA_HOME}/lib" id="runtime.javac">
         <include name="tools.jar"/>
     </fileset-->
@@ -103,13 +103,14 @@
         <pathelement location="${dir.lib}/jdom.jar"/>
         <pathelement location="${jfreechart.jar}"/>
         <pathelement location="${jcommon.jar}"/>
-        <pathelement location="${dir.lib}/commons-beanutils-1.7.0.jar"/>
+        <pathelement location="${dir.lib}/commons-beanutils-1.8.3.jar"/>
         <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-        <pathelement location="${dir.lib}/commons-collections-3.1.jar"/>
-        <pathelement location="${dir.lib}/commons-configuration-1.5.jar"/>
-        <pathelement location="${dir.lib}/commons-digester-1.6.jar"/>
-        <pathelement location="${dir.lib}/commons-lang-2.4.jar"/>
-        <pathelement location="${dir.lib}/commons-logging-1.1.jar"/>
+        <pathelement location="${dir.lib}/commons-collections-3.2.1.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration-1.7.jar"/>
+        <pathelement location="${dir.lib}/commons-digester-2.1.jar"/>
+        <pathelement location="${dir.lib}/commons-jxpath-1.3.jar"/>
+        <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
+        <pathelement location="${dir.lib}/commons-logging-1.1.1.jar"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
         <pathelement location="${dir.lib}/xercesImpl.jar"/>
@@ -233,7 +234,7 @@
             depends="bindings.simkit"
             description="Build bindings to Schemas" >
         <javac destdir="${dir.build.classes}"
-               debug="off"
+               debug="false"
                source="${javac.source}"
                target="${javac.target}"
                includeAntRuntime="no">
@@ -245,7 +246,7 @@
             <src path="${dir.src.simevg}"/>
         </javac>
         <javac destdir="${dir.build.classes}"
-               debug="off"
+               debug="false"
                source="${javac.source}"
                target="${javac.target}"
                includeAntRuntime="no">
@@ -257,7 +258,7 @@
             <src path="${dir.src.simasm}"/>
         </javac>
         <javac destdir="${dir.build.classes}"
-               debug="off"
+               debug="false"
                source="${javac.source}"
                target="${javac.target}"
                includeAntRuntime="no">
@@ -269,7 +270,7 @@
             <src path="${dir.src.simasm}/stats"/>
         </javac>
         <javac destdir="${dir.build.classes}"
-               debug="off"
+               debug="false"
                source="${javac.source}"
                target="${javac.target}"
                includeAntRuntime="no">
@@ -306,9 +307,10 @@
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"
                target="${javac.target}"
+               debug="true"
                includeantruntime="false">
 
-            <!-- Reveals generics and deprecation warings -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
 	    <compilerarg value="${javac.debug}"/>
@@ -326,14 +328,14 @@
 
     <!--  === TARGET: compile === -->
     <target name="compile" depends="compile.edu.util">
-        <javac verbose="no"
-               destdir="${dir.build.classes}"
+        <javac destdir="${dir.build.classes}"
                excludes="xsd/** */test/*"
                source="${javac.source}"
                target="${javac.target}"
+               debug="true"
                includeantruntime="false">
 
-            <!-- Reveals generics and deprecation warings -->
+            <!-- Reveals generics and deprecation warnings -->
             <compilerarg value="${javac.unchecked}"/>
             <compilerarg value="${javac.deprecation}"/>
 	    <compilerarg value="${javac.debug}"/>
@@ -345,9 +347,9 @@
                 <pathelement location="${dir.lib}/simkit.jar"/>
                 <pathelement location="${dir.lib}/jhall.jar"/>
                 <pathelement location="${jfreechart.jar}"/>
-                <pathelement location="${dir.lib}/commons-configuration-1.5.jar"/>
+                <pathelement location="${dir.lib}/commons-configuration-1.7.jar"/>
                 <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-                <pathelement location="${dir.lib}/commons-lang-2.4.jar"/>
+                <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
                 <pathelement location="${log4j.jar}"/>
                 <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
                 <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
