@@ -33,20 +33,17 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
+import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-
+import java.util.Map;
 import javax.swing.JComponent;
-
-import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
-
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -415,7 +412,7 @@ public class Vstatics {
             try {
                 f = c.getField("parameterMap");
             } catch (SecurityException ex) {
-                ex.printStackTrace();
+                LogUtils.getLogger(Vstatics.class).error(ex);
             } catch (NoSuchFieldException ex) {}
             if (f != null) { // these would be base classes not arrays
                 if (debug) {
@@ -448,15 +445,15 @@ public class Vstatics {
                                         System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                                     }
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    LogUtils.getLogger(Vstatics.class).error(e);
                                 }
                             }
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
+                    LogUtils.getLogger(Vstatics.class).error(ex);
                 } catch (IllegalAccessException ex) {
-                    ex.printStackTrace();
+                    LogUtils.getLogger(Vstatics.class).error(ex);
                 }
             } else {
                 if (debug) {
@@ -516,7 +513,7 @@ public class Vstatics {
                                 System.out.println("\t " + p.getName() + p.getType());
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LogUtils.getLogger(Vstatics.class).error(e);
                         }
                     }
                 }
@@ -527,12 +524,12 @@ public class Vstatics {
         return resolved;
     }
 
-    /** Checks if primitive type in Viskit format ie not Clazz format
-     * @param type the type to evaluate as a primitive
+    /** Checks if primitive type in Viskit format, i.e. not Clazz format
+     * @param type the type to evaluate and determine if a primitive
      * @return an indication of success
      */
     public static boolean isPrimitive(String type) {
-        return type.equals("byte") | type.equals("boolean") | type.equals("char") | type.equals("double") | type.equals("float") | type.equals("int") | type.equals("short");
+        return type.equals("byte") | type.equals("boolean") | type.equals("char") | type.equals("double") | type.equals("float") | type.equals("int") | type.equals("short") | type.equals("long");
     }
 
     // returns number of constructors, checks is [] type

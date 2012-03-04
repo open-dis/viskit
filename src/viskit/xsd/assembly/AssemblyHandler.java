@@ -20,11 +20,8 @@ package viskit.xsd.assembly;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.crypto.*;
-import javax.crypto.spec.*;
 import javax.xml.bind.JAXBContext;
-import org.apache.xmlrpc.*;
-import viskit.xsd.bindings.assembly.*;
+import org.apache.xmlrpc.XmlRpcHandler;
 
 /**
  *
@@ -70,8 +67,8 @@ public class AssemblyHandler implements XmlRpcHandler {
     
     public Object execute(String methodName, Vector arguments) throws java.lang.Exception {
         Object ret;
-        String call = new String(methodName);
-        String xmlData = new String("empty");
+        String call = methodName;
+        String xmlData = "empty";
         String usid;
 
         // handle login request. returns a cookie which may or may not be real.
@@ -92,14 +89,14 @@ public class AssemblyHandler implements XmlRpcHandler {
         usid = "null";
         if (arguments.size() > 0) {
             if (arguments.elementAt(0)!=null) {
-                usid = new String((String)arguments.elementAt(0));
+                usid = (String)arguments.elementAt(0);
             }
         }
         
         
         if (sessionManager.authenticate(usid)) {
             
-            GridRunner gridRunner = (GridRunner) gridRuns.get(usid);
+            GridRunner gridRunner = gridRuns.get(usid);
             
             if (call.equals("gridkit.setAssembly")) {
                 
@@ -244,7 +241,7 @@ public class AssemblyHandler implements XmlRpcHandler {
                 
             } else {
                 
-                ret = new String("No such method \""+methodName+"\"! ");
+                ret = "No such method \""+methodName+"\"! ";
                 
             }
             return ret;

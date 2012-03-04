@@ -44,20 +44,15 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.SysExitHandler;
-import viskit.doe.DoeMain;
-
-/* DIFF between OA3302 branch and trunk */
-import viskit.doe.DoeMainFrame;
-/* End DIFF between OA3302 branch and trunk */
-
-import viskit.doe.JobLauncherTab2;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import viskit.doe.DoeMain;
+import viskit.doe.DoeMainFrame;
+import viskit.doe.JobLauncherTab2;
 
 public class EventGraphAssemblyComboMainFrame extends JFrame {
 
@@ -110,7 +105,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         return myQuitAction;
     }
     
-    ArrayList<JMenuBar> menus = new ArrayList<JMenuBar>();
+    java.util.List<JMenuBar> menus = new ArrayList<JMenuBar>();
 
     private void initUI() {
         VGlobals.instance().setAssemblyQuitHandler(null);

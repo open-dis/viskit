@@ -19,11 +19,13 @@
  */
 package viskit.xsd.assembly;
 
-import org.apache.commons.codec.binary.Base64;
-import viskit.xsd.bindings.assembly.ObjectFactory;
-import viskit.xsd.bindings.assembly.PasswordFile;
-import viskit.xsd.bindings.assembly.User;
-//import viskit.doe.DoeSessionDriver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -31,18 +33,17 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.commons.codec.binary.Base64;
+import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.PasswordFile;
+import viskit.xsd.bindings.assembly.User;
 
 /**
  * @version $Id$
  * @author Rick Goldberg
  */
 public class SessionManager /* compliments DoeSessionDriver*/ {
+    
     private Hashtable<String, String> sessions;
     private JAXBContext jaxbCtx;
     private static final String WTMP = "/var/gridkit/wtmp.xml";
@@ -340,19 +341,24 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
         return "nobody";
     }
     
-    void log(String message) {
+    final void log(String message) {
         String line = "<Log>"+new java.util.Date().toString()+": "+message+"</Log>"+'\n';
+        FileOutputStream fos = null;
         try {
             File f = new File(WTMP);
             if (!f.exists()) {
                 f.createNewFile();
             }
-            FileOutputStream fos = new FileOutputStream(f,true);
+            fos = new FileOutputStream(f,true);
             fos.write(line.getBytes());
-            fos.flush();
-            fos.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getLocalizedMessage());
+        } finally {
+            try {
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+            }
         }
     }
 }

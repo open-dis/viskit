@@ -210,7 +210,7 @@ public class ViskitProject {
             loadProjectFromFile(getProjectFile());
         }
         ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
-        setProjectOpen(true);
+        setProjectOpen(projectFileExists);
         return projectFileExists;
     }
 
@@ -611,13 +611,14 @@ public class ViskitProject {
         initializeProjectChooser(startingDirPath);
 
         projectChooser.setDialogTitle("Open an Existing Viskit Project");
+        boolean isProjectDir;
         do {
             int ret = projectChooser.showOpenDialog(parent);
             if (ret != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
             projectDir = projectChooser.getSelectedFile();
-
+            isProjectDir = isViskitProject(projectDir);
             if (!isProjectDir) {
                 Object[] options = {"Select project", "Cancel"};
                 int retrn = JOptionPane.showOptionDialog(parent, "Selected directory is not a Viskit project.", "Unable to open project",
@@ -633,18 +634,18 @@ public class ViskitProject {
         return projectDir;
     }
 
-    /** Report if directory f is a Viskit Project
-     * @param f the project directory to test
+    /** Report if directory fDir is a Viskit Project
+     * @param fDir the project directory to test
      * @return true when a viskitProject.xml file is found
      */
-    private static boolean isViskitProject(File f) {
+    private static boolean isViskitProject(File fDir) {
 
-        if ((f == null) || !f.exists() || !f.isDirectory()) {
+        if ((fDir == null) || !fDir.exists() || !fDir.isDirectory()) {
             return false;
         }
 
         // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
-        File[] files = f.listFiles(new java.io.FilenameFilter() {
+        File[] files = fDir.listFiles(new java.io.FilenameFilter() {
 
             @Override
             public boolean accept(File dir, String name) {
@@ -652,7 +653,7 @@ public class ViskitProject {
                 // configuration/ contains the template viskitProject.xml file
                 // so, don't show this directory as a potential Viskit project
                 if (dir.getName().equals(VISKIT_CONFIG_DIR)) {return false;}
-
+                
                 // Be brutally specific to reduce looking for any *.xml
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             }
@@ -661,10 +662,8 @@ public class ViskitProject {
         // This can happen on Win machines when parsing "My Computer" directory
         if (files == null) return false;
 
-        java.util.List<File> dirList = java.util.Arrays.asList(files);
-
         // If this List is not empty, we found a project file
-        return !dirList.isEmpty();
+        return files.length > 0;
     }
 
     /**
@@ -674,7 +673,6 @@ public class ViskitProject {
         this.analystReportStatisticsDir = analystReportStatisticsDir;
     }
 
-    static boolean isProjectDir = false;
     private static class ViskitProjectFileView extends FileView {
 
         Icon viskitProjIcon;
@@ -686,8 +684,7 @@ public class ViskitProject {
 
         @Override
         public Icon getIcon(File f) {
-            isProjectDir = isViskitProject(f);
-            return isProjectDir ? viskitProjIcon : null;
+            return isViskitProject(f) ? viskitProjIcon : null;
         }
     }
 

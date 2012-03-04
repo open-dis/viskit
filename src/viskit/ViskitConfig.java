@@ -1,18 +1,13 @@
 package viskit;
 
+import edu.nps.util.FileIO;
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.nps.util.FileIO;
-import edu.nps.util.LogUtils;
-import org.apache.commons.configuration.CombinedConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.DefaultConfigurationBuilder;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.*;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -20,9 +15,10 @@ import org.jdom.output.XMLOutputter;
 import viskit.doe.FileHandler;
 
 /**
- * Viskit Discrete Event Simulation (DES) Tool
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * Viskit Discrete Event Simulation (DES) Tool</p>
+ * Naval Postgraduate School, Monterey, CA</p>
+ * www.nps.edu</p>
+ * 
  * @author Mike Bailey
  * @since Mar 8, 2005
  * @since 11:09:07 AM
@@ -131,7 +127,11 @@ public class ViskitConfig {
         try {
             builder = new DefaultConfigurationBuilder();
             builder.setFile(V_CONFIG_FILE);
-            cc = builder.getConfiguration(true);
+            try {
+                cc = builder.getConfiguration(true);
+            } catch (ConfigurationException e) {
+                LOG.error(e);
+            }
 
             // Save off the indiv XML config for each prefix so we can write back
             int numConfigs = cc.getNumberOfConfigurations();

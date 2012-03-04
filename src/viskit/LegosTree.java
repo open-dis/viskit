@@ -1,13 +1,8 @@
 package viskit;
 
+import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
@@ -16,14 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.jar.JarFile;
-
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JTree;
+import javax.swing.tree.*;
 import org.apache.log4j.Logger;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -104,9 +99,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
         rendr.setLeafIcon(myLeafIcon);
         DragSource dragSource = DragSource.getDefaultDragSource();
+        
+        LegosTree instance = this;
 
-        dragSource.createDefaultDragGestureRecognizer(this, // component where drag originates
-                DnDConstants.ACTION_COPY_OR_MOVE, this);
+        dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
+                DnDConstants.ACTION_COPY_OR_MOVE, instance);
     }
 
     // beginning of hack to hide the tree root
@@ -309,8 +306,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
-                if (/*true*/viskit.Vstatics.debug) {
-                    throwable.printStackTrace();
+                if (viskit.Vstatics.debug) {
+//                    throwable.printStackTrace();
                 }
                 log.error("Could not process " + f.getName() + ": "
                         + throwable.getCause() + " " + throwable.getMessage());
@@ -320,9 +317,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             }            
         } // directory
     }
-    HashMap<String, DefaultMutableTreeNode> directoryRoots;
+    Map<String, DefaultMutableTreeNode> directoryRoots;
     DefaultMutableTreeNode rootNode;
-    HashMap<String, DefaultMutableTreeNode> packagesHM = new HashMap<String, DefaultMutableTreeNode>();
+    Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<String, DefaultMutableTreeNode>();
 
     private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
         String pkg = c.getPackage().getName();
@@ -365,7 +362,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     private void jarFileCommon(JarFile jarFile) {
         List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, targetClass);
         for (Class<?> c : list) {
-            Constructor[] constr = c.getConstructors();
+            Constructor<?>[] constr = c.getConstructors();
             List<Object>[] plist = newListObjectTypeArray(ArrayList.class, constr.length);
             ObjectFactory of = new ObjectFactory();
             Field f = null;
@@ -390,7 +387,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                 }
 
-                ParameterMap param = (ParameterMap) constr[i].getAnnotation(viskit.ParameterMap.class);
+                ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
                 // possible that a class inherited a parameterMap, check if annotated first
                 if (param != null) {
                     String[] names = param.names();
@@ -493,6 +490,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     class MyClassSorter implements Comparator {
 
+        @Override
         public int compare(Object o1, Object o2) {
             String s = ((Class) o1).getName();
             s = s.substring(s.lastIndexOf('.') + 1);
@@ -551,6 +549,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             dirsToo = inclDirs;
         }
 
+        @Override
         public boolean accept(File f) {
             if (f.isDirectory()) {
                 if (!dirsToo) {
@@ -570,6 +569,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     // Drag stuff
+    @Override
     public void dragGestureRecognized(DragGestureEvent e) {
         if (lis == null) {
             return;
@@ -607,18 +607,23 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
     }
 
+    @Override
     public void dragDropEnd(DragSourceDropEvent e) {
     }
 
+    @Override
     public void dragEnter(DragSourceDragEvent e) {
     }
 
+    @Override
     public void dragExit(DragSourceEvent e) {
     }
 
+    @Override
     public void dragOver(DragSourceDragEvent e) {
     }
 
+    @Override
     public void dropActionChanged(DragSourceDragEvent e) {
     }
 

@@ -1,32 +1,26 @@
 package viskit;
 
+import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import javax.swing.*;
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import viskit.xsd.bindings.eventgraph.*;
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import viskit.xsd.bindings.eventgraph.ObjectFactory;
+import viskit.xsd.bindings.eventgraph.Parameter;
+import viskit.xsd.bindings.eventgraph.SimEntity;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

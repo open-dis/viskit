@@ -33,7 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import javax.swing.*;
+import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.NameSpace;
+import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.LogUtils;
+import edu.nps.util.SysExitHandler;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -49,13 +54,7 @@ import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.NameSpace;
-import edu.nps.util.LogUtils;
-import edu.nps.util.SysExitHandler;
-import static edu.nps.util.GenericConversion.toArray;
+import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AssemblyModel;
@@ -188,7 +187,7 @@ public class VGlobals {
                 avf.setVisible(false);
             }
             if (egvf != null && egvf.isVisible()) {
-                return;
+                // do nothing at the moment
             }
         }
      };
@@ -254,7 +253,7 @@ public class VGlobals {
                 egvf.setVisible(false);
             }
             if (avf != null && avf.isVisible()) {
-                return;
+                // do nothing at the moment
             }
         }
     };

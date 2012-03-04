@@ -33,14 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import javax.swing.*;
-
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-
 import edu.nps.util.LogUtils;
 import java.awt.EventQueue;
+import javax.swing.*;
 
 /**
  * MOVES Institute</p>
