@@ -690,10 +690,12 @@ public class ViskitProject {
 
     private static class ProjectFilter extends javax.swing.filechooser.FileFilter {
 
+        @Override
         public boolean accept(File pathname) {
             return !pathname.getName().contains("svn");
         }
 
+        @Override
         public String getDescription() {
             return "Viskit projects";
         }
