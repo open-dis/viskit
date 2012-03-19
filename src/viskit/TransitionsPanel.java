@@ -1,16 +1,15 @@
 package viskit;
 
-import viskit.model.EventStateTransition;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
 
 /**
@@ -25,11 +24,11 @@ import viskit.model.ViskitElement;
  */
 public class TransitionsPanel extends JPanel {
 
-    JTextArea jta;
-    JList lis;
-    JButton testButt, minusButt, plusButt;
-    myListModel model;
-    JButton edButt;
+    private JTextArea jta;
+    private JList lis;
+    private JButton testButt, minusButt, plusButt;
+    private myListModel model;
+    private JButton edButt;
 
     public TransitionsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -119,7 +118,7 @@ public class TransitionsPanel extends JPanel {
         });
     }
     
-    // TODO: combine with list model
+    // TODO: combine with list model.  List has no clone method implemented
     ArrayList<ViskitElement> arLis = new ArrayList<ViskitElement>();
 
     public void setTransitions(List<? extends ViskitElement> tLis) {
@@ -131,8 +130,8 @@ public class TransitionsPanel extends JPanel {
 
     // We know this to be an ArrayList<ViskitElement> clone
     @SuppressWarnings("unchecked")
-    public ArrayList<ViskitElement> getTransitions() {
-        return (ArrayList<ViskitElement>) arLis.clone();
+    public List<ViskitElement> getTransitions() {
+        return (List<ViskitElement>) arLis.clone();
     }
 
     private void addTransition(ViskitElement est) {
@@ -202,6 +201,7 @@ public class TransitionsPanel extends JPanel {
 
     class plusButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (VGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
                 JOptionPane.showMessageDialog(TransitionsPanel.this,
@@ -239,6 +239,7 @@ public class TransitionsPanel extends JPanel {
 
     class minusButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (lis.getSelectionModel().getValueIsAdjusting()) {
                 return;
@@ -270,6 +271,7 @@ public class TransitionsPanel extends JPanel {
 
     class myListSelectionListener implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent event) {
             if (event.getValueIsAdjusting()) {
                 return;

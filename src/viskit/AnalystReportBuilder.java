@@ -39,21 +39,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import viskit.model.AssemblyNode;
 import viskit.xsd.assembly.HistogramChart;
 import viskit.xsd.assembly.LinearRegressionChart;
@@ -427,8 +422,8 @@ public final class AnalystReportBuilder {
         if (EventGraphCache.instance().getEventGraphNamesList() != null) {
             for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) {
                 Element behavior = new Element("Behavior");
-                Element localRootElement = null;
-                String descriptText = "";
+                Element localRootElement;
+                String descriptText;
                 behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNamesList().get(i));
 
                 if (descript) {
@@ -670,10 +665,10 @@ public final class AnalystReportBuilder {
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
         LinearRegressionChart linearRegressionChart = new LinearRegressionChart();
-        String chartTitle = "";
-        String axisLabel  = "";
+        String chartTitle;
+        String axisLabel;
         String typeStat = "";
-        boolean isCount = false;
+        boolean isCount;
         for (Element simEntity : simEntities) {
             List<Element> dataPoints = simEntity.getChildren("DataPoint");
             for (Element dataPoint : dataPoints) {
@@ -712,10 +707,10 @@ public final class AnalystReportBuilder {
                 chartTitle = simEntity.getAttributeValue("name");
                 axisLabel  = dataPoint.getAttributeValue("property") ;
 
-                Element histogramChartURL = null;
-                Element linearRegressionChartURL = null;
-                double[] data = null;
-                Element repRecord = null;
+                Element histogramChartURL;
+                Element linearRegressionChartURL;
+                double[] data;
+                Element repRecord;
                 for (Element replicationReport : replicationReports) {
                     List<Element> replications = replicationReport.getChildren("Replication");
 

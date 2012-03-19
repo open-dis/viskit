@@ -1,9 +1,8 @@
 package viskit;
 
-import viskit.model.*;
-
 import java.io.File;
 import java.util.Collection;
+import viskit.model.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +19,10 @@ public interface ViskitAssemblyView {
     // permit user to edit existing entities
     boolean doEditPclNode(PropChangeListenerNode pclNode);
 
+    /** Permits user to edit existing entities
+     * @param evNode the event graph node to edit
+     * @return an indication of success
+     */
     boolean doEditEvGraphNode(EvGraphNode evNode);
 
     boolean doEditPclEdge(PropChangeEdge pclEdge);
@@ -75,6 +78,12 @@ public interface ViskitAssemblyView {
      */
     File openRecentFilesAsk(Collection<String> lis);
 
+    /** Saves the current Assembly "as" desired by the user
+     *
+     * @param suggName the package and file name of the Assembly
+     * @param showUniqueName show Assembly name only
+     * @return a File object of the saved Assembly
+     */
     File saveFileAsk(String suggName, boolean suggUniqueName);
 
     /** Open an already existing Viskit Project */
@@ -85,6 +94,13 @@ public interface ViskitAssemblyView {
      */
     void setSelectedAssemblyName(String s);
     
+    /**
+     * Called by the controller after source has been generated.  Show to the
+     * user and provide the option to save.
+     *
+     * @param className
+     * @param s Java source
+     */
     void showAndSaveSource(String className, String s);
 
     void displayXML(File f);

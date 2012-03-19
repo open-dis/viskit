@@ -1,11 +1,5 @@
 package viskit;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -17,7 +11,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import viskit.model.ViskitElement;
 
 /**
@@ -37,6 +36,8 @@ public abstract class ViskitTablePanel extends JPanel {
     private JButton plusButt,  minusButt,  edButt;
     private ThisTableModel mod;
     private int defaultWidth = 0,  defaultNumRows = 3;
+    
+    // List has no implemented clone method
     private ArrayList<ViskitElement> shadow = new ArrayList<ViskitElement>();
     private ActionListener myEditLis,  myPlusLis,  myMinusLis;
     private String plusToolTip = "Add a row to this table";
@@ -132,6 +133,7 @@ public abstract class ViskitTablePanel extends JPanel {
         // install the handler to enable delete and edit buttons only on row-select
         tab.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent event) {
                 if (!event.getValueIsAdjusting()) {
                     boolean yn = tab.getSelectedRowCount() > 0;
@@ -250,8 +252,8 @@ public abstract class ViskitTablePanel extends JPanel {
      */
     // We know this to be an ArrayList<ViskitElement> clone
     @SuppressWarnings("unchecked")
-    public ArrayList<ViskitElement> getData() {
-        return (ArrayList<ViskitElement>) shadow.clone();
+    public List<ViskitElement> getData() {
+        return (List<ViskitElement>) shadow.clone();
     }
 
     public boolean isEmpty() {
@@ -334,7 +336,7 @@ public abstract class ViskitTablePanel extends JPanel {
             row = tab.getSelectedRow();
         } // else look at all
         else {
-            int r = 0;
+            int r;
             for (r = 0; r < shadow.size(); r++) {
                 if (o == shadow.get(r)) {
                     row = r;
@@ -409,6 +411,7 @@ public abstract class ViskitTablePanel extends JPanel {
     /** The local listener for plus, minus and edit clicks */
     class MyAddDelEditHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (event.getActionCommand().equals("p")) {
                 if (myPlusLis != null) {
@@ -464,7 +467,7 @@ public abstract class ViskitTablePanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent e) {
-            String tip = null;
+            String tip;
             java.awt.Point p = e.getPoint();
             int rowIndex = rowAtPoint(p);
             int colIndex = columnAtPoint(p);

@@ -1,7 +1,7 @@
 package viskit;
 
+import java.util.List;
 import viskit.model.EventArgument;
-import java.util.ArrayList;
 import viskit.model.ViskitElement;
 
 /**
@@ -28,15 +28,17 @@ public class ArgumentsPanel extends ViskitTablePanel {
         init(true);                       // separate constructor from initialization
     }
 
+    @Override
     public String[] getColumnTitles() {
         return mytitles;
     }
 
+    @Override
     public String[] getFields(Object o, int rowNum) {
         String[] sa = new String[3];
         sa[0] = ((EventArgument) o).getName();
         sa[1] = ((EventArgument) o).getType();
-        ArrayList ar = ((EventArgument) o).getDescription();
+        List<String> ar = ((EventArgument) o).getDescription();
         if (ar.size() > 0) {
             sa[2] = ((EventArgument) o).getDescription().get(0);
         } else {
@@ -53,6 +55,7 @@ public class ArgumentsPanel extends ViskitTablePanel {
         return ea;
     }
 
+    @Override
     public int getNumVisibleRows() {
         return 3;
     }

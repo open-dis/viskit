@@ -53,6 +53,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         this._setFileSet();
     }
 
+    @Override
     public void begin() {
         java.util.List<String> lis = getOpenFileSet(false);
 
@@ -79,6 +80,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void settings() {
         // placeholder for multi-tabbed combo app.
     }
@@ -88,6 +90,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         VGlobals.instance().getAssemblyController().newProject();
     }
         
+    @Override
     public void newEventGraph() {
         GraphMetaData oldGmd = null;
         ViskitModel viskitModel = (ViskitModel) getModel();
@@ -157,6 +160,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void open() {
         // Bug fix: 1249
         File[] files = ((ViskitView) getView()).openFilesAsk();
@@ -171,6 +175,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     
+    @Override
     public void openRecentEventGraph(String path) {
         _doOpen(new File(path));
     }
@@ -276,20 +281,25 @@ public class EventGraphController extends mvcAbstractController implements Viski
         view.removeFromEventGraphPallette(f);
     }
 
+    @Override
     public void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) {
         dirWatch.addListener(lis);
     }
 
+    @Override
     public void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) {
         dirWatch.removeListener(lis);
     }
 
     Set<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    
+    @Override
     public void addRecentFileListListener(RecentFileListener lis)
     {
       recentListeners.add(lis);
     }
     
+    @Override
     public void removeRecentFileListListener(RecentFileListener lis)
     {
       recentListeners.remove(lis);
@@ -351,12 +361,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
         getHistoryConfig().getDocument().normalize();
     }
 
+    @Override
     public void clearRecentFileSet() {
         recentFileSet.clear();
         saveHistoryXML(recentFileSet);
         notifyRecentFileListeners();
     }
 
+    @Override
     public Set<String> getRecentFileSet() {
         return getRecentFileSet(false);
     }
@@ -368,7 +380,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         return recentFileSet;
     }
 
-    private java.util.List<String> getOpenFileSet(boolean refresh) {
+    private List<String> getOpenFileSet(boolean refresh) {
         if (refresh || openEventGraphs == null) {
             _setFileSet();
         }
@@ -376,6 +388,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     /* a component, e.g., model, wants to say something. */
+    @Override
     public void messageUser(int typ, String msg) // typ is one of JOptionPane types
     {
         String title;
@@ -398,12 +411,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ((ViskitView) getView()).genericErrorReport(title, msg);
     }
     
+    @Override
     public void quit() {
         if (preQuit()) {
             postQuit();
         }
     }
 
+    @Override
     public boolean preQuit() {
 
         // Check for dirty models before exiting
@@ -415,11 +430,13 @@ public class EventGraphController extends mvcAbstractController implements Viski
         return true;
     }
 
+    @Override
     public void postQuit() {
         ((ViskitView) getView()).prepareToQuit();
         VGlobals.instance().quitEventGraphEditor();
     }
 
+    @Override
     public void closeAll() {
         
         ViskitModel[] mods = ((ViskitView) getView()).getOpenModels();
@@ -429,12 +446,14 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void close() {
         if (preClose()) {
             postClose();
         }
     }
 
+    @Override
     public boolean preClose() {
         Model mod = (Model) getModel();
         if (mod == null) {
@@ -448,6 +467,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         return true;
     }
 
+    @Override
     public void postClose() {
 
         Model mod = (Model) getModel();
@@ -481,6 +501,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void save() {
         ViskitModel mod = (ViskitModel) getModel();
         File localLastFile = mod.getLastFile();
@@ -492,6 +513,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void saveAs() {
         ViskitModel mod = (ViskitModel) getModel();
         ViskitView view = (ViskitView) getView();
@@ -519,16 +541,19 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void newSimParameter() //------------------------
     {
         ((ViskitView) getView()).addParameterDialog();
 
     }
 
+    @Override
     public void buildNewSimParameter(String name, String type, String initVal, String comment) {
         ((ViskitModel) getModel()).newSimParameter(name, type, initVal, comment);
     }
 
+    @Override
     public void simParameterEdit(vParameter param) {
         boolean modified = ((ViskitView) getView()).doEditParameter(param);
         if (modified) {
@@ -536,10 +561,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void codeBlockEdit(String s) {
         ((viskit.model.ViskitModel) getModel()).changeCodeBlock(s);
     }
 
+    @Override
     public void stateVariableEdit(vStateVariable var) {
         boolean modified = ((ViskitView) getView()).doEditStateVariable(var);
         if (modified) {
@@ -548,17 +575,20 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     // Comes in from plus button
+    @Override
     public void newStateVariable() {
         ((ViskitView) getView()).addStateVariableDialog();
     }
 
     // Comes in from view
+    @Override
     public void buildNewStateVariable(String name, String type, String initVal, String comment) //----------------------------
     {
         ((viskit.model.ViskitModel) getModel()).newStateVariable(name, type, initVal, comment);
     }
     private Vector selectionVector = new Vector();
 
+    @Override
     public void selectNodeOrEdge(Vector v) //------------------------------------
     {
         selectionVector = v;
@@ -569,6 +599,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
     private Vector copyVector = new Vector();
 
+    @Override
     public void copy() //----------------
     {
         if (!nodeSelected()) {
@@ -604,6 +635,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     }
 
+    @Override
     public void paste() //-----------------
     {
         if (copyVector.size() <= 0) {
@@ -622,6 +654,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void cut() //---------------
     {
         if (selectionVector != null && selectionVector.size() > 0) {
@@ -668,10 +701,12 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void deleteSimParameter(vParameter p) {
         ((ViskitModel) getModel()).deleteSimParameter(p);
     }
 
+    @Override
     public void deleteStateVariable(vStateVariable var) {
         ((ViskitModel) getModel()).deleteStateVariable(var);
     }
@@ -689,6 +724,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         return true;
     }
 
+    @Override
     public void generateJavaSource() {
         ViskitModel mod = (ViskitModel) getModel();
         File localLastFile = mod.getLastFile();
@@ -713,6 +749,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void showXML() {
         if (!checkSave() || ((ViskitModel) getModel()).getLastFile() == null) {
             return;
@@ -721,6 +758,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ((ViskitView) getView()).displayXML(((ViskitModel) getModel()).getLastFile());
     }
 
+    @Override
     public void runAssemblyEditor() {
         if (VGlobals.instance().getAssemblyEditor() == null) {
             VGlobals.instance().buildAssemblyViewFrame(false);
@@ -728,6 +766,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         VGlobals.instance().runAssemblyView();
     }
 
+    @Override
     public void eventList() {
         // not used
         if (viskit.Vstatics.debug) {
@@ -736,21 +775,25 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
     private int nodeCount = 0;
 
+    @Override
     public void newNode() //-------------------
     {
         buildNewNode(new Point(100, 100));
     }
 
+    @Override
     public void buildNewNode(Point p) //--------------------------
     {
         buildNewNode(p, "evnt_" + nodeCount++);
     }
 
+    @Override
     public void buildNewNode(Point p, String nm) //------------------------------------
     {
         ((viskit.model.ViskitModel) getModel()).newEvent(nm, p);
     }
 
+    @Override
     public void buildNewArc(Object[] nodes) //--------------------------------
     {
         // My node view objects hold node model objects and vice versa
@@ -759,6 +802,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ((ViskitModel) getModel()).newEdge(src, tar);
     }
 
+    @Override
     public void buildNewCancelArc(Object[] nodes) //--------------------------------------
     {
         // My node view objects hold node model objects and vice versa
@@ -779,6 +823,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void editGraphMetaData() {
         ViskitModel mod = (ViskitModel) getModel();
         if (mod == null) {return;}
@@ -793,6 +838,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void nodeEdit(viskit.model.EventNode node) // shouldn't be required
     //----------------------------------
     {
@@ -806,6 +852,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         } while (!done);
     }
 
+    @Override
     public void arcEdit(viskit.model.SchedulingEdge ed) {
         boolean modified = ((ViskitView) getView()).doEditEdge(ed);
         if (modified) {
@@ -813,6 +860,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         }
     }
 
+    @Override
     public void canArcEdit(viskit.model.CancellingEdge ed) {
         boolean modified = ((ViskitView) getView()).doEditCancelEdge(ed);
         if (modified) {
@@ -822,7 +870,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 
-    /** Screen capture a snapshot of the Event Graph View Frame */
+    @Override
     public void captureWindow() {
         String fileName = "ViskitScreenCapture";
 
@@ -917,6 +965,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             this.component = component;
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {            
 
             if (component instanceof JScrollPane) {

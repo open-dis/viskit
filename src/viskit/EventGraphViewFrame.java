@@ -4,6 +4,20 @@ import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.EventGraphFileFilter;
 import edu.nps.util.LogUtils;
+import java.awt.*;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.apache.commons.configuration.XMLConfiguration;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
@@ -12,25 +26,6 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
-
-import java.awt.*;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TooManyListenersException;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
@@ -216,6 +211,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     class TabSelectionHandler implements ChangeListener {
 
         /** Tab switch: this will come in with the newly selected tab in place */
+        @Override
         public void stateChanged(ChangeEvent e) {
             VgraphComponentWrapper myVgcw = getCurrentVgcw();
 
@@ -265,6 +261,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         // Introspector can't handle a param to the method....?
         vp.addMinusListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 ((ViskitController) getController()).deleteStateVariable((vStateVariable) event.getSource());
             }
@@ -272,6 +269,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         vp.addDoubleClickedListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 ((ViskitController) getController()).stateVariableEdit((vStateVariable) event.getSource());
             }
@@ -325,12 +323,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         // Introspector can't handle a param to the method....?
         pp.addMinusListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 ((ViskitController) getController()).deleteSimParameter((vParameter) event.getSource());
             }
         });
         pp.addDoubleClickedListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 ((ViskitController) getController()).simParameterEdit((vParameter) event.getSource());
             }
@@ -362,6 +362,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         CodeBlockPanel cbp = new CodeBlockPanel(this, true, "Event Graph Code Block");
         cbp.addUpdateListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String s = (String) e.getSource();
                 if (s != null) {
@@ -390,6 +391,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return p;
     }
     
+    @Override
     public void setSelectedEventGraphDescription(String description) {
         JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
         JPanel jp = (JPanel) jsp.getTopComponent();
@@ -404,6 +406,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     int untitledCount = 0;
 
+    @Override
     public void addTab(ViskitModel mod) {
         vGraphModel vmod = new vGraphModel();
         VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
@@ -443,6 +446,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         getToolBar().setVisible(true);
     }
 
+    @Override
     public void delTab(ViskitModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
@@ -463,6 +467,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         }
     }
 
+    @Override
     public ViskitModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
         ViskitModel[] vm = new ViskitModel[ca.length];
@@ -482,6 +487,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         help.mainFrameLocated(this.getBounds());
     }
 
+    @Override
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
         XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
@@ -495,6 +501,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * run the add parameter dialog
      * @return the String representation of this parameter
      */
+    @Override
     public String addParameterDialog() {
 
         if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
@@ -507,6 +514,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return null;
     }
 
+    @Override
     public String addStateVariableDialog() {
         if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
             ((ViskitController) getController()).buildNewStateVariable(StateVariableDialog.newName,
@@ -531,6 +539,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     class _RecentFileListener implements ViskitController.RecentFileListener {
 
+        @Override
         public void listChanged() {
             ViskitController vcontroller = (ViskitController) getController();
             Set<String> lis = vcontroller.getRecentFileSet();
@@ -564,6 +573,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             super(s);
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {
             ViskitController vcontroller = (ViskitController) getController();
             String fullPath = (String) getValue(FULLPATH);
@@ -800,12 +810,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         zoomIn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgcw().setScale(getCurrentVgcw().getScale() + 0.1d);
             }
         });
         zoomOut.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgcw().setScale(Math.max(getCurrentVgcw().getScale() - 0.1d, 0.1d));
             }
@@ -822,18 +834,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         selectMode.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgcw().setPortsVisible(false);
             }
         });
         arcMode.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgcw().setPortsVisible(true);
             }
         });
         cancelArcMode.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgcw().setPortsVisible(true);
             }
@@ -882,11 +897,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             }
             int infoflags;
 
+            @Override
             public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
                 this.infoflags = infoflags;
                 return (infoflags & ImageObserver.ALLBITS) == 0;
             }
 
+            @Override
             public void run() {
                 infoflags = 0;
                 int w = img.getWidth(this);
@@ -894,12 +911,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 if (w == -1 || h == -1) {
                     waitForIt();
                 }
-                BufferedImage bi = null;
+                
                 GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 GraphicsDevice gs = ge.getDefaultScreenDevice();
                 GraphicsConfiguration gc = gs.getDefaultConfiguration();
                 Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
-                bi = gc.createCompatibleImage(d.width, d.height, Transparency.BITMASK);
+                BufferedImage bi = gc.createCompatibleImage(d.width, d.height, Transparency.BITMASK);
                 infoflags = 0;
                 w = bi.getWidth(this);
                 h = bi.getHeight(this);
@@ -965,6 +982,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     class vDropTargetAdapter extends DropTargetAdapter {
 
+        @Override
         public void drop(DropTargetDropEvent dtde) {
             Point p = dtde.getLocation();  // subtract the size of the label
             if (dragger == NODE_DRAG) {
@@ -995,6 +1013,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         }
     }
 
+    @Override
     public File[] openFilesAsk() {
         jfc = buildOpenSaveChooser();
         jfc.setDialogTitle("Open Event Graph Files");
@@ -1040,6 +1059,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * @param showUniqueName show EG name only
      * @return a File object of the saved EG
      */
+    @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
@@ -1068,6 +1088,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return null;
     }
 
+    @Override
     public File openRecentFilesAsk(Collection<String> lis) {
         String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, lis);
         if (fn != null) {
@@ -1081,6 +1102,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         return null;
     }
 
+    @Override
     public void setSelectedEventGraphName(String s) {
         boolean nullString = !(s != null && s.length() > 0);
         String ttl =
@@ -1095,41 +1117,50 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         }
     }
 
+    @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
         return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), node); // blocks
     }
 
+    @Override
     public boolean doEditEdge(SchedulingEdge edge) {
         selectMode.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
+    @Override
     public boolean doEditCancelEdge(CancellingEdge edge) {
         selectMode.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
+    @Override
     public boolean doEditParameter(vParameter param) {
         return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), param);    // blocks
     }
 
+    @Override
     public boolean doEditStateVariable(vStateVariable var) {
         return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), var);
     }
 
+    @Override
     public int genericAsk(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
+    @Override
     public int genericAskYN(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
     }
 
+    @Override
     public void genericErrorReport(String title, String msg) {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
+    @Override
     public String promptForStringOrCancel(String title, String message, String initval) {
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
                 null, null, initval);
@@ -1184,14 +1215,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * @param s Java source
      * @param filename
      */
+    @Override
     public void showAndSaveSource(String className, String s, String filename) {
         JFrame f = new SourceWindow(this, className, s);
         f.setTitle("Generated source from " + filename);
         f.setVisible(true);
     }
 
+    @Override
     public void displayXML(File f) {
-        JComponent xt = null;
+        JComponent xt;
         try {
             xt = XTree.getTreeInPanel(f);
         } catch (Exception e) {
@@ -1224,6 +1257,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         closeButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 jf.dispose();
             }

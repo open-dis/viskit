@@ -270,12 +270,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         // let the assebmly controller establish the Viskit classpath and open
         // EventGraphs first
         runLater(3000, new Runnable() {
+            @Override
             public void run() {
                 egCntlr.begin();
             }
         });
 
         runLater(0, new Runnable() {
+            @Override
             public void run() {
                 assyCntlr.begin();
             }
@@ -294,6 +296,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     Thread.sleep(ms);
@@ -307,6 +310,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
     class myTabChangeListener implements ChangeListener {
 
+        @Override
         public void stateChanged(ChangeEvent e) {
             int i = tabbedPane.getSelectedIndex();
             if (i == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]) {
@@ -368,6 +372,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     
     ActionListener mySettingsHandler = new ActionListener() {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             SettingsDialog.showDialog(EventGraphAssemblyComboMainFrame.this);
         }
@@ -400,6 +405,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             super(s);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
             VGlobals.instance().setSysExitHandler(nullSysExitHandler);
@@ -469,6 +475,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     
     private SysExitHandler nullSysExitHandler = new SysExitHandler() {
 
+        @Override
         public void doSysExit(int status) {
             // do nothing
         }
@@ -482,6 +489,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
          * 
          * @param execStrings command line VM arguments
          */
+        @Override
         public void exec(String[] execStrings) {
             if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != 0) {
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
@@ -496,6 +504,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
     class myTitleListener implements TitleListener {
 
+        @Override
         public void setTitle(String title, int key) {
             titles[key] = title;
             int tabIdx = tabbedPane.getSelectedIndex();

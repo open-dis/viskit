@@ -43,7 +43,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     private ImageIcon myLeafIcon;
     private Icon standardNonLeafIcon;
     private Image myLeafIconImage;
-    DefaultTreeModel mod;
+    private DefaultTreeModel mod;
     private DragStartListener lis;
     private Vector<String> recurseNogoList;
     private String genericTableToolTip = "Drag onto canvas";
@@ -190,7 +190,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     // 4 May 06 JMB The filter down below checks for empty dirs.  
     /** If there is a directory with xml in it, it will show in the LEGO tree,
-     * but if its children have errors when marshalling they will not appear.
+     * but if its children have errors when marshaling they will not appear.
      * @param f the path to evaluate for SimEntities
      */
     public void addContentRoot(File f) {
@@ -306,9 +306,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
-                if (viskit.Vstatics.debug) {
-//                    throwable.printStackTrace();
-                }
+//                throwable.printStackTrace();
                 log.error("Could not process " + f.getName() + ": "
                         + throwable.getCause() + " " + throwable.getMessage());
                 if (recurseNogoList != null) {
@@ -581,7 +579,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
 
         Transferable xfer;
-        StringSelection ss = null;
+        StringSelection ss;
         
         if (o instanceof FileBasedAssyNode) {
             FileBasedAssyNode xn = (FileBasedAssyNode) o;

@@ -170,6 +170,7 @@ public class VGlobals {
 
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 if (assyFirstRun) {
                     return;
@@ -182,6 +183,7 @@ public class VGlobals {
     }
     ActionListener defaultAssyQuitHandler = new ActionListener() {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (avf != null) {
                 avf.setVisible(false);
@@ -248,6 +250,7 @@ public class VGlobals {
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (egvf != null) {
                 egvf.setVisible(false);
@@ -334,8 +337,8 @@ public class VGlobals {
         // Lose the new lines
         String noCRs = interpretString.replace('\n', ' ');
 
-        String name = null;
-        String type = null;
+        String name;
+        String type;
 
         if (node != null) {
 
@@ -441,7 +444,6 @@ public class VGlobals {
         return returnString;
     }
 
-    @SuppressWarnings("unchecked")
     private String findType(String name, String type) {
         String returnString = null;
         try {
@@ -857,6 +859,7 @@ public class VGlobals {
 
     private SysExitHandler sysexithandler = new SysExitHandler() {
 
+        @Override
         public void doSysExit(int status) {
 
             log.debug("Viskit is exiting with status: " + status);
@@ -968,12 +971,14 @@ public class VGlobals {
 
     class myTypeListener implements ActionListener, ItemListener {
 
+        @Override
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 lastSelected = e.getItem();
             }
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Object o = e.getSource();
             if (o instanceof JComboBox) {
@@ -997,6 +1002,7 @@ public class VGlobals {
     class myTypeListRenderer extends JLabel implements ListCellRenderer {
         //Font specialFont = getFont().deriveFont(Font.ITALIC);
 
+        @Override
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             JLabel lab = new JLabel(value.toString());

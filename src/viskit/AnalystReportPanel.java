@@ -43,6 +43,8 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit;
 
+import edu.nps.util.FileIO;
+import edu.nps.util.LogUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -57,36 +59,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import edu.nps.util.FileIO;
-import edu.nps.util.LogUtils;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import org.apache.log4j.Logger;
 import viskit.xsd.assembly.XsltUtility;
 
@@ -122,6 +102,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
      * @param source the listener source
      * @param param the object to act upon
      */
+    @Override
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
@@ -141,6 +122,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
     }
 
+    @Override
     public String getHandle() {
         return "";
     }
@@ -180,12 +162,12 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
     private void buildArb(File targetFile) {
         log.debug("TargetFile is: " + targetFile);
-        AnalystReportBuilder arbLocal = null;
+        AnalystReportBuilder arbLocal;
         try {
             arbLocal = new AnalystReportBuilder(this, targetFile, currentAssyFile);
         } catch (Exception e) {
             log.error("Error parsing analyst report: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace();
             return;
         }
         setContent(arbLocal);
@@ -218,6 +200,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     private void fillLayout() {
         // We don't always come in on the swing thread.
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 _fillLayout();
             }
@@ -942,6 +925,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         open.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (dirty) {
                     int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current simulation data and analyst report annotations?",
@@ -974,6 +958,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         ActionListener saveAsLis = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
                 saveChooser.setSelectedFile(reportFile);
@@ -1003,6 +988,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         ActionListener generateViewHtmlListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 
                 if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
@@ -1087,6 +1073,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             this.tf = tf;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int resp = locationImageFileChooser.showOpenDialog(AnalystReportPanel.this);
             if (resp == JFileChooser.APPROVE_OPTION) {
@@ -1149,11 +1136,13 @@ class EntityParamTable extends ROTable implements TableCellRenderer {
         defRenderer = new DefaultTableCellRenderer();
 
         TableColumn tc = getColumnModel().getColumn(0);
-        tc.setCellRenderer(this);
+        EntityParamTable instance = this;
+        tc.setCellRenderer(instance);
     }
     Color grey = new Color(204, 204, 204);
     Color origBkgd;
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = defRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         if (origBkgd == null) {

@@ -14,7 +14,7 @@
  * Description:  A class to serve as the jgraph object, while carrying other 
  *               objects needed for the gui
  *
- * References:   see viskit.vGraphComponentWrapper
+ * References:   see viskit.VgraphComponentWrapper
  *
  * URL:          
  *
@@ -59,7 +59,6 @@
 package viskit;
 
 import javax.swing.JSplitPane;
-
 import viskit.jgraph.vGraphAssemblyComponent;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.ViskitAssemblyModel;
@@ -74,22 +73,22 @@ import viskit.model.ViskitAssemblyModel;
  *   <pre><b>
  *     Date:     22 AUG 2008
  *     Time:     1758Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.vGraphAssemblyComponentWrapper">Terry Norbraten, NPS MOVES</a>
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.VgraphAssemblyComponentWrapper">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
  * 
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class vGraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
+public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
     
     public ViskitAssemblyModel model;
     public JSplitPane drawingSplitPane;
     public JSplitPane trees; 
     public boolean isActive = true;
     
-    public vGraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyViewFrame frame) {
         super(model, frame);
     }
 
-} // end class file vGraphAssemblyComponentWrapper.java
+} // end class file VgraphAssemblyComponentWrapper.java

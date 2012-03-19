@@ -1,5 +1,9 @@
 package viskit;
 
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
+import edu.nps.util.AssemblyFileFilter;
+import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -9,24 +13,14 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.filechooser.FileFilter;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-
-// Application specific imports
-import actions.ActionIntrospector;
-import actions.ActionUtilities;
-import edu.nps.util.AssemblyFileFilter;
-import edu.nps.util.LogUtils;
-import java.util.Set;
-import java.util.TooManyListenersException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import org.apache.commons.configuration.XMLConfiguration;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
@@ -37,7 +31,6 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
-
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -59,6 +52,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
+    
     /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
@@ -155,18 +149,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private _RecentAssyFileListener myAssyFileListener;
     private _RecentProjFileListener myProjFileListener;
 
-    private vGraphAssemblyComponentWrapper getCurrentVgacw() {
+    private VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
         }
 
         JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
-        return (vGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
+        return (VgraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        vGraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        VgraphAssemblyComponentWrapper vcw = getCurrentVgacw();
         return vcw.drawingSplitPane.getRightComponent();
     }
 
@@ -181,8 +175,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     class TabSelectionHandler implements ChangeListener {
 
         /** Tab switch: this will come in with the newly selected tab in place */
+        @Override
         public void stateChanged(ChangeEvent e) {
-            vGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
+            VgraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
 
             if (myVgacw == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
@@ -214,6 +209,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     class _RecentAssyFileListener implements ViskitAssemblyController.RecentAssyFileListener {
 
+        @Override
         public void assySetChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             Set<String> lis = acontroller.getRecentAssyFileSet();
@@ -243,6 +239,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     class _RecentProjFileListener implements ViskitAssemblyController.RecentProjFileListener {
 
+        @Override
         public void projSetChanged() {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             Set<String> lis = acontroller.getRecentProjFileSet();
@@ -280,6 +277,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             super(s);
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
@@ -297,6 +295,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             super(s);
         }
 
+        @Override
         public void actionPerformed(ActionEvent ev) {
             ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
@@ -533,12 +532,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         zoomIn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgacw().setScale(getCurrentVgacw().getScale() + 0.1d);
             }
         });
         zoomOut.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgacw().setScale(Math.max(getCurrentVgacw().getScale() - 0.1d, 0.1d));
             }
@@ -556,6 +557,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 this.tOrF = tOrF;
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgacw().setPortsVisible(tOrF);
             }
@@ -612,12 +614,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return b;
     }
 
-    /** Enable adding of one or more Assembly tabs
-     * @param mod the ViskitAssemblyModel to view on this tab
-     */
+    @Override
     public void addTab(ViskitAssemblyModel mod) {
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
-        vGraphAssemblyComponentWrapper graphPane = new vGraphAssemblyComponentWrapper(vGAmod, this);
+        VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
 
         graphPane.model = mod;
@@ -655,13 +655,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         getToolBar().setVisible(true);
     }
 
+    @Override
     public void delTab(ViskitAssemblyModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
         for (int i = 0; i < ca.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            vGraphAssemblyComponentWrapper vgacw = (vGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgacw.model == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
@@ -675,13 +676,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
+    @Override
     public ViskitAssemblyModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
         ViskitAssemblyModel[] vm = new ViskitAssemblyModel[ca.length];
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            vGraphAssemblyComponentWrapper vgacw = (vGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgacw.model;
         }
         return vm;
@@ -707,7 +709,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         String[] extraCP = SettingsDialog.getExtraClassPath();
         
         if (extraCP != null) {
-            File file = null;
+            File file;
             for (String path : extraCP) { // tbd same for pcls
                 file = new File(path);
                 if (file.exists()) {
@@ -764,18 +766,21 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return treePanels;
     }
 
+    @Override
     public void genericErrorReport(String title, String msg) //-----------------------------------------------------
     {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
     Transferable dragged;
 
+    @Override
     public void startingDrag(Transferable trans) {
         dragged = trans;
     }
 
     class vDropTargetAdapter extends DropTargetAdapter {
 
+        @Override
         public void drop(DropTargetDropEvent dtde) {
             if (dragged != null) {
                 try {
@@ -804,9 +809,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                     dragged = null;
                 } catch (UnsupportedFlavorException e) {
-                    e.printStackTrace();
+                    LogUtils.getLogger(AssemblyViewFrame.class).error(e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogUtils.getLogger(AssemblyViewFrame.class).error(e);
                 } 
             }
         }
@@ -821,6 +826,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
     private boolean firstShown = false;
 
+    @Override
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
         XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
@@ -852,12 +858,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    /**
-     * This is where the "master" model (simkit.viskit.model.Model) updates the view.
-     * Not so much to do in this editor as in EventGraphViewFrame
-     *
-     * @param event
-     */
     @Override
     public void modelChanged(mvcModelEvent event) {
         switch (event.getID()) {
@@ -866,27 +866,28 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    /** permits user to edit existing entities
-     * @param evNode the event graph node to edit
-     * @return an indication of success
-     */
+    @Override
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
         JFrame frame = VGlobals.instance().getMainAppWindow();
         return EventGraphNodeInspectorDialog.showDialog(frame, frame, evNode);
     }
 
+    @Override
     public boolean doEditPclNode(PropChangeListenerNode pclNode) {
         return PclNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), pclNode); // blocks
     }
 
+    @Override
     public boolean doEditPclEdge(PropChangeEdge pclEdge) {
         return PclEdgeInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), pclEdge);
     }
 
+    @Override
     public boolean doEditAdapterEdge(AdapterEdge aEdge) {
         return AdapterConnectionInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), aEdge);
     }
 
+    @Override
     public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), seEdge);
     }
@@ -901,14 +902,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
     }
 
+    @Override
     public Object getSelectedEventGraph() {
         return getLeafUO(lTree);
     }
 
+    @Override
     public Object getSelectedPropChangeListener() {
         return getLeafUO(pclTree);
     }
 
+    @Override
     public void addToEventGraphPallette(File f, boolean b) {
         // f may be an empty directory
         if (f.exists() && f.listFiles().length > 0) {
@@ -916,32 +920,39 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
+    @Override
     public void addToPropChangePallette(File f, boolean b) {
         pclTree.addContentRoot(f, b);
     }
 
+    @Override
     public void removeFromEventGraphPallette(File f) {
         lTree.removeContentRoot(f);
     }
 
+    @Override
     public void removeFromPropChangePallette(File f) {
         pclTree.removeContentRoot(f);
     }
 
+    @Override
     public int genericAsk(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
+    @Override
     public int genericAskYN(String title, String msg) {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
     }
 
+    @Override
     public int genericAsk2Butts(String title, String msg, String butt1, String butt2) {
         return JOptionPane.showOptionDialog(this, msg, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
                 new String[]{butt1, butt2}, butt1);
     }
 
+    @Override
     public String promptForStringOrCancel(String title, String message, String initval) {
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
                 null, null, initval);
@@ -958,6 +969,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
+    @Override
     public File[] openFilesAsk() {
         jfc = buildOpenSaveChooser();
         jfc.setDialogTitle("Open Assembly Files");
@@ -972,6 +984,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return (returnVal == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
     }
 
+    @Override
     public File openRecentFilesAsk(Collection<String> lis) {
         String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), lis);
         if (fn != null) {
@@ -985,6 +998,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
+    @Override
     public void setSelectedAssemblyName(String s) {
         boolean nullString = !(s != null && !s.isEmpty());
         String ttl =
@@ -999,8 +1013,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
+    @Override
     public void openProject() {
-        int ret = -1;
+        int ret;
         ViskitAssemblyController aController = ((ViskitAssemblyController) getController());
         if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
@@ -1039,12 +1054,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return fil;
     }
 
-    /** Saves the current Assembly "as" desired by the user
-     *
-     * @param suggName the package and file name of the Assembly
-     * @param showUniqueName show Assembly name only
-     * @return a File object of the saved Assembly
-     */
+    @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
@@ -1075,21 +1085,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         return null;
     }
 
-    /**
-     * Called by the controller after source has been generated.  Show to the
-     * user and provide the option to save.
-     *
-     * @param className
-     * @param s Java source
-     */
+    @Override
     public void showAndSaveSource(String className, String s) {
         JFrame f = new SourceWindow(this, className, s);
         f.setTitle("Generated source from " + filename);
         f.setVisible(true);
     }
 
+    @Override
     public void displayXML(File f) {
-        JComponent xt = null;
+        JComponent xt;
         try {
             xt = XTree.getTreeInPanel(f);
         } catch (Exception e) {
@@ -1122,6 +1127,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         closeButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 jf.dispose();
             }

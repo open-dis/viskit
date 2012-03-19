@@ -1,11 +1,10 @@
 package viskit;
 
 import edu.nps.util.DirectoryWatch;
-import viskit.model.*;
-
-import java.awt.*;
+import java.awt.Point;
 import java.util.Set;
 import java.util.Vector;
+import viskit.model.*;
 
 /**
  * @author Mike Bailey

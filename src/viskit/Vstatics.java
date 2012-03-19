@@ -216,7 +216,7 @@ public class Vstatics {
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c = null;
+        Class<?> c;
 
         c = cForName(s, VGlobals.instance().getWorkClassLoader());
         if (c == null) {
@@ -232,7 +232,7 @@ public class Vstatics {
     }
 
     static Class<?> cForName(String s, ClassLoader clsLoader) {
-        Class<?> c = null;
+        Class<?> c;
         try {
             c = Class.forName(s, false, clsLoader); //true,clsLoader);
             return c;

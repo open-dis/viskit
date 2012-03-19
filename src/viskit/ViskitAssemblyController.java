@@ -1,12 +1,11 @@
 package viskit;
 
+import edu.nps.util.DirectoryWatch;
 import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.JComponent;
-
-import edu.nps.util.DirectoryWatch;
 import viskit.model.*;
 
 /**
@@ -56,6 +55,10 @@ public interface ViskitAssemblyController {
 
     void selectNodeOrEdge(Vector<Object> v);
 
+    /**
+     * Creates an adapter arc between two assembly nodes
+     * @param nodes and array of Nodes to connect with an adapter
+     */
     void newAdapterArc(Object[] nodes);
 
     void newSimEvListArc(Object[] nodes);

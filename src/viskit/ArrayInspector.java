@@ -1,25 +1,14 @@
 package viskit;
 
 import java.awt.Dimension;
-import viskit.model.VInstantiator;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import viskit.model.VInstantiator;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -134,6 +123,7 @@ public class ArrayInspector extends JDialog {
 
     class sizeListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setSize();
         }
@@ -160,6 +150,7 @@ public class ArrayInspector extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             //if(checkBlankFields())
             //  return;
@@ -170,6 +161,7 @@ public class ArrayInspector extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             dispose();
         }
@@ -177,12 +169,14 @@ public class ArrayInspector extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
         //getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }

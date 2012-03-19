@@ -3,24 +3,17 @@ package viskit;
 import edu.nps.util.LogUtils;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.*;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.*;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.border.TitledBorder;
-import viskit.model.EventArgument;
-import viskit.model.EventLocalVariable;
-import viskit.model.EventNode;
-import viskit.model.EventStateTransition;
-import viskit.model.SchedulingEdge;
-import viskit.model.ViskitElement;
-import viskit.model.vEdgeParameter;
+import viskit.model.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -213,6 +206,7 @@ public class EventInspectorDialog extends JDialog {
         arguments.addDoubleClickedListener(new ActionListener() {
             
             // EventArgumentDialog: Event arguments
+            @Override
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
                 boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
@@ -244,6 +238,7 @@ public class EventInspectorDialog extends JDialog {
         localVariables.addMinusListener(myChangeListener);
         localVariables.addDoubleClickedListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 EventLocalVariable elv = (EventLocalVariable) e.getSource();
                 boolean modified = LocalVariableDialog.showDialog(fr, locationComponent, elv);
@@ -367,6 +362,7 @@ public class EventInspectorDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;
             
@@ -378,6 +374,7 @@ public class EventInspectorDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
 
@@ -454,6 +451,7 @@ public class EventInspectorDialog extends JDialog {
 
     class addHideButtListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource().equals(addDescriptionButton)) {
                 hideShowDescription(true);
@@ -482,12 +480,14 @@ public class EventInspectorDialog extends JDialog {
 
     class myChangeActionListener implements ChangeListener, ActionListener {
 
+        @Override
         public void stateChanged(ChangeEvent event) {
             modified = true;
             okButton.setEnabled(true);
             getRootPane().setDefaultButton(okButton);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             stateChanged(null);
         }
@@ -513,6 +513,7 @@ public class EventInspectorDialog extends JDialog {
 
     class commentListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             StringBuffer sb = new StringBuffer(EventInspectorDialog.this.description.getText().trim());
             boolean modded = TextAreaDialog.showTitledDialog("Event Description", EventInspectorDialog.this,
