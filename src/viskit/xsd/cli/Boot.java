@@ -6,19 +6,19 @@
 package viskit.xsd.cli;
 
 import edu.nps.util.TempFileManager;
-import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.JarURLConnection;
+import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
+import java.net.URLConnection;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * @author Rick Goldberg
@@ -50,7 +50,7 @@ public class Boot extends URLClassLoader implements Runnable {
         setArgs(args);
     }
     
-    public void setArgs(final String[] args) {
+    public final void setArgs(final String[] args) {
         this.args=args;
     }
     
@@ -112,7 +112,7 @@ public class Boot extends URLClassLoader implements Runnable {
     }
 
     @Override
-    public void addURL(URL jarURL) {
+    public final void addURL(URL jarURL) {
         URLConnection urlc;
         JarEntry je;
         JarInputStream jis;
@@ -152,7 +152,7 @@ public class Boot extends URLClassLoader implements Runnable {
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
                         FileOutputStream fos = new FileOutputStream(extJar);
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        int c = 0;
+                        int c;
                         byte[] buff = new byte[512];
                         while ((c = jis.read(buff)) > -1 ) {
                             baos.write(buff,0,c);
@@ -194,6 +194,7 @@ public class Boot extends URLClassLoader implements Runnable {
         return clz;
     }
     
+    @Override
     public void run() {
         try {
             Class<?> lclaz = loadClass("viskit.xsd.cli.Launcher");
@@ -218,7 +219,7 @@ public class Boot extends URLClassLoader implements Runnable {
             p.load(configIn);
             String javaVersion = (p.getProperty("JavaVersion") == null) ? "unk" : p.getProperty("JavaVersion");
             if (javaVersion.indexOf("1.4") > 0) {
-                rev = new String("java14");
+                rev = "java14";
             }
         } catch (Exception e) {
             e.printStackTrace();

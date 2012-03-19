@@ -1,6 +1,6 @@
 package viskit.mvc;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -15,43 +15,41 @@ import javax.swing.*;
 /**
  * From an article at www.jaydeetechnology.co.uk
  */
+public class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener {
 
-public class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener
-{
-  private mvcModel model;
-  private mvcController controller;
+    private mvcModel model;
+    private mvcController controller;
 
-  public mvcAbstractJFrameView(String title)
-  {
-    super(title);
-  }
-  public void registerWithModel()
-  {
-    ((mvcAbstractModel)model).addModelListener(this);
-  }
+    public mvcAbstractJFrameView(String title) {
+        super(title);
+    }
 
-  public mvcController getController()
-  {
-    return controller;
-  }
+    public void registerWithModel() {
+        ((mvcAbstractModel) model).addModelListener(this);
+    }
 
-  public mvcModel getModel()
-  {
-    return model;
-  }
+    @Override
+    public mvcController getController() {
+        return controller;
+    }
 
-  public void setController(mvcController controller)
-  {
-    this.controller = controller;
-  }
+    @Override
+    public mvcModel getModel() {
+        return model;
+    }
 
-  public void setModel(mvcModel model)
-  {
-    this.model = model;
-    registerWithModel();
-  }
+    @Override
+    public void setController(mvcController controller) {
+        this.controller = controller;
+    }
 
-  public void modelChanged(mvcModelEvent event)
-  {
-  }
+    @Override
+    public void setModel(mvcModel model) {
+        this.model = model;
+        registerWithModel();
+    }
+
+    @Override
+    public void modelChanged(mvcModelEvent event) {
+    }
 }

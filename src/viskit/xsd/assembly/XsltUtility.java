@@ -1,11 +1,11 @@
 package viskit.xsd.assembly;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 /** This class was written by CDR Duane Davis for work on the AUV Workbench.
  * It was copied to this application to perform XSLT conversions.

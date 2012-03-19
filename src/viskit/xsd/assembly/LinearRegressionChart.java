@@ -58,15 +58,14 @@
  */
 package viskit.xsd.assembly;
 
+import edu.nps.util.LogUtils;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import edu.nps.util.LogUtils;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -121,8 +120,8 @@ public class LinearRegressionChart {
 
     /**
      * Creates a data set that is used for making a scatter plot of the data
-     * @param label
-     * @param data
+     * @param label the name of the ScatterPlot
+     * @param data an array of doubles that are to be plotted
      * @return
      */
     private XYDataset createDataset(String label, double[] data) {

@@ -33,26 +33,18 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.xsd.assembly;
 
-import org.apache.log4j.Logger;
+import static edu.nps.util.GenericConversion.toArray;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import javax.swing.JOptionPane;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
+import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;
@@ -61,7 +53,6 @@ import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 import viskit.model.AssemblyNode;
-import static edu.nps.util.GenericConversion.toArray;
 
 /**
  * Base class for creating Simkit scenarios.
@@ -224,9 +215,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
          */
         if (getReplicationStats().length == 0) {return;}
         designPointStats = new SampleStatistics[getReplicationStats().length];
-        String typeStat = "";
+        String typeStat;
         int ix = 0;
-        boolean isCount = false;
+        boolean isCount;
         for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
             LOG.debug("entry is: " + entry);
             Object obj;
@@ -389,6 +380,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Empty, needed to implement SimEntity
      * @param simEvent the sim event to handle
      */
+    @Override
     public void handleSimEvent(SimEvent simEvent) {
     }
 
@@ -396,6 +388,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Empty, needed to implement SimEntity
      * @param simEvent the sim event to process
      */
+    @Override
     public void processSimEvent(SimEvent simEvent) {}
 
     /** @return an array of design point statistics for this Assembly */
@@ -578,6 +571,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /** Execute the simulation for the desired number of replications */
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
+    @Override
     public void run() {
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
@@ -722,9 +716,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 Schedule.startSimulation();
 
-                String typeStat = "";
+                String typeStat;
                 int ix = 0;
-                boolean isCount = false;
+                boolean isCount;
 
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {

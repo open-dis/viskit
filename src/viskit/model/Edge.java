@@ -1,6 +1,6 @@
 package viskit.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -16,7 +16,7 @@ public abstract class Edge extends ViskitElement {
 
     public EventNode to;
     public EventNode from;
-    public ArrayList<ViskitElement> parameters;
+    public List<ViskitElement> parameters;
     public String conditional;
     public String conditionalDescription;
     public String delay;

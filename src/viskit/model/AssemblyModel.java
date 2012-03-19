@@ -1,25 +1,18 @@
 package viskit.model;
 
-import javax.swing.*;
+import edu.nps.util.FileIO;
+import edu.nps.util.LogUtils;
+import edu.nps.util.TempFileManager;
+import java.awt.Point;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Vector;
-
-import edu.nps.util.FileIO;
-import edu.nps.util.LogUtils;
-import edu.nps.util.TempFileManager;
 import viskit.FileBasedAssyNode;
 import viskit.ModelEvent;
 import viskit.ViskitAssemblyController;
@@ -70,33 +63,33 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
+    @Override
     public boolean isDirty() {
         return modelDirty;
     }
 
+    @Override
     public void setDirty(boolean wh) {
         modelDirty = wh;
     }
 
+    @Override
     public SimkitAssembly getJaxbRoot() {
         return jaxbRoot;
     }
 
+    @Override
     public GraphMetaData getMetaData() {
         return metaData;
     }
 
+    @Override
     public void changeMetaData(GraphMetaData gmd) {
         metaData = gmd;
         setDirty(true);
     }
 
-    /**
-     * Replace current model with one contained in the passed file.
-     *
-     * @param f the Assembly file to check open
-     * @return true for good open, else false
-     */
+    @Override
     public boolean newModel(File f) {
         getNodeCache().clear();
         pointLess = new Point(100, 100);
@@ -155,6 +148,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return true;
     }
 
+    @Override
     public void saveModel(File f) {
         if (f == null) {
             f = currentFile;
@@ -162,7 +156,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
         // file on a marshal error.
 
-        File tmpF = null;
+        File tmpF;
         FileWriter fw = null;
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
@@ -178,12 +172,6 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
-
-            String nm = f.getName();
-            int dot = -1;
-            if ((dot = nm.indexOf('.')) != -1) {
-                nm = nm.substring(0, dot);
-            }
 
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
@@ -212,12 +200,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     "\n" + e.getMessage() +
                     "\n(check for blank data fields)",
                     "XML I/O Error", JOptionPane.ERROR_MESSAGE);
-            return;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage(),
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
-            return;
         } finally {
             try {
                 fw.close();
@@ -225,7 +211,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
     }
 
-    /** @return a File object representing the last one passed to the two methods above */
+    @Override
     public File getLastFile() {
         return currentFile;
     }
@@ -234,6 +220,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
      *
      * @param v
      */
+    @Override
     public void externalClassesChanged(Vector<String> v) {
 
     }
@@ -284,6 +271,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return true;
     }
 
+    @Override
     public boolean nameExists(String name) {
         for (AssemblyNode n : getNodeCache().values()) {
             if (n.getName().equals(name)) {
@@ -293,12 +281,14 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return false;
     }
 
+    @Override
     public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
         newEventGraph(widgetName, node.loadedClass, p);
     }
 
+    @Override
     public void newEventGraph(String widgetName, String className, Point p) {
         EvGraphNode node = new EvGraphNode(widgetName, className);
         if (p == null) {
@@ -336,6 +326,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
     }
 
+    @Override
     public void newPropChangeListener(String widgetName, String className, Point p) {
         PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
         if (p == null) {
@@ -363,12 +354,14 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(pcNode, ModelEvent.PCLADDED, "Property Change Node added to assembly"));
     }
 
+    @Override
     public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
         newPropChangeListener(widgetName, node.loadedClass, p);
     }
 
+    @Override
     public AdapterEdge newAdapterEdge(String adName, AssemblyNode src, AssemblyNode target) {
         AdapterEdge ae = new AdapterEdge();
         ae.setFrom(src);
@@ -394,6 +387,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return ae;
     }
 
+    @Override
     public PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target) {
         PropChangeEdge pce = new PropChangeEdge();
         pce.setFrom(src);
@@ -416,6 +410,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return pce;
     }
 
+    @Override
     public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) {
         SimEvListenerEdge sele = new SimEvListenerEdge();
         sele.setFrom(src);
@@ -437,28 +432,27 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
     }
 
+    @Override
     public void deleteEvGraphNode(EvGraphNode evNode) {
         SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
-        getNodeCache().remove(jaxbEv);
+        getNodeCache().remove(jaxbEv.getName());
         jaxbRoot.getSimEntity().remove(jaxbEv);
 
         modelDirty = true;
         this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event graph deleted"));
     }
 
+    @Override
     public void deletePCLNode(PropChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
-        getNodeCache().remove(pclNode);
+        getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
 
         modelDirty = true;
         this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
     }
 
-    /**
-     * Assembly nodes don't hold onto edges.
-     * @param pce
-     */
+    @Override
     public void deletePropChangeEdge(PropChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
@@ -468,6 +462,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
     }
 
+    @Override
     public void deleteSimEvLisEdge(SimEvListenerEdge sele) {
         SimEventListenerConnection sel_c = (SimEventListenerConnection) sele.opaqueModelObject;
 
@@ -477,6 +472,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
     }
 
+    @Override
     public void deleteAdapterEdge(AdapterEdge ae) {
         Adapter j_adp = (Adapter) ae.opaqueModelObject;
         jaxbRoot.getAdapter().remove(j_adp);
@@ -485,6 +481,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
     }
 
+    @Override
     public void changePclEdge(PropChangeEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
@@ -494,6 +491,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(pclEdge, ModelEvent.PCLEDGECHANGED, "PCL edge changed"));
     }
 
+    @Override
     public void changeAdapterEdge(AdapterEdge ae) {
         EvGraphNode src = (EvGraphNode) ae.getFrom();
         EvGraphNode targ = (EvGraphNode) ae.getTo();
@@ -513,6 +511,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGECHANGED, "Adapter edge changed"));
     }
 
+    @Override
     public void changeSimEvEdge(SimEvListenerEdge seEdge) {
         EvGraphNode src = (EvGraphNode) seEdge.getFrom();
         EvGraphNode targ = (EvGraphNode) seEdge.getTo();
@@ -526,6 +525,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         notifyChanged(new ModelEvent(seEdge, ModelEvent.SIMEVLISTEDGECHANGED, "SimEvListener edge changed"));
     }
 
+    @Override
     public boolean changePclNode(PropChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
@@ -589,6 +589,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return retcode;
     }
 
+    @Override
     public boolean changeEvGraphNode(EvGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
@@ -693,6 +694,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         vTL.add(op);
     }
 
+    @Override
     public Vector<String> getDetailedOutputEntityNames() {
         Vector<String> v = new Vector<String>();
         for (Output ot : jaxbRoot.getOutput()) {
@@ -706,7 +708,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         return v;
     }
 
-     public Vector<String> getVerboseOutputEntityNames() {
+    @Override
+    public Vector<String> getVerboseOutputEntityNames() {
         Vector<String> v = new Vector<String>();
         for (Verbose ot : jaxbRoot.getVerbose()) {
             Object entity = ot.getEntity();
@@ -928,7 +931,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
-        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl);
+        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl.getName());
         if (pNode != null) {
             return pNode;
         }
@@ -968,7 +971,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
-        EvGraphNode en = (EvGraphNode) getNodeCache().get(se);
+        EvGraphNode en = (EvGraphNode) getNodeCache().get(se.getName());
         if (en != null) {
             return en;
         }

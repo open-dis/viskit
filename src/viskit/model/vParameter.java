@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import viskit.VGlobals;
 
 /**
@@ -19,7 +20,7 @@ public class vParameter extends ViskitElement {
     private String comment = "";
     private String arrayType;
     private String[] arraySize;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -38,18 +39,22 @@ public class vParameter extends ViskitElement {
         this.comment = comment;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String pName) {
         name = pName;
     }
 
+    @Override
     public String getType() {
         return type;
     }
     
+    @Override
     public String getValue() {
         return value;
     }
@@ -58,6 +63,7 @@ public class vParameter extends ViskitElement {
         this.value = value;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
@@ -66,12 +72,14 @@ public class vParameter extends ViskitElement {
         this.comment = cmt;
     }
 
-    public void setType(String pType) {
+    @Override
+    public final void setType(String pType) {
         type = pType;
         arrayType = VGlobals.instance().stripArraySize(pType);
         arraySize = VGlobals.instance().getArraySize(pType);
     }
 
+    @Override
     public String getArrayType() {
         return arrayType;
     }
@@ -81,12 +89,12 @@ public class vParameter extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

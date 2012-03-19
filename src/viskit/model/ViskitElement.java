@@ -1,6 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,7 +58,7 @@ abstract public class ViskitElement {
 
     public abstract List<String> getDescriptionArray();
 
-    public abstract void setDescriptionArray(ArrayList<String> descriptionArray);
+    public abstract void setDescriptionArray(List<String> descriptionArray);
 
     public abstract String getOperationOrAssignment();
 

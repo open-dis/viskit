@@ -1,25 +1,13 @@
 package viskit.xsd.translator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import edu.nps.util.LogUtils;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-// Application specific imports
-import edu.nps.util.LogUtils;
 import org.apache.log4j.Logger;
 import viskit.AssemblyController;
 import viskit.xsd.bindings.eventgraph.*;
@@ -341,7 +329,7 @@ public class SimkitXML2Java {
 
     private int dims(String t) {
         int d = 0;
-        int s = 0;
+        int s;
 
         while ((s = t.indexOf("[")) > 0) {
             d++;

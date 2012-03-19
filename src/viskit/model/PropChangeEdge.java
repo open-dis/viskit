@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -17,7 +18,7 @@ public class PropChangeEdge extends AssemblyEdge {
     protected String property;
     private String name;
     private String type;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -60,12 +61,12 @@ public class PropChangeEdge extends AssemblyEdge {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

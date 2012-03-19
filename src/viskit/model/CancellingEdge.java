@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  */
 public class CancellingEdge extends Edge {
     private String type;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private String name;
     private boolean operation;
     private String operationOrAssignment;
@@ -30,6 +31,7 @@ public class CancellingEdge extends Edge {
         parameters = new ArrayList<ViskitElement>();
     }
 
+    @Override
     Object copyShallow() {
         CancellingEdge ce = new CancellingEdge();
         ce.opaqueViewObject = opaqueViewObject;
@@ -52,12 +54,12 @@ public class CancellingEdge extends Edge {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

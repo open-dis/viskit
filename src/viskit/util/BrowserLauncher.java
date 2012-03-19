@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import static javax.swing.event.HyperlinkEvent.EventType.ACTIVATED;
 import javax.swing.event.HyperlinkEvent;
+import static javax.swing.event.HyperlinkEvent.EventType.ACTIVATED;
 import javax.swing.event.HyperlinkListener;
 import org.apache.log4j.Logger;
 
@@ -20,6 +20,7 @@ public class BrowserLauncher implements HyperlinkListener {
     public static final String MAC = "Mac OS X";
     static Logger log = LogUtils.getLogger(BrowserLauncher.class);
     
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == ACTIVATED) {
             URL url = e.getURL();

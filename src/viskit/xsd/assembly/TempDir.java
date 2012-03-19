@@ -23,10 +23,10 @@ import java.io.IOException;
 
 public class TempDir {
 
-    private static DirDeleter deleterThread;
+    private static final DirDeleter DELETER_THREAD;
     static {
-        deleterThread = new DirDeleter();
-        Runtime.getRuntime().addShutdownHook(deleterThread);
+        DELETER_THREAD = new DirDeleter();
+        Runtime.getRuntime().addShutdownHook(DELETER_THREAD);
     }
 
     /**
@@ -46,7 +46,7 @@ public class TempDir {
         if (!tempFile.mkdir()) {
             throw new IOException();
         }
-        deleterThread.add(tempFile);
+        DELETER_THREAD.add(tempFile);
         return tempFile;
     }
 
@@ -64,7 +64,7 @@ public class TempDir {
         if (!tempFile.mkdir()) {
             throw new IOException();
         }
-        deleterThread.add(tempFile);
+        DELETER_THREAD.add(tempFile);
         return tempFile;
     }
 }

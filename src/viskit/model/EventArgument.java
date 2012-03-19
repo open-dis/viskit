@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,10 +13,10 @@ import java.util.ArrayList;
 public class EventArgument extends ViskitElement {
 
     private String stateVarType;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private String type;
     private String name;
-    private ArrayList<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<String>();
     private String value;
     private boolean operation;
     private String operationOrAssignment;
@@ -24,11 +25,11 @@ public class EventArgument extends ViskitElement {
     private String stateVarName;
     private String comment;
 
-    public ArrayList<String> getDescription() {
+    public List<String> getDescription() {
         return comments;
     }
 
-    public void setComments(ArrayList<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 
@@ -43,12 +44,12 @@ public class EventArgument extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

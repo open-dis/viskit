@@ -12,28 +12,28 @@ package viskit.mvc;
  *
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class mvcAbstractController implements mvcController
-{
-  private mvcView view;
-  private mvcModel model;
+public abstract class mvcAbstractController implements mvcController {
 
-  public mvcModel getModel()
-  {
-    return model;
-  }
+    private mvcView view;
+    private mvcModel model;
 
-  public mvcView getView()
-  {
-    return view;
-  }
+    @Override
+    public mvcModel getModel() {
+        return model;
+    }
 
-  public void setModel(mvcModel model)
-  {
-    this.model = model;
-  }
+    @Override
+    public mvcView getView() {
+        return view;
+    }
 
-  public void setView(mvcView view)
-  {
-    this.view = view;
-  }
+    @Override
+    public void setModel(mvcModel model) {
+        this.model = model;
+    }
+
+    @Override
+    public void setView(mvcView view) {
+        this.view = view;
+    }
 }

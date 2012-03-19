@@ -1,31 +1,23 @@
 package viskit.model;
 
+import edu.nps.util.FileIO;
+import edu.nps.util.TempFileManager;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-import edu.nps.util.FileIO;
-import edu.nps.util.TempFileManager;
 import viskit.ModelEvent;
 import viskit.ViskitController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
-import viskit.xsd.bindings.eventgraph.Event;
 
 /**
  * This is the "master" model of an event graph.  It should hold the node, edge and assembly
@@ -47,8 +39,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
     File currentFile;
-    HashMap<Event, EventNode> evNodeCache = new HashMap<Event, EventNode>();
-    HashMap<Object, Object> edgeCache = new HashMap<Object, Object>();
+    Map<Event, EventNode> evNodeCache = new HashMap<Event, EventNode>();
+    Map<Object, Object> edgeCache = new HashMap<Object, Object>();
     Vector<ViskitElement> stateVariables = new Vector<ViskitElement>();
     Vector<ViskitElement> simParameters = new Vector<ViskitElement>();
     private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;    
@@ -65,6 +57,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         metaData = new GraphMetaData(this);
     }
 
+    @Override
     public void init() {
         try {
             jc = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
@@ -77,38 +70,28 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
-    /**
-     * Boolean to signify whether the model has been changed since last disk save.
-     *
-     * @return true means changes have been made and it needs to be flushed.
-     */
+    @Override
     public boolean isDirty() {
         return modelDirty;
     }    
 
-    /**
-     * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
-     * @param dirt
-     */
+    @Override
     public void setDirty(boolean dirt) {
         modelDirty = dirt;
     }
 
+    @Override
     public GraphMetaData getMetaData() {
         return metaData;
     }
 
+    @Override
     public void changeMetaData(GraphMetaData gmd) {
         metaData = gmd;
         setDirty(true);
     }
 
-    /**
-     * Replace current model with one contained in the passed file.
-     *
-     * @param f the EventGraph file to check open
-     * @return true for good open, else false
-     */
+    @Override
     public boolean newModel(File f) {
         stateVariables.removeAllElements();
         simParameters.removeAllElements();
@@ -131,7 +114,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 mymetaData.extendsPackageName = jaxbRoot.getExtend();
                 mymetaData.implementsPackageName = jaxbRoot.getImplement();
                 List<String> lis = jaxbRoot.getComment();
-                StringBuffer sb = new StringBuffer("");
+                StringBuilder sb = new StringBuilder("");
                 for (String comment : lis) {
                     sb.append(comment);
                     sb.append(" ");
@@ -168,6 +151,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         return true;
     }
 
+    @Override
     public void saveModel(File f) {
         if (f == null) {
             f = currentFile;
@@ -176,7 +160,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
         // file on a marshal error.
 
-        File tmpF = null;
+        File tmpF;
         FileWriter fw = null;
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
@@ -190,14 +174,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         try {
             fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
-
-            String nm = f.getName();
-            int dot = -1;
-            if ((dot = nm.indexOf('.')) != -1) {
-                nm = nm.substring(0, dot);
-            }
 
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
@@ -236,7 +214,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
-    /** @return a File object representing the last one passed to the two methods above */
+    @Override
     public File getLastFile() {
         return currentFile;
     }
@@ -271,7 +249,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private String concatStrings(List<String> lis) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String s : lis) {
             sb.append(s);
             if (sb.length() > 0 && sb.charAt(sb.length() - 1) != ' ') {
@@ -295,7 +273,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     private String mangleName(String name) {
         int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
-        StringBuffer sb = new StringBuffer(name);
+        StringBuilder sb = new StringBuilder(name);
         if (sb.charAt(sb.length() - 1) == '_') {
             sb.setLength(sb.length() - 6);
         }
@@ -437,7 +415,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     
     private void buildScheduleEdgeFromJaxb(EventNode src, Schedule ed) {
         SchedulingEdge se = new SchedulingEdge();
-        String s = null;
+        String s;
         se.opaqueModelObject = ed;
 
         se.from = src;
@@ -485,7 +463,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         List<String> cmt = ed.getComment();
         if (!cmt.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (String comment : cmt) {
                 sb.append(comment);
                 sb.append("  ");
@@ -509,7 +487,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         List<String> cmt = ed.getComment();
         if (!cmt.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (String comment : cmt) {
                 sb.append(comment);
                 sb.append("  ");
@@ -592,24 +570,28 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
+    @Override
     public Vector<ViskitElement> getAllNodes() {
         return new Vector<ViskitElement>(evNodeCache.values());
     }
     
     // TODO: Known unchecked cast to ViskitElement
     @SuppressWarnings("unchecked")
+    @Override
     public Vector<ViskitElement> getStateVariables() {
         return (Vector<ViskitElement>) stateVariables.clone();
     }
 
     // TODO: Known unchecked cast to ViskitElement
     @SuppressWarnings("unchecked")
+    @Override
     public Vector<ViskitElement> getSimParameters() {
         return (Vector<ViskitElement>) simParameters.clone();
     }
 
     // parameter mods
     // --------------
+    @Override
     public void newSimParameter(String nm, String typ, String xinitVal, String comment) {
         setDirty(true);
 
@@ -637,6 +619,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
     }
 
+    @Override
     public void deleteSimParameter(vParameter vp) {
         // remove jaxb variable
         jaxbRoot.getParameter().remove(vp.opaqueModelObject);
@@ -645,11 +628,13 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
     }
 
+    @Override
     public void changeCodeBlock(String s) {
         jaxbRoot.setCode(s);
         setDirty(true);
     }
 
+    @Override
     public boolean changeSimParameter(vParameter vp) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
@@ -673,6 +658,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     // State variable mods
     // -------------------
+    @Override
     public void newStateVariable(String name, String type, String xinitVal, String comment) {
         setDirty(true);
 
@@ -696,6 +682,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
     }
 
+    @Override
     public void deleteStateVariable(vStateVariable vsv) {
         // remove jaxb variable
         jaxbRoot.getStateVariable().remove(vsv.opaqueModelObject);
@@ -704,6 +691,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
     }
 
+    @Override
     public boolean changeStateVariable(vStateVariable vsv) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
@@ -727,11 +715,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     // Event (node) mods
     // -----------------
-    /**
-     * Add a new event to the graph with the given label, at the given point
-     * @param nodeName the name of the Event Node
-     * @param p the (x, y) position of the Event Node
-     */
+    @Override
     public void newEvent(String nodeName, Point p) {
         EventNode node = new EventNode(nodeName);
         if (p == null) {
@@ -757,11 +741,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTADDED, "Event added"));
     }
 
-    /**
-     * Delete the referenced event, also deleting attached edges.
-     *
-     * @param node
-     */
+    @Override
     public void deleteEvent(EventNode node) {
         Event jaxbEv = (Event) node.opaqueModelObject;
         evNodeCache.remove(jaxbEv);
@@ -782,6 +762,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
     private int locVarNameSequence = 0;
 
+    @Override
     public String generateLocalVariableName() {
         String nm = null;
         do {
@@ -791,11 +772,13 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     }
 
+    @Override
     public void resetLVNameGenerator() {
         locVarNameSequence = 0;
     }
     private int idxVarNameSequence = 0;
 
+    @Override
     public String generateIndexVariableName() {
         String nm = null;
         do {
@@ -804,6 +787,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         return nm;
     }
 
+    @Override
     public void resetIdxNameGenerator() {
         idxVarNameSequence = 0;
     }
@@ -834,6 +818,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         return true;
     }
 
+    @Override
     public String generateStateVariableName() {
         String nm = null;
         int startnum = 0;
@@ -907,6 +892,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
     }
 
+    @Override
     public boolean changeEvent(EventNode node) {
         boolean retcode = true;
         if (!eventNameCheck()) {
@@ -947,6 +933,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     // Edge mods
     // ---------
     
+    @Override
     public void newEdge(EventNode src, EventNode target) {
         SchedulingEdge se = new SchedulingEdge();
         se.from = src;
@@ -980,6 +967,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
     }
 
+    @Override
     public void newCancelEdge(EventNode src, EventNode target) {
         CancellingEdge ce = new CancellingEdge();
         ce.from = src;
@@ -1011,6 +999,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         this.notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Edge added"));
     }
 
+    @Override
     public void deleteEdge(SchedulingEdge edge) {
         _commonEdgeDelete(edge);
 
@@ -1030,6 +1019,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         edgeCache.remove(edg);
     }
 
+    @Override
     public void deleteCancelEdge(CancellingEdge edge) {
         _commonEdgeDelete(edge);
 
@@ -1037,6 +1027,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGEDELETED, "Cancelling edge deleted"));
     }
 
+    @Override
     public void changeEdge(SchedulingEdge e) {
         Schedule sch = (Schedule) e.opaqueModelObject;
         sch.setCondition(e.conditional);
@@ -1059,6 +1050,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         this.notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
     }
 
+    @Override
     public void changeCancelEdge(CancellingEdge e) {
         Cancel can = (Cancel) e.opaqueModelObject;
         can.setCondition(e.conditional);

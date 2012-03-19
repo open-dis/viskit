@@ -5,17 +5,16 @@
  */
 package viskit.xsd.assembly;
 
+import edu.nps.util.LogUtils;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-
-import edu.nps.util.LogUtils;
-import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -107,7 +106,7 @@ public class ReportStatisticsConfig {
         if (keyValues.size() > 0) {
             System.out.println("Replication Statistic(s) created");
             System.out.println("--------------------------------");
-            int seperator = 0;
+            int seperator;
             int idx = 0;
             for (String key : keyValues) {
                 seperator = findUnderscore(key);

@@ -1,45 +1,18 @@
 package viskit.xsd.assembly;
 
-import java.io.FileNotFoundException;
+import edu.nps.util.LogUtils;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.TreeSet;
-import java.util.SortedSet;
-import java.util.LinkedHashMap;
-import java.util.ListIterator;
+import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
-
-import edu.nps.util.LogUtils;
+import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.AssemblyController;
-import viskit.xsd.bindings.assembly.Adapter;
-import viskit.xsd.bindings.assembly.FactoryParameter;
-import viskit.xsd.bindings.assembly.MultiParameter;
-import viskit.xsd.bindings.assembly.Output;
-import viskit.xsd.bindings.assembly.PropertyChangeListener;
-import viskit.xsd.bindings.assembly.PropertyChangeListenerConnection;
-import viskit.xsd.bindings.assembly.Results;
-import viskit.xsd.bindings.assembly.Schedule;
-import viskit.xsd.bindings.assembly.SimEntity;
-import viskit.xsd.bindings.assembly.SimEventListenerConnection;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.bindings.assembly.TerminalParameter;
-import viskit.xsd.bindings.assembly.Verbose;
+import viskit.xsd.bindings.assembly.*;
 
 /**
  * @author  Rick Goldberg
@@ -622,11 +595,11 @@ public class SimkitAssemblyXML2Java {
     void buildListeners(StringWriter listeners) {
         
         PrintWriter pw = new PrintWriter(listeners);
-        LinkedHashMap<String, PropertyChangeListener> replicationStats = new LinkedHashMap<String, PropertyChangeListener>();
-        LinkedHashMap<String, PropertyChangeListener> designPointStats = new LinkedHashMap<String, PropertyChangeListener>();
-        LinkedHashMap<String, PropertyChangeListener> propertyChangeListeners = new LinkedHashMap<String, PropertyChangeListener>();
-        LinkedHashMap<String, ArrayList<PropertyChangeListenerConnection>> propertyChangeListenerConnections = 
-                new LinkedHashMap<String, ArrayList<PropertyChangeListenerConnection>>();
+        Map<String, PropertyChangeListener> replicationStats = new LinkedHashMap<String, PropertyChangeListener>();
+        Map<String, PropertyChangeListener> designPointStats = new LinkedHashMap<String, PropertyChangeListener>();
+        Map<String, PropertyChangeListener> propertyChangeListeners = new LinkedHashMap<String, PropertyChangeListener>();
+        Map<String, List<PropertyChangeListenerConnection>> propertyChangeListenerConnections = 
+                new LinkedHashMap<String, List<PropertyChangeListenerConnection>>();
         
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
@@ -647,7 +620,7 @@ public class SimkitAssemblyXML2Java {
                 
         for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
             String name = pclc.getListener();
-            ArrayList<PropertyChangeListenerConnection> connections = propertyChangeListenerConnections.get(name);
+            List<PropertyChangeListenerConnection> connections = propertyChangeListenerConnections.get(name);
             if (connections == null) {
                 connections = new ArrayList<PropertyChangeListenerConnection>();
                 propertyChangeListenerConnections.put(name, connections);
@@ -708,7 +681,7 @@ public class SimkitAssemblyXML2Java {
             
             pw.println(sp8 + rp + sc);
             pw.println();
-            ArrayList<PropertyChangeListenerConnection> myConnections =
+            List<PropertyChangeListenerConnection> myConnections =
                     propertyChangeListenerConnections.get(propChangeListener);
             if (myConnections != null) {
                 for (PropertyChangeListenerConnection pclc : myConnections) {

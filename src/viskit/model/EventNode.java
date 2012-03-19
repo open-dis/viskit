@@ -1,11 +1,10 @@
 package viskit.model;
 
-import viskit.xsd.bindings.eventgraph.Event;
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import viskit.xsd.bindings.eventgraph.Event;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -61,10 +60,12 @@ public class EventNode extends ViskitElement {
         return en;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String s) {
         if (this.opaqueModelObject != null) {
             ((Event) opaqueModelObject).setName(s);
@@ -76,7 +77,7 @@ public class EventNode extends ViskitElement {
         return arguments;
     }
 
-    public void setArguments(ArrayList<ViskitElement> arguments) {
+    public void setArguments(List<ViskitElement> arguments) {
         this.arguments = arguments;
     }
 
@@ -84,7 +85,7 @@ public class EventNode extends ViskitElement {
         return comments;
     }
 
-    public void setComments(ArrayList<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 
@@ -116,7 +117,7 @@ public class EventNode extends ViskitElement {
         return transitions;
     }
 
-    public void setTransitions(ArrayList<ViskitElement> transitions) {
+    public void setTransitions(List<ViskitElement> transitions) {
         this.transitions = transitions;
     }
 
@@ -144,7 +145,7 @@ public class EventNode extends ViskitElement {
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

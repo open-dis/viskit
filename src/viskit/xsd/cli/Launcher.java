@@ -1,25 +1,13 @@
 package viskit.xsd.cli;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.jar.JarOutputStream;
 
 public class Launcher extends Thread implements Runnable {
@@ -138,7 +126,7 @@ public class Launcher extends Thread implements Runnable {
                     launchGUI();
                 }
             } catch (Exception e) {
-                ;
+                
             }
 
         } catch (Exception e) {
@@ -183,11 +171,11 @@ public class Launcher extends Thread implements Runnable {
      * @param assemblyURL
      * @throws java.lang.Exception 
      */
-    public void setAssembly(URL assemblyURL) throws Exception {
+    public final void setAssembly(URL assemblyURL) throws Exception {
         URLConnection urlc = assemblyURL.openConnection();
         InputStream is = urlc.getInputStream();
-        int c = 0;
-        StringBuffer xml = new StringBuffer();
+        int c;
+        StringBuilder xml = new StringBuilder();
         while ((c = is.read()) > -1) {
             xml.append((char) c);
         }
@@ -239,8 +227,8 @@ public class Launcher extends Thread implements Runnable {
      * @throws java.lang.Exception 
      */
     public void addEventGraph(InputStream is) throws Exception {
-        int c = 0;
-        StringBuffer xml = new StringBuffer();
+        int c;
+        StringBuilder xml = new StringBuilder();
         // for some reason, maybe OS dependent, reading from 
         // a jar stream marker sometimes doesn't work for reads
         // greater than one char at a time, particularly signed
@@ -274,12 +262,12 @@ public class Launcher extends Thread implements Runnable {
                 System.out.println(xml.toString());
             }
         } catch (Exception e) {
-            ;
+            
         } // silent this may not be an event-graph xml
 
     }
 
-    public void addEventGraph(URL eventGraphURL) throws Exception {
+    public final void addEventGraph(URL eventGraphURL) throws Exception {
         URLConnection urlc = eventGraphURL.openConnection();
         addEventGraph(urlc.getInputStream());
     }
@@ -374,7 +362,7 @@ public class Launcher extends Thread implements Runnable {
                     // translate xml to generate java source
                     m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                     out = m.invoke(out, new Object[]{});
-                    eventGraphJava = new String((String) out);
+                    eventGraphJava = (String) out;
                     if (debug) {
                         System.out.println(eventGraphJava);
                     }
@@ -420,7 +408,7 @@ public class Launcher extends Thread implements Runnable {
                 // translate xml to generate java source
                 m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                 out = m.invoke(out, new Object[]{});
-                assemblyJava = new String((String) out);
+                assemblyJava = (String) out;
                 if (debug) {
                     System.out.println(assemblyJava);
                 }
@@ -534,7 +522,7 @@ public class Launcher extends Thread implements Runnable {
                 // translate xml to generate java source
                 m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                 out = m.invoke(out, new Object[]{});
-                eventGraphJava = new String((String) out);
+                eventGraphJava = (String) out;
                 if (debug) {
                     System.out.println(eventGraphJava);
                 }

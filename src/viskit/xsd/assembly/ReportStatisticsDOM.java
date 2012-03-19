@@ -6,7 +6,7 @@
 package viskit.xsd.assembly;
 
 import java.util.HashMap;
-
+import java.util.Map;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -31,7 +31,7 @@ public class ReportStatisticsDOM {
     /**
      * The collection of SimEntityRecords sorted by entityName
      */
-    private HashMap<String, SimEntityRecord> entities;
+    private Map<String, SimEntityRecord> entities;
     /**
      *The names that correspond to the order of the data being sent
      */
@@ -123,7 +123,7 @@ public class ReportStatisticsDOM {
         String entityName;
         String property;
         Element simEntity, sumReport;
-        HashMap<String, Element> dataPointMap = new HashMap<String, Element>();
+        Map<String, Element> dataPointMap = new HashMap<String, Element>();
 
         SimEntityRecord(String entityName) {
             //Initialize the default layout

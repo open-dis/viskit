@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  */
 public class EventStateTransition extends ViskitElement {
     
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private String type;
     private String name;
     private String arrayType;
@@ -19,7 +20,7 @@ public class EventStateTransition extends ViskitElement {
     private String stateVarType = "";
     private String operationOrAssignment = "";
     private boolean isOperation = false;
-    private ArrayList<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<String>();
     private String indexingExpression = "";
     private String value;
     private String comment;
@@ -48,14 +49,15 @@ public class EventStateTransition extends ViskitElement {
         }
     }
 
-    public ArrayList<String> getComments() {
+    public List<String> getComments() {
         return comments;
     }
 
-    public void setComments(ArrayList<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 
+    @Override
     public boolean isOperation() {
         return isOperation;
     }
@@ -64,6 +66,7 @@ public class EventStateTransition extends ViskitElement {
         isOperation = operation;
     }
 
+    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -72,6 +75,7 @@ public class EventStateTransition extends ViskitElement {
         this.operationOrAssignment = operationOrAssignment;
     }
 
+    @Override
     public String getStateVarName() {
         return stateVarName;
     }
@@ -80,6 +84,7 @@ public class EventStateTransition extends ViskitElement {
         this.stateVarName = stateVarName;
     }
 
+    @Override
     public String getStateVarType() {
         return stateVarType;
     }
@@ -88,6 +93,7 @@ public class EventStateTransition extends ViskitElement {
         this.stateVarType = stateVarType;
     }
 
+    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -117,12 +123,12 @@ public class EventStateTransition extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

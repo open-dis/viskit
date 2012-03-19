@@ -24,8 +24,10 @@
  */
 
 package viskit.xsd.assembly;
-import simkit.random.MersenneTwister;
+
 import java.util.ArrayList;
+import java.util.List;
+import simkit.random.MersenneTwister;
 
 /**
  *
@@ -33,7 +35,6 @@ import java.util.ArrayList;
  */
 public class LatinPermutator {
     MersenneTwister rnd;
-    ArrayList set;
     int size;
     int[] row;
     int[] col;
@@ -152,8 +153,8 @@ public class LatinPermutator {
     }
     
     void randomSquare() {
-        ArrayList<Integer> r = new ArrayList<Integer>();
-        ArrayList<Integer> c = new ArrayList<Integer>();
+        List<Integer> r = new ArrayList<Integer>();
+        List<Integer> c = new ArrayList<Integer>();
         
         for ( int i = 0; i < size; i ++) {
             r.add(new Integer(i));

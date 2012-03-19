@@ -1,14 +1,13 @@
 package viskit.xsd.assembly;
 
+import static edu.nps.util.GenericConversion.toArray;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 import simkit.Adapter;
 import simkit.SimEntity;
 import simkit.stat.SampleStatistics;
-import static edu.nps.util.GenericConversion.toArray;
 
 /** BasicAssembly doesn't provide Viskit users with ability to 
  * reference a known SimEntity within a constructor. This class 
@@ -60,6 +59,7 @@ public class ViskitAssembly extends BasicAssembly {
     
     /** to be called after all entities have been added as a super() */
     /*  note not using template version of ArrayList... */
+    @Override
     protected void createSimEntities() {
         if (entities != null) {
             if (entities.values() != null) {
@@ -68,6 +68,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
+    @Override
     protected void createReplicationStats() {
         replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener sampleStats : replicationStats) {
@@ -87,6 +88,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
     
+    @Override
     protected void createPropertyChangeListeners() {
         propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener pcl : propertyChangeListener) {
@@ -99,6 +101,7 @@ public class ViskitAssembly extends BasicAssembly {
         super.performHookups();
     }
    
+    @Override
     public void hookupSimEventListeners() {
         String[] listeners = toArray(simEventListenerConnections.keySet(), new String[0]);
         if(debug) {
@@ -118,6 +121,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
     
      
+    @Override
     public void hookupReplicationListeners() {        
         String[] listeners = toArray(replicationStatsListenerConnections.keySet(), new String[0]);
         for (String listener : listeners) {
@@ -131,6 +135,7 @@ public class ViskitAssembly extends BasicAssembly {
             }
         }
     }
+    
     @Override
     protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();

@@ -34,9 +34,7 @@ public interface ViskitModel {
      */
     void saveModel(File f);
 
-    /**
-     * @return A File object representing the last one passed to the two methods above.
-     */
+    /** @return a File object representing the last one passed to the two methods above */
     File getLastFile();
 
     /**
@@ -64,13 +62,22 @@ public interface ViskitModel {
      */
     Vector<? extends ViskitElement> getSimParameters();
 
-    // todo further comments...
+    /**
+     * Add a new event to the graph with the given label, at the given point
+     * @param nodeName the name of the Event Node
+     * @param p the (x, y) position of the Event Node
+     */
     void newEvent(String nodeName, Point p);
 
     void newEdge(EventNode src, EventNode target);
 
     void newCancelEdge(EventNode src, EventNode target);
 
+    /**
+     * Delete the referenced event, also deleting attached edges.
+     *
+     * @param node the node to delete
+     */
     void deleteEvent(EventNode node);
 
     void deleteEdge(SchedulingEdge edge);
@@ -101,6 +108,10 @@ public interface ViskitModel {
 
     GraphMetaData getMetaData();
 
+    /**
+     * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
+     * @param dirt
+     */
     void setDirty(boolean dirty);
 
     String generateLocalVariableName();

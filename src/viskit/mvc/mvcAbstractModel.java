@@ -1,6 +1,7 @@
 package viskit.mvc;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract root class of the model hierarchy.  Provides basic notification behavior.
@@ -12,14 +13,14 @@ import java.util.ArrayList;
  * Naval Postgraduate School, Monterey CA
  * www.nps.edu
  * @author Mike Bailey
- * @since Mar 2, 2004
- * @since 11:04:25 AM
+ * @since Mar 2, 2004 : 11:04:25 AM
  * @version $Id$
  */
 public abstract class mvcAbstractModel implements mvcModel {
 
-    private ArrayList<mvcModelListener> listeners = new ArrayList<mvcModelListener>(4);
+    private List<mvcModelListener> listeners = new ArrayList<mvcModelListener>(4);
 
+    @Override
     public void notifyChanged(mvcModelEvent event) {
         
         for (mvcModelListener ml : listeners) {

@@ -23,6 +23,7 @@ public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileO
         this.messageString = messageString;
     }
 
+    @Override
     public void report(Diagnostic<? extends JavaFileObject> message) {
         String msg = message.getMessage(null);
         if (msg.indexOf("should be declared in a file named") > 0) {

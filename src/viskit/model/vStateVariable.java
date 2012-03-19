@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import viskit.VGlobals;
 
 /**
@@ -14,16 +15,20 @@ public class vStateVariable extends ViskitElement {
 
     /** Name of the state variable */
     private String variableName;
+    
     /** The variable type. This can be a primitive or a class name. */
     private String variableType;
+    
     /** The above field holds the size within the brackets **/
     private String arrayVariableType;
+    
     /** array size, for (multi-dim) array */
     private String[] arraySize;
+    
     /** Object that represents its current value */
     private Object currentValue;
     private String comment = "";
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -57,6 +62,7 @@ public class vStateVariable extends ViskitElement {
      *
      * @return name of state variable
      */
+    @Override
     public String getName() {
         return variableName;
     }
@@ -66,6 +72,7 @@ public class vStateVariable extends ViskitElement {
      *
      * @param pVariableName what the state variable name will become
      */
+    @Override
     public void setName(String pVariableName) {
         variableName = pVariableName;
     }
@@ -75,8 +82,9 @@ public class vStateVariable extends ViskitElement {
      * be a primitive type (int, double, float, etc) or an Object (String,
      * container, etc.).
      *
-     * @return string represenatation of the type of the variable
+     * @return string representation of the type of the variable
      */
+    @Override
     public String getType() {
         return variableType;
     }
@@ -86,14 +94,16 @@ public class vStateVariable extends ViskitElement {
      * type is valid; this will happily accept a class name string that
      * does not exist.
      *
-     * @param pVariableType represenation of the type of the state variable
+     * @param pVariableType representation of the type of the state variable
      */
-    public void setType(String pVariableType) {
+    @Override
+    public final void setType(String pVariableType) {
         variableType = pVariableType;
         arrayVariableType = VGlobals.instance().stripArraySize(pVariableType);
         arraySize = VGlobals.instance().getArraySize(pVariableType);
     }
 
+    @Override
     public String getArrayType() {
         return arrayVariableType;
     }
@@ -118,6 +128,7 @@ public class vStateVariable extends ViskitElement {
         currentValue = pCurrentValue;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
@@ -127,12 +138,12 @@ public class vStateVariable extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

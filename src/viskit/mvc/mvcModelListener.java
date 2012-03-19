@@ -12,7 +12,13 @@ package viskit.mvc;
  *
  * From an article at www.jaydeetechnology.co.uk
  */
-public interface mvcModelListener
-{
-  public void modelChanged(mvcModelEvent event);
+public interface mvcModelListener {
+
+    /**
+     * This is where the "master" model (simkit.viskit.model.Model) updates the
+     * view. Not so much to do in this editor as in EventGraphViewFrame
+     *
+     * @param event the instance when our model has changed
+     */
+    void modelChanged(mvcModelEvent event);
 }

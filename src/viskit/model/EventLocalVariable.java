@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import viskit.VGlobals;
 
 /**
@@ -19,7 +20,7 @@ public class EventLocalVariable extends ViskitElement {
     private String comment = "";
     private String arrayType;
     private String[] arraySize;
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private String indexingExpression;
     private String stateVarName;
     private boolean operation;
@@ -32,6 +33,7 @@ public class EventLocalVariable extends ViskitElement {
         this.value = value;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
@@ -40,18 +42,22 @@ public class EventLocalVariable extends ViskitElement {
         this.comment = comment;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
@@ -60,12 +66,14 @@ public class EventLocalVariable extends ViskitElement {
         this.value = value;
     }
 
-    public void setType(String pType) {
+    @Override
+    public final void setType(String pType) {
         type = pType;
         arrayType = VGlobals.instance().stripArraySize(pType);
         arraySize = VGlobals.instance().getArraySize(pType);
     }
 
+    @Override
     public String getArrayType() {
         return arrayType;
     }
@@ -75,12 +83,12 @@ public class EventLocalVariable extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

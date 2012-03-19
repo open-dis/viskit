@@ -15,6 +15,7 @@
 package viskit.util;
 
 // Standard Library Imports
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,9 +26,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-
-// Applcation Specific Local Imports
-import edu.nps.util.LogUtils;
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -201,6 +199,7 @@ public class XMLValidationTool {
             valid = false;
         }
 
+        @Override
         public void warning(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Warning: ");
@@ -211,6 +210,7 @@ public class XMLValidationTool {
          * reported here
          * @param ex 
          */
+        @Override
         public void error(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Error: ");
@@ -220,6 +220,7 @@ public class XMLValidationTool {
         /**
          * @param ex 
          * @throws SAXParseException on fatal errors */
+        @Override
         public void fatalError(SAXParseException ex) throws SAXParseException {
             setMessage(ex);
             writeMessage("Fatal: ");

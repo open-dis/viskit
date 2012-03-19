@@ -1,6 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 public class vEdgeParameter extends ViskitElement {
 
     private String stateVarType;    
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private String type;    
     private String name;    
     public String bogus; //todo fix
@@ -28,14 +29,17 @@ public class vEdgeParameter extends ViskitElement {
         this.value = value;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
@@ -55,12 +59,12 @@ public class vEdgeParameter extends ViskitElement {
     }
 
     @Override
-    public ArrayList<String> getDescriptionArray() {
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
     @Override
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 

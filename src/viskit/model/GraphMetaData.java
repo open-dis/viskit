@@ -1,7 +1,7 @@
 package viskit.model;
 
-import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.bindings.eventgraph.SimEntity;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

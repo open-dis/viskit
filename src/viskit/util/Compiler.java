@@ -1,7 +1,6 @@
 package viskit.util;
 
 import edu.nps.util.LogUtils;
-import viskit.*;
 import java.io.File;
 import java.util.Arrays;
 import javax.tools.JavaCompiler;
@@ -9,6 +8,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 
 /** Using the java compiler now part of javax, we no longer have to 
  * either ship tools.jar or require a jdk environment variable.
@@ -37,7 +37,7 @@ public class Compiler {
         StringBuilder sb = new StringBuilder();
         CompilerDiagnosticsListener diag = new CompilerDiagnosticsListener(diagnosticMessages);
         JavaObjectFromString jofs = null;
-        StringBuilder classPaths = null;
+        StringBuilder classPaths;
         String cp = null;
 
         try {

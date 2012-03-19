@@ -1,8 +1,9 @@
 package viskit.model;
 
-import java.util.Vector;
-import java.util.ArrayList;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -19,7 +20,7 @@ public abstract class AssemblyNode extends ViskitElement {
     private String name;
     private String type;
     private Vector<AssemblyEdge> connections = new Vector<AssemblyEdge>();
-    private ArrayList<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<String>();
     private Point position = new Point(0, 0);
     private VInstantiator instantiator;
     private String descriptionString = "";  // instance information
@@ -31,27 +32,31 @@ public abstract class AssemblyNode extends ViskitElement {
         instantiator = new VInstantiator.FreeF(type, "");
     }
     
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String s) {
         this.name = s;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String typ) {
         this.type = typ;
     }
 
-    public ArrayList<String> getComments() {
+    public List<String> getComments() {
         return comments;
     }
 
-    public void setComments(ArrayList<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 

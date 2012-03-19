@@ -1,7 +1,7 @@
 package viskit.model;
 
 import java.util.ArrayList;
-
+import java.util.List;
 import viskit.Vstatics;
 
 /**
@@ -18,7 +18,7 @@ import viskit.Vstatics;
  */
 public class PropChangeListenerNode extends AssemblyNode {
     
-    private ArrayList<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<String>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -37,7 +37,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     }
 
     @Override
-    public void setType(String typ) {
+    public final void setType(String typ) {
         super.setType(typ);
 
         Class<?> myClass = Vstatics.classForName(typ);
@@ -86,42 +86,52 @@ public class PropChangeListenerNode extends AssemblyNode {
         getCount = b;
     }
 
-    public ArrayList<String> getDescriptionArray() {
+    @Override
+    public List<String> getDescriptionArray() {
         return descriptionArray;
     }
 
-    public void setDescriptionArray(ArrayList<String> descriptionArray) {
+    @Override
+    public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
     }
 
+    @Override
     public String getArrayType() {
         return arrayType;
     }
 
+    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
 
+    @Override
     public String getStateVarName() {
         return stateVarName;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
 
+    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
 
+    @Override
     public boolean isOperation() {
         return operation;
     }
 
+    @Override
     public String getStateVarType() {
         return stateVarType;
     }

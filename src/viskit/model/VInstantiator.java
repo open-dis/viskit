@@ -9,15 +9,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import viskit.Vstatics;
-import viskit.xsd.bindings.eventgraph.Parameter;
-import viskit.xsd.bindings.assembly.TerminalParameter;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
 import viskit.xsd.bindings.assembly.ObjectFactory;
+import viskit.xsd.bindings.assembly.TerminalParameter;
+import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -95,7 +94,7 @@ public abstract class VInstantiator {
             return value;
         }
 
-        public void setValue(String value) {
+        public final void setValue(String value) {
             this.value = value;
         }
 
@@ -104,6 +103,7 @@ public abstract class VInstantiator {
             return value;
         }
 
+        @Override
         public VInstantiator vcopy() {
             VInstantiator rv = new VInstantiator.FreeF(getType(), getValue());
             rv.setName(getName());
@@ -111,6 +111,7 @@ public abstract class VInstantiator {
             return rv;
         }
 
+        @Override
         public boolean isValid() {
             String t = getType();
             String v = getValue();
@@ -127,7 +128,7 @@ public abstract class VInstantiator {
         /** Takes a List of Assembly parameters and args for type
          *
          * @param params a list of Assembly parameters
-         * @param type a paramater type
+         * @param type a parameter type
          */
         public Constr(List<Object> params, String type) {
             super(type);
@@ -589,6 +590,7 @@ public abstract class VInstantiator {
             return rets + ")";
         }
 
+        @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<Object>();
             for (Object o : getArgs()) {
@@ -601,8 +603,9 @@ public abstract class VInstantiator {
             return rv;
         }
 
+        @Override
         public boolean isValid() {
-            if (getType() == null || getType().length() <= 0) {
+            if (getType() == null || getType().isEmpty()) {
                 return false;
             }
             for (Object o : getArgs()) {
@@ -633,6 +636,7 @@ public abstract class VInstantiator {
             setInstantiators(inst);
         }
 
+        @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<Object>();
             for (Object vi : getInstantiators()) {
@@ -662,8 +666,9 @@ public abstract class VInstantiator {
             }
         }
 
+        @Override
         public boolean isValid() {
-            if (getType() == null || getType().length() <= 0) {
+            if (getType() == null || getType().isEmpty()) {
                 return false;
             }
             for (Object vi : getInstantiators()) {
@@ -721,6 +726,7 @@ public abstract class VInstantiator {
             return factoryClass + "." + method + "(" + ((VInstantiator) params.get(0)).getType() + ",...)";
         }
 
+        @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<Object>();
             for (Object o : getParams()) {
@@ -733,6 +739,7 @@ public abstract class VInstantiator {
             return rv;
         }
 
+        @Override
         public boolean isValid() {
             String t = getType(), fc = getFactoryClass(), m = getMethod();
             if (t == null || fc == null || m == null ||

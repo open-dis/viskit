@@ -65,6 +65,7 @@ public class AssemblyHandler implements XmlRpcHandler {
      * methods. Realize that many users will be calling this all at once, globals strong-bad.
      */
     
+    @Override
     public Object execute(String methodName, Vector arguments) throws java.lang.Exception {
         Object ret;
         String call = methodName;
