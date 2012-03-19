@@ -159,8 +159,53 @@
         <echo message="https://savage.nps.edu/hudson/Viskit"/>
     </target>
 
+    <!-- some platform-unique initialization (,initializeWindows,initializeUnix,initializeMac) -->
+    <target name="platformInitialize" depends="platformType"/>
+    <target name="platformType">
+        <condition property="isWindows" >
+            <os family="windows"/>
+        </condition>
+        <condition property="isMac" >
+            <os family="mac"/>
+        </condition>
+        <!-- Based on Apache Ant user-manual example -->
+        <condition property="isUnixNotMac">
+            <and>
+                <os family="unix"/>
+
+                <not>
+                    <equals arg1="${os.name}" arg2="Mac OS X"/>
+                </not>
+
+            </and>
+        </condition>
+    </target>
+    <target name="initializeWindows" if="isWindows" depends="initializeAll">
+        <echo message="os.architecture.bitness=${os.architecture.bitness}"/>
+        <property name="run.args" value="${win_runarguments}"/>
+    </target>
+    <target name="initializeUnix" if="isUnixNotMac" depends="initializeAll">
+        <property name="run.args" value="${unix_runarguments}"/>
+    </target>
+    <target name="initializeMac" if="isMac" depends="initializeAll">
+        <property name="run.args" value="${mac_runarguments}"/>
+    </target>
+    <target name="initializeAll" >
+        <property name="win_runarguments"  value="${common.args} ${runarg6} ${runarg7}"/>
+        <property name="unix_runarguments" value="${common.args} ${runarg8} ${runarg9}"/>
+        <property name="mac_runarguments"  value="${common.args} ${runarg10} ${runarg11} ${runarg12} ${runarg13} ${runarg17}"/>
+    </target>
+  
+    <target name="check.JAVA_HOME" unless="env.JAVA_HOME" if="isWindows">
+        <echo message="warning:  JAVA_HOME not set!"/>
+    </target>
+    <target name="check.ANT_HOME" unless="env.ANT_HOME" if="isWindows">
+        <echo message="warning:  ANT_HOME not set!"/>
+    </target>
+
     <!--  === TARGET: init === -->
     <target name="init"
+            depends="platformInitialize,check.JAVA_HOME,check.ANT_HOME"
             description="Preparatory actions required for all targets">
         <tstamp/>
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
@@ -650,13 +695,9 @@
 
     </target>
 
-    <target name="checkJAVA_HOME" unless="env.JAVA_HOME">
-        <echo message="warning:  JAVA_HOME not set!"/>
-    </target>
-
     <!-- TARGET: Run w/Viskit custom splash -->
     <target name="build.run.with.extensions"
-            depends="build.viskit.with.extensions,checkJAVA_HOME"
+            depends="build.viskit.with.extensions"
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
@@ -698,7 +739,7 @@
 
     <!-- TARGET: Run w/Ant Splash @deprecated -->
     <target name="build.run"
-            depends="splashy,jar,runtime.extensions,checkJAVA_HOME"
+            depends="splashy,jar,runtime.extensions"
             description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.extensions)">
         <java classname="viskit.EventGraphAssemblyComboMain"
               classpathref="runtime.classpath"
