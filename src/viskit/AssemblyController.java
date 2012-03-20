@@ -678,9 +678,6 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return nextPoint;
     }
 
-    /**
-     *
-     */
     @Override
     public void newEventGraphNode() // menu click
     {
@@ -699,31 +696,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         ((ViskitAssemblyView) getView()).genericErrorReport("Can't create", "You must first select an Event Graph from the panel on the left.");
     }
 
-    /**
-     *
-     * @param typeName
-     * @param p
-     */
     @Override
     public void newEventGraphNode(String typeName, Point p) {
         String shName = shortEgName(typeName);
         ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
-    /**
-     *
-     * @param xnode
-     * @param p
-     */
     @Override
     public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
         ((ViskitAssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
-    /**
-     *
-     */
     @Override
     public void newPropChangeListenerNode() // menu click
     {
@@ -742,22 +726,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         ((ViskitAssemblyView) getView()).genericErrorReport("Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
 
-    /**
-     *
-     * @param name
-     * @param p
-     */
     @Override
     public void newPropChangeListenerNode(String name, Point p) {
         String shName = shortPCLName(name);
         ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
-    /**
-     *
-     * @param xnode
-     * @param p
-     */
     @Override
     public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
@@ -1477,48 +1451,18 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    /**
-     *
-     */
     public static final int EXEC_JAVACMD = 0;
-    /**
-     *
-     */
     public static final int EXEC_VMARG0 = 1;
-    /**
-     *
-     */
     public static final int EXEC_VMARG1 = 2;
-    /**
-     *
-     */
     public static final int EXEC_VMARG3 = 3;
-    /**
-     *
-     */
     public static final int EXEC_DASH_CP = 4;
-    /**
-     *
-     */
     public static final int EXEC_CLASSPATH = 5;
-    /**
-     *
-     */
     public static final int EXEC_TARGET_CLASS_NAME = 6;
-    /**
-     *
-     */
     public static final int EXEC_VERBOSE_SWITCH = 7;
-    /**
-     *
-     */
     public static final int EXEC_STOPTIME_SWITCH = 8;
-    /**
-     *
-     */
     public static final int EXEC_FIRST_ENTITY_NAME = 9;
 
-    /** Prepare for the compilation of the loaded assembly file from java source
+    /** Prepare for the compilation of the loaded assembly file from java source.
      * Maintain the above statics to match the order below.
      * @param className the name of the Assembly file to compile
      * @param classPath the current ClassLoader context
@@ -1536,9 +1480,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         sb.append("java");
         v.add(sb.toString());        // 0
 
-//        v.add("-Xss5M");             // 1
+        v.add("-Xss2m");             // 1
         v.add("-Xincgc");            // 2
-        v.add("-Xmx512M");           // 3
+        v.add("-Xmx512m");           // 3
         v.add("-cp");                // 4
         v.add(classPath);            // 5
         v.add(className);            // 6
@@ -1846,5 +1790,5 @@ class PkgAndFile {
 }
 
 interface AssemblyRunnerPlug {
-    public void exec(String[] execStrings);
+    void exec(String[] execStrings);
 }
