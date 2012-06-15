@@ -3,7 +3,7 @@ package viskit;
 import edu.nps.util.LogUtils;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-
+import java.util.Map;
 import simkit.random.*;
 
 /**
@@ -28,11 +28,11 @@ public class VsimkitObjects {
      * VGlobals uses this field, which combines all the methods below.
      * It does not use the individual methods.
      */
-    private static final HashMap<String, Object> HASH_MAP = new HashMap<String, Object>();
+    private static final Map<String, Object> HASH_MAP = new HashMap<String, Object>();
 
     static {
         try {
-            Class c = Vstatics.classForName("viskit.VsimkitObjects");
+            Class<?> c = Vstatics.classForName("viskit.VsimkitObjects");
             Method[] meths = c.getDeclaredMethods();
             for (Method method : meths) {
                 String name = method.getName();
@@ -189,7 +189,7 @@ public class VsimkitObjects {
     }
     
     public static Object get_random_NPPoissonProcessThinned() {
-        return new NPPoissonProcessThinned();
+        return new NPPoissonProcessThinnedVariate();
     }
 
     public static Object get_random_NSSrng() {
