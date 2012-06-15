@@ -1,14 +1,15 @@
 package viskit.jgraph;
 
-import org.jgraph.JGraph;
-import org.jgraph.graph.*;
-
-import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
-import viskit.VGlobals;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import org.jgraph.JGraph;
+import org.jgraph.graph.*;
 import viskit.model.AssemblyNode;
 
 /**
@@ -80,16 +81,22 @@ public class vAssemblyEgVertexRenderer
 
     /** Use this flag to control if groups should appear transparent. */
     protected boolean hideGroups = true;
+    
     /** Cache the current graph for drawing. */
     transient protected JGraph graph;
+    
     /** Cache the current shape for drawing. */
     transient protected VertexView view;
+    
     /** Cached hasFocus and selected value. */
     transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
+    
     /** Cached default foreground and default background. */
     transient protected Color defaultForeground,  defaultBackground,  bordercolor;
+    
     /** Cached borderwidth. */
     transient protected int borderWidth;
+    
     /** Cached value of the double buffered state */
     transient boolean isDoubleBuffered = false;
 
@@ -133,6 +140,7 @@ public class vAssemblyEgVertexRenderer
      * @param   preview whether we are drawing a preview.
      * @return	the component used to render the value.
      */
+    @Override
     public Component getRendererComponent(
             JGraph graph,
             CellView view,
@@ -144,17 +152,7 @@ public class vAssemblyEgVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-            if (graph.getEditingCell() != view.getCell()) {
-                Object label = graph.convertValueToString(view);
-                if (label != null) {
-                    ;
-                }//setText(label.toString());
-                else {
-                    ;
-                } //jmb setText(null);
-            } else {
-                ;
-            } // jmb setText(null);
+            
             this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
@@ -224,16 +222,16 @@ public class vAssemblyEgVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle r = view.getBounds();
+        Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
-        g2.fillRoundRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff, 20, 20);
+        g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         //g2.fillOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff); // size of rect is 54,54
         g2.setColor(Color.darkGray);
         //g2.drawOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff);
-        g2.drawRoundRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff, 20, 20);
+        g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
@@ -255,7 +253,7 @@ public class vAssemblyEgVertexRenderer
     }
 
     private String breakName(String name, int maxW, FontMetrics metrics) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
         for (int i = 0; i < n.length; i++) {
             String[] nn = splitIfNeeded(n[i], maxW, metrics);
@@ -374,43 +372,6 @@ public class vAssemblyEgVertexRenderer
             Dimension d = getSize();
             g.drawRect(0, 0, d.width - 1, d.height - 1);
         }
-    }
-
-    /**
-     * Returns the intersection of the bounding rectangle and the
-     * straight line between the source and the specified point p.
-     * The specified point is expected not to intersect the bounds.
-     */
-    public Point getPerimeterPoint(VertexView view, Point source, Point p) {
-        Rectangle bounds = view.getBounds();
-        int x = bounds.x;
-        int y = bounds.y;
-        int width = bounds.width;
-        int height = bounds.height;
-        int xCenter = (x + width / 2);
-        int yCenter = (y + height / 2);
-        int dx = p.x - xCenter; // Compute Angle
-        int dy = p.y - yCenter;
-        double alpha = Math.atan2(dy, dx);
-        int xout = 0, yout = 0;
-        double pi = Math.PI;
-        double pi2 = Math.PI / 2.0;
-        double beta = pi2 - alpha;
-        double t = Math.atan2(height, width);
-        if (alpha < -pi + t || alpha > pi - t) { // Left edge
-            xout = x;
-            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
-        } else if (alpha < -t) { // Top Edge
-            yout = y;
-            xout = xCenter - (int) (height * Math.tan(beta) / 2);
-        } else if (alpha < t) { // Right Edge
-            xout = x + width;
-            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
-        } else { // Bottom Edge
-            yout = y + height;
-            xout = xCenter + (int) (height * Math.tan(beta) / 2);
-        }
-        return new Point(xout, yout);
     }
 
     /**

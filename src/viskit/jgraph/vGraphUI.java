@@ -1,5 +1,10 @@
 package viskit.jgraph;
 
+import java.awt.event.MouseEvent;
+import java.util.Hashtable;
+import java.util.Map;
+import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
@@ -8,11 +13,6 @@ import viskit.model.CancellingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.SchedulingEdge;
-
-import javax.swing.*;
-import java.awt.event.MouseEvent;
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -32,7 +32,6 @@ public class vGraphUI extends BasicGraphUI {
 
     private JDialog editDialog;
     private vGraphComponent parent;
-
 
     // This will force snap-to-grid, but it won't make the lines straight: that's
     // due to the bezier line drawing code.
@@ -57,6 +56,7 @@ public class vGraphUI extends BasicGraphUI {
 
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ViskitController cntl = (ViskitController) vGraphUI.this.parent.parent.getController();     // todo fix this
                 if (cell instanceof vEdgeCell) {
@@ -106,7 +106,7 @@ public class vGraphUI extends BasicGraphUI {
                 graph.requestFocus();
             }
             if (messageGraph) {
-                Map map = GraphConstants.createMap();
+                Map map = graph.getGraphLayoutCache().createNestedMap();
                 GraphConstants.setValue(map, newValue);
                 Map<Object, Map> nested = new Hashtable<Object, Map>();
                 nested.put(oldCell, map);

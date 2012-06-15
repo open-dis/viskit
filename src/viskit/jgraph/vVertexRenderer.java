@@ -1,13 +1,15 @@
 package viskit.jgraph;
 
-import org.jgraph.JGraph;
-import org.jgraph.graph.*;
-
-import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import org.jgraph.JGraph;
+import org.jgraph.graph.*;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -77,19 +79,39 @@ public class vVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
-    /** Use this flag to control if groups should appear transparent. */
+    /**
+     * Use this flag to control if groups should appear transparent.
+     */
     protected boolean hideGroups = true;
-    /** Cache the current graph for drawing. */
+    
+    /**
+     * Cache the current graph for drawing.
+     */
     transient protected JGraph graph;
-    /** Cache the current shape for drawing. */
+    
+    /**
+     * Cache the current shape for drawing.
+     */
     transient protected VertexView view;
-    /** Cached hasFocus and selected value. */
-    transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
-    /** Cached default foreground and default background. */
-    transient protected Color defaultForeground,  defaultBackground,  bordercolor;
-    /** Cached borderwidth. */
+    
+    /**
+     * Cached hasFocus and selected value.
+     */
+    transient protected boolean hasFocus, selected, preview, opaque, childrenSelected;
+    
+    /**
+     * Cached default foreground and default background.
+     */
+    transient protected Color defaultForeground, defaultBackground, bordercolor;
+    
+    /**
+     * Cached borderwidth.
+     */
     transient protected int borderWidth;
-    /** Cached value of the double buffered state */
+    
+    /**
+     * Cached value of the double buffered state
+     */
     transient boolean isDoubleBuffered = false;
 
     /**
@@ -119,19 +141,19 @@ public class vVertexRenderer
     }
 
     /**
-     * Configure and return the renderer based on the passed in
-     * components. The value is typically set from messaging the
-     * graph with <code>convertValueToString</code>.
-     * We recommend you check the value's class and throw an
-     * illegal argument exception if it's not correct.
+     * Configure and return the renderer based on the passed in components. The
+     * value is typically set from messaging the graph with
+     * <code>convertValueToString</code>. We recommend you check the value's
+     * class and throw an illegal argument exception if it's not correct.
      *
-     * @param   graph the graph that that defines the rendering context.
-     * @param   view the object that should be rendered.
-     * @param   sel whether the object is selected.
-     * @param   focus whether the object has the focus.
-     * @param   preview whether we are drawing a preview.
+     * @param graph the graph that that defines the rendering context.
+     * @param view the object that should be rendered.
+     * @param sel whether the object is selected.
+     * @param focus whether the object has the focus.
+     * @param preview whether we are drawing a preview.
      * @return	the component used to render the value.
      */
+    @Override
     public Component getRendererComponent(
             JGraph graph,
             CellView view,
@@ -143,17 +165,7 @@ public class vVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-            if (graph.getEditingCell() != view.getCell()) {
-                Object label = graph.convertValueToString(view);
-                if (label != null) {
-                    ;
-                }// jmb	setText(label.toString());
-                else {
-                    ;
-                } //jmb setText(null);
-            } else {
-                ;
-            } // jmb setText(null);
+
             this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
@@ -166,7 +178,7 @@ public class vVertexRenderer
                 // jmb setText(null);
                 setBorder(null);
                 setOpaque(false);
-            // jmb setIcon(null);
+                // jmb setIcon(null);
             }
             return this;
         }
@@ -174,10 +186,9 @@ public class vVertexRenderer
     }
 
     /**
-     * Install the attributes of specified cell in this
-     * renderer instance. This means, retrieve every published
-     * key from the cells hashtable and set global variables
-     * or superclass properties accordingly.
+     * Install the attributes of specified cell in this renderer instance. This
+     * means, retrieve every published key from the cells hashtable and set
+     * global variables or superclass properties accordingly.
      *
      * @param view cell to retrieve the attribute values from.
      */
@@ -203,8 +214,7 @@ public class vVertexRenderer
     }
 
     /**
-     * Paint the renderer. Overrides superclass paint
-     * to add specific painting.
+     * Paint the renderer. Overrides superclass paint to add specific painting.
      */
     @Override
     public void paint(Graphics g) {
@@ -214,7 +224,7 @@ public class vVertexRenderer
             super.paint(g);   // jmb this will come down to paintCompoent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
-        // JDK Bug: Zero length string passed to TextLayout constructor
+            // JDK Bug: Zero length string passed to TextLayout constructor
         }
     }
     Color circColor = new Color(255, 255, 204); // pale yellow
@@ -223,14 +233,14 @@ public class vVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle r = view.getBounds();
+        Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
-        g2.fillOval(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff); // size of rect is 54,54
+        g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
         g2.setColor(Color.darkGray);
-        g2.drawOval(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff);
+        g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
 
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
@@ -251,7 +261,7 @@ public class vVertexRenderer
     }
 
     private String breakName(String name, int maxW, FontMetrics metrics) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
         for (int i = 0; i < n.length; i++) {
             String[] nn = splitIfNeeded(n[i], maxW, metrics);
@@ -320,11 +330,11 @@ public class vVertexRenderer
 
     @Override
     protected void paintBorder(Graphics g) {
-    // jmb lose the rectangle super.paintBorder(g);
+        // jmb lose the rectangle super.paintBorder(g);
     }
 
     /**
-     * Provided for subclassers to paint a selection border.
+     * Provided for subclasses to paint a selection border.
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
@@ -343,82 +353,40 @@ public class vVertexRenderer
     }
 
     /**
-     * Returns the intersection of the bounding rectangle and the
-     * straight line between the source and the specified point p.
-     * The specified point is expected not to intersect the bounds.
-     */
-    public Point getPerimeterPoint(VertexView view, Point source, Point p) {
-        Rectangle bounds = view.getBounds();
-        int x = bounds.x;
-        int y = bounds.y;
-        int width = bounds.width;
-        int height = bounds.height;
-        int xCenter = (int) (x + width / 2);
-        int yCenter = (int) (y + height / 2);
-        int dx = p.x - xCenter; // Compute Angle
-        int dy = p.y - yCenter;
-        double alpha = Math.atan2(dy, dx);
-        int xout = 0, yout = 0;
-        double pi = Math.PI;
-        double pi2 = Math.PI / 2.0;
-        double beta = pi2 - alpha;
-        double t = Math.atan2(height, width);
-        if (alpha < -pi + t || alpha > pi - t) { // Left edge
-            xout = x;
-            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
-        } else if (alpha < -t) { // Top Edge
-            yout = y;
-            xout = xCenter - (int) (height * Math.tan(beta) / 2);
-        } else if (alpha < t) { // Right Edge
-            xout = x + width;
-            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
-        } else { // Bottom Edge
-            yout = y + height;
-            xout = xCenter + (int) (height * Math.tan(beta) / 2);
-        }
-        return new Point(xout, yout);
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void validate() {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void revalidate() {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(Rectangle r) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     protected void firePropertyChange(
@@ -432,9 +400,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -444,9 +411,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -456,9 +422,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -468,9 +433,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -480,9 +444,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -492,9 +455,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -504,9 +466,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -516,9 +477,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -529,6 +489,7 @@ public class vVertexRenderer
 
     /**
      * Returns the hideGroups.
+     *
      * @return boolean
      */
     public boolean isHideGroups() {
@@ -537,6 +498,7 @@ public class vVertexRenderer
 
     /**
      * Sets the hideGroups.
+     *
      * @param hideGroups The hideGroups to set
      */
     public void setHideGroups(boolean hideGroups) {

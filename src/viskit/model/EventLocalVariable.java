@@ -10,7 +10,6 @@ import viskit.VGlobals;
  * @since Apr 1, 2004
  * @since 3:59:01 PM
  * @version $Id$
- * To change this template use File | Settings | File Templates.
  */
 public class EventLocalVariable extends ViskitElement {
 

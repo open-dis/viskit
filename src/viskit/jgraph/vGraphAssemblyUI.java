@@ -1,15 +1,15 @@
 package viskit.jgraph;
 
+import java.awt.event.MouseEvent;
+import java.util.Hashtable;
+import java.util.Map;
+import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.ViskitAssemblyController;
 import viskit.model.*;
-
-import javax.swing.*;
-import java.awt.event.MouseEvent;
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -49,6 +49,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ViskitAssemblyController cntl = (ViskitAssemblyController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
                 if (cell instanceof vAssemblyEdgeCell) {
@@ -100,7 +101,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
                 graph.requestFocus();
             }
             if (messageGraph) {
-                Map map = GraphConstants.createMap();
+                Map map = graph.getGraphLayoutCache().createNestedMap();
                 GraphConstants.setValue(map, newValue);
                 Map<Object, Map> nested = new Hashtable<Object, Map>();
                 nested.put(oldCell, map);

@@ -42,17 +42,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.io.*;
 import java.util.Map;
 import javax.swing.*;
 import org.apache.log4j.Logger;
-
 import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
-import viskit.xsd.assembly.BasicAssembly;
 import viskit.doe.LocalBootLoader;
+import viskit.xsd.assembly.BasicAssembly;
 
 /** Handles RunnerPanel2
  * 
@@ -137,6 +136,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         return null;
     }
 
+    @Override
     public String getHandle() {
         return "";
     }
@@ -146,6 +146,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     }
 
     // TODO: not used?
+    @Override
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
@@ -416,6 +417,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class startResumeListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             runPanel.vcrSimTime.setText("0.0");    // because no pausing
             twiddleButtons(InternalAssemblyRunner.START);
@@ -425,6 +427,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class stepListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             twiddleButtons(InternalAssemblyRunner.STEP);
         }
@@ -432,6 +435,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class stopListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Method setStopRun;
             try {
@@ -462,6 +466,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class rewindListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             twiddleButtons(InternalAssemblyRunner.REWIND);
         }
@@ -472,6 +477,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
      */
     class verboseListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (assembly == null) {return;}
             assembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
@@ -482,6 +488,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class saveListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -639,6 +646,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class copyListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             String s = runPanel.soutTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
@@ -649,6 +657,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class selectAllListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             runPanel.soutTA.requestFocus();
             runPanel.soutTA.selectAll();
@@ -657,6 +666,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class clearListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             runPanel.soutTA.setText(null);
         }
@@ -664,6 +674,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
     class viewListener implements ActionListener
     {
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             File f; // = tmpFile;
@@ -721,6 +732,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
     
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         log.debug(evt.getPropertyName());
         

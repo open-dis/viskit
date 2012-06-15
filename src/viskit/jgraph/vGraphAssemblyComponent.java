@@ -1,26 +1,18 @@
 package viskit.jgraph;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Toolkit;
-import javax.swing.*;
+import edu.nps.util.LogUtils;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-
+import javax.swing.*;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
@@ -49,7 +41,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     public vGraphAssemblyComponent(vGraphAssemblyModel model, AssemblyViewFrame frame) {
         super(model);
         parent = frame;
-        ToolTipManager.sharedInstance().registerComponent(this);
+        
+        vGraphAssemblyComponent instance = this;
+        ToolTipManager.sharedInstance().registerComponent(instance);
         //super.setDoubleBuffered(false); // test for mac
         this.model = model;
         this.setBendable(true);
@@ -64,7 +58,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setMarqueeHandler(new MyMarqueeHandler());
         this.setAntiAliased(true);
         this.addGraphSelectionListener(new myGraphSelectionListener());
-        model.addGraphModelListener(this);
+        model.addGraphModelListener(instance);
 
         setupCutCopyPaste();
 
@@ -73,6 +67,57 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setHighlightColor(Color.red);
         //this.setHandleColor(Color.orange);
         this.setDropEnabled(true);
+        
+        // As of 29-Nov-2004: JGraph-5.2-Revelation, custom cell rendering is 
+        // accomplished via this convention
+        getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
+            
+            // To use circles, from the tutorial
+            @Override
+            protected VertexView createVertexView(Object v) {
+                VertexView view;
+                if (v instanceof AssemblyCircleCell) {
+                    view = new AssemblyCircleView(v);
+                } else if (v instanceof AssemblyPropListCell) {
+                    view = new AssemblyPropListView(v);
+                } else {
+                    view = super.createVertexView(v);
+                }
+                return view;
+            }
+
+            // To customize my edges
+            @Override
+            protected EdgeView createEdgeView(Object e) {
+                EdgeView view = null;
+                if (e instanceof vAssemblyEdgeCell) {
+                    Object o = ((vAssemblyEdgeCell) e).getUserObject();
+                    if (o instanceof PropChangeEdge) {
+                        view = new vAssyPclEdgeView(e);
+                    }
+                    if (o instanceof AdapterEdge) {
+                        view = new vAssyAdapterEdgeView(e);
+                    }
+                    if (o instanceof SimEvListenerEdge) {
+                        view = new vAssySelEdgeView(e);
+                    }
+                } else {
+                    view = super.createEdgeView(e);
+                }
+                return view;
+            }
+
+            @Override
+            protected PortView createPortView(Object p) {
+                PortView view;
+                if (p instanceof vAssemblyPortCell) {
+                    view = new vAssemblyPortView(p);
+                } else {
+                    view = super.createPortView(p);
+                }
+                return view;
+            }
+        });
     }
 
     private void setupCutCopyPaste() {
@@ -100,6 +145,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             super("copy");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             ((ViskitAssemblyController) parent.getController()).copy();
         }
@@ -111,6 +157,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             super("cut");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             ((ViskitAssemblyController) parent.getController()).cut();
         }
@@ -122,6 +169,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             super("paste");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             ((ViskitAssemblyController) parent.getController()).paste();
         }
@@ -135,13 +183,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         invalidate();
     }
 
-    public ViskitElement getViskitElementAt(Point p) {
-        Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(p.x, p.y);
-        if (cell != null && (cell instanceof AssemblyCircleCell || cell instanceof AssemblyPropListCell)) {
-            return (ViskitElement) ((DefaultGraphCell) cell).getUserObject();
-        }
-        return null;
-    }
     private ModelEvent currentModelEvent = null;
 
     public void viskitModelChanged(ModelEvent ev) {
@@ -207,14 +248,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         currentModelEvent = null;
     }
 
-    /**
-     * GraphModelListener entry.  We use this to listen for position changes so
-     * we can stuff them into EventNode
-     *
-     * @param e
-     */
-    // TODO: JGraph v3.1 not generic
-    @SuppressWarnings("unchecked")
+    @Override
     public void graphChanged(GraphModelEvent e) {
         //   if(currentModelEvent!= null && currentModelEvent.getID() == ModelEvent.NEWMODEL)
         if (currentModelEvent != null && currentModelEvent.getSource() != this.model) // bail if this came from outside
@@ -228,26 +262,31 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             for (Object cell : ch) {
                 if (cell instanceof AssemblyCircleCell) {
                     AssemblyCircleCell cc = (AssemblyCircleCell) cell;
-                    Map<String, Rectangle> m = cc.getAttributes();
-                    Rectangle r = m.get("bounds");
+                    
+                    @SuppressWarnings("unchecked") // JGraph not genericized
+                    Map<String, Rectangle2D> m = cc.getAttributes();
+                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
                         EvGraphNode en = (EvGraphNode) cc.getUserObject();
-                        en.setPosition(new Point(r.x, r.y));
+                        en.setPosition(new Point2D.Double(r.x, r.y));
                         ((ViskitAssemblyModel) parent.getModel()).changeEvGraphNode(en);
 
-                        m.put("bounds", new Rectangle(en.getPosition().x, en.getPosition().y, r.width, r.height));
+                        // might have changed:
+                        m.put("bounds", new Rectangle2D.Double(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 } else if (cell instanceof AssemblyPropListCell) {
                     AssemblyPropListCell plc = (AssemblyPropListCell) cell;
-                    Map<String, Rectangle> m = plc.getAttributes();
-                    Rectangle r = m.get("bounds");
+                    
+                    @SuppressWarnings("unchecked") // JGraph not genericized
+                    Map<String, Rectangle2D> m = plc.getAttributes();
+                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
                         PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
-                        pcln.setPosition(new Point(r.x, r.y));
+                        pcln.setPosition(new Point2D.Double(r.x, r.y));
                         ((ViskitAssemblyModel) parent.getModel()).changePclNode(pcln);
+                        
                         // might have changed:
-                        // TODO: Fix generics
-                        m.put("bounds", new Rectangle(pcln.getPosition().x, pcln.getPosition().y, r.width, r.height));
+                        m.put("bounds", new Rectangle2D.Double(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
                     }
                 }
             }
@@ -387,44 +426,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         return null;
     }
 
-    // To use circles, from the tutorial
-    @Override
-    protected VertexView createVertexView(Object v, CellMapper cm) {
-        if (v instanceof AssemblyCircleCell) {
-            return new AssemblyCircleView(v, this, cm);
-        } else if (v instanceof AssemblyPropListCell) {
-            return new AssemblyPropListView(v, this, cm);
-        }
-        // else
-        return super.createVertexView(v, cm);
-    }
-
-    // To customize my edges
-    @Override
-    protected EdgeView createEdgeView(Object e, CellMapper cm) {
-        if (e instanceof vAssemblyEdgeCell) {
-            Object o = ((vAssemblyEdgeCell) e).getUserObject();
-            if (o instanceof PropChangeEdge) {
-                return new vAssyPclEdgeView(e, this, cm);
-            }
-            if (o instanceof AdapterEdge) {
-                return new vAssyAdapterEdgeView(e, this, cm);
-            }
-            if (o instanceof SimEvListenerEdge) {
-                return new vAssySelEdgeView(e, this, cm);
-            }
-        }
-        return super.createEdgeView(e, cm);
-    }
-
-    @Override
-    protected PortView createPortView(Object p, CellMapper cm) {
-        if (p instanceof vAssemblyPortCell) {
-            return new vAssemblyPortView(p, this, cm);
-        }
-        return super.createPortView(p, cm);
-    }
-
     /**
      * This class informs the controller that the selected set has changed.  Since we're only using this
      * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
@@ -435,6 +436,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         Vector<Object> selected = new Vector<Object>();
 
+        @Override
         public void valueChanged(GraphSelectionEvent e) {
             Object[] oa = e.getCells();
             if (oa == null || oa.length <= 0) {
@@ -452,11 +454,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         }
     }
 
-// MarqueeHandler that Connects Vertices and Displays PopupMenus
+    // MarqueeHandler that Connects Vertices and Displays PopupMenus
     public class MyMarqueeHandler extends BasicMarqueeHandler {
 
         // Holds the Start and the Current Point
-        protected Point start,  current;
+        protected Point2D start,  current;
 
         // Holds the First and the Current Port
         protected PortView port,  firstPort;
@@ -482,9 +484,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             return super.isForceMarqueeEvent(e);
         }
 
-        /** Display PopupMenu or Remember Start Location and First Port
-         * @param e 
-         */
         @Override
         public void mousePressed(final MouseEvent e) {
             // If Right Mouse Button
@@ -514,9 +513,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             }
         }
 
-        /** Find Port under Mouse and Repaint Connector
-         * @param e 
-         */
         @Override
         public void mouseDragged(MouseEvent e) {
             // If remembered Start Point is Valid
@@ -543,11 +539,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             super.mouseDragged(e);
         }
 
-        public PortView getSourcePortAt(Point point) {
+        protected PortView getSourcePortAt(Point point) {
             // Scale from Screen to Model
-            Point tmp = vGraphAssemblyComponent.this.fromScreen(new Point(point));
+            Point2D tmp = vGraphAssemblyComponent.this.fromScreen(new Point2D.Double(point.x, point.y));
             // Find a Port View in Model Coordinates and Remember
-            return vGraphAssemblyComponent.this.getPortViewAt(tmp.x, tmp.y);
+            return vGraphAssemblyComponent.this.getPortViewAt(tmp.getX(), tmp.getY());
         }
 
         // Find a Cell at point and Return its first Port as a PortView
@@ -570,9 +566,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             return getSourcePortAt(point);
         }
 
-        /** Connect the First Port and the Current Port in the Graph or Repaint
-         * @param e 
-         */
         @Override
         public void mouseReleased(MouseEvent e) {
             // If Valid Event, Current and First Port
@@ -593,10 +586,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             super.mouseReleased(e);
         }
 
-        /** Show Special Cursor if Over Port
-         * 
-         * @param e
-         */
         @Override
         public void mouseMoved(MouseEvent e) {
             // Check Mode and Find Port
@@ -622,7 +611,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             // If Valid First Port, Start and Current Point
             if (firstPort != null && start != null && current != null) // Then Draw A Line From Start to Current Point
             {
-                g.drawLine(start.x, start.y, current.x, current.y);
+                g.drawLine((int) start.getX(), (int) start.getY(), (int) current.getX(), (int) current.getY());
             }
         }
 
@@ -633,35 +622,46 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 // If Not Floating Port...
                 boolean o = (GraphConstants.getOffset(port.getAttributes()) != null);
                 // ...Then use Parent's Bounds
-                Rectangle r = (o) ? port.getBounds() : port.getParentView().getBounds();
+                Rectangle2D r = (o) ? port.getBounds() : port.getParentView().getBounds();
                 // Scale from Model to Screen
-                r = vGraphAssemblyComponent.this.toScreen(new Rectangle(r));
+                r = vGraphAssemblyComponent.this.toScreen(r);
                 // Add Space For the Highlight Border
                 //r.setBounds(r.x - 3, r.y - 3, r.width + 6, r.height + 6);
-                r.setBounds(r.x - 5, r.y - 5, r.width + 10, r.height + 10);
+                r.setFrame(((Rectangle2D.Double) r).x - 5, ((Rectangle2D.Double) r).y - 5, ((Rectangle2D.Double) r).width + 10, ((Rectangle2D.Double) r).height + 10);
                 // Paint Port in Preview (=Highlight) Mode
                 vGraphAssemblyComponent.this.getUI().paintCell(g, port, r, true);
             }
         }
 
         // Insert a new Vertex at point
-        public void insert(Point point) {
+        private void insert(Point point) {
+            
             // Construct Vertex with no Label
             DefaultGraphCell vertex = new DefaultGraphCell();
+            
             // Add one Floating Port
             vertex.add(new DefaultPort());
+            
+            Point2D.Double pt = new Point2D.Double(point.x, point.y);
+            
             // Snap the Point to the Grid
-            point = vGraphAssemblyComponent.this.snap(new Point(point));
+            pt = (Point2D.Double) vGraphAssemblyComponent.this.snap(pt);
+            
             // Default Size for the new Vertex
             Dimension size = new Dimension(25, 25);
+            
             // Create a Map that holds the attributes for the Vertex
-            Map map = GraphConstants.createMap();
+            Map map = getGraphLayoutCache().createNestedMap();
+            
             // Add a Bounds Attribute to the Map
-            GraphConstants.setBounds(map, new Rectangle(point, size));
+            GraphConstants.setBounds(map, new Rectangle2D.Double(pt.x, pt.y, size.width, size.height));
+            
             // Add a Border Color Attribute to the Map
             GraphConstants.setBorderColor(map, Color.black);
+            
             // Add a White Background
             GraphConstants.setBackground(map, Color.white);
+            
             // Make Vertex Opaque
             GraphConstants.setOpaque(map, true);
 
@@ -689,39 +689,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 controller.newPropChangeListArc(oa);
             }
         }
-
-        public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
-            JPopupMenu menu = new JPopupMenu();
-            if (cell != null) {
-                // Edit
-                menu.add(new AbstractAction("Edit") {
-
-                    public void actionPerformed(ActionEvent e) {
-                        vGraphAssemblyComponent.this.startEditingAtCell(cell);
-                    }
-                });
-            }
-            // Remove
-            if (!vGraphAssemblyComponent.this.isSelectionEmpty()) {
-                menu.addSeparator();
-                menu.add(new AbstractAction("Remove") {
-
-                    public void actionPerformed(ActionEvent e) {
-                    // jmb fix remove.actionPerformed(e);
-                    // remove is an Action
-                    }
-                });
-            }
-            menu.addSeparator();
-            // Insert
-            menu.add(new AbstractAction("Insert") {
-
-                public void actionPerformed(ActionEvent ev) {
-                    insert(pt);
-                }
-            });
-            return menu;
-        }
+        
     } // End of Editor.MyMarqueeHandler
 }
 
@@ -759,17 +727,17 @@ class vAssemblyPortView extends PortView {
 
     static int mysize = 54;   // same as the circle
 
-    public vAssemblyPortView(Object o, JGraph jGraph, CellMapper cellMapper) {
-        super(o, jGraph, cellMapper);
+    public vAssemblyPortView(Object o) {
+        super(o);
     }
 
     @Override
-    public Rectangle getBounds() {
-        Rectangle bounds = new Rectangle(getLocation(null));
-        bounds.x = bounds.x - mysize / 2;
-        bounds.y = bounds.y - mysize / 2;
-        bounds.width = bounds.width + mysize;
-        bounds.height = bounds.height + mysize;
+    public Rectangle2D getBounds() {
+        Rectangle2D.Double bounds = new Rectangle2D.Double(getLocation(null).getX(), getLocation(null).getY(), 0d, 0d);
+        bounds.x -= (mysize / 2);
+        bounds.y -= (mysize / 2);
+        bounds.width +=  mysize;
+        bounds.height += mysize;
         return bounds;
     }
 }
@@ -795,8 +763,8 @@ class AssemblyPropListView extends VertexView {
 
     static vAssemblyPclVertexRenderer vapvr = new vAssemblyPclVertexRenderer();
 
-    public AssemblyPropListView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public AssemblyPropListView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -823,8 +791,8 @@ class AssemblyCircleView extends VertexView {
 
     static vAssemblyEgVertexRenderer vaevr = new vAssemblyEgVertexRenderer();
 
-    public AssemblyCircleView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public AssemblyCircleView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -838,8 +806,8 @@ class vAssyAdapterEdgeView extends vEdgeView {
 
     public static vAssyAdapterEdgeRenderer vaaer = new vAssyAdapterEdgeRenderer();
 
-    public vAssyAdapterEdgeView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public vAssyAdapterEdgeView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -852,8 +820,8 @@ class vAssySelEdgeView extends vEdgeView {
 
     public static vAssySelEdgeRenderer vaser = new vAssySelEdgeRenderer();
 
-    public vAssySelEdgeView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public vAssySelEdgeView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -866,8 +834,8 @@ class vAssyPclEdgeView extends vEdgeView {
 
     public static vAssyPclEdgeRenderer vaper = new vAssyPclEdgeRenderer();
 
-    public vAssyPclEdgeView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public vAssyPclEdgeView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -879,7 +847,7 @@ class vAssyPclEdgeView extends vEdgeView {
 class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
 
     /**
-     * Paint the vapvr.  Overridden to do a double line and paint over the end shap
+     * Paint the vapvr.  Overridden to do a double line and paint over the end shape
      */
     @Override
     public void paint(Graphics g) {
@@ -925,7 +893,7 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
             }
             if (selected) { // Paint Selected
                 g2.setStroke(GraphConstants.SELECTION_STROKE);
-                g2.setColor(graph.getHighlightColor());
+                g2.setColor(((JGraph) graph.get()).getHighlightColor());
                 if (view.beginShape != null) {
                     g2.draw(view.beginShape);
                 }
@@ -936,26 +904,26 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
                     g2.draw(view.endShape);
                 }
             }
-            if (graph.getEditingCell() != view.getCell()) {
-                Object label = graph.convertValueToString(view);
+            if (((JGraph) graph.get()).getEditingCell() != view.getCell()) {
+                Object label = ((JGraph) graph.get()).convertValueToString(view);
                 if (label != null) {
                     g2.setStroke(new BasicStroke(1));
                     g.setFont(getFont());
-                    paintLabel(g, label.toString());
+                    paintLabel(g, label.toString(), ((JGraph) graph.get()).getCenterPoint(), true);
                 }
             }
         }
     }
 
     @Override
-    protected Shape createLineEnd(int size, int style, Point src, Point dst) {
-        int d = (int) Math.max(1, dst.distance(src));
-        int ax = -(size * (dst.x - src.x) / d);
-        int ay = -(size * (dst.y - src.y) / d);
+    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
+        double d = Math.max(1, dst.distance(src));
+        double ax = -(size * (dst.getX() - src.getX()) / d);
+        double ay = -(size * (dst.getY() - src.getY()) / d);
         GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 4);
-        path.moveTo(dst.x - ay / 3, dst.y + ax / 3);
-        path.lineTo(dst.x + ax / 2, dst.y + ay / 2);
-        path.lineTo(dst.x + ay / 3, dst.y - ax / 3);
+        path.moveTo(dst.getX() - ay / 3, dst.getY() + ax / 3);
+        path.lineTo(dst.getX() + ax / 2, dst.getY() + ay / 2);
+        path.lineTo(dst.getX() + ay / 3, dst.getY() - ax / 3);
 
         return path;
     }
@@ -964,15 +932,15 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
 class vAssySelEdgeRenderer extends vEdgeRenderer {
 
     @Override
-    protected Shape createLineEnd(int size, int style, Point src, Point dst) {
+    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
         // Same as above
-        int d = (int) Math.max(1, dst.distance(src));
-        int ax = -(size * (dst.x - src.x) / d);
-        int ay = -(size * (dst.y - src.y) / d);
+        double d = Math.max(1, dst.distance(src));
+        double ax = -(size * (dst.getX() - src.getX()) / d);
+        double ay = -(size * ((int) dst.getY() - (int) src.getY()) / d);
         GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 4);
-        path.moveTo(dst.x - ay / 3, dst.y + ax / 3);
-        path.lineTo(dst.x + ax / 2, dst.y + ay / 2);
-        path.lineTo(dst.x + ay / 3, dst.y - ax / 3);
+        path.moveTo(dst.getX() - ay / 3, dst.getY() + ax / 3);
+        path.lineTo(dst.getX() + ax / 2, dst.getY() + ay / 2);
+        path.lineTo(dst.getX() + ay / 3, dst.getY() - ax / 3);
 
         return path;
     }
@@ -981,48 +949,52 @@ class vAssySelEdgeRenderer extends vEdgeRenderer {
 class vAssyPclEdgeRenderer extends vEdgeRenderer {
 
     @Override
-    protected Shape createLineEnd(int size, int style, Point src, Point dst) {
-        int d = (int) Math.max(1, dst.distance(src));
-        int ax = -(size * (dst.x - src.x) / d);
-        int ay = -(size * (dst.y - src.y) / d);
+    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
+        double d = Math.max(1, dst.distance(src));
+        double ax = -(size * (dst.getX() - src.getX()) / d);
+        double ay = -(size * (dst.getY() - src.getY()) / d);
         GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 4);
-        path.moveTo(dst.x - ay / 3, dst.y + ax / 3);
-        path.lineTo(dst.x + ax / 2 - ay / 3, dst.y + ay / 2 + ax / 3);
-        path.lineTo(dst.x + ax / 2 + ay / 3, dst.y + ay / 2 - ax / 3);
-        path.lineTo(dst.x + ay / 3, dst.y - ax / 3);
+        path.moveTo(dst.getX() - ay / 3, dst.getY() + ax / 3);
+        path.lineTo(dst.getX() + ax / 2 - ay / 3, dst.getY() + ay / 2 + ax / 3);
+        path.lineTo(dst.getX() + ax / 2 + ay / 3, dst.getY() + ay / 2 - ax / 3);
+        path.lineTo(dst.getX() + ay / 3, dst.getY() - ax / 3);
 
         return path;
     }
 }
 // End support for custom line ends and double adapter line on assembly edges
 /**
- * A replacement class to tweek the routing slightly so that the edges come into the node from other directions than
- * NSE and W.  Also, support offsetting edges between the same two nodes.
+ * A replacement class to tweek the routing slightly so that the edges come into
+ * the node from other directions than NSE and W.  Also, support offsetting edges
+ * between the same two nodes.
  */
 class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing {
 
-    // TODO: JGraph v3.1 not generic
-    @SuppressWarnings("unchecked")
-    public void route(EdgeView edge, List points) {
-        int n = points.size();
+    @Override
+    @SuppressWarnings("unchecked") // JGraph not genericized
+    public List route(GraphLayoutCache glc, EdgeView edge) {
+        int n = edge.getPointCount();
+        List points = edge.getPoints();
         Object fromKey = null, toKey = null;
 
-        Point from = edge.getPoint(0);
+        Point2D from = edge.getPoint(0);
 
         if (edge.getSource() instanceof PortView) {
-            from = ((PortView) edge.getSource()).getLocation(null);
+            from = ((PortView) edge.getSource()).getLocation(edge);
             fromKey = getKey((PortView) edge.getSource());
         } else if (edge.getSource() != null) {
-            from = edge.getSource().getBounds().getLocation();
+            Rectangle2D rec = edge.getBounds();
+            from = new Point2D.Double(rec.getX(), rec.getY());
         }
 
-        Point to = edge.getPoint(n - 1);
+        Point2D to = edge.getPoint(n - 1);
 
         if (edge.getTarget() instanceof PortView) {
-            to = ((PortView) edge.getTarget()).getLocation(null);
+            to = ((PortView) edge.getTarget()).getLocation(edge);
             toKey = getKey((PortView) edge.getTarget());
         } else if (edge.getTarget() != null) {
-            to = edge.getTarget().getBounds().getLocation();
+            Rectangle2D rec = edge.getBounds();
+            to = new Point2D.Double(rec.getX(), rec.getY());
         }
 
         int adjustFactor = 0;
@@ -1037,19 +1009,19 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing {
             adjustFactor *= -1;
         }
 
-        int adjustment = /*0  + */ 35 * adjustFactor;       // little bias
+        int adjustment = 35 * adjustFactor;       // little bias
 
-        int dx = Math.abs(from.x - to.x);
-        int dy = Math.abs(from.y - to.y);
-        int x2 = from.x + ((to.x - from.x) / 2);
-        int y2 = from.y + ((to.y - from.y) / 2);
-        Point[] routed = new Point[2];
+        double dx = Math.abs(from.getX() - to.getX());
+        double dy = Math.abs(from.getY() - to.getY());
+        double x2 = (from.getX() + (to.getX() - from.getX() / 2));
+        double y2 = (from.getY() + (to.getY() - from.getY() / 2));
+        Point2D[] routed = new Point2D.Double[2];
         if (dx > dy) {
-            routed[0] = new Point(x2, from.y + adjustment);
-            routed[1] = new Point(x2, to.y - adjustment);
+            routed[0] = new Point2D.Double(x2, from.getY() + adjustment);
+            routed[1] = new Point2D.Double(x2, to.getY() - adjustment);
         } else {
-            routed[0] = new Point(from.x - adjustment, y2);
-            routed[1] = new Point(to.x + adjustment, y2);
+            routed[0] = new Point2D.Double(from.getX() - adjustment, y2);
+            routed[1] = new Point2D.Double(to.getX() + adjustment, y2);
         }
 
         // Set/Add Points
@@ -1060,11 +1032,13 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing {
                 points.add(i + 1, routed[i]);
             }
         }
+        
         // Remove spare points
         while (points.size() > routed.length + 2) {
             points.remove(points.size() - 2);
         }
-
+        
+        return points;
     }
 
     private Object getKey(PortView pv) {
@@ -1080,16 +1054,16 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing {
             PropChangeListenerNode pn = (PropChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
-            System.err.println("bad state vGraphAssemblyComponent.getKey()");
+            LogUtils.getLogger(ViskitAssemblyRouting.class).warn("ParentView of " + pv + " is " + o);
             return null;
         }
     }
-    static HashMap<String, Vector<Object>> nodePairs = new HashMap<String, Vector<Object>>();
+    static Map<String, Vector<Object>> nodePairs = new HashMap<String, Vector<Object>>();
 
     private int getFactor(Object toKey, Object fromKey, EdgeView ev) {
         String toStr = toKey.toString();
         String fromStr = fromKey.toString();
-        String masterKey = null;
+        String masterKey;
         if (toStr.compareTo(fromStr) > 0) {
             masterKey = fromStr + "-" + toStr;
         } else {
@@ -1115,4 +1089,10 @@ class ViskitAssemblyRouting implements org.jgraph.graph.Edge.Routing {
         }
         return lis.indexOf(edgeKey);
     }
-}
+    
+    @Override
+    public int getPreferredLineStyle(EdgeView ev) {
+        return NO_PREFERENCE;
+    }
+    
+} // end class file vgraphAssemblyComponent.java
