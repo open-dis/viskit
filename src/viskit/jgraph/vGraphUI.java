@@ -24,7 +24,7 @@ import viskit.model.SchedulingEdge;
  * @since 3:17:59 PM
  * @version $Id$
  *
- * BasicGraphUI must be overridden to allow in node and edge editting.
+ * BasicGraphUI must be overridden to allow in node and edge editing.
  * This code is a copy of the appropriate part of EditorGraph.java, which is
  * part of JGraph examples.
  */
@@ -106,7 +106,7 @@ public class vGraphUI extends BasicGraphUI {
                 graph.requestFocus();
             }
             if (messageGraph) {
-                Map map = graph.getGraphLayoutCache().createNestedMap();
+                Map map = GraphConstants.createMap();
                 GraphConstants.setValue(map, newValue);
                 Map<Object, Map> nested = new Hashtable<Object, Map>();
                 nested.put(oldCell, map);

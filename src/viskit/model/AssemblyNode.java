@@ -1,6 +1,6 @@
 package viskit.model;
 
-import java.awt.geom.Point2D;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -21,7 +21,7 @@ public abstract class AssemblyNode extends ViskitElement {
     private String type;
     private Vector<AssemblyEdge> connections = new Vector<AssemblyEdge>();
     private List<String> comments = new ArrayList<String>();
-    private Point2D position = new Point2D.Double(0d, 0d);
+    private Point position = new Point(0, 0);
     private VInstantiator instantiator;
     private String descriptionString = "";  // instance information
 
@@ -68,11 +68,11 @@ public abstract class AssemblyNode extends ViskitElement {
         this.connections = connections;
     }
 
-    public Point2D getPosition() {
+    public Point getPosition() {
         return position;
     }
 
-    public void setPosition(Point2D position) {
+    public void setPosition(Point position) {
         this.position = position;
     }
 

@@ -1,7 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
@@ -126,6 +125,7 @@ public class vAssemblyPclVertexRenderer
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
+    
     private float[] dash = {5f, 5f};
     private BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -170,7 +170,7 @@ public class vAssemblyPclVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-            
+
             this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
@@ -238,17 +238,17 @@ public class vAssemblyPclVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle2D r = view.getBounds();
+        Rectangle r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
         //g2.fillOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff); // size of rect is 54,54
-        g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+        g2.fillRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff);
         g2.setColor(Color.darkGray);
         //g2.drawOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff);
         g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
-        g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+        g2.drawRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff);
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
@@ -292,7 +292,7 @@ public class vAssemblyPclVertexRenderer
             v.add(nuts[0]);
         } while (nuts[1] != null);
         String[] ra = new String[v.size()];
-        ra = (String[]) v.toArray(ra);
+        ra = v.toArray(ra);
         return ra;
     }
 
@@ -341,7 +341,7 @@ public class vAssemblyPclVertexRenderer
     }
 
     /**
-     * Provided for subclasses to paint a selection border.
+     * Provided for subclassers to paint a selection border.
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
@@ -357,6 +357,43 @@ public class vAssemblyPclVertexRenderer
             Dimension d = getSize();
             g.drawRect(0, 0, d.width - 1, d.height - 1);
         }
+    }
+
+    /**
+     * Returns the intersection of the bounding rectangle and the straight line
+     * between the source and the specified point p. The specified point is
+     * expected not to intersect the bounds.
+     */
+    public Point getPerimeterPoint(VertexView view, Point source, Point p) {
+        Rectangle bounds = view.getBounds();
+        int x = bounds.x;
+        int y = bounds.y;
+        int width = bounds.width;
+        int height = bounds.height;
+        int xCenter = (x + width / 2);
+        int yCenter = (y + height / 2);
+        int dx = p.x - xCenter; // Compute Angle
+        int dy = p.y - yCenter;
+        double alpha = Math.atan2(dy, dx);
+        int xout, yout;
+        double pi = Math.PI;
+        double pi2 = Math.PI / 2.0;
+        double beta = pi2 - alpha;
+        double t = Math.atan2(height, width);
+        if (alpha < -pi + t || alpha > pi - t) { // Left edge
+            xout = x;
+            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
+        } else if (alpha < -t) { // Top Edge
+            yout = y;
+            xout = xCenter - (int) (height * Math.tan(beta) / 2);
+        } else if (alpha < t) { // Right Edge
+            xout = x + width;
+            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
+        } else { // Bottom Edge
+            yout = y + height;
+            xout = xCenter + (int) (height * Math.tan(beta) / 2);
+        }
+        return new Point(xout, yout);
     }
 
     /**
@@ -511,5 +548,4 @@ public class vAssemblyPclVertexRenderer
     public void setHideGroups(boolean hideGroups) {
         this.hideGroups = hideGroups;
     }
-
 }

@@ -2,8 +2,7 @@ package viskit.jgraph;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.Rectangle2D;
-import java.util.HashMap;
+import java.awt.Rectangle;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
@@ -39,7 +38,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked") // JGraph not genericized
     private void initViskitStyle() {
 
-        viskitAssyAdapterEdgeStyle = new HashMap();
+        viskitAssyAdapterEdgeStyle = GraphConstants.createMap();
 
         // common to 3 types
         GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle, false);
@@ -53,13 +52,13 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setRouting(viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
 
         // duplicate for pcl
-        viskitAssyPclEdgeStyle = new HashMap();
+        viskitAssyPclEdgeStyle = GraphConstants.createMap();
 
         // TODO: Fix generics
         viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
         // duplicate for sel
-        viskitAssySimEvLisEdgeStyle = new HashMap();
+        viskitAssySimEvLisEdgeStyle = GraphConstants.createMap();
 
         // TODO: Fix generics
         viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
@@ -109,10 +108,10 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         egn.opaqueViewObject = c;
         c.setUserObject(egn);
 
-        Map<DefaultGraphCell, Map> localAttributes = new Hashtable<DefaultGraphCell, Map>();
-        localAttributes.put(c, createBounds(egn.getPosition().getX(), egn.getPosition().getY(), Color.black));
+        Map<DefaultGraphCell, Map> attributes = new Hashtable<DefaultGraphCell, Map>();
+        attributes.put(c, createBounds(egn.getPosition().x, egn.getPosition().y, Color.black));
         c.add(new vAssemblyPortCell(egn.getName() + "/Center"));
-        this.insert(new Object[]{c}, localAttributes, null, null, null);
+        this.insert(new Object[]{c}, attributes, null, null, null);
         this.toFront(new Object[]{c});
     }
 
@@ -130,10 +129,10 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         pcln.opaqueViewObject = c;
         c.setUserObject(pcln);
 
-        Map<DefaultGraphCell, Map> localAttributes = new Hashtable<DefaultGraphCell, Map>();
-        localAttributes.put(c, createBounds(pcln.getPosition().getX(), pcln.getPosition().getY(), Color.black));
+        Map<DefaultGraphCell, Map> attributes = new Hashtable<DefaultGraphCell, Map>();
+        attributes.put(c, createBounds(pcln.getPosition().x, pcln.getPosition().y, Color.black));
         c.add(new vAssemblyPortCell(pcln.getName() + "/Center"));
-        this.insert(new Object[]{c}, localAttributes, null, null, null);
+        this.insert(new Object[]{c}, attributes, null, null, null);
         this.toFront(new Object[]{c});
     }
 
@@ -272,13 +271,13 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
     }
 
-    public Map createBounds(double x, double y, Color c) {
-        Map map = graph.getGraphLayoutCache().createNestedMap();
-        GraphConstants.setBounds(map, new Rectangle2D.Double(x, y, 54, 54)); //90, 30));
+    public Map createBounds(int x, int y, Color c) {
+        Map map = GraphConstants.createMap();
+        GraphConstants.setBounds(map, new Rectangle(x, y, 54, 54)); //90, 30));
         GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
         GraphConstants.setBackground(map, c.darker());
         GraphConstants.setForeground(map, Color.white);
-        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
+        GraphConstants.setFont(map, GraphConstants.defaultFont.deriveFont(Font.BOLD, 12));
         GraphConstants.setOpaque(map, true);
         return map;
     }

@@ -94,7 +94,7 @@
 
         <!-- See note above id="runtime.javac" -->
         <!--pathelement location="${env.JAVA_HOME}/lib/tools.jar"/-->
-        <pathelement location="${dist.jar}"/>
+        <pathelement location="${dir.build.classes}"/>
         <pathelement location="${dir.lib}/batik-ext.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -762,7 +762,7 @@
     </target>
 
     <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
-    <target name="quick.run" description="Run Viskit, don't check dependencies">
+    <target name="quick.run" description="Run Viskit, don't check dependencies, don't rebuild">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
@@ -783,6 +783,43 @@
               classpathref="runtime.classpath"
               fork="true">
             <arg value="viskit.Main"/>
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+        </java>
+    </target>
+    
+    <target depends="compile" description="Debug Project" name="debug">
+        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
+            <classpath refid="runtime.classpath"/>
+        </nbjpdastart>
+        <java classname="viskit.EventGraphAssemblyComboMain" fork="true">
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Djava.compiler=none"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <classpath refid="runtime.classpath"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+        </java>
+    </target>
+    
+    <!-- TARGET: Quick Debug don't check dependencies, TBD ant should be able to not rebuild if not needed -->
+    <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
+        
+        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
+            <classpath refid="runtime.classpath"/>
+        </nbjpdastart>
+        <java classname="viskit.EventGraphAssemblyComboMain" 
+              classpathref="runtime.classpath"
+              fork="true">
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Djava.compiler=none"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg value="-XX:MaxPermSize=160m"/>
+            <jvmarg value="-Xmx256m"/>
             <!-- Font anti-aliasing -->
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>

@@ -1,7 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
@@ -178,7 +177,7 @@ public class vVertexRenderer
                 // jmb setText(null);
                 setBorder(null);
                 setOpaque(false);
-                // jmb setIcon(null);
+            // jmb setIcon(null);
             }
             return this;
         }
@@ -224,7 +223,7 @@ public class vVertexRenderer
             super.paint(g);   // jmb this will come down to paintCompoent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
-            // JDK Bug: Zero length string passed to TextLayout constructor
+        // JDK Bug: Zero length string passed to TextLayout constructor
         }
     }
     Color circColor = new Color(255, 255, 204); // pale yellow
@@ -233,14 +232,14 @@ public class vVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle2D r = view.getBounds();
+        Rectangle r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
-        g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
+        g2.fillOval(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff); // size of rect is 54,54
         g2.setColor(Color.darkGray);
-        g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+        g2.drawOval(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff);
 
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
@@ -283,7 +282,7 @@ public class vVertexRenderer
             v.add(nuts[0]);
         } while (nuts[1] != null);
         String[] ra = new String[v.size()];
-        ra = (String[]) v.toArray(ra);
+        ra = v.toArray(ra);
         return ra;
     }
 
@@ -330,7 +329,7 @@ public class vVertexRenderer
 
     @Override
     protected void paintBorder(Graphics g) {
-        // jmb lose the rectangle super.paintBorder(g);
+    // jmb lose the rectangle super.paintBorder(g);
     }
 
     /**
@@ -350,6 +349,43 @@ public class vVertexRenderer
             Dimension d = getSize();
             g.drawRect(0, 0, d.width - 1, d.height - 1);
         }
+    }
+
+    /**
+     * Returns the intersection of the bounding rectangle and the
+     * straight line between the source and the specified point p.
+     * The specified point is expected not to intersect the bounds.
+     */
+    public Point getPerimeterPoint(VertexView view, Point source, Point p) {
+        Rectangle bounds = view.getBounds();
+        int x = bounds.x;
+        int y = bounds.y;
+        int width = bounds.width;
+        int height = bounds.height;
+        int xCenter = (x + width / 2);
+        int yCenter = (y + height / 2);
+        int dx = p.x - xCenter; // Compute Angle
+        int dy = p.y - yCenter;
+        double alpha = Math.atan2(dy, dx);
+        int xout, yout;
+        double pi = Math.PI;
+        double pi2 = Math.PI / 2.0;
+        double beta = pi2 - alpha;
+        double t = Math.atan2(height, width);
+        if (alpha < -pi + t || alpha > pi - t) { // Left edge
+            xout = x;
+            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
+        } else if (alpha < -t) { // Top Edge
+            yout = y;
+            xout = xCenter - (int) (height * Math.tan(beta) / 2);
+        } else if (alpha < t) { // Right Edge
+            xout = x + width;
+            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
+        } else { // Bottom Edge
+            yout = y + height;
+            xout = xCenter + (int) (height * Math.tan(beta) / 2);
+        }
+        return new Point(xout, yout);
     }
 
     /**

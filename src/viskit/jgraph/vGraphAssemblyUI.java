@@ -101,7 +101,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
                 graph.requestFocus();
             }
             if (messageGraph) {
-                Map map = graph.getGraphLayoutCache().createNestedMap();
+                Map map = GraphConstants.createMap();
                 GraphConstants.setValue(map, newValue);
                 Map<Object, Map> nested = new Hashtable<Object, Map>();
                 nested.put(oldCell, map);

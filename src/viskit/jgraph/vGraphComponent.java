@@ -4,7 +4,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -64,50 +67,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         //this.setMarqueeColor(Color.red);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
-        //this.setHandleColor(Color.orange);
-        
-        // As of 29-Nov-2004: JGraph-5.2-Revelation, custom cell rendering is 
-        // accomplished via this convention
-        getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
-            
-            // To use circles, from the tutorial
-            @Override
-            protected VertexView createVertexView(Object v) {
-                VertexView view;
-                if (v instanceof CircleCell) {
-                    view = new CircleView(v);
-                } else {
-                    view = super.createVertexView(v);
-                }
-                return view;
-            }
+    //this.setHandleColor(Color.orange);
 
-            // To customize my edges
-            @Override
-            protected EdgeView createEdgeView(Object e) {
-                EdgeView view;
-                if (e instanceof vSelfEdgeCell) // order important... 1st is sub of 2nd
-                {
-                    view = new vSelfEdgeView(e);
-                } else if (e instanceof vEdgeCell) {
-                    view = new vEdgeView(e);
-                } else {
-                    view = super.createEdgeView(e);
-                }
-                return view;
-            }
-
-            @Override
-            protected PortView createPortView(Object p) {
-                PortView view;
-                if (p instanceof vPortCell) {
-                    view = new vPortView(p);
-                } else {
-                    view = super.createPortView(p);
-                }
-                return view;
-            }
-        });
     }
 
     private void setupCutCopyPaste() {
@@ -236,15 +197,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     CircleCell cc = (CircleCell) cell;
                     
                     @SuppressWarnings("unchecked") // JGraph not genericized
-                    Map<String, Rectangle2D> m = cc.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
+                    Map<String, Rectangle> m = cc.getAttributes();
+                    Rectangle r = m.get("bounds");
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
-                        en.setPosition(new Point2D.Double(r.x, r.y));
+                        en.setPosition(new Point(r.x, r.y));
                         ((ViskitModel) parent.getModel()).changeEvent(en);
-                        
-                        // might have changed:
-                        m.put("bounds", new Rectangle2D.Double(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
+                        m.put("bounds", new Rectangle(en.getPosition().x, en.getPosition().y, r.width, r.height));
                     }
                 }
             }
@@ -480,6 +439,37 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         return null;
     }
 
+    // To use circles, from the tutorial
+    @Override
+    protected VertexView createVertexView(Object v, CellMapper cm) {
+        if (v instanceof CircleCell) {
+            return new CircleView(v, this, cm);
+        }
+        // else
+        return super.createVertexView(v, cm);
+    }
+
+    // To customize my edges
+    @Override
+    protected EdgeView createEdgeView(Object e, CellMapper cm) {
+        if (e instanceof vSelfEdgeCell) // order important... 1st is sub of 2nd
+        {
+            return new vSelfEdgeView(e, this, cm);
+        } else if (e instanceof vEdgeCell) {
+            return new vEdgeView(e, this, cm);
+        }
+        // else
+        return super.createEdgeView(e, cm);
+    }
+
+    @Override
+    protected PortView createPortView(Object p, CellMapper cm) {
+        if (p instanceof vPortCell) {
+            return new vPortView(p, this, cm);
+        }
+        return super.createPortView(p, cm);
+    }
+
     /**
      * This class informs the controller that the selected set has changed.  Since we're only using this
      * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
@@ -511,7 +501,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     public class MyMarqueeHandler extends BasicMarqueeHandler {
 
         // Holds the Start and the Current Point
-        protected Point2D start,  current;
+        protected Point start,  current;
 
         // Holds the First and the Current Port
         protected PortView port,  firstPort;
@@ -592,11 +582,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             super.mouseDragged(e);
         }
 
-        protected PortView getSourcePortAt(Point point) {
+        public PortView getSourcePortAt(Point point) {
             // Scale from Screen to Model
-            Point2D tmp = vGraphComponent.this.fromScreen(new Point2D.Double(point.x, point.y));
+            Point tmp = vGraphComponent.this.fromScreen(new Point(point));
             // Find a Port View in Model Coordinates and Remember
-            return vGraphComponent.this.getPortViewAt(tmp.getX(), tmp.getY());
+            return vGraphComponent.this.getPortViewAt(tmp.x, tmp.y);
         }
 
         // Find a Cell at point and Return its first Port as a PortView
@@ -666,7 +656,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             // If Valid First Port, Start and Current Point
             if (firstPort != null && start != null && current != null) // Then Draw A Line From Start to Current Point
             {
-                g.drawLine((int) start.getX(), (int) start.getY(), (int) current.getX(), (int) current.getY());
+                g.drawLine(start.x, start.y, current.x, current.y);
             }
         }
 
@@ -677,12 +667,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 // If Not Floating Port...
                 boolean o = (GraphConstants.getOffset(port.getAttributes()) != null);
                 // ...Then use Parent's Bounds
-                Rectangle2D r = (o) ? port.getBounds() : port.getParentView().getBounds();
+                Rectangle r = (o) ? port.getBounds() : port.getParentView().getBounds();
                 // Scale from Model to Screen
-                r = vGraphComponent.this.toScreen(r);
+                r = vGraphComponent.this.toScreen(new Rectangle(r));
                 // Add Space For the Highlight Border
                 //r.setBounds(r.x - 3, r.y - 3, r.width + 6, r.height + 6);
-                r.setFrame(((Rectangle2D.Double) r).x - 5, ((Rectangle2D.Double) r).y - 5, ((Rectangle2D.Double) r).width + 10, ((Rectangle2D.Double) r).height + 10);
+                r.setBounds(r.x - 5, r.y - 5, r.width + 10, r.height + 10);
                 // Paint Port in Preview (=Highlight) Mode
                 vGraphComponent.this.getUI().paintCell(g, port, r, true);
             }
@@ -696,27 +686,18 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             
             // Add one Floating Port
             vertex.add(new DefaultPort());
-            
-            Point2D.Double pt = new Point2D.Double(point.x, point.y);
-            
             // Snap the Point to the Grid
-            pt = (Point2D.Double) vGraphComponent.this.snap(pt);
-            
+            point = vGraphComponent.this.snap(new Point(point));
             // Default Size for the new Vertex
             Dimension size = new Dimension(25, 25);
-            
             // Create a Map that holds the attributes for the Vertex
-            Map map = getGraphLayoutCache().createNestedMap();
-            
+            Map map = GraphConstants.createMap();
             // Add a Bounds Attribute to the Map
-            GraphConstants.setBounds(map, new Rectangle2D.Double(pt.x, pt.y, size.width, size.height));
-            
+            GraphConstants.setBounds(map, new Rectangle(point, size));
             // Add a Border Color Attribute to the Map
             GraphConstants.setBorderColor(map, Color.black);
-            
             // Add a White Background
             GraphConstants.setBackground(map, Color.white);
-            
             // Make Vertex Opaque
             GraphConstants.setOpaque(map, true);
         // Construct a Map from cells to Maps (for insert)
@@ -741,6 +722,41 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             }
         }
 
+        public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
+            JPopupMenu menu = new JPopupMenu();
+            if (cell != null) {
+                // Edit
+                menu.add(new AbstractAction("Edit") {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        vGraphComponent.this.startEditingAtCell(cell);
+                    }
+                });
+            }
+            // Remove
+            if (!vGraphComponent.this.isSelectionEmpty()) {
+                menu.addSeparator();
+                menu.add(new AbstractAction("Remove") {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    // jmb fix remove.actionPerformed(e);
+                    // remove is an Action
+                    }
+                });
+            }
+            menu.addSeparator();
+            // Insert
+            menu.add(new AbstractAction("Insert") {
+
+                @Override
+                public void actionPerformed(ActionEvent ev) {
+                    insert(pt);
+                }
+            });
+            return menu;
+        }
     } // End of Editor.MyMarqueeHandler
 }
 
@@ -789,17 +805,17 @@ class vPortView extends PortView {
 
     static int mysize = 54;   // same as the circle
 
-    public vPortView(Object o) {
-        super(o);
+    public vPortView(Object o, JGraph jGraph, CellMapper cellMapper) {
+        super(o, jGraph, cellMapper);
     }
 
     @Override
-    public Rectangle2D getBounds() {
-        Rectangle2D.Double bounds = new Rectangle2D.Double(getLocation(null).getX(), getLocation(null).getY(), 0d, 0d);
-        bounds.x -= (mysize / 2);
-        bounds.y -= (mysize / 2);
-        bounds.width +=  mysize;
-        bounds.height += mysize;
+    public Rectangle getBounds() {
+        Rectangle bounds = new Rectangle(getLocation(null));
+        bounds.x = bounds.x - mysize / 2;
+        bounds.y = bounds.y - mysize / 2;
+        bounds.width = bounds.width + mysize;
+        bounds.height = bounds.height + mysize;
         return bounds;
     }
 }
@@ -811,8 +827,8 @@ class vEdgeView extends EdgeView {
 
     public static vEdgeRenderer localRenderer = new vEdgeRenderer();
 
-    public vEdgeView(Object cell) {
-        super(cell);
+    public vEdgeView(Object cell, JGraph gr, CellMapper cm) {
+        super(cell, gr, cm);
     }
 
     @Override
@@ -828,8 +844,8 @@ class vSelfEdgeView extends vEdgeView {
 
     public static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
 
-    public vSelfEdgeView(Object cell) {
-        super(cell);
+    public vSelfEdgeView(Object cell, JGraph gr, CellMapper cm) {
+        super(cell, gr, cm);
     }
 
     @Override
@@ -859,8 +875,8 @@ class CircleView extends VertexView {
 
     static vVertexRenderer localRenderer = new vVertexRenderer();
 
-    public CircleView(Object cell) {
-        super(cell);
+    public CircleView(Object cell, JGraph gr, CellMapper cm) {
+        super(cell, gr, cm);
     }
 
     @Override
@@ -869,9 +885,8 @@ class CircleView extends VertexView {
     }
 }
 
-
 /**
- * A replacement class to tweek the routing slightly so that the edges come into
+ * A replacement class to tweak the routing slightly so that the edges come into
  * the node from other directions than NSE and W.  Also, support offsetting 
  * edges between the same two nodes.
  */
@@ -879,29 +894,26 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing {
 
     @Override
     @SuppressWarnings("unchecked") // JGraph not genericized
-    public List route(GraphLayoutCache glc, EdgeView edge) {
-        int n = edge.getPointCount();
-        List points = edge.getPoints();
+    public void route(EdgeView edge, List points) {
+        int n = points.size();
         Object fromKey = null, toKey = null;
 
-        Point2D from = edge.getPoint(0);
+        Point from = edge.getPoint(0);
 
         if (edge.getSource() instanceof PortView) {
-            from = ((PortView) edge.getSource()).getLocation(edge);
+            from = ((PortView) edge.getSource()).getLocation(null);
             fromKey = getKey((PortView) edge.getSource());
         } else if (edge.getSource() != null) {
-            Rectangle2D rec = edge.getBounds();
-            from = new Point2D.Double(rec.getX(), rec.getY());
+            from = edge.getSource().getBounds().getLocation();
         }
 
-        Point2D to = edge.getPoint(n - 1);
+        Point to = edge.getPoint(n - 1);
 
         if (edge.getTarget() instanceof PortView) {
-            to = ((PortView) edge.getTarget()).getLocation(edge);
+            to = ((PortView) edge.getTarget()).getLocation(null);
             toKey = getKey((PortView) edge.getTarget());
         } else if (edge.getTarget() != null) {
-            Rectangle2D rec = edge.getBounds();
-            to = new Point2D.Double(rec.getX(), rec.getY());
+            to = edge.getTarget().getBounds().getLocation();
         }
 
         int adjustFactor = 0;
@@ -916,19 +928,19 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing {
             adjustFactor *= -1;
         }
 
-        int adjustment = 35 * adjustFactor;       // little bias
+        int adjustment = 0 + 35 * adjustFactor;       // little bias
 
-        double dx = Math.abs(from.getX() - to.getX());
-        double dy = Math.abs(from.getY() - to.getY());
-        double x2 = (from.getX() + (to.getX() - from.getX() / 2));
-        double y2 = (from.getY() + (to.getY() - from.getY() / 2));
-        Point2D[] routed = new Point2D.Double[2];
+        int dx = Math.abs(from.x - to.x);
+        int dy = Math.abs(from.y - to.y);
+        int x2 = from.x + ((to.x - from.x) / 2);
+        int y2 = from.y + ((to.y - from.y) / 2);
+        Point[] routed = new Point[2];
         if (dx > dy) {
-            routed[0] = new Point2D.Double(x2, from.getY() + adjustment);
-            routed[1] = new Point2D.Double(x2, to.getY() - adjustment);
+            routed[0] = new Point(x2, from.y + adjustment);
+            routed[1] = new Point(x2, to.y - adjustment);
         } else {
-            routed[0] = new Point2D.Double(from.getX() - adjustment, y2);
-            routed[1] = new Point2D.Double(to.getX() + adjustment, y2);
+            routed[0] = new Point(from.x - adjustment, y2);
+            routed[1] = new Point(to.x + adjustment, y2);
         }
 
         // Set/Add Points
@@ -944,8 +956,7 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing {
         while (points.size() > routed.length + 2) {
             points.remove(points.size() - 2);
         }
-        
-        return points;
+
     }
 
     private Object getKey(PortView pv) {
@@ -986,12 +997,6 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing {
         }
         return lis.indexOf(edgeKey);
     }
-
-    @Override
-    public int getPreferredLineStyle(EdgeView ev) {
-        return NO_PREFERENCE;
-    }
-    
 }
 
 /**
@@ -999,7 +1004,7 @@ class ViskitRouting implements org.jgraph.graph.Edge.Routing {
  */
 class vSelfEdgeRenderer extends vEdgeRenderer {
 
-    private double circleDiam = 30.0d;
+    private int circleDiam = 30;
     private Arc2D arc;
 
     /**
@@ -1014,21 +1019,21 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
     @Override
     protected Shape createShape() {
         CircleView myCircle = (CircleView) view.getSource().getParentView();
-        Rectangle2D circBnds = myCircle.getBounds();
-        double circCenterX = circBnds.getBounds2D().getCenterX();
-        double circCenterY = circBnds.getBounds2D().getCenterY();
+        Rectangle circBnds = myCircle.getBounds();
+        int circCenterX = circBnds.x + circBnds.width / 2;
+        int circCenterY = circBnds.y + circBnds.height / 2;
 
-        double topCenterX = circCenterX - circleDiam / 2;
-        double topCenterY = circBnds.getBounds().getMaxY() - 7;  // 7 pixels up
+        int topCenterX = circBnds.x + circBnds.width / 2 - circleDiam / 2;
+        int topCenterY = circBnds.y + circBnds.height - 7;  // 7 pixels up
 
         AffineTransform rotater = new AffineTransform();
-        rotater.setToRotation(getAngle(), circCenterX, circCenterY);
+        rotater.setToRotation(getAngle(), (double) circCenterX, (double) circCenterY);
 
         if (view.sharedPath == null) {
-            double ex = topCenterX;
-            double ey = topCenterY;
-            double ew = circleDiam;
-            double eh = circleDiam;
+            double ex = 0.0d + topCenterX;
+            double ey = 0.0d + topCenterY;
+            double ew = 0.0d + circleDiam;
+            double eh = 0.0d + circleDiam;
             arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start , extent
             view.sharedPath = new GeneralPath(arc);
             view.sharedPath = new GeneralPath(view.sharedPath.createTransformedShape(rotater));
@@ -1040,15 +1045,15 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
 
         Point2D p2start = arc.getStartPoint();
         Point2D p2end = arc.getEndPoint();
-        Point2D pstrt = new Point2D.Double(p2start.getX(), p2start.getY());
-        Point2D pend = new Point2D.Double(p2end.getX(), p2end.getY());
+        Point pstrt = new Point((int) p2start.getX(), (int) p2start.getY());
+        Point pend = new Point((int) p2end.getX(), (int) p2end.getY());
 
         if (beginDeco != GraphConstants.ARROW_NONE) {
-            view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point2D.Double(pstrt.getX() + 15, pstrt.getY() + 15));
+            view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point(pstrt.x + 15, pstrt.y + 15));
             view.beginShape = rotater.createTransformedShape(view.beginShape);
         }
         if (endDeco != GraphConstants.ARROW_NONE) {
-            view.endShape = createLineEnd(endSize, endDeco, new Point2D.Double(pend.getX() + 15, pend.getY() + 25), pend);
+            view.endShape = createLineEnd(endSize, endDeco, new Point(pend.x + 15, pend.y + 25), pend);
             view.endShape = rotater.createTransformedShape(view.endShape);
         }
 

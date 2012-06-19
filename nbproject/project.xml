@@ -59,21 +59,12 @@
                     <target>clean</target>
                     <target>jar</target>
                 </action>
-                <action name="run.single">
-                    <script>nbproject/nbjdk.xml</script>
-                    <target>run-selected-file-in-Viskit</target>
-                    <context>
-                        <property>run.class</property>
-                        <folder>src</folder>
-                        <pattern>\.java$</pattern>
-                        <format>java-name</format>
-                        <arity>
-                            <one-file-only/>
-                        </arity>
-                    </context>
+                <action name="debug">
+                    <script>${ant.script}</script>
+                    <target>quick.debug</target>
                 </action>
                 <action name="compile.single">
-                    <script>nbproject/nbjdk.xml</script>
+                    <script>nbproject/ide-file-targets.xml</script>
                     <target>compile-selected-files-in-src</target>
                     <context>
                         <property>files</property>
@@ -85,9 +76,18 @@
                         </arity>
                     </context>
                 </action>
-                <action name="debug">
-                    <script>${ant.script}</script>
-                    <target>debug.quick</target>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-src</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
                 </action>
             </ide-actions>
             <export>

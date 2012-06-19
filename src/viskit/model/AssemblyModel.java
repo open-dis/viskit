@@ -558,8 +558,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
-        double x = ((pclNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
-        double y = ((pclNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
+        int x = ((pclNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
+        int y = ((pclNode.getPosition().y + GridScale / 2) / GridScale) * GridScale;
         coor.setX("" + x);
         coor.setY("" + y);
         pclNode.getPosition().setLocation(x, y);
@@ -607,8 +607,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
-        double x = ((evNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
-        double y = ((evNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
+        int x = ((evNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
+        int y = ((evNode.getPosition().y + GridScale / 2) / GridScale) * GridScale;
         coor.setX("" + x);
         coor.setY("" + y);
         evNode.getPosition().setLocation(x, y);
