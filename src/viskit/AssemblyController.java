@@ -72,7 +72,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /** This method is for introducing Assemblies to compile from outside of
      * Viskit itself, i.e. from SavageStudio.  This method is not used from
-     * Viskit and must be here for extenal use.
+     * Viskit and must be here for external use.
      * @param assyPath an assembly file to compile
      */
     public void compileAssembly(String assyPath) {

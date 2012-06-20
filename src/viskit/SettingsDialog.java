@@ -34,14 +34,10 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtils;
-import org.apache.commons.configuration.XMLConfiguration;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -49,6 +45,12 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileFilter;
+import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * MOVES Institute</p>
@@ -94,7 +96,7 @@ public class SettingsDialog extends JDialog {
         super(mother, "Viskit Application Settings", true);
         this.mother = mother;
 
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
         initConfigs();
 
@@ -275,6 +277,7 @@ public class SettingsDialog extends JDialog {
     
     class lafListener implements ActionListener
     {
+      @Override
       public void actionPerformed(ActionEvent e)
       {
         if(e.getSource() == otherTF) {
@@ -308,6 +311,7 @@ public class SettingsDialog extends JDialog {
 
     class VisibilityHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
@@ -333,6 +337,7 @@ public class SettingsDialog extends JDialog {
 
     class clearEGHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             ViskitController ctrlr = (ViskitController) VGlobals.instance().getEventGraphEditor().getController();
             ctrlr.clearRecentFileSet();
@@ -341,6 +346,7 @@ public class SettingsDialog extends JDialog {
 
     class clearAssHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             AssemblyController aCtrlr = VGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentAssyFileList();
@@ -388,6 +394,7 @@ public class SettingsDialog extends JDialog {
 
     static class Task extends SwingWorker<Void, Void> {
 
+        @Override
         public Void doInBackground() {
             if (dialog != null) {
                 progressDialog.setVisible(true);
@@ -451,6 +458,7 @@ public class SettingsDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
@@ -459,6 +467,7 @@ public class SettingsDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             unloadWidgets();
             dispose();
@@ -469,7 +478,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            if (modified == true) {
+            if (modified) {
                 int ret = JOptionPane.showConfirmDialog(SettingsDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
@@ -486,6 +495,7 @@ public class SettingsDialog extends JDialog {
 
     class addCPhandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (addChooser == null) {
                 addChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -494,6 +504,7 @@ public class SettingsDialog extends JDialog {
                 addChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 addChooser.setFileFilter(new FileFilter() {
 
+                    @Override
                     public boolean accept(File f) {
                         if (f.isDirectory()) {
                             return true;
@@ -510,6 +521,7 @@ public class SettingsDialog extends JDialog {
                         return false;
                     }
 
+                    @Override
                     public String getDescription() {
                         return "Directories, jars and zips";
                     }
@@ -537,6 +549,7 @@ public class SettingsDialog extends JDialog {
 
     class delCPhandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classPathJlist.getSelectedIndices();
             if (selected == null || selected.length <= 0) {
@@ -551,6 +564,7 @@ public class SettingsDialog extends JDialog {
 
     class upCPhandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classPathJlist.getSelectedIndices();
             if (selected == null || selected.length <= 0 || selected[0] <= 0) {
@@ -572,6 +586,7 @@ public class SettingsDialog extends JDialog {
 
     class downCPhandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classPathJlist.getSelectedIndices();
             int listLen = classPathJlist.getModel().getSize();
@@ -609,7 +624,7 @@ public class SettingsDialog extends JDialog {
     }
     
     public static String getLookAndFeel() {
-      return ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
+        return ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
     }
 
     public static boolean getVisibilitySense(String prop) {

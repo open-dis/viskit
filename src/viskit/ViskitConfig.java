@@ -18,7 +18,7 @@ import viskit.doe.FileHandler;
  * Viskit Discrete Event Simulation (DES) Tool</p>
  * Naval Postgraduate School, Monterey, CA</p>
  * www.nps.edu</p>
- * 
+ *
  * @author Mike Bailey
  * @since Mar 8, 2005
  * @since 11:09:07 AM
@@ -117,7 +117,7 @@ public class ViskitConfig {
         } catch (IOException ex) {
             LOG.error(ex);
         }
-        setXmlConfigurations(new HashMap<String, XMLConfiguration>());
+        xmlConfigurations = new HashMap<String, XMLConfiguration>();
         sessionHM = new HashMap<String, String>();
         setDefaultConfig();
     }
@@ -144,7 +144,7 @@ public class ViskitConfig {
                 xc.setAutoSave(true);
                 HierarchicalConfiguration.Node n = xc.getRoot();
                 for (Object o : n.getChildren()) {
-                    getXmlConfigurations().put(((HierarchicalConfiguration.Node) o).getName(), xc);
+                    xmlConfigurations.put(((HierarchicalConfiguration.Node) o).getName(), xc);
                 }
             }
         } catch (Exception e) {
@@ -154,7 +154,7 @@ public class ViskitConfig {
     }
 
     /**
-     * Rather screwy.  A decent design would allow the CompositeConfiguration obj
+     * Rather screwy.  A decent design would allow the CombinedConfiguration obj
      * to do the saving, but it won't.
      *
      * @param key the ViskitConfig named key to set
@@ -162,7 +162,7 @@ public class ViskitConfig {
      */
     public void setVal(String key, String val) {
         String cfgKey = key.substring(0, key.indexOf('.'));
-        XMLConfiguration xc = getXmlConfigurations().get(cfgKey);
+        XMLConfiguration xc = xmlConfigurations.get(cfgKey);
         xc.setProperty(key, val);
     }
 
@@ -191,10 +191,11 @@ public class ViskitConfig {
             LOG.error(ce);
         }
         projectXMLConifg.setAutoSave(true);
-        cc.addConfiguration(projectXMLConifg);
+        cc.addConfiguration(projectXMLConifg, "proj");
+        xmlConfigurations.put("proj", projectXMLConifg);
     }
 
-    /** @return a specific project's XMLConfiguration */
+    /** @return the XMLConfiguration for Viskit project */
     public XMLConfiguration getProjectXMLConfig() {
         return projectXMLConifg;
     }
@@ -204,6 +205,7 @@ public class ViskitConfig {
      */
     public void removeProjectXMLConfig(XMLConfiguration projConfig) {
         cc.removeConfiguration(projConfig);
+        xmlConfigurations.remove("proj");
     }
 
     /** @return the XMLConfiguration for Viskit app */
@@ -211,7 +213,7 @@ public class ViskitConfig {
         return (XMLConfiguration) cc.getConfiguration("app");
     }
 
-    /** @return the XMLConfiguration for Viskit app */
+    /** @return the XMLConfiguration for Viskit gui */
     public XMLConfiguration getViskitGuiConfig() {
         return (XMLConfiguration) cc.getConfiguration("gui");
     }
@@ -257,17 +259,5 @@ public class ViskitConfig {
         } catch (Exception e) {
             LOG.error("Bad jdom op: " + e.getMessage());
         }
-    }
-
-    /** @return a Map of XMLConfigurations */
-    public Map<String, XMLConfiguration> getXmlConfigurations() {
-        return xmlConfigurations;
-    }
-
-    /**
-     * @param xmlConfigurations the xmlConfigurations to set
-     */
-    public final void setXmlConfigurations(HashMap<String, XMLConfiguration> xmlConfigurations) {
-        this.xmlConfigurations = xmlConfigurations;
     }
 }

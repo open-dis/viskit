@@ -98,9 +98,9 @@ public class EventGraphAssemblyComboMain {
                     file.delete();
                 }
                 boolean success = viskitDir.delete();
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getName() + " was found to be corrupted and will be deleted");
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getPath() + " directory was found to be corrupted and will be deleted");
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(viskitDir.getName() + " was found and deleted = " + success);
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("The next start attempt will be successful and a new " + viskitDir.getName() + " will be created");
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
             }
         }
     }
