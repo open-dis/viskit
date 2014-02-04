@@ -43,7 +43,7 @@ public class SimkitXML2Java {
     private final String qu = "\"";
     private final String lb = "[";
     private final String rb = "]";
-    
+
     private String extendz = "";
     private String className = "";
     private File eventGraphFile;
@@ -54,14 +54,14 @@ public class SimkitXML2Java {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         } catch (JAXBException ex) {
             log.error(ex);
-        }       
+        }
     }
-    
+
     /**
      * Creates a new instance of SimkitXML2Java
      * when used from another class, instance this
      * with a String for the className of the xmlFile
-     * @param xmlFile 
+     * @param xmlFile
      */
     public SimkitXML2Java(String xmlFile) {
         this();
@@ -75,7 +75,7 @@ public class SimkitXML2Java {
 
     public SimkitXML2Java(InputStream stream) {
         this();
-        fileInputStream = stream;        
+        fileInputStream = stream;
     }
 
     public SimkitXML2Java(File f) throws FileNotFoundException {
@@ -84,18 +84,18 @@ public class SimkitXML2Java {
         setEventGraphFile(f);
     }
 
-    public void unmarshal() {        
+    public void unmarshal() {
         try {
             setUnMarshaller(jaxbCtx.createUnmarshaller());
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
             this.root = (SimEntity) getUnMarshalledObject();
         } catch (JAXBException ex) {
-            
+
             // Silence attempting to unmarshal an Assembly here
             log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
         }
     }
-    
+
     public Unmarshaller getUnMarshaller() {
         return unMarshaller;
     }
@@ -112,10 +112,10 @@ public class SimkitXML2Java {
     public void setUnMarshalledObject(Object unMarshalledObject) {
         this.unMarshalledObject = unMarshalledObject;
     }
-    
+
     /** @return the XML to Java translated source as a string */
     public String translate() {
-        
+
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
         StringWriter vars = new StringWriter();
@@ -131,7 +131,7 @@ public class SimkitXML2Java {
         buildToString(toStringBlock);
         buildParameterMapAndConstructor(parameterMapAndConstructor);
         buildEventBlock(runBlock, eventBlock);
-        
+
         // TODO: Rename?  This is actually the code block builder
         buildTail(tail);
 
@@ -139,29 +139,29 @@ public class SimkitXML2Java {
 
         return source.toString();
     }
-    
+
     /** @return the base name of this EG file */
     public String getFileBaseName() {
         return fileBaseName;
     }
 
     /**
-     * 
+     *
      * @param fileBaseName
      */
     public void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
     }
-    
+
     /**
-     * 
+     *
      * @param data
      * @param out
      */
     public void writeOut(String data, PrintStream out) {
         out.println(data);
     }
-    
+
     /** @return the XML root of this SimEntity */
     public SimEntity getRoot() {
         return root;
@@ -188,7 +188,7 @@ public class SimkitXML2Java {
         pw.println("import java.util.*;");
         pw.println();
         pw.println("// Application specific imports");
-        
+
         // For debugging only
 //        pw.println("import org.apache.log4j.Logger;");
         pw.println("import simkit.*;");
@@ -231,11 +231,11 @@ public class SimkitXML2Java {
 
         pw.println(sp4 + "/* Simulation State Variables */");
         for (StateVariable s : liStateV) {
-            
+
             Class<?> c = null;
-            
+
             // TODO: use better checking for primitive types i.e. Class.isPrimitive()
-            
+
             // TODO: Determine if encountering generics that contain array types
             if (isGeneric(s.getType())) {
                 pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
@@ -249,7 +249,7 @@ public class SimkitXML2Java {
             }
 
             if (c != null) {
-                Constructor cst = null;
+                Constructor<?> cst = null;
 
                 try {
                     cst = c.getConstructor(new Class<?>[] {});
@@ -277,7 +277,7 @@ public class SimkitXML2Java {
         pw.print(sp8 + "this" + pd + p.getName() + sp + eq + sp);
 
         if (isArray(p.getType()) || isGeneric(p.getType())) {
-            
+
             pw.print(shortinate(p.getName()));
             pw.println(pd + "clone" + lp + rp + sc);
         } else {
@@ -322,7 +322,7 @@ public class SimkitXML2Java {
         pw.println(lp + rp + sp + ob);
 //        pw.println(sp8 + "super.toString()" + sc);
         pw.println(sp8 + "return" + sp + "this.getClass().getName()" + sc);
-//        pw.println(sp8 + "return" + sp + "super.toString()" + sp + "+" + sp + 
+//        pw.println(sp8 + "return" + sp + "super.toString()" + sp + "+" + sp +
 //                qu + " :: " + qu + sp + "+" + sp + "this.getClass().getName()" + sc);
         pw.println(sp4 + cb);
     }
@@ -368,15 +368,15 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(sw);
         String clStr = "";
         String tyStr = "";
-        
+
         // check for cloneable
         if (isCloneable(s.getType())) {
             clStr = ".clone()";
-            
+
             if (!isArray(s.getType())) {
                 tyStr = lp + stripLength(s.getType()) + rp;
             }
-         
+
             // Supress warning call to unchecked cast
             if (isGeneric(s.getType())) {
                 pw.println(sp4 + "@SuppressWarnings(\"unchecked\")");
@@ -402,7 +402,7 @@ public class SimkitXML2Java {
     }
 
     void buildParameterMapAndConstructor(StringWriter parameterMapAndConstructor) {
-        
+
         PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
         List<Parameter> superPList = new ArrayList<Parameter>();
         List<Parameter> pList = this.root.getParameter();
@@ -489,7 +489,7 @@ public class SimkitXML2Java {
     }
 
    void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
-       
+
         List<Event> events = this.root.getEvent();
 
         // Bugfix 1398
@@ -501,12 +501,12 @@ public class SimkitXML2Java {
             }
         }
     }
-    
+
     void doRunBlock(Event run, StringWriter runBlock) {
-        
+
         PrintWriter pw = new PrintWriter(runBlock);
         List<Object> liSchedCanc = run.getScheduleOrCancel();
-        
+
         pw.println(sp4 + "/** Set initial values of all state variables */");
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void reset() {");
@@ -527,7 +527,7 @@ public class SimkitXML2Java {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
-            
+
             /* Prevent generic containers of arrays from getting initialized as
              * array types.
              */
@@ -555,17 +555,17 @@ public class SimkitXML2Java {
         }
 
         pw.println(sp4 + cb);
-        pw.println();        
+        pw.println();
 
         // check if super has a doRun()
         if (extendz.indexOf("SimEntityBase") < 0) {
-            
+
             Method doRun = null;
             try {
                 Class<?> sup = Class.forName(extendz);
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
-            } catch (ClassNotFoundException cnfe) {                
-                
+            } catch (ClassNotFoundException cnfe) {
+
                 // If using plain Vanilla Viskit, don't report on diskit extended EGs
                 if (!cnfe.getMessage().contains("diskit")) {
 //                    log.error(cnfe);
@@ -587,7 +587,7 @@ public class SimkitXML2Java {
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
             pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
-            
+
             // Give these FPC "getters" as arguments
             String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
             String stateVariableGetter = "get" + stateVariableName + lp + rp;
@@ -622,7 +622,7 @@ public class SimkitXML2Java {
         List<Argument> liArgs = e.getArgument();
         List<LocalVariable> liLocalV = e.getLocalVariable();
         List<Object> liSchedCanc = e.getScheduleOrCancel();
-                
+
         pw.print(sp4 + "public void do" + e.getName() + lp);
 
         for (Argument a : liArgs) {
@@ -643,7 +643,7 @@ public class SimkitXML2Java {
                 lines = value.split("\\;");
             }
             pw.print(sp8 + local.getType() + sp + local.getName() + sp + eq);
-                        
+
             // reduce redundant casts
             pw.println(sp + lines[0].trim() + sc);
             for (int i = 1; i < lines.length; i++) {
@@ -682,7 +682,7 @@ public class SimkitXML2Java {
             if (!decls.contains(oldName)) {
                 olds = sv.getType();
                 decls.add(oldName);
-                
+
                 // Prevent calling a generic container of arrays with an index
                 if (isArray(olds) && !isGeneric(olds)) {
                     String[] baseName;
@@ -700,7 +700,7 @@ public class SimkitXML2Java {
             } else {
                 olds += getter;
             }
-            
+
             // Prevent accessing an array index for generic containers of array types
             // check need _idxvar_from(st)
             if (isArray(sv.getType()) && !isGeneric(olds)) {
@@ -730,7 +730,7 @@ public class SimkitXML2Java {
             }
             pw.println();
         }
-        
+
         // waitDelay/interrupt
         for (Object o : liSchedCanc) {
             if (o instanceof Schedule) {
@@ -753,28 +753,28 @@ public class SimkitXML2Java {
 
         pw.print(sp8 + condent + "waitDelay" + lp + qu + ((Event) s.getEvent()).getName() + qu + cm + sp);
 
-        // according to schema to meet Priority class definition, the following 
+        // according to schema to meet Priority class definition, the following
         // tags should be permitted:
         // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
         // however, historically these could be numbers.
-        
+
         // Bugfix 1400: These should now be eneumerations instead of FP values
         pw.print(s.getDelay() + cm + " Priority" + pd + s.getPriority());
-        
+
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
         for (EdgeParameter ep : s.getEdgeParameter()) {
             pw.print(cm + " (Object) ");
-            
+
             String epValue = ep.getValue();
-            
+
             // Cover case where there is a "+ 1" increment, or "-1" decrement on a value
             if (epValue.contains("+") || epValue.contains("-")) {
                 pw.print(lp + ep.getValue() + rp);
             } else {
                 pw.print(ep.getValue());
-            }            
+            }
         }
 
         pw.println(rp + sc);
@@ -819,7 +819,7 @@ public class SimkitXML2Java {
         pw.println(cb);
     }
 
-    void buildSource(StringBuffer source, StringWriter head, StringWriter vars, 
+    void buildSource(StringBuffer source, StringWriter head, StringWriter vars,
             StringWriter parameterMapAndConstructor, StringWriter runBlock,
             StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter tail) {
 
@@ -840,11 +840,11 @@ public class SimkitXML2Java {
     }
 
     public File getEventGraphFile() {return eventGraphFile;}
-    
+
     public final void setEventGraphFile(File f) {
         eventGraphFile = f;
     }
-    
+
     private String stripLength(String s) {
         int left, right;
         if (!isArray(s)) {
@@ -924,7 +924,7 @@ public class SimkitXML2Java {
     // or 0 for an oddball constructor. typically constructor
     // list size should be at minimum the same set as the super.
     // unused?
-    private List<Parameter> paramsInSuper(Constructor c, List<Parameter> params) {
+    private List<Parameter> paramsInSuper(Constructor<?> c, List<Parameter> params) {
         Class<?>[] cTypes = c.getParameterTypes();
         Vector<String> pTypes = new Vector<String>();
         Vector<String> superPTypes = new Vector<String>();
@@ -932,8 +932,8 @@ public class SimkitXML2Java {
         for (Parameter p : params) {
             pTypes.addElement(p.getType());
         }
-        for (int i = 0; i < cTypes.length; i++) {
-            superPTypes.addElement(cTypes[i].getName());
+        for (Class<?> cType : cTypes) {
+            superPTypes.addElement(cType.getName());
         }
         if (pTypes.containsAll(superPTypes)) {
             for (Parameter p : params) {
@@ -1009,7 +1009,7 @@ public class SimkitXML2Java {
         String xmlFile = args[0].replaceAll("\\\\", "/");
         log.info("EventGraph (EG) file is: " + xmlFile);
         log.info("Generating Java Source...");
-        
+
         InputStream is = null;
         try {
             is = new FileInputStream(xmlFile);
