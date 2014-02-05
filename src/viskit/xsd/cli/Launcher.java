@@ -415,12 +415,14 @@ public class Launcher extends Thread implements Runnable {
                 m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                 out = m.invoke(out, new Object[]{});
                 assemblyJava = (String) out;
-                if (debug) {
-                    System.out.println(assemblyJava);
-                }
 
-                if (AssemblyController.compileJavaClassFromString(assemblyJava) != null) {
-                    log.info("Compilation of assempby complete.");
+                log.debug(assemblyJava);
+
+                m = assyContlr.getDeclaredMethod("compileJavaClassFromString", new Class<?>[]{String.class});
+
+                log.info("Generating Java Bytecode...");
+                if (m.invoke(null, new Object[]{assemblyJava}) != null) {
+                    log.info("Compilation of assembly complete.");
                 }
             }
 
