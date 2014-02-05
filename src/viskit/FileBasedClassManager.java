@@ -93,7 +93,7 @@ public class FileBasedClassManager implements Runnable {
      * @throws java.lang.Throwable for a problem finding a class
      */
     public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
-        
+
         // if it is cached, cache directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
@@ -135,7 +135,7 @@ public class FileBasedClassManager implements Runnable {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
                 fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
                 Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
-            }        
+            }
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
             throw new Exception("Unsupported file type.");
         }
@@ -154,23 +154,23 @@ public class FileBasedClassManager implements Runnable {
         // since we're here, cache the parameter names
         try {
             simEntity = (fXml == null) ? (SimEntity) um.unmarshal(f) : (SimEntity) um.unmarshal(fXml);
-            
+
             // NOTE: If the project's build directory got nuked and we have
             // cached our EGs and classes with MD5 hash, we'll throw a
-            // ClassNotFoundException.  
+            // ClassNotFoundException.
             // TODO: Check for this and recompile the EGs before loading their classes
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
-            
-            fban =  (fXml == null) ? 
-                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) : 
+
+            fban =  (fXml == null) ?
+                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
                 new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
-            
+
             List<Object>[] pa = newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
             Vstatics.putParameterList(fclass.getName(), pa);
 
             log.debug("Put " + fclass.getName() + simEntity.getParameter());
-        
+
         } catch (JAXBException e) {
             log.error(e);
         } catch (ClassNotFoundException e) {
@@ -278,8 +278,6 @@ public class FileBasedClassManager implements Runnable {
                 return false;
             }
         } catch (IOException ex) {
-            return false;
-        } catch (Exception ex) {
             log.error(ex);
 //            ex.printStackTrace();
             return false;
@@ -300,7 +298,7 @@ public class FileBasedClassManager implements Runnable {
                 log.debug("getCached index at " + index);
                 log.debug("will return " + cacheClass.get(index));
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             log.error(ex);
 //            ex.printStackTrace();
         }
@@ -326,7 +324,7 @@ public class FileBasedClassManager implements Runnable {
                 log.debug("getCachedXml index at " + index);
                 log.debug("will return " + cacheXML.get(index));
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             log.error(ex);
 //            ex.printStackTrace();
         }
@@ -434,8 +432,7 @@ public class FileBasedClassManager implements Runnable {
         String filePath;
         try {
             filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");
-            int index = -1;
-            index = cacheDigest.lastIndexOf(filePath);
+            int index = cacheDigest.lastIndexOf(filePath);
             if (index >= 0) {
                 String cachedDigest = cacheDigest.get(index);
                 String compareDigest = createMessageDigest(egFile, classFile);
@@ -459,8 +456,8 @@ public class FileBasedClassManager implements Runnable {
             paramAnnots = constr[j].getDeclaredAnnotations();
             if (paramAnnots == null) {
                 l[j] = new ArrayList<Object>();
-                for (int i = 0; i < clz.length; i++) {
-                    String zName = clz[i].getName();
+                for (Class<?> clz1 : clz) {
+                    String zName = clz1.getName();
                     if (zName.indexOf(".class") > 0) {
                         zName = zName.split("\\.")[0];
                     }
@@ -510,6 +507,7 @@ public class FileBasedClassManager implements Runnable {
         return fileMap.get(className).xmlSource;
     }
 
+    @Override
     public void run() {
         final Vector<String> v = new Vector<String>();
 
@@ -525,6 +523,7 @@ public class FileBasedClassManager implements Runnable {
 
                 if (v.size() > 0) {
                     SwingUtilities.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             VGlobals.instance().getAssemblyModel().externalClassesChanged(v);
                         }

@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
+ * @deprecated use {@link edu.nps.util.TempFileManager} instead
  * @author rmgoldbe
  */
 

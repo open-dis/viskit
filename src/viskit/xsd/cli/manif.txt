@@ -1,1 +1,2 @@
 Main-Class: viskit.xsd.cli.Boot
+Class-Path: lib/bsh-2.0b4.jar lib/commons-beanutils-1.8.3.jar lib/commons-codec-1.3.jar lib/commons-configuration-1.7.jar lib/commons-collections-3.2.1.jar lib/commons-digester-2.1.jar lib/commons-lang-2.6.jar lib/commons-logging-1.1.1.jar lib/jaxb-api.jar lib/jaxb-impl.jar lib/jdom.jar lib/log4j.jar lib/simkit.jar lib/viskit.jar lib/xmlrpc-2.0.jar

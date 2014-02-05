@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
  *  java.io.File} instead.
  *
  *  Refer to Sun bugs 4171239 and 4950148 for more details.
- * 
+ *
  *  Code adapted from article titled "Clean Up Your Mess: Managing Temp Files in Java Apps"
  *  @link http://www.devx.com/Java/Article/22018/1954
  *  @author Michael Pilone
@@ -120,7 +120,7 @@ public class TempFileManager {
         // Select all the files
         File[] files = rootDir.listFiles();
         for (File file : files) {
-            
+
             // If the file is a directory, we will
             // recursively call delete on it.
             if (file.isDirectory()) {
@@ -141,7 +141,7 @@ public class TempFileManager {
             throw new IOException("Could not delete: " + rootDir.getAbsolutePath());
         }
     }
-    
+
     /**
      *  The prefix for the temp directory in the system temp directory
      */
@@ -150,9 +150,9 @@ public class TempFileManager {
      *  The temp directory to generate all files in
      */
     private static File sTmpDir = null;
-    
+
     /**
-     *  Static block used to clean up any old temp directories found -- the JVM 
+     *  Static block used to clean up any old temp directories found -- the JVM
      *  will run this block when a class loader loads the class.
      */
     static {
@@ -163,6 +163,7 @@ public class TempFileManager {
         FileFilter tmpDirFilter =
                 new FileFilter() {
 
+                    @Override
                     public boolean accept(File pathname) {
                         return (pathname.isDirectory() &&
                                 pathname.getName().startsWith(TEMP_DIR_PREFIX));

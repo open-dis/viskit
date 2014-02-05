@@ -2,7 +2,7 @@
  * SessionManager.java
  *
  * Created on January 26, 2006, 4:57 PM
- * 
+ *
  * Handles login and session cookies, required to
  * authenticate and de-multiplex multi-jobs.
  *
@@ -19,21 +19,33 @@
  */
 package viskit.xsd.assembly;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFile;
 import viskit.xsd.bindings.assembly.User;
@@ -43,11 +55,13 @@ import viskit.xsd.bindings.assembly.User;
  * @author Rick Goldberg
  */
 public class SessionManager /* compliments DoeSessionDriver*/ {
-    
+
     private Hashtable<String, String> sessions;
     private JAXBContext jaxbCtx;
-    private static final String WTMP = "/var/gridkit/wtmp.xml";
-    private static final String PASSWD = "/var/gridkit/passwd.xml";
+
+    Logger LOG = LogUtils.getLogger(SessionManager.class);
+
+    private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";
 
     public static String LOGIN_ERROR = "LOGIN-ERROR";
@@ -57,24 +71,23 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
         sessions = new Hashtable<String, String>();
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-        } catch (Exception e) {
-            log("Package Error");
+        } catch (JAXBException e) {
+            LOG.error(e);
         }
-        log("SessionManager initialized");
+        LOG.info("SessionManager initialized");
     }
-    
+
     public String login(String username, String password) {
- 
+
         try {
-            FileInputStream is = 
-                new FileInputStream(PASSWD);
+            FileInputStream is = new FileInputStream(PASSWD);
             Unmarshaller u = jaxbCtx.createUnmarshaller();
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
-            List users = passwd.getUser();
+            List<User> users = passwd.getUser();
             String passcrypt = null;
-            Iterator it = users.iterator();
+            Iterator<User> it = users.iterator();
             while (it.hasNext()) {
-                User user = (User) it.next();
+                User user = it.next();
                 if (user.getName().equals(username)) {
                     passcrypt = user.getPassword();
                 }
@@ -98,37 +111,64 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 String clear = new String(utf8, "UTF-8");
                 if (clear.equals(username)) {
                     String cookie = generateCookie(username);
-                    if (! cookie.equals("BAD-COOKIE")) {
+                    if (!cookie.equals("BAD-COOKIE")) {
                         createSession(cookie, username);
-                        log("Session created for "+username);
+                        LOG.info("Session created for "+username);
                     }
                     return cookie;
                } else {
-                    log("Failed login attempt for "+username);
+                    LOG.warn("Failed login attempt for "+username);
                     return "BAD-LOGIN";
                 }
             }
-        } catch (Exception e) {
-            log(new java.util.Date().toString()+": Login error "+e.toString());
+        } catch (FileNotFoundException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (JAXBException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (NoSuchAlgorithmException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (InvalidKeySpecException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (NoSuchPaddingException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (InvalidKeyException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (InvalidAlgorithmParameterException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (UnsupportedEncodingException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (IllegalBlockSizeException e) {
+            LOG.error(e);
+            return LOGIN_ERROR;
+        } catch (BadPaddingException e) {
+            LOG.error(e);
             return LOGIN_ERROR;
         }
-        
-        log("Unknown user "+username);
+
+        LOG.info("Unknown user "+username);
         return "UNKNOWN-USER";
     }
-    
+
     public Boolean logout(String ssid) {
         if (sessions.containsKey(ssid)) {
             String[] session = sessions.get(ssid).trim().split("\\s+");
             long startTime = Long.parseLong(session[session.length - 1]);
             long endTime = new java.util.Date().getTime();
             sessions.remove(ssid);
-            log("Logout "+session[0]+" after "+(endTime-startTime)/1000+" seconds");
+            LOG.info("Logout "+session[0]+" after "+(endTime-startTime)/1000+" seconds");
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
-                      
+
     /**
      * create a new user identity with default password as
      * uid encrypted with uid. To bootstrap a password file,
@@ -137,12 +177,12 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
      * @param usid the user ID
      * @param newUser the name of the new user
      * @return an indication of success
-     */    
+     */
     public Boolean addUser(String usid, String newUser) {
         if ( isAdmin(usid) ) {
-            
+
             File pwd = new File(PASSWD);
-            
+
             try {
                 String passcrypt = null;
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
@@ -152,19 +192,19 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 //when marshalled doesn't contain proper <PasswordFile>
                 //tags, but createPasswordFile() does.
                 PasswordFile passwd = of.createPasswordFile();
-                
+
                 // TODO: upgrade to generic JWSDP
                 List<User> users = passwd.getUser();
                 if (pwd.exists()) {
                     FileInputStream is = new FileInputStream(pwd);
                     passwd = (PasswordFile) u.unmarshal(is);
                     is.close();
-                    
+
                     // TODO: upgrade to generic JWSDP
                     users = passwd.getUser();
-                    Iterator it = users.iterator();
+                    Iterator<User> it = users.iterator();
                     while (it.hasNext()) {
-                        User user = (User) it.next();
+                        User user = it.next();
                         if (user.getName().equals(newUser)) {
                             passcrypt = user.getPassword();
                         }
@@ -176,7 +216,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     // new user id itself
                     User user = (new ObjectFactory()).createUser();
                     user.setName(newUser);
-                    log("Trying to add user "+newUser);
+                    LOG.info("Trying to add user "+newUser);
                     // set up crypto stuff
                     byte[] salt = SALT.getBytes();
                     PBEKeySpec keySpec = new PBEKeySpec(newUser.toCharArray(), salt, 18);
@@ -184,38 +224,60 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     Cipher encipher = Cipher.getInstance(key.getAlgorithm());
                     PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
                     encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
-                    
+
                     // encrypt newUser id with newUser id for temporary password token
                     byte[] utf8 = newUser.getBytes("UTF-8");
                     byte[] enc = encipher.doFinal(utf8);
-                    
+
                     // Encode bytes to base64 to get a string and write out to passwd.xml file
                     user.setPassword( new String(new org.apache.commons.codec.binary.Base64().encode(enc)) );
                     users.add(user);
-                    
+
                     // write out to XML user database
                     FileOutputStream fos = new FileOutputStream(pwd);
-                    
+
                     jaxbCtx.createMarshaller().marshal(passwd,fos);
                     fos.flush();
                     fos.close();
-                    log("New user created for "+newUser);
+                    LOG.info("New user created for "+newUser);
                     return Boolean.TRUE;
                 } else {
-                    log("Add existing user failed for "+newUser);
+                    LOG.warn("Add existing user failed for "+newUser);
                     return Boolean.FALSE;
                 }
-            } catch (Exception e) {
-                log("Add user error with "+newUser+" check with admin");
+            } catch (JAXBException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (IOException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (NoSuchAlgorithmException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidKeySpecException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (NoSuchPaddingException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidKeyException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidAlgorithmParameterException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (IllegalBlockSizeException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (BadPaddingException e) {
+                LOG.error(e);
                 return Boolean.FALSE;
             }
-            
-            
         }
-        log("Attempted add user by non-admin!");
+        LOG.warn("Attempted add user by non-admin!");
         return Boolean.FALSE;
     }
-    
+
     public Boolean changePassword(String usid, String username, String newPassword) {
         File pwd = new File(PASSWD);
         if ( getUser(usid).equals(username) || isAdmin(usid) ) {
@@ -224,23 +286,23 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 FileInputStream is = new FileInputStream(pwd);
                 PasswordFile passwd = (PasswordFile) u.unmarshal(is);
                 is.close();
-                List users = passwd.getUser();
-                Iterator it = users.iterator();
+                List<User> users = passwd.getUser();
+                Iterator<User> it = users.iterator();
                 while (it.hasNext()) {
-                    User user = (User) it.next();
+                    User user = it.next();
                     if (user.getName().equals(username)) {
-                        //TBD could refactor out the crypto stuff 
+                        //TBD could refactor out the crypto stuff
                         byte[] salt = SALT.getBytes();
                         PBEKeySpec keySpec = new PBEKeySpec(newPassword.toCharArray(), salt, 18);
                         SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
                         Cipher encipher = Cipher.getInstance(key.getAlgorithm());
                         PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 18);
                         encipher.init(Cipher.ENCRYPT_MODE,key,paramSpec);
-                        
+
                         // encrypt username id with newPassword for temporary password token
                         byte[] utf8 = username.getBytes("UTF-8");
                         byte[] enc = encipher.doFinal(utf8);
-                        
+
                         // Encode bytes to base64 to get a string and write out to passwd.xml file
                         user.setPassword( new String(new org.apache.commons.codec.binary.Base64().encode(enc)) );
                     }
@@ -249,20 +311,44 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 jaxbCtx.createMarshaller().marshal(passwd,fos);
                 fos.flush();
                 fos.close();
-            } catch (Exception e) {
-                log("Error changing password for"+username);
+            } catch (JAXBException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (IOException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (NoSuchAlgorithmException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidKeySpecException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (NoSuchPaddingException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidKeyException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (InvalidAlgorithmParameterException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (IllegalBlockSizeException e) {
+                LOG.error(e);
+                return Boolean.FALSE;
+            } catch (BadPaddingException e) {
+                LOG.error(e);
                 return Boolean.FALSE;
             }
-            log("Password changed for "+username);
+            LOG.info("Password changed for "+username);
             return Boolean.TRUE;
         }
-        
+
         return Boolean.FALSE;
     }
-  
+
     // end of XML-RPC direct back-ends
-    
-    
+
+
      private String generateCookie(String username) {
         try {
             byte[] salt = SALT.getBytes();
@@ -276,19 +362,33 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             byte[] enc = encipher.doFinal(utf8);
             // Encode bytes to base64 to get a String
             return new String(new org.apache.commons.codec.binary.Base64().encode(enc));
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
+            return "BAD-COOKIE";
+        } catch (InvalidKeySpecException e) {
+            return "BAD-COOKIE";
+        } catch (NoSuchPaddingException e) {
+            return "BAD-COOKIE";
+        } catch (InvalidKeyException e) {
+            return "BAD-COOKIE";
+        } catch (InvalidAlgorithmParameterException e) {
+            return "BAD-COOKIE";
+        } catch (UnsupportedEncodingException e) {
+            return "BAD-COOKIE";
+        } catch (IllegalBlockSizeException e) {
+            return "BAD-COOKIE";
+        } catch (BadPaddingException e) {
             return "BAD-COOKIE";
         }
     }
-     
+
     // tag the username with the login time, can auto-logout
     // after inactivity check (TBD). see note about cookie
     // randomness and decide if following is redundant:
-     
+
     private void createSession(String cookie, String username) {
         sessions.put(cookie, username+" "+new java.util.Date().getTime());
     }
-    
+
     private String getPasscrypt(String username) {
         try {
             String passcrypt = null;
@@ -296,69 +396,39 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             File pwd = new File(PASSWD);
             FileInputStream is = new FileInputStream(pwd);
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
-            List users = passwd.getUser();
-            Iterator it = users.iterator();
+            List<User> users = passwd.getUser();
+            Iterator<User> it = users.iterator();
             while (it.hasNext()) {
-                User user = (User) it.next();
+                User user = it.next();
                 if (user.getName().equals(username)) {
                     passcrypt = user.getPassword();
                 }
             }
             return passcrypt;
-        } catch (Exception e) {
+        } catch (JAXBException e) {
+            return e.toString();
+        } catch (FileNotFoundException e) {
             return e.toString();
         }
     }
- 
+
     public boolean authenticate(String usid) {
-        // isAdmin only happens if no password file
-        // has yet been created. 
-        if ( sessions.get(usid) != null || isAdmin(usid)) {
-            return true;
-        } else {
-            return false;
-        }
+        return sessions.get(usid) != null || isAdmin(usid);
     }
-    
+
     boolean isAdmin(String usid) {
         if (getUser(usid).equals("admin")) {
             return true;
         }
-        
-        File f = new File(PASSWD);
-        if(!f.exists()) {
-            return true; // init passwd with addUser for admin
-        } // init passwd with addUser for admin
-        
-        return false;
+
+        return !new File(PASSWD).exists();
     }
-    
+
     private String getUser(String usid) {
         if ( sessions.containsKey(usid) ) {
             String[] session = sessions.get(usid).trim().split("\\s+");
             return session[0];
         }
         return "nobody";
-    }
-    
-    final void log(String message) {
-        String line = "<Log>"+new java.util.Date().toString()+": "+message+"</Log>"+'\n';
-        FileOutputStream fos = null;
-        try {
-            File f = new File(WTMP);
-            if (!f.exists()) {
-                f.createNewFile();
-            }
-            fos = new FileOutputStream(f,true);
-            fos.write(line.getBytes());
-        } catch (Exception e) {
-            System.err.println(e.getLocalizedMessage());
-        } finally {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-            }
-        }
     }
 }

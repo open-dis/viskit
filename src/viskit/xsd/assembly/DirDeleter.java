@@ -10,14 +10,15 @@ package viskit.xsd.assembly;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.File;
+import java.util.List;
 
 /**
- *
+ * @deprecated use {@link edu.nps.util.TempFileManager} instead
  * @author rmgoldbe
  */
 
 public class DirDeleter extends Thread {
-    private ArrayList<File> dirList = new ArrayList<File>();
+    private List<File> dirList = new ArrayList<File>();
 
     public synchronized void add(File dir) {
         dirList.add(dir);
@@ -26,9 +27,9 @@ public class DirDeleter extends Thread {
     @Override
     public void run() {
         synchronized (this) {
-            Iterator iterator = dirList.iterator();
+            Iterator<File> iterator = dirList.iterator();
             while (iterator.hasNext()) {
-                File dir = (File)iterator.next();
+                File dir = iterator.next();
                 deleteDirectory(dir);
                 iterator.remove();
             }
@@ -39,14 +40,14 @@ public class DirDeleter extends Thread {
         File[] fileArray = dir.listFiles();
 
         if (fileArray != null) {
-            for (int i = 0; i < fileArray.length; i++) {
-                //if (fileArray[i].isDirectory())
-                  //deleteDirectory(fileArray[i]);
-                //else
-                   //fileArray[i].delete();
+            for (File file : fileArray) {
+                if (file.isDirectory())
+                   deleteDirectory(file);
+                else
+                   file.delete();
             }
         }
-        //dir.delete();
+        dir.delete();
     }
 }
 

@@ -7,10 +7,14 @@
  */
 package viskit.test;
 
+import edu.nps.util.LogUtils;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.apache.xmlrpc.XmlRpcException;
 
 /**
  *
@@ -19,9 +23,11 @@ import org.apache.xmlrpc.XmlRpcClientLite;
  */
 public class TestGridkitLogin extends Thread {
 
+    static Logger LOG = LogUtils.getLogger(TestGridkitLogin.class);
+
     XmlRpcClientLite xmlrpc;
 
-    /** 
+    /**
      * Creates a new instance of TestGridkitLogin
      * To set up a server, run the ant gridkit-jar
      * target, then just "java -jar dist/gridkit.jar"
@@ -34,7 +40,7 @@ public class TestGridkitLogin extends Thread {
     public void run() {
         Vector<Object> params = new Vector<Object>();
         String user = "admin";
-        String usid = "";
+        String usid;
         Object ret;
         params.add(user); // just something to create bogus usid
         params.add(user); // to initialize a password file
@@ -176,8 +182,10 @@ public class TestGridkitLogin extends Thread {
                 chunks--;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (XmlRpcException e) {
+            LOG.error(e);
+        } catch (IOException e) {
+            LOG.error(e);
         }
 
     }
@@ -187,7 +195,7 @@ public class TestGridkitLogin extends Thread {
             TestGridkitLogin test = new TestGridkitLogin(args[0], Integer.parseInt(args[1]));
             test.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e);
         }
     }
 }

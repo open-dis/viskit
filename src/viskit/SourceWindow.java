@@ -30,6 +30,7 @@ import javax.tools.ToolProvider;
  * @since 3:17:23 PM
  * @version $Id$
  */
+@SuppressWarnings("serial")
 public class SourceWindow extends JFrame {
     // weird compiler error, lets src be visible as final
     // but not className???
@@ -72,12 +73,14 @@ public class SourceWindow extends JFrame {
         tb.add(againButt);
         fontPlus.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 jta.setFont(jta.getFont().deriveFont(jta.getFont().getSize2D() + 1.0f));
             }
         });
         fontMinus.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 jta.setFont(jta.getFont().deriveFont(Math.max(jta.getFont().getSize2D() - 1.0f, 1.0f)));
             }
@@ -141,6 +144,7 @@ public class SourceWindow extends JFrame {
 
         closeButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 SourceWindow.this.dispose();
             }
@@ -151,11 +155,12 @@ public class SourceWindow extends JFrame {
             StringBuffer sb = new StringBuffer();
             BufferedReader br;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
                 JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                StringBuffer diagnosticMessages = new StringBuffer();
+                StringBuilder diagnosticMessages = new StringBuilder();
                 CompilerDiagnosticListener diag = new CompilerDiagnosticListener(diagnosticMessages);
                 String clName = SourceWindow.className;
                 JavaObjectFromString jofs;
@@ -167,13 +172,13 @@ public class SourceWindow extends JFrame {
                     Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
                     String workDirPath = workDir.toURI().getPath();
                     String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
-                    StringBuffer classPaths = new StringBuffer();
+                    StringBuilder classPaths = new StringBuilder();
 
                     for (String cPath : workClassPath) {
-                        classPaths.append(cPath + File.pathSeparator);
+                        classPaths.append(cPath).append(File.pathSeparator);
                     }
 
-                    String[] options = {                        
+                    String[] options = {
                         "-Xlint:unchecked",
                         "-Xlint:deprecation",
                         "-cp",
@@ -192,8 +197,8 @@ public class SourceWindow extends JFrame {
                             fileObjects).call();
                     sb.append(baosOut.toString());
                     sb.append(diag.messageString);
-                    sb.append(jofs.toUri() + "\n\n");
-                   
+                    sb.append(jofs.toUri()).append("\n\n");
+
                     sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
                     if (diag.messageString.toString().indexOf("No Compiler Errors") < 0) {
@@ -218,6 +223,7 @@ public class SourceWindow extends JFrame {
 
         saveButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String fn = getFileName();
                 saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(), fn));
@@ -253,16 +259,17 @@ public class SourceWindow extends JFrame {
 
     public class CompilerDiagnosticListener implements DiagnosticListener<JavaFileObject> {
 
-        public StringBuffer messageString;
+        public StringBuilder messageString;
         public long startOffset = -1;
         public long endOffset = 0;
         public long line;
         public long columnNumber = 0;
 
-        public CompilerDiagnosticListener(StringBuffer messageString) {
+        public CompilerDiagnosticListener(StringBuilder messageString) {
             this.messageString = messageString;
         }
 
+        @Override
         public void report(Diagnostic message) {
             String msg = message.getMessage(null);
             if (msg.indexOf("should be declared in a file named") > 0) {
@@ -344,7 +351,7 @@ public class SourceWindow extends JFrame {
                 le = le3;
             }
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sa.length; i++) {
             String n = "" + (i + 1);
             int diff = 3 - n.length();        // right align number, 3 digits, pad w/ spaces on left
@@ -385,6 +392,7 @@ public class SourceWindow extends JFrame {
 
         startAct = new AbstractAction(startSearchHandle) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 searcher.startSearch();
                 jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
@@ -392,6 +400,7 @@ public class SourceWindow extends JFrame {
         };
         againAct = new AbstractAction(searchAgainHandle) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 searcher.searchAgain();
                 jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
@@ -475,11 +484,12 @@ class Searcher {
     }
 }
 
+@SuppressWarnings("serial")
 class sysOutDialog extends JDialog implements ActionListener {
 
     private static sysOutDialog dialog;
     private static String value = "";
-    private JList list;
+    private JList<Object> list;
     private JTextArea jta;
     private JScrollPane jsp;
 
@@ -493,8 +503,8 @@ class sysOutDialog extends JDialog implements ActionListener {
      * dialog should appear.
      * @param frameComp
      * @param locationComp
-     * @param labelText 
-     * @param title 
+     * @param labelText
+     * @param title
      * @return the dialog for this SourceWindow
      */
     public static String showDialog(Component frameComp,
@@ -518,7 +528,7 @@ class sysOutDialog extends JDialog implements ActionListener {
 
         //Create and initialize the buttons.
         JButton cancelButton = new JButton("OK");
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener(sysOutDialog.this);
         getRootPane().setDefaultButton(cancelButton);
 
         //main part of the dialog
@@ -557,6 +567,7 @@ class sysOutDialog extends JDialog implements ActionListener {
     }
 
     //Handle clicks on the Set and Cancel buttons.
+    @Override
     public void actionPerformed(ActionEvent e) {
         sysOutDialog.dialog.dispose();
     }

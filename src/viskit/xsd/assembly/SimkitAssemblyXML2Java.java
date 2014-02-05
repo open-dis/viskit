@@ -20,7 +20,7 @@ import viskit.xsd.bindings.assembly.*;
  * @version $Id$
  */
 public class SimkitAssemblyXML2Java {
-    
+
     SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
@@ -28,9 +28,9 @@ public class SimkitAssemblyXML2Java {
     JAXBContext jaxbCtx;
 //    static final boolean debug = false;
     static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
- 
+
     /* convenience Strings for formatting */
-    
+
     final private String sp  = " ";
     final private String sp4 = sp+sp+sp+sp;
     final private String sp8 = sp4+sp4;
@@ -46,7 +46,7 @@ public class SimkitAssemblyXML2Java {
     final private String pd  = ".";
     final private String qu  = "\"";
     final private String nw = "new";
-    
+
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
         try {
@@ -59,18 +59,18 @@ public class SimkitAssemblyXML2Java {
 //            }
         }
     }
-    
+
     public SimkitAssemblyXML2Java(SimkitAssembly root) {
         this();
         this.root = root;
     }
-    
+
     /**
      * Creates a new instance of SimkitAssemblyXML2Java
      * when used from another class, instance this
      * with a String for the name of the xmlFile.
      * @param xmlFile
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
         this(new File(xmlFile));
@@ -78,25 +78,25 @@ public class SimkitAssemblyXML2Java {
 
     /** Used by Viskit
      * @param f the Assembly File to process
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
-    public SimkitAssemblyXML2Java(File f) throws FileNotFoundException {        
+    public SimkitAssemblyXML2Java(File f) throws FileNotFoundException {
         this(new FileInputStream(f));
         this.fileBaseName = baseNameOf(f.getName());
         this.inputFile = f;
     }
-    
+
     public SimkitAssemblyXML2Java(InputStream is) {
         this();
         fileInputStream = is;
     }
-    
+
     public void unmarshal() {
         try {
             Unmarshaller u = jaxbCtx.createUnmarshaller();
-                        
+
             this.root = (SimkitAssembly) u.unmarshal(fileInputStream);
-            
+
             // For debugging, make true
             if (false) {
                 marshalRoot();
@@ -106,7 +106,7 @@ public class SimkitAssemblyXML2Java {
 //            ex.printStackTrace();
         }
     }
-    
+
     public String getFileBaseName() {
         return fileBaseName;
     }
@@ -114,7 +114,7 @@ public class SimkitAssemblyXML2Java {
     public void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
     }
-    
+
     public javax.xml.bind.Element unmarshalAny(String bindings) {
         JAXBContext oldCtx = jaxbCtx;
         Unmarshaller u;
@@ -123,12 +123,12 @@ public class SimkitAssemblyXML2Java {
             u = jaxbCtx.createUnmarshaller();
             jaxbCtx = oldCtx;
             return (javax.xml.bind.Element) u.unmarshal(fileInputStream);
-        } catch (Exception e) {
+        } catch (JAXBException e) {
             jaxbCtx = oldCtx;
             return (javax.xml.bind.Element) null;
-        }        
+        }
     }
-    
+
     public void marshalRoot() {
         try {
             Marshaller m = jaxbCtx.createMarshaller();
@@ -138,7 +138,7 @@ public class SimkitAssemblyXML2Java {
             log.error(ex);
         }
     }
-    
+
     public String marshalToString(Object jaxb) {
         Marshaller m;
         String s;
@@ -158,13 +158,13 @@ public class SimkitAssemblyXML2Java {
             PrintWriter pw = new PrintWriter(sw);
             m.marshal(jaxb,pw);
             s = sw.toString();
-        } catch (Exception e) { 
+        } catch (JAXBException e) {
             log.error(e);
 //            e.printStackTrace();
         }
         return s;
     }
-    
+
     public String marshalFragmentToString(Object jaxb) {
         Marshaller m;
         String s;
@@ -184,42 +184,42 @@ public class SimkitAssemblyXML2Java {
             PrintWriter pw = new PrintWriter(sw);
             m.marshal(jaxb,pw);
             s = sw.toString();
-        } catch (Exception e) { 
+        } catch (JAXBException e) {
             log.error(e);
 //            e.printStackTrace();
         }
         return s;
-    }    
-    
+    }
+
     public void marshal(File f) {
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(f);
             marshal((javax.xml.bind.Element) root, (OutputStream)fos);
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             log.error(e);
 //            e.printStackTrace();
         }
     }
-    
+
     public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
         Marshaller m;
         try {
             m = jaxbCtx.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(node,o);
-        } catch (Exception e) {
+        } catch (JAXBException e) {
             log.error(e);
 //            e.printStackTrace();
         }
     }
-    
+
     public SimkitAssembly getRoot() {
         return root;
     }
-    
+
     public String translate() {
-        
+
         StringBuffer source = new StringBuffer();
         StringWriter head = new StringWriter();
         StringWriter entities = new StringWriter();
@@ -227,19 +227,19 @@ public class SimkitAssemblyXML2Java {
         StringWriter output = new StringWriter();
         StringWriter tail = new StringWriter();
         StringWriter verbose = new StringWriter();
-        
+
         buildHead(head);
         buildEntities(entities);
         buildListeners(listeners);
         buildOutput(output);
         buildVerbose(verbose);
         buildTail(tail);
-        
+
         buildSource(source, head, entities, listeners, output, verbose, tail);
-        
+
         return source.toString();
     }
-    
+
     void buildHead(StringWriter head) {
         PrintWriter pw = new PrintWriter(head);
         String name = this.root.getName();
@@ -247,14 +247,14 @@ public class SimkitAssemblyXML2Java {
         String extendz = this.root.getExtend();
         String implementz = this.root.getImplement();
         Schedule schedule;
-        
+
         pw.println("package " + pkg + sc);
         pw.println();
-        
+
         // Fully qualified names are used, no imports required
-//        printImports(pw);        
+//        printImports(pw);
 //        pw.println();
-        
+
         if (extendz.equals("java.lang.Object")) {
             extendz = "";
         } else {
@@ -271,34 +271,34 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
         pw.println(sp8 + "super" + lp + rp + sc);
         if ( (schedule = this.root.getSchedule()) != null ) {
-            
+
             pw.print(sp8 + "setStopTime");
             pw.println(lp + schedule.getStopTime() + rp + sc);
-            
+
             pw.print(sp8 + "setVerbose");
             pw.println(lp + schedule.getVerbose() + rp + sc);
-            
+
             pw.print(sp8 + "setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
-            
+
             pw.print(sp8 + "setSaveReplicationData");
             pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
-            
+
             pw.print(sp8 + "setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
-            
+
             pw.print(sp8 + "setPrintSummaryReport");
-            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);            
+            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
         }
-        
+
         pw.println(sp4 + cb);
         pw.println();
     }
-    
+
     /** Print out required imports to the Assembly
      * @param pw the PrintWriter to write out Java source
      */
-    void printImports(PrintWriter pw) {        
+    void printImports(PrintWriter pw) {
         SortedSet<String> list = Collections.synchronizedSortedSet(new TreeSet<String>());
         List<SimEntity> r = this.root.getSimEntity();
 
@@ -319,7 +319,7 @@ public class SimkitAssemblyXML2Java {
         };
 
         List<String> exList = java.util.Arrays.asList(excludes);
-        
+
         synchronized (list) {
             Iterator<String> listI = list.iterator();
             while (listI.hasNext()) {
@@ -330,16 +330,16 @@ public class SimkitAssemblyXML2Java {
                 }
             }
         }
-        
+
         for (String imports : list) {
             if (!imports.startsWith("java.lang")) {
                 pw.println("import" + sp + imports + sc);
             }
         }
     }
-    
+
     /** This method currently unused
-     * 
+     *
      * @param branch
      * @param tlist
      */
@@ -349,7 +349,7 @@ public class SimkitAssemblyXML2Java {
             if (!tlist.contains(t)) {
                 tlist.add(t);
             }
-            
+
             List<Object> p = ((SimEntity) branch).getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
@@ -360,7 +360,7 @@ public class SimkitAssemblyXML2Java {
             if (!tlist.contains(t)) {
                 tlist.add(t);
             }
-            
+
             List<Object> p = fp.getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
@@ -371,11 +371,11 @@ public class SimkitAssemblyXML2Java {
             if (!tlist.contains(t)) {
                 tlist.add(t);
             }
-            
-            List<Object> p = mp.getParameters();            
+
+            List<Object> p = mp.getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
-            }            
+            }
         } else if ( branch instanceof TerminalParameter ) {
             TerminalParameter tp = (TerminalParameter)branch;
             String t = stripBrackets(tp.getType());
@@ -391,36 +391,36 @@ public class SimkitAssemblyXML2Java {
             if (!tlist.contains(t)) {
                 tlist.add(t);
             }
-            
+
             List<Object> p = pcl.getParameters();
             for (Object o : p) {
                 traverseForImports(o, tlist);
             }
         }
     }
-    
+
     /** This method currently unused
      * @param type
-     * @return 
+     * @return
      */
     String stripBrackets(String type) {
         int brindex = type.indexOf('[');
         return (brindex > 0) ? new String(type.substring(0, brindex)): type;
-    }    
-    
+    }
+
     void buildEntities(StringWriter entities) {
         PrintWriter pw = new PrintWriter(entities);
-        
+
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "protected void createSimEntities" + lp + rp + sp + ob);
-        
+
         for (SimEntity se : this.root.getSimEntity()) {
             List<Object> pl = se.getParameters();
-            
+
             pw.println();
             pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
             pw.print(sp12 + nw + sp + se.getType() + lp);
-            
+
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
@@ -430,38 +430,38 @@ public class SimkitAssemblyXML2Java {
             } else {
                 pw.println(rp);
             }
-            
+
             pw.println(sp8 + rp + sc);
         }
-       
+
         if ( this.root.getSimEventListenerConnection().size() > 0 ) {
             pw.println();
         }
-        
+
         for (SimEventListenerConnection sect : this.root.getSimEventListenerConnection()) {
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + sect.getListener() + qu);
             pw.println(cm + qu + sect.getSource() + qu + rp + sc);
         }
-        
+
         if ( this.root.getAdapter().size() > 0 ) {
             pw.println();
         }
-        
+
         for (Adapter a : this.root.getAdapter()) {
             pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm );
             pw.print(sp + qu + a.getEventHeard() + qu + cm );
             pw.print(sp + qu + a.getEventSent() + qu + cm );
             pw.print(sp + qu + a.getFrom() + qu + cm );
             pw.println(sp + qu + a.getTo() + qu + rp + sc );
-        } 
-        
+        }
+
         pw.println();
         pw.println(sp8 + "super" + pd + "createSimEntities"+ lp + rp + sc);
-        
+
         pw.println(sp4 + cb);
-        pw.println();        
+        pw.println();
     }
-    
+
      /** Build up a parameter up to but not including a trailing comma.
       * _callers_ should check the size of the list to determine if a
       * comma is needed. This may include a closing paren or brace
@@ -470,10 +470,10 @@ public class SimkitAssemblyXML2Java {
       * @param plist
       * @param param
       * @param indent
-      * @param pw 
+      * @param pw
       */
     void doParameter(List<Object> plist, Object param, String indent, PrintWriter pw) {
-        
+
         if ( param instanceof MultiParameter ) {
             doMultiParameter((MultiParameter) param, indent, pw);
         } else if ( param instanceof FactoryParameter ) {
@@ -481,10 +481,10 @@ public class SimkitAssemblyXML2Java {
         } else {
             doTerminalParameter((TerminalParameter) param, indent, pw);
         }
-        
+
         maybeComma(plist, param, pw);
     }
-    
+
     // with newer getSimEntityByName() always returns SimEntity, however
     // parameter may actually call for a subclass.
     String castIfSimEntity(String type) {
@@ -500,7 +500,7 @@ public class SimkitAssemblyXML2Java {
         }
         return sret;
     }
-    
+
     void doFactoryParameter(FactoryParameter fact, String indent, PrintWriter pw) {
         String factory = fact.getFactory();
         String method = fact.getMethod();
@@ -511,9 +511,9 @@ public class SimkitAssemblyXML2Java {
         }
         pw.print(indent + sp4 + rp);
     }
-    
+
     void doTerminalParameter(TerminalParameter term, String indent, PrintWriter pw) {
-        
+
         String type = term.getType();
         String value = term.getValue();
         if ( term.getLinkRef() != null ) {
@@ -525,48 +525,44 @@ public class SimkitAssemblyXML2Java {
             pw.print(indent + sp4 + qu + value + qu);
         } else { // some Expression
             pw.print(indent + castIfSimEntity(type) + value);
-        }        
+        }
     }
-    
+
     void doSimpleStringParameter(TerminalParameter term, PrintWriter pw) {
-        
+
         String type = term.getType();
         String value = term.getValue();
-        
+
         if ( isString(type) ) {
             pw.print(qu + value + qu);
         } else {
             error("Should only have a single String parameter for this PropertyChangeListener");
-        }        
-    }
-    
-    boolean isPrimitive(String type) {
-        if (type.equals("boolean") |
-            type.equals("char") |
-            type.equals("double") |
-            type.equals("float") |
-            type.equals("int") |
-            type.equals("long") |
-            type.equals("short")) {
-            return true;
-        } else {
-            return false;
         }
     }
-    
+
+    boolean isPrimitive(String type) {
+        return type.equals("boolean") |
+               type.equals("char") |
+               type.equals("double") |
+               type.equals("float") |
+               type.equals("int") |
+               type.equals("long") |
+               type.equals("short");
+    }
+
     boolean isString(String type) {
         return type.equals("String") | type.equals("java.lang.String");
     }
-    
+
     boolean isArray(String type) {
         return type.endsWith("]");
     }
-    
+
     void doMultiParameter(MultiParameter p, String indent, PrintWriter pw) {
-        
+
         List<Object> params = p.getParameters();
         String ptype = p.getType();
-        
+
         if ( isArray(ptype) ) {
             pw.println(indent + sp4 + nw + sp + ptype + ob);
             for (Object o : params) {
@@ -574,16 +570,16 @@ public class SimkitAssemblyXML2Java {
             }
             pw.print(indent + sp4 + cb);
         } else { // some multi param object
-            
+
             // Reduce redundant casting
             pw.println(indent + sp4 + /*castIfSimEntity(ptype) +*/ nw + sp + ptype + lp);
             for (Object o : params) {
                 doParameter(params, o, indent + sp4, pw);
             }
             pw.print(indent + sp4 + rp);
-        }        
+        }
     }
-    
+
     void maybeComma(List<Object> params, Object param, PrintWriter pw) {
         if ( params.size() > 1 && params.indexOf(param) < params.size() - 1 ) {
             pw.println(cm);
@@ -591,16 +587,16 @@ public class SimkitAssemblyXML2Java {
             pw.println();
         }
     }
-    
+
     void buildListeners(StringWriter listeners) {
-        
+
         PrintWriter pw = new PrintWriter(listeners);
         Map<String, PropertyChangeListener> replicationStats = new LinkedHashMap<String, PropertyChangeListener>();
         Map<String, PropertyChangeListener> designPointStats = new LinkedHashMap<String, PropertyChangeListener>();
         Map<String, PropertyChangeListener> propertyChangeListeners = new LinkedHashMap<String, PropertyChangeListener>();
-        Map<String, List<PropertyChangeListenerConnection>> propertyChangeListenerConnections = 
+        Map<String, List<PropertyChangeListenerConnection>> propertyChangeListenerConnections =
                 new LinkedHashMap<String, List<PropertyChangeListenerConnection>>();
-        
+
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
 
@@ -617,7 +613,7 @@ public class SimkitAssemblyXML2Java {
                 propertyChangeListeners.put(pcl.getName(), pcl);
             }
         }
-                
+
         for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
             String name = pclc.getListener();
             List<PropertyChangeListenerConnection> connections = propertyChangeListenerConnections.get(name);
@@ -627,10 +623,10 @@ public class SimkitAssemblyXML2Java {
             }
             connections.add( pclc);
         }
-        
+
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
-        
+
         for (PropertyChangeListener pcl : propertyChangeListeners.values()) {
                               List<Object> pl = pcl.getParameters();
                   pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcl.getName() + qu + cm);
@@ -647,7 +643,7 @@ public class SimkitAssemblyXML2Java {
                   }
                   pw.println(sp8 + rp + sc);
         }
-        
+
         for (String propChangeListener : propertyChangeListenerConnections.keySet()) {
             for (PropertyChangeListenerConnection pclc : propertyChangeListenerConnections.get(propChangeListener)) {
                 pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propChangeListener + qu + cm + qu + pclc.getProperty() + qu + cm);
@@ -658,17 +654,17 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp8 + "super" + pd + "createPropertyChangeListeners" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-        
+
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
-        
+
         String[] pcls = replicationStats.keySet().toArray(new String[0]);
         for (String propChangeListener : pcls) {
             PropertyChangeListener pcl = replicationStats.get(propChangeListener);
             List<Object> pl = pcl.getParameters();
             pw.println(sp8 + "addReplicationStats" + lp + qu + propChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
-            
+
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
@@ -678,7 +674,7 @@ public class SimkitAssemblyXML2Java {
             } else {
                 pw.println(rp);
             }
-            
+
             pw.println(sp8 + rp + sc);
             pw.println();
             List<PropertyChangeListenerConnection> myConnections =
@@ -694,18 +690,18 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
-        
+
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
-        
+
         pcls = designPointStats.keySet().toArray(new String[0]);
-        
+
         for (String propChangeListener : pcls) {
             PropertyChangeListener pcl = designPointStats.get(propChangeListener);
             List<Object> pl = pcl.getParameters();
             pw.println(sp8 + "addDesignPointStats" + lp + qu + propChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
-            
+
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
@@ -716,11 +712,11 @@ public class SimkitAssemblyXML2Java {
                 pw.println(rp);
             }
          }
-        
+
         pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
-        
+
         pw.println(sp4 + cb);
-        pw.println();        
+        pw.println();
     }
 
     String nameAsm() {
@@ -729,7 +725,7 @@ public class SimkitAssemblyXML2Java {
         asm += this.root.getName().substring(1,this.root.getName().length());
         return asm;
     }
-    
+
     void buildVerbose(StringWriter out)
     {
         PrintWriter pw = new PrintWriter(out);
@@ -740,10 +736,10 @@ public class SimkitAssemblyXML2Java {
             pw.println();
         }
     }
-    
+
     void buildOutput(StringWriter out) {
         PrintWriter pw = new PrintWriter(out);
-        
+
         // override the printInfo method to dump detailed output from the nodes which are marked, if any
         List<Output> outputs = getRoot().getOutput();
         if(!outputs.isEmpty()) {
@@ -756,21 +752,21 @@ public class SimkitAssemblyXML2Java {
             pw.println(sp4 + cb);
             pw.println();
             pw.println();
-        }        
+        }
     }
-    
+
     private void dumpEntities(List<Output> lis, PrintWriter pw) {
         List<SimEntity> simEntities = getRoot().getSimEntity();
         List<PropertyChangeListener> pcls = getRoot().getPropertyChangeListener();
         for (Output output : lis) {
             Object elem = output.getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
-            
+
             for (SimEntity se : simEntities) {
                 if (se.getName().equals(elem.toString())) {
                     name = se.getName();
                     break;
-                } 
+                }
             }
 
             for (PropertyChangeListener pcl : pcls) {
@@ -779,45 +775,45 @@ public class SimkitAssemblyXML2Java {
                     break;
                 }
             }
-            
+
             if (!name.contains("<FIX:")) {
                 pw.println(sp8 + "System.out.println" + lp + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
             }
-        }      
+        }
     }
-    
+
     void buildTail(StringWriter t) {
-        
+
         PrintWriter pw = new PrintWriter(t);
         String nAsm = nameAsm();
-        
+
         // The main method doesn't need to dump the outputs, since their done at object init time now
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
-                
+
         pw.println(sp8 + nw + sp + "Thread" + lp + nAsm + rp + pd + "start" + lp + rp + sc);
-        
+
         pw.println();
         pw.println(sp4 + cb);
         pw.println(cb);
     }
-    
+
     void buildSource(StringBuffer source, StringWriter head, StringWriter entities,
             StringWriter listeners, StringWriter output, StringWriter verbose, StringWriter tail ) {
-        
+
         source.append(head.getBuffer()).  append(entities.getBuffer()).append(listeners.getBuffer());
         source.append(output.getBuffer()).append(verbose.getBuffer()). append(tail.getBuffer());
     }
-    
+
     public void writeOut(String data, java.io.PrintStream out) {
         out.println(data);
     }
-    
+
     private String baseNameOf(String s) {
         return s.substring(0, s.indexOf(pd));
     }
-    
+
     void runIt() {
         try {
             File f = new File(pd);
@@ -829,19 +825,19 @@ public class SimkitAssemblyXML2Java {
             mainMethod.invoke(null, params);
         } catch (Exception e) { error(e.toString()); }
     }
-    
+
     void error(String desc) {
-        
+
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        
+
         pw.println("error :");
         pw.println(desc);
-        
+
         System.err.println(sw.toString());
         System.exit(1);
     }
-    
+
     /**
      * @param arg the command line arguments
      * arg[0] - -f | --file | -p | --port
@@ -855,11 +851,11 @@ public class SimkitAssemblyXML2Java {
         SimkitAssemblyXML2Java sax2j = null;
         List<String> args = java.util.Arrays.asList(arg);
         ListIterator<String> lit = args.listIterator();
-        
+
         for (String a : args) {
             //FIXME Remove port stuff
             if (a.equals("-p") || a.equals("--port")) {
-                
+
                 // Dummy forward looking next()
                 lit.next();
                 if (lit.hasNext()) {
@@ -869,21 +865,21 @@ public class SimkitAssemblyXML2Java {
                     usage();
                 }
             } else if (a.equals("-f") || a.equals("--file")) {
-                
+
                 // Dummy forward looking next()
                 lit.next();
                 if (lit.hasNext()) {
-                    fileName = lit.next();                    
+                    fileName = lit.next();
                     fileName = fileName.replaceAll("\\\\", "/");
                 } else {
                     usage();
                 }
             }
         }
-        
+
         log.info("Assembly file is: " + fileName);
         log.info("Generating Java Source...");
-        
+
         if (port == 0) {
             if ( fileName == null ) {
                 usage();
@@ -891,11 +887,11 @@ public class SimkitAssemblyXML2Java {
                 try {
                     sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
                 } catch (FileNotFoundException ex) {log.error(ex);}
-                sax2j.unmarshal();               
-            }            
+                sax2j.unmarshal();
+            }
         } else {
             if (fileName == null) {
-                sax2j = new SimkitAssemblyXML2Java(); 
+                sax2j = new SimkitAssemblyXML2Java();
             } else {
                 InputStream is = null;
                 try {
@@ -903,10 +899,10 @@ public class SimkitAssemblyXML2Java {
                 } catch (FileNotFoundException fnfe) {
                     log.error(fnfe);
                 }
-                sax2j = new SimkitAssemblyXML2Java(is);                
+                sax2j = new SimkitAssemblyXML2Java(is);
             }
         }
-        
+
         File baseName = new File(sax2j.baseNameOf(fileName));
         sax2j.setFileBaseName(baseName.getName());
         sax2j.unmarshal();
@@ -920,10 +916,10 @@ public class SimkitAssemblyXML2Java {
            log.info("Done.");
         }
     }
-    
+
     static void usage() {
         System.out.println("Check args, you need at least a port or a file in grid mode");
         System.out.println("usage: Assembly [-p port | --port port | -f file | --file file]");
         System.exit(1);
-    }    
+    }
 }

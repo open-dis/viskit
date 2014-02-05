@@ -231,7 +231,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
             // TODO: Implement an Assembly descrition block set here
             adjustRecentAssySet(file);
-            
+
             // Mark every vAMod opened as "open"
             openAlready = vaw.getOpenModels();
             for (ViskitAssemblyModel vAMod : openAlready) {
@@ -264,7 +264,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @param jaxbroot the JAXB root of this XML file
      */
     protected void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
-        OpenAssembly.inst().setFile(f, jaxbroot);        
+        OpenAssembly.inst().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyController */
@@ -354,7 +354,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     Set<RecentAssyFileListener> recentAssyListeners = new HashSet<RecentAssyFileListener>();
-    
+
     @Override
     public void addRecentAssyFileSetListener(RecentAssyFileListener lis) {
         recentAssyListeners.add(lis);
@@ -364,7 +364,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void removeRecentAssyFileSetListener(RecentAssyFileListener lis) {
         recentAssyListeners.remove(lis);
     }
-    
+
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssyFileListeners() {
@@ -374,7 +374,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     Set<RecentProjFileListener> recentProjListeners = new HashSet<RecentProjFileListener>();
-    
+
     @Override
     public void addRecentProjFileSetListener(RecentProjFileListener lis) {
         recentProjListeners.add(lis);
@@ -384,7 +384,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void removeRecentProjFileSetListener(RecentProjFileListener lis) {
         recentProjListeners.remove(lis);
     }
-    
+
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentProjFileListeners() {
@@ -608,7 +608,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     }
 
     private boolean closeAll = false;
-    
+
     @Override
     public void closeAll() {
 
@@ -952,7 +952,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ((ViskitAssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
     }
-    
+
     private Vector<Object> selectionVector = new Vector<Object>();
 
     /**
@@ -976,7 +976,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             ActionIntrospector.getAction(this, "edit").setEnabled(false);
         }
     }
-    
+
     private Vector<EvGraphNode> copyVector = new Vector<EvGraphNode>();
 
     @SuppressWarnings("unchecked")
@@ -1032,9 +1032,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         int x = 100,
                 y = 100;
         int n = 0;
-        // We only paste un-attached nodes (at first)
-        for (Iterator<EvGraphNode> itr = copyVector.iterator(); itr.hasNext();) {
-            Object o = itr.next();
+        for (Object o : copyVector) {
             if (o instanceof AssemblyEdge) {
                 continue;
             }
@@ -1347,7 +1345,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
                 // TODO: Need to announce/recommend to the user to place
                 // diskit.jar in the classpath, then restart Viskit
-            } else {               
+            } else {
                 paf = compileJavaClassAndSetPackage(src);
             }
         } catch (FileNotFoundException e) {

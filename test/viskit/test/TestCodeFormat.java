@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -31,25 +33,26 @@ public class TestCodeFormat extends Thread {
     InputStream inputStream;
     ByteArrayOutputStream bufferOut;
     ByteArrayInputStream bufferIn;
-    
+
     /** Creates a new instance of TestCodeFormat */
     public TestCodeFormat(String testFile) {
-        this.testFile = new String(testFile);
+        this.testFile = testFile;
         bufferOut = new ByteArrayOutputStream();
         bufferIn = new ByteArrayInputStream(new byte[0]);
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings");
+            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         } catch ( javax.xml.bind.JAXBException jaxbe ) {
             jaxbe.printStackTrace();
         }
     }
-    
+
+    @Override
     public void run() {
         try {
             inputStream = openEventGraph(testFile);
             loadEventGraph(inputStream);
             showXML(System.out);
-            // reopen it 
+            // reopen it
             inputStream.close();
             inputStream = openEventGraph(testFile);
             showJava(inputStream);
@@ -62,64 +65,64 @@ public class TestCodeFormat extends Thread {
             byte[] buff = bufferOut.toByteArray();
             bufferIn = new ByteArrayInputStream(buff);
             showJava(bufferIn);
-            
+
         } catch ( Exception e ) {
             e.printStackTrace();
         }
     }
-    
+
     InputStream openEventGraph(String filename) {
         InputStream is = null;
         try {
 	    is = new FileInputStream(filename);
-	} catch ( Exception e ) {
-            System.out.println("Failed to open "+filename);
+	} catch ( FileNotFoundException e ) {
+            System.err.println("Failed to open "+filename);
 	    e.printStackTrace();
-	} 
+	}
         return is;
     }
-    
+
     void loadEventGraph(InputStream is) {
         Unmarshaller u;
 	try {
 	    u = jaxbCtx.createUnmarshaller();
 	    this.root = (SimEntity) u.unmarshal(is);
-	} catch (Exception e) { e.printStackTrace(); }
-        
+	} catch (JAXBException e) { e.printStackTrace(); }
+
     }
-    
+
     void showXML(OutputStream out) {
         try {
             Marshaller m = jaxbCtx.createMarshaller();
             // even setting this to false, thereby losing all
             // tabs in the XML, the CDATA still appears to preserve
             // formatting.
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(root,out);
         } catch ( Exception e ) {
             e.printStackTrace();
         }
-        
+
     }
-    
+
     void showJava(InputStream is) throws Exception {
         sx2j = new SimkitXML2Java(is);
         sx2j.unmarshal();
         System.out.println( sx2j.translate() );
     }
-    
-    
-    // add a Code block via jaxb, which 
+
+
+    // add a Code block via jaxb, which
     // gives a handy setCode(String code)
     // method rather than having to create
     // a <Code> element then setValue(String)
     // on that.
-    // String here is 
+    // String here is
     //     "System.out.println("this is a test");
     //      if ( true ) {
     //          System.out.println();
     //      }"
-    //  
+    //
     void modifyEventGraph() throws Exception {
 
         root.setCode(""+
@@ -128,13 +131,13 @@ public class TestCodeFormat extends Thread {
                 "\tSystem.out.println();\n" +
                 "}"
         );
-        
+
     }
-    
+
     public static void main(String[] args) {
       System.out.println("wd=>>>>>>>>>>> "+System.getProperty("user.dir"));
         TestCodeFormat tcf = new TestCodeFormat(args[0]);
         tcf.start();
     }
-    
+
 }
