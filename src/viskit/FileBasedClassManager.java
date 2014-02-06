@@ -116,7 +116,7 @@ public class FileBasedClassManager implements Runnable {
                     setFileBasedAssemblyNode(f);
 
                     // TODO: work situtation where another build/classes gets added
-                    // to the classpath as it won't readily been seen before the
+                    // to the classpath as it won't readily be seen before the
                     // project's build/classes is.  This causes ClassNotFoundExceptions
                     addCache(f, fban.classFile);
                 }
