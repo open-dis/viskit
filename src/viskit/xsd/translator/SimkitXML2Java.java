@@ -104,7 +104,7 @@ public class SimkitXML2Java {
         this.unMarshaller = unMarshaller;
     }
 
-    /** @return an unmarshalled JAXB Ojbect */
+    /** @return an unmarshalled JAXB Object */
     public Object getUnMarshalledObject() {
         return unMarshalledObject;
     }
@@ -116,7 +116,7 @@ public class SimkitXML2Java {
     /** @return the XML to Java translated source as a string */
     public String translate() {
 
-        StringBuffer source = new StringBuffer();
+        StringBuilder source = new StringBuilder();
         StringWriter head = new StringWriter();
         StringWriter vars = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
@@ -819,7 +819,7 @@ public class SimkitXML2Java {
         pw.println(cb);
     }
 
-    void buildSource(StringBuffer source, StringWriter head, StringWriter vars,
+    void buildSource(StringBuilder source, StringWriter head, StringWriter vars,
             StringWriter parameterMapAndConstructor, StringWriter runBlock,
             StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter tail) {
 

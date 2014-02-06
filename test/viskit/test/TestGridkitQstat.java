@@ -7,10 +7,15 @@
  */
 package viskit.test;
 
+import edu.nps.util.LogUtils;
+import java.io.IOException;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.apache.xmlrpc.XmlRpcException;
 
 /**
+ * NOTE: unless a qstat package is installed, this will not work
  *
  * @author Rick Goldberg
  * @version $Id: TestGridkitQstat.java 1662 2007-12-16 19:44:04Z tdnorbra $
@@ -18,11 +23,10 @@ import org.apache.xmlrpc.XmlRpcClientLite;
 public class TestGridkitQstat extends Thread {
 
     XmlRpcClientLite xmlrpc;
+    static Logger log = LogUtils.getLogger(TestGridkitQstat.class);
 
-    /** 
+    /**
      * Creates a new instance of TestGridkitLogin
-     * To set up a server, run the ant gridkit-jar
-     * target, then just "java -jar dist/gridkit.jar"
      */
     public TestGridkitQstat(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server, port);
@@ -33,7 +37,7 @@ public class TestGridkitQstat extends Thread {
         Vector<Object> params = new Vector<Object>();
         String user = "newbie";
         String passwd = "newpass";
-        String usid = "";
+        String usid;
         Object ret;
         try {
             params.clear();
@@ -53,8 +57,8 @@ public class TestGridkitQstat extends Thread {
                 System.out.println(xmlrpc.execute("gridkit.qstatXML", params));
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    ;
+                } catch (InterruptedException e) {
+                    log.error(e);
                 }
                 System.out.println("=======================================");
             }
@@ -65,18 +69,27 @@ public class TestGridkitQstat extends Thread {
             ret = xmlrpc.execute("gridkit.logout", params);
             System.out.println("logged out");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error(e);
+        } catch (XmlRpcException e) {
+            log.error(e);
         }
 
     }
 
+    /**
+     * To set up a server, first run the ant gridkit-jar target, then on the
+     * command line, navigate to the Viskit base directory and :
+     * "java -Djava.endorsed.dirs=dist/lib/endorsed -jar dist/gridkit.jar"
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         try {
             TestGridkitQstat test = new TestGridkitQstat(args[0], Integer.parseInt(args[1]));
             test.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 }

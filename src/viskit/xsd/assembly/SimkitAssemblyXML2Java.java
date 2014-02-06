@@ -195,14 +195,14 @@ public class SimkitAssemblyXML2Java {
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(f);
-            marshal((javax.xml.bind.Element) root, (OutputStream)fos);
+            marshal(root, fos);
         } catch (FileNotFoundException e) {
             log.error(e);
 //            e.printStackTrace();
         }
     }
 
-    public void marshal(javax.xml.bind.Element node, java.io.OutputStream o) {
+    public void marshal(Object node, OutputStream o) {
         Marshaller m;
         try {
             m = jaxbCtx.createMarshaller();
@@ -220,7 +220,7 @@ public class SimkitAssemblyXML2Java {
 
     public String translate() {
 
-        StringBuffer source = new StringBuffer();
+        StringBuilder source = new StringBuilder();
         StringWriter head = new StringWriter();
         StringWriter entities = new StringWriter();
         StringWriter listeners = new StringWriter();
@@ -799,7 +799,7 @@ public class SimkitAssemblyXML2Java {
         pw.println(cb);
     }
 
-    void buildSource(StringBuffer source, StringWriter head, StringWriter entities,
+    void buildSource(StringBuilder source, StringWriter head, StringWriter entities,
             StringWriter listeners, StringWriter output, StringWriter verbose, StringWriter tail ) {
 
         source.append(head.getBuffer()).  append(entities.getBuffer()).append(listeners.getBuffer());

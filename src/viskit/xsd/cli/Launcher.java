@@ -12,7 +12,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import org.apache.log4j.Logger;
-import viskit.AssemblyController;
 
 public class Launcher extends Thread implements Runnable {
 
@@ -47,18 +46,19 @@ public class Launcher extends Thread implements Runnable {
                 // a specific directory is more automated
                 String eventGraphDir = p.getProperty("EventGraphDir");
                 eventGraphDir = (eventGraphDir == null) ? "?" : eventGraphDir;
-                if (Thread.currentThread().getContextClassLoader() instanceof Boot) {
-                    Boot b = (Boot) Thread.currentThread().getContextClassLoader();
+                log.info("eventGraphDir is " + eventGraphDir);
+                if (cloader instanceof Boot) {
+                    Boot b = (Boot) cloader;
                     u = b.baseJarURL;
                     URLConnection urlc = u.openConnection();
                     JarInputStream jis = new JarInputStream(urlc.getInputStream());
                     JarEntry je;
                     while ((je = jis.getNextJarEntry()) != null) {
                         String name = je.getName();
-                        System.out.println("Loading EventGraph from: " + name);
-                        // nb: BehaviorLibraries is sort of hard coded here,
-                        // better to have a property tbd
-                        if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml")) {
+
+                        // Assemblies are foreced to be identified with "Assembly" in the file name
+                        if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml") && !name.contains("Assembly") ) {
+                            log.info("Loading EventGraph from: " + name);
                             addEventGraph(jis);
                         }
                     }
@@ -111,13 +111,9 @@ public class Launcher extends Thread implements Runnable {
                 if (p.getProperty("Port") != null) {
                     launchGridkit(p.getProperty("Port"));
                 } else if (p.getProperty("Assembly") != null) {
-                    if (debug) {
-                        System.out.println("Running Assembly " + p.getProperty("Assembly"));
-                    }
+                    log.debug("Running Assembly " + p.getProperty("Assembly"));
                     u = cloader.getResource(p.getProperty("Assembly"));
-                    if (debug) {
-                        System.out.println("From URL: " + u);
-                    }
+                    log.debug("From URL: " + u);
                     setAssembly(u);
                     // EventGraphs can also be dropped onto the top-level dir
                     // as long as they are enumerated
@@ -212,7 +208,7 @@ public class Launcher extends Thread implements Runnable {
         Object assemblyJaxb = m.invoke(umo, new Object[]{bais});
 
         // get the root node of the assembly and obtain name of assembly
-        jclz = cloader.loadClass("viskit.xsd.bindings.assembly.SimkitAssemblyType");
+        jclz = cloader.loadClass("viskit.xsd.bindings.assembly.SimkitAssembly");
         m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
         assemblyName = (String) m.invoke(assemblyJaxb, new Object[]{});
         m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
@@ -249,17 +245,15 @@ public class Launcher extends Thread implements Runnable {
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
             Object eventgraph = m.invoke(umo, new Object[]{bais});
 
-            jclz = cloader.loadClass("viskit.xsd.bindings.eventgraph.SimEntityType");
+            jclz = cloader.loadClass("viskit.xsd.bindings.eventgraph.SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
             String eventGraphName = (String) m.invoke(eventgraph, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
             eventGraphName += "." + m.invoke(eventgraph, new Object[]{});
 
             eventGraphs.put(eventGraphName, xml.toString());
-            if (debug) {
-                System.out.println(eventGraphName + "EventGraph XML");
-                System.out.println(xml.toString());
-            }
+            log.debug(eventGraphName + "EventGraph XML");
+            log.debug(xml.toString());
 
         // silent this may not be an event-graph xml
         } catch (ClassNotFoundException e) {
@@ -314,7 +308,7 @@ public class Launcher extends Thread implements Runnable {
             compile();
             if (assemblyName != null) {
                 // run it
-                Class<?> asmz = Thread.currentThread().getContextClassLoader().loadClass(assemblyName);
+                Class<?> asmz = cloader.loadClass(assemblyName);
                 Constructor<?> c = asmz.getConstructor(new Class<?>[]{});
                 Object out = c.newInstance(new Object[]{});
                 Thread t = new Thread((Runnable) out);
@@ -430,7 +424,7 @@ public class Launcher extends Thread implements Runnable {
             URL url = new URL("file:" + File.separator + File.separator + jarFromDir.getCanonicalPath() + File.separator);
             // if these path-jammers don't work, then will need to define classes directly in the classloader
             // via bytes. url here is the file:\/\/+ canonical path from above to tempDir
-            ((Boot) (Thread.currentThread().getContextClassLoader())).addURL(url);
+            ((Boot) (cloader)).addURL(url);
             // jam the classpath with the new directory
             systemClassPath = System.getProperty("java.class.path");
             System.setProperty("java.class.path", systemClassPath + File.pathSeparator + jarFromDir.getCanonicalPath());
@@ -477,9 +471,7 @@ public class Launcher extends Thread implements Runnable {
         bshcm = m.invoke(bsh, new Object[]{});
         m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
         out = m.invoke(bshcm, new Object[]{"viskit.xsd.assembly.BasicAssembly"});
-        if (debug) {
-            System.out.println("Checking if viskit.xsd.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
-        }
+        log.debug("Checking if viskit.xsd.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
 
         try {
             Enumeration<String> e = eventGraphs.keys();
@@ -499,9 +491,7 @@ public class Launcher extends Thread implements Runnable {
                 m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                 out = m.invoke(out, new Object[]{});
                 eventGraphJava = (String) out;
-                if (debug) {
-                    System.out.println(eventGraphJava);
-                }
+                log.debug(eventGraphJava);
 
                 // bsh eval generated java source
                 m = bshz.getDeclaredMethod("eval", new Class<?>[]{String.class});
@@ -524,9 +514,7 @@ public class Launcher extends Thread implements Runnable {
             m = axml2jz.getDeclaredMethod("translate", new Class<?>[]{});
             out = m.invoke(out, new Object[]{});
             assemblyJava = (String) out;
-            if (debug) {
-                System.out.println(assemblyJava);
-            }
+            log.debug(assemblyJava);
 
             // bsh eval the generated source
             m = bshz.getDeclaredMethod("eval", new Class<?>[]{String.class});
@@ -538,13 +526,9 @@ public class Launcher extends Thread implements Runnable {
             // sanity check the bsh class loaders if assembly exists
             m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
             out = m.invoke(bshcm, new Object[]{assemblyName});
-            if (debug) {
-                System.out.println("Checking if " + assemblyName + " exists... " + ((Boolean) out).toString());
-            }
+            log.debug("Checking if " + assemblyName + " exists... " + ((Boolean) out).toString());
             out = m.invoke(bshcm, new Object[]{"simkit.random.RandomVariateFactory"});
-            if (debug) {
-                System.out.println("Checking if simkit.random.RandomVariateFactory exists... " + ((Boolean) out).toString());
-            }
+            log.debug("Checking if simkit.random.RandomVariateFactory exists... " + ((Boolean) out).toString());
 
             // get the assembly class, create instance and thread it
             m = bshcmz.getDeclaredMethod("classForName", new Class<?>[]{String.class});
@@ -595,7 +579,7 @@ public class Launcher extends Thread implements Runnable {
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = Thread.currentThread().getContextClassLoader().loadClass("viskit.xsd.translator.SimkitXML2Java");
+    Class clz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     //xml2j = new SimkitXML2Java(bais);
     xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
@@ -614,7 +598,7 @@ public class Launcher extends Thread implements Runnable {
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
-    Class clz = Thread.currentThread().getContextClassLoader().loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
+    Class clz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();

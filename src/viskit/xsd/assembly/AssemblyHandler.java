@@ -64,12 +64,11 @@ public class AssemblyHandler implements XmlRpcHandler {
      * Implement the XmlRpcHandler interface directly to manually specify available
      * methods. Realize that many users will be calling this all at once, globals strong-bad.
      */
-
     @Override
     public Object execute(String methodName, Vector arguments) throws java.lang.Exception {
         Object ret;
         String call = methodName;
-        String xmlData = "empty";
+        String xmlData;
         String usid;
 
         // handle login request. returns a cookie which may or may not be real.

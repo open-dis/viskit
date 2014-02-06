@@ -29,8 +29,6 @@ public class TestGridkitLogin extends Thread {
 
     /**
      * Creates a new instance of TestGridkitLogin
-     * To set up a server, run the ant gridkit-jar
-     * target, then just "java -jar dist/gridkit.jar"
      */
     public TestGridkitLogin(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server, port);
@@ -190,6 +188,13 @@ public class TestGridkitLogin extends Thread {
 
     }
 
+    /**
+     * To set up a server, first run the ant gridkit-jar target, then on the
+     * command line, navigate to the Viskit base directory and :
+     * "java -Djava.endorsed.dirs=dist/lib/endorsed -jar dist/gridkit.jar"
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         try {
             TestGridkitLogin test = new TestGridkitLogin(args[0], Integer.parseInt(args[1]));

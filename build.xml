@@ -525,14 +525,12 @@
         </copy>
     </target>
 
-    <target name="gridkit.jar" depends="jar">
+    <target name="gridkit.jar" depends="build.viskit.with.extensions">
         <delete dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/lib"/>
 
         <copy todir="${dir.dist}/lib">
-            <fileset dir="${dir.build.lib}">
-                <include name="viskit.jar"/>
-            </fileset>
+            <fileset file="${dist.jar}"/>
             <fileset dir="${dir.lib}">
                 <include name="bsh-2.0b4.jar"/>
                 <include name="commons-beanutils-1.8.3.jar"/>
@@ -564,12 +562,27 @@
         <copy todir="${dir.dist}/gridkit-stage/examples">
             <fileset dir="${examples.lib}">
                 <include name="**/*.xml"/>
+                <exclude name="**/viskitProject.xml"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${dir.dist}/gridkit-stage/viskit/xsd/cli"/>
+        <copy todir="${dir.dist}/gridkit-stage/viskit/xsd/cli" >
+            <fileset dir="${dir.build}/classes/viskit/xsd/cli" >
+                <include name="Boot.class"/>
+                <include name="Launcher.class"/>
             </fileset>
         </copy>
 
         <jar basedir="${dir.dist}/gridkit-stage"
              destfile="${dir.dist}/gridkit.jar"
              manifest="${dir.src.cli.util}/manif.txt" />
+
+        <!-- products of running gridkit -->
+        <delete dir=".">
+            <include name="*.jar"/>
+            <include name="ServerAssembly*"/>
+        </delete>
 
     </target>
 
@@ -580,7 +593,7 @@
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-            <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <arg value="${main.class}"/>
             <jvmarg value="-XX:MaxPermSize=160m"/>
             <jvmarg value="-Xmx256m"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
@@ -592,7 +605,7 @@
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-            <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <arg value="${main.class}"/>
             <jvmarg value="-XX:MaxPermSize=160m"/>
             <jvmarg value="-Xmx256m"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
@@ -619,7 +632,7 @@
     <target name="build.run"
             depends="splashy,jar,runtime.extensions"
             description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.extensions)">
-        <java classname="viskit.EventGraphAssemblyComboMain"
+        <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-XX:MaxPermSize=160m"/>
@@ -644,7 +657,7 @@
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-            <arg value="viskit.EventGraphAssemblyComboMain"/>
+            <arg value="${main.class}"/>
 	    <!--arg value="Your path to an assembly file to initialize Viskit ready to run"/-->
 	    <!--arg value="${basedir}/MyViskitProjects/DefaultProject/Assemblies/atfp/PortOfBaltimoreAssembly.xml"/-->
 	    <!--arg value="${basedir}/MyViskitProjects/TestFoo/Assemblies/oa3302/ServerAssembly.xml"/-->
@@ -672,7 +685,7 @@
         <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <java classname="viskit.EventGraphAssemblyComboMain" fork="true">
+        <java classname="${debug.class}" fork="true">
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Djava.compiler=none"/>
@@ -689,7 +702,7 @@
         <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <java classname="viskit.EventGraphAssemblyComboMain"
+        <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-Xdebug"/>
@@ -701,6 +714,10 @@
             <!-- Font anti-aliasing -->
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+
+            <!-- Any debug args can go here -->
+            <arg value="localhost" />
+            <arg value="4444" />
         </java>
     </target>
 
@@ -729,6 +746,13 @@
         </java>
     </target>
 
+    <!-- For the following test targets set up a server, first run the ant gridkit-jar target,
+         then on the command line, navigate to the Viskit base directory and :
+         "java -Djava.endorsed.dirs=dist/lib/endorsed -jar dist/gridkit.jar", then run
+         the below target
+    -->
+
+    <!-- Run this first to establish login credentials for the gridlet -->
     <target name="test-gridkit-login" depends="compile.test" description="Test Gridkit login">
         <java classname="viskit.test.TestGridkitLogin" classpathref="runtime.test.classpath" fork="true">
             <arg value="localhost" />
@@ -736,6 +760,7 @@
         </java>
     </target>
 
+    <!-- Currently, we do not include the qstat package.  This will not work -->
     <target name="test-gridkit-qstat" depends="compile.test" description="Test Gridkit qstat">
         <java classname="viskit.test.TestGridkitQstat" classpathref="runtime.test.classpath" fork="true">
             <arg value="localhost" />
@@ -743,6 +768,7 @@
         </java>
     </target>
 
+    <!-- Currently, we do not include the qsub package.  This will not work -->
     <target name="test-gridkit-ServerAssembly3" depends="compile.test" description="Test Gridkit ServerAssembly3">
         <java classname="viskit.test.TestGridkitServerAssembly3" classpathref="runtime.test.classpath" fork="true">
             <arg value="localhost" />
@@ -765,6 +791,55 @@
         <delete dir="${dir.lib.ext}">
             <include name="*.jar"/>
         </delete>
+
+        <delete dir="${dir.lib.ext}">
+            <include name="*.jar"/>
+        </delete>
+
+        <!-- products of running gridkit -->
+        <delete dir=".">
+            <include name="*.jar"/>
+            <include name="ServerAssembly*"/>
+        </delete>
+    </target>
+
+    <!-- These targets are useful for viewing in the console various
+         ${user.home}/.visit properties/config files -->
+
+    <target name="show.debug.log" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="debug.log"/>
+        </concat>
+    </target>
+
+    <target name="show.app.xml" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="c_app.xml"/>
+        </concat>
+    </target>
+
+    <target name="show.gui.xml" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="c_gui.xml"/>
+        </concat>
+    </target>
+
+    <target name="show.passwd.xml" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="passwd.xml"/>
+        </concat>
+    </target>
+
+    <target name="show.validation.errors" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="validationErrors.log"/>
+        </concat>
+    </target>
+
+    <target name="show.config.xml" depends="build.init">
+        <concat>
+            <fileset dir="${env.HOME}/.viskit" includes="vconfig.xml"/>
+        </concat>
     </target>
 
     <!--target name="delete.temps.cache" depends="init"-->
