@@ -234,7 +234,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     if(filename.endsWith(".jar")) {
                         filename = filename.substring(0,filename.length()-4);
                     }
-                    File jarFile = File.createTempFile(filename,".jar");
+                    File jarFile = TempFileManager.createTempFile(filename,".jar");
                     FileOutputStream fos = new FileOutputStream(jarFile);
                     fos.write(jarData.toByteArray());
                     fos.flush();
@@ -785,8 +785,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 // give it unique name
                 experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
             } else {
-                File tempDir = TempFileManager.createTempFile("viskit","exp");
-                experimentFile = File.createTempFile(root.getName()+"Exp",".xml",tempDir);
+                experimentFile = TempFileManager.createTempFile(root.getName()+"Exp",".xml");
             }
         } catch (IOException e) {
             log.error(e);

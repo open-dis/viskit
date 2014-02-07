@@ -88,6 +88,17 @@ public class TempFileManager {
         return File.createTempFile(prefix, suffix, sTmpDir);
     }
 
+    /** Used to create a temp directory made from the process above
+     *
+     * @param f the temp file created from {@link createTempFile}
+     * @return a temp directory
+     */
+    public static File createTempDir(File f) {
+        f.delete();
+        f.mkdir();
+        return f;
+    }
+
     /**
      *  Utility method to load the TempFileManager at any time and allow it to
      *  clean the temporary files that may be left from previous instances
@@ -161,14 +172,14 @@ public class TempFileManager {
         // return only directories that start with your
         // prefix.
         FileFilter tmpDirFilter =
-                new FileFilter() {
+            new FileFilter() {
 
-                    @Override
-                    public boolean accept(File pathname) {
-                        return (pathname.isDirectory() &&
-                                pathname.getName().startsWith(TEMP_DIR_PREFIX));
-                    }
-                };
+                @Override
+                public boolean accept(File pathname) {
+                    return (pathname.isDirectory() &&
+                            pathname.getName().startsWith(TEMP_DIR_PREFIX));
+                }
+            };
 
         // Get the system temp directory and filter the files.
         String tmpDirName = System.getProperty("java.io.tmpdir");

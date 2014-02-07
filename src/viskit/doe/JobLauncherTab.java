@@ -803,7 +803,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                         writeStatus("DesignPointStats from task " + (i + 1) + " is sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
                         ret = rpc.execute("gridkit.getDesignPointStats", args);
                         if (statsGraph == null) {
-                            
+
                             final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
                         //statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
                         //statsGraph.setVisible(true);
@@ -836,12 +836,11 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         }
 
     }
-    ArrayList<Object[]> outputList;
+    List<Object[]> outputList;
 
     private void createOutputDir() throws Exception {
-        outDir = File.createTempFile("DoeRun", "");
-        outDir.delete();
-        outDir.mkdir();
+        outDir = TempFileManager.createTempFile("DoeRun", "");
+        outDir = TempFileManager.createTempDir(outDir);
     }
     JobResults chartter;
 
@@ -865,7 +864,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         int nrun = ((Integer) oa[1]).intValue();
         Gresults res = new Gresults();
 
-        Document doc = null;
+        Document doc;
         try {
             doc = FileHandler.unmarshallJdom(f);
         } catch (Exception e) {
@@ -984,7 +983,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             statusURL = new URL(surl);
             editorPane.setPage(statusURL);
         } catch (Exception e) {
-            System.out.println("Error showing cluster status: " + e.getMessage());
+            System.err.println("Error showing cluster status: " + e.getMessage());
             return;
         }
 
@@ -1044,6 +1043,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     class statusUpdater implements Runnable {
 
+        @Override
         public void run() {
             if (waitToGo) {
                 try {
@@ -1069,6 +1069,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                     int vm = vbar.getMaximum();
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             hbar.setValue(50);
                             vbar.setValue(50); //vbar.getMaximum());
@@ -1195,7 +1196,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     }
 
     /**
-     * 
+     *
      * @param ret
      * @param d
      * @param s

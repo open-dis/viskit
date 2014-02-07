@@ -15,13 +15,13 @@ import java.util.jar.JarOutputStream;
 import edu.nps.util.TempFileManager;
 import viskit.VGlobals;
 
-/** LocalBootLoader is similar to Viskit's Vstatics.classForName and implememnts 
- * class loading that can be used in "Local Grid" mode. 
- * 
- * In "Remote Grid" mode, Grid nodes can't have already loaded classes 
- * from the Viskit panel, not unless we serialize the classes and their 
- * instances, which could be problematic. 
- * 
+/** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
+ * class loading that can be used in "Local Grid" mode.
+ *
+ * In "Remote Grid" mode, Grid nodes can't have already loaded classes
+ * from the Viskit panel, not unless we serialize the classes and their
+ * instances, which could be problematic.
+ *
  * So in Remote ( or Regular ) Grid mode, a class loader
  * called Boot loads up all the Event Graphs from XML, the Assembly,
  * and any jars sent via the XML-RPC call, or any jars packaged within
@@ -34,7 +34,7 @@ import viskit.VGlobals;
  * from the Assembly XML, since each replication, a new class definition
  * of the same type is used.
  *
- * Viskit caches all generated classes in the VGlobals workDirectory, 
+ * Viskit caches all generated classes in the VGlobals workDirectory,
  * however, it also caches the Assembly classes, which need to be
  * "zero turn-around" for each DesignPoint in the experiment, meaning
  * a class loader has to "forget" the Assembly class each time since
@@ -62,10 +62,10 @@ import viskit.VGlobals;
  * Each thread that uses a LocalBoot should set the contextClassLoader
  * to be its own LocalBoot's parent's parent; this should enable multiple threads to use
  * class methods in a unique context, eg. Schedule.reset();
- * 
+ *
  * In order to do that, as in create a separate context for Simkit per Thread,
- * without running an external Process, everything must be read into a 
- * ClassLoader that has the current Viskit running Thread's parent's 
+ * without running an external Process, everything must be read into a
+ * ClassLoader that has the current Viskit running Thread's parent's
  * contextClassLoader, above from where simkit.jar got loaded in, ie, the
  * stage prior to reading in the lib directory during JVM initialization. Then
  * each new ClassLoader so constructed can have a unique Simkit run
@@ -105,7 +105,7 @@ public class LocalBootLoader extends URLClassLoader {
      * one another or between LocalBootLoaders, here
      * done by setting threads' contextClassLoaders to
      * their own LocalBootLoaders
-     * @param allowAssembly 
+     * @param allowAssembly
      * @return a LocalBootLoader instance
      */
     public LocalBootLoader init(boolean allowAssembly) {
@@ -123,7 +123,7 @@ public class LocalBootLoader extends URLClassLoader {
         stage1.allowAssembly = this.allowAssembly;
 
         jar = buildCleanWorkJar();
-        
+
         //stage1 gets dirty during bring up of clean jar
         //reboot it with cleanWorkJar
         //System.out.println("Stage1 reinit ");
@@ -142,7 +142,7 @@ public class LocalBootLoader extends URLClassLoader {
                 ex.printStackTrace();
             }
         }
-        
+
         // Now add our project's working directory, i.e. build/classes
         try {
 
@@ -192,7 +192,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /**
-     * 
+     *
      * @param u
      */
     public void doAddURL(URL u) {
@@ -201,7 +201,7 @@ public class LocalBootLoader extends URLClassLoader {
 
     /** @return a custom classpath String [] */
     public String[] getClassPath() {
-        
+
         // very verbose when "info" mode
 //        for (String line : classPath) {
 //            log.info(line);
@@ -259,7 +259,7 @@ public class LocalBootLoader extends URLClassLoader {
 
         // if each LocalBootLoader individually has to read from
         // a file, then each instance of the loader will have its own
-        // context in terms of static variables from the read-in classes, 
+        // context in terms of static variables from the read-in classes,
         // eg. simkit.Schedule.reset() in one thread will not reset another.
         // see sample case StaticsTest
         while (loop) {
@@ -272,7 +272,7 @@ public class LocalBootLoader extends URLClassLoader {
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
                 stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
-            } catch (Exception e) { // should probably be class not found exception
+            } catch (ClassNotFoundException e) {
                 loop = false;
             }
         }
@@ -283,7 +283,7 @@ public class LocalBootLoader extends URLClassLoader {
             //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
-            } 
+            }
             stage1.classPath = getClassPath();
         }
     }
@@ -294,19 +294,14 @@ public class LocalBootLoader extends URLClassLoader {
 
             // Don't jar up an empty build/classes directory
             if (getWorkDir().listFiles().length == 0) {return null;}
-            
-            // This will for sure delete the temp "cruf" that we generate
-            File newDir = TempFileManager.createTempFile("viskit", "working");
-            newDir.delete();
-            newDir.mkdir();
-                        
+
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
             stage1.addURL(getWorkDir().toURI().toURL());
-            
+
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
-            newJar = makeJarFileFromDir(getWorkDir(), newDir);
+            newJar = makeJarFileFromDir(getWorkDir());
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -315,11 +310,11 @@ public class LocalBootLoader extends URLClassLoader {
         return newJar;
     }
 
-    private File makeJarFileFromDir(File dir2jar, File destDir) {
+    private File makeJarFileFromDir(File dir2jar) {
         File jarOut = dir2jar;
         JarOutputStream jos = null;
         try {
-            jarOut = File.createTempFile("eventGraphs", ".jar", destDir);
+            jarOut = TempFileManager.createTempFile("eventGraphs", ".jar");
             FileOutputStream fos = new FileOutputStream(jarOut);
             jos = new JarOutputStream(fos);
             if (dir2jar.isDirectory()) {
@@ -327,20 +322,26 @@ public class LocalBootLoader extends URLClassLoader {
             }
 
             jos.flush();
-            jos.close();
         } catch (java.util.zip.ZipException ze) {
 
             // could be first time through; caused by no entries in the jar
             return dir2jar;
         } catch (IOException ex) {
             ex.printStackTrace();
-        } 
+        } finally {
+            try {
+                if (jos != null)
+                   jos.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
         return jarOut;
     }
 
     private void makeJarFileFromDir(File baseDir, File newDir, JarOutputStream jos) {
         File[] dirList = newDir.listFiles();
-        FileInputStream fis;
+        FileInputStream fis = null;
         JarEntry je;
         for (File file : dirList) {
 
@@ -353,7 +354,7 @@ public class LocalBootLoader extends URLClassLoader {
                 String entryClass = "";
                 entryName = file.getParentFile().getName() + "/" + file.getName();
                 entryClass = entryName.replace('/', '.');
-                
+
                 //System.out.println("Entry Class "+entryClass);
                 String dotClass = ".class";
                 if (entryClass.endsWith(dotClass)) { // else do nothing
@@ -394,7 +395,13 @@ public class LocalBootLoader extends URLClassLoader {
                             jos.closeEntry();
                         } catch (IOException ex) {
                             ex.printStackTrace();
-
+                        } finally {
+                            try {
+                                if (fis != null)
+                                    fis.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                 }

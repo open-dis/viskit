@@ -77,7 +77,7 @@ public class VGlobals {
     static Logger log = LogUtils.getLogger(VGlobals.class);
     private static VGlobals me;
     private Interpreter interpreter;
-    private DefaultComboBoxModel cbMod;
+    private DefaultComboBoxModel<String> cbMod;
     private JPopupMenu popup;
     private myTypeListener myListener;
     private JFrame mainAppWindow;
@@ -104,7 +104,7 @@ public class VGlobals {
     }
 
     private VGlobals() {
-        cbMod = new DefaultComboBoxModel(new Vector<String>(Arrays.asList(defaultTypeStrings)));
+        cbMod = new DefaultComboBoxModel<String>(new Vector<String>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
         initProjectHome();
@@ -482,7 +482,7 @@ public class VGlobals {
         ViskitConfig vConfig = ViskitConfig.instance();
         String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
         log.debug(projectHome);
-        if (projectHome.isEmpty() || !(new File(projectHome).exists())) { 
+        if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitProjectButtonPanel.showDialog();
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
@@ -507,7 +507,7 @@ public class VGlobals {
             Constructor<?>[] constructors = c.getConstructors();
 
             // The first constructor should be the default, no argument one
-            for (Constructor constructor : constructors) {
+            for (Constructor<?> constructor : constructors) {
                 if (constructor.getParameterTypes().length == 0) {
                     if (isArr) {
                         o = Array.newInstance(c, 1);
@@ -753,12 +753,12 @@ public class VGlobals {
                 popup.add(mi);
             } else {
                 m = new JMenu(morePackages[i]);
-                for (int j = 0; j < moreClasses[i].length; j++) {
+                for (String item : moreClasses[i]) {
                     if (i == PRIMITIVES_INDEX) {
-                        mi = new MyJMenuItem(moreClasses[i][j], moreClasses[i][j]);
+                        mi = new MyJMenuItem(item, item);
                     } // no package
                     else {
-                        mi = new MyJMenuItem(moreClasses[i][j], morePackages[i] + "." + moreClasses[i][j]);
+                        mi = new MyJMenuItem(item, morePackages[i] + "." + item);
                     }
                     mi.addActionListener(myListener);
                     m.add(mi);
@@ -955,6 +955,7 @@ public class VGlobals {
      * Small class to hold on to the fully-qualified class name, while displaying only the
      * un-qualified name;
      */
+    @SuppressWarnings("serial")
     class MyJMenuItem extends JMenuItem {
 
         private String fullName;
@@ -999,6 +1000,7 @@ public class VGlobals {
         }
     }
 
+    @SuppressWarnings("serial")
     class myTypeListRenderer extends JLabel implements ListCellRenderer {
         //Font specialFont = getFont().deriveFont(Font.ITALIC);
 

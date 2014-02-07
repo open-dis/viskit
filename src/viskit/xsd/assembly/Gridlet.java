@@ -290,6 +290,7 @@ public class Gridlet extends Thread {
             if (!usid.equals("LOCAL-RUN")) {
 
                 tempDir = TempFileManager.createTempFile("gridkit","doe");
+                tempDir = TempFileManager.createTempDir(tempDir);
                 // setting a classpath this way, we don't need to keep track of the
                 // actual files, ie "javac -d tempDir" will create subdirs
                 classPath = System.getProperty("java.class.path");
@@ -298,6 +299,7 @@ public class Gridlet extends Thread {
             } else {
 
                 tempDir = TempFileManager.createTempFile("viskit","doe");
+                tempDir = TempFileManager.createTempDir(tempDir);
 
                 Object loader = getContextClassLoader();
                 Class<?> loaderz = loader.getClass();

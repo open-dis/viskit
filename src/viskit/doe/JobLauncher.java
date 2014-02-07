@@ -537,9 +537,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     ArrayList<Object[]> outputList;
 
     private void createOutputDir() throws Exception {
-        outDir = File.createTempFile("DoeRun", "");
-        outDir.delete();
-        outDir.mkdir();
+        outDir = TempFileManager.createTempFile("DoeRun", "");
+        outDir = TempFileManager.createTempDir(outDir);
     }
     JobResults chartter;
 
@@ -563,7 +562,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         int nrun = ((Integer) oa[1]).intValue();
         Gresults res = new Gresults();
 
-        Document document = null;
+        Document document;
         try {
             document = FileHandler.unmarshallJdom(f);
         } catch (Exception e) {
@@ -764,6 +763,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     int vm = vbar.getMaximum();
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             hbar.setValue(50);
                             vbar.setValue(50); //vbar.getMaximum());

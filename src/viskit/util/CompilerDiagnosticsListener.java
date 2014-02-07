@@ -13,13 +13,13 @@ import javax.tools.JavaFileObject;
  */
 public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> {
 
-    public StringBuffer messageString;
+    public StringBuilder messageString;
     public long startOffset = -1;
     public long endOffset = 0;
     public long line;
     public long columnNumber = 0;
 
-    public CompilerDiagnosticsListener(StringBuffer messageString) {
+    public CompilerDiagnosticsListener(StringBuilder messageString) {
         this.messageString = messageString;
     }
 

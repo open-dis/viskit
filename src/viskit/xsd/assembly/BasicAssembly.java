@@ -149,14 +149,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /**
      * Create all the objects used.  The <code>createSimEntities()</code> method
      * is abstract and will be implemented in the concrete subclass.  The others
-     * are empty by default.  The <code>createReplicationStats()</code> method 
+     * are empty by default.  The <code>createReplicationStats()</code> method
      * must be overridden if any replications stats are needed.
      */
     protected void createObjects() {
 //        LOG.info("I was called?");
         createSimEntities();
         createReplicationStats();
-        
+
         // This is implemented in this class
         createDesignPointStats();
         createPropertyChangeListeners();
@@ -166,7 +166,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected void performHookups() {
         hookupSimEventListeners();
         hookupReplicationListeners();
-                
+
         // This is implemented in this class
         hookupDesignPointListeners();
         hookupPropertyChangeListeners();
@@ -200,7 +200,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     protected abstract void createSimEntities();
-        
+
     protected abstract void createReplicationStats();
 
     /**
@@ -209,7 +209,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * corresponding name + ".count," or ".mean"
      */
     protected void createDesignPointStats() {
-        
+
         /* Check for zero length.  SimplePropertyDumper may have been selected
          * as the only PCL
          */
@@ -222,7 +222,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             LOG.debug("entry is: " + entry);
             Object obj;
             if (entry.toString().contains("PropChangeListenerNode")) {
-                
+
                 // Since the pclNodeCache was created under a previous ClassLoader
                 // we must use reflection to invoke the methods on the AssemblyNodes
                 // that it contains, otherwise we will throw ClassCastExceptions
@@ -259,11 +259,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     protected abstract void createPropertyChangeListeners();
-    
+
     protected abstract void hookupSimEventListeners();
 
     protected abstract void hookupReplicationListeners();
-    
+
     /** Set up all outer stats propertyChangeListeners */
     protected void hookupDesignPointListeners() {
         for (SampleStatistics designPointStat : designPointStats) {
@@ -276,7 +276,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * it if no additional PropertyChangeListeners are desired.
      */
     protected void hookupPropertyChangeListeners() {}
-    
+
     public void setStopTime(double time) {
         if (time < 0.0) {
             throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
@@ -812,7 +812,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             ClassLoader localLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.AnalystReportBuilder");
-                Constructor arbConstructor = clazz.getConstructor(String.class, Map.class);
+                Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), getPclNodeCache());
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);

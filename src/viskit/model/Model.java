@@ -23,7 +23,7 @@ import viskit.xsd.bindings.eventgraph.*;
  * This is the "master" model of an event graph.  It should hold the node, edge and assembly
  * information.  What hasn't been done is to put in accessor methods for the view to
  * read pieces that it needs, say after it receives a "new model" event.
- * 
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -43,7 +43,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     Map<Object, Object> edgeCache = new HashMap<Object, Object>();
     Vector<ViskitElement> stateVariables = new Vector<ViskitElement>();
     Vector<ViskitElement> simParameters = new Vector<ViskitElement>();
-    private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;    
+    private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
     private String privateIdxVarPrefix = "_idxvar_";
     private String privateLocVarPrefix = "locvar_";
     private String stateVarPrefix = "state_";
@@ -51,9 +51,9 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     private ViskitController controller;
     private boolean modelDirty = false;
     private boolean numericPriority;
-    
+
     public Model(ViskitController controller) {
-        this.controller = controller;        
+        this.controller = controller;
         metaData = new GraphMetaData(this);
     }
 
@@ -73,7 +73,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     @Override
     public boolean isDirty() {
         return modelDirty;
-    }    
+    }
 
     @Override
     public void setDirty(boolean dirt) {
@@ -98,14 +98,14 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         evNodeCache.clear();
         edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
-        
+
         if (f == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(f);
-                
+
                 GraphMetaData mymetaData = new GraphMetaData(this);
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
@@ -315,7 +315,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     public boolean isNumericPriority() {
         return numericPriority;
     }
-    
+
     public void setNumericPriority(boolean b) {
         numericPriority = b;
     }
@@ -349,7 +349,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         node.getComments().addAll(ev.getComment());
         node.setCodeBLock(ev.getCode());
         node.getLocalVariables().clear();
-        
+
         for (LocalVariable lv : ev.getLocalVariable()) {
             if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
                 EventLocalVariable elv = new EventLocalVariable(
@@ -412,7 +412,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             }
         }
     }
-    
+
     private void buildScheduleEdgeFromJaxb(EventNode src, Schedule ed) {
         SchedulingEdge se = new SchedulingEdge();
         String s;
@@ -424,14 +424,14 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         src.getConnections().add(se);
         target.getConnections().add(se);
-        se.conditional = ed.getCondition();        
-        
+        se.conditional = ed.getCondition();
+
         // Attempt to avoid NumberFormatException thrown on Double.parseDouble(String s)
         if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ed.getPriority())) {
             s = ed.getPriority();
-            
+
             setNumericPriority(true);
-            
+
             // We have a FP number
             // TODO: Deal with LOWEST or HIGHEST values containing exponents, i.e. (+/-) 1.06E8
             if (s.contains("-3")) {
@@ -456,7 +456,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         }
 
         se.priority = s;
-        
+
         // Now set the JAXB Schedule to record the Priority enumeration to overwrite
         // numeric Priority values
         ed.setPriority(se.priority);
@@ -574,7 +574,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     public Vector<ViskitElement> getAllNodes() {
         return new Vector<ViskitElement>(evNodeCache.values());
     }
-    
+
     // TODO: Known unchecked cast to ViskitElement
     @SuppressWarnings("unchecked")
     @Override
@@ -622,7 +622,13 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     @Override
     public void deleteSimParameter(vParameter vp) {
         // remove jaxb variable
-        jaxbRoot.getParameter().remove(vp.opaqueModelObject);
+        Iterator<Parameter> spItr = jaxbRoot.getParameter().iterator();
+        while (spItr.hasNext()) {
+            if (spItr.next() == (Parameter) vp.opaqueModelObject) {
+                spItr.remove();
+                break;
+            }
+        }
         setDirty(true);
         simParameters.remove(vp);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
@@ -685,7 +691,13 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     @Override
     public void deleteStateVariable(vStateVariable vsv) {
         // remove jaxb variable
-        jaxbRoot.getStateVariable().remove(vsv.opaqueModelObject);
+        Iterator<StateVariable> svItr = jaxbRoot.getStateVariable().iterator();
+        while (svItr.hasNext()) {
+            if (svItr.next() == (StateVariable) vsv.opaqueModelObject) {
+                svItr.remove();
+                break;
+            }
+        }
         stateVariables.remove(vsv);
         setDirty(true);
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
@@ -838,10 +850,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         for (ViskitElement transition : local) {
             StateTransition st = oFactory.createStateTransition();
             StateVariable sv = findStateVariable(transition.getStateVarName());
-            st.setState(sv);            
-            
+            st.setState(sv);
+
             if (sv.getType() != null && sv.getType().indexOf('[') != -1) {
-                               
+
                 // Match the state transition's index to the given index
                 st.setIndex(transition.getIndexingExpression());
             }
@@ -932,7 +944,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
     // Edge mods
     // ---------
-    
+
     @Override
     public void newEdge(EventNode src, EventNode target) {
         SchedulingEdge se = new SchedulingEdge();
@@ -1038,7 +1050,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         sch.setEvent((Event) e.to.opaqueModelObject);
         sch.setPriority(e.priority);
         sch.getEdgeParameter().clear();
-        
+
         // Bug 1373: This is where an edge parameter gets written out to XML
         for (ViskitElement edgeParameter : e.parameters) {
             EdgeParameter p = oFactory.createEdgeParameter();
@@ -1081,5 +1093,5 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             }
         }
         return s;
-    }    
+    }
 }

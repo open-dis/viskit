@@ -1,6 +1,7 @@
 package viskit.xsd.cli;
 
 import edu.nps.util.LogUtils;
+import edu.nps.util.TempFileManager;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -127,6 +128,7 @@ public class Launcher extends Thread implements Runnable {
                 }
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
 
         } catch (IOException e) {
@@ -336,18 +338,10 @@ public class Launcher extends Thread implements Runnable {
 
         xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
-        tempDirz = cloader.loadClass("edu.nps.util.TempFileManager");
         assyContlr = cloader.loadClass("viskit.AssemblyController");
+        tempDirz = cloader.loadClass("viskit.VGlobals");
 
         try {
-            m = tempDirz.getDeclaredMethod("createTempFile", new Class<?>[]{String.class, String.class});
-            tempDir = (File) (m.invoke(null, new Object[]{"gridkit", "doe"}));
-
-            // jam the classpath with the new directory
-            String systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath + File.pathSeparator + tempDir.getCanonicalPath());
-            // hopefully don't have to addURL, but here just in case
-
 
             Enumeration<String> e = eventGraphs.keys();
             while (e.hasMoreElements()) {
@@ -370,9 +364,26 @@ public class Launcher extends Thread implements Runnable {
 
                     log.debug(eventGraphJava);
 
+                    // these could be handled by viskit.AssemblyController.createJavaClassFromString()
+                    // since it is not likely to be run in Grid mode here, if at all, so no worries
+                    // about shared storage.
+
+                    // A Gridlet on the other hand will require a separate
+                    // path since it could be shared with another Gridlet, especially in a multiprocessor
+                    // configuration.
+
+                    // see steps from Gridlet, except go through introspection for javac
+                    // Gridlet will handle any event-graphs that were sent from the Viskit
+                    // editor that aren't already in the BehaviorLibraries, so here we need
+                    // to boot up the BehaviorLibraries.
+
                     m = assyContlr.getDeclaredMethod("compileJavaClassFromString", new Class<?>[]{String.class});
 
                     log.info("Generating Java Bytecode...");
+
+                    // This will now generate source and byte code and place each
+                    // in thier respective ${viskit.project}/build directories,
+                    // once for src and one for classes
                     if (m.invoke(null, new Object[]{eventGraphJava}) != null) {
                         log.info("Compilation of " + eventGraphName + " complete.");
                     }
@@ -419,15 +430,19 @@ public class Launcher extends Thread implements Runnable {
             }
 
             // finally jar up the classes and add them to the Boot ClassLoader
+            m = tempDirz.getDeclaredMethod("instance", new Class<?>[]{});
+            out = m.invoke(null, new Object[]{});
+            m = tempDirz.getDeclaredMethod("getWorkDirectory", new Class<?>[]{});
+            tempDir = (File) m.invoke(out, new Object[]{});
 
             File jarFromDir = makeJarFileFromDir(tempDir);
             URL url = new URL("file:" + File.separator + File.separator + jarFromDir.getCanonicalPath() + File.separator);
             // if these path-jammers don't work, then will need to define classes directly in the classloader
             // via bytes. url here is the file:\/\/+ canonical path from above to tempDir
-            ((Boot) (cloader)).addURL(url);
+            ((Boot) cloader).addURL(url);
             // jam the classpath with the new directory
-            systemClassPath = System.getProperty("java.class.path");
-            System.setProperty("java.class.path", systemClassPath + File.pathSeparator + jarFromDir.getCanonicalPath());
+            System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator + jarFromDir.getCanonicalPath());
+            log.debug(System.getProperty("java.class.path"));
 
         } catch (NoSuchMethodException e) {
             log.error(e);
@@ -728,18 +743,26 @@ public class Launcher extends Thread implements Runnable {
 
     private File makeJarFileFromDir(File dir2jar) {
         File jarOut = dir2jar;
+        JarOutputStream jos = null;
         try {
-            jarOut = File.createTempFile("bhvr", ".jar", new File(System.getProperty("user.dir")));
+            jarOut = TempFileManager.createTempFile("bhvr", ".jar");
             FileOutputStream fos = new FileOutputStream(jarOut);
-            JarOutputStream jos = new JarOutputStream(fos);
+            jos = new JarOutputStream(fos);
             if (dir2jar.isDirectory()) {
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
             }
             jos.flush();
-            jos.close();
 
         } catch (IOException ex) {
             log.error(ex);
+        } finally {
+            try {
+                if (jos != null) {
+                    jos.close();
+                }
+            } catch (IOException ex) {
+                log.error(ex);
+            }
         }
         return jarOut;
     }

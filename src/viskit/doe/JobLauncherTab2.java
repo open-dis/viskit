@@ -310,7 +310,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         topPan.add(numRepsTF);
         topPan.add(tmoLab);
         topPan.add(tmo);
-        topPan.add(analystReportLab); // tooltip this with warning 
+        topPan.add(analystReportLab); // tooltip this with warning
         topPan.add(doAnalystReports);
         //topPan.add(doGraphLab);
         //topPan.add(doGraphOutput);
@@ -978,9 +978,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     List<Object[]> outputList;
 
     private void createOutputDir() throws Exception {
-        outDir = File.createTempFile("DoeRun", "");
-        outDir.delete();
-        outDir.mkdir();
+        outDir = TempFileManager.createTempFile("DoeRun", "");
+        outDir = TempFileManager.createTempDir(outDir);
     }
     JobResults chartter;
 
@@ -1343,7 +1342,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private void addDesignPointStatsToGraphs(Map ret, int d, int s) {
 
-        // for the SwingWorker to publish a single object 
+        // for the SwingWorker to publish a single object
         bQ.add(new DesignPointStatsWrapper(ret, d, s));
 
     }

@@ -51,25 +51,25 @@ public class TestGridkitLogin extends Thread {
             // part of installing Gridkit by the admin,
             // before the port is made external.
             ret = xmlrpc.execute("gridkit.addUser", params);
-            System.out.println("addUser returns " + ret.toString());
+            LOG.info("addUser returns " + ret.toString());
 
             // users are initialized with their usernames a password
             // and should change them asap.
             usid = (String) xmlrpc.execute("gridkit.login", params);
-            System.out.println("login returned " + usid);
+            LOG.info("login returned " + usid);
 
             // logout this session
             params.clear();
             params.add(usid);
             ret = xmlrpc.execute("gridkit.logout", params);
-            System.out.println("logout " + usid + " " + ret);
+            LOG.info("logout " + usid + " " + ret);
 
             // log back in
             params.clear();
             params.add("admin");
             params.add("admin");
             usid = (String) xmlrpc.execute("gridkit.login", params);
-            System.out.println("login returned " + usid);
+            LOG.info("login returned " + usid);
 
             // change admin's password
             params.clear();
@@ -77,54 +77,54 @@ public class TestGridkitLogin extends Thread {
             params.add("admin");
             params.add("hello");
             ret = xmlrpc.execute("gridkit.changePassword", params);
-            System.out.println("changePassword returned " + ret);
+            LOG.info("changePassword returned " + ret);
 
             // logout again
             params.clear();
             params.add(usid);
             ret = xmlrpc.execute("gridkit.logout", params);
-            System.out.println("logout " + usid + " " + ret);
+            LOG.info("logout " + usid + " " + ret);
 
             // test new password with login
             params.clear();
             params.add("admin");
             params.add("hello");
             usid = (String) xmlrpc.execute("gridkit.login", params);
-            System.out.println("login returned " + usid);
+            LOG.info("login returned " + usid);
 
             // logout again
             params.clear();
             params.add(usid);
             ret = xmlrpc.execute("gridkit.logout", params);
-            System.out.println("logout " + usid + " " + ret);
+            LOG.info("logout " + usid + " " + ret);
 
             // now try a bogus password for admin and force an error
             params.clear();
             params.add("admin");
             params.add("bogus");
             usid = (String) xmlrpc.execute("gridkit.login", params);
-            System.out.println("bogus login attempt returned " + usid + ((usid.equals("LOGIN-ERROR")) ? " which is cool" : " which is not cool"));
+            LOG.info("bogus login attempt returned " + usid + ((usid.equals("LOGIN-ERROR")) ? " which is cool" : " which is not cool"));
 
             // now see if bogus usid allows me to create a user
             params.clear();
             params.add(usid);
             params.add("newbie");
             ret = xmlrpc.execute("gridkit.addUser", params);
-            System.out.println("bogus addUser attempt returned " + ret + ((((Boolean) ret).booleanValue()) ? " which is not cool" : " which is cool"));
+            LOG.info("bogus addUser attempt returned " + ret + ((((Boolean) ret).booleanValue()) ? " which is not cool" : " which is cool"));
 
             // now login as admin to create newbie
             params.clear();
             params.add("admin");
             params.add("hello");
             usid = (String) xmlrpc.execute("gridkit.login", params);
-            System.out.println("login returned " + usid);
+            LOG.info("login returned " + usid);
 
             // addUser newbie with verified admin usid
             params.clear();
             params.add(usid);
             params.add("newbie");
             ret = xmlrpc.execute("gridkit.addUser", params);
-            System.out.println("addUser of newbie returned " + ret);
+            LOG.info("addUser of newbie returned " + ret);
 
             // this time don't logout, see if multi session works
             // for newbie to login and changePassword from default
@@ -137,21 +137,21 @@ public class TestGridkitLogin extends Thread {
             params.add("newbie");
             params.add("newpass");
             ret = xmlrpc.execute("gridkit.changePassword", params);
-            System.out.println("newbie login and changePassword returned " + ret);
+            LOG.info("newbie login and changePassword returned " + ret);
 
             // now send a jar to newbies new session
 
             URL u = Thread.currentThread().getContextClassLoader().getResource("diskit/DISMover3D.class");
-            System.out.println("Opening " + u);
+            LOG.info("Opening " + u);
             u = new URL((u.getFile().split("!"))[0].trim());
             File jar = new File(u.getFile());
-            System.out.println("Opening " + jar);
+            LOG.info("Opening " + jar);
             java.io.InputStream fis = u.openStream();
             long fileSize = fis.available();
-            System.out.println("which is " + fileSize + " bytes");
+            LOG.info("which is " + fileSize + " bytes");
             byte[] buf = new byte[1024];
             int chunks = (int) (fileSize / 1024L + (fileSize % 1024L > 0L ? 0L : -1L));
-            System.out.println("into " + chunks + 1 + " of " + buf.length);
+            LOG.info("into " + chunks + 1 + " of " + buf.length);
             while (chunks > -1) {
                 params.clear();
                 params.add(usid);
@@ -165,18 +165,18 @@ public class TestGridkitLogin extends Thread {
                     System.arraycopy(buf, 0, outBuf, 0, readIn);
                     // but if not #0 io error
                     if (chunks != 0) {
-                        System.out.println("File io error");
+                        LOG.error("File io error");
                     }
                 } else {
                     outBuf = buf;
                 }
 
-                System.out.println("read in " + readIn);
+                LOG.info("read in " + readIn);
 
                 params.add(outBuf);
                 params.add(new Integer(chunks));
                 ret = xmlrpc.execute("gridkit.transferJar", params);
-                System.out.println("Transferred " + ret + " bytes in chunk # " + chunks);
+                LOG.info("Transferred " + ret + " bytes in chunk # " + chunks);
                 chunks--;
             }
 
