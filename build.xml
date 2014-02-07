@@ -525,7 +525,7 @@
         </copy>
     </target>
 
-    <target name="gridkit.jar" depends="build.viskit.with.extensions">
+    <target name="build.gridkit" depends="build.viskit.with.extensions">
         <delete dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/lib"/>
 
@@ -577,12 +577,6 @@
         <jar basedir="${dir.dist}/gridkit-stage"
              destfile="${dir.dist}/gridkit.jar"
              manifest="${dir.src.cli.util}/manif.txt" />
-
-        <!-- products of running gridkit -->
-        <delete dir=".">
-            <include name="*.jar"/>
-            <include name="ServerAssembly*"/>
-        </delete>
 
     </target>
 
@@ -794,12 +788,6 @@
 
         <delete dir="${dir.lib.ext}">
             <include name="*.jar"/>
-        </delete>
-
-        <!-- products of running gridkit -->
-        <delete dir=".">
-            <include name="*.jar"/>
-            <include name="ServerAssembly*"/>
         </delete>
     </target>
 
