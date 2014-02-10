@@ -17,7 +17,7 @@ import org.jgraph.graph.*;
  * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 3:40:51 PM
- * @version $Id$ 
+ * @version $Id$
  */
 
 /*
@@ -82,32 +82,32 @@ public class vVertexRenderer
      * Use this flag to control if groups should appear transparent.
      */
     protected boolean hideGroups = true;
-    
+
     /**
      * Cache the current graph for drawing.
      */
     transient protected JGraph graph;
-    
+
     /**
      * Cache the current shape for drawing.
      */
     transient protected VertexView view;
-    
+
     /**
      * Cached hasFocus and selected value.
      */
     transient protected boolean hasFocus, selected, preview, opaque, childrenSelected;
-    
+
     /**
      * Cached default foreground and default background.
      */
     transient protected Color defaultForeground, defaultBackground, bordercolor;
-    
+
     /**
      * Cached borderwidth.
      */
     transient protected int borderWidth;
-    
+
     /**
      * Cached value of the double buffered state
      */
@@ -134,8 +134,7 @@ public class vVertexRenderer
      * Constructs a renderer that may be used to render vertices.
      */
     public vVertexRenderer(boolean hideGroups) {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
+        this();
         this.hideGroups = hideGroups;
     }
 
@@ -262,10 +261,10 @@ public class vVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
-        for (int i = 0; i < n.length; i++) {
-            String[] nn = splitIfNeeded(n[i], maxW, metrics);
-            for (int j = 0; j < nn.length; j++) {
-                sb.append(nn[j]);
+        for (String n1 : n) {
+            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            for (String nn1 : nn) {
+                sb.append(nn1);
                 sb.append("\n");
             }
         }

@@ -80,22 +80,22 @@ public class vAssemblyEgVertexRenderer
 
     /** Use this flag to control if groups should appear transparent. */
     protected boolean hideGroups = true;
-    
+
     /** Cache the current graph for drawing. */
     transient protected JGraph graph;
-    
+
     /** Cache the current shape for drawing. */
     transient protected VertexView view;
-    
+
     /** Cached hasFocus and selected value. */
     transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
-    
+
     /** Cached default foreground and default background. */
     transient protected Color defaultForeground,  defaultBackground,  bordercolor;
-    
+
     /** Cached borderwidth. */
     transient protected int borderWidth;
-    
+
     /** Cached value of the double buffered state */
     transient boolean isDoubleBuffered = false;
 
@@ -120,8 +120,7 @@ public class vAssemblyEgVertexRenderer
      * Constructs a renderer that may be used to render vertices.
      */
     public vAssemblyEgVertexRenderer(boolean hideGroups) {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
+        this();
         this.hideGroups = hideGroups;
     }
 
@@ -151,7 +150,7 @@ public class vAssemblyEgVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-            
+
             this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
@@ -234,7 +233,7 @@ public class vAssemblyEgVertexRenderer
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
-        
+
         // Use the getName method instead of toString
         String nm = ((AssemblyNode) cell.getUserObject()).getName();
         FontMetrics metrics = g2.getFontMetrics();
@@ -254,31 +253,40 @@ public class vAssemblyEgVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
-        for (int i = 0; i < n.length; i++) {
-            String[] nn = splitIfNeeded(n[i], maxW, metrics);
-            for (int j = 0; j < nn.length; j++) {
-                sb.append(nn[j]);
+        for (String n1 : n) {
+            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            for (String nn1 : nn) {
+                sb.append(nn1);
                 sb.append("\n");
             }
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();
     }
+
     /*
-    public static void main(String[] args)
-    {
-    JLabel j = new JLabel("yup");
-    JFrame jf = new JFrame();
-    jf.getContentPane().add(j);
-    jf.pack();
-    jf.show();
-    Image ii = j.createImage(500,500); //"viskit/images/eventNode.png") ;
-    Graphics gr = ii.getGraphics();
-    FontMetrics fm = gr.getFontMetrics();
-    vAssemblyEgVertexRenderer.splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia",50,fm);
-    vAssemblyEgVertexRenderer.splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA",50,fm);
-    vAssemblyEgVertexRenderer.splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia",50,fm);
-    vAssemblyEgVertexRenderer.splitIfNeeded("mynameismikebaileyandiliveincalifornia",50,fm);
+    public static void main(String[] args) {
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+
+                JLabel j = new JLabel("yup");
+                JFrame jf = new JFrame();
+                jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                jf.getContentPane().add(j);
+                jf.pack();
+                jf.setVisible(true);
+                Image ii = j.createImage(500, 500); //"viskit/images/eventNode.png");
+                Graphics gr = ii.getGraphics();
+                FontMetrics fm = gr.getFontMetrics();
+                new vAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia", 50, fm);
+                new vAssemblyEgVertexRenderer().splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA", 50, fm);
+                new vAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia", 50, fm);
+                new vAssemblyEgVertexRenderer().splitIfNeeded("mynameismikebaileyandiliveincalifornia", 50, fm);
+            }
+        });
     }
      */
 
@@ -355,7 +363,7 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Provided for subclassers to paint a selection border.
+     * Provided for subclass users to paint a selection border.
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);

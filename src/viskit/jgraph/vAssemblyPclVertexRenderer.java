@@ -83,17 +83,17 @@ public class vAssemblyPclVertexRenderer
      * Use this flag to control if groups should appear transparent.
      */
     protected boolean hideGroups = true;
-    
+
     /**
      * Cache the current graph for drawing.
      */
     transient protected JGraph graph;
-    
+
     /**
      * Cache the current shape for drawing.
      */
     transient protected VertexView view;
-    
+
     /**
      * Cached hasFocus and selected value.
      */
@@ -102,17 +102,17 @@ public class vAssemblyPclVertexRenderer
             preview,
             opaque,
             childrenSelected;
-    
+
     /**
      * Cached default foreground and default background.
      */
     transient protected Color defaultForeground, defaultBackground, bordercolor;
-    
+
     /**
      * Cached borderwidth.
      */
     transient protected int borderWidth;
-    
+
     /**
      * Cached value of the double buffered state
      */
@@ -125,7 +125,7 @@ public class vAssemblyPclVertexRenderer
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
-    
+
     private float[] dash = {5f, 5f};
     private BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -140,8 +140,7 @@ public class vAssemblyPclVertexRenderer
      * Constructs a renderer that may be used to render vertices.
      */
     public vAssemblyPclVertexRenderer(boolean hideGroups) {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
+        this();
         this.hideGroups = hideGroups;
     }
 
@@ -272,10 +271,10 @@ public class vAssemblyPclVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
-        for (int i = 0; i < n.length; i++) {
-            String[] nn = splitIfNeeded(n[i], maxW, metrics);
-            for (int j = 0; j < nn.length; j++) {
-                sb.append(nn[j]);
+        for (String n1 : n) {
+            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            for (String nn1 : nn) {
+                sb.append(nn1);
                 sb.append("\n");
             }
         }
@@ -341,7 +340,7 @@ public class vAssemblyPclVertexRenderer
     }
 
     /**
-     * Provided for subclassers to paint a selection border.
+     * Provided for subclasses to paint a selection border.
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
@@ -548,4 +547,5 @@ public class vAssemblyPclVertexRenderer
     public void setHideGroups(boolean hideGroups) {
         this.hideGroups = hideGroups;
     }
+
 }
