@@ -47,13 +47,13 @@ public interface ViskitController {
   void simParameterEdit (vParameter param);
   void stateVariableEdit(vStateVariable var);
   void codeBlockEdit    (String s);
-  
+
   /* menu selections */
   void copy();
-  
-  /** Ultimately performs a delete fuction for selected edges and nodes */
+
+  /** Ultimately performs a delete function for selected edges and nodes */
   void cut();        // to remove nodes and edges
-  
+
   /** Opens selected files from a FileChooser */
   void open();
   void openRecentEventGraph(String path);
@@ -62,7 +62,7 @@ public interface ViskitController {
   void paste();
   void quit();
   void save();
-  
+
   /** Save the current EventGraph "as" desired by user */
   void saveAs();
   void selectNodeOrEdge(Vector v);
@@ -78,21 +78,21 @@ public interface ViskitController {
   void deleteStateVariable(vStateVariable var);
 
   void eventList();
-  
+
   /** Generates Java source code from an Event Graph file */
-  void generateJavaSource();  
-  
+  void generateJavaSource();
+
   /** Provides a single screenshot capture capability */
   void captureWindow();
-  
+
   void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis);
   void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis) ;
-  
+
   void addRecentFileListListener(RecentFileListener lis);
   void removeRecentFileListListener(RecentFileListener lis);
   Set<String> getRecentFileSet();
   void clearRecentFileSet();
-  
+
   static interface RecentFileListener {
       void listChanged();
   }
