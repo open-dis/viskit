@@ -77,31 +77,40 @@ public class EventGraphAssemblyComboMain {
                 });
             }
 
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
-            
-            // If we encounter this case, then uncomment printStackTrace() to 
-            // drill down on the cause.  Easier than setting a breakpoint and
-            // debugging!
-            if (e instanceof InvocationTargetException) {
-//                e.printStackTrace();
-            }
 
             // if we got here, then we need to nuke the ${user.home}/.viskit dir
             // it will be recreated on next start up
-            java.io.File viskitDir = new java.io.File(System.getProperty("user.home") + "/.viskit");
-            if (viskitDir.exists()) {
+            nukeHomeDirectory();
+        } catch (InvocationTargetException e) {
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
-                // Can't delete .viskit dir unless it's empty
-                java.io.File[] files = viskitDir.listFiles();
-                for (java.io.File file : files) {
-                    file.delete();
-                }
-                boolean success = viskitDir.delete();
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getPath() + " directory was found to be corrupted and will be deleted");
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(viskitDir.getName() + " was found and deleted = " + success);
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+            // If we encounter this case, then uncomment printStackTrace() to
+            // drill down on the cause.  Easier than setting a breakpoint and
+            // debugging!
+//            e.printStackTrace();
+
+            // if we got here, then we need to nuke the ${user.home}/.viskit dir
+            // it will be recreated on next start up
+            nukeHomeDirectory();
+        }
+    }
+
+    private static void nukeHomeDirectory() {
+        java.io.File viskitDir = new java.io.File(System.getProperty("user.home") + "/.viskit");
+        if (viskitDir.exists()) {
+
+            // Can't delete .viskit dir unless it's empty
+            java.io.File[] files = viskitDir.listFiles();
+            for (java.io.File file : files) {
+                file.delete();
             }
+            boolean success = viskitDir.delete();
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getPath() + " directory was found to be corrupted and will be deleted");
+            if (success)
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(viskitDir.getName() + " was found and deleted.");
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }
 
@@ -126,7 +135,7 @@ public class EventGraphAssemblyComboMain {
         mainFrame.setVisible(true);
     }
 
-    public static void setLandFandFonts() {
+    private static void setLandFandFonts() {
         ViskitConfig cfg = ViskitConfig.instance();
         String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
         try {
@@ -142,7 +151,7 @@ public class EventGraphAssemblyComboMain {
         }
     }
 
-    public static void setJGoodies() throws Exception{
+    private static void setJGoodies() throws Exception{
         LookAndFeel laf = new PlasticLookAndFeel();
         Options.setUseNarrowButtons(true);
         PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());

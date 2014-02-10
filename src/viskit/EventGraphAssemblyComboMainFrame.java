@@ -47,6 +47,7 @@ import edu.nps.util.SysExitHandler;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -65,7 +66,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     AnalystReportPanel reportPanel;
     Action myQuitAction;
     private DoeMain doeMain;
-    
+
     /** The initial assembly to load. */
     private String initialFile;
     private int TAB0_EGEDITOR_IDX = 0;
@@ -99,12 +100,12 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         this.setIconImage(icon.getImage());
     }
-    
+
     /** @return the quit action class for Viskit */
     public Action getMyQuitAction() {
         return myQuitAction;
     }
-    
+
     java.util.List<JMenuBar> menus = new ArrayList<JMenuBar>();
 
     private void initUI() {
@@ -173,7 +174,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             menus.add(null); // placeholder
         }
         tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = tabbedPaneIdx;
-        
+
         // Analyst report
         boolean analystReportVisible = SettingsDialog.isAnalystReportVisible();
         if (analystReportVisible) {
@@ -210,10 +211,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
         asyRunComponent.setAnalystReportGUI(reportPanel);
-        
+
         /* DIFF between OA3302 branch and trunk */
-        
-        // Design of experiments    
+
+        // Design of experiments
         doeMain = DoeMain.main2();
         DoeMainFrame doeFrame = doeMain.getMainFrame();
         runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
@@ -243,40 +244,40 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
 
         /* End DIFF between OA3302 branch and trunk */
-        
+
         // Now setup the assembly file change listener(s)
-        final ViskitAssemblyController assyCntlr = (ViskitAssemblyController) asyFrame.getController();        
+        final ViskitAssemblyController assyCntlr = (ViskitAssemblyController) asyFrame.getController();
         assyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
         assyCntlr.addAssemblyFileListener(asyRunComponent);
-        
+
         /* DIFF between OA3302 branch and trunk */
         assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
         /* End DIFF between OA3302 branch and trunk */
-        
+
         assyCntlr.addAssemblyFileListener(runGridComponent);
         if (analystReportVisible) {
             assyCntlr.addAssemblyFileListener(reportPanel);
         }
-        
+
         // Now setup the open-event graph listener(s)
         final ViskitController egCntlr = (ViskitController) egFrame.getController();
         egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
-        
+
         /* DIFF between OA3302 branch and trunk */
         egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
-        
+
         // let the assebmly controller establish the Viskit classpath and open
         // EventGraphs first
-        runLater(3000, new Runnable() {
+        runLater(500L, new Runnable() {
             @Override
             public void run() {
                 egCntlr.begin();
             }
         });
 
-        runLater(0, new Runnable() {
+        runLater(0L, new Runnable() {
             @Override
             public void run() {
                 assyCntlr.begin();
@@ -291,21 +292,18 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     }
 
     private void runLater(final long ms, final Runnable runr) {
-        if (viskit.Vstatics.debug) {
-            System.out.println("Run later: " + runr);
-        }
-        Thread t = new Thread(new Runnable() {
+
+        java.util.Timer timer = new java.util.Timer("DelayedRunner", true);
+
+        TimerTask delayedThreadStartTask = new TimerTask() {
 
             @Override
             public void run() {
-                try {
-                    Thread.sleep(ms);
-                } catch (InterruptedException e) {}
                 SwingUtilities.invokeLater(runr);
             }
-        }, "runLater");
-        t.setPriority(Thread.NORM_PRIORITY);
-        t.start();
+        };
+
+        timer.schedule(delayedThreadStartTask, ms);
     }
 
     class myTabChangeListener implements ChangeListener {
@@ -324,9 +322,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             setTitle(titles[i]);
         }
     }
-    
+
     private JMenu hmen;
-    
+
     /**
      * Stick the first Help menu we see into all the following ones.
      * @param mb
@@ -369,7 +367,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             }
         }
     }
-    
+
     ActionListener mySettingsHandler = new ActionListener() {
 
         @Override
@@ -410,10 +408,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
             VGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
-            // Tell Visit to not recompile open EGs from any remaining open 
+            // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
             VGlobals.instance().getAssemblyController().setCloseAll(true);
-            
+
             outer:
             {
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
@@ -428,7 +426,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                         break outer;
                     }
                 }
-                
+
                 /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
@@ -440,26 +438,26 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 /* End DIFF between OA3302 branch and trunk */
 
                 // TODO: other preQuits here if needed
-                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler                
-                
+                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
+
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
                     ((ViskitController) egFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
                     ((AssemblyController) asyFrame.getController()).postQuit();
                 }
-                
+
                 /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     doeMain.getController().postQuit();
                 }
                 /* End DIFF between OA3302 branch and trunk */
-                
+
                 // TODO: other postQuits here if needed
 
                 // Pretty-fy all xml docs used for configuration
                 ViskitConfig.instance().cleanup();
-                
+
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.Vstatics.debug) {
@@ -472,7 +470,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             VGlobals.instance().setSysExitHandler(defaultHandler);
         }
     }
-    
+
     private SysExitHandler nullSysExitHandler = new SysExitHandler() {
 
         @Override
@@ -483,10 +481,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
 
-        /** The default version of this does a RuntimeExec("java"....) to 
+        /** The default version of this does a RuntimeExec("java"....) to
          * spawn a new VM as we want to run the assembly in a new VM, not
          * the GUI's VM.
-         * 
+         *
          * @param execStrings command line VM arguments
          */
         @Override
@@ -498,7 +496,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             }
         }
     }
-    
+
     String[] titles = new String[]{"", "", "", "", "", "", "", "", "", ""};
     TitleListener myTitleListener = new myTitleListener();
 
