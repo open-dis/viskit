@@ -710,8 +710,8 @@
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
 
             <!-- Any debug args can go here -->
-            <arg value="localhost" />
-            <arg value="4444" />
+            <!--arg value="localhost" />
+            <arg value="4444" /-->
         </java>
     </target>
 
