@@ -1,13 +1,11 @@
 package viskit.jgraph;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.BorderFactory;
 import org.jgraph.JGraph;
+import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.ConnectionSet;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
@@ -38,7 +36,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked") // JGraph not genericized
     private void initViskitStyle() {
 
-        viskitAssyAdapterEdgeStyle = GraphConstants.createMap();
+        viskitAssyAdapterEdgeStyle = new AttributeMap();
 
         // common to 3 types
         GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle, false);
@@ -46,21 +44,17 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setBeginFill(viskitAssyAdapterEdgeStyle, false);
         GraphConstants.setBeginSize(viskitAssyAdapterEdgeStyle, 16);
         GraphConstants.setBendable(viskitAssyAdapterEdgeStyle, true);
-        GraphConstants.setLineStyle(viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_BEZIER);
+        GraphConstants.setLineStyle(viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
         GraphConstants.setOpaque(viskitAssyAdapterEdgeStyle, true);
         GraphConstants.setForeground(viskitAssyAdapterEdgeStyle, Color.black);
-        GraphConstants.setRouting(viskitAssyAdapterEdgeStyle, new ViskitAssemblyRouting());
+        GraphConstants.setRouting(viskitAssyAdapterEdgeStyle, new vRouting());
 
         // duplicate for pcl
-        viskitAssyPclEdgeStyle = GraphConstants.createMap();
-
-        // TODO: Fix generics
+        viskitAssyPclEdgeStyle = new AttributeMap();
         viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
         // duplicate for sel
-        viskitAssySimEvLisEdgeStyle = GraphConstants.createMap();
-
-        // TODO: Fix generics
+        viskitAssySimEvLisEdgeStyle = new AttributeMap();
         viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
 
         // Customize adapter
@@ -87,10 +81,10 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void deleteAll() {
         //remove(getRoots(this));
         Object[] localRoots = getRoots(this);
-        for (int i = 0; i < localRoots.length; i++) {
-            if (localRoots[i] instanceof AssemblyCircleCell || localRoots[i] instanceof AssemblyPropListCell) {
+        for (Object localRoot : localRoots) {
+            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropListCell) {
                 Object[] child = new Object[1];
-                child[0] = ((DefaultGraphCell) localRoots[i]).getFirstChild();
+                child[0] = ((DefaultGraphCell) localRoot).getFirstChild();
                 remove(child);
             }
         }
@@ -103,44 +97,18 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         this.remove(new Object[]{c});
     }
 
-    public void addEGNode(EvGraphNode egn) {
-        DefaultGraphCell c = new AssemblyCircleCell(egn.getName());
-        egn.opaqueViewObject = c;
-        c.setUserObject(egn);
-
-        Map<DefaultGraphCell, Map> attributes = new Hashtable<DefaultGraphCell, Map>();
-        attributes.put(c, createBounds(egn.getPosition().x, egn.getPosition().y, Color.black));
-        c.add(new vAssemblyPortCell(egn.getName() + "/Center"));
-        this.insert(new Object[]{c}, attributes, null, null, null);
-        this.toFront(new Object[]{c});
-    }
-
     public void changeEGNode(EvGraphNode egn) {
         AssemblyCircleCell c = (AssemblyCircleCell) egn.opaqueViewObject;
         c.setUserObject(egn);
 
         graph.getUI().stopEditing(graph);
         graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
-
-    }
-
-    public void addPCLNode(PropChangeListenerNode pcln) {
-        DefaultGraphCell c = new AssemblyPropListCell(pcln.getName());
-        pcln.opaqueViewObject = c;
-        c.setUserObject(pcln);
-
-        Map<DefaultGraphCell, Map> attributes = new Hashtable<DefaultGraphCell, Map>();
-        attributes.put(c, createBounds(pcln.getPosition().x, pcln.getPosition().y, Color.black));
-        c.add(new vAssemblyPortCell(pcln.getName() + "/Center"));
-        this.insert(new Object[]{c}, attributes, null, null, null);
-        this.toFront(new Object[]{c});
     }
 
     public void deletePCLNode(PropChangeListenerNode pcln) {
         DefaultGraphCell c = (DefaultGraphCell) pcln.opaqueViewObject;
         c.removeAllChildren();
         this.remove(new Object[]{c});
-
     }
 
     public void changePCLNode(PropChangeListenerNode pcln) {
@@ -169,15 +137,16 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         ae.opaqueViewObject = edge;
         edge.setUserObject(ae);
+
         ConnectionSet cs = new ConnectionSet();
-        cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
+        cs.connect(edge, from.getFirstChild(), to.getFirstChild());
 
-        Map<vAssemblyEdgeCell, Map> localAttributes = new Hashtable<vAssemblyEdgeCell, Map>();
-        localAttributes.put(edge, this.viskitAssyAdapterEdgeStyle);
+        Map atts = new Hashtable();
+        atts.put(edge, this.viskitAssyAdapterEdgeStyle);
 
-        this.insert(new Object[]{edge}, localAttributes, cs, null, null);
-        this.toBack(new Object[]{edge});
-        
+        insert(new Object[]{edge}, atts, cs, null, null);
+        toBack(new Object[]{edge});
+
         // If a user cancels this edge, it needs to be counted as selected
         // so that the AssemblyController can find it
         Vector<Object> ev = new Vector<Object>();
@@ -220,14 +189,15 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         sele.opaqueViewObject = edge;
         edge.setUserObject(sele);
+
         ConnectionSet cs = new ConnectionSet();
-        cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
+        cs.connect(edge, from.getFirstChild(), to.getFirstChild());
 
-        Map<vAssemblyEdgeCell, Map> localAttributes = new Hashtable<vAssemblyEdgeCell, Map>();
-        localAttributes.put(edge, this.viskitAssySimEvLisEdgeStyle);
+        Map atts = new Hashtable();
+        atts.put(edge, this.viskitAssySimEvLisEdgeStyle);
 
-        this.insert(new Object[]{edge}, localAttributes, cs, null, null);
-        this.toBack(new Object[]{edge});        
+        insert(new Object[]{edge}, atts, cs, null, null);
+        toBack(new Object[]{edge});
     }
 
     public void deleteSimEvListEdge(SimEvListenerEdge sele) {
@@ -255,30 +225,20 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         pce.opaqueViewObject = edge;
         edge.setUserObject(pce);
+
         ConnectionSet cs = new ConnectionSet();
         cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
 
-        Map<vAssemblyEdgeCell, Map> localAttributes = new Hashtable<vAssemblyEdgeCell, Map>();
-        localAttributes.put(edge, this.viskitAssyPclEdgeStyle);
+        Map atts = new Hashtable();
+        atts.put(edge, this.viskitAssyPclEdgeStyle);
 
-        this.insert(new Object[] {edge}, localAttributes, cs, null, null);
-        this.toBack(new Object[] {edge});
-        
+        insert(new Object[] {edge}, atts, cs, null, null);
+        toBack(new Object[] {edge});
+
         // If a user cancels this edge, it needs to be counted as selected
-        // so that the AssemblyController can find it        
+        // so that the AssemblyController can find it
         Vector<Object> ev = new Vector<Object>();
         ev.add(pce);
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
-    }
-
-    public Map createBounds(int x, int y, Color c) {
-        Map map = GraphConstants.createMap();
-        GraphConstants.setBounds(map, new Rectangle(x, y, 54, 54)); //90, 30));
-        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
-        GraphConstants.setBackground(map, c.darker());
-        GraphConstants.setForeground(map, Color.white);
-        GraphConstants.setFont(map, GraphConstants.defaultFont.deriveFont(Font.BOLD, 12));
-        GraphConstants.setOpaque(map, true);
-        return map;
     }
 }

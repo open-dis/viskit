@@ -9,6 +9,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
@@ -52,7 +53,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
-    
+
     /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
@@ -322,16 +323,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
+        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", new Integer(KeyEvent.VK_N),
+        fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "open", "Open", new Integer(KeyEvent.VK_O),
+        fileMenu.add(buildMenuItem(controller, "open", "Open", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P),
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
@@ -339,20 +340,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(controller, "closeAll", "Close All", null, null));
-        fileMenu.add(buildMenuItem(controller, "save", "Save", new Integer(KeyEvent.VK_S),
+        fileMenu.add(buildMenuItem(controller, "save", "Save", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", new Integer(KeyEvent.VK_A), null));
+        fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
 
         fileMenu.addSeparator();
-        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", new Integer(KeyEvent.VK_X), null));
-        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", new Integer(KeyEvent.VK_I),
+        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
+        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J, null));
+        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", new Integer(KeyEvent.VK_C),
+        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
         if (contentOnly) {
-            fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", new Integer(KeyEvent.VK_C), null));
+            fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
         }
         if (!contentOnly) {
             fileMenu.addSeparator();
@@ -363,19 +364,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
         }
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", new Integer(KeyEvent.VK_X), KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
+        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
         // the next three are disabled until something is selected
-        editMenu.add(buildMenuItem(controller, "cut", "Cut", new Integer(KeyEvent.VK_T),
+        editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_T,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
-        editMenu.add(buildMenuItem(controller, "copy", "Copy", new Integer(KeyEvent.VK_C),
+        editMenu.add(buildMenuItem(controller, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(controller, "paste", "Paste", new Integer(KeyEvent.VK_P),
+        editMenu.add(buildMenuItem(controller, "paste", "Paste", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editMenu.add(buildMenuItem(controller, "edit", "Load an EG Editor Tab", new Integer(KeyEvent.VK_E),
+        editMenu.add(buildMenuItem(controller, "edit", "Load an EG Editor Tab", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
         // These 4 start off being disabled, until something is selected
@@ -386,14 +387,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...",
-                new Integer(KeyEvent.VK_G), null));
-        editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...",
-                new Integer(KeyEvent.VK_L), null));
+        editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
+        editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
 
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", new Integer(KeyEvent.VK_E),
+        editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
         // Create a new menu bar and add the menus we created above to it
@@ -405,11 +404,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        helpMenu.add(buildMenuItem(help, "doContents", "Contents", new Integer(KeyEvent.VK_C), null));
-        helpMenu.add(buildMenuItem(help, "doSearch", "Search", new Integer(KeyEvent.VK_S), null));
+        helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
+        helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
         helpMenu.addSeparator();
-        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", new Integer(KeyEvent.VK_T), null));
-        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", new Integer(KeyEvent.VK_A), null));
+        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
+        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
         myMenuBar.add(helpMenu);
 
         if (!contentOnly) {
@@ -702,12 +701,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
-        
+
         pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListIcon(20, 20),
-                this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");       
+                this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
-        
+
         if (extraCP != null) {
             File file;
             for (String path : extraCP) { // tbd same for pcls
@@ -715,7 +714,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                 if (file.exists()) {
                     if ((path.endsWith(".jar"))) {
                         lTree.addContentRoot(file);
-                        
+
                     // ${file} may be an empty directory
                     } else if (file.isDirectory() && file.listFiles().length == 0) {
                         continue;
@@ -781,6 +780,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
+        public void dragOver(DropTargetDragEvent e) {
+
+            // NOTE: this action is very critical in getting JGraph 5.14 to
+            // signal the drop method
+            e.acceptDrag(e.getDropAction());
+        }
+
+        @Override
         public void drop(DropTargetDropEvent dtde) {
             if (dragged != null) {
                 try {
@@ -812,7 +819,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     LogUtils.getLogger(AssemblyViewFrame.class).error(e);
                 } catch (IOException e) {
                     LogUtils.getLogger(AssemblyViewFrame.class).error(e);
-                } 
+                }
             }
         }
     }
@@ -824,7 +831,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             return null;
         }
     }
-    private boolean firstShown = false;
 
     @Override
     public void prepareToQuit() {
@@ -1161,5 +1167,5 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
 interface DragStartListener {
 
-    public void startingDrag(Transferable trans);
+    void startingDrag(Transferable trans);
 }

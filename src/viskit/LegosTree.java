@@ -24,17 +24,17 @@ import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects</p>
- * MOVES Institute</p>
- * Naval Postgraduate School, Monterey, CA</p>
- * www.nps.edu</p>
+ * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects<p/>
+ * MOVES Institute<p/>
+ * Naval Postgraduate School, Monterey, CA<p/>
+ * www.nps.edu<p/>
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:31 AM
  * @version $Id$
  */
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener {
-    
+
     static Logger log = LogUtils.getLogger(LegosTree.class);
     private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     private Class<?> targetClass;
@@ -99,7 +99,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
         rendr.setLeafIcon(myLeafIcon);
         DragSource dragSource = DragSource.getDefaultDragSource();
-        
+
         LegosTree instance = this;
 
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
@@ -188,7 +188,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         return null;
     }
 
-    // 4 May 06 JMB The filter down below checks for empty dirs.  
+    // 4 May 06 JMB The filter down below checks for empty dirs.
     /** If there is a directory with xml in it, it will show in the LEGO tree,
      * but if its children have errors when marshaling they will not appear.
      * @param f the path to evaluate for SimEntities
@@ -204,7 +204,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     /** Adds SimEntity icons to the Assembly Editor drag and drop tree
-     * 
+     *
      * @param f the directory to recurse to find SimEntitiy based EGs
      * @param recurse if true, recurse the directory
      */
@@ -219,7 +219,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
         if (!f.getName().endsWith(".java")) {
             addContentRoot(f, recurse, v);
-        }        
+        }
     }
 
     // The two above are the public ones.
@@ -273,7 +273,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             FileBasedAssyNode fban;
             try {
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
-                
+
                 // If an Assembly, or non simkit.BasicSimEntity type class was
                 // encountered by the FBCM, just return for convenience
                 if (fban != null) {
@@ -307,12 +307,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 }
             } catch (Throwable throwable) {
 //                throwable.printStackTrace();
-                log.error("Could not process " + f.getName() + ": "
-                        + throwable.getCause() + " " + throwable.getMessage());
+                log.error(throwable);
                 if (recurseNogoList != null) {
                     recurseNogoList.add(f.getName());
                 }
-            }            
+            }
         } // directory
     }
     Map<String, DefaultMutableTreeNode> directoryRoots;
@@ -329,7 +328,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         DefaultMutableTreeNode parent = packagesHM.get(pkg);
 
         if (parent == null) {
-            if (pkg.indexOf('.') == -1) {
+            if (!pkg.contains(".")) {
                 // we're as far up as we can be
                 parent = new DefaultMutableTreeNode(pkg);
                 mod.insertNodeInto(parent, lroot, 0);
@@ -370,14 +369,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 log.error(ex);
 //                ex.printStackTrace();
             } catch (NoSuchFieldException ex) {}
-            
+
             if (viskit.Vstatics.debug) {
                 System.out.println("adding " + c.getName());
             }
             if (viskit.Vstatics.debug) {
                 System.out.println("\t # constructors: " + constr.length);
             }
-            
+
             for (int i = 0; i < constr.length; i++) {
                 Class<?>[] ptypes = constr[i].getParameterTypes();
                 plist[i] = new ArrayList<Object>();
@@ -554,7 +553,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     return false;
                 }
                 // TBD add an ignore in SettingsDialog, and in history file
-                if (f.getName().contains("svn") || f.getName().indexOf("Assemblies") > -1 || f.getName().indexOf("Assembly") > -1 || f.getName().indexOf("Scenario") > -1 || f.getName().indexOf("Locations") > -1) {
+                if (f.getName().contains("svn") || f.getName().contains("Assemblies") || f.getName().contains("Assembly") || f.getName().contains("Scenario") || f.getName().contains("Locations")) {
                     return false;
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
@@ -580,7 +579,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
         Transferable xfer;
         StringSelection ss;
-        
+
         if (o instanceof FileBasedAssyNode) {
             FileBasedAssyNode xn = (FileBasedAssyNode) o;
             ss = new StringSelection(targetClassName + "\t" + xn.toString());

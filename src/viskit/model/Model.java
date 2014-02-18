@@ -2,7 +2,7 @@ package viskit.model;
 
 import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -209,7 +209,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
         } finally {
             try {
-                fw.close();
+                if (fw != null)
+                    fw.close();
             } catch (IOException ioe) {}
         }
     }
@@ -341,8 +342,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         Coordinate coor = ev.getCoordinate();
         if (coor != null) //todo lose this after all xmls updated
         {
-            node.setPosition(new Point(Integer.parseInt(coor.getX()),
-                    Integer.parseInt(coor.getY())));
+            node.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
         }
 
         node.getComments().clear();
@@ -382,7 +383,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             est.setStateVarType(sv.getType());
 
             // bug fix 1183
-            if (sv.getType().indexOf('[') != -1) {
+            if (sv.getType().contains("[")) {
                 String idx = st.getIndex();
                 est.setIndexingExpression(idx);
             }
@@ -728,13 +729,14 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     // Event (node) mods
     // -----------------
     @Override
-    public void newEvent(String nodeName, Point p) {
+    public void newEvent(String nodeName, Point2D p) {
         EventNode node = new EventNode(nodeName);
         if (p == null) {
-            node.setPosition(new Point(100, 100));
+            node.setPosition(new Point2D.Double(100, 100));
         } else {
-            p.x = ((p.x + 5) / 10) * 10;    //round
-            p.y = ((p.y + 5) / 10) * 10;
+            double x = ((p.getX() + 5) / 10) * 10;    //round
+            double y = ((p.getY() + 5) / 10) * 10;
+            p.setLocation(x, y);
             node.setPosition(p);
         }
         Event jaxbEv = oFactory.createEvent();
@@ -852,7 +854,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             StateVariable sv = findStateVariable(transition.getStateVarName());
             st.setState(sv);
 
-            if (sv.getType() != null && sv.getType().indexOf('[') != -1) {
+            if (sv.getType() != null && sv.getType().contains("[")) {
 
                 // Match the state transition's index to the given index
                 st.setIndex(transition.getIndexingExpression());
@@ -922,8 +924,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
 
         // rudimentary snap to grid - this works on saved file only, not the live position in the node.  reload to enjoy.
         int GridScale = 10;
-        int x = ((node.getPosition().x + GridScale / 2) / GridScale) * GridScale;
-        int y = ((node.getPosition().y + GridScale / 2) / GridScale) * GridScale;
+        double x = ((node.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
+        double y = ((node.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
         coor.setX("" + x);
         coor.setY("" + y);
         node.getPosition().setLocation(x, y);
@@ -964,8 +966,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
-            for (int i = 0; i < args.size(); i++) {
+            List<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
+            for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(""));
             }
             se.parameters = edgeParameters;
@@ -998,8 +1000,8 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            ArrayList<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
-            for (int i = 0; i < args.size(); i++) {
+            List<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
+            for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(""));
             }
             ce.parameters = edgeParameters;

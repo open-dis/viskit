@@ -87,6 +87,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     public void begin() {
 
         File f;
+
+        // The initialFile is set if we have stated a file "arg" upon startup
         if (initialFile != null) {
             LOGGER.debug("Loading initial file: " + initialFile);
             f = new File(initialFile);
@@ -467,7 +469,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             egCountField = AssemblyController.class.getDeclaredField("egNodeCount");
             adptrCountField = AssemblyController.class.getDeclaredField("adptrNodeCount");
             pclCountField = AssemblyController.class.getDeclaredField("pclNodeCount");
-        } catch (Exception ex) {
+        } catch (NoSuchFieldException ex) {
+            throw new RuntimeException(ex);
+        } catch (SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -504,8 +508,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 retn = shortname + count++;
             } while (model.nameExists(retn));   // don't force the vAMod to mangle the name
             intField.setInt(this, count);
-        } catch (Exception ex) {
-            System.err.println("Program error in AssemblyController.shortName" + ex.getLocalizedMessage());
+        } catch (IllegalArgumentException ex) {
+            LOGGER.error(ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.error(ex);
         }
         return retn;
     }
@@ -1305,7 +1311,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             LOGGER.error(ioe);
         } finally {
             try {
-                fw.close();
+                if (fw != null)
+                    fw.close();
             } catch (IOException ioe) {}
         }
         return null;

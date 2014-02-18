@@ -195,7 +195,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         } else {
             tabIndices[TAB0_ANAL_REPORT_IDX] = -1;
         }
-
+        
         // Assembly runner
         asyRunComponent = new InternalAssemblyRunner();
         runTabbedPane.add(asyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
@@ -390,8 +390,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
 
         ActionListener[] al = mi.getActionListeners();
-        for (int i = 0; i < al.length; i++) {
-            mi.removeActionListener(al[i]);
+        for (ActionListener al1 : al) {
+            mi.removeActionListener(al1);
         }
 
         mi.setAction(qa);

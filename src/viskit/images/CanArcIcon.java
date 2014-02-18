@@ -15,16 +15,19 @@ import java.awt.*;
 
 public class CanArcIcon implements Icon
 {
+  @Override
   public int getIconHeight()
   {
     return 24;
   }
 
+  @Override
   public int getIconWidth()
   {
     return 24;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y)
   {
     Graphics2D g2d = (Graphics2D)g;

@@ -185,13 +185,9 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ViskitView viskitView = (ViskitView) getView();
         Model mod = new Model(this);
         mod.init();
-
         viskitView.addTab(mod);
 
-        ViskitModel[] openAlready = null;
-        if (viskitView != null) {
-            openAlready = viskitView.getOpenModels();
-        }
+        ViskitModel[] openAlready = viskitView.getOpenModels();
         boolean isOpenAlready = false;
         if (openAlready != null) {
             for (ViskitModel model : openAlready) {
@@ -589,7 +585,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     public void selectNodeOrEdge(Vector v) //------------------------------------
     {
         selectionVector = v;
-        boolean ccbool = (selectionVector.size() > 0 ? true : false);
+        boolean ccbool = (selectionVector.size() > 0);
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
         ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
         ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);

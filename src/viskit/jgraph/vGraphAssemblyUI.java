@@ -79,7 +79,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
      * the graphModel is messaged with valueForCellChanged.
      * @param messageStop
      * @param messageCancel
-     * @param messageGraph 
+     * @param messageGraph
      */
     @Override
     protected void completeEditing(boolean messageStop, boolean messageCancel, boolean messageGraph) {
@@ -101,7 +101,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
                 graph.requestFocus();
             }
             if (messageGraph) {
-                Map map = GraphConstants.createMap();
+                Map map = graphLayoutCache.createNestedMap();
                 GraphConstants.setValue(map, newValue);
                 Map<Object, Map> nested = new Hashtable<Object, Map>();
                 nested.put(oldCell, map);
@@ -109,7 +109,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             }
             updateSize();
             // Remove Editor Listener
-            if (oldEditor != null && cellEditorListener != null) {
+            if (cellEditorListener != null) {
                 oldEditor.removeCellEditorListener(cellEditorListener);
             }
             cellEditor = null;

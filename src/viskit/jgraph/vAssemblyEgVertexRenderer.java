@@ -1,12 +1,12 @@
 package viskit.jgraph;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.UIManager;
+import javax.swing.*;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.AssemblyNode;
@@ -220,16 +220,16 @@ public class vAssemblyEgVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle r = view.getBounds();
+        Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
-        g2.fillRoundRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff, 20, 20);
+        g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         //g2.fillOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff); // size of rect is 54,54
         g2.setColor(Color.darkGray);
         //g2.drawOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff);
-        g2.drawRoundRect(myoff, myoff, r.width - 2 * myoff, r.height - 2 * myoff, 20, 20);
+        g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
@@ -385,19 +385,21 @@ public class vAssemblyEgVertexRenderer
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
+     * 
+     * TODO: Not currently used
      */
-    public Point getPerimeterPoint(VertexView view, Point source, Point p) {
-        Rectangle bounds = view.getBounds();
-        int x = bounds.x;
-        int y = bounds.y;
-        int width = bounds.width;
-        int height = bounds.height;
-        int xCenter = (x + width / 2);
-        int yCenter = (y + height / 2);
-        int dx = p.x - xCenter; // Compute Angle
-        int dy = p.y - yCenter;
+    public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
+        Rectangle2D bounds = view.getBounds();
+        double x = bounds.getX();
+        double y = bounds.getY();
+        double width = bounds.getWidth();
+        double height = bounds.getHeight();
+        double xCenter = bounds.getCenterX();
+        double yCenter = bounds.getCenterY();
+        double dx = p.x - xCenter; // Compute Angle
+        double dy = p.y - yCenter;
         double alpha = Math.atan2(dy, dx);
-        int xout, yout;
+        double xout, yout;
         double pi = Math.PI;
         double pi2 = Math.PI / 2.0;
         double beta = pi2 - alpha;
@@ -415,7 +417,7 @@ public class vAssemblyEgVertexRenderer
             yout = y + height;
             xout = xCenter + (int) (height * Math.tan(beta) / 2);
         }
-        return new Point(xout, yout);
+        return new Point2D.Double(xout, yout);
     }
 
     /**

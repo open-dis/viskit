@@ -15,16 +15,19 @@ import java.awt.*;
 
 public class EventNodeIcon implements Icon
 {
+  @Override
   public int getIconHeight()
   {
     return 24;
   }
 
+  @Override
   public int getIconWidth()
   {
     return 24;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y)
   {
     Graphics2D g2d = (Graphics2D)g;
@@ -33,7 +36,7 @@ public class EventNodeIcon implements Icon
       ins = ((JComponent)c).getInsets();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.translate(ins.left,ins.top);
-    
+
     g2d.setColor(new Color(0xff,0xff,0xCC));
     g2d.fillOval(1,1,22,22);
     g2d.setColor(Color.black);

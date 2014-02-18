@@ -125,23 +125,33 @@ public class VGlobals {
         return avf;
     }
 
+    /** Used only if a call to {@link getAssemblyEditor()} ever returns null
+     * 
+     * @param contentOnly
+     * @return the component AssemblyViewFrame
+     */
     public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly) {
         AssemblyController cont = new AssemblyController();
         return buildAssemblyViewFrame(contentOnly, cont);
     }
 
-    public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
-        initAssemblyViewFrame(contentOnly, cont);
-        cont.begin();
-        return avf;
-    }
-
+    /** Called from the EventGraphAssemblyComboMainFrame to initialize UI startup
+     * 
+     * @param contentOnly if true, build certain menu items only
+     * @return the component AssemblyViewFrame
+     */
     public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly) {
         AssemblyController cont = new AssemblyController();
         return initAssemblyViewFrame(contentOnly, cont);
     }
 
-    public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+    private AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+        initAssemblyViewFrame(contentOnly, cont);
+        cont.begin();
+        return avf;
+    }
+
+    private AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
         acont = cont;
         avf = new AssemblyViewFrame(contentOnly, cont);
         cont.setView(avf);

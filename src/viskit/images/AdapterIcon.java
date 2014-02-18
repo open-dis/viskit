@@ -21,16 +21,19 @@ public class AdapterIcon implements Icon
     width = w;
     height = h;
   }
+  @Override
   public int getIconHeight()
   {
     return height;
   }
 
+  @Override
   public int getIconWidth()
   {
     return width;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y)
   {
     Graphics2D g2d = (Graphics2D)g;

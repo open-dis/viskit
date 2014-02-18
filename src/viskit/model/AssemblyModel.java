@@ -3,7 +3,7 @@ package viskit.model;
 import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     /** We require specific order on this Map's contents */
     private Map<String, AssemblyNode> nodeCache;
     private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
-    private Point pointLess = new Point(100, 100);
+    private Point2D.Double pointLess = new Point2D.Double(100, 100);
     private ViskitAssemblyController controller;
 
     public AssemblyModel(ViskitAssemblyController cont) {
@@ -92,7 +92,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     @Override
     public boolean newModel(File f) {
         getNodeCache().clear();
-        pointLess = new Point(100, 100);
+        pointLess = new Point2D.Double(100, 100);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
         if (f == null) {
@@ -206,7 +206,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
                     "File I/O Error", JOptionPane.ERROR_MESSAGE);
         } finally {
             try {
-                fw.close();
+                if (fw != null)
+                    fw.close();
             } catch (IOException ioe) {}
         }
     }
@@ -282,20 +283,21 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p) {
+    public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
         newEventGraph(widgetName, node.loadedClass, p);
     }
 
     @Override
-    public void newEventGraph(String widgetName, String className, Point p) {
+    public void newEventGraph(String widgetName, String className, Point2D p) {
         EvGraphNode node = new EvGraphNode(widgetName, className);
         if (p == null) {
-            node.setPosition(new Point(100, 100));
+            node.setPosition(new Point2D.Double(100, 100));
         } else {
-            p.x = ((p.x + 5) / 10) * 10;    // round
-            p.y = ((p.y + 5) / 10) * 10;
+            double x = ((p.getX() + 5) / 10) * 10;    // round
+            double y = ((p.getY() + 5) / 10) * 10;
+            p.setLocation(x, y);
             node.setPosition(p);
         }
 
@@ -327,10 +329,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     @Override
-    public void newPropChangeListener(String widgetName, String className, Point p) {
+    public void newPropChangeListener(String widgetName, String className, Point2D p) {
         PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
         if (p == null) {
-            pcNode.setPosition(new Point(100, 100));
+            pcNode.setPosition(new Point2D.Double(100, 100));
         } else {
             pcNode.setPosition(p);
         }
@@ -355,7 +357,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     @Override
-    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p) {
+    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
         // This is not needed
         //todo yank out all the FileBasedAssyNode stuff
         newPropChangeListener(widgetName, node.loadedClass, p);
@@ -558,8 +560,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
-        int x = ((pclNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
-        int y = ((pclNode.getPosition().y + GridScale / 2) / GridScale) * GridScale;
+        double x = ((pclNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
+        double y = ((pclNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
         coor.setX("" + x);
         coor.setY("" + y);
         pclNode.getPosition().setLocation(x, y);
@@ -607,8 +609,8 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = oFactory.createCoordinate();
 
         int GridScale = 10;
-        int x = ((evNode.getPosition().x + GridScale / 2) / GridScale) * GridScale;
-        int y = ((evNode.getPosition().y + GridScale / 2) / GridScale) * GridScale;
+        double x = ((evNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
+        double y = ((evNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
         coor.setX("" + x);
         coor.setY("" + y);
         evNode.getPosition().setLocation(x, y);
@@ -751,7 +753,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         }
         if (o instanceof MultiParameter) {           // used for both arrays and Constr arg lists
             MultiParameter mu = (MultiParameter) o;
-            return (mu.getType().indexOf('[') != -1) ? buildArrayFromMultiParameter(mu) : buildConstrFromMultiParameter(mu);
+            return (mu.getType().contains("[")) ? buildArrayFromMultiParameter(mu) : buildConstrFromMultiParameter(mu);
         }
         return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
@@ -945,10 +947,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = pcl.getCoordinate();
         if (coor == null) {
             pNode.setPosition(pointLess);
-            pointLess = new Point(pointLess.x + 20, pointLess.y + 20);
+            pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
         } else {
-            pNode.setPosition(new Point(Integer.parseInt(coor.getX()),
-                    Integer.parseInt(coor.getY())));
+            pNode.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
         }
         List<Object> lis = pcl.getParameters();
         VInstantiator.Constr vc = new VInstantiator.Constr(pcl.getType(),
@@ -980,10 +982,10 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         Coordinate coor = se.getCoordinate();
         if (coor == null) {
             en.setPosition(pointLess);
-            pointLess = new Point(pointLess.x + 20, pointLess.y + 20);
+            pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
         } else {
-            en.setPosition(new Point(Integer.parseInt(coor.getX()),
-                    Integer.parseInt(coor.getY())));
+            en.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
         }
 
         en.setDescriptionString(se.getDescription());

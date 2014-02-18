@@ -1,11 +1,8 @@
 package viskit.jgraph;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
 import java.util.Hashtable;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.CancellingEdge;
@@ -17,7 +14,7 @@ import viskit.model.SchedulingEdge;
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
- * @author Mike Baily
+ * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 1:21:52 PM
  * @version $Id$
@@ -35,48 +32,30 @@ public class vGraphModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked") // JGraph not genericized
     private void initViskitStyle() {
 
-        // TODO: JGraph produced Maps are not generic, need updated JGraph
-        viskitEdgeStyle = GraphConstants.createMap();
+        viskitEdgeStyle = new AttributeMap();
         GraphConstants.setDisconnectable(viskitEdgeStyle, false);
         GraphConstants.setLineEnd(viskitEdgeStyle, GraphConstants.ARROW_TECHNICAL);
         GraphConstants.setEndFill(viskitEdgeStyle, true);
         GraphConstants.setEndSize(viskitEdgeStyle, 10);
-        GraphConstants.setFont(viskitEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
+        GraphConstants.setFont(viskitEdgeStyle, GraphConstants.DEFAULTFONT.deriveFont(10));
         GraphConstants.setBendable(viskitEdgeStyle, true);
-        GraphConstants.setLineStyle(viskitEdgeStyle, GraphConstants.STYLE_BEZIER);
+        GraphConstants.setLineStyle(viskitEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
         GraphConstants.setLineWidth(viskitEdgeStyle, 1);
         GraphConstants.setOpaque(viskitEdgeStyle, true);
         GraphConstants.setBackground(viskitEdgeStyle, new Color(255, 255, 255, 180));
-        // comment out for no border GraphConstants.setBorderColor(viskitAssyAdapterEdgeStyle, Color.gray);
         GraphConstants.setForeground(viskitEdgeStyle, Color.black);
-        GraphConstants.setRouting(viskitEdgeStyle, new ViskitRouting());
+        GraphConstants.setRouting(viskitEdgeStyle, new vRouting());
 
-        viskitCancelEdgeStyle = GraphConstants.createMap();
-        GraphConstants.setDisconnectable(viskitCancelEdgeStyle, false);
-        GraphConstants.setLineEnd(viskitCancelEdgeStyle, GraphConstants.ARROW_TECHNICAL);
-        GraphConstants.setEndFill(viskitCancelEdgeStyle, true);
-        GraphConstants.setEndSize(viskitCancelEdgeStyle, 10);
-        GraphConstants.setFont(viskitCancelEdgeStyle, GraphConstants.defaultFont.deriveFont(10));
-        GraphConstants.setBendable(viskitCancelEdgeStyle, true);
-        GraphConstants.setLineStyle(viskitCancelEdgeStyle, GraphConstants.STYLE_BEZIER);
-        GraphConstants.setLineWidth(viskitCancelEdgeStyle, 1);
-        GraphConstants.setOpaque(viskitCancelEdgeStyle, true);
-        GraphConstants.setBackground(viskitCancelEdgeStyle, new Color(255, 255, 255, 180));
-        // comment out for no border GraphConstants.setBorderColor(viskitAssyPclEdgeStyle, Color.gray);
-        GraphConstants.setForeground(viskitCancelEdgeStyle, Color.black);
+        viskitCancelEdgeStyle = new AttributeMap();
+        viskitCancelEdgeStyle.putAll(viskitEdgeStyle);
         GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[]{3, 3});
-        GraphConstants.setRouting(viskitCancelEdgeStyle, new ViskitRouting());
 
-        viskitSelfRefEdge = GraphConstants.createMap();
+        viskitSelfRefEdge = new AttributeMap();
         viskitSelfRefEdge.putAll(viskitEdgeStyle);
-        GraphConstants.setLineStyle(viskitSelfRefEdge, GraphConstants.STYLE_ORTHOGONAL);
-        //GraphConstants.setLineEnd   (viskitAssySimEvLisEdgeStyle, GraphConstants.ARROW_SIMPLE);
         viskitSelfRefEdge.remove(GraphConstants.ROUTING);
 
-        viskitSelfRefCancel = GraphConstants.createMap();
+        viskitSelfRefCancel = new AttributeMap();
         viskitSelfRefCancel.putAll(viskitCancelEdgeStyle);
-        GraphConstants.setLineStyle(viskitSelfRefCancel, GraphConstants.STYLE_ORTHOGONAL);
-        //GraphConstants.setLineEnd(viskitSelfRefCancel, GraphConstants.ARROW_CIRCLE);
         viskitSelfRefCancel.remove(GraphConstants.ROUTING);
     }
 
@@ -116,10 +95,10 @@ public class vGraphModel extends DefaultGraphModel {
     public void deleteAll() {
         //remove(getRoots(this));
         Object[] localRoots = getRoots(this);
-        for (int i = 0; i < localRoots.length; i++) {
-            if (localRoots[i] instanceof CircleCell) {
+        for (Object localRoot : localRoots) {
+            if (localRoot instanceof CircleCell) {
                 Object[] child = new Object[1];
-                child[0] = ((CircleCell) localRoots[i]).getFirstChild();
+                child[0] = ((CircleCell) localRoot).getFirstChild();
                 remove(child);
             }
         }
@@ -142,20 +121,6 @@ public class vGraphModel extends DefaultGraphModel {
         this.remove(new Object[]{c});
     }
 
-    public void addEventNode(EventNode en) {
-        DefaultGraphCell c = new CircleCell(en.getName());
-        en.opaqueViewObject = c;
-        c.setUserObject(en);
-
-        Map<DefaultGraphCell, Map> attributes = new Hashtable<DefaultGraphCell, Map>();
-        attributes.put(c, createBounds(en.getPosition().x, en.getPosition().y, Color.black));
-        //attributes.put(c,createBounds(p.x,p.y,Color.black)); // color a nop?
-
-        //c.add(new DefaultPort(en.getName()+"/Center"));
-        c.add(new vPortCell(en.getName() + "/Center"));
-        this.insert(new Object[]{c}, attributes, null, null, null);
-    }
-
     public void addEdge(SchedulingEdge se) {
         _addEdgeCommon(se, viskitEdgeStyle);
     }
@@ -167,8 +132,8 @@ public class vGraphModel extends DefaultGraphModel {
     private void _addEdgeCommon(viskit.model.Edge ed, Map edgeStyle) {
         EventNode enfrom = ed.from;
         EventNode ento = ed.to;
-        DefaultGraphCell from = (DefaultGraphCell) enfrom.opaqueViewObject;
-        DefaultGraphCell to = (DefaultGraphCell) ento.opaqueViewObject;
+        DefaultGraphCell source = (DefaultGraphCell) enfrom.opaqueViewObject;
+        DefaultGraphCell target = (DefaultGraphCell) ento.opaqueViewObject;
 
         DefaultEdge edge;
         if (enfrom == ento) {
@@ -179,33 +144,21 @@ public class vGraphModel extends DefaultGraphModel {
 
         ed.opaqueViewObject = edge;
         edge.setUserObject(ed);
+
         ConnectionSet cs = new ConnectionSet();
-        cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
+        cs.connect(edge, source.getFirstChild(), target.getFirstChild());
 
-        Map<DefaultEdge, Map> attributes = new Hashtable<DefaultEdge, Map>();
-
-        attributes.put(edge, edgeStyle);
+        Map atts = new Hashtable();
+        atts.put(edge, edgeStyle);
 
         if (enfrom == ento) {// self referential overwrite
             if (ed instanceof SchedulingEdge) {
-                attributes.put(edge, this.viskitSelfRefEdge);
+                atts.put(edge, viskitSelfRefEdge);
             } else {
-                attributes.put(edge, this.viskitSelfRefCancel);
+                atts.put(edge, viskitSelfRefCancel);
             }
         }
 
-        this.insert(new Object[]{edge}, attributes, cs, null, null);
-
-    }
-
-    public Map createBounds(int x, int y, Color c) {
-        Map map = GraphConstants.createMap();
-        GraphConstants.setBounds(map, new Rectangle(x, y, 54, 54)); //90, 30));
-        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
-        GraphConstants.setBackground(map, c.darker());
-        GraphConstants.setForeground(map, Color.white);
-        GraphConstants.setFont(map, GraphConstants.defaultFont.deriveFont(Font.BOLD, 12));
-        GraphConstants.setOpaque(map, true);
-        return map;
+        insert(new Object[]{edge}, atts, cs, null, null);
     }
 }

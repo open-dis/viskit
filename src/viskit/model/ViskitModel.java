@@ -1,6 +1,6 @@
 package viskit.model;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
 
@@ -67,7 +67,7 @@ public interface ViskitModel {
      * @param nodeName the name of the Event Node
      * @param p the (x, y) position of the Event Node
      */
-    void newEvent(String nodeName, Point p);
+    void newEvent(String nodeName, Point2D p);
 
     void newEdge(EventNode src, EventNode target);
 
@@ -110,7 +110,7 @@ public interface ViskitModel {
 
     /**
      * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
-     * @param dirt
+     * @param dirty, if true force to save
      */
     void setDirty(boolean dirty);
 

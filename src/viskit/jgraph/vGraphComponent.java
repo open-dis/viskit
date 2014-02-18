@@ -8,12 +8,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
@@ -23,14 +25,14 @@ import org.jgraph.graph.*;
 import viskit.EventGraphViewFrame;
 import viskit.ModelEvent;
 import viskit.ViskitController;
-import viskit.model.Edge;
 import viskit.model.*;
+import viskit.model.Edge;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
  * MOVES Institute.
  * Naval Postgraduate School, Monterey, CA
- * @author Mike Bailey 
+ * @author Mike Bailey
  * @since Feb 19, 2004
  * @since 2:54:31 PM
  * @version $Id$
@@ -39,11 +41,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
     vGraphModel model;
     EventGraphViewFrame parent;
+    protected Action removeAction;
 
     public vGraphComponent(vGraphModel model, EventGraphViewFrame frame) {
         super(model);
         parent = frame;
-        
+
         vGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         //super.setDoubleBuffered(false); // test for mac
@@ -59,6 +62,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setGridSize(10);
         this.setMarqueeHandler(new MyMarqueeHandler());
         this.setAntiAliased(true);
+
+        // Set the Tolerance to 2 Pixel
+        setTolerance(2);
+        // Jump to default port on connect
+        setJumpToDefaultPort(true);
+
         this.addGraphSelectionListener(new myGraphSelectionListener());
         model.addGraphModelListener(instance);
 
@@ -67,13 +76,56 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         //this.setMarqueeColor(Color.red);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
-    //this.setHandleColor(Color.orange);
+        //this.setHandleColor(Color.orange);
 
+        // As of JGraph-5.2, custom cell rendering is
+        // accomplished via this convention
+        getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
+
+            // To use circles, from the tutorial
+            @Override
+            protected VertexView createVertexView(Object v) {
+                VertexView view;
+                if (v instanceof CircleCell) {
+                    view = new CircleView(v);
+                } else {
+                    view = super.createVertexView(v);
+                }
+                return view;
+            }
+
+            // To customize my edges
+            @Override
+            protected EdgeView createEdgeView(Object e) {
+                EdgeView view;
+                if (e instanceof vSelfEdgeCell) // order important... 1st is sub of 2nd
+                {
+                    view = new vSelfEdgeView(e);
+                } else if (e instanceof vEdgeCell) {
+                    view = new vEdgeView(e);
+                } else {
+                    view = super.createEdgeView(e);
+                }
+                return view;
+            }
+
+            @Override
+            protected PortView createPortView(Object p) {
+                PortView view;
+                if (p instanceof vPortCell) {
+                    view = new vPortView(p);
+                } else {
+                    view = super.createPortView(p);
+                }
+                return view;
+            }
+        });
     }
 
     private void setupCutCopyPaste() {
+
         // Handle keystrokes
-        AbstractAction cutAction = new myCutKeyHandler();
+        Action cutAction = new myCutKeyHandler();
         Action copyAction = new myCopyKeyHandler();
         Action pasteAction = new myPasteKeyHandler();
 
@@ -88,6 +140,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.getActionMap().put(cutAction.getValue(Action.NAME), cutAction);
         this.getActionMap().put(copyAction.getValue(Action.NAME), copyAction);
         this.getActionMap().put(pasteAction.getValue(Action.NAME), pasteAction);
+
+        removeAction = new myRemoveKeyHandler();
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod),
+                removeAction.getValue(Action.NAME));
+        this.getActionMap().put(removeAction.getValue(Action.NAME), removeAction);
     }
 
     class myCopyKeyHandler extends AbstractAction {
@@ -126,6 +183,22 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         }
     }
 
+    class myRemoveKeyHandler extends AbstractAction {
+
+        myRemoveKeyHandler() {
+            super("remove");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!vGraphComponent.this.isSelectionEmpty()) {
+                Object[] cells = vGraphComponent.this.getSelectionCells();
+                cells = vGraphComponent.this.getDescendants(cells);
+                vGraphComponent.this.getModel().remove(cells);
+            }
+        }
+    }
+
     @Override
     public void updateUI() {
         // Install a new UI
@@ -151,7 +224,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 model.deleteAll();
                 break;
             case ModelEvent.EVENTADDED:
-                model.addEventNode((EventNode) ev.getSource());
+
+                // Reclaimed from the model to here
+                insert((EventNode) ev.getSource());
                 break;
             case ModelEvent.EDGEADDED:
                 model.addEdge((SchedulingEdge) ev.getSource());
@@ -195,15 +270,16 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             for (Object cell : ch) {
                 if (cell instanceof CircleCell) {
                     CircleCell cc = (CircleCell) cell;
-                    
-                    @SuppressWarnings("unchecked") // JGraph not genericized
-                    Map<String, Rectangle> m = cc.getAttributes();
-                    Rectangle r = m.get("bounds");
+
+                    AttributeMap m = cc.getAttributes();
+                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
-                        en.setPosition(new Point(r.x, r.y));
+                        en.setPosition(new Point2D.Double(r.x, r.y));
                         ((ViskitModel) parent.getModel()).changeEvent(en);
-                        m.put("bounds", new Rectangle(en.getPosition().x, en.getPosition().y, r.width, r.height));
+
+                        // might have changed:
+                        m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 }
             }
@@ -239,7 +315,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
                         double priority;
                         String s;
-                        
+
                         // Assume numeric comes in, avoid NumberFormatException via Regex check
                         if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority)) {
                             priority = Double.parseDouble(((SchedulingEdge) se).priority);
@@ -324,7 +400,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                             sb.append("<br>");
                         }
                     }
-                    
+
                     List<ViskitElement> argLis = en.getArguments();
                     StringBuffer args = new StringBuffer();
                     int n = 1;
@@ -369,7 +445,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
                         sttrans.append("<br>");
                     }
-                    
+
                     if (sttrans.length() > 0) {
                         sb.append("<u>state transitions</u><br>");
                         sb.append(sttrans);
@@ -439,37 +515,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         return null;
     }
 
-    // To use circles, from the tutorial
-    @Override
-    protected VertexView createVertexView(Object v, CellMapper cm) {
-        if (v instanceof CircleCell) {
-            return new CircleView(v, this, cm);
-        }
-        // else
-        return super.createVertexView(v, cm);
-    }
-
-    // To customize my edges
-    @Override
-    protected EdgeView createEdgeView(Object e, CellMapper cm) {
-        if (e instanceof vSelfEdgeCell) // order important... 1st is sub of 2nd
-        {
-            return new vSelfEdgeView(e, this, cm);
-        } else if (e instanceof vEdgeCell) {
-            return new vEdgeView(e, this, cm);
-        }
-        // else
-        return super.createEdgeView(e, cm);
-    }
-
-    @Override
-    protected PortView createPortView(Object p, CellMapper cm) {
-        if (p instanceof vPortCell) {
-            return new vPortView(p, this, cm);
-        }
-        return super.createPortView(p, cm);
-    }
-
     /**
      * This class informs the controller that the selected set has changed.  Since we're only using this
      * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
@@ -482,15 +527,18 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         @Override
         public void valueChanged(GraphSelectionEvent e) {
+            boolean enabled = !vGraphComponent.this.isSelectionEmpty();
+	    removeAction.setEnabled(enabled);
+
             Object[] oa = e.getCells();
             if (oa == null || oa.length <= 0) {
                 return;
             }
-            for (int i = 0; i < oa.length; i++) {
-                if (e.isAddedCell(i)) {
-                    selected.add(((DefaultGraphCell) oa[i]).getUserObject());
+            for (Object o : oa) {
+                if (e.isAddedCell(o)) {
+                    selected.add(((DefaultGraphCell) o).getUserObject());
                 } else {
-                    selected.remove(((DefaultGraphCell) oa[i]).getUserObject());
+                    selected.remove(((DefaultGraphCell) o).getUserObject());
                 }
             }
             ((ViskitController) parent.getController()).selectNodeOrEdge(selected);
@@ -501,14 +549,42 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     public class MyMarqueeHandler extends BasicMarqueeHandler {
 
         // Holds the Start and the Current Point
-        protected Point start,  current;
+        protected Point2D start, current;
 
         // Holds the First and the Current Port
-        protected PortView port,  firstPort;
+        protected PortView port, firstPort;
+
+        /**
+         * Component that is used for highlighting cells if the graph does not
+         * allow XOR painting.
+         */
+        protected JComponent highlight;
+
+        public MyMarqueeHandler() {
+            // Configures the panel for highlighting ports
+            highlight = createHighlight();
+        }
+
+        /**
+         * Creates the component that is used for highlighting cells if the
+         * graph does not allow XOR painting.
+         * @return a component that is used for highlighting cells
+         */
+        private JComponent createHighlight() {
+            JPanel panel = new JPanel();
+            panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            panel.setVisible(false);
+            panel.setOpaque(false);
+
+            return panel;
+        }
 
         // Override to Gain Control (for PopupMenu and ConnectMode)
         @Override
         public boolean isForceMarqueeEvent(MouseEvent e) {
+            if (e.isShiftDown()) {
+                return false;
+            }
             // If Right Mouse Button we want to Display the PopupMenu
             if (SwingUtilities.isRightMouseButton(e)) // Return Immediately
             {
@@ -530,25 +606,18 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         public void mousePressed(final MouseEvent e) {
             // If Right Mouse Button
             if (SwingUtilities.isRightMouseButton(e)) {
-            // Scale From Screen to Model
-            //Point loc = vGraphComponent.this.fromScreen(e.getPoint());
-            // Find Cell in Model Coordinates
-            //Object cell = vGraphComponent.this.getFirstCellForLocation(loc.x, loc.y);
-            // Create PopupMenu for the Cell
-            //JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
-            // Display PopupMenu
-
-            // jmb...not today
-            //menu.show(vGraphComponent.this, e.getX(), e.getY());
-
-            // Else if in ConnectMode and Remembered Port is Valid
-            } else if (port != null && !e.isConsumed() && vGraphComponent.this.isPortsVisible()) {
+                // Find Cell in Model Coordinates
+//                Object cell = vGraphComponent.this.getFirstCellForLocation(e.getX(), e.getY());
+                // Create PopupMenu for the Cell
+//                JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
+                // Display PopupMenu
+//                menu.show(vGraphComponent.this, e.getX(), e.getY());
+                // Else if in ConnectMode and Remembered Port is Valid
+            } else if (port != null && vGraphComponent.this.isPortsVisible()) {
                 // Remember Start Location
-                start = vGraphComponent.this.toScreen(port.getLocation(null));
+                start = vGraphComponent.this.toScreen(port.getLocation());
                 // Remember First Port
                 firstPort = port;
-                // Consume Event
-                e.consume();
             } else // Call Superclass
             {
                 super.mousePressed(e);
@@ -559,67 +628,62 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         @Override
         public void mouseDragged(MouseEvent e) {
             // If remembered Start Point is Valid
-            if (start != null && !e.isConsumed()) {
+            if (start != null) {
                 // Fetch Graphics from Graph
                 Graphics g = vGraphComponent.this.getGraphics();
-                // Xor-Paint the old Connector (Hide old Connector)
-                paintConnector(Color.black, vGraphComponent.this.getBackground(), g);
                 // Reset Remembered Port
-                port = getTargetPortAt(e.getPoint());
-                // If Port was found then Point to Port Location
-                if (port != null) {
-                    current = vGraphComponent.this.toScreen(port.getLocation(null));
-                } // Else If no Port was found then Point to Mouse Location
-                else {
-                    current = vGraphComponent.this.snap(e.getPoint());
+                PortView newPort = getTargetPortAt(e.getPoint());
+                // Do not flicker (repaint only on real changes)
+                if (newPort == null || newPort != port) {
+                    // Xor-Paint the old Connector (Hide old Connector)
+                    paintConnector(Color.black, vGraphComponent.this.getBackground(), g);
+                    // If Port was found then Point to Port Location
+                    port = newPort;
+                    if (port != null) {
+                        current = vGraphComponent.this.toScreen(port.getLocation());
+                    } // Else If no Port was found then Point to Mouse Location
+                    else {
+                        current = vGraphComponent.this.snap(e.getPoint());
+                    }
+                    // Xor-Paint the new Connector
+                    paintConnector(vGraphComponent.this.getBackground(), Color.black, g);
                 }
-                // Xor-Paint the new Connector
-                paintConnector(vGraphComponent.this.getBackground(), Color.black, g);
-                // Consume Event
-                e.consume();
             }
             // Call Superclass
             super.mouseDragged(e);
         }
 
-        public PortView getSourcePortAt(Point point) {
-            // Scale from Screen to Model
-            Point tmp = vGraphComponent.this.fromScreen(new Point(point));
-            // Find a Port View in Model Coordinates and Remember
-            return vGraphComponent.this.getPortViewAt(tmp.x, tmp.y);
+        public PortView getSourcePortAt(Point2D point) {
+            // Disable jumping
+            vGraphComponent.this.setJumpToDefaultPort(false);
+            PortView result;
+            try {
+                // Find a Port View in Model Coordinates and Remember
+                result = vGraphComponent.this.getPortViewAt(point.getX(), point.getY());
+            } finally {
+                vGraphComponent.this.setJumpToDefaultPort(true);
+            }
+            return result;
         }
 
         // Find a Cell at point and Return its first Port as a PortView
-        protected PortView getTargetPortAt(Point point) {
-            // Find Cell at point (No scaling needed here)
-            Object cell = vGraphComponent.this.getFirstCellForLocation(point.x, point.y);
-            // Loop Children to find PortView
-            for (int i = 0; i < vGraphComponent.this.getModel().getChildCount(cell); i++) {
-                // Get Child from Model
-                Object tmp = vGraphComponent.this.getModel().getChild(cell, i);
-                // Get View for Child using the Graph's View as a Cell Mapper
-                //jmb fix  tmp = graphPane.getView().getMapping(tmp, false);
-                // If Child View is a Port View and not equal to First Port
-                if (tmp instanceof PortView && tmp != firstPort) // Return as PortView
-                {
-                    return (PortView) tmp;
-                }
-            }
-            // No Port View found
-            return getSourcePortAt(point);
+        protected PortView getTargetPortAt(Point2D point) {
+            // Find a Port View in Model Coordinates and Remember
+            return vGraphComponent.this.getPortViewAt(point.getX(), point.getY());
         }
 
         // Connect the First Port and the Current Port in the Graph or Repaint
         @Override
         public void mouseReleased(MouseEvent e) {
+            highlight(vGraphComponent.this, null);
+
             // If Valid Event, Current and First Port
-            if (e != null && !e.isConsumed() && port != null && firstPort != null &&
-                    firstPort != port) {
+            if (e != null && port != null && firstPort != null
+                    && firstPort != port) {
                 // Then Establish Connection
                 connect((Port) firstPort.getCell(), (Port) port.getCell());
-                // Consume Event
                 e.consume();
-            // Else Repaint the Graph
+                // Else Repaint the Graph
             } else {
                 vGraphComponent.this.repaint();
             }
@@ -634,29 +698,62 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         @Override
         public void mouseMoved(MouseEvent e) {
             // Check Mode and Find Port
-            if (e != null && getSourcePortAt(e.getPoint()) != null &&
-                    !e.isConsumed() && vGraphComponent.this.isPortsVisible()) {
+            if (e != null && getSourcePortAt(e.getPoint()) != null
+                    && vGraphComponent.this.isPortsVisible()) {
                 // Set Cusor on Graph (Automatically Reset)
                 vGraphComponent.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                // Consume Event
+				// Consume Event
+                // Note: This is to signal the BasicGraphUI's
+                // MouseHandle to stop further event processing.
                 e.consume();
+            } else // Call Superclass
+            {
+                super.mouseMoved(e);
             }
-            // Call Superclass
-            super.mouseMoved(e); //this was super.mouseReleased() but apparently was not causing probs.
         }
 
         // Use Xor-Mode on Graphics to Paint Connector
         protected void paintConnector(Color fg, Color bg, Graphics g) {
-            // Set Foreground
-            g.setColor(fg);
-            // Set Xor-Mode Color
-            g.setXORMode(bg);
-            // Highlight the Current Port
-            paintPort(vGraphComponent.this.getGraphics());
-            // If Valid First Port, Start and Current Point
-            if (firstPort != null && start != null && current != null) // Then Draw A Line From Start to Current Point
-            {
-                g.drawLine(start.x, start.y, current.x, current.y);
+            if (vGraphComponent.this.isXorEnabled()) {
+                // Set Foreground
+                g.setColor(fg);
+                // Set Xor-Mode Color
+                g.setXORMode(bg);
+                // Highlight the Current Port
+                paintPort(vGraphComponent.this.getGraphics());
+
+                drawConnectorLine(g);
+            } else {
+                Rectangle dirty = new Rectangle((int) start.getX(), (int) start.getY(), 1, 1);
+
+                if (current != null) {
+                    dirty.add(current);
+                }
+
+                dirty.grow(1, 1);
+
+                vGraphComponent.this.repaint(dirty);
+                highlight(vGraphComponent.this, port);
+            }
+        }
+
+	// Overrides parent method to paint connector if
+        // XOR painting is disabled in the graph
+        @Override
+        public void paint(JGraph graph, Graphics g) {
+            super.paint(graph, g);
+
+            if (!graph.isXorEnabled()) {
+                g.setColor(Color.black);
+                drawConnectorLine(g);
+            }
+        }
+
+        protected void drawConnectorLine(Graphics g) {
+            if (firstPort != null && start != null && current != null) {
+                // Then Draw A Line From Start to Current Point
+                g.drawLine((int) start.getX(), (int) start.getY(),
+                        (int) current.getX(), (int) current.getY());
             }
         }
 
@@ -665,102 +762,188 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             // If Current Port is Valid
             if (port != null) {
                 // If Not Floating Port...
-                boolean o = (GraphConstants.getOffset(port.getAttributes()) != null);
+                boolean o = (GraphConstants.getOffset(port.getAllAttributes()) != null);
                 // ...Then use Parent's Bounds
-                Rectangle r = (o) ? port.getBounds() : port.getParentView().getBounds();
+                Rectangle2D r = (o) ? port.getBounds() : port.getParentView()
+                        .getBounds();
                 // Scale from Model to Screen
-                r = vGraphComponent.this.toScreen(new Rectangle(r));
+                r = vGraphComponent.this.toScreen((Rectangle2D) r.clone());
                 // Add Space For the Highlight Border
-                //r.setBounds(r.x - 3, r.y - 3, r.width + 6, r.height + 6);
-                r.setBounds(r.x - 5, r.y - 5, r.width + 10, r.height + 10);
+                r.setFrame(r.getX() - 3, r.getY() - 3, r.getWidth() + 6, r
+                        .getHeight() + 6);
                 // Paint Port in Preview (=Highlight) Mode
                 vGraphComponent.this.getUI().paintCell(g, port, r, true);
             }
         }
 
-        // Insert a new Vertex at point
-        private void insert(Point point) {
-            
-            // Construct Vertex with no Label
-            DefaultGraphCell vertex = new DefaultGraphCell();
-            
-            // Add one Floating Port
-            vertex.add(new DefaultPort());
-            // Snap the Point to the Grid
-            point = vGraphComponent.this.snap(new Point(point));
-            // Default Size for the new Vertex
-            Dimension size = new Dimension(25, 25);
-            // Create a Map that holds the attributes for the Vertex
-            Map map = GraphConstants.createMap();
-            // Add a Bounds Attribute to the Map
-            GraphConstants.setBounds(map, new Rectangle(point, size));
-            // Add a Border Color Attribute to the Map
-            GraphConstants.setBorderColor(map, Color.black);
-            // Add a White Background
-            GraphConstants.setBackground(map, Color.white);
-            // Make Vertex Opaque
-            GraphConstants.setOpaque(map, true);
-        // Construct a Map from cells to Maps (for insert)
-        // Hashtable attributes = new Hashtable();
-        // Associate the Vertex with its Attributes
-        // attributes.put(vertex, map);
+        /**
+         * Highlights the given cell view or removes the highlight if no cell
+         * view is specified.
+         *
+         * @param graph
+         * @param cellView
+         */
+        protected void highlight(JGraph graph, CellView cellView) {
+            if (cellView != null) {
+                highlight.setBounds(getHighlightBounds(graph, cellView));
 
-        // Insert the Vertex and its Attributes
-        //   graphPane.getModel().insert(new Object[]{vertex}, null, null, attributes);
-        }
-
-        // Insert a new Edge between source and target
-        public void connect(Port source, Port target) {
-            DefaultGraphCell src = (DefaultGraphCell) vGraphComponent.this.getModel().getParent(source);
-            DefaultGraphCell tar = (DefaultGraphCell) vGraphComponent.this.getModel().getParent(target);
-            Object[] oa = new Object[]{src, tar};
-            ViskitController controller = (ViskitController) parent.getController();
-            if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
-                controller.buildNewCancelArc(oa);
+                if (highlight.getParent() == null) {
+                    graph.add(highlight);
+                    highlight.setVisible(true);
+                }
             } else {
-                controller.buildNewArc(oa);
+                if (highlight.getParent() != null) {
+                    highlight.setVisible(false);
+                    highlight.getParent().remove(highlight);
+                }
             }
         }
 
-        public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
-            JPopupMenu menu = new JPopupMenu();
-            if (cell != null) {
-                // Edit
-                menu.add(new AbstractAction("Edit") {
+        /**
+         * Returns the bounds to be used to highlight the given cell view.
+         *
+         * @param graph
+         * @param cellView
+         * @return
+         */
+        protected Rectangle getHighlightBounds(JGraph graph, CellView cellView) {
+            boolean offset = (GraphConstants.getOffset(cellView.getAllAttributes()) != null);
+            Rectangle2D r = (offset) ? cellView.getBounds() : cellView
+                    .getParentView().getBounds();
+            r = graph.toScreen((Rectangle2D) r.clone());
+            int s = 3;
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        vGraphComponent.this.startEditingAtCell(cell);
-                    }
-                });
-            }
-            // Remove
-            if (!vGraphComponent.this.isSelectionEmpty()) {
-                menu.addSeparator();
-                menu.add(new AbstractAction("Remove") {
+            return new Rectangle((int) (r.getX() - s), (int) (r.getY() - s),
+                    (int) (r.getWidth() + 2 * s), (int) (r.getHeight() + 2 * s));
+        }
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                    // jmb fix remove.actionPerformed(e);
-                    // remove is an Action
-                    }
-                });
-            }
-            menu.addSeparator();
-            // Insert
-            menu.add(new AbstractAction("Insert") {
+    } // End of Editor.MyMarqueeHandler
+
+    // NOTE: Not used
+    // PopupMenu
+    //
+    public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
+        JPopupMenu menu = new JPopupMenu();
+        if (cell != null) {
+            // Edit
+            menu.add(new AbstractAction("Edit") {
 
                 @Override
-                public void actionPerformed(ActionEvent ev) {
-                    insert(pt);
+                public void actionPerformed(ActionEvent e) {
+                    vGraphComponent.this.startEditingAtCell(cell);
                 }
             });
-            return menu;
         }
-    } // End of Editor.MyMarqueeHandler
+        // Remove
+        if (!vGraphComponent.this.isSelectionEmpty()) {
+            menu.addSeparator();
+            menu.add(new AbstractAction("Remove") {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    removeAction.actionPerformed(e);
+                }
+            });
+        }
+        menu.addSeparator();
+        // Insert
+        menu.add(new AbstractAction("Insert") {
+
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+//                insert(pt);
+            }
+        });
+        return menu;
+    }
+
+    // Insert a new Edge between source and target
+    public void connect(Port source, Port target) {
+
+        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
+        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
+        Object[] oa = new Object[]{src, tar};
+        ViskitController controller = (ViskitController) parent.getController();
+        if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
+            controller.buildNewCancelArc(oa);
+        } else {
+            controller.buildNewArc(oa);
+        }
+    }
+
+    /** Create the cells attributes before rendering on the graph
+     *
+     * @param point the 2D point at which to render the cell
+     * @return the cells attributes before rendering on the graph
+     */
+    public Map createCellAttributes(Point2D point) {
+        Map map = new Hashtable();
+
+        // Snap the Point to the Grid
+        if (this != null) {
+            point = snap((Point2D) point.clone());
+        } else {
+            point = (Point2D) point.clone();
+        }
+
+        // Add a Bounds Attribute to the Map
+        GraphConstants.setBounds(map, new Rectangle2D.Double(point.getX(),
+                point.getY(), 54, 54));
+
+        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
+
+        // Make sure the cell is resized on insert (doen't work)
+//        GraphConstants.setResize(map, true);
+
+        GraphConstants.setBackground(map, Color.black.darker());
+        GraphConstants.setForeground(map, Color.white);
+        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
+
+        // Add a nice looking gradient background
+//        GraphConstants.setGradientColor(map, Color.blue);
+        // Add a Border Color Attribute to the Map
+//        GraphConstants.setBorderColor(map, Color.black);
+        // Add a White Background
+//        GraphConstants.setBackground(map, Color.white);
+
+        // Make Vertex Opaque
+        GraphConstants.setOpaque(map, true);
+        return map;
+    }
+
+    /**
+     * Creates a DefaultGraphCell with a given name
+     * @param node the named EventNode
+     * @return a DefaultGraphCell with a given name
+     */
+    protected DefaultGraphCell createDefaultGraphCell(EventNode node) {
+
+        DefaultGraphCell cell = new CircleCell(node.getName());
+        node.opaqueViewObject = cell;
+        cell.setUserObject(node);
+
+        // Add one Floating Port
+        cell.add(new vPortCell(node.getName() + "/Center"));
+        return cell;
+    }
+
+    /** Insert a new Vertex at point
+     * @param node the EventNode to insert
+     */
+    public void insert(EventNode node) {
+        DefaultGraphCell vertex = createDefaultGraphCell(node);
+
+        // Create a Map that holds the attributes for the Vertex
+        vertex.getAttributes().applyMap(createCellAttributes(node.getPosition()));
+
+        // Insert the Vertex (including child port and attributes)
+        getGraphLayoutCache().insert(vertex);
+    }
 }
 
-/***********************************************/
+/**
+ * ********************************************
+ */
 /**
  * To mark our edges.
  */
@@ -803,20 +986,11 @@ class vPortCell extends DefaultPort {
 
 class vPortView extends PortView {
 
-    static int mysize = 54;   // same as the circle
+    static int mysize = 10;   // smaller than the circle
 
-    public vPortView(Object o, JGraph jGraph, CellMapper cellMapper) {
-        super(o, jGraph, cellMapper);
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        Rectangle bounds = new Rectangle(getLocation(null));
-        bounds.x = bounds.x - mysize / 2;
-        bounds.y = bounds.y - mysize / 2;
-        bounds.width = bounds.width + mysize;
-        bounds.height = bounds.height + mysize;
-        return bounds;
+    public vPortView(Object o) {
+        super(o);
+        setPortSize(mysize);
     }
 }
 
@@ -825,10 +999,10 @@ class vPortView extends PortView {
  */
 class vEdgeView extends EdgeView {
 
-    public static vEdgeRenderer localRenderer = new vEdgeRenderer();
+    static vEdgeRenderer localRenderer = new vEdgeRenderer();
 
-    public vEdgeView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public vEdgeView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -842,10 +1016,10 @@ class vEdgeView extends EdgeView {
  */
 class vSelfEdgeView extends vEdgeView {
 
-    public static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
+    static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
 
-    public vSelfEdgeView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public vSelfEdgeView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -854,6 +1028,7 @@ class vSelfEdgeView extends vEdgeView {
     }
 }
 
+/***********************************************/
 /**
  * To mark our nodes.
  */
@@ -875,8 +1050,8 @@ class CircleView extends VertexView {
 
     static vVertexRenderer localRenderer = new vVertexRenderer();
 
-    public CircleView(Object cell, JGraph gr, CellMapper cm) {
-        super(cell, gr, cm);
+    public CircleView(Object cell) {
+        super(cell);
     }
 
     @Override
@@ -886,125 +1061,11 @@ class CircleView extends VertexView {
 }
 
 /**
- * A replacement class to tweak the routing slightly so that the edges come into
- * the node from other directions than NSE and W.  Also, support offsetting 
- * edges between the same two nodes.
- */
-class ViskitRouting implements org.jgraph.graph.Edge.Routing {
-
-    @Override
-    @SuppressWarnings("unchecked") // JGraph not genericized
-    public void route(EdgeView edge, List points) {
-        int n = points.size();
-        Object fromKey = null, toKey = null;
-
-        Point from = edge.getPoint(0);
-
-        if (edge.getSource() instanceof PortView) {
-            from = ((PortView) edge.getSource()).getLocation(null);
-            fromKey = getKey((PortView) edge.getSource());
-        } else if (edge.getSource() != null) {
-            from = edge.getSource().getBounds().getLocation();
-        }
-
-        Point to = edge.getPoint(n - 1);
-
-        if (edge.getTarget() instanceof PortView) {
-            to = ((PortView) edge.getTarget()).getLocation(null);
-            toKey = getKey((PortView) edge.getTarget());
-        } else if (edge.getTarget() != null) {
-            to = edge.getTarget().getBounds().getLocation();
-        }
-
-        int adjustFactor = 0;
-        if (toKey != null && fromKey != null) {
-            adjustFactor = getFactor(toKey, fromKey, edge);
-        }
-
-        int sig = adjustFactor % 2;
-        adjustFactor++;
-        adjustFactor /= 2;
-        if (sig == 0) {
-            adjustFactor *= -1;
-        }
-
-        int adjustment = 0 + 35 * adjustFactor;       // little bias
-
-        int dx = Math.abs(from.x - to.x);
-        int dy = Math.abs(from.y - to.y);
-        int x2 = from.x + ((to.x - from.x) / 2);
-        int y2 = from.y + ((to.y - from.y) / 2);
-        Point[] routed = new Point[2];
-        if (dx > dy) {
-            routed[0] = new Point(x2, from.y + adjustment);
-            routed[1] = new Point(x2, to.y - adjustment);
-        } else {
-            routed[0] = new Point(from.x - adjustment, y2);
-            routed[1] = new Point(to.x + adjustment, y2);
-        }
-
-        // Set/Add Points
-        for (int i = 0; i < routed.length; i++) {
-            if (points.size() > i + 2) {
-                points.set(i + 1, routed[i]);
-            } else {
-                points.add(i + 1, routed[i]);
-            }
-        }
-        
-        // Remove spare points
-        while (points.size() > routed.length + 2) {
-            points.remove(points.size() - 2);
-        }
-
-    }
-
-    private Object getKey(PortView pv) {
-        CircleView cv = (CircleView) pv.getParentView();
-        CircleCell cc = (CircleCell) cv.getCell();
-        EventNode en = (EventNode) cc.getUserObject();
-        return en.getModelKey();
-    }
-    static Map<Object, Vector<Object>> nodePairs = new HashMap<Object, Vector<Object>>();
-
-    private int getFactor(Object toKey, Object fromKey, EdgeView ev) {
-        String toStr = toKey.toString();
-        String fromStr = fromKey.toString();
-        String masterKey;
-        if (toStr.compareTo(fromStr) > 0) {
-            masterKey = fromStr + "-" + toStr;
-        } else {
-            masterKey = toStr + "-" + fromStr;
-        }
-
-        vEdgeCell vec = (vEdgeCell) ev.getCell();
-        viskit.model.Edge edg = (viskit.model.Edge) vec.getUserObject();
-        Object edgeKey = edg.getModelKey();
-
-        Vector<Object> lis = nodePairs.get(masterKey);
-        if (lis == null) {
-            // never had an edge between these 2 before
-            Vector<Object> v = new Vector<Object>();
-            v.add(edgeKey);
-            //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
-            nodePairs.put(masterKey, v);
-            return 0;
-        }
-        // Here if there has been a previous edge between the 2, maybe just this one
-        if (!lis.contains(edgeKey)) {
-            lis.add(edgeKey);
-        //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
-        }
-        return lis.indexOf(edgeKey);
-    }
-}
-
-/**
  * Class to draw the self-referential edges as an arc attached to the node.
  */
 class vSelfEdgeRenderer extends vEdgeRenderer {
 
-    private int circleDiam = 30;
+    private double circleDiam = 30.0d;
     private Arc2D arc;
 
     /**
@@ -1012,28 +1073,28 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
      * in the context of the current graph.
      * This method sets the global beginShape, lineShape
      * and endShape variables as a side-effect.
-     * 
+     *
      * @return the shape that represents the current edge
      * in the context of the current graph
      */
     @Override
     protected Shape createShape() {
         CircleView myCircle = (CircleView) view.getSource().getParentView();
-        Rectangle circBnds = myCircle.getBounds();
-        int circCenterX = circBnds.x + circBnds.width / 2;
-        int circCenterY = circBnds.y + circBnds.height / 2;
+        Rectangle2D circBnds = myCircle.getBounds();
+        double circCenterX = circBnds.getCenterX();
+        double circCenterY = circBnds.getCenterY();
 
-        int topCenterX = circBnds.x + circBnds.width / 2 - circleDiam / 2;
-        int topCenterY = circBnds.y + circBnds.height - 7;  // 7 pixels up
+        double topCenterX = circCenterX - circleDiam / 2;
+        double topCenterY = circBnds.getY() + circBnds.getHeight() - 7;  // 7 pixels up
 
         AffineTransform rotater = new AffineTransform();
-        rotater.setToRotation(getAngle(), (double) circCenterX, (double) circCenterY);
+        rotater.setToRotation(getAngle(), circCenterX, circCenterY);
 
         if (view.sharedPath == null) {
-            double ex = 0.0d + topCenterX;
-            double ey = 0.0d + topCenterY;
-            double ew = 0.0d + circleDiam;
-            double eh = 0.0d + circleDiam;
+            double ex = topCenterX;
+            double ey = topCenterY;
+            double ew = circleDiam;
+            double eh = circleDiam;
             arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start , extent
             view.sharedPath = new GeneralPath(arc);
             view.sharedPath = new GeneralPath(view.sharedPath.createTransformedShape(rotater));
@@ -1045,15 +1106,15 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
 
         Point2D p2start = arc.getStartPoint();
         Point2D p2end = arc.getEndPoint();
-        Point pstrt = new Point((int) p2start.getX(), (int) p2start.getY());
-        Point pend = new Point((int) p2end.getX(), (int) p2end.getY());
+        Point2D pstrt = new Point2D.Double(p2start.getX(), p2start.getY());
+        Point2D pend = new Point2D.Double(p2end.getX(), p2end.getY());
 
         if (beginDeco != GraphConstants.ARROW_NONE) {
-            view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point(pstrt.x + 15, pstrt.y + 15));
+            view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point2D.Double(pstrt.getX() + 15, pstrt.getY() + 15));
             view.beginShape = rotater.createTransformedShape(view.beginShape);
         }
         if (endDeco != GraphConstants.ARROW_NONE) {
-            view.endShape = createLineEnd(endSize, endDeco, new Point(pend.x + 15, pend.y + 25), pend);
+            view.endShape = createLineEnd(endSize, endDeco, new Point2D.Double(pend.getX() + 15, pend.getY() + 25), pend);
             view.endShape = rotater.createTransformedShape(view.endShape);
         }
 
@@ -1068,7 +1129,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
 
         return view.sharedPath;
     }
-    
+
     /**
      * Defines how much we increment the angle calculated in getAngle() for each self-referential edge discovered.
      * Since we want to advance 3/8 of a circle for each edge, the value below should be 2Pi * 3/8.

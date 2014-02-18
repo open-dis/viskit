@@ -1,9 +1,9 @@
 package viskit.jgraph;
 
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import org.jgraph.graph.EdgeRenderer;
 import org.jgraph.graph.EdgeView;
 
@@ -19,7 +19,7 @@ import org.jgraph.graph.EdgeView;
  * The guy that actually paints edges.
  */
 public class vEdgeRenderer extends EdgeRenderer {
-        
+
     double[] coo = new double[6];
 
     /**
@@ -29,27 +29,27 @@ public class vEdgeRenderer extends EdgeRenderer {
      * @return Center point of label
      */
     @Override
-    public Point getLabelPosition(EdgeView view) {
+    public Point2D getLabelPosition(EdgeView view) {
         super.getLabelPosition(view);  // incase of side effects, but forget the return
         //view.sharedPath.
 
         Shape s = view.sharedPath;
-        Point src = null;
-        Point aim;
+        Point2D src = null;
+        Point2D aim;
 
         for (PathIterator pi = s.getPathIterator(null); !pi.isDone();) {
             int ret = pi.currentSegment(coo);
             if (ret == PathIterator.SEG_MOVETO) {
-                src = new Point((int) coo[0], (int) coo[1]);
+                src = new Point2D.Double(coo[0], coo[1]);
             }
 
             if (ret == PathIterator.SEG_CUBICTO) {
-                aim = new Point((int) coo[4], (int) coo[5]);
+                aim = new Point2D.Double(coo[4], coo[5]);
 
                 double theta = Math.atan2(aim.getY() - src.getY(), aim.getX() - src.getX());
-                int newX = src.x + (int) (Math.cos(theta) * 25);
-                int newY = src.y + (int) (Math.sin(theta) * 25);
-                return new Point(newX, newY);
+                double newX = src.getX() + (Math.cos(theta) * 25);
+                double newY = src.getY() + (Math.sin(theta) * 25);
+                return new Point2D.Double(newX, newY);
 
 
             // make it the midpoint of the straight line between the control points
@@ -63,7 +63,7 @@ public class vEdgeRenderer extends EdgeRenderer {
             pi.next();
         }
 
-        Rectangle tr = getPaintBounds(view);
-        return new Point(tr.x + tr.width / 2, tr.y + tr.height / 2); // just use the center of the clip
+        Rectangle2D tr = getPaintBounds(view);
+        return new Point2D.Double(tr.getCenterX(), tr.getCenterY()); // just use the center of the clip
     }
 }

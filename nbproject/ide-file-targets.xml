@@ -5,10 +5,10 @@
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#compilesingle) -->
     <target depends="init" name="compile-selected-files-in-src">
         <fail unless="files">Must set property 'files'</fail>
-        <javac destdir="${dir.build.classes}" 
-               includeantruntime="false" 
-               includes="${files}" 
-               source="1.6" 
+        <javac destdir="${dir.build.classes}"
+               includeantruntime="false"
+               includes="${files}"
+               source="1.6"
                srcdir="src"
                debug="true">
             <classpath refid="runtime.classpath"/>
@@ -18,7 +18,7 @@
             <compilerarg value="${javac.debug}"/>
         </javac>
     </target>
-    <target depends="init" name="run-selected-file-in-src">
+    <target depends="init,compile" name="run-selected-file-in-src">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath refid="runtime.classpath"/>

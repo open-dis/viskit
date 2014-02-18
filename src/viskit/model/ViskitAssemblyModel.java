@@ -1,6 +1,6 @@
 package viskit.model;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
 import viskit.FileBasedAssyNode;
@@ -17,13 +17,13 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  */
  public interface ViskitAssemblyModel {
 
-    void newEventGraph(String widgetName, String className, Point p);
+    void newEventGraph(String widgetName, String className, Point2D p);
 
-    void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point p);
+    void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
-    void newPropChangeListener(String widgetName, String className, Point p);
+    void newPropChangeListener(String widgetName, String className, Point2D p);
 
-    void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point p);
+    void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
     /**
      * Boolean to signify whether the model has been changed since last disk
