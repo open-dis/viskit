@@ -6,6 +6,7 @@ import edu.nps.util.EventGraphFileFilter;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -44,10 +45,10 @@ import viskit.mvc.mvcModelEvent;
  * 2) When the ChangeListener is hit, the controller.setModel() method installs
  * the appropriate model for the newly-selected eventgraph.
  *
- * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects</p>
- * MOVES Institute</p>
- * Naval Postgraduate School, Monterey CA</p>
- * www.nps.edu</p>
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects<p/>
+ * MOVES Institute<p/>
+ * Naval Postgraduate School, Monterey CA<p/>
+ * www.nps.edu<p/>
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM
@@ -219,7 +220,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 setSelectedEventGraphName(null);
                 return;
             }
-            
+
             setModel((Model) myVgcw.model);        // hold on locally
             getController().setModel(getModel());  // tell controller
             adjustMenus((ViskitModel) getModel()); // enable/disable menu items based on new EG
@@ -231,7 +232,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             } else if (viskit.Vstatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");
             }
-        }        
+        }
     }
 
     private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
@@ -294,7 +295,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
-        
+
         // This works, you just have to have several lines of typed text to cause
         // the etched scrollbar to appear
         parametersPanel.add(descriptionScrollPane);
@@ -343,7 +344,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 new JScrollPane(stateVariablesPanel),
                 new JScrollPane(buildCodeBlockComponent(codeblockPan)));
         stateCblockSplt.setResizeWeight(0.75);
-        
+
         // Split pane that has description, parameters, state variables and code block.
         JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 parametersPanel,
@@ -390,7 +391,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         return p;
     }
-    
+
     @Override
     public void setSelectedEventGraphDescription(String description) {
         JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
@@ -436,10 +437,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         // the view holds only one model, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed model
         setModel((mvcModel) mod);
-        
-        tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);        
-        
-        // Bring the JGraph component to front  
+
+        tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);
+
+        // Bring the JGraph component to front
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
 
         // Now expose the EventGraph toolbar
@@ -599,27 +600,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         JMenu fileMenu = new JMenu("File");
 
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        fileMenu.add(buildMenuItem(vcontroller, "newProject", "New Viskit Project", new Integer(KeyEvent.VK_V),
+        fileMenu.add(buildMenuItem(vcontroller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        fileMenu.add(buildMenuItem(vcontroller, "newEventGraph", "New Event Graph", new Integer(KeyEvent.VK_N),
+        fileMenu.add(buildMenuItem(vcontroller, "newEventGraph", "New Event Graph", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(vcontroller, "open", "Open", new Integer(KeyEvent.VK_O),
+        fileMenu.add(buildMenuItem(vcontroller, "open", "Open", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentMenu = buildMenu("Open Recent Event Graph"));
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", new Integer(KeyEvent.VK_P),
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "closeAll", "Close All", null, null));
-        fileMenu.add(buildMenuItem(vcontroller, "save", "Save", new Integer(KeyEvent.VK_S),
+        fileMenu.add(buildMenuItem(vcontroller, "save", "Save", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(vcontroller, "saveAs", "Save as...", new Integer(KeyEvent.VK_A), null));
+        fileMenu.add(buildMenuItem(vcontroller, "saveAs", "Save as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
-        fileMenu.add(buildMenuItem(vcontroller, "showXML", "View Saved XML", new Integer(KeyEvent.VK_X), null));
-        fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", new Integer(KeyEvent.VK_J), null));
-        fileMenu.add(buildMenuItem(vcontroller, "captureWindow", "Save Screen Image", new Integer(KeyEvent.VK_I),
+        fileMenu.add(buildMenuItem(vcontroller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
+        fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J, null));
+        fileMenu.add(buildMenuItem(vcontroller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         if (!contentOnly) {
             fileMenu.addSeparator();
@@ -630,17 +631,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             fileMenu.add(buildMenuItem(vcontroller, "settings", "Settings", null, null));
         }
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit", new Integer(KeyEvent.VK_X), KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
+        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
         // the next three are disabled until something is selected
-        editMenu.add(buildMenuItem(vcontroller, "cut", "Cut", new Integer(KeyEvent.VK_T),
+        editMenu.add(buildMenuItem(vcontroller, "cut", "Cut", KeyEvent.VK_T,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
-        editMenu.add(buildMenuItem(vcontroller, "copy", "Copy", new Integer(KeyEvent.VK_C),
+        editMenu.add(buildMenuItem(vcontroller, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(vcontroller, "paste", "Paste Events", new Integer(KeyEvent.VK_P),
+        editMenu.add(buildMenuItem(vcontroller, "paste", "Paste Events", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
 
         // These 3 start off being disabled, until something is selected
@@ -650,16 +651,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(vcontroller, "newNode", "Add Event Node", new Integer(KeyEvent.VK_N), null));
-        editMenu.add(buildMenuItem(vcontroller, "newSimParameter", "Add Simulation Parameter...", new Integer(KeyEvent.VK_S), null));
-        editMenu.add(buildMenuItem(vcontroller, "newStateVariable", "Add State Variable...", new Integer(KeyEvent.VK_V), null));
-        editMenu.add(buildMenuItem(vcontroller, "newSelfRefEdge", "Add Self-Referential Edge...", new Integer(KeyEvent.VK_R), null));
+        editMenu.add(buildMenuItem(vcontroller, "newNode", "Add Event Node", KeyEvent.VK_N, null));
+        editMenu.add(buildMenuItem(vcontroller, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S, null));
+        editMenu.add(buildMenuItem(vcontroller, "newStateVariable", "Add State Variable...", KeyEvent.VK_V, null));
+        editMenu.add(buildMenuItem(vcontroller, "newSelfRefEdge", "Add Self-Referential Edge...", KeyEvent.VK_R, null));
 
         // This starts off being disabled, until something is selected
         ActionIntrospector.getAction(vcontroller, "newSelfRefEdge").setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(vcontroller, "editGraphMetaData", "Edit Properties...", new Integer(KeyEvent.VK_E),
+        editMenu.add(buildMenuItem(vcontroller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
         // Create a new menu bar and add the menus we created above to it
@@ -671,11 +672,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        helpMenu.add(buildMenuItem(help, "doContents", "Contents", new Integer(KeyEvent.VK_C), null));
-        helpMenu.add(buildMenuItem(help, "doSearch", "Search", new Integer(KeyEvent.VK_S), null));
+        helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
+        helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
         helpMenu.addSeparator();
-        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", new Integer(KeyEvent.VK_T), null));
-        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", new Integer(KeyEvent.VK_A), null));
+        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
+        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
 
@@ -772,15 +773,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 "Connect nodes with a cancelling edge");
         cancelArcMode.setIcon(new CanArcIcon());
 
+        modeButtonGroup.add(selectMode);
+        modeButtonGroup.add(arcMode);
+        modeButtonGroup.add(cancelArcMode);
+
         JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
 
         JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
-
-        modeButtonGroup.add(selectMode);
-        modeButtonGroup.add(arcMode);
-        modeButtonGroup.add(cancelArcMode);
 
         // Make selection mode the default mode
         selectMode.setSelected(true);
@@ -872,7 +873,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
-            if (d.width != 0 && d.height != 0) {
+            if (d.width != 0 && d.height != 0 && System.getProperty("os.name").contains("Windows")) {
+
+                // Only works on windoze
                 buildCancelCursor(img);
             } else {
                 cancel = Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(0, 0), "CancelArcCursor");
@@ -882,7 +885,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         /**
          * This is a lot of work to build a cursor.
          *
-         * @param img
+         * @param img the cursor image to build
          */
         private void buildCancelCursor(Image img) {
             new Thread(new cursorBuilder(img)).start();
@@ -911,7 +914,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 if (w == -1 || h == -1) {
                     waitForIt();
                 }
-                
+
                 GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 GraphicsDevice gs = ge.getDefaultScreenDevice();
                 GraphicsConfiguration gc = gs.getDefaultConfiguration();
@@ -983,8 +986,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
-        public void drop(DropTargetDropEvent dtde) {
-            Point p = dtde.getLocation();  // subtract the size of the label
+        public void dragOver(DropTargetDragEvent e) {
+
+            // NOTE: this action is very critical in getting JGraph 5.14 to
+            // signal the drop method
+            e.acceptDrag(e.getDropAction());
+        }
+
+        @Override
+        public void drop(DropTargetDropEvent e) {
+            Point p = e.getLocation();  // subtract the size of the label
             if (dragger == NODE_DRAG) {
                 Point pp = new Point(
                         p.x - addEvent.getWidth(),
