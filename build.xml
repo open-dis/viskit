@@ -272,7 +272,7 @@
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit">
+    <target name="compile" depends="bindings.simkit,javahelp">
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"
                target="${javac.target}"
@@ -342,7 +342,7 @@
     </target>
 
     <!--  === TARGET: jar === -->
-    <target name="jar" depends="compile,javahelp">
+    <target name="jar" depends="compile">
         <jar basedir="${dir.build.classes}"
              compress="false"
              destfile="${dist.jar}">

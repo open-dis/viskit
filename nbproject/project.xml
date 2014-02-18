@@ -33,7 +33,7 @@
             <ide-actions>
                 <action name="build">
                     <script>${ant.script}</script>
-                    <target>jar</target>
+                    <target>compile</target>
                 </action>
                 <action name="clean">
                     <script>${ant.script}</script>
@@ -54,7 +54,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean</target>
-                    <target>jar</target>
+                    <target>compile</target>
                 </action>
                 <action name="debug">
                     <script>${ant.script}</script>
