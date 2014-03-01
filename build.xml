@@ -381,9 +381,6 @@
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
         </jar>
-
-        <!-- No longer needed for stage building -->
-        <delete file="${dir.build.lib}/visxml.jar"/>
     </target>
 
     <target name="fresh.diskit" description="diskit module">
