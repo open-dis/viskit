@@ -42,7 +42,7 @@
 
     <property description="OA3302 Course Examples Directory" location="MyViskitProjects/DefaultProject" name="examples.lib" />
 
-    <property description="DISKIT directory" location="../DISKIT" name="dir.diskit"/>
+    <property description="DISKIT directory" location="../DISKIT.old" name="dir.diskit"/>
 
     <property description="Assembly utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
 
@@ -280,11 +280,7 @@
                fork="true"
                includeantruntime="false">
 
-            <!-- Reveals generics and deprecation warnings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-	    <compilerarg value="${javac.debug}"/>
-            <compilerarg line="-endorseddirs ${java.endorsed}"/>
+            <compilerarg line="${javac.compile.args}"/>
             <classpath>
                 <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
                 <pathelement location="${dir.lib}/jdom.jar"/>
@@ -721,10 +717,7 @@
                debug="true"
                includeantruntime="false">
 
-            <!-- Reveals generics and deprecation warnings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-	    <compilerarg value="${javac.debug}"/>
+            <compilerarg line="${javac.compile.args}"/>
             <classpath refid="runtime.test.classpath"/>
             <src path="${dir.test}"/>
         </javac>
