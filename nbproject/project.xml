@@ -91,13 +91,13 @@
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>jar</build-target>
+                <build-target>compile</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>build/classes</location>
                 <script>${ant.script}</script>
-                <build-target>jar</build-target>
+                <build-target>compile</build-target>
             </export>
             <view>
                 <items>
