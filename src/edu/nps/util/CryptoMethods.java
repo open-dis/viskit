@@ -43,14 +43,19 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package edu.nps.util;
 
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.StringTokenizer;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * This class is based on sample code found on various web sites.
@@ -69,10 +74,18 @@ public class CryptoMethods
       byte[] ciphertext = desCipher.doFinal(cleartext);
       return getString(ciphertext);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
+    catch (InvalidKeyException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (NoSuchAlgorithmException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (BadPaddingException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (IllegalBlockSizeException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (NoSuchPaddingException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      }
+      return null;
   }
 
   public static String doDecryption(String string, Key key)
@@ -85,9 +98,17 @@ public class CryptoMethods
 
       return new String(cleartext);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+    catch (InvalidKeyException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (NoSuchAlgorithmException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (BadPaddingException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (IllegalBlockSizeException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (NoSuchPaddingException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      }
     return null;
   }
 
@@ -100,15 +121,19 @@ public class CryptoMethods
       SecretKey s = skf.generateSecret(pass);
       return s;
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+    catch (InvalidKeyException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (NoSuchAlgorithmException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      } catch (InvalidKeySpecException e) {
+          LogUtils.getLogger(CryptoMethods.class).error(e);
+      }
     return null;
   }
 
   private static String getString(byte[] bytes)
   {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < bytes.length; i++) {
       byte b = bytes[i];
       sb.append((int) (0x00FF & b));
