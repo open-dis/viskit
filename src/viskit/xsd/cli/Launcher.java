@@ -128,7 +128,6 @@ public class Launcher extends Thread implements Runnable {
                 }
             } catch (Exception e) {
                 log.error(e);
-                e.printStackTrace();
             }
 
         } catch (IOException e) {
@@ -334,7 +333,7 @@ public class Launcher extends Thread implements Runnable {
         Constructor<?> c;
         ByteArrayInputStream bais;
         String assemblyJava;
-        File tempDir = null;
+        File tempDir;
 
         xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
