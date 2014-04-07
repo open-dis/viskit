@@ -42,7 +42,7 @@
 
     <property description="OA3302 Course Examples Directory" location="MyViskitProjects/DefaultProject" name="examples.lib" />
 
-    <property description="DISKIT directory" location="../DISKIT.old" name="dir.diskit"/>
+    <property description="DISKIT directory" location="../DISKIT" name="dir.diskit"/>
 
     <property description="Assembly utility" location="${dir.src}/viskit/xsd/assembly" name="dir.src.simasm.util"/>
 
