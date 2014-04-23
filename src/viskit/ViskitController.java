@@ -34,6 +34,9 @@ public interface ViskitController {
   /** Create a new blank EventGraph model */
   void newEventGraph();
 
+  /** Creates a new Viskit Project */
+  void newProject();
+
   void runAssemblyEditor();
   void showXML();
 

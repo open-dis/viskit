@@ -126,7 +126,7 @@ public class VGlobals {
     }
 
     /** Used only if a call to {@link getAssemblyEditor()} ever returns null
-     * 
+     *
      * @param contentOnly
      * @return the component AssemblyViewFrame
      */
@@ -136,7 +136,7 @@ public class VGlobals {
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize UI startup
-     * 
+     *
      * @param contentOnly if true, build certain menu items only
      * @return the component AssemblyViewFrame
      */
@@ -732,7 +732,7 @@ public class VGlobals {
     public String typeChosen(String ty) {
         ty = ty.replaceAll("\\s", "");              // every whitespace removed
         for (int i = 0; i < cbMod.getSize(); i++) {
-            if (cbMod.getElementAt(i).toString().equals(ty)) {
+            if (cbMod.getElementAt(i).equals(ty)) {
                 return ty;
             }
         }
@@ -860,6 +860,7 @@ public class VGlobals {
     }
 
     /** @return a model to print a stack trace of calling classes and their methods */
+    @SuppressWarnings({"ThrowableInstanceNotThrown", "ThrowableInstanceNeverThrown", "ThrowableResultIgnored"})
     public String printCallerLog() {
         StringBuilder sb = new StringBuilder();
         sb.append("Calling class: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());

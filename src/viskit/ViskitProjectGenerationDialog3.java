@@ -49,14 +49,17 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
 
     class myDocListener implements DocumentListener {
 
+        @Override
         public void changedUpdate(DocumentEvent e) {
             common();
         }
 
+        @Override
         public void insertUpdate(DocumentEvent e) {
             common();
         }
 
+        @Override
         public void removeUpdate(DocumentEvent e) {
             common();
         }

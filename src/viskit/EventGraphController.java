@@ -86,6 +86,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     /** Creates a new Viskit Project */
+    @Override
     public void newProject() {
         VGlobals.instance().getAssemblyController().newProject();
     }

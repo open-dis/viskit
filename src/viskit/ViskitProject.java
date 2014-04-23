@@ -61,7 +61,7 @@ public class ViskitProject {
      */
     public static final String DEFAULT_VISKIT_PROJECTS_DIR =
             System.getProperty("user.home").replaceAll("\\\\", "/") + "/MyViskitProjects";
-    
+
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
     /** This static variable will be set by the user upon first Viskit startup
@@ -74,7 +74,7 @@ public class ViskitProject {
     public static final String PROJECT_FILE_NAME = "viskitProject.xml";
     public static final String ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
     public static final String EVENT_GRAPHS_DIRECTORY_NAME = "EventGraphs";
-    
+
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
     public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
     public static final String VISKIT_CONFIG_DIR = "configuration";
@@ -82,9 +82,9 @@ public class ViskitProject {
     public static final String ANALYST_REPORT_CHARTS_DIRECTORY_NAME = "charts";
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
     public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
-    public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;        
+    public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
-    
+
     public static final String BUILD_DIRECTORY_NAME = "build";
     public static final String CLASSES_DIRECTORY_NAME = "classes";
     public static final String SOURCE_DIRECTORY_NAME = "src";
@@ -158,7 +158,7 @@ public class ViskitProject {
         if (!analystReportStatisticsDir.exists()) {
             getAnalystReportStatisticsDir().mkdirs();
         }
-        
+
         setAssembliesDir(new File(projectRoot, ASSEMBLIES_DIRECTORY_NAME));
         if (!assembliesDir.exists()) {
             getAssembliesDir().mkdir();
@@ -195,7 +195,7 @@ public class ViskitProject {
         if (!libDir.exists()) {
             getLibDir().mkdir();
         }
-        
+
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectRoot, PROJECT_FILE_NAME));
         if (!projectFile.exists()) {
@@ -216,7 +216,7 @@ public class ViskitProject {
 
     private Document createProjectDocument() {
         Document document = new Document();
-        
+
         Element root = new Element(VISKIT_ROOT_NAME);
         root.setAttribute("name", projectRoot.getName());
         document.setRootElement(root);
@@ -224,7 +224,7 @@ public class ViskitProject {
         Element element = new Element(ANALYST_REPORTS_DIRECTORY_NAME);
         element.setAttribute("name", ANALYST_REPORTS_DIRECTORY_NAME);
         root.addContent(element);
-        
+
         element = new Element("AssembliesDirectory");
         element.setAttribute("name", ASSEMBLIES_DIRECTORY_NAME);
         root.addContent(element);
@@ -263,13 +263,12 @@ public class ViskitProject {
             fileOutputStream = new FileOutputStream(getProjectFile());
             xmlOutputter.output(projectDocument, fileOutputStream);
             projectFileExists = true;
-        } catch (FileNotFoundException ex) {
-            log.error(ex);
         } catch (IOException ex) {
             log.error(ex);
         } finally {
             try {
-                fileOutputStream.close();
+                if (fileOutputStream != null)
+                    fileOutputStream.close();
             } catch (IOException ex) {
                 log.error(ex);
             }
@@ -649,11 +648,11 @@ public class ViskitProject {
 
             @Override
             public boolean accept(File dir, String name) {
-                
+
                 // configuration/ contains the template viskitProject.xml file
                 // so, don't show this directory as a potential Viskit project
                 if (dir.getName().equals(VISKIT_CONFIG_DIR)) {return false;}
-                
+
                 // Be brutally specific to reduce looking for any *.xml
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             }
