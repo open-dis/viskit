@@ -717,7 +717,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                     // ${file} may be an empty directory
                     } else if (file.isDirectory() && file.listFiles().length == 0) {
-                        continue;
+                        
 
                     // Recurse a directory and locate appropriate SimEntity class files
                     } else {

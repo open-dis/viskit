@@ -329,7 +329,6 @@ public class VGlobals {
 
         NameSpace ns = interpreter.getNameSpace();
         ns.importPackage("simkit.*");
-        ns.importPackage("simkit.examples.*");
         ns.importPackage("simkit.random.*");
         ns.importPackage("simkit.smdx.*");
         ns.importPackage("simkit.stat.*");

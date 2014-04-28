@@ -306,6 +306,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
+
+                // Uncomment to reveal common reason for Exceptions
 //                throwable.printStackTrace();
                 log.error(throwable);
                 if (recurseNogoList != null) {

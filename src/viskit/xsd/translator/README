@@ -5,7 +5,7 @@ generated from simkit.dtd.
 
 Note: some of the test files do not have the simkit.xsd or simkit.dtd placed in
 an absolute path, so to run this with those test cases, simkit.dtd has been placed
-here relatively, but should not be condidered the dtd for code generation. 
+here relatively, but should not be considered the dtd for code generation.
 
 See simkit/xml for code generation of the JAXB for details.
 

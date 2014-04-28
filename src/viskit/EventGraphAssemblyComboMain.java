@@ -42,8 +42,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;
 
 /**
- * MOVES Institute</p>
- * Naval Postgraduate School, Monterey, CA</p>
+ * <p>MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since Sep 22, 2005 : 3:23:52 PM

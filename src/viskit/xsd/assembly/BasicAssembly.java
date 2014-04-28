@@ -64,7 +64,7 @@ import viskit.model.AssemblyNode;
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     static final Logger LOG = LogUtils.getLogger(BasicAssembly.class);
-    protected LinkedHashMap<Integer, ArrayList<SavedStats>> replicationData;
+    protected Map<Integer, List<SavedStats>> replicationData;
     protected PropertyChangeListener[] replicationStats;
     protected SampleStatistics[] designPointStats;
     protected SimEntity[] simEntity;
@@ -113,7 +113,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         form = new DecimalFormat("0.0000");
         setPrintReplicationReports(false);
         setPrintSummaryReport(true);
-        replicationData = new LinkedHashMap<Integer, ArrayList<SavedStats>>();
+        replicationData = new LinkedHashMap<Integer, List<SavedStats>>();
         simEntity = new SimEntity[0];
         replicationStats = new PropertyChangeListener[0];
         designPointStats = new SampleStatistics[0];
@@ -407,7 +407,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public SampleStatistics[] getReplicationStats(int id) {
         SampleStatistics[] stats = null;
 
-        ArrayList<SavedStats> reps = replicationData.get(new Integer(id));
+        List<SavedStats> reps = replicationData.get(id);
         if (reps != null) {
             stats = toArray(reps, new SavedStats[0]);
         }
@@ -435,8 +435,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-    public Map<Integer, ArrayList<SavedStats>> getReplicationData() {
-        return new LinkedHashMap<Integer, ArrayList<SavedStats>>(replicationData);
+    public Map<Integer, List<SavedStats>> getReplicationData() {
+        return new LinkedHashMap<Integer, List<SavedStats>>(replicationData);
     }
 
     private void saveState(int lastRepNum) {
@@ -604,7 +604,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             replicationData.clear();
             int repStatsLength = getReplicationStats().length;
             for (int i = 0; i < repStatsLength; i++) {
-                replicationData.put(new Integer(i), new ArrayList<SavedStats>());
+                replicationData.put(i, new ArrayList<SavedStats>());
             }
         }
 
@@ -621,7 +621,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 timer = entity;
 
             // Convenience for Diskit
-            } else if (entity.getName().indexOf("ScenarioManager") > -1) {
+            } else if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
                 // access the SM's numberOfReplications parameter setter
                 try {
@@ -683,7 +683,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
-                Long seed = new Long(simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed());
+                Long seed = simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 firePropertyChange("seed", seed);
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");

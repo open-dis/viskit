@@ -134,7 +134,13 @@ public class FileBasedClassManager implements Runnable {
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
                 fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
-                Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
+
+                // If we have an annotated ParameterMap, then cache it.  If not,
+                // then treat the fclass as something that belongs on the
+                // extra classpath
+                List<Object>[] pMap = listOfParamNames(fclass);
+                if (pMap != null && pMap.length > 0)
+                    Vstatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
             }
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
             throw new Exception("Unsupported file type.");
@@ -209,9 +215,12 @@ public class FileBasedClassManager implements Runnable {
             if (viskit.Vstatics.debug) {
                 log.debug("Adding cache " + xmlEg + " " + classFile);
             }
-            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEg.getCanonicalPath().replaceAll("\\\\", "/"));
-            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
-            projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEg, classFile));
+
+            if (cache != null) {
+                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEg.getCanonicalPath().replaceAll("\\\\", "/"));
+                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
+                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEg, classFile));
+            }
             // if used to miss, unmiss it
             removeCacheMiss(xmlEg);
         } catch (IOException ex) {
@@ -359,7 +368,10 @@ public class FileBasedClassManager implements Runnable {
                 projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@xml]");
                 projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@class]");
                 projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@digest]");
-                boolean didDelete = deletedCache.delete();
+
+                boolean didDelete = false;
+                if (deletedCache != null)
+                    didDelete = deletedCache.delete();
                 if (viskit.Vstatics.debug) {
                     log.debug(didDelete + ": cachedFile deleted index at " + index);
                 }
@@ -446,7 +458,7 @@ public class FileBasedClassManager implements Runnable {
         return false;
     }
 
-    protected List<Object>[] listOfParamNames(Class<?> c) {
+    private List<Object>[] listOfParamNames(Class<?> c) {
         ObjectFactory of = new ObjectFactory();
         Constructor<?>[] constr = c.getConstructors();
         Annotation[] paramAnnots;
@@ -490,10 +502,8 @@ public class FileBasedClassManager implements Runnable {
                         l[0] = new ArrayList<Object>();
                         l[0].add(p);
                     }
-
-                } else {
-                    throw new RuntimeException("Only One ParameterMap Annotation used");
                 }
+                // If param was null, then treat as jar file in the extra classpath
             }
         }
         return l;
@@ -534,8 +544,7 @@ public class FileBasedClassManager implements Runnable {
             // event graph, and when he switches back and tries to run his assembly
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
 }

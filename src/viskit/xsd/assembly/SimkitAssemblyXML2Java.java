@@ -2,7 +2,9 @@ package viskit.xsd.assembly;
 
 import edu.nps.util.LogUtils;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -12,6 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.AssemblyController;
+import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.*;
 
 /**
@@ -26,7 +29,7 @@ public class SimkitAssemblyXML2Java {
     private String fileBaseName;
     File inputFile;
     JAXBContext jaxbCtx;
-//    static final boolean debug = false;
+    static final boolean debug = false;
     static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
@@ -98,7 +101,7 @@ public class SimkitAssemblyXML2Java {
             this.root = (SimkitAssembly) u.unmarshal(fileInputStream);
 
             // For debugging, make true
-            if (false) {
+            if (debug) {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
@@ -490,9 +493,9 @@ public class SimkitAssemblyXML2Java {
     String castIfSimEntity(String type) {
         String sret = "";
         try {
-            if ((Class.forName("simkit.SimEntityBase")).isAssignableFrom(Class.forName(type))
+            if ((Class.forName("simkit.SimEntityBase", true, VGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type, true, VGlobals.instance().getWorkClassLoader()))
                     ||
-                    (Class.forName("simkit.SimEntity")).isAssignableFrom(Class.forName(type))) {
+                    (Class.forName("simkit.SimEntity", true, VGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type))) {
                 sret = lp + type + rp;
             }
         } catch (ClassNotFoundException cnfe) {
@@ -823,7 +826,21 @@ public class SimkitAssemblyXML2Java {
             Class<?> classParams[] = { params[0].getClass() };
             Method mainMethod = assembly.getDeclaredMethod("main", classParams);
             mainMethod.invoke(null, params);
-        } catch (Exception e) { error(e.toString()); }
+        } catch (MalformedURLException e) {
+            error(e.toString()); }
+        catch (ClassNotFoundException e) {
+            error(e.toString());
+        } catch (NoSuchMethodException e) {
+            error(e.toString());
+        } catch (SecurityException e) {
+            error(e.toString());
+        } catch (IllegalAccessException e) {
+            error(e.toString());
+        } catch (IllegalArgumentException e) {
+            error(e.toString());
+        } catch (InvocationTargetException e) {
+            error(e.toString());
+        }
     }
 
     void error(String desc) {
@@ -887,7 +904,8 @@ public class SimkitAssemblyXML2Java {
                 try {
                     sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
                 } catch (FileNotFoundException ex) {log.error(ex);}
-                sax2j.unmarshal();
+                if (sax2j != null)
+                    sax2j.unmarshal();
             }
         } else {
             if (fileName == null) {
@@ -903,17 +921,19 @@ public class SimkitAssemblyXML2Java {
             }
         }
 
-        File baseName = new File(sax2j.baseNameOf(fileName));
-        sax2j.setFileBaseName(baseName.getName());
-        sax2j.unmarshal();
-        String dotJava = sax2j.translate();
-        log.info("Done.");
+        if (sax2j != null) {
+            File baseName = new File(sax2j.baseNameOf(fileName));
+            sax2j.setFileBaseName(baseName.getName());
+            sax2j.unmarshal();
+            String dotJava = sax2j.translate();
+            log.info("Done.");
 
-        // also write out the .java to a file and compile it
-        // to a .class
-        log.info("Generating Java Bytecode...");
-        if(AssemblyController.compileJavaClassFromString(dotJava) != null) {
-           log.info("Done.");
+            // also write out the .java to a file and compile it
+            // to a .class
+            log.info("Generating Java Bytecode...");
+            if (AssemblyController.compileJavaClassFromString(dotJava) != null) {
+                log.info("Done.");
+            }
         }
     }
 

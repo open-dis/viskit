@@ -71,12 +71,12 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     public static final int MAX_COL = 5;
     Object[][] mydata = new Object[0][0];
     Vector<Object[]> rows;
-    public HashSet<Integer> noEditRows = new HashSet<Integer>();
-    public HashSet<Integer> multiRows = new HashSet<Integer>();
+    public Set<Integer> noEditRows = new HashSet<Integer>();
+    public Set<Integer> multiRows = new HashSet<Integer>();
     public boolean dirty = false;
 
     /**
-     * 
+     *
      * @param simEntitiesJaxb
      * @param designParamsJaxb
      */
@@ -103,9 +103,10 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             }
         }
         dirty = false;
-        this.addTableModelListener(this);
+        this.addTableModelListener(ParamTableModel.this);
     }
 
+    @Override
     public void tableChanged(TableModelEvent e) {
         if (viskit.Vstatics.debug) {
             System.out.println("Sending paramlocally editted from ParamTableModel");
@@ -114,15 +115,13 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     }
 
     private void processDesignParam(TerminalParameter tp) {
-        String typ = tp.getType();
-        typ = (typ == null ? "" : typ);
 
         String nm = tp.getName();
-        if (nm.length() <= 0) {
+        if (nm.isEmpty()) {
             System.err.println("Terminal param w/out name ref!");
         }
 
-        int row = termHashMap.get(nm).intValue();
+        int row = termHashMap.get(nm);
 
         String val = tp.getValue();
         val = (val == null) ? "" : val;
@@ -133,9 +132,9 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         setValueAt(vr.getValue().getLowValue(), row, MIN_COL);
         setValueAt(vr.getValue().getHighValue(), row, MAX_COL);
 
-        setValueAt(new Boolean(true), row, FACTOR_COL); //cb
+        setValueAt(true, row, FACTOR_COL); //cb
     }
-    
+
     Interpreter interpreter;
 
     private void initBeanShell() {
@@ -143,15 +142,14 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         interpreter.setStrictJava(true);       // no loose typeing
         NameSpace ns = interpreter.getNameSpace();
         ns.importPackage("simkit.*");
-        ns.importPackage("simkit.examples.*");
         ns.importPackage("simkit.random.*");
         ns.importPackage("simkit.smdx.*");
         ns.importPackage("simkit.stat.*");
         ns.importPackage("simkit.util.*");
         ns.importPackage("diskit.*");         // 17 Nov 2004
     }
-    HashMap<String, Integer> termHashMap = new HashMap<String, Integer>();
-    ArrayList<Object> elementsByRow = new ArrayList<Object>();
+    Map<String, Integer> termHashMap = new HashMap<String, Integer>();
+    List<Object> elementsByRow = new ArrayList<Object>();
 
     private void processRow(Object obj, String defaultName) {
         Object[] oa = new Object[6];
@@ -169,11 +167,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             typ = (typ == null ? "" : typ);
             oa[TYPE_COL] = "<html><b>" + loseDots(typ);
             oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = new Boolean(false);
+            oa[FACTOR_COL] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
-            noEditRows.add(new Integer(rows.size() - 1));
+            noEditRows.add(rows.size() - 1);
 
             List<Object> children = se.getParameters();
             int i = 1;
@@ -204,11 +202,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             String value = tp.getValue();
             oa[VALUE_COL] = (value == null ? "" : value);
             oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
-            oa[FACTOR_COL] = new Boolean(false);
+            oa[FACTOR_COL] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
-            termHashMap.put(tpname, new Integer(rows.size() - 1));
+            termHashMap.put(tpname, rows.size() - 1);
         } else if (obj instanceof MultiParameter) {
             MultiParameter mp = (MultiParameter) obj;
             String MPname = mp.getName();
@@ -219,11 +217,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             String typ = mp.getType();
             oa[TYPE_COL] = loseDots(typ == null ? "" : typ);
             oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = new Boolean(false);
+            oa[FACTOR_COL] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
-            multiRows.add(new Integer(rows.size() - 1));
+            multiRows.add(rows.size() - 1);
             List<Object> children = mp.getParameters();
             int i = 1;
             for (Object o : children) {
@@ -240,11 +238,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             String typ = fp.getType();
             oa[TYPE_COL] = typ; //loseDots(typ)
             oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = new Boolean(false);
+            oa[FACTOR_COL] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
-            multiRows.add(new Integer(rows.size() - 1));
+            multiRows.add(rows.size() - 1);
 
             List<Object> children = fp.getParameters();
             int i = 1;
@@ -252,7 +250,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
                 processRow(o, FPname + "_" + i++);
             }
         } else if (obj instanceof Coordinate) {
-            ;
+            // Do nothing
         } else {
             System.err.println("Error ParamTableModel.processRow, unknown type: " + obj);
         }
@@ -322,14 +320,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         if (col == TYPE_COL) {
             return false;
         }
-        Integer rowKey = new Integer(row);
+        Integer rowKey = row;
         if (noEditRows.contains(rowKey)) {
             return false;
         }
-        if (col > TYPE_COL && multiRows.contains(rowKey)) {
-            return false;
-        }
-        return true;
+        return col <= TYPE_COL || !multiRows.contains(rowKey);
     }
 
     /*
@@ -345,9 +340,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     }
     OpenAssembly.AssyChangeListener dummyListener = new OpenAssembly.AssyChangeListener() {
 
+        @Override
         public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         }
 
+        @Override
         public String getHandle() {
             return "Design of Experiments";
         }

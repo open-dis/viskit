@@ -22,7 +22,7 @@ import java.util.jar.JarFile;
  * @author  ahbuss
  */
 public class FindClassesForInterface {
-    
+
     /**
      * Added by Mike Bailey
      * @param f Class file to read from
@@ -91,7 +91,7 @@ public class FindClassesForInterface {
                 FileChannel fc = classFile.getChannel();
                 buffer = ByteBuffer.allocate((int) fc.size());
                 fc.read(buffer);
-            } catch (Throwable thr) {
+            } catch (IOException thr) {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
@@ -151,7 +151,7 @@ public class FindClassesForInterface {
 
     /**
      * @param args the command line arguments
-     * @throws java.lang.Throwable 
+     * @throws java.lang.Throwable
      */
     public static void main(String[] args) throws Throwable {
         String jarFileName = args.length > 0 ? args[0] : "/R:/Simkit/simkit.jar";
@@ -183,8 +183,8 @@ public class FindClassesForInterface {
         if (true) {
             return;
         }
-        ArrayList<Class<?>> simEntities = new ArrayList<Class<?>>();
-        ArrayList<Class<?>> propertyChangeListeners = new ArrayList<Class<?>>();
+        List<Class<?>> simEntities = new ArrayList<Class<?>>();
+        List<Class<?>> propertyChangeListeners = new ArrayList<Class<?>>();
         System.out.println(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
@@ -208,7 +208,7 @@ public class FindClassesForInterface {
                     simEntities.add(c);
 //                    System.out.println("\tIs SimEntity!");
                 }
-            } catch (Throwable t) {
+            } catch (ClassNotFoundException t) {
 //                System.out.println("\t" + nextEntry + " not loaded");
             }
         }

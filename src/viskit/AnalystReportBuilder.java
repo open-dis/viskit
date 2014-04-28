@@ -102,7 +102,7 @@ public final class AnalystReportBuilder {
         initDocument();
     }
 
-    /** Build an AnalystReport object from an existing statisticsReport
+    /** <p>Build an AnalystReport object from an existing statisticsReport
      * document.  This is done from viskit.BasicAssembly via reflection.</p>
      * @param statisticsReportPath the path to the statistics generated report
      *        used by this Analyst Report
@@ -123,7 +123,7 @@ public final class AnalystReportBuilder {
     }
 
     /**
-     * Build an analystReport object from an existing partial Analyst Report.
+     * <p>Build an analystReport object from an existing partial Analyst Report.
      * This done after the statistic report is incorporated into the basic
      * Analyst Report and further annotations are to be written by the analyst
      * to finalize the report.</p>
@@ -739,7 +739,7 @@ public final class AnalystReportBuilder {
 
                     histogramChartURL.setAttribute("dir", histogramChart.createChart(chartTitle, axisLabel, data));
                     entity.addContent(histogramChartURL);
-                    
+
                     // data[] must be > than length 1 for scatter regression
                     if (data.length > 1) {
                         linearRegressionChartURL.setAttribute("dir", linearRegressionChart.createChart(chartTitle, axisLabel, data));
@@ -1009,7 +1009,7 @@ public final class AnalystReportBuilder {
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
-        String assemblyImageDir = 
+        String assemblyImageDir =
                 VGlobals.instance().getCurrentViskitProject().getAnalystReportAssemblyImagesDir().getAbsolutePath();
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
         String assyFileName = getAssemblyFile().getName();
@@ -1033,7 +1033,7 @@ public final class AnalystReportBuilder {
         if (baseName.contains("_")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("_"));
         }
-        String locationImagePath = 
+        String locationImagePath =
                 VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir() +
                 baseName + ".png";
         locationImagePath = locationImagePath.replaceAll("\\\\", "/");

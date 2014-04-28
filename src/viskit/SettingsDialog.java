@@ -53,8 +53,8 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.commons.configuration.XMLConfiguration;
 
 /**
- * MOVES Institute</p>
- * Naval Postgraduate School, Monterey, CA</p>
+ * <p>MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since Nov 2, 2005
@@ -79,8 +79,8 @@ public class SettingsDialog extends JDialog {
     private JRadioButton defaultLafRB;
     private JRadioButton platformLafRB;
     private JRadioButton otherLafRB;
-    private JTextField otherTF; 
-    
+    private JTextField otherTF;
+
     public static boolean showDialog(JFrame mother) {
         if (dialog == null) {
             dialog = new SettingsDialog(mother);
@@ -228,7 +228,7 @@ public class SettingsDialog extends JDialog {
         visibleP.add(Box.createVerticalGlue());
 
         tabbedPane.addTab("Tab visibility", visibleP);
-        
+
         JPanel lookAndFeelP = new JPanel();
         lookAndFeelP.setLayout(new BoxLayout(lookAndFeelP, BoxLayout.Y_AXIS));
         lookAndFeelP.add(Box.createVerticalGlue());
@@ -259,9 +259,9 @@ public class SettingsDialog extends JDialog {
         lab.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         lookAndFeelP.add(lab);
         lookAndFeelP.add(Box.createVerticalGlue());
-        
+
         tabbedPane.addTab("Look and Feel",lookAndFeelP);
-        
+
         ButtonGroup bg = new ButtonGroup();
         defaultLafRB.setSelected(true);
         otherTF.setEnabled(false);
@@ -274,7 +274,7 @@ public class SettingsDialog extends JDialog {
         otherLafRB.addActionListener(lis);
         otherTF.addActionListener(lis);
      }
-    
+
     class lafListener implements ActionListener
     {
       @Override
@@ -296,13 +296,13 @@ public class SettingsDialog extends JDialog {
            guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
            otherTF.setEnabled(true);
          }
-        } 
+        }
       }
     }
     private static XMLConfiguration vConfig;
     private static XMLConfiguration projectConfig;
     private static XMLConfiguration guiConfig;
-    
+
     private static void initConfigs() {
         vConfig = ViskitConfig.instance().getViskitAppConfig();
         projectConfig = ViskitConfig.instance().getProjectXMLConfig();
@@ -358,13 +358,13 @@ public class SettingsDialog extends JDialog {
         initConfigs();
         projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
-    
+
     static JDialog progressDialog;
     static JProgressBar progress = new JProgressBar(0, 100);
 
     public static void saveExtraClassPathEntries(String[] lis) {
         clearClassPathEntries();
-        
+
         int ix = 0;
         if (lis != null) {
             for (String s : lis) {
@@ -374,7 +374,7 @@ public class SettingsDialog extends JDialog {
                 ix++;
             }
         }
-        
+
         if (dialog != null) {
             progressDialog = new JDialog(dialog);
             progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -436,7 +436,7 @@ public class SettingsDialog extends JDialog {
         runCB.setSelected(isAssemblyRunVisible());
         analRptCB.setSelected(isAnalystReportVisible());
         debugMsgsCB.setSelected(isVerboseDebug());
-        
+
         String laf = getLookAndFeel();
         if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {
             platformLafRB.setSelected(true);
@@ -446,7 +446,7 @@ public class SettingsDialog extends JDialog {
           otherLafRB.setSelected(true);
           otherTF.setEnabled(true);
           otherTF.setText(laf);
-        }        
+        }
     }
 
     private void unloadWidgets() {
@@ -541,7 +541,7 @@ public class SettingsDialog extends JDialog {
     private void installExtraClassPathIntoConfig() {
         Object[] oa = ((DefaultListModel) classPathJlist.getModel()).toArray();
         String[] sa = new String[oa.length];
-        
+
         System.arraycopy(oa, 0, sa, 0, oa.length);
 
         saveExtraClassPathEntries(sa);
@@ -622,7 +622,7 @@ public class SettingsDialog extends JDialog {
         }
         return extClassPathsUrls;
     }
-    
+
     public static String getLookAndFeel() {
         return ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
     }

@@ -37,9 +37,11 @@ import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @version $Id$
  */
 public class Vstatics {
-    
+
     public static boolean debug = false;
 
     /**
@@ -178,14 +180,14 @@ public class Vstatics {
         Runtime run = Runtime.getRuntime();
         String os = System.getProperty("os.name");
         try {
-            if (os.indexOf("Mac") != -1) {
+            if (os.contains("Mac")) {
                 run.exec(new String[]{"open", path});
-            } else if (os.indexOf("Win") != -1) {
+            } else if (os.contains("Win")) {
                 run.exec(new String[]{"start", "iexplore", path});
             } else {
                 run.exec(new String[]{path});
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             return e.getMessage();
         }
         return null;
@@ -265,7 +267,7 @@ public class Vstatics {
         }
         try {
             return Class.forName(conv, false, cLdr); // test 26JUL04 true,cLdr);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             return null;
         }
     }
@@ -371,12 +373,12 @@ public class Vstatics {
     static public String getFileSeparator() {
         return System.getProperty("file.separator");
     }
-    
+
     static Map<String, List<Object>[]> parameterMap = new HashMap<String, List<Object>[]>();
 
     static void putParameterList(String type, List<Object>[] p) {
         if (debug) {
-            System.out.println("Vstatics putting " + type + " " + p);
+            System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
         }
         parameterMap.remove(type);
         parameterMap.put(type, p);
@@ -534,7 +536,7 @@ public class Vstatics {
 
     // returns number of constructors, checks is [] type
     public static int numConstructors(String type) {
-        // 
+        //
         if (debug) {
             System.out.print("number of constructors for " + type + ":");
         }

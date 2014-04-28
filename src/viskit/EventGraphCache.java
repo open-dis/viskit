@@ -72,7 +72,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * Set of utility methods for caching a List<File> of EventGraph paths
+ * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
  * @version $Id$
  * <p>cacheing
  *   <b>History:</b>
@@ -88,7 +88,7 @@ import org.jdom.input.SAXBuilder;
  *     Comments: 1) Twas bad using Strings to hold file/directory path info. Now
  *                  using File and URL objects to better deal with whitespace in
  *                  a directory/file path name
- * 
+ *
  *     Date:     23 JUL 2008
  *     Time:     0930Z
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
@@ -98,7 +98,7 @@ import org.jdom.input.SAXBuilder;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
-    
+
     static Logger log = LogUtils.getLogger(EventGraphCache.class);
 
     /** The jdom.Document object of the assembly file */
@@ -112,11 +112,11 @@ public class EventGraphCache {
     private LinkedList<File> eventGraphFilesList  = new LinkedList<File>();
     private LinkedList<String> eventGraphImagePathsList = new LinkedList<String>();
 
-    private final String EVENT_GRAPH_IMAGE_DIR = 
+    private final String EVENT_GRAPH_IMAGE_DIR =
             VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir() + "/";
     private Element entityTable;
     private static EventGraphCache me;
-    
+
     public static synchronized EventGraphCache instance() {
         if (me == null) {
             me = new EventGraphCache();
@@ -129,7 +129,7 @@ public class EventGraphCache {
         eventGraphFilesList  = new LinkedList<File>();
         eventGraphImagePathsList = new LinkedList<String>();
     }
-    
+
     /**
      * Creates the entity table for this analyst xml object
      *
@@ -207,7 +207,7 @@ public class EventGraphCache {
     private void saveEventGraphReferences(String fileType) {
         log.debug("Parameter fileType: " + fileType);
         eventGraphNamesList.add(fileType);
-        
+
         // find the package seperator
         char letter;
         int idx = 0;
@@ -220,15 +220,15 @@ public class EventGraphCache {
         }
 
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
-        
+
         // TODO: Move ARs to project folders.  That's where they should be
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
         log.debug("EventGraph Name: " + eventGraphName);
-        
+
         String imgFile = EVENT_GRAPH_IMAGE_DIR + fileTypePackageToPath + eventGraphName + ".xml.png";
         imgFile = imgFile.replaceAll("\\\\", "/");
         log.debug("Event Graph Image location: " + imgFile);
-        
+
         eventGraphImagePathsList.add(imgFile);
     }
 
@@ -239,11 +239,11 @@ public class EventGraphCache {
     private void setEventGraphFiles(File f) {
 
         File[] files = f.listFiles();
-        for (File file : files) {        
+        for (File file : files) {
             if (file.isDirectory()) {
                 setEventGraphFiles(file);
             } else {
-                
+
                 // Check against the eventGraphNamesList obtained from the Assembly
                 for (String eventGraphName : eventGraphNamesList) {
                     eventGraphName = eventGraphName.substring(eventGraphName.lastIndexOf(".") + 1) + ".xml";
@@ -280,5 +280,5 @@ public class EventGraphCache {
     public void setEntityTable(Element entityTable) {
         this.entityTable = entityTable;
     }
-    
+
 } // end class file EventGraphCache.java

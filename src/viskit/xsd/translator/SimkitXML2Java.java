@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.AssemblyController;
+import viskit.VGlobals;
 import viskit.xsd.bindings.eventgraph.*;
 
 /**
@@ -48,6 +49,9 @@ public class SimkitXML2Java {
     private String className = "";
     private File eventGraphFile;
 
+    private List<Parameter> superParams;
+    private List<Parameter> liParams;
+
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
         try {
@@ -67,7 +71,7 @@ public class SimkitXML2Java {
         this();
         try {
             fileBaseName = baseNameOf(xmlFile);
-            fileInputStream = Class.forName("viskit.xsd.translator.SimkitXML2Java").getClassLoader().getResourceAsStream(xmlFile);
+            fileInputStream = Class.forName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe);
         }
@@ -202,15 +206,15 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(vars);
 
-        List<Parameter> liParam = this.root.getParameter();
-        List<Parameter> superParams = resolveSuperParams(this.root.getParameter());
+        liParams = this.root.getParameter();
+        superParams = resolveSuperParams(liParams);
 
         // Logger instantiation
 //        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
         pw.println(sp4 + "/* Simulation Parameters */");
-        for (Parameter p : liParam) {
+        for (Parameter p : liParams) {
 
             if (!superParams.contains(p)) {
                 pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
@@ -218,7 +222,7 @@ public class SimkitXML2Java {
                 pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
             }
 
-            if (!(extendz.indexOf("SimEntityBase") < 0)) {
+            if (extendz.contains("SimEntityBase")) {
                 buildParameterAccessor(p, accessorBlock);
             } else if (!superParams.contains(p)) {
                 buildParameterAccessor(p, accessorBlock);
@@ -241,7 +245,7 @@ public class SimkitXML2Java {
                 pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
             } else {
                 try {
-                    c = Class.forName(s.getType());
+                    c = Class.forName(s.getType(), true, VGlobals.instance().getWorkClassLoader());
                 } catch (ClassNotFoundException cnfe) {
 //                log.error(cnfe);
                     pw.println(sp4 + "protected" + sp + stripLength(s.getType()) + sp + s.getName() + sc);
@@ -322,8 +326,8 @@ public class SimkitXML2Java {
         pw.println(lp + rp + sp + ob);
 //        pw.println(sp8 + "super.toString()" + sc);
         pw.println(sp8 + "return" + sp + "this.getClass().getName()" + sc);
-//        pw.println(sp8 + "return" + sp + "super.toString()" + sp + "+" + sp +
-//                qu + " :: " + qu + sp + "+" + sp + "this.getClass().getName()" + sc);
+//        pw.println(sp8 + "return" + localSuperParams + "super.toString()" + localSuperParams + "+" + localSuperParams +
+//                qu + " :: " + qu + localSuperParams + "+" + localSuperParams + "this.getClass().getName()" + sc);
         pw.println(sp4 + cb);
     }
 
@@ -404,15 +408,13 @@ public class SimkitXML2Java {
     void buildParameterMapAndConstructor(StringWriter parameterMapAndConstructor) {
 
         PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
-        List<Parameter> superPList = new ArrayList<Parameter>();
-        List<Parameter> pList = this.root.getParameter();
 
         pw.println();
         pw.println(sp4 + "@viskit.ParameterMap" + sp + lp);
         pw.print(sp8 + "names =" + sp + ob);
-        for (Parameter pt : pList) {
+        for (Parameter pt : liParams) {
             pw.print(qu + pt.getName() + qu);
-            if (pList.indexOf(pt) < pList.size() - 1) {
+            if (liParams.indexOf(pt) < liParams.size() - 1) {
                 pw.print(cm);
                 pw.println();
                 pw.print(sp8 + sp4);
@@ -420,9 +422,9 @@ public class SimkitXML2Java {
         }
         pw.println(cb + cm);
         pw.print(sp8 + "types =" + sp + ob);
-        for (Parameter pt : pList) {
+        for (Parameter pt : liParams) {
             pw.print(qu + pt.getType() + qu);
-            if (pList.indexOf(pt) < pList.size() - 1) {
+            if (liParams.indexOf(pt) < liParams.size() - 1) {
                 pw.print(cm);
                 pw.println();
                 pw.print(sp8 + sp4);
@@ -434,12 +436,12 @@ public class SimkitXML2Java {
         pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
         pw.print(sp4 + "public " + this.root.getName() + lp);
 
-        for (Parameter pt : pList) {
+        for (Parameter pt : liParams) {
 
             pw.print(pt.getType() + sp + shortinate(pt.getName()));
 
-            if (pList.size() > 1) {
-                if (pList.indexOf(pt) < pList.size() - 1) {
+            if (liParams.size() > 1) {
+                if (liParams.indexOf(pt) < liParams.size() - 1) {
                     pw.print(cm);
                     pw.println();
                     pw.print(sp8 + sp4);
@@ -449,14 +451,12 @@ public class SimkitXML2Java {
 
         pw.println(rp + sp + ob);
 
-        if (extendz.indexOf("SimEntityBase") < 0) {
+        if (!extendz.contains("SimEntityBase")) {
 
-            pList = this.root.getParameter();
-            superPList = resolveSuperParams(pList);
             pw.print(sp8 + "super" + lp);
-            for (Parameter pt : superPList) {
+            for (Parameter pt : superParams) {
                 pw.print(shortinate(pt.getName()));
-                if ((superPList.size() > 1) && (superPList.indexOf(pt) < superPList.size() - 1)) {
+                if ((superParams.size() > 1) && (superParams.indexOf(pt) < superParams.size() - 1)) {
                     pw.print(cm);
                 }
             }
@@ -464,9 +464,9 @@ public class SimkitXML2Java {
         }
 
         // skip over any sets that would get done in the superclass
-        for (int l = superPList.size(); l < this.root.getParameter().size(); l++) {
+        for (int l = superParams.size(); l < liParams.size(); l++) {
 
-            Parameter pt = this.root.getParameter().get(l);
+            Parameter pt = liParams.get(l);
             pw.println(sp8 + "set" + capitalize(pt.getName()) + lp + shortinate(pt.getName()) + rp + sc);
         }
 
@@ -558,11 +558,11 @@ public class SimkitXML2Java {
         pw.println();
 
         // check if super has a doRun()
-        if (extendz.indexOf("SimEntityBase") < 0) {
+        if (!extendz.contains("SimEntityBase")) {
 
             Method doRun = null;
             try {
-                Class<?> sup = Class.forName(extendz);
+                Class<?> sup = Class.forName(extendz, true, VGlobals.instance().getWorkClassLoader());
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
             } catch (ClassNotFoundException cnfe) {
 
@@ -860,16 +860,16 @@ public class SimkitXML2Java {
     // note a subclass should have at least the superclass's
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
-        List<Parameter> superParams = new ArrayList<Parameter>();
+        List<Parameter> localSuperParams = new ArrayList<Parameter>();
         if (extendz.equals("simkit.SimEntityBase") || extendz.equals("simkit.BasicSimEntity")) {
-            return superParams;
+            return localSuperParams;
         }
 
         try {
             // the extendz field may also contain an implemnts
             // tail.
 
-            Class<?> c = Class.forName(extendz.split("\\s")[0]);
+            Class<?> c = Class.forName(extendz.split("\\s")[0], true, VGlobals.instance().getWorkClassLoader());
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
@@ -895,14 +895,14 @@ public class SimkitXML2Java {
                 }
             }
 
-            superParams = Arrays.asList(parray);
+            localSuperParams = Arrays.asList(parray);
 
         } catch (java.lang.ClassNotFoundException cnfe) {
             if (extendz.equals("simkit.SimEntityBase")) {
                 log.error(extendz + " not in classpath ");
             }
         }
-        return superParams;
+        return localSuperParams;
     }
 
     // check equivalence of eg. java.lang.Integer vs. Integer

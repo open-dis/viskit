@@ -16,7 +16,7 @@ import java.util.List;
  * @deprecated use {@link edu.nps.util.TempFileManager} instead
  * @author rmgoldbe
  */
-
+@Deprecated
 public class DirDeleter extends Thread {
     private List<File> dirList = new ArrayList<File>();
 

@@ -118,13 +118,12 @@ public class LocalBootLoader extends URLClassLoader {
         File jar;
 
         //System.out.println("Stage1 start init ");
+        // Capture the current runtime classpath
         initStage1();
 
         stage1.allowAssembly = this.allowAssembly;
 
-        jar = buildCleanWorkJar();
-
-        //stage1 gets dirty during bring up of clean jar
+        //stage1 gets dirty during bring up of clean jar <-- Why?
         //reboot it with cleanWorkJar
         //System.out.println("Stage1 reinit ");
 //        initStage1();
@@ -142,6 +141,8 @@ public class LocalBootLoader extends URLClassLoader {
                 ex.printStackTrace();
             }
         }
+
+        jar = buildCleanWorkJar();
 
         // Now add our project's working directory, i.e. build/classes
         try {
@@ -303,7 +304,7 @@ public class LocalBootLoader extends URLClassLoader {
             // to be added to a newer stage1 (rebooted) instance.
             newJar = makeJarFileFromDir(getWorkDir());
 
-        } catch (IOException ex) {
+        } catch (MalformedURLException ex) {
             ex.printStackTrace();
         }
 
@@ -332,9 +333,7 @@ public class LocalBootLoader extends URLClassLoader {
             try {
                 if (jos != null)
                    jos.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            } catch (IOException ex) {}
         }
         return jarOut;
     }
@@ -350,8 +349,8 @@ public class LocalBootLoader extends URLClassLoader {
                 makeJarFileFromDir(baseDir, file, jos);
             } else {
 
-                String entryName = "";
-                String entryClass = "";
+                String entryName;
+                String entryClass;
                 entryName = file.getParentFile().getName() + "/" + file.getName();
                 entryClass = entryName.replace('/', '.');
 
@@ -377,7 +376,7 @@ public class LocalBootLoader extends URLClassLoader {
                         if (vzClz.isAssignableFrom(clz)) {
                             isEventGraph = false;
                         }
-                    } catch (Exception ex) {
+                    } catch (ClassNotFoundException ex) {
                         System.err.println("Check viskit.jar has jaxb bindings, or: " + entryClass);
                         ex.printStackTrace();
                     }
@@ -399,9 +398,7 @@ public class LocalBootLoader extends URLClassLoader {
                             try {
                                 if (fis != null)
                                     fis.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
+                            } catch (IOException ex) {}
                         }
                     }
                 }
