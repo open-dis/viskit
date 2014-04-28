@@ -482,7 +482,6 @@ public class FileBasedClassManager implements Runnable {
                     l[j].add(p);
                 }
             } else {
-                System.err.println("Enter Annotation");
                 if (paramAnnots.length > 1) {
                     throw new RuntimeException("Only one Annotation per constructor");
                 }
