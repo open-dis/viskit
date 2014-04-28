@@ -5,23 +5,61 @@
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#compilesingle) -->
     <target depends="init" name="compile-selected-files-in-src">
         <fail unless="files">Must set property 'files'</fail>
-        <javac destdir="${dir.build.classes}"
-               includeantruntime="false"
-               includes="${files}"
-               source="1.6"
-               srcdir="src"
-               debug="true">
-            <classpath refid="runtime.classpath"/>
-            <!-- Reveals generics and deprecation warings -->
-            <compilerarg value="${javac.unchecked}"/>
-            <compilerarg value="${javac.deprecation}"/>
-            <compilerarg value="${javac.debug}"/>
+        <javac debug="true" destdir="${dir.build.classes}" includeantruntime="false" includes="${files}" source="${javac.source}" srcdir="src">
+            <compilerarg line="${javac.compile.args}"/>
+            <classpath>
+                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
+                <pathelement location="${dir.lib}/jdom.jar"/>
+                <pathelement location="${dir.lib}/jgraph.jar"/>
+                <pathelement location="${dir.lib}/actions.jar"/>
+                <pathelement location="${dir.lib}/simkit.jar"/>
+                <pathelement location="${dir.lib}/jhall.jar"/>
+                <pathelement location="${jfreechart.jar}"/>
+                <pathelement location="${dir.lib}/commons-configuration-1.7.jar"/>
+                <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
+                <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
+                <pathelement location="${log4j.jar}"/>
+                <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
+                <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
+            </classpath>
         </javac>
     </target>
-    <target depends="init,compile" name="run-selected-file-in-src">
+
+    <!-- Can use this to perfrom manual Viskit XML -> Java translations -->
+    <!-- EG translator is viskit.xsd.translator.SimkitXML2Java -->
+    <!-- Assy translator is viskit.xsd.assembly.SimkitAssemblyXML2Java -->
+    <target depends="init" name="run-selected-file-in-src">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
+            <classpath>
+                <path refid="runtime.classpath"/>
+            </classpath>
+            <!-- Uncomment for translating and compiling EGs -->
+            <arg value="${viskit.eg}"/>
+            <!-- Uncomment for translating and compiling Assemblies -->
+            <!--arg value="-f"/-->
+            <!--arg value="${viskit.assy}"/-->
+        </java>
+    </target>
+
+     <!-- Can use this to debug manual Viskit XML -> Java translations -->
+    <!-- EG translator is viskit.xsd.translator.SimkitXML2Java -->
+    <!-- Assy translator is viskit.xsd.assembly.SimkitAssemblyXML2Java -->
+    <target name="debug-selected-file-in-src">
+        <fail unless="debug.class">Must set property 'debug.class'</fail>
+        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
+        </nbjpdastart>
+        <java classname="${debug.class}" fork="true">
+            <classpath refid="runtime.classpath"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+
+            <!-- Uncomment for translating and compiling EGs -->
+            <arg value="${viskit.eg}"/>
+            <!-- Uncomment for translating and compiling Assemblies -->
+            <!--arg value="-f"/-->
+            <!--arg value="${viskit.assy}"/-->
         </java>
     </target>
 </project>

@@ -71,10 +71,6 @@
         <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar"/>
     </path>
 
-    <fileset dir="${dir.build.lib}" id="runtime.viskit.exe">
-        <include name="viskit-exe.jar"/>
-    </fileset>
-
     <!-- The following used for the IzPack installer routine -->
     <fileset dir="${dir.lib}" id="runtime.lib" >
         <!-- could use restrictions in current runtime.classpath -->
@@ -387,6 +383,7 @@
             <fileset dir="${dir.diskit}/lib">
                 <include name="open-dis_4.06.jar"/>
                 <include name="dis-enums.jar"/>
+                <include name="hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
             </fileset>
         </copy>
     </target>
