@@ -108,9 +108,9 @@ public class EventGraphCache {
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
-    private LinkedList<String> eventGraphNamesList  = new LinkedList<String>();
-    private LinkedList<File> eventGraphFilesList  = new LinkedList<File>();
-    private LinkedList<String> eventGraphImagePathsList = new LinkedList<String>();
+    private List<String> eventGraphNamesList  = new LinkedList<String>();
+    private List<File> eventGraphFilesList  = new LinkedList<File>();
+    private List<String> eventGraphImagePathsList = new LinkedList<String>();
 
     private final String EVENT_GRAPH_IMAGE_DIR =
             VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir() + "/";
@@ -263,9 +263,9 @@ public class EventGraphCache {
     /** @return a JDOM document (Assembly XML file) */
     public Document getAssemblyDocument() {return assemblyDocument;}
 
-    public LinkedList<String> getEventGraphNamesList() {return eventGraphNamesList;}
-    public LinkedList<File> getEventGraphFilesList() {return eventGraphFilesList;}
-    public LinkedList<String> getEventGraphImagePathsList() {return eventGraphImagePathsList;}
+    public List<String> getEventGraphNamesList() {return eventGraphNamesList;}
+    public List<File> getEventGraphFilesList() {return eventGraphFilesList;}
+    public List<String> getEventGraphImagePathsList() {return eventGraphImagePathsList;}
 
     /**
      * @return the entityTable

@@ -76,14 +76,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     private AnalystReportBuilder arb;
     private File reportFile;
 
-    /** 
+    /**
      * TODO: rewire this functionality?
-     * boolean to show that raw report has not been saved to AnalystReports 
+     * boolean to show that raw report has not been saved to AnalystReports
      */
     private boolean dirty = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
-    
+
     public AnalystReportPanel() {
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
@@ -93,7 +93,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
-    JComboBox classifiedTF = new JComboBox(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    JComboBox<String> classifiedTF = new JComboBox<String>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
@@ -174,7 +174,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         reportFile = targetFile;
         dirty = false;
     }
-    
+
     private void openAnalystReport(File selectedFile) {
           AnalystReportBuilder arbLocal = new AnalystReportBuilder(selectedFile);
           setContent(arbLocal);
@@ -319,7 +319,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     /************************/
     JCheckBox wantLocationDescriptions;
     JCheckBox wantLocationImages;
-    JTextArea locCommentsTA, locConclusionsTA, locProductionNotesTA;    
+    JTextArea locCommentsTA, locConclusionsTA, locProductionNotesTA;
     JTextField simLocImgTF;
     JButton simLocImgButt;
     JTextField simChartImgTF;
@@ -337,17 +337,17 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Description of Location Features"));
         p.add(jsp);
-        
+
         jsp = new JScrollPane(locProductionNotesTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Production Notes"));
         p.add(jsp);
-        
+
         jsp = new JScrollPane(locConclusionsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
         p.add(jsp);
-        
+
         wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
         wantLocationImages.setToolTipText("Include entries in output report");
         wantLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -435,7 +435,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
         p.add(jsp);
-       
+
         jsp = new JScrollPane(simProductionNotes = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Production Notes"));
@@ -445,7 +445,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
         p.add(jsp);
-        
+
         wantEntityTable = new JCheckBox("Include entity definition table", true);
         wantEntityTable.setToolTipText("Include entries in output report");
         wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -499,7 +499,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         simConfigConclusions.setText(arb.getSimConfigConclusions());
         simConfigConclusions.setEnabled(arb.isPrintSimConfigComments());
-        
+
         wantSimConfigImages.setSelected(arb.isPrintAssemblyImage());
         configImgButt.setEnabled(wantSimConfigImages.isSelected());
         configImgPathTF.setEnabled(wantSimConfigImages.isSelected());
@@ -518,7 +518,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             arb.setAssemblyImageLocation(s);
         }
     }
-    
+
     JCheckBox wantEntityParameterDescriptions;
     JCheckBox wantEntityParameterTables;
     JTabbedPane entityParamTabs;
@@ -690,8 +690,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             cols.add("description");
 
             Vector<Vector<String>> data = new Vector<Vector<String>>(behaviorParameters.size());
-            for (int i = 0; i < behaviorParameters.size(); i++) {
-                String[] sa = (String[]) behaviorParameters.get(i);
+            for (Object behaviorParameter : behaviorParameters) {
+                String[] sa = (String[]) behaviorParameter;
                 Vector<String> row = new Vector<String>(3);
                 row.add(sa[0]);
                 row.add(sa[1]);
@@ -704,8 +704,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             p.add(jsp);
 
             data = new Vector<Vector<String>>(behaviorStateVariables.size());
-            for (int i = 0; i < behaviorStateVariables.size(); i++) {
-                String[] sa = (String[]) behaviorStateVariables.get(i);
+            for (Object behaviorStateVariable : behaviorStateVariables) {
+                String[] sa = (String[]) behaviorStateVariable;
                 Vector<String> row = new Vector<String>(3);
                 row.add(sa[0]);
                 row.add(sa[1]);
@@ -953,7 +953,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 }
 
                 openAnalystReport(openChooser.getSelectedFile());
-            }            
+            }
         });
 
         ActionListener saveAsLis = new ActionListener() {
@@ -990,13 +990,13 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+
                 if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
                         JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                         "The checkbox for <code>Enable Analyst Reports </code>is not" +
                         " currently selected.  Please select on the <code>Assembly Run </code>panel," +
                         " re-run the experiment and the report will then be available to " +
-                        "view.</p></body></html>", "Enable Analyst Reports not selected", 
+                        "view.</p></body></html>", "Enable Analyst Reports not selected",
                         JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
@@ -1006,7 +1006,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
 //                        // TODO:  change XML input to temp file, rather than final file, if possible
 //                        if (true) { // TODO:  check if analyst report data is 'dirty' to avoid unnecessary saves
-//                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
+//                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this,
 //                                    "Save current analyst report data?",
 //                                    "Confirm", JOptionPane.WARNING_MESSAGE);
 //                            switch (result) {
@@ -1031,7 +1031,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
                 if (JOptionPane.YES_OPTION ==
-                    JOptionPane.showConfirmDialog(AnalystReportPanel.this, 
+                    JOptionPane.showConfirmDialog(AnalystReportPanel.this,
                     "Rename analyst report output?",
                     "Confirm", JOptionPane.YES_NO_OPTION)) {
                     genChooser.showSaveDialog(AnalystReportPanel.this);
@@ -1062,7 +1062,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         if (errMsg != null) {
             JOptionPane.showMessageDialog(this, "<html><center>Error displaying HTML:<br>" + errMsg, "Error", JOptionPane.ERROR_MESSAGE);
-        }    
+        }
     }
 
     class fileChoiceListener implements ActionListener {

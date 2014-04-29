@@ -69,7 +69,7 @@ public class SettingsDialog extends JDialog {
     private JButton canButt;
     private JButton okButt;
     private JTabbedPane tabbedPane;
-    private JList classPathJlist;
+    private JList<String> classPathJlist;
     private JCheckBox evGrCB;
     private JCheckBox assyCB;
     private JCheckBox runCB;
@@ -160,7 +160,7 @@ public class SettingsDialog extends JDialog {
     private void buildWidgets() {
         JPanel classpathP = new JPanel();
         classpathP.setLayout(new BoxLayout(classpathP, BoxLayout.Y_AXIS));
-        classPathJlist = new JList(new DefaultListModel());
+        classPathJlist = new JList<String>(new DefaultListModel<String>());
         JScrollPane jsp = new JScrollPane(classPathJlist);
         jsp.setPreferredSize(new Dimension(70, 70));  // don't want it to control size of dialog
         classpathP.add(jsp);
@@ -418,7 +418,7 @@ public class SettingsDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        DefaultListModel mod = (DefaultListModel) classPathJlist.getModel();
+        DefaultListModel<String> mod = (DefaultListModel<String>) classPathJlist.getModel();
         mod.clear();
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
@@ -532,7 +532,7 @@ public class SettingsDialog extends JDialog {
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
-                ((DefaultListModel) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
+                ((DefaultListModel<String>) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
                 installExtraClassPathIntoConfig();
             }
         }
@@ -576,10 +576,10 @@ public class SettingsDialog extends JDialog {
 
     private void moveLine(int idx, int polarity) {
         classPathJlist.clearSelection();
-        DefaultListModel mod = (DefaultListModel) classPathJlist.getModel();
+        DefaultListModel<String> mod = (DefaultListModel<String>) classPathJlist.getModel();
         Object o = mod.get(idx);
         mod.remove(idx);
-        mod.add(idx + polarity, o);
+        mod.add(idx + polarity, (String) o);
         installExtraClassPathIntoConfig();
         classPathJlist.setSelectedIndex(idx + polarity);
     }

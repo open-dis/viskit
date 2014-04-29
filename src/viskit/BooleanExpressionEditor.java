@@ -27,7 +27,7 @@ public class BooleanExpressionEditor extends JDialog {
     private static boolean modified = false;
     private JButton canButt,  okButt;
     private JTextField name,  delay;
-    private JList transitions;
+    private JList<String> transitions;
 
     /**
      * Set up and show the dialog.  The first Component argument
@@ -95,7 +95,7 @@ public class BooleanExpressionEditor extends JDialog {
         con.add(Box.createVerticalStrut(5));
 
         // state transitions
-        transitions = new JList();
+        transitions = new JList<String>();
         transitions.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         JScrollPane condSp = new JScrollPane(transitions);
         condSp.setBorder(BorderFactory.createTitledBorder("State Transitions"));
@@ -161,6 +161,7 @@ public class BooleanExpressionEditor extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;
             dispose();
@@ -169,6 +170,7 @@ public class BooleanExpressionEditor extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             // test
             modified = true;
@@ -191,6 +193,7 @@ public class BooleanExpressionEditor extends JDialog {
 
     class myChangeActionListener implements ChangeListener, ActionListener {
 
+        @Override
         public void stateChanged(ChangeEvent event) {
             if (viskit.Vstatics.debug) {
                 System.out.println("stateChanged");
@@ -201,6 +204,7 @@ public class BooleanExpressionEditor extends JDialog {
 
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             stateChanged(null);
         }

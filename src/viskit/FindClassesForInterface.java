@@ -103,7 +103,7 @@ public class FindClassesForInterface {
                 LogUtils.getLogger(FindClassesForInterface.class).info("Found Class: " + clz.getName() + "\n");
                 return clz;
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtils.getLogger(FindClassesForInterface.class).error(e);
                 return (Class<?>) null;
             } finally {
                 try {

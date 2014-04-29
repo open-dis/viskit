@@ -59,10 +59,10 @@ public class EdgeInspectorDialog extends JDialog {
     private JButton addDescriptionButton;
     private JTextArea descriptionJta;
     private JScrollPane descriptionJsp;
-    
+
     Vector<ViskitElement> nodeList;
     Model mod; //todo fix
-    
+
     /**
      * Set up and show the dialog.  The first Component argument
      * determines which frame the dialog depends on; it should be
@@ -87,7 +87,7 @@ public class EdgeInspectorDialog extends JDialog {
         // above call blocks
         return modified;
     }
-    
+
     private EdgeInspectorDialog(JFrame frame, Component locationComp, Edge edge) {
         super(frame, "Edge Inspector", true);
         this.edge = edge;
@@ -96,7 +96,7 @@ public class EdgeInspectorDialog extends JDialog {
         this.addWindowListener(new myCloseListener());
 
         mod = (Model) (VGlobals.instance().getEventGraphEditor().getModel());
-        
+
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
@@ -165,6 +165,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         descriptionJta.addCaretListener(new CaretListener() {
 
+            @Override
             public void caretUpdate(CaretEvent e) {
                 if (changeListener != null) {
                     changeListener.stateChanged(new ChangeEvent(descriptionJta));
@@ -275,6 +276,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         parameters.addDoubleClickedListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 vEdgeParameter ep = (vEdgeParameter) event.getSource();
 
@@ -324,17 +326,23 @@ public class EdgeInspectorDialog extends JDialog {
                     } // save the default one
                 }
             }
-            JComboBox jcb = new JComboBox(priorityNames);
+            JComboBox<String> jcb = new JComboBox<String>(priorityNames);
             jcb.setEditable(true); // this allows anything to be intered
             return jcb;
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
-            return new JComboBox(new String[] {"simkit package not in class path"});
+        } catch (SecurityException e) {
+            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
+        } catch (IllegalArgumentException e) {
+            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
+        } catch (IllegalAccessException e) {
+            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
         }
+        return new JComboBox<String>(new String[] {"simkit package not in class path"});
     }
 
     private void setPriorityCBValue(String pr) {
-            
+
         // Assume numeric comes in, avoid NumberFormatException via Regex check
         if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, pr)) {
 
@@ -370,7 +378,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         srcEvent.setText(edge.from.getName());
         targEvent.setText(edge.to.getName());
-        myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), 
+        myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
         if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
@@ -427,11 +435,11 @@ public class EdgeInspectorDialog extends JDialog {
     private void unloadWidgets() {
         if (edge instanceof SchedulingEdge) {
             int idx = priorityCB.getSelectedIndex();
-            String s = null;
+            String s;
             if (idx < 0) {
                 s = (String) priorityCB.getSelectedItem();
                 if (s.isEmpty()) {
-                    
+
                     // Force default in this case (no information provided in EG)
                     s = "DEFAULT";
                 } else {
@@ -449,28 +457,28 @@ public class EdgeInspectorDialog extends JDialog {
                         s = "HIGHEST";
                     } else {
                         s = "DEFAULT";
-                    }                    
+                    }
                 }
             } else {
                Priority p = priorityList.get(idx);
-                
+
                 // Get the name of the Priority in this manner
                 s = p.toString().split("[\\ \\[]") [1];
             }
-            
+
             ((SchedulingEdge) edge).priority = s;
         }
         String delaySt = delay.getText();
         edge.delay = (delaySt == null || delaySt.trim().isEmpty()) ? "0.0" : delay.getText();
-        
+
         String condSt = conditionalExpressionPanel.getText();
         edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? "true" : conditionalExpressionPanel.getText();
-        
+
         edge.conditionalDescription = getDescription();
         if (!edge.parameters.isEmpty()) {
             edge.parameters.clear();
         }
-        
+
         // Key on the EdgeNode's list of potential arguments
         // TODO: How do we do this automatically from the EventInspectorDialog
         // when we remove an argument?
@@ -501,6 +509,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     class addHideButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource().equals(addConditionalButton)) {
                 hideShowConditionals(true);
@@ -512,6 +521,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     class reverseButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             EventNode en = edge.from;
             edge.from = edge.to;
@@ -524,6 +534,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
@@ -532,6 +543,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 // todo fix beanshell syntax checking.  I don't know if this was ever complete enough.  The example to test it
@@ -570,16 +582,19 @@ public class EdgeInspectorDialog extends JDialog {
 
     class myChangeListener extends KeyAdapter implements ChangeListener, ActionListener, CaretListener {
 
+        @Override
         public void stateChanged(ChangeEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             stateChanged(null);
         }
 
+        @Override
         public void caretUpdate(CaretEvent e) {
             stateChanged(null);
         }
@@ -587,7 +602,7 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void keyTyped(KeyEvent e) {
             stateChanged(null);
-            // TODO:  update OK button when description field modified, rather than waiting to select another field            
+            // TODO:  update OK button when description field modified, rather than waiting to select another field
         }
     }
 

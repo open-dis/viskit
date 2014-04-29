@@ -129,6 +129,8 @@ public class vGraphModel extends DefaultGraphModel {
         _addEdgeCommon(ce, viskitCancelEdgeStyle);
     }
 
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     private void _addEdgeCommon(viskit.model.Edge ed, Map edgeStyle) {
         EventNode enfrom = ed.from;
         EventNode ento = ed.to;

@@ -10,8 +10,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,7 +28,6 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-
 import viskit.model.VInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -43,10 +42,10 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @version $Id$
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
-    
+
     private JLabel typeLab,  methodLab;
     private JTextField typeTF;
-    private JComboBox methodCB;
+    private JComboBox<String> methodCB;
     private static final int FF = 0,  CONSTR = 1,  FACT = 2,  ARR = 10;
     private JPanel instPane;
     private CardLayout instPaneLayMgr;
@@ -78,6 +77,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         typeTF.setEditable(typeEditable);
         typeTF.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 methodCB.actionPerformed(e);
@@ -87,7 +87,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         methodLab = new JLabel("method", JLabel.TRAILING);
 
-        methodCB = new JComboBox(new String[]{"free form", "constructor", "factory"});
+        methodCB = new JComboBox<String>(new String[]{"free form", "constructor", "factory"});
         //or
         JTextField onlyConstrTF = new JTextField("Constructor");
         onlyConstrTF.setEditable(false);
@@ -127,6 +127,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             int lastIdx = 0;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!typeTF.getText().trim().equals(myVi.getType())) {
                     String newType = typeTF.getText().trim();
@@ -213,12 +214,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (modifiedListener != null) {
             modifiedListener.actionPerformed(null);
         }
     }
 
+    @Override
     public void caretUpdate(CaretEvent e) {
         actionPerformed(null);
     }
@@ -235,7 +238,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
             value = new JTextField("");
-            value.addCaretListener(this);
+            value.addCaretListener(FFPanel.this);
             value.setAlignmentX(Box.CENTER_ALIGNMENT);
             Vstatics.clampHeight(value);
 
@@ -263,6 +266,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             return new VInstantiator.FreeF(typ, value.getText().trim());
         }
 
+        @Override
         public void caretUpdate(CaretEvent e) {
             if (ip.modifiedListener != null) {
                 ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Textfield touched"));
@@ -322,10 +326,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             actionPerformed(null);    // set icon for initially selected pane
         }
 
+        @Override
         public void caretUpdate(CaretEvent e) {
             ip.caretUpdate(e);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int idx = tp.getSelectedIndex();
 //            if (construct == null || construct.length <= 0) // some classes have no constructors
@@ -333,10 +339,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 //                return;
 //            }
 // Don't know what the above was about; the field was never being initted
-            
+
             // tell mommy...put up here to emphasize that it is the chief reason for having this listener
             ip.actionPerformed(e);
-            
+
           // But we can do this: leave off the red border if only one to choose from
             if(tp.getTabCount() > 1)
               for (int i = 0; i < tp.getTabCount(); i++) {
@@ -357,7 +363,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 return;
             }
             // oddly enough this is exactly what VInstantiator.indexOfArgNames(String type, List args)
-            // 
+            //
             if (viskit.Vstatics.debug) {
                 System.out.println("setting data for " + vi.getType());
             }
@@ -366,7 +372,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (viskit.Vstatics.debug) {
                 System.out.println("found a matching constructor at " + indx);
             }
-            if(indx != -1) {       
+            if(indx != -1) {
                 constructorPanels[indx].setData(vi.getArgs());
                 tp.setSelectedIndex(indx);
             }
@@ -384,7 +390,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private InstantiationPanel ip;
         private JLabel factClassLab,  factMethodLab;
-        private JComboBox factClassCB;
+        private JComboBox<Object> factClassCB;
         private JTextField factMethodTF;
         private JButton factMethodButt;
         private JPanel topP;
@@ -396,7 +402,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
-            factClassCB = new JComboBox(new Object[]{"simkit.random.RandomVariateFactory"});
+            factClassCB = new JComboBox<Object>(new Object[]{"simkit.random.RandomVariateFactory"});
             // this is wierd, I want it's height to be the one for a non-editable CB
             //  factClassCB.setEditable(false);
             factClassCB.setEditable(true);
@@ -438,6 +444,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         class MyChangedListener implements ActionListener {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (ip.modifiedListener != null) {
                     ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Button pressed"));
@@ -447,6 +454,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         class MyCaretListener implements CaretListener {
 
+            @Override
             public void caretUpdate(CaretEvent e) {
                 if (ip.modifiedListener != null) {
                     ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "TF edited pressed"));
@@ -457,11 +465,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         class MyClassListener implements ActionListener {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (noClassAction) {
                     return;
                 }
-                Class c = null;
+                Class c;
                 //String cName = factClassCB.getText().trim();
                 String cName = factClassCB.getSelectedItem().toString();
                 try {
@@ -484,7 +493,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     return;
                 }
                 Vector<String> vn = new Vector<String>();
-                HashMap<String, Method> hm = new HashMap<String, Method>();
+                Map<String, Method> hm = new HashMap<String, Method>();
 
                 for (Method method : statMeths) {
                     int mods = method.getModifiers();
@@ -515,7 +524,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     return;
                 }
 
-                Method m = hm.get(ret);
+                Method m = hm.get((String)ret);
                 factMethodTF.setText(m.getName());
                 factMethodTF.setEnabled(true);
                 factMethodLab.setEnabled(true);

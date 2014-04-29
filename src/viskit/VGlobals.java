@@ -297,7 +297,7 @@ public class VGlobals {
         }
     }
 
-    private Vector<? extends ViskitElement> getStateVarsList() {
+    private Vector<ViskitElement> getStateVarsList() {
         return getActiveEventGraphModel().getStateVariables();
     }
 
@@ -305,8 +305,8 @@ public class VGlobals {
         return getActiveEventGraphModel().getSimParameters();
     }
 
-    public ComboBoxModel getStateVarsCBModel() {
-        return new DefaultComboBoxModel(getStateVarsList());
+    public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
+        return new DefaultComboBoxModel<ViskitElement>(getStateVarsList());
     }
 
     /******/
@@ -740,8 +740,8 @@ public class VGlobals {
         return ty;
     }
 
-    public JComboBox getTypeCB() {
-        JComboBox cb = new JComboBox(cbMod);
+    public JComboBox<String> getTypeCB() {
+        JComboBox<String> cb = new JComboBox<String>(cbMod);
         cb.addActionListener(myListener);
         cb.addItemListener(myListener);
         cb.setRenderer(new myTypeListRenderer());
@@ -1011,17 +1011,17 @@ public class VGlobals {
     }
 
     @SuppressWarnings("serial")
-    class myTypeListRenderer extends JLabel implements ListCellRenderer {
+    class myTypeListRenderer extends JLabel implements ListCellRenderer<String> {
         //Font specialFont = getFont().deriveFont(Font.ITALIC);
 
         @Override
-        public Component getListCellRendererComponent(JList list, Object value,
-                int index, boolean isSelected, boolean cellHasFocus) {
-            JLabel lab = new JLabel(value.toString());
-            if (value.toString().equals(moreTypesString)) {
+        public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+
+            JLabel lab = new JLabel(value);
+            if (value.equals(moreTypesString)) {
                 lab.setBorder(BorderFactory.createRaisedBevelBorder());
             } //createEtchedBorder());
-        //lab.setFont(specialFont);
+            //lab.setFont(specialFont);
             return lab;
         }
     }

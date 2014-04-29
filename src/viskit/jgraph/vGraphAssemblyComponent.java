@@ -280,6 +280,9 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         currentModelEvent = null;
     }
 
+
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
         if (currentModelEvent != null && currentModelEvent.getSource() != this.model) // bail if this came from outside
@@ -293,7 +296,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             for (Object cell : ch) {
                 if (cell instanceof AssemblyCircleCell) {
                     AssemblyCircleCell cc = (AssemblyCircleCell) cell;
-
                     AttributeMap m = cc.getAttributes();
                     Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {

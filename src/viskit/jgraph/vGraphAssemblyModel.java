@@ -119,6 +119,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
     }
 
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     public void addAdapterEdge(AdapterEdge ae) {
         Object frO = ae.getFrom();
         Object toO = ae.getTo();
@@ -171,6 +173,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         changeAnyEdge(ae);
     }
 
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     public void addSimEvListEdge(SimEvListenerEdge sele) {
         Object frO = sele.getFrom();
         Object toO = sele.getTo();
@@ -216,6 +220,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         changeAnyEdge(pce);
     }
 
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     public void addPclEdge(PropChangeEdge pce) {
         EvGraphNode egn = (EvGraphNode) pce.getFrom();
         //PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed

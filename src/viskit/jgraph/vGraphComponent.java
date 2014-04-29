@@ -258,6 +258,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         currentModelEvent = null;
     }
 
+    // TODO: This version JGraph does not support generics
+    @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {

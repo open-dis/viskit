@@ -63,6 +63,7 @@ public class ClassPanel extends JPanel {
         add(buttPan);
         minus.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 tree.removeSelected();
             }
@@ -70,6 +71,7 @@ public class ClassPanel extends JPanel {
 
         plus.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 jfc.setFileFilter(new ClassTypeFilter(tree.getTargetClass()));
                 jfc.setAcceptAllFileFilterUsed(false);
@@ -79,16 +81,16 @@ public class ClassPanel extends JPanel {
                 int retv = jfc.showOpenDialog(ClassPanel.this);
                 if (retv == JFileChooser.APPROVE_OPTION) {
                     File[] fa = jfc.getSelectedFiles();
-                    for (int i = 0; i < fa.length; i++) {
+                    for (File fa1 : fa) {
                         Boolean recurse = null;
-                        if (fa[i].isDirectory()) {
+                        if (fa1.isDirectory()) {
                             if (recurse == null) {
                                 int retrn = JOptionPane.showConfirmDialog(ClassPanel.this, "Recurse directories?", "Question", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
-                                recurse = new Boolean(retrn == JOptionPane.YES_OPTION);
+                                recurse = retrn == JOptionPane.YES_OPTION;
                             }
-                            tree.addContentRoot(fa[i], recurse.booleanValue());
+                            tree.addContentRoot(fa1, recurse);
                         } else {
-                            tree.addContentRoot(fa[i]);
+                            tree.addContentRoot(fa1);
                         }
                     }
                 }
@@ -104,6 +106,7 @@ public class ClassPanel extends JPanel {
             this.targetClass = c;
         }
 
+        @Override
         public boolean accept(File f) {
             if (f.isFile()) {
                 String lcnam = f.getName().toLowerCase();
@@ -147,6 +150,7 @@ public class ClassPanel extends JPanel {
             return c;
         }
 
+        @Override
         public String getDescription() {
             return "Java class files, xml files, jar files or directories";
         }

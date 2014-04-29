@@ -17,12 +17,12 @@ import java.awt.event.WindowEvent;
  * close box, the caller retrieves the "buttonChosen" variable from
  * the object to determine the choice. If the user clicked "OK", the
  * caller can retrieve various choices from the object.
- * 
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
- * @author Mike Bailey * 
+ * @author Mike Bailey *
  * @author DMcG
  * @since June 2, 2004
  * @since 9:19:41 AM
@@ -35,7 +35,7 @@ public class EventListDialog extends JDialog {
     private String[] names;
     private Component locationComp;
     private JButton okButt,  canButt;
-    private JList list;
+    private JList<String> list;
     private JPanel buttPan;
     public static String newName;
 
@@ -58,7 +58,7 @@ public class EventListDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        list = new JList();
+        list = new JList<String>();
         list.getSelectionModel().addListSelectionListener(new mySelectionListener());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -104,12 +104,12 @@ public class EventListDialog extends JDialog {
 
         this.setLocationRelativeTo(c);
     }
-    
+
     String[] colNames = {"property name", "property type"};
 
     private void fillWidgets() {
         if (names != null) {
-            DefaultListModel dlm = new myUneditableListModel(names);
+            DefaultListModel<String> dlm = new myUneditableListModel(names);
             //DefaultTableModel dtm = new myUneditableTableModel(names,colNames);
             list.setModel(dlm);
             list.setVisibleRowCount(5);
@@ -132,6 +132,7 @@ public class EventListDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             selection = -1;
             dispose();
@@ -140,6 +141,7 @@ public class EventListDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             dispose();
         }
@@ -147,6 +149,7 @@ public class EventListDialog extends JDialog {
 
     class mySelectionListener implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             //Ignore extra messages.
             if (e.getValueIsAdjusting()) {
@@ -154,9 +157,8 @@ public class EventListDialog extends JDialog {
             }
 
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-            if (lsm.isSelectionEmpty()) {
-                return;
-            } else {
+            if (!lsm.isSelectionEmpty()) {
+
                 selection = lsm.getMinSelectionIndex();
                 okButt.setEnabled(true);
                 getRootPane().setDefaultButton(okButt);
@@ -182,7 +184,7 @@ public class EventListDialog extends JDialog {
         }
     }
 
-    class myUneditableListModel extends DefaultListModel {
+    class myUneditableListModel extends DefaultListModel<String> {
 
         myUneditableListModel(String[] data) {
             for (int i = 0; i < data.length; i++) {

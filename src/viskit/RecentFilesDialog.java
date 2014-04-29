@@ -63,7 +63,7 @@ public class RecentFilesDialog extends JDialog {
 
     private static RecentFilesDialog dialog;
     private Collection<String> lis;
-    private JList jlist;
+    private JList<String> jlist;
     private JButton closeButt;
     private Color defaultColor;
     private MouseListener myRollOverHandler = new mHandler();
@@ -96,6 +96,7 @@ public class RecentFilesDialog extends JDialog {
         closeButt.setBorder(new EmptyBorder(2, 2, 2, 2)); //null); //new LineBorder(Color.gray,1));
         closeButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 RecentFilesDialog.this.dispose();
             }
@@ -116,7 +117,7 @@ public class RecentFilesDialog extends JDialog {
         p.add(closeButt);
         cont.add(p);
 
-        jlist = new JList();
+        jlist = new JList<String>();
         jlist.setBorder(new EmptyBorder(0, 3, 0, 3));
         jlist.addMouseListener(new myMM());
         cont.add(jlist);
@@ -133,13 +134,14 @@ public class RecentFilesDialog extends JDialog {
             this.nlis = lis;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             nlis.clear();
             closeButt.doClick();
         }
     }
 
-    public void setParams(Component c, Collection<String> lis) {
+    public final void setParams(Component c, Collection<String> lis) {
         this.lis = lis;
         myClearer.nlis = lis;
 
@@ -150,7 +152,7 @@ public class RecentFilesDialog extends JDialog {
 
     private void fillWidgets() {
         jlist.removeAll();
-        jlist.setListData(lis.toArray());
+        jlist.setListData((String[]) lis.toArray());
         jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jlist.clearSelection();
         jlist.requestFocus();
@@ -163,7 +165,7 @@ public class RecentFilesDialog extends JDialog {
         public void mouseClicked(MouseEvent e) {
 
             if (jlist.getSelectedIndex() != -1) {
-                selection = (String) jlist.getSelectedValue();
+                selection = jlist.getSelectedValue();
             } else {
                 selection = null;
             }

@@ -25,8 +25,8 @@ import viskit.model.ViskitElement;
 public class TransitionsPanel extends JPanel {
 
     private JTextArea jta;
-    private JList lis;
-    private JButton testButt, minusButt, plusButt;
+    private JList<String> lis;
+    private JButton minusButt, plusButt;
     private myListModel model;
     private JButton edButt;
 
@@ -52,7 +52,7 @@ public class TransitionsPanel extends JPanel {
         model.addElement("1");
         model.addElement("2");
         model.addElement("3");
-        lis = new JList(model);
+        lis = new JList<String>(model);
         lis.setVisibleRowCount(3);
 
         JScrollPane jsp = new JScrollPane(lis);
@@ -104,7 +104,7 @@ public class TransitionsPanel extends JPanel {
                 if (event.getClickCount() == 2) {
                     if (myMouseLis != null) {
                         int idx = lis.getSelectedIndex();
-                        
+
                         // Don't fail on ArrayIndexOutOfBoundsException
                         if (idx == -1) {
                             return;
@@ -117,7 +117,7 @@ public class TransitionsPanel extends JPanel {
             }
         });
     }
-    
+
     // TODO: combine with list model.  List has no clone method implemented
     ArrayList<ViskitElement> arLis = new ArrayList<ViskitElement>();
 
@@ -192,7 +192,7 @@ public class TransitionsPanel extends JPanel {
         model.setElementAt(transitionString(est), idx);
     }
 
-    class myListModel extends DefaultListModel {
+    class myListModel extends DefaultListModel<String> {
 
         myListModel() {
             super();
@@ -229,7 +229,7 @@ public class TransitionsPanel extends JPanel {
                 myMouseLis.mouseClicked(me);
 
                 // If they cancelled, kill it
-                if (model.get(model.getSize() - 1) == "double click to edit") {  // remove it
+                if ("double click to edit".equals(model.get(model.getSize() - 1))) {  // remove it
                     ActionEvent ae = new ActionEvent(minusButt, 0, "delete");  // dummy
                     minusButt.getActionListeners()[0].actionPerformed(ae);
                 }

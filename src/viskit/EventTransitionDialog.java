@@ -24,11 +24,11 @@ import viskit.model.vStateVariable;
  * @version $Id$
  */
 public class EventTransitionDialog extends JDialog {
-    
+
     private JTextField actionField;
     private JTextField arrayIndexField;
     private JTextField commentField;
-    private JComboBox stateVarsCB;
+    private JComboBox<ViskitElement> stateVarsCB;
     private JRadioButton assTo, opOn;
     private static EventTransitionDialog dialog;
     private static boolean modified = false;
@@ -38,12 +38,12 @@ public class EventTransitionDialog extends JDialog {
     private JButton newSVButt;
     private JLabel actionLab;
     private JPanel indexPanel;
-    
+
     /** Required to get the EventArgument for indexing a State Variable array */
     private ArgumentsPanel argPanel;
     public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
     public static boolean newIsOperation;
-    
+
     public static boolean showDialog(JDialog f, Component comp, EventStateTransition est, ArgumentsPanel ap) {
         if (dialog == null) {
             dialog = new EventTransitionDialog(f, comp, est, ap);
@@ -91,7 +91,7 @@ public class EventTransitionDialog extends JDialog {
         JLabel commLab = new JLabel("state var. comment");
         int w = maxWidth(new JComponent[]{nameLab, assTo, opOn, actionLab, commLab});
 
-        stateVarsCB = new JComboBox(VGlobals.instance().getStateVarsCBModel());
+        stateVarsCB = new JComboBox<ViskitElement>(VGlobals.instance().getStateVarsCBModel());
         setMaxHeight(stateVarsCB);
         stateVarsCB.setBackground(Color.white);
         newSVButt = new JButton("new");
@@ -135,6 +135,7 @@ public class EventTransitionDialog extends JDialog {
         commentField.addCaretListener(lis);
         stateVarsCB.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox) e.getSource();
                 vStateVariable sv = (vStateVariable) cb.getSelectedItem();
@@ -147,13 +148,14 @@ public class EventTransitionDialog extends JDialog {
         });
         newSVButt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
                 if (nm != null) {
                     stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
                     for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
                         vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
-                        if (vsv.getName().indexOf(nm) != -1) {
+                        if (vsv.getName().contains(nm)) {
                             stateVarsCB.setSelectedIndex(i);
                             break;
                         }
@@ -183,7 +185,7 @@ public class EventTransitionDialog extends JDialog {
     }
 
     private int maxWidth(JComponent[] c) {
-        int tmpw = 0, maxw = 0;
+        int tmpw, maxw = 0;
         for (JComponent jc : c) {
             tmpw = jc.getPreferredSize().width;
             if (tmpw > maxw) {
@@ -216,7 +218,7 @@ public class EventTransitionDialog extends JDialog {
     // bugfix 1183
     private void fillWidgets() {
         String indexArg = "";
-        
+
         // Conceptually, should only be one indexing argument
         if (!argPanel.isEmpty()) {
             for (ViskitElement ia : argPanel.getData()) {
@@ -245,15 +247,15 @@ public class EventTransitionDialog extends JDialog {
                 commentField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());
             } else {
                 commentField.setText("");
-            }            
+            }
         } else {
             actionField.setText("");
-            arrayIndexField.setText(indexArg);            
+            arrayIndexField.setText(indexArg);
             stateVarsCB.setSelectedIndex(0);
             commentField.setText("");
             assTo.setSelected(true);
         }
-       
+
         // We have an indexing argument already set
         indexPanel.setVisible(((vStateVariable) stateVarsCB.getSelectedItem()).getType().indexOf('[') != -1);
         pack();
@@ -302,6 +304,7 @@ public class EventTransitionDialog extends JDialog {
     class cancelButtonListener implements ActionListener {
 
         // bugfix 1183
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             actionField.setText("");
@@ -312,6 +315,7 @@ public class EventTransitionDialog extends JDialog {
 
     class RadButtListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             modified = true;
             okButt.setEnabled(true);
@@ -335,6 +339,7 @@ public class EventTransitionDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 // check for array index
@@ -365,12 +370,14 @@ public class EventTransitionDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }
