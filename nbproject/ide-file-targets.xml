@@ -42,7 +42,7 @@
         </java>
     </target>
 
-     <!-- Can use this to debug manual Viskit XML -> Java translations -->
+    <!-- Can use this to debug manual Viskit XML -> Java translations -->
     <!-- EG translator is viskit.xsd.translator.SimkitXML2Java -->
     <!-- Assy translator is viskit.xsd.assembly.SimkitAssemblyXML2Java -->
     <target name="debug-selected-file-in-src">
@@ -54,12 +54,20 @@
             <classpath refid="runtime.classpath"/>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-
             <!-- Uncomment for translating and compiling EGs -->
             <arg value="${viskit.eg}"/>
             <!-- Uncomment for translating and compiling Assemblies -->
             <!--arg value="-f"/-->
             <!--arg value="${viskit.assy}"/-->
+        </java>
+    </target>
+
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
+    <target name="run-selected-file-in-test" depends="compile.test">
+        <fail unless="run.class">Must set property 'run.class'</fail>
+        <java classname="${run.class}" failonerror="true" fork="true">
+            <classpath refid="runtime.test.classpath"/>
         </java>
     </target>
 </project>

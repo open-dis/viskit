@@ -41,7 +41,7 @@ public class TestCodeFormat extends Thread {
         bufferIn = new ByteArrayInputStream(new byte[0]);
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
-        } catch ( javax.xml.bind.JAXBException jaxbe ) {
+        } catch ( JAXBException jaxbe ) {
             jaxbe.printStackTrace();
         }
     }
@@ -99,7 +99,7 @@ public class TestCodeFormat extends Thread {
             // formatting.
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(root,out);
-        } catch ( Exception e ) {
+        } catch ( JAXBException e ) {
             e.printStackTrace();
         }
 
