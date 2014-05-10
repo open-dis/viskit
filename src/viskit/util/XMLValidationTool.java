@@ -5,10 +5,10 @@
  *
  * Refenences:  Code borrowed from Elliotte Rusty Harold's IBM article at:
  *              http://www-128.ibm.com/developerworks/xml/library/x-javaxmlvalidapi.html,
- *              and from Olaf Meyer's posting on Google Groups - comp.text.xml 
+ *              and from Olaf Meyer's posting on Google Groups - comp.text.xml
  *              (ErrorPrinter).
  *
- * Assumptions: Connection to the internet now optional.  XML files will be 
+ * Assumptions: Connection to the internet now optional.  XML files will be
  *              resolved to the Schema in order to shorten internal parsing
  *              validation time.
  */
@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 import viskit.ViskitConfig;
 
 /**
- * Utility class to validate XML files against provided Schema and 
+ * Utility class to validate XML files against provided Schema and
  * report errors in &lt;(file: row, column): error&gt; format.
  * @version $Id: XMLValidationTool.java 1213 2008-02-12 03:21:15Z tnorbraten $
  * <p>
@@ -52,17 +52,17 @@ public class XMLValidationTool {
 
     public static final String ASSEMBLY_SCHEMA = "http://diana.nps.edu/Simkit/assembly.xsd";
     public static final String EVENT_GRAPH_SCHEMA = "http://diana.nps.edu/Simkit/simkit.xsd";
-    
+
     /** The locally resolved location for assembly.xsd */
-    public static final String LOCAL_ASSEMBLY_SCHEMA = 
+    public static final String LOCAL_ASSEMBLY_SCHEMA =
             System.getProperty("user.dir") + "/Schemas/assembly.xsd";
-    
+
     /** The locally resolved location for simkit.xsd */
-    public static final String LOCAL_EVENT_GRAPH_SCHEMA = 
+    public static final String LOCAL_EVENT_GRAPH_SCHEMA =
             System.getProperty("user.dir") + "/Schemas/simkit.xsd";
 
     static Logger log = LogUtils.getLogger(XMLValidationTool.class);
-    
+
     private FileWriter fWriter;
     private File xmlFile, schemaFile;
     private boolean valid = true;
@@ -76,7 +76,7 @@ public class XMLValidationTool {
         setXmlFile(xmlFile);
         setSchemaFile(schema);
 
-        /* Through trial and error, found how to set this property by 
+        /* Through trial and error, found how to set this property by
          * deciphering the JAXP debug readout using the -Djaxp.debug=1 JVM arg.
          * Reading the API for SchemaFactory.getInstance(String) helps too.
          */
@@ -87,7 +87,7 @@ public class XMLValidationTool {
     }
 
     /** Will report well-formedness and any validation errors encountered
-     * @return true if parsed XML file is well-formed XML 
+     * @return true if parsed XML file is well-formed XML
      */
     public boolean isValidXML() {
 
@@ -120,7 +120,7 @@ public class XMLValidationTool {
 
             // Prepare error errorsLog with current DTG
             File errorsLog = new File(ViskitConfig.VISKIT_HOME_DIR + "/validationErrors.log");
-            
+
             // New LogUtils.getLogger() each Viskit startup
             if (errorsLog.exists()) {errorsLog.delete();}
             fWriter = new FileWriter(errorsLog, true);
@@ -130,7 +130,7 @@ public class XMLValidationTool {
             fWriter.write("****************************\n\n");
 
             validator.validate(source);
-            
+
         } catch (SAXException ex) {
             log.fatal(source.getSystemId() + " is not well-formed XML");
             log.fatal(ex);
@@ -158,7 +158,7 @@ public class XMLValidationTool {
     public final void setXmlFile(File file) {
         xmlFile = file;
     }
-    
+
     public File getSchemaFile() {
         return schemaFile;
     }
@@ -167,7 +167,7 @@ public class XMLValidationTool {
         this.schemaFile = schema;
     }
 
-    /** Inner utility class to report errors in <(file: row, column): error> 
+    /** Inner utility class to report errors in <(file: row, column): error>
      * format and to resolve X3D scenes to a local DTD
      */
     class MyHandler implements ErrorHandler {
@@ -180,9 +180,10 @@ public class XMLValidationTool {
          * @param ex the particular SAXParseException used to form a message
          */
         private void setMessage(SAXParseException ex) {
-            msg = message.format(new Object[]{ex.getSystemId(), new Integer(ex.getLineNumber()),
-                new Integer(ex.getColumnNumber()), ex.getMessage()
-            });
+            msg = message.format(new Object[]{ex.getSystemId(),
+                ex.getLineNumber(),
+                ex.getColumnNumber(),
+                ex.getMessage()});
         }
 
         /** Needed to ensure that a batch of file errors get recorded
@@ -194,7 +195,7 @@ public class XMLValidationTool {
             } catch (IOException ex) {
                 log.fatal(ex);
             }
-            
+
             // if we got here, there is something wrong
             valid = false;
         }
@@ -208,7 +209,7 @@ public class XMLValidationTool {
 
         /** Recoverable errors such as violations of validity contraints are
          * reported here
-         * @param ex 
+         * @param ex
          */
         @Override
         public void error(SAXParseException ex) {
@@ -218,7 +219,7 @@ public class XMLValidationTool {
         }
 
         /**
-         * @param ex 
+         * @param ex
          * @throws SAXParseException on fatal errors */
         @Override
         public void fatalError(SAXParseException ex) throws SAXParseException {
@@ -228,5 +229,5 @@ public class XMLValidationTool {
             throw ex;
         }
     }
-    
+
 } // end class file XMLValidationTool.java
