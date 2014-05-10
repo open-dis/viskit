@@ -15,7 +15,6 @@
 package viskit.util;
 
 // Standard Library Imports
-import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +30,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+// Local imports
+import edu.nps.util.LogUtils;
 import viskit.ViskitConfig;
 
 /**
@@ -207,7 +209,7 @@ public class XMLValidationTool {
             log.warn(msg);
         }
 
-        /** Recoverable errors such as violations of validity contraints are
+        /** Recoverable errors such as violations of validity constraints are
          * reported here
          * @param ex
          */

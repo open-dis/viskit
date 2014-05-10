@@ -68,12 +68,13 @@ public class FileFilterEx extends javax.swing.filechooser.FileFilter {
         this._msg = msg;
         this._showDirs = showDirectories;
     }
-    
+
     /**
      * accept/refuse file
      * @param f a File
      * @return true/false
      */
+    @Override
     public boolean accept(java.io.File f) {
         if (f.isDirectory()) {
             return _showDirs;
@@ -85,11 +86,12 @@ public class FileFilterEx extends javax.swing.filechooser.FileFilter {
         }
         return false;
     }
-    
+
     /**
      * get description of file extension
      * @return String value
      */
+    @Override
     public String getDescription() {
         return _msg;
     }

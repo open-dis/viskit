@@ -26,31 +26,31 @@ public class XsltUtility {
      * @return the resulting transformed XML file
      */
     public static boolean runXslt(String inFile, String outFile, String xslFile) {
-        
+
         try {
             // Force Xalan for this TransformerFactory
             System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
-            
+
             // Look in the viskit.jar file for this XSLT
-            Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xslFile)));            
+            Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xslFile)));
             Transformer xFormer = template.newTransformer();
             Source source = new StreamSource(new FileInputStream(inFile));
             Result result = new StreamResult(new FileOutputStream(outFile));
             xFormer.transform(source, result);
         } catch (FileNotFoundException e) {
-            System.out.println("Unable to load file for XSL Transformation\n" +
+            System.err.println("Unable to load file for XSL Transformation\n" +
                     "   Input file : " + inFile + "\n" +
                     "   Output file: " + outFile + "\n" +
                     "   XSLT file  : " + xslFile);
             return false;
         } catch (TransformerConfigurationException e) {
-            System.out.println("Unable to configure transformer for XSL Transformation");
+            System.err.println("Unable to configure transformer for XSL Transformation");
             return false;
         } catch (TransformerException e) {
-            System.out.println("Exception during XSL Transformation");
+            System.err.println("Exception during XSL Transformation");
             return false;
-        } 
+        }
         return true;
     }
 

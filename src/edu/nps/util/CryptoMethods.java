@@ -136,7 +136,7 @@ public class CryptoMethods
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < bytes.length; i++) {
       byte b = bytes[i];
-      sb.append((int) (0x00FF & b));
+      sb.append(0x00FF & b);
       if (i + 1 < bytes.length) {
         sb.append("-");
       }

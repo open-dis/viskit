@@ -63,6 +63,7 @@ package edu.nps.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -84,7 +85,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
      *  Provide delegation constructor
      *
      * @param parent
-     * @param directoryRoot 
+     * @param directoryRoot
      */
     public SimpleDirectoryClassLoader(ClassLoader parent, File directoryRoot) {
         super(parent);
@@ -94,7 +95,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
     /**
      *  Same old ClassLoader constructor
      *
-     * @param directoryRoot 
+     * @param directoryRoot
      */
     public SimpleDirectoryClassLoader(File directoryRoot) {
         super();
@@ -114,14 +115,13 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
         try {
             fi = new FileInputStream("store\\MANIFEST.MF");    // unused and untested
             manifest = new Manifest(fi);
-        } catch (Exception e) {
+        } catch (IOException e) {
         // No manifest
         } finally {
             if (null != fi) {
                 try {
                     fi.close();
-                } catch (Exception e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }
@@ -136,7 +136,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
      */
     @Override
     protected Class findClass(String name) throws ClassNotFoundException {
-        FileInputStream fi = null;
+        InputStream fi = null;
 
         try {
             String path = name.replace('.', '/');
@@ -147,15 +147,14 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
             definePackage(name);
             return defineClass(name, classBytes, 0, classBytes.length);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             // We could not find the class, so indicate the problem with an exception
             throw new ClassNotFoundException(name);
         } finally {
             if (null != fi) {
                 try {
                     fi.close();
-                } catch (Exception e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }
@@ -189,7 +188,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
      *
      *  @param name the resource name
      *  @return Enumeration of one URL
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     protected Enumeration<URL> findResources(final String name) throws IOException {
@@ -201,10 +200,12 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
 
             URL resource = findResource(name);
 
+            @Override
             public boolean hasMoreElements() {
-                return (resource != null ? true : false);
+                return (resource != null);
             }
 
+            @Override
             public URL nextElement() {
                 if (!hasMoreElements()) {
                     throw new NoSuchElementException();
@@ -220,7 +221,7 @@ public class SimpleDirectoryClassLoader extends ClassLoader {
     /**
      *  Minimal package definition
      *
-     * @param className 
+     * @param className
      */
     private void definePackage(String className) {
         // Extract the package name from the class name,
