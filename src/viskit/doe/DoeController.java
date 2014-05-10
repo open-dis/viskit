@@ -239,7 +239,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             int n = dfm.paramTable.getModel().getRowCount();
 
             for (int r = 0; r < n; r++) {
-                if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL)).booleanValue()) {
+                if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
                     break check;
                 }
             }
@@ -300,7 +300,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     public File doTempFileMarshall() {
         DoeFileModel dfm = doeFrame.getModel();
         if (dfm != null) {
-            File fil = null;
+            File fil;
             try {
                 fil = dfm.marshallJaxb();
                 return fil;
@@ -315,13 +315,13 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     private JFileChooser initFileChooser() {
-        JFileChooser chooser = new JFileChooser(); 
+        JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         FileHandler.FileFilterEx[] filter = {new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
                 new FileHandler.FileFilterEx(".xml", "Assembly files (*.xml)", true)};
-        for (int i = 0; i < filter.length; i++) {
-            chooser.addChoosableFileFilter(filter[i]);
+        for (FileHandler.FileFilterEx filter1 : filter) {
+            chooser.addChoosableFileFilter(filter1);
         }
 
         return chooser;
@@ -344,10 +344,12 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         return this;
     }
 
+    @Override
     public String getHandle() {
         return "";
     }
 
+    @Override
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
@@ -381,6 +383,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     /* and here we hear about open event graphs */
     class EGListener implements DirectoryWatch.DirectoryChangeListener {
 
+        @Override
         public void fileChanged(File file, int action, DirectoryWatch source) {
             switch (action) {
                 case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:

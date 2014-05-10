@@ -35,6 +35,7 @@ package viskit.doe;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -43,6 +44,7 @@ import javax.xml.bind.Marshaller;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -70,8 +72,10 @@ public class FileHandler {
         try {
             builder = new SAXBuilder();
             doc = builder.build(f);
-        } catch (Exception e) {
-            builder = null;
+        } catch (IOException e) {
+            doc = null;
+            throw new Exception("Error parsing or finding file " + f.getAbsolutePath());
+        } catch (JDOMException e) {
             doc = null;
             throw new Exception("Error parsing or finding file " + f.getAbsolutePath());
         }
@@ -126,7 +130,7 @@ public class FileHandler {
         JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
         FileOutputStream fos = new FileOutputStream(of);
         Marshaller m = jaxbCtx.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 
         //fillRoot();
@@ -177,21 +181,22 @@ public class FileHandler {
             this._extensions = extensions;
             this._msg = msg;
             this._showDirs = showDirectories;
-
         }
 
+        @Override
         public boolean accept(java.io.File f) {
             if (f.isDirectory()) {
                 return _showDirs;
             }
-            for (int i = 0; i < _extensions.length; i++) {
-                if (f.getName().endsWith(_extensions[i])) {
+            for (String _extension : _extensions) {
+                if (f.getName().endsWith(_extension)) {
                     return true;
                 }
             }
             return false;
         }
 
+        @Override
         public String getDescription() {
             return _msg;
         }
