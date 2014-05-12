@@ -61,21 +61,21 @@
         </FactoryParameter>
         <Coordinate x="350" y="140"/>
     </SimEntity>
-    <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat">
-        <TerminalParameter value="queue" type="java.lang.String"/>
-        <Coordinate x="230" y="260"/>
+    <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="queue" type="java.lang.String"/>
+        <Coordinate x="560.0" y="60.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat">
-        <TerminalParameter value="numberAvailableServers" type="java.lang.String"/>
-        <Coordinate x="320" y="260"/>
+    <PropertyChangeListener name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
+        <Coordinate x="350.0" y="290.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
-        <TerminalParameter value="numberServed" type="java.lang.String"/>
-        <Coordinate x="410" y="260"/>
+    <PropertyChangeListener name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberServed" type="java.lang.String"/>
+        <Coordinate x="350.0" y="20.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
-        <TerminalParameter value="numberReneges" type="java.lang.String"/>
-        <Coordinate x="510" y="260"/>
+    <PropertyChangeListener name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberReneges" type="java.lang.String"/>
+        <Coordinate x="560.0" y="140.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
         <TerminalParameter value="numberArrivals" type="java.lang.String"/>
