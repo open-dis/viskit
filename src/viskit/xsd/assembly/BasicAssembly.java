@@ -100,7 +100,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private int verboseReplicationNumber;
 
     /**
-     * Default constructor sets paameters of BasicAssembly to their
+     * Default constructor sets parameters of BasicAssembly to their
      * default values.  These are:
      * <pre>
      * printReplicationReports = false
@@ -849,7 +849,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml");
         } catch (IOException e) {
             analystReportFile = null;
-            System.err.println("Error creating AnalystReport file: " + e.getMessage());
+            LOG.error(e);
         }
     }
 

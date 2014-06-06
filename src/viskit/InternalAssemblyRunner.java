@@ -54,7 +54,7 @@ import viskit.doe.LocalBootLoader;
 import viskit.xsd.assembly.BasicAssembly;
 
 /** Handles RunnerPanel2
- * 
+ *
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
@@ -78,7 +78,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     PipedOutputStream pos;
     PipedInputStream pis;
     BasicAssembly assembly;
-    
+
     /** external runner saves a file */
     private String analystReportTempFile = null;
     FileOutputStream fos;
@@ -97,7 +97,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         inRegressionMode = false;
 
         saver = new saveListener();
-                
+
         runPanel = new RunnerPanel2(null, true);
         doMenus();
         runPanel.vcrStop.addActionListener(new stopListener());
@@ -127,7 +127,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     }
 
     public JComponent getRunnerPanel() {return runPanel;}
-    
+
     public JMenuBar getMenus() {
         return myMenuBar;
     }
@@ -178,13 +178,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         targetClassName = params[AssemblyController.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
-        
+
         // TODO: should this be editable?
         runPanel.vcrSimTime.setText("0.0");
 
-        boolean defaultVerbose = Boolean.valueOf(params[AssemblyController.EXEC_VERBOSE_SWITCH]).booleanValue();
+        boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyController.EXEC_VERBOSE_SWITCH]);
         double defaultStopTime = Double.parseDouble(params[AssemblyController.EXEC_STOPTIME_SWITCH]);
-        
+
         try {
             fillRepWidgetsFromBasicAssemblyObject(targetClassName, defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
@@ -200,13 +200,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         // Assembly has been compiled by now
         lastLoaderNoReset = VGlobals.instance().getResetWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-        
+
         targetClass = Vstatics.classForName(clName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }
         targetObject = targetClass.newInstance();
-                
+
         /* in order to see BasicAssembly this thread has to have
          * the same loader as the one used since they don't
          * share the same simkit or viskit.
@@ -230,15 +230,15 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
         setStopTime.invoke(targetObject, stopTime);
         runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
-        
+
         Schedule.coldReset();
     }
-    
+
     File tmpFile;
     RandomAccessFile rTmpFile;
     boolean resetSeeds = false;
     JTextAreaOutputStream textAreaOutputStream;
-    
+
     protected void initRun() {
         mutex++;
         if (mutex > 1) {
@@ -246,15 +246,20 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
         Runnable assemblyRunnable;
 
-        try {          
+        try {
+
+            // TODO: Two interesting things here.  First, check if we really need
+            // to reset the Local Classloader here.  Second, why are we resetting
+            // the RNG seed?  Is it to ensure the same run of events if we
+            // invoke another Assembly run?
             loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
-            
+
             // Forcing the extra classpaths here bug fix 1237
-            loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());            
-            loader = loader.init(true);            
+            loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
+            loader = loader.init(true);
             Thread.currentThread().setContextClassLoader(loader);
-            
+
             // Test for Bug 1237
 //            for (String s : loader.getClassPath()) {
 //                log.info(s);
@@ -262,7 +267,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             lastLoaderWithReset = loader;
             targetClass = loader.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
-                        
+
             Method setOutputStream = targetClass.getMethod("setOutputStream", OutputStream.class);
             Method setNumberReplications = targetClass.getMethod("setNumberReplications", int.class);
             Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData", boolean.class);
@@ -271,17 +276,19 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports", boolean.class);
             Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
             Method setStopTime = targetClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);                
-            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);        
+            Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);
+            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);
             Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+
+            // Resetting the seed
             Class<?> RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
+
             Class<?> RNClass = loader.loadClass("simkit.random.RandomNumber");
             Method setSeed = RNClass.getMethod("setSeed", long.class);
-            
             setSeed.invoke(rn, seed);
-            
+
             textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA,16*1024);
 
             setOutputStream.invoke(assemblyObj, textAreaOutputStream);
@@ -289,18 +296,18 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyObj, runPanel.printRepReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyObj, runPanel.printSummReportsCB.isSelected());
-            
+
             /* DIFF between OA3302 branch and trunk */
             setEnableAnalystReports.invoke(assemblyObj, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
-            
+
             setStopTime.invoke(assemblyObj, getStopTime());
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
-            setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());                  
-            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());        
+            setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
+            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
             addPropertyChangeListener.invoke(assemblyObj, this);
-            assemblyRunnable = (Runnable) assemblyObj;              
-            
+            assemblyRunnable = (Runnable) assemblyObj;
+
             // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
             new SimThreadMonitor(simRunner).start();
@@ -392,7 +399,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 //                ex.printStackTrace();
             }
             mutex--;
-            
+
             twiddleButtons(InternalAssemblyRunner.STOP);
             textAreaOutputStream.kill();
         }
@@ -457,7 +464,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
                 log.error(ex);
 //                ex.printStackTrace();
             }
-                    
+
             twiddleButtons(InternalAssemblyRunner.STOP);
             textAreaOutputStream.kill();
             //runPanel.fileChaser.stop();
@@ -483,7 +490,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             assembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
         }
     }
-   
+
     private JFileChooser saveChooser;
 
     class saveListener implements ActionListener {
@@ -708,7 +715,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             }
         }
     }
-    
+
     private String namePrefix = "Viskit Assembly Runner";
     private String currentTitle = namePrefix;
 
@@ -729,13 +736,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         titlkey = key;
         doTitle(null);
     }
-                
+
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         log.debug(evt.getPropertyName());
-        
+
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue());
@@ -744,9 +751,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             npsString.append("</b>\n");
             npsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(npsString.toString());
-            
+
             // reset for the next replication output
             npsString.delete(beginLength, npsString.length());
         }
     }
-}
+
+}  // end class file InternalAssemblyRunner.java
