@@ -13,6 +13,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 import edu.nps.util.TempFileManager;
+import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
@@ -78,6 +79,7 @@ import viskit.VGlobals;
  */
 public class LocalBootLoader extends URLClassLoader {
 
+    private final static Logger LOG = Logger.getLogger(LocalBootLoader.class);
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
@@ -138,11 +140,17 @@ public class LocalBootLoader extends URLClassLoader {
                 tmp[tmp.length - 1] = ext.toURI().getPath();
                 classPath = tmp;
             } catch (URISyntaxException ex) {
-                ex.printStackTrace();
+                LOG.error(ex);
             }
         }
 
-        jar = buildCleanWorkJar();
+        // TODO: Clearly, adding build/classes to the classpath violates the
+        // dirty assembly in the classpath issue that we are attempting to
+        // mitigate with the buildCleanWorkJar call below, but something doesn't
+        // go quite right if we are building a project from scratch with where
+        // we have no build/classes compiled, and/or have no cached EGs in the
+        // viskitProject.xml.  So, leaving commeted out for now and will need
+        // to reopen this issue when we need strict design points for DOE.
 
         // Now add our project's working directory, i.e. build/classes
         try {
@@ -154,31 +162,33 @@ public class LocalBootLoader extends URLClassLoader {
                 tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
                 classPath = tmp;
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOG.error(ex);
             }
         } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+            LOG.error(ex);
         }
+
+//        jar = buildCleanWorkJar();
 
         // Now add our tmp jars containing compiled EGs and Assemblies
-        try {
-            if (jar != null)  {
-
-                // If this is the first time through, and no cached EGs, we are
-                // now adding our project's build/classes path here
-                stage1.addURL(jar.toURI().toURL());
-                String[] tmp = new String[getClassPath().length + 1];
-                System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
-                try {
-                    tmp[tmp.length - 1] = jar.getCanonicalPath();
-                    classPath = tmp;
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            if (jar != null)  {
+//
+//                // If this is the first time through, and no cached EGs, we are
+//                // now adding our project's build/classes path here
+//                stage1.addURL(jar.toURI().toURL());
+//                String[] tmp = new String[getClassPath().length + 1];
+//                System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+//                try {
+//                    tmp[tmp.length - 1] = jar.getCanonicalPath();
+//                    classPath = tmp;
+//                } catch (IOException ex) {
+//                    LOG.error(ex);
+//                }
+//            }
+//        } catch (MalformedURLException ex) {
+//            LOG.error(ex);
+//        }
 
         // Now normalize all the paths in the classpath variable[]
         String[] tempClasspath = new String[getClassPath().length];
@@ -232,7 +242,7 @@ public class LocalBootLoader extends URLClassLoader {
         return workDir;
     }
 
-    /** @return an indication for allowing an Assembly to be jared up */
+    /** @return an indication for allowing an Assembly to be jarred up */
     public boolean getAllowAssemby() {
         return allowAssembly;
     }
@@ -283,7 +293,7 @@ public class LocalBootLoader extends URLClassLoader {
                 stage1.addURL(new File(path).toURI().toURL());
             //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
-                ex.printStackTrace();
+                LOG.error(ex);
             }
             stage1.classPath = getClassPath();
         }
@@ -305,7 +315,7 @@ public class LocalBootLoader extends URLClassLoader {
             newJar = makeJarFileFromDir(getWorkDir());
 
         } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+            LOG.error(ex);
         }
 
         return newJar;
@@ -328,7 +338,7 @@ public class LocalBootLoader extends URLClassLoader {
             // could be first time through; caused by no entries in the jar
             return dir2jar;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOG.error(ex);
         } finally {
             try {
                 if (jos != null)
@@ -378,7 +388,7 @@ public class LocalBootLoader extends URLClassLoader {
                         }
                     } catch (ClassNotFoundException ex) {
                         System.err.println("Check viskit.jar has jaxb bindings, or: " + entryClass);
-                        ex.printStackTrace();
+                        LOG.error(ex);
                     }
 
                     if (isEventGraph | allowAssembly) {
@@ -393,7 +403,7 @@ public class LocalBootLoader extends URLClassLoader {
                             }
                             jos.closeEntry();
                         } catch (IOException ex) {
-                            ex.printStackTrace();
+                            LOG.error(ex);
                         } finally {
                             try {
                                 if (fis != null)

@@ -236,8 +236,7 @@ public class Vstatics {
     static Class<?> cForName(String s, ClassLoader clsLoader) {
         Class<?> c;
         try {
-            c = Class.forName(s, false, clsLoader); //true,clsLoader);
-            return c;
+            c = Class.forName(s, false, clsLoader);
         } catch (ClassNotFoundException e) {
             c = tryPrimsAndArrays(s, clsLoader);
             if (c == null) {
@@ -252,8 +251,8 @@ public class Vstatics {
                     }
                 }
             }
-            return c;
         }
+        return c;
     }
 
     static class retrnChar {

@@ -812,14 +812,6 @@
         </concat>
     </target>
 
-    <!--target name="delete.temps.cache" depends="init"-->
-        <!-- create the batch file to delete temp files -->
-        <!--echo file="deleteTempsCache.bat" append="false">@echo on
-@rem Built by ${ant.project.name} on ${TODAY} at ${TSTAMP} hrs
-${delete.temps.cache}</echo>
-        <exec executable="deleteTempsCache.bat" resolveexecutable="true"/>
-    </target-->
-
     <!-- add izpack installer task -->
     <import file="buildInstallers.xml"/>
 
