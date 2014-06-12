@@ -393,9 +393,7 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                LogUtils.getLogger(Vstatics.class).info("Not yet resolving type: " + type + ".  Likely, an " +
-                        "Assembly is opening in Viskit before a parse of the " +
-                        "EventGraph classpath");
+                LogUtils.getLogger(Vstatics.class).warn("Class file for: " + type + " was not found in the classpath");
                 return resolved;
             }
             if (debug) {
