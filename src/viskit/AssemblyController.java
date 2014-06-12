@@ -1153,6 +1153,9 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     private boolean checkSaveForSourceCompile() {
         ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
+
+        // Perhaps a cached file is no longer present in the path
+        if (vmod == null) {return false;}
         if (vmod.isDirty() || vmod.getLastFile() == null) {
             int ret = ((ViskitAssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
             if (ret != JOptionPane.YES_OPTION) {
