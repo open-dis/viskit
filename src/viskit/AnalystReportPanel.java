@@ -68,7 +68,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.apache.log4j.Logger;
-import viskit.xsd.assembly.XsltUtility;
+import viskit.util.XsltUtility;
 
 public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
 
