@@ -209,7 +209,7 @@ public class SimkitXML2Java {
         liParams = this.root.getParameter();
         superParams = resolveSuperParams(liParams);
 
-        // Logger instantiation
+        // Logger instantiation (for debugging only)
 //        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
@@ -377,7 +377,7 @@ public class SimkitXML2Java {
         if (isCloneable(s.getType())) {
             clStr = ".clone()";
 
-            if (!isArray(s.getType())) {
+            if (!isArray(s.getType()) || isGeneric(s.getType())) {
                 tyStr = lp + stripLength(s.getType()) + rp;
             }
 
@@ -387,19 +387,18 @@ public class SimkitXML2Java {
             }
         }
 
-        pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()));
-        pw.println(lp + rp + sp + ob);
-        pw.println(sp8 + "return" + sp + (tyStr + sp + s.getName() + clStr).trim() + sc);
-        pw.println(sp4 + cb);
-        pw.println();
-
-        // Prevent creating accessor for generic containers of array types
         if (isArray(s.getType()) && !isGeneric(s.getType())) {
             int d = dims(s.getType());
             pw.print(sp4 + "public" + sp + baseOf(s.getType()) + sp + "get");
             pw.print(capitalize(s.getName()) + lp + indxncm(d));
             pw.println(rp + sp + ob);
             pw.println(sp8 + "return" + sp + s.getName() + indxbr(d) + sc);
+            pw.println(sp4 + cb);
+            pw.println();
+        } else {
+            pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()));
+            pw.println(lp + rp + sp + ob);
+            pw.println(sp8 + "return" + sp + (tyStr + sp + s.getName() + clStr).trim() + sc);
             pw.println(sp4 + cb);
             pw.println();
         }
@@ -836,7 +835,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isGeneric(String type) {
-        return (type.contains("<") && type.contains(">"));
+        return type.contains("<") && type.contains(">");
     }
 
     public File getEventGraphFile() {return eventGraphFile;}
