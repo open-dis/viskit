@@ -6,19 +6,26 @@
  */
 package viskit.xsd.assembly;
 
-import edu.nps.util.LogUtils;
-import edu.nps.util.TempFileManager;
+import static edu.nps.util.LogUtils.getLogger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import static java.io.File.createTempFile;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.System.gc;
+import static java.lang.System.getProperty;
+import static java.lang.System.runFinalization;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
+import static java.util.Collections.synchronizedList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -27,6 +34,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
+import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -73,7 +81,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
     Integer jobID;
     int port;
-    static Logger log = LogUtils.getLogger(GridRunner.class);
+    static Logger log = getLogger(GridRunner.class);
     Vector<String> eventGraphs;
     Hashtable<String, Object> thirdPartyJars;
     File experimentFile;
@@ -164,7 +172,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
-            JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader() );
+            JAXBContext jaxbCtx = newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader() );
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
@@ -175,16 +183,16 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // clear results count
         this.tasksCompleted = 0;
         // set number replications per DesignPoint
-        this.replicationsPerDesignPoint = Integer.parseInt(root.getExperiment().getReplicationsPerDesignPoint());
+        this.replicationsPerDesignPoint = parseInt(root.getExperiment().getReplicationsPerDesignPoint());
         // set totalSamples
-        this.totalSamples = Integer.parseInt(root.getExperiment().getTotalSamples());
+        this.totalSamples = parseInt(root.getExperiment().getTotalSamples());
         // totalSample * designPointCount = queue size
         // also handy, sampleIndex = taskID / designPointCount;
         // and         designPtIndex = taskID % designPointCount;
         this.designPointCount = root.getDesignParameters().size();
         // timeout for synchronized calls as set by Experiment tag, or not means indefinite wait
         String to = root.getExperiment().getTimeout();
-        this.timeout = Long.parseLong(to==null?"0":to);
+        this.timeout = parseLong(to==null?"0":to);
         this.queue = new ArrayList<Object>();
         this.designPointStatsNotifiers = new ArrayList<Boolean>();
         this.replicationStatsNotifiers = new ArrayList<Boolean>();
@@ -234,7 +242,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     if(filename.endsWith(".jar")) {
                         filename = filename.substring(0,filename.length()-4);
                     }
-                    File jarFile = TempFileManager.createTempFile(filename,".jar");
+                    File jarFile = createTempFile(filename,".jar");
                     FileOutputStream fos = new FileOutputStream(jarFile);
                     fos.write(jarData.toByteArray());
                     fos.flush();
@@ -249,13 +257,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     log.debug("Cached jar " + u);
                 }
             }
-            return Integer.valueOf(""+data.length);
+            return valueOf(""+data.length);
         } catch (IOException e) {
             log.error(e);
-            return Integer.valueOf("-1");
+            return valueOf("-1");
         } catch (NumberFormatException e) {
             log.error(e);
-            return Integer.valueOf("-1");
+            return valueOf("-1");
         }
     }
 
@@ -284,11 +292,11 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         try {
 
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly" , root.getClass().getClassLoader());
+            JAXBContext jc = newInstance( "viskit.xsd.bindings.assembly" , root.getClass().getClassLoader());
             Unmarshaller u = jc.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
-            int sample = Integer.parseInt(r.getSample());
-            int designPt = Integer.parseInt(r.getDesignPoint());
+            int sample = parseInt(r.getSample());
+            int designPt = parseInt(r.getDesignPoint());
             // note replication is not indexed, yet.
             // after sim has finished run(), then is queried
             // directly for replicationStats and designPointStats
@@ -467,7 +475,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
             this.numberOfStats = numberOfStats; // this really only needs to be set the first time
-            JAXBContext jc = JAXBContext.newInstance("viskit.xsd.bindings.assembly", root.getClass().getClassLoader());
+            JAXBContext jc = newInstance("viskit.xsd.bindings.assembly", root.getClass().getClassLoader());
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
@@ -493,7 +501,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
         try {
-            JAXBContext jc = JAXBContext.newInstance( "viskit.xsd.bindings.assembly", this.getClass().getClassLoader()  );
+            JAXBContext jc = newInstance( "viskit.xsd.bindings.assembly", this.getClass().getClassLoader()  );
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
@@ -528,7 +536,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         taskID += designPtIndex;
         taskID += 1;
 
-        removeTask(jobID.intValue(),taskID);
+        removeTask(jobID,taskID);
 
         // TBD check if result first then make an empty result if needed
         try {
@@ -541,7 +549,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (Exception e) {
             log.error(e);
         }
-        return new Integer(taskID);
+        return taskID;
     }
 
     // called by Gridlet to remove itself after
@@ -551,12 +559,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         try {
             log.debug("qdel: " + jobID + "." + taskID);
             if (!usid.equals("LOCAL-RUN")) {
-                Runtime.getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
+                getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
             } else {
                 status.set(taskID-1,"Complete");
             }
 
-            List<Object> sQueue = Collections.synchronizedList(queue);
+            List<Object> sQueue = synchronizedList(queue);
 
             synchronized(sQueue) {
                 ListIterator<Object> li = sQueue.listIterator(taskID-1);
@@ -619,7 +627,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             // a good place to also store this "core dump" filename for the
             // session.
             if ( tasksCompleted == designPointCount * totalSamples) {
-                File dump = File.createTempFile(root.getName(),"Results.xml",experimentFile.getParentFile());
+                File dump = createTempFile(root.getName(),"Results.xml",experimentFile.getParentFile());
 
                 new SimkitAssemblyXML2Java().marshal(root, new FileOutputStream(dump));
 
@@ -627,9 +635,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (IOException e) {
             log.error(e);
         }
-        System.runFinalization();
-        System.gc();
-        return new Integer(taskID);
+        runFinalization();
+        gc();
+        return taskID;
     }
 
     /**
@@ -639,9 +647,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      */
 
     public Integer flushQueue() {
-        Integer remainingTasks = new Integer(( designPointCount * totalSamples ) - tasksCompleted );
+        Integer remainingTasks = ( designPointCount * totalSamples ) - tasksCompleted;
         try {
-            Runtime.getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
+            getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (IOException e) {
             log.debug(e);
         }
@@ -663,7 +671,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      */
 
     public Integer getRemainingTasks() {
-        return new Integer(( designPointCount * totalSamples ) - tasksCompleted );
+        return ( designPointCount * totalSamples ) - tasksCompleted;
     }
 
     // idea is to reduce waiting threads to avoid hitting the xml-rpc
@@ -704,7 +712,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public Boolean clear() {
         flushQueue();
         this.root = null;
-        System.gc();
+        gc();
         return true;
     }
 
@@ -726,7 +734,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
         } else {
             try {
-                Runtime r = Runtime.getRuntime();
+                Runtime r = getRuntime();
                 Process p = r.exec(new String[]{"qstat","-f"});
                 java.io.InputStream i = p.getInputStream();
                 java.io.StringWriter sw = new java.io.StringWriter();
@@ -743,12 +751,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
 
     public Integer getDesignPointCount() {
-        return new Integer(designPointCount);
+        return designPointCount;
     }
 
     public String qstatXML() {
         try {
-            Runtime r = Runtime.getRuntime();
+            Runtime r = getRuntime();
             Process p = r.exec(new String[]{"qstat","-xml"});
             java.io.InputStream i = p.getInputStream();
             java.io.StringWriter sw = new java.io.StringWriter();
@@ -780,12 +788,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
             if (!usid.equals("LOCAL-RUN")) {
                 // Grid runs put these in the gridkit daemon's user dir
-                userDir = new File(System.getProperty("user.dir"));
+                userDir = new File(getProperty("user.dir"));
                 // create experimentFile, an assembly tree with decorations
                 // give it unique name
-                experimentFile = File.createTempFile(root.getName()+"Exp",".xml",userDir);
+                experimentFile = createTempFile(root.getName()+"Exp",".xml",userDir);
             } else {
-                experimentFile = TempFileManager.createTempFile(root.getName()+"Exp",".xml");
+                experimentFile = createTempFile(root.getName()+"Exp",".xml");
             }
         } catch (IOException e) {
             log.error(e);
@@ -794,7 +802,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         // calculate DesignPoints
 
-        if ( calculateDesignPoints() == Boolean.FALSE ) {
+        if (!calculateDesignPoints()) {
             return Boolean.FALSE;
         }
 
@@ -812,7 +820,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         log.info("usid is: " + usid);
         try {
             if (!usid.equals("LOCAL-RUN")) {
-                Runtime.getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
+                getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
             } else {
                 localRun(experimentFile,totalTasks);
             }
@@ -901,10 +909,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     private synchronized ArrayList<Object> cloneFromLocalTaskQueue(LocalTaskQueue localQ) {
         ArrayList<Object> q = new ArrayList<Object>();
-        //synchronized (localQ) {
-            for ( int i = 0; i < localQ.size(); i++ ) {
-                q.add((Boolean) localQ.get(i));
-            }
+        for (Object localQ1 : localQ) {
+            q.add((Boolean) localQ1);
+        }
         //}
         return q;
     }
@@ -923,7 +930,6 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 Sample s = assemblyFactory.createSample();
                 s.setIndex("" + 0);
 
-                // TODO: fix generics
                 e.getSample().add(s);
                 e.setType("full-factorial");
                 root.setExperiment(e);
@@ -1120,8 +1126,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     // while maintaining proximity to the same hypersurface anchor points
                     boolean enableJitter = true; // make a property of Experiment type tbd
                     if (range[0] instanceof Double) { // right now accept Double[2], spline TBD
-                        double h = ((Double) (range[0])).doubleValue();
-                        double l = ((Double) (range[1])).doubleValue();
+                        double h = ((Double) (range[0]));
+                        double l = ((Double) (range[1]));
                         if (h < l) {
                             double tmp = l;
                             l = h;
