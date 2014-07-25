@@ -772,9 +772,10 @@
             <include name="*.jar"/>
         </delete>
     </target>
-    
+
     <target name="nuke.dot.viskit" description="Abolish an out of synch viskit metadata directory">
         <delete includeemptydirs="yes" dir="${user.home}/.viskit"/>
+        <delete file="${user.home}/.viskit_history.xml"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
