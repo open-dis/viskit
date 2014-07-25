@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
+import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBException;
 import org.apache.xmlrpc.XmlRpcHandler;
 
@@ -54,7 +55,7 @@ public class AssemblyHandler implements XmlRpcHandler {
         this.sessionManager = sessionManager;
         gridRuns = new Hashtable<String, GridRunner>();
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            jaxbCtx = newInstance("viskit.xsd.bindings.assembly");
         } catch (JAXBException e) {
             sessionManager.LOG.error("Classpath error loading jaxb bindings?", e);
         }
@@ -63,6 +64,10 @@ public class AssemblyHandler implements XmlRpcHandler {
     /**
      * Implement the XmlRpcHandler interface directly to manually specify available
      * methods. Realize that many users will be calling this all at once, globals strong-bad.
+     * @param methodName
+     * @param arguments
+     * @return
+     * @throws java.lang.Exception
      */
     @Override
     public Object execute(String methodName, Vector arguments) throws java.lang.Exception {
@@ -112,8 +117,7 @@ public class AssemblyHandler implements XmlRpcHandler {
                 // used by DOE to send a chunk of a jar
                 // jarTransfer(filename,byte[]).
                 ret = gridRunner.transferJar((String)arguments.elementAt(1),
-                        (byte[])arguments.elementAt(2),
-                        ((Integer)arguments.elementAt(3)).intValue());
+                        (byte[])arguments.elementAt(2), ((Integer)arguments.elementAt(3)));
 
             } else if (call.equals("gridkit.getJars")) {
                 // used Gridlet to update its own Boot class loader
@@ -133,25 +137,25 @@ public class AssemblyHandler implements XmlRpcHandler {
 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
-                ret = gridRunner.getResult(sample.intValue(), designPt.intValue());
+                ret = gridRunner.getResult(sample, designPt);
 
             } else if (call.equals("gridkit.getResultByTaskID")) {
 
                 Integer taskID = (Integer) arguments.elementAt(1);
-                ret = gridRunner.getResultByTaskID(taskID.intValue());
+                ret = gridRunner.getResultByTaskID(taskID);
 
             } else if (call.equals("gridkit.getDesignPointStats")) {
 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
-                ret = gridRunner.getDesignPointStats(sample.intValue(), designPt.intValue());
+                ret = gridRunner.getDesignPointStats(sample, designPt);
 
             } else if (call.equals("gridkit.getReplicationStats")) {
 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
                 Integer replication = (Integer) arguments.elementAt(3);
-                ret = gridRunner.getReplicationStats(sample.intValue(), designPt.intValue(), replication.intValue());
+                ret = gridRunner.getReplicationStats(sample, designPt, replication);
 
             } else if (call.equals("gridkit.addDesignPointStat")) {
 
@@ -159,7 +163,7 @@ public class AssemblyHandler implements XmlRpcHandler {
                 Integer designPt = (Integer) arguments.elementAt(2);
                 Integer numberOfStats = (Integer) arguments.elementAt(3);
                 String stat = (String) arguments.elementAt(4);
-                ret = gridRunner.addDesignPointStat(sample.intValue(), designPt.intValue(), numberOfStats.intValue(), stat);
+                ret = gridRunner.addDesignPointStat(sample, designPt, numberOfStats, stat);
 
             } else if (call.equals("gridkit.addReplicationStat")) {
 
@@ -167,7 +171,7 @@ public class AssemblyHandler implements XmlRpcHandler {
                 Integer designPt = (Integer) arguments.elementAt(2);
                 Integer replication = (Integer) arguments.elementAt(3);
                 String stat = (String) arguments.elementAt(4);
-                ret = gridRunner.addReplicationStat(sample.intValue(), designPt.intValue(), replication.intValue(), stat);
+                ret = gridRunner.addReplicationStat(sample, designPt, replication, stat);
 
             } else if (call.equals("gridkit.flushQueue")) {
 
@@ -189,13 +193,13 @@ public class AssemblyHandler implements XmlRpcHandler {
 
                 Integer sample = (Integer) arguments.elementAt(1);
                 Integer designPt = (Integer) arguments.elementAt(2);
-                ret = gridRunner.removeTask(sample.intValue(),designPt.intValue());
+                ret = gridRunner.removeTask(sample, designPt);
 
             } else if (call.equals("gridkit.removeTask")) {
 
                 Integer jobID = (Integer) arguments.elementAt(1);
                 Integer taskID = (Integer) arguments.elementAt(2);
-                ret = gridRunner.removeTask(jobID.intValue(),taskID.intValue());
+                ret = gridRunner.removeTask(jobID, taskID);
 
             } else if (call.equals("gridkit.setJobID")) {
                 // SGE jobID's are only known to the Gridlets
