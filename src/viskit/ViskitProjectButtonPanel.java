@@ -189,7 +189,10 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
     setupViskitProject(projF);
-    VGlobals.instance().createWorkDirectory();
+
+    // The work directory will have already been created by default as VGlobals.init
+    // was already called by the ${user.home}/.viskit which creates the directory
+    // during constructor init
 }//GEN-LAST:event_createButtActionPerformed
 
 private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
