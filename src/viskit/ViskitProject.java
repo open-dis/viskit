@@ -130,8 +130,9 @@ public class ViskitProject {
 
         setAnalystReportsDir(new File(projectRoot, ANALYST_REPORTS_DIRECTORY_NAME));
         if (!analystReportsDir.exists()) {
-            getAnalystReportsDir().mkdir();
-            try {FileIO.copyFile(new File(VISKIT_ICON_SOURCE), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME), true);
+            getAnalystReportsDir().mkdirs();
+            try {
+                FileIO.copyFile(new File(VISKIT_ICON_SOURCE), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME), true);
             } catch (IOException ex) {
                 log.error(ex);
             }
