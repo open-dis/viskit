@@ -7,21 +7,7 @@
         <fail unless="files">Must set property 'files'</fail>
         <javac debug="true" destdir="${dir.build.classes}" includeantruntime="false" includes="${files}" source="${javac.source}" srcdir="src">
             <compilerarg line="${javac.compile.args}"/>
-            <classpath>
-                <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
-                <pathelement location="${dir.lib}/jdom.jar"/>
-                <pathelement location="${dir.lib}/jgraph.jar"/>
-                <pathelement location="${dir.lib}/actions.jar"/>
-                <pathelement location="${dir.lib}/simkit.jar"/>
-                <pathelement location="${dir.lib}/jhall.jar"/>
-                <pathelement location="${jfreechart.jar}"/>
-                <pathelement location="${dir.lib}/commons-configuration-1.7.jar"/>
-                <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-                <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
-                <pathelement location="${log4j.jar}"/>
-                <pathelement location="${dir.lib}/looks-1.3.1.jar"/>
-                <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
-            </classpath>
+            <classpath refid="compile.classpath"/>
         </javac>
     </target>
 
