@@ -45,5 +45,5 @@ package viskit;
 
 public interface TitleListener
 {
-  public void setTitle(String title, int key);
+  void setTitle(String title, int key);
 }

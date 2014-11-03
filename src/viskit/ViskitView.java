@@ -38,12 +38,15 @@ public interface ViskitView
   File    openRecentFilesAsk(Collection<String> lis);
   File    saveFileAsk(String suggName,boolean showUniqueName);
 
+  /** Show the project name in the main frame title bar */
+  void showProjectName();
+
   /** Update the name of the EventGraph in the component title bar
    * @param name the name of the EventGraph
    */
   void    setSelectedEventGraphName(String name);
-  
-  /** @param description the description to set for the EventGraph */    
+
+  /** @param description the description to set for the EventGraph */
   void    setSelectedEventGraphDescription(String description);
 
   void    addTab(ViskitModel mod); // When a tab is added

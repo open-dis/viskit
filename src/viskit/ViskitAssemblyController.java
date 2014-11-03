@@ -19,10 +19,10 @@ import viskit.model.*;
  * @version $Id$
  */
 public interface ViskitAssemblyController {
-    
+
     /* start app */
     void begin();
-    
+
     // user has clicked a menu item
     void newEventGraphNode();
     void newPropChangeListenerNode();
@@ -78,12 +78,12 @@ public interface ViskitAssemblyController {
     /** menu selections */
     void copy();
 
-    /** Ultimately performs a delete fuction for selected edges and nodes */
+    /** Ultimately performs a delete function for selected edges and nodes */
     void cut();        // to remove nodes and edges
-    
-    /** Performs a delete fuction for selected edges and nodes */
+
+    /** Performs a delete function for selected edges and nodes */
     void delete();
-  
+
     /** Opens a Viskit Project Assembly File */
     void open();
 
@@ -96,7 +96,7 @@ public interface ViskitAssemblyController {
     void openProject(File file);
 
     void openRecent(String fullPath);
-    
+
     void paste();
 
     /** Perform shutdown operations */
@@ -111,7 +111,7 @@ public interface ViskitAssemblyController {
     // Bug fix: 1195
     /** Calls both pre and post closing actions */
     void close();
-    
+
     void closeAll();
 
     /** @return indication of completion */
@@ -150,7 +150,7 @@ public interface ViskitAssemblyController {
     void export2grid();
 
     void captureWindow();
-    
+
     void addRecentAssyFileSetListener(RecentAssyFileListener lis);
 
     void removeRecentAssyFileSetListener(RecentAssyFileListener lis);

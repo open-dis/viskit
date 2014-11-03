@@ -66,9 +66,9 @@ public interface ViskitAssemblyView {
     void genericErrorReport(String title, String message);
 
     String promptForStringOrCancel(String title, String message, String initval);
- 
+
     /** Allow opening of one, or more Assembly files
-     * 
+     *
      * @return one or more chosen Assembly files
      */
     File[] openFilesAsk();
@@ -81,7 +81,7 @@ public interface ViskitAssemblyView {
     /** Saves the current Assembly "as" desired by the user
      *
      * @param suggName the package and file name of the Assembly
-     * @param showUniqueName show Assembly name only
+     * @param suggUniqueName show Assembly name only
      * @return a File object of the saved Assembly
      */
     File saveFileAsk(String suggName, boolean suggUniqueName);
@@ -89,11 +89,14 @@ public interface ViskitAssemblyView {
     /** Open an already existing Viskit Project */
     void openProject();
 
+    /** Show the project name in the main frame title bar */
+    void showProjectName();
+
     /** Update the name of the Assembly in the component title bar
      * @param s the name of the Assembly
      */
     void setSelectedAssemblyName(String s);
-    
+
     /**
      * Called by the controller after source has been generated.  Show to the
      * user and provide the option to save.
@@ -104,22 +107,22 @@ public interface ViskitAssemblyView {
     void showAndSaveSource(String className, String s);
 
     void displayXML(File f);
-    
+
     /** Add an Assembly tab to the Assembly View Editor
-     * 
+     *
      * @param mod the Assembly model to display graphically
      */
     void addTab(ViskitAssemblyModel mod);
-    
+
     /** Remove an Assembly tab from the Assembly View Editor
-     * 
+     *
      * @param mod the Assembly model to remove from view
      */
     void delTab(ViskitAssemblyModel mod);
-    
+
     /** @return an array of open ViskitAssemblyModels */
     ViskitAssemblyModel[] getOpenModels();
-    
+
     /** Capture Assembly Editor user set Frame bounds */
     void prepareToQuit();
 }

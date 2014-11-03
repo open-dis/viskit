@@ -2,7 +2,7 @@ package viskit;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.EventGraphFileFilter;
+import viskit.util.EventGraphFileFilter;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
@@ -1043,6 +1043,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     /** Open an already existing Viskit Project */
     public void openProject() {
         ((AssemblyViewFrame) VGlobals.instance().getAssemblyController().getView()).openProject();
+
+        showProjectName();
+    }
+
+    @Override
+    public void showProjectName() {
+
+        // Set project title in Frame title bar
+        String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
+        setTitle(ttl);
+        if (this.titlList != null) {
+            titlList.setTitle(ttl, titlKey);
+        }
     }
 
     private File getUniqueName(String suggName) {
@@ -1116,15 +1129,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     @Override
     public void setSelectedEventGraphName(String s) {
         boolean nullString = !(s != null && s.length() > 0);
-        String ttl =
-                nullString ? FRAME_DEFAULT_TITLE :
-                    " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
-        setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
-        }
-        if (this.titlList != null) {
-            titlList.setTitle(ttl, titlKey);
         }
     }
 
@@ -1279,9 +1285,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         titlList = lis;
         titlKey = key;
 
-        // default
-        if (titlList != null) {
-            titlList.setTitle(FRAME_DEFAULT_TITLE, titlKey);
-        }
+        showProjectName();
     }
 }

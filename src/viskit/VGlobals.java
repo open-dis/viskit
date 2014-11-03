@@ -791,10 +791,6 @@ public class VGlobals {
         return currentViskitProject;
     }
 
-    public void setCurrentViskitProject(ViskitProject currentViskitProject) {
-        this.currentViskitProject = currentViskitProject;
-    }
-
     /**
      * @return a working directory which is now non null and exists in the
      * filesystem

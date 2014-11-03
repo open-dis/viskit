@@ -2,7 +2,7 @@ package viskit;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.AssemblyFileFilter;
+import viskit.util.AssemblyFileFilter;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -203,7 +203,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
             } else if (viskit.Vstatics.debug) {
-                System.out.println("error: AssemblyViewFrame gmd null..");
+                System.err.println("error: AssemblyViewFrame gmd null..");
             }
         }
     }
@@ -717,7 +717,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                     // ${file} may be an empty directory
                     } else if (file.isDirectory() && file.listFiles().length == 0) {
-                        
+
 
                     // Recurse a directory and locate appropriate SimEntity class files
                     } else {
@@ -1007,15 +1007,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     @Override
     public void setSelectedAssemblyName(String s) {
         boolean nullString = !(s != null && !s.isEmpty());
-        String ttl =
-                nullString ? FRAME_DEFAULT_TITLE :
-                    " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
-        setTitle(ttl);
         if (!nullString) {
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
-        }
-        if (this.titlList != null) {
-            titlList.setTitle(ttl, titlkey);
         }
     }
 
@@ -1038,6 +1031,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
             aController.openProject(file);
+        }
+
+        showProjectName();
+    }
+
+    @Override
+    public void showProjectName() {
+
+        // Set project title in Frame title bar
+        String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
+        setTitle(ttl);
+        if (this.titlList != null) {
+            titlList.setTitle(ttl, titlKey);
         }
     }
 
@@ -1152,16 +1158,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         comp.setMinimumSize(d);
     }
     private TitleListener titlList;
-    private int titlkey;
+    private int titlKey;
 
     public void setTitleListener(TitleListener lis, int key) {
         titlList = lis;
-        titlkey = key;
+        titlKey = key;
 
-        // default
-        if (titlList != null) {
-            titlList.setTitle(FRAME_DEFAULT_TITLE, titlkey);
-        }
+        showProjectName();
     }
 }
 
