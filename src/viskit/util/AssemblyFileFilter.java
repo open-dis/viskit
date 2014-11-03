@@ -3,10 +3,10 @@
  *
  * Created on:  August 17, 2007, 1852Z
  *
- * Refenences:  This code adapted from Roedy Green's FileFilter suite at: 
+ * Refenences:  This code adapted from Roedy Green's FileFilter suite at:
  *              <a href="http://mindprod.com/products1.html#FILTER">http://mindprod.com/products1.html#FILTER</a>
  *
- * Assumptions: Just give it the String to parse and it should filter based on 
+ * Assumptions: Just give it the String to parse and it should filter based on
  *              that String
  */
 
@@ -43,7 +43,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-package edu.nps.util;
+package viskit.util;
 
 // Standard library imports
 import java.io.File;
@@ -65,12 +65,12 @@ import javax.swing.filechooser.FileFilter;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten</a>
  */
 public final class AssemblyFileFilter extends FileFilter {
-        
+
     /** we filter to accept only files starting with this string */
     private final String contains;
-    
+
     /* CONSTRUCTOR(s) */
-    
+
     /**
      * Creates an instance of AssemblyFileFilter
      *
@@ -79,22 +79,24 @@ public final class AssemblyFileFilter extends FileFilter {
     public AssemblyFileFilter(String contains) {this.contains = contains.toLowerCase();}
 
     /**
-     * Select only files containing our String.  Does expose directories 
+     * Select only files containing our String.  Does expose directories
      * for ease of navigation
      *
-     * @param f the file for naming determination 
+     * @param f the file for naming determination
      *
      * @return true if and only if the name should be included in the file list;
      *         false otherwise.
      */
+    @Override
     public boolean accept(File f) {
         if (f.isDirectory()) {
             return !f.getName().contains("svn");
         }
-        return f.getName().toLowerCase().contains(contains);        
+        return f.getName().toLowerCase().contains(contains);
     }
-    
+
     /** @return a fileview description of the filter */
+    @Override
     public String getDescription() {return "Viskit Assembly XML Files Only";}
-   
+
 } // end class file AssemblyFileFilter.java
