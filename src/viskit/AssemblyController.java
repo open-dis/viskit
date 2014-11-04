@@ -602,7 +602,11 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         ViskitAssemblyModel[] modAr = ((ViskitAssemblyView) getView()).getOpenModels();
         for (ViskitAssemblyModel vmod : modAr) {
             setModel((mvcModel) vmod);
-            preClose();
+
+            // Check for a canceled exit
+            if (!preClose()) {
+                return false;
+            }
         }
         return true;
     }
@@ -747,10 +751,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /**
      *
-     * @return true = continue, false = don't (i.e., we cancelled)
+     * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((ViskitAssemblyView) getView()).genericAskYN("Question", "Save modified assembly?"));
+        int yn = (((ViskitAssemblyView) getView()).genericAsk("Question", "Save modified assembly?"));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -761,6 +765,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 return true;
             case JOptionPane.NO_OPTION:
                 return true;
+            case JOptionPane.CANCEL_OPTION:
+                return false;
 
             // Something funny if we're here
             default:

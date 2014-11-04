@@ -139,10 +139,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     /**
      *
-     * @return true = continue, false = don't (i.e., we cancelled)
+     * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((ViskitView) getView()).genericAskYN("Question", "Save modified graph?"));
+        int yn = (((ViskitView) getView()).genericAsk("Question", "Save modified graph?"));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -151,9 +151,10 @@ public class EventGraphController extends mvcAbstractController implements Viski
                     return false;
                 } // we cancelled
                 return true;
-            //break;
             case JOptionPane.NO_OPTION:
                 return true;
+            case JOptionPane.CANCEL_OPTION:
+                return false;
 
             // Something funny if we're here
             default:
@@ -174,7 +175,6 @@ public class EventGraphController extends mvcAbstractController implements Viski
             }
         }
     }
-
 
     @Override
     public void openRecentEventGraph(String path) {
@@ -419,7 +419,11 @@ public class EventGraphController extends mvcAbstractController implements Viski
         ViskitModel[] mods = ((ViskitView) getView()).getOpenModels();
         for (ViskitModel mod : mods) {
             setModel((mvcModel) mod);
-            preClose();
+
+            // Check for a canceled exit
+            if (!preClose()) {
+                return false;
+            }
         }
         return true;
     }

@@ -90,6 +90,9 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         this.setLocation((d.width - 800) / 2, (d.height - 600) / 2);
         //this.setSize(800, 600);
         this.setSize(930, 680);
+
+        // Let the quit handler take care of an exit initiation
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -195,7 +198,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         } else {
             tabIndices[TAB0_ANAL_REPORT_IDX] = -1;
         }
-        
+
         // Assembly runner
         asyRunComponent = new InternalAssemblyRunner();
         runTabbedPane.add(asyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
