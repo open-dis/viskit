@@ -36,6 +36,7 @@ package viskit;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.jdom.Document;
 import viskit.xsd.bindings.assembly.ObjectFactory;
@@ -68,7 +69,7 @@ public class OpenAssembly {
             return instance;
         }
     }
-    
+
     public File file;
     public Document jdomDoc;
     public SimkitAssembly jaxbRoot;
@@ -90,7 +91,7 @@ public class OpenAssembly {
             doSendNewAssy(file);
         }
     }
-    private HashSet<AssyChangeListener> listeners = new HashSet<AssyChangeListener>();
+    private Set<AssyChangeListener> listeners = new HashSet<>();
 
     /**
      * @param lis
@@ -111,7 +112,7 @@ public class OpenAssembly {
     public void doParamLocallyEditted(AssyChangeListener source) {
         fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
     }
-   
+
     public void doSendAssyJaxbChanged(AssyChangeListener source) {
         fireAction(AssyChangeListener.JAXB_CHANGED, source, null);
     }
@@ -134,10 +135,10 @@ public class OpenAssembly {
 
     static public interface AssyChangeListener {
         // public final static int JDOM_CHANGED = 0;
-        public final static int JAXB_CHANGED = 1;
-        public final static int NEW_ASSY = 2;
-        public final static int CLOSE_ASSY = 3;
-        public final static int PARAM_LOCALLY_EDITTED = 4;
+        int JAXB_CHANGED = 1;
+        int NEW_ASSY = 2;
+        int CLOSE_ASSY = 3;
+        int PARAM_LOCALLY_EDITTED = 4;
 
         /**
          * Notify the assembly listeners of a change
@@ -145,9 +146,9 @@ public class OpenAssembly {
          * @param source the AssyChangeListener
          * @param param the object that changes
          */
-        public void assyChanged(int action, AssyChangeListener source, Object param);
+        void assyChanged(int action, AssyChangeListener source, Object param);
 
         /** @return the handle for this Assembly ChangeListener */
-        public String getHandle();
+        String getHandle();
     }
 }

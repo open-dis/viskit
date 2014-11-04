@@ -689,7 +689,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     // Use the actions package
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
         Action a = ActionIntrospector.getAction(source, method);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         if (mn != null) {
             map.put(Action.MNEMONIC_KEY, mn);
         }

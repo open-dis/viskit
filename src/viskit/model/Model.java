@@ -39,10 +39,10 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
     File currentFile;
-    Map<Event, EventNode> evNodeCache = new HashMap<Event, EventNode>();
-    Map<Object, Object> edgeCache = new HashMap<Object, Object>();
-    Vector<ViskitElement> stateVariables = new Vector<ViskitElement>();
-    Vector<ViskitElement> simParameters = new Vector<ViskitElement>();
+    Map<Event, EventNode> evNodeCache = new HashMap<>();
+    Map<Object, Object> edgeCache = new HashMap<>();
+    Vector<ViskitElement> stateVariables = new Vector<>();
+    Vector<ViskitElement> simParameters = new Vector<>();
     private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
     private String privateIdxVarPrefix = "_idxvar_";
     private String privateLocVarPrefix = "locvar_";
@@ -273,7 +273,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     Random mangleRandom = new Random();
 
     private String mangleName(String name) {
-        int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
+        int nxt = mangleRandom.nextInt(0x1_0000); // 4 hex digits
         StringBuilder sb = new StringBuilder(name);
         if (sb.charAt(sb.length() - 1) == '_') {
             sb.setLength(sb.length() - 6);
@@ -303,7 +303,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private boolean eventNameCheck() {
-        HashSet<String> hs = new HashSet<String>(10);
+        HashSet<String> hs = new HashSet<>(10);
         for (EventNode en : evNodeCache.values()) {
             if (!hs.add(en.getName())) {
                 return false;
@@ -322,7 +322,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private boolean stateVarParamNameCheck() {
-        HashSet<String> hs = new HashSet<String>(10);
+        HashSet<String> hs = new HashSet<>(10);
         for (ViskitElement sv : stateVariables) {
             if (!hs.add(sv.getName())) {
                 return false;
@@ -368,7 +368,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
             ea.setName(arg.getName());
             ea.setType(arg.getType());
 
-            ArrayList<String> com = new ArrayList<String>();
+            ArrayList<String> com = new ArrayList<>();
             com.addAll(arg.getComment());
             ea.setComments(com);
             ea.opaqueModelObject = arg;
@@ -395,7 +395,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
             }
 
-            ArrayList<String> cmt = new ArrayList<String>();
+            ArrayList<String> cmt = new ArrayList<>();
             cmt.addAll(sv.getComment());
             est.setComments(cmt);
 
@@ -512,7 +512,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     }
 
     private ArrayList<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
-        ArrayList<ViskitElement> alis = new ArrayList<ViskitElement>(3);
+        ArrayList<ViskitElement> alis = new ArrayList<>(3);
         for (EdgeParameter ep : lis) {
             vEdgeParameter vep = new vEdgeParameter(ep.getValue());
             alis.add(vep);
@@ -966,7 +966,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            List<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
+            List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(""));
             }
@@ -1000,7 +1000,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
         if (args.size() > 0) {
-            List<ViskitElement> edgeParameters = new ArrayList<ViskitElement>(args.size());
+            List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(""));
             }
@@ -1049,7 +1049,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
         sch.getComment().add(e.conditionalDescription);
         sch.setDelay("" + e.delay);
 
-        sch.setEvent((Event) e.to.opaqueModelObject);
+        sch.setEvent(e.to.opaqueModelObject);
         sch.setPriority(e.priority);
         sch.getEdgeParameter().clear();
 
@@ -1068,7 +1068,7 @@ public class Model extends mvcAbstractModel implements ViskitModel {
     public void changeCancelEdge(CancellingEdge e) {
         Cancel can = (Cancel) e.opaqueModelObject;
         can.setCondition(e.conditional);
-        can.setEvent((Event) e.to.opaqueModelObject);
+        can.setEvent(e.to.opaqueModelObject);
         can.getComment().clear();
         can.getComment().add(e.conditionalDescription);
 

@@ -19,8 +19,8 @@ public abstract class AssemblyNode extends ViskitElement {
 
     private String name;
     private String type;
-    private Vector<AssemblyEdge> connections = new Vector<AssemblyEdge>();
-    private List<String> comments = new ArrayList<String>();
+    private Vector<AssemblyEdge> connections = new Vector<>();
+    private List<String> comments = new ArrayList<>();
     private Point2D position = new Point2D.Double(0d, 0d);
     private VInstantiator instantiator;
     private String descriptionString = "";  // instance information

@@ -239,7 +239,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     Random mangleRandom = new Random();
 
     private String mangleName(String name) {
-        int nxt = mangleRandom.nextInt(0x10000); // 4 hex digits
+        int nxt = mangleRandom.nextInt(0x1_0000); // 4 hex digits
         StringBuilder sb = new StringBuilder(name);
         if (sb.charAt(sb.length() - 1) == '_') {
             sb.setLength(sb.length() - 6);
@@ -263,7 +263,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     private boolean nameCheck() {
-        HashSet<String> hs = new HashSet<String>(10);
+        HashSet<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
                 return false;
@@ -342,7 +342,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
         jaxbPCL.setName(nIe(widgetName));
         jaxbPCL.setType(className);
 
-        VInstantiator.Constr vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<Object>());
+        VInstantiator.Constr vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<>());
         pcNode.setInstantiator(vc);
 
         pcNode.opaqueModelObject = jaxbPCL;
@@ -698,7 +698,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     @Override
     public Vector<String> getDetailedOutputEntityNames() {
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         for (Output ot : jaxbRoot.getOutput()) {
             Object entity = ot.getEntity();
             if (entity instanceof SimEntity) {
@@ -712,7 +712,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
     @Override
     public Vector<String> getVerboseOutputEntityNames() {
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         for (Verbose ot : jaxbRoot.getVerbose()) {
             Object entity = ot.getEntity();
             if (entity instanceof SimEntity) {
@@ -726,7 +726,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
 
    private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
 
-        List<Object> vi = new ArrayList<Object>();
+        List<Object> vi = new ArrayList<>();
 
         for (Object o : lis) {
             vi.add(buildInstantiatorFromJaxbParameter(o));
@@ -735,7 +735,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
     }
 
     private List<String> getNamesFromParmList(List<Object> lis) {
-        List<String> v = new ArrayList<String>();
+        List<String> v = new ArrayList<>();
         for (Object o : lis) {
             if (o instanceof TerminalParameter) {
                 String n = ((TerminalParameter) o).getName();
@@ -783,7 +783,7 @@ public class AssemblyModel extends mvcAbstractModel implements ViskitAssemblyMod
             return (List<Object>) o;
         }
 
-        Vector<Object> v = new Vector<Object>();
+        Vector<Object> v = new Vector<>();
         v.add(o);
         return v;
     }

@@ -19,9 +19,9 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
-import org.jgraph.graph.DefaultGraphCell;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -239,7 +239,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             watchDir = TempFileManager.createTempDir(watchDir);
 
             dirWatch = new DirectoryWatch(watchDir);
-            dirWatch.setLoopSleepTime(1000); // 1 sec
+            dirWatch.setLoopSleepTime(1_000); // 1 sec
             dirWatch.startWatcher();
         } catch (IOException e) {
             LOGGER.error(e);
@@ -285,7 +285,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
         dirWatch.removeListener(lis);
     }
 
-    Set<RecentFileListener> recentListeners = new HashSet<RecentFileListener>();
+    Set<RecentFileListener> recentListeners = new HashSet<>();
 
     @Override
     public void addRecentFileListListener(RecentFileListener lis)
@@ -307,7 +307,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
     }
 
     private static final int RECENTLISTSIZE = 15;
-    private Set<String> recentFileSet = new LinkedHashSet<String>(RECENTLISTSIZE + 1);;
+    private Set<String> recentFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -325,7 +325,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
 
     private java.util.List<String> openEventGraphs;
     private void _setFileSet() {
-        openEventGraphs = new ArrayList<String>(4);
+        openEventGraphs = new ArrayList<>(4);
         if (historyConfig == null) {return;}
         String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
@@ -646,7 +646,7 @@ public class EventGraphController extends mvcAbstractController implements Viski
             if (o instanceof Edge) {
                 continue;
             }
-            String nm = ((viskit.model.EventNode) o).getName();
+            String nm = ((ViskitElement) o).getName();
             ((viskit.model.ViskitModel) getModel()).newEvent(nm + "-copy", new Point(x + (20 * n), y + (20 * n)));
             n++;
         }
@@ -795,8 +795,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
     public void buildNewArc(Object[] nodes) //--------------------------------
     {
         // My node view objects hold node model objects and vice versa
-        EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-        EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+        EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
         ((ViskitModel) getModel()).newEdge(src, tar);
     }
 
@@ -804,8 +804,8 @@ public class EventGraphController extends mvcAbstractController implements Viski
     public void buildNewCancelArc(Object[] nodes) //--------------------------------------
     {
         // My node view objects hold node model objects and vice versa
-        EventNode src = (EventNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-        EventNode tar = (EventNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+        EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
         ((ViskitModel) getModel()).newCancelEdge(src, tar);
     }
 

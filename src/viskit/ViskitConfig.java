@@ -117,8 +117,8 @@ public class ViskitConfig {
         } catch (IOException ex) {
             LOG.error(ex);
         }
-        xmlConfigurations = new HashMap<String, XMLConfiguration>();
-        sessionHM = new HashMap<String, String>();
+        xmlConfigurations = new HashMap<>();
+        sessionHM = new HashMap<>();
         setDefaultConfig();
     }
 

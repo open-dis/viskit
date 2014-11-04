@@ -424,7 +424,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
         Action a = ActionIntrospector.getAction(source, method);
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         if (mn != null) {
             map.put(Action.MNEMONIC_KEY, mn);
         }
@@ -800,17 +800,23 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                     FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
                     if (xn != null) {
-                        if (sa[0].equals("simkit.BasicSimEntity")) {
-                            ((ViskitAssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
-                        } else if (sa[0].equals("java.beans.PropertyChangeListener")) {
-                            ((ViskitAssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
+                        switch (sa[0]) {
+                            case "simkit.BasicSimEntity":
+                                ((ViskitAssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
+                                break;
+                            case "java.beans.PropertyChangeListener":
+                                ((ViskitAssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
+                                break;
                         }
                     } else {
                         // Else class-based node
-                        if (sa[0].equals("simkit.BasicSimEntity")) {
-                            ((ViskitAssemblyController) getController()).newEventGraphNode(sa[1], p);
-                        } else if (sa[0].equals("java.beans.PropertyChangeListener")) {
-                            ((ViskitAssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
+                        switch (sa[0]) {
+                            case "simkit.BasicSimEntity":
+                                ((ViskitAssemblyController) getController()).newEventGraphNode(sa[1], p);
+                                break;
+                            case "java.beans.PropertyChangeListener":
+                                ((ViskitAssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
+                                break;
                         }
                     }
 

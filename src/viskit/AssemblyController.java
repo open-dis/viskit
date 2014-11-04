@@ -22,9 +22,9 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
-import org.jgraph.graph.DefaultGraphCell;
 import viskit.doe.LocalBootLoader;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -169,7 +169,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         boolean ret = true;
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod != null) {
-            if (((AssemblyModel) getModel()).isDirty()) {
+            if (((ViskitAssemblyModel) getModel()).isDirty()) {
                 return askToSaveAndContinue();
             }
         }
@@ -275,7 +275,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         return assyChgListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<OpenAssembly.AssyChangeListener>();
+    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<>();
     OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
 
         @Override
@@ -302,18 +302,21 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                     break;
 
                 case CLOSE_ASSY:
-                    ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
-                    ViskitAssemblyView view = (ViskitAssemblyView) getView();
-                    ViskitAssemblyModel[] modAr = view.getOpenModels();
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
                     VGlobals.instance().getEventGraphEditor().controller.closeAll();
+
+                    ViskitAssemblyModel vmod = (ViskitAssemblyModel) getModel();
                     markAssyConfigClosed(vmod.getLastFile());
+
+                    ViskitAssemblyView view = (ViskitAssemblyView) getView();
                     view.delTab(vmod);
 
-                    // Keep the other Assembly's EGs open
+                    // Keep all other Assemblies' EGs open
                     if (!isCloseAll()) {
+
+                        ViskitAssemblyModel[] modAr = view.getOpenModels();
                         for (ViskitAssemblyModel mod : modAr) {
                             if (!mod.equals(vmod)) {
                                 openEventGraphs(mod.getLastFile());
@@ -325,7 +328,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                     break;
 
                 default:
-                    System.err.println("Program error AssemblyController.assyChanged");
+                    LOGGER.warn("Program error AssemblyController.assyChanged");
             }
         }
 
@@ -355,7 +358,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         OpenAssembly.inst().removeListener(lis);
     }
 
-    Set<RecentAssyFileListener> recentAssyListeners = new HashSet<RecentAssyFileListener>();
+    Set<RecentAssyFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
     public void addRecentAssyFileSetListener(RecentAssyFileListener lis) {
@@ -375,7 +378,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    Set<RecentProjFileListener> recentProjListeners = new HashSet<RecentProjFileListener>();
+    Set<RecentProjFileListener> recentProjListeners = new HashSet<>();
 
     @Override
     public void addRecentProjFileSetListener(RecentProjFileListener lis) {
@@ -469,9 +472,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
             egCountField = AssemblyController.class.getDeclaredField("egNodeCount");
             adptrCountField = AssemblyController.class.getDeclaredField("adptrNodeCount");
             pclCountField = AssemblyController.class.getDeclaredField("pclNodeCount");
-        } catch (NoSuchFieldException ex) {
-            throw new RuntimeException(ex);
-        } catch (SecurityException ex) {
+        } catch (NoSuchFieldException | SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -508,9 +509,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 retn = shortname + count++;
             } while (model.nameExists(retn));   // don't force the vAMod to mangle the name
             intField.setInt(this, count);
-        } catch (IllegalArgumentException ex) {
-            LOGGER.error(ex);
-        } catch (IllegalAccessException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             LOGGER.error(ex);
         }
         return retn;
@@ -535,9 +534,10 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     @Override
     public void doProjectCleanup() {
         closeAll();
+        ((ViskitController) VGlobals.instance().getEventGraphEditor().getController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
         clearRecentAssyFileList();
-        ((EventGraphController) VGlobals.instance().getEventGraphEditor().getController()).clearRecentFileSet();
+        ((ViskitController) VGlobals.instance().getEventGraphEditor().getController()).clearRecentFileSet();
         VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
@@ -709,7 +709,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     @Override
     public void newEventGraphNode(String typeName, Point p) {
         String shName = shortEgName(typeName);
-        ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
+        ((ViskitAssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
     @Override
@@ -739,13 +739,13 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     @Override
     public void newPropChangeListenerNode(String name, Point p) {
         String shName = shortPCLName(name);
-        ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
+        ((ViskitAssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
     @Override
     public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
+        ((ViskitAssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
 
     }
 
@@ -759,7 +759,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         switch (yn) {
             case JOptionPane.YES_OPTION:
                 save();
-                if (((AssemblyModel) getModel()).isDirty()) {
+                if (((ViskitAssemblyModel) getModel()).isDirty()) {
                     return false;
                 } // we cancelled
                 return true;
@@ -776,8 +776,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     @Override
     public void newAdapterArc(Object[] nodes) {
-        AssemblyNode oA = (AssemblyNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
         AssemblyNode[] oArr;
         try {
@@ -799,8 +799,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      */
     @Override
     public void newSimEvListArc(Object[] nodes) {
-        AssemblyNode oA = (AssemblyNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
         AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
 
@@ -818,8 +818,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     @Override
     public void newPropChangeListArc(Object[] nodes) {
         // One and only one has to be a prop change listener
-        AssemblyNode oA = (AssemblyNode) ((DefaultGraphCell) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultGraphCell) nodes[1]).getUserObject();
+        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
         AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
 
@@ -965,7 +965,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    private Vector<Object> selectionVector = new Vector<Object>();
+    private Vector<Object> selectionVector = new Vector<>();
 
     /**
      *
@@ -989,7 +989,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
         }
     }
 
-    private Vector<EvGraphNode> copyVector = new Vector<EvGraphNode>();
+    private Vector<EvGraphNode> copyVector = new Vector<>();
 
     @SuppressWarnings("unchecked")
     public void edit() {
@@ -1002,7 +1002,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 JOptionPane.showMessageDialog(null, "Please select an Event Graph");
                 return;
             }
-            String className = ((EvGraphNode) o).getType();
+            String className = ((ViskitElement) o).getType();
             File f = null;
             try {
                 f = FileBasedClassManager.instance().getFile(className);
@@ -1049,12 +1049,12 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
                 continue;
             }
             if (o instanceof EvGraphNode) {
-                String nm = ((EvGraphNode) o).getName();
-                String typ = ((EvGraphNode) o).getType();
+                String nm = ((ViskitElement) o).getName();
+                String typ = ((ViskitElement) o).getType();
                 ((ViskitAssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount++, typ, new Point(x + (20 * n), y + (20 * n)));
             } else if (o instanceof PropChangeListenerNode) {
-                String nm = ((PropChangeListenerNode) o).getName();
-                String typ = ((PropChangeListenerNode) o).getType();
+                String nm = ((ViskitElement) o).getName();
+                String typ = ((ViskitElement) o).getType();
                 ((ViskitAssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount++, typ, new Point(x + (20 * n), y + (20 * n)));
             }
             n++;
@@ -1483,7 +1483,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
      * @return os exec array
      */
     private String[] buildExecStrings(String className, String classPath) {
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         String fsep = Vstatics.getFileSeparator();
 
         StringBuilder sb = new StringBuilder();
@@ -1644,8 +1644,8 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private Set<String> recentAssyFileSet = new LinkedHashSet<String>(RECENTLISTSIZE + 1);
-    private Set<String> recentProjFileSet = new LinkedHashSet<String>(RECENTLISTSIZE + 1);
+    private Set<String> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private Set<String> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -1677,7 +1677,7 @@ public class AssemblyController extends mvcAbstractController implements ViskitA
     private java.util.List<String> openAssemblies;
 
     private void _setAssyFileSet() {
-        openAssemblies = new ArrayList<String>(4);
+        openAssemblies = new ArrayList<>(4);
         if (getHistoryConfig() == null) {
             return;
         }

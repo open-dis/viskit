@@ -303,7 +303,7 @@ public class ViskitProject {
     public String[] getProjectContents() {
 
         // Prevent duplicate entries
-        Set<String> cp = new HashSet<String>();
+        Set<String> cp = new HashSet<>();
 
         // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
@@ -614,6 +614,8 @@ public class ViskitProject {
         boolean isProjectDir;
         do {
             int ret = projectChooser.showOpenDialog(parent);
+
+            // User may have exited the chooser
             if (ret != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
@@ -634,7 +636,7 @@ public class ViskitProject {
         return projectDir;
     }
 
-    /** Report if directory fDir is a Viskit Project
+    /** Report if given directory holds a Viskit Project
      * @param fDir the project directory to test
      * @return true when a viskitProject.xml file is found
      */
