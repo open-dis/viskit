@@ -210,7 +210,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         jamSettingsHandler(menuBar);
         asyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
         jamQuitHandler(asyRunComponent.getQuitMenuItem(), myQuitAction, asyRunComponent.getMenus());
-        AssemblyController controller = ((AssemblyController) asyFrame.getController());
+        AssemblyControllerImpl controller = ((AssemblyControllerImpl) asyFrame.getController());
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
         asyRunComponent.setAnalystReportGUI(reportPanel);
@@ -249,7 +249,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         /* End DIFF between OA3302 branch and trunk */
 
         // Now setup the assembly file change listener(s)
-        final ViskitAssemblyController assyCntlr = (ViskitAssemblyController) asyFrame.getController();
+        final AssemblyController assyCntlr = (AssemblyController) asyFrame.getController();
         assyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
         assyCntlr.addAssemblyFileListener(asyRunComponent);
@@ -264,7 +264,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
 
         // Now setup the open-event graph listener(s)
-        final ViskitController egCntlr = (ViskitController) egFrame.getController();
+        final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
         egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
 
         /* DIFF between OA3302 branch and trunk */
@@ -419,13 +419,13 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             {
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
-                    if (!((EventGraphController) egFrame.getController()).preQuit()) {
+                    if (!((EventGraphControllerImpl) egFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
                 if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYEDITOR_IDX]);
-                    if (!((ViskitAssemblyController) asyFrame.getController()).preQuit()) {
+                    if (!((AssemblyController) asyFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -444,10 +444,10 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
-                    ((ViskitController) egFrame.getController()).postQuit();
+                    ((EventGraphController) egFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
-                    ((AssemblyController) asyFrame.getController()).postQuit();
+                    ((AssemblyControllerImpl) asyFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */

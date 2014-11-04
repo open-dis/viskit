@@ -167,7 +167,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     }
 
     /**
-     * Get param indices from AssemblyController statics
+     * Get param indices from AssemblyControllerImpl statics
      * @param params command line arguments to initialize the Assembly runner
      */
     public void initParams(String[] params) {
@@ -176,14 +176,14 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 //            log.info("VM argument is: " + s);
 //        }
 
-        targetClassName = params[AssemblyController.EXEC_TARGET_CLASS_NAME];
+        targetClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
 
         // TODO: should this be editable?
         runPanel.vcrSimTime.setText("0.0");
 
-        boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyController.EXEC_VERBOSE_SWITCH]);
-        double defaultStopTime = Double.parseDouble(params[AssemblyController.EXEC_STOPTIME_SWITCH]);
+        boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
+        double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
             fillRepWidgetsFromBasicAssemblyObject(targetClassName, defaultVerbose, defaultStopTime);

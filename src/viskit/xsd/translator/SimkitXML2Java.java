@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
-import viskit.AssemblyController;
+import viskit.AssemblyControllerImpl;
 import viskit.VGlobals;
 import viskit.xsd.bindings.eventgraph.*;
 
@@ -1030,7 +1030,7 @@ public class SimkitXML2Java {
         // to a .class
         log.info("Generating Java Bytecode...");
         try {
-            if (AssemblyController.compileJavaClassFromString(dotJava) != null) {
+            if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
                 log.info("Done.");
             }
         } catch (NullPointerException npe) {

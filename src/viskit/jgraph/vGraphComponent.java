@@ -24,7 +24,7 @@ import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.EventGraphViewFrame;
 import viskit.ModelEvent;
-import viskit.ViskitController;
+import viskit.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
 
@@ -155,7 +155,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitController) parent.getController()).copy();
+            ((EventGraphController) parent.getController()).copy();
         }
     }
 
@@ -167,7 +167,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitController) parent.getController()).cut();
+            ((EventGraphController) parent.getController()).cut();
         }
     }
 
@@ -179,7 +179,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitController) parent.getController()).paste();
+            ((EventGraphController) parent.getController()).paste();
         }
     }
 
@@ -278,7 +278,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((ViskitModel) parent.getModel()).changeEvent(en);
+                        ((Model) parent.getModel()).changeEvent(en);
 
                         // might have changed:
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
@@ -543,7 +543,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     selected.remove(((DefaultGraphCell) o).getUserObject());
                 }
             }
-            ((ViskitController) parent.getController()).selectNodeOrEdge(selected);
+            ((EventGraphController) parent.getController()).selectNodeOrEdge(selected);
         }
     }
 
@@ -865,7 +865,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
         DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
         Object[] oa = new Object[]{src, tar};
-        ViskitController controller = (ViskitController) parent.getController();
+        EventGraphController controller = (EventGraphController) parent.getController();
         if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
             controller.buildNewCancelArc(oa);
         } else {

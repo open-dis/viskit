@@ -43,7 +43,7 @@ import viskit.mvc.mvcModelEvent;
  * @since 2:07:37 PM
  * @version $Id$
  */
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAssemblyView, DragStartListener {
+public class AssemblyViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
 
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
@@ -66,11 +66,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     private JButton runButt;
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(AssemblyController controller) {
+    public AssemblyViewFrame(AssemblyControllerImpl controller) {
         this(false, controller);
     }
 
-    public AssemblyViewFrame(boolean contentOnly, AssemblyController controller) {
+    public AssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI(contentOnly);   // build widgets
@@ -85,7 +85,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    ((ViskitAssemblyController) getController()).quit();
+                    ((AssemblyController) getController()).quit();
                 }
             });
 
@@ -110,7 +110,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
      * Initialize the MCV connections
      * @param ctrl
      */
-    private void initMVC(AssemblyController ctrl) {
+    private void initMVC(AssemblyControllerImpl ctrl) {
         setController(ctrl);
     }
 
@@ -188,15 +188,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
-            setModel((AssemblyModel) myVgacw.model);          // hold on locally
-            getController().setModel((AssemblyModel) myVgacw.model);  // tell controller
-            AssemblyModel mod = (AssemblyModel) getModel();
+            setModel((AssemblyModelImpl) myVgacw.model);          // hold on locally
+            getController().setModel((AssemblyModelImpl) myVgacw.model);  // tell controller
+            AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null) {
 
                 // Also, tell the Design of Experiments Panel to update
                 VGlobals.instance().amod = mod;
-                ((AssemblyController) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
+                ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
             GraphMetaData gmd = myVgacw.model.getMetaData();
@@ -208,11 +208,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    class _RecentAssyFileListener implements ViskitAssemblyController.RecentAssyFileListener {
+    class _RecentAssyFileListener implements AssemblyController.RecentAssyFileListener {
 
         @Override
         public void assySetChanged() {
-            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            AssemblyController acontroller = (AssemblyController) getController();
             Set<String> lis = acontroller.getRecentAssyFileSet();
             openRecentAssyMenu.removeAll();
             for (String fullPath : lis) {
@@ -238,11 +238,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
         }
     }
 
-    class _RecentProjFileListener implements ViskitAssemblyController.RecentProjFileListener {
+    class _RecentProjFileListener implements AssemblyController.RecentProjFileListener {
 
         @Override
         public void projSetChanged() {
-            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            AssemblyController acontroller = (AssemblyController) getController();
             Set<String> lis = acontroller.getRecentProjFileSet();
             openRecentProjMenu.removeAll();
             for (String fullPath : lis) {
@@ -280,7 +280,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            AssemblyController acontroller = (AssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
                 acontroller.clearRecentAssyFileList();
@@ -298,7 +298,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            ViskitAssemblyController acontroller = (ViskitAssemblyController) getController();
+            AssemblyController acontroller = (AssemblyController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
                 acontroller.clearRecentProjFileSet();
@@ -310,7 +310,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     private void buildMenus(boolean contentOnly) {
-        ViskitAssemblyController controller = (ViskitAssemblyController) getController();
+        AssemblyController controller = (AssemblyController) getController();
 
         myAssyFileListener = new _RecentAssyFileListener();
         controller.addRecentAssyFileSetListener(myAssyFileListener);
@@ -614,7 +614,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     @Override
-    public void addTab(ViskitAssemblyModel mod) {
+    public void addTab(AssemblyModel mod) {
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
@@ -655,7 +655,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     @Override
-    public void delTab(ViskitAssemblyModel mod) {
+    public void delTab(AssemblyModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
         for (int i = 0; i < ca.length; i++) {
@@ -676,9 +676,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     }
 
     @Override
-    public ViskitAssemblyModel[] getOpenModels() {
+    public AssemblyModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
-        ViskitAssemblyModel[] vm = new ViskitAssemblyModel[ca.length];
+        AssemblyModel[] vm = new AssemblyModel[ca.length];
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
@@ -802,20 +802,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((ViskitAssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((ViskitAssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
                                 break;
                         }
                     } else {
                         // Else class-based node
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((ViskitAssemblyController) getController()).newEventGraphNode(sa[1], p);
+                                ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((ViskitAssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
+                                ((AssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
                                 break;
                         }
                     }
@@ -1021,7 +1021,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements ViskitAs
     @Override
     public void openProject() {
         int ret;
-        ViskitAssemblyController aController = ((ViskitAssemblyController) getController());
+        AssemblyController aController = ((AssemblyController) getController());
         if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";

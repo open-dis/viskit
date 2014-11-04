@@ -13,7 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
-import viskit.AssemblyController;
+import viskit.AssemblyControllerImpl;
 import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.*;
 
@@ -931,7 +931,7 @@ public class SimkitAssemblyXML2Java {
             // also write out the .java to a file and compile it
             // to a .class
             log.info("Generating Java Bytecode...");
-            if (AssemblyController.compileJavaClassFromString(dotJava) != null) {
+            if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
                 log.info("Done.");
             }
         }

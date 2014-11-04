@@ -36,7 +36,7 @@ package viskit;
 import javax.swing.JSplitPane;
 import viskit.jgraph.vGraphComponent;
 import viskit.jgraph.vGraphModel;
-import viskit.model.ViskitModel;
+import viskit.model.Model;
 
 /**
  * A class to serve as the jgraph object, while carrying other objects needed 
@@ -52,7 +52,7 @@ import viskit.model.ViskitModel;
  */
 public class VgraphComponentWrapper extends vGraphComponent {
 
-    public ViskitModel model;
+    public Model model;
     public JSplitPane drawingSplitPane;
     public JSplitPane stateParamSplitPane;
     public ParametersPanel paramPan;

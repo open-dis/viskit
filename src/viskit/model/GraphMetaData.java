@@ -34,7 +34,7 @@ public class GraphMetaData {
         author = System.getProperty("user.name");
         packageName = "test";
         
-        if (caller instanceof AssemblyModel) {
+        if (caller instanceof AssemblyModelImpl) {
             name = "AssemblyName";
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();

@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.ViskitAssemblyController;
+import viskit.AssemblyController;
 import viskit.model.*;
 
 /**
@@ -51,7 +51,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
             @Override
             public void run() {
-                ViskitAssemblyController cntl = (ViskitAssemblyController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
+                AssemblyController cntl = (AssemblyController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
                 if (cell instanceof vAssemblyEdgeCell) {
                     Object edgeObj = ((vAssemblyEdgeCell) cell).getUserObject();
                     if (edgeObj instanceof AdapterEdge) {

@@ -30,22 +30,22 @@ import viskit.mvc.mvcModelEvent;
 
 /**
  * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
- * showing a jgraph on the left and state variables and sim parameters panels on
- * the right, with menus and a toolbar.  To fully implement application-level
- * MVC, events like the dragging and dropping of a node on the screen are first
- * recognized in this class, but the GUI is not yet changed.  Instead, this
- * class (the View) messages the controller class (EventGraphController -- by
- * means of the ViskitController i/f).  The controller then informs the model
- * (Model), which then updates itself and "broadcasts" that fact.  This class is
- * a model listener, so it gets the report, then updates the GUI.  A round trip.
- *
- * 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is
- * largely unchanged.  To understand the flow, understand that
- * 1) The tab "ChangeListener" plays a key role;
- * 2) When the ChangeListener is hit, the controller.setModel() method installs
- * the appropriate model for the newly-selected eventgraph.
- *
- * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects<p/>
+ showing a jgraph on the left and state variables and sim parameters panels on
+ the right, with menus and a toolbar.  To fully implement application-level
+ MVC, events like the dragging and dropping of a node on the screen are first
+ recognized in this class, but the GUI is not yet changed.  Instead, this
+ class (the View) messages the controller class (EventGraphControllerImpl -- by
+ means of the EventGraphController i/f).  The controller then informs the model
+ (ModelImpl), which then updates itself and "broadcasts" that fact.  This class is
+ a model listener, so it gets the report, then updates the GUI.  A round trip.
+
+ 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is
+ largely unchanged.  To understand the flow, understand that
+ 1) The tab "ChangeListener" plays a key role;
+ 2) When the ChangeListener is hit, the controller.setModel() method installs
+ the appropriate model for the newly-selected eventgraph.
+
+ OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects<p/>
  * MOVES Institute<p/>
  * Naval Postgraduate School, Monterey CA<p/>
  * www.nps.edu<p/>
@@ -54,7 +54,7 @@ import viskit.mvc.mvcModelEvent;
  * @since 12:52:59 PM
  * @version $Id$
  */
-public class EventGraphViewFrame extends mvcAbstractJFrameView implements ViskitView {
+public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE = 0;
     public final static int ADD_NODE_MODE = 1;
@@ -76,10 +76,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private JMenuItem quitMenuItem;
     private TitleListener titlList;
     private int titlKey;
-    public EventGraphController controller;
+    public EventGraphControllerImpl controller;
     private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
 
-    public EventGraphViewFrame(EventGraphController ctrl) {
+    public EventGraphViewFrame(EventGraphControllerImpl ctrl) {
         this(false, ctrl);
     }
 
@@ -88,7 +88,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * @param contentOnly
      * @param ctrl
      */
-    public EventGraphViewFrame(boolean contentOnly, EventGraphController ctrl) {
+    public EventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl ctrl) {
         super(FRAME_DEFAULT_TITLE);
         this.controller = ctrl;
         initMVC(ctrl);   // set up mvc linkages
@@ -150,9 +150,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
     /**
      * Initialize the MCV connections
-     * @param ctrl the EventGraphController
+     * @param ctrl the EventGraphControllerImpl
      */
-    private void initMVC(EventGraphController ctrl) {
+    private void initMVC(EventGraphControllerImpl ctrl) {
         setController(ctrl);
     }
 
@@ -221,11 +221,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 return;
             }
 
-            setModel((Model) myVgcw.model);        // hold on locally
+            setModel((ModelImpl) myVgcw.model);        // hold on locally
             getController().setModel(getModel());  // tell controller
-            adjustMenus((ViskitModel) getModel()); // enable/disable menu items based on new EG
+            adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
 
-            GraphMetaData gmd = ((ViskitModel) getModel()).getMetaData();
+            GraphMetaData gmd = ((Model) getModel()).getMetaData();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
@@ -257,14 +257,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
         vp.doAddsAndDeletes(false);
-        vp.addPlusListener(ActionIntrospector.getAction((ViskitController) getController(), "newStateVariable"));
+        vp.addPlusListener(ActionIntrospector.getAction((EventGraphController) getController(), "newStateVariable"));
 
         // Introspector can't handle a param to the method....?
         vp.addMinusListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((ViskitController) getController()).deleteStateVariable((vStateVariable) event.getSource());
+                ((EventGraphController) getController()).deleteStateVariable((vStateVariable) event.getSource());
             }
         });
 
@@ -272,7 +272,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((ViskitController) getController()).stateVariableEdit((vStateVariable) event.getSource());
+                ((EventGraphController) getController()).stateVariableEdit((vStateVariable) event.getSource());
             }
         });
 
@@ -319,21 +319,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
         pp.doAddsAndDeletes(false);
-        pp.addPlusListener(ActionIntrospector.getAction((ViskitController) getController(), "newSimParameter"));
+        pp.addPlusListener(ActionIntrospector.getAction((EventGraphController) getController(), "newSimParameter"));
 
         // Introspector can't handle a param to the method....?
         pp.addMinusListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((ViskitController) getController()).deleteSimParameter((vParameter) event.getSource());
+                ((EventGraphController) getController()).deleteSimParameter((vParameter) event.getSource());
             }
         });
         pp.addDoubleClickedListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((ViskitController) getController()).simParameterEdit((vParameter) event.getSource());
+                ((EventGraphController) getController()).simParameterEdit((vParameter) event.getSource());
             }
         });
 
@@ -367,7 +367,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
             public void actionPerformed(ActionEvent e) {
                 String s = (String) e.getSource();
                 if (s != null) {
-                    ((ViskitController) getController()).codeBlockEdit((String) e.getSource());
+                    ((EventGraphController) getController()).codeBlockEdit((String) e.getSource());
                 }
             }
         });
@@ -408,7 +408,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     int untitledCount = 0;
 
     @Override
-    public void addTab(ViskitModel mod) {
+    public void addTab(Model mod) {
         vGraphModel vmod = new vGraphModel();
         VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
         vmod.graph = graphPane;                               // todo fix this
@@ -448,7 +448,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     @Override
-    public void delTab(ViskitModel mod) {
+    public void delTab(Model mod) {
         Component[] ca = tabbedPane.getComponents();
 
         for (int i = 0; i < ca.length; i++) {
@@ -469,9 +469,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     @Override
-    public ViskitModel[] getOpenModels() {
+    public Model[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
-        ViskitModel[] vm = new ViskitModel[ca.length];
+        Model[] vm = new Model[ca.length];
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
@@ -506,7 +506,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     public String addParameterDialog() {
 
         if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
-            ((ViskitController) getController()).buildNewSimParameter(ParameterDialog.newName,
+            ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
                     ParameterDialog.newComment);
@@ -518,7 +518,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     @Override
     public String addStateVariableDialog() {
         if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
-            ((ViskitController) getController()).buildNewStateVariable(StateVariableDialog.newName,
+            ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
                     StateVariableDialog.newComment);
@@ -532,17 +532,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
      * follow, make use of the "actions" package, which
      * @param mod
      */
-    private void adjustMenus(ViskitModel mod) {
+    private void adjustMenus(Model mod) {
         //todo
     }
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
 
-    class _RecentFileListener implements ViskitController.RecentFileListener {
+    class _RecentFileListener implements EventGraphController.RecentFileListener {
 
         @Override
         public void listChanged() {
-            ViskitController vcontroller = (ViskitController) getController();
+            EventGraphController vcontroller = (EventGraphController) getController();
             Set<String> lis = vcontroller.getRecentFileSet();
             openRecentMenu.removeAll();
             for (String fullPath : lis) {
@@ -576,7 +576,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            ViskitController vcontroller = (ViskitController) getController();
+            EventGraphController vcontroller = (EventGraphController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
                 vcontroller.clearRecentFileSet();
@@ -589,7 +589,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     private _RecentFileListener myFileListener;
 
     private void buildMenus(boolean contentOnly) {
-        ViskitController vcontroller = (ViskitController) getController();
+        EventGraphController vcontroller = (EventGraphController) getController();
 
         myFileListener = new _RecentFileListener();
         vcontroller.addRecentFileListListener(myFileListener);
@@ -830,7 +830,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
         addSelfRef.addMouseListener(new DragMouseAdapter());
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
-        // not under control of the application controller (EventGraphController.java).  Small, simple anonymous inner classes
+        // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
         // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
         selectMode.addActionListener(new ActionListener() {
@@ -1000,14 +1000,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
                 Point pp = new Point(
                         p.x - addEvent.getWidth(),
                         p.y - addEvent.getHeight());
-                ((ViskitController) getController()).buildNewNode(pp);
+                ((EventGraphController) getController()).buildNewNode(pp);
             } else {
                 // get the node in question from the graph
                 Object o = getCurrentVgcw().getViskitElementAt(p);
                 if (o != null && o instanceof EventNode) {
                     EventNode en = (EventNode) o;
                     // We're making a self-referential arc
-                    ((ViskitController) getController()).buildNewArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                    ((EventGraphController) getController()).buildNewArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
                 }
             }
         }
@@ -1184,7 +1184,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements Viskit
     }
 
     /**
-     * This is where the "master" model (viskit.model.Model) updates the view.
+     * This is where the "master" model (viskit.model.ModelImpl) updates the view.
      * @param event
      */
     @Override

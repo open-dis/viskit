@@ -1,16 +1,18 @@
 package viskit;
 
-import edu.nps.util.LogUtils;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.nps.util.LogUtils;
 import simkit.random.*;
 
 /**
- * A class to provide the beanshell parser in viskit with sample, throw-away 
- * simkit instantiated objects on which to test conditions and transitions code 
+ * A class to provide the beanshell parser in viskit with sample, throw-away
+ * simkit instantiated objects on which to test conditions and transitions code
  * within events and edges.
- * 
+ *
  * TODO: This needs work if we are to use it.  Currently, not used.
  *
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -23,12 +25,12 @@ import simkit.random.*;
  * @version $Id$
  */
 public class VsimkitObjects {
-    
+
     /**
      * VGlobals uses this field, which combines all the methods below.
      * It does not use the individual methods.
      */
-    private static final Map<String, Object> HASH_MAP = new HashMap<String, Object>();
+    private static final Map<String, Object> HASH_MAP = new HashMap<>();
 
     static {
         try {
@@ -36,27 +38,27 @@ public class VsimkitObjects {
             Method[] meths = c.getDeclaredMethods();
             for (Method method : meths) {
                 String name = method.getName();
-                
+
                 // we can skip these
                 if (name.equals("getInstance") || name.equals("getFullName")) {
                     continue;
                 }
-                
+
                 // lose the 'get_'
                 name = name.replaceAll("get_", "");
                 name = "simkit." + name.replace('_', '.');
-                
+
                 // with no package
                 String noPackageName = name.substring(name.lastIndexOf('.') + 1);
-                
-                // TODO: this breaks on AR1Variate instance "getting" 
+
+                // TODO: this breaks on AR1Variate instance "getting"
                 Object m = method.invoke(null, (Object[]) null);
                 Object o = new FullNameAndInstance(name, m);
                 LogUtils.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
                 HASH_MAP.put(name, o);
                 HASH_MAP.put(noPackageName, o);
             }
-        } catch (Exception e) {
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             LogUtils.getLogger(VsimkitObjects.class).error(e);
 //            e.printStackTrace();
         }
@@ -135,7 +137,7 @@ public class VsimkitObjects {
     public static Object get_random_ExponentialVariate() {
         return new ExponentialVariate();
     }
-    
+
     public static Object get_random_FrequencyRandomObjectVariate() {
         return new FrequencyRandomObjectVariate();
     }
@@ -159,7 +161,7 @@ public class VsimkitObjects {
     public static Object get_random_MersenneTwister() {
         return new MersenneTwister();
     }
-    
+
     public static Object get_random_MersenneTwisterDC() {
         return new MersenneTwisterDC();
     }
@@ -187,7 +189,7 @@ public class VsimkitObjects {
     public static Object get_random_NormalVariate() {
         return new NormalVariate();
     }
-    
+
     public static Object get_random_NPPoissonProcessThinned() {
         return new NPPoissonProcessThinnedVariate();
     }
@@ -213,7 +215,7 @@ public class VsimkitObjects {
     public static Object get_random_Pooled() {
         return get_random_PooledXORGenerator();
     }
-    
+
     public static Object get_random_PooledXORGenerator() {
         return new PooledXORGenerator();
     }

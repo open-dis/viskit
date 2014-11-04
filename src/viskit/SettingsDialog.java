@@ -339,7 +339,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            ViskitController ctrlr = (ViskitController) VGlobals.instance().getEventGraphEditor().getController();
+            EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphEditor().getController();
             ctrlr.clearRecentFileSet();
         }
     }
@@ -348,7 +348,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyController aCtrlr = VGlobals.instance().getAssemblyController();
+            AssemblyControllerImpl aCtrlr = VGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentAssyFileList();
         }
     }

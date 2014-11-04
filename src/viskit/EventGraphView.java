@@ -6,8 +6,8 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
- * chosen view only as much as is described by this interface.
+ * The MVC design of Viskit means that the Model and the EventGraphView know about the
+ chosen view only as much as is described by this interface.
  *
  * Created by IntelliJ IDEA.
  * @author Mike Bailey
@@ -15,7 +15,7 @@ import java.util.Collection;
  * @since 12:06:11 PM
  * @version $Id$
  */
-public interface ViskitView
+public interface EventGraphView
 {
   // permit user to edit existing entities
   boolean doEditCancelEdge   ( CancellingEdge edge );
@@ -49,9 +49,9 @@ public interface ViskitView
   /** @param description the description to set for the EventGraph */
   void    setSelectedEventGraphDescription(String description);
 
-  void    addTab(ViskitModel mod); // When a tab is added
-  void    delTab(ViskitModel mod); // When a tab is removed
-  ViskitModel[] getOpenModels();
+  void    addTab(Model mod); // When a tab is added
+  void    delTab(Model mod); // When a tab is removed
+  Model[] getOpenModels();
 
   void    showAndSaveSource(String className, String s, String filename);
   void    displayXML(File f);

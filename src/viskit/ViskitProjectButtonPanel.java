@@ -148,7 +148,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         mvcController vac = VGlobals.instance().getAssemblyController();
         if (vac != null) {
 
-            ViskitAssemblyView vaw = (ViskitAssemblyView) vac.getView();
+            AssemblyView vaw = (AssemblyView) vac.getView();
 
             if (vaw != null) {
                 vaw.openProject();

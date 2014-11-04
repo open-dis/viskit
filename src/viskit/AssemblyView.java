@@ -10,11 +10,11 @@ import viskit.model.*;
  * @since Mar 18, 2004
  * @since 12:06:11 PM
  * @version $Id$
- *
- * The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
- * chosen view only as much as is described by this interface.
+
+ The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
+ chosen view only as much as is described by this interface.
  */
-public interface ViskitAssemblyView {
+public interface AssemblyView {
 
     // permit user to edit existing entities
     boolean doEditPclNode(PropChangeListenerNode pclNode);
@@ -112,16 +112,16 @@ public interface ViskitAssemblyView {
      *
      * @param mod the Assembly model to display graphically
      */
-    void addTab(ViskitAssemblyModel mod);
+    void addTab(AssemblyModel mod);
 
     /** Remove an Assembly tab from the Assembly View Editor
      *
      * @param mod the Assembly model to remove from view
      */
-    void delTab(ViskitAssemblyModel mod);
+    void delTab(AssemblyModel mod);
 
     /** @return an array of open ViskitAssemblyModels */
-    ViskitAssemblyModel[] getOpenModels();
+    AssemblyModel[] getOpenModels();
 
     /** Capture Assembly Editor user set Frame bounds */
     void prepareToQuit();

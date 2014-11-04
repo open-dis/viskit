@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import simkit.Priority;
 import viskit.model.EventNode;
 import viskit.model.Edge;
-import viskit.model.Model;
+import viskit.model.ModelImpl;
 import viskit.model.SchedulingEdge;
 import viskit.model.ViskitElement;
 import viskit.model.vEdgeParameter;
@@ -61,7 +61,7 @@ public class EdgeInspectorDialog extends JDialog {
     private JScrollPane descriptionJsp;
 
     Vector<ViskitElement> nodeList;
-    Model mod; //todo fix
+    ModelImpl mod; //todo fix
 
     /**
      * Set up and show the dialog.  The first Component argument
@@ -95,7 +95,7 @@ public class EdgeInspectorDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        mod = (Model) (VGlobals.instance().getEventGraphEditor().getModel());
+        mod = (ModelImpl) (VGlobals.instance().getEventGraphEditor().getModel());
 
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));

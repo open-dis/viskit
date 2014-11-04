@@ -1,6 +1,6 @@
 package viskit;
 
-import viskit.model.ViskitModel;
+import viskit.model.Model;
 import viskit.model.vStateVariable;
 
 import javax.swing.*;
@@ -181,7 +181,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
             arraySizeField.setEnabled(isArray);
             arrSizeLab.setEnabled(isArray);
         } else {
-            stateVarNameField.setText(((ViskitModel) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
+            stateVarNameField.setText(((Model) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             String ty = (String) stateVarTypeCombo.getSelectedItem();
             boolean isArray = VGlobals.instance().isArray(ty);
             commentField.setText("");

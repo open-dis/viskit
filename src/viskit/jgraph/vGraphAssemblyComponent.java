@@ -20,7 +20,7 @@ import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.AssemblyViewFrame;
 import viskit.ModelEvent;
-import viskit.ViskitAssemblyController;
+import viskit.AssemblyController;
 import viskit.model.*;
 
 /**
@@ -159,7 +159,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitAssemblyController) parent.getController()).copy();
+            ((AssemblyController) parent.getController()).copy();
         }
     }
 
@@ -171,7 +171,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitAssemblyController) parent.getController()).cut();
+            ((AssemblyController) parent.getController()).cut();
         }
     }
 
@@ -183,7 +183,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ((ViskitAssemblyController) parent.getController()).paste();
+            ((AssemblyController) parent.getController()).paste();
         }
     }
 
@@ -301,7 +301,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (r != null) {
                         EvGraphNode en = (EvGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((ViskitAssemblyModel) parent.getModel()).changeEvGraphNode(en);
+                        ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
 
                         // might have changed:
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
@@ -314,7 +314,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (r != null) {
                         PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point2D.Double(r.x, r.y));
-                        ((ViskitAssemblyModel) parent.getModel()).changePclNode(pcln);
+                        ((AssemblyModel) parent.getModel()).changePclNode(pcln);
 
                         // might have changed:
                         m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
@@ -484,7 +484,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     selected.remove(((DefaultGraphCell) o).getUserObject());
                 }
             }
-            ((ViskitAssemblyController) parent.getController()).selectNodeOrEdge(selected);
+            ((AssemblyController) parent.getController()).selectNodeOrEdge(selected);
         }
     }
 
@@ -805,7 +805,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         DefaultGraphCell src = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(source);
         DefaultGraphCell tar = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(target);
         Object[] oa = new Object[]{src, tar};
-        ViskitAssemblyController controller = (ViskitAssemblyController) parent.getController();
+        AssemblyController controller = (AssemblyController) parent.getController();
 
         if (parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE) {
             controller.newAdapterArc(oa);

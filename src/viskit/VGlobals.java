@@ -57,10 +57,10 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.doe.LocalBootLoader;
-import viskit.model.AssemblyModel;
+import viskit.model.AssemblyModelImpl;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
-import viskit.model.ViskitModel;
+import viskit.model.Model;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -113,8 +113,8 @@ public class VGlobals {
 
     /* routines to manage the singleton-aspect of the views. */
     AssemblyViewFrame avf;
-    AssemblyController acont;
-    AssemblyModel amod;
+    AssemblyControllerImpl acont;
+    AssemblyModelImpl amod;
     boolean assyFirstRun = false;
 
     /**
@@ -131,7 +131,7 @@ public class VGlobals {
      * @return the component AssemblyViewFrame
      */
     public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly) {
-        AssemblyController cont = new AssemblyController();
+        AssemblyControllerImpl cont = new AssemblyControllerImpl();
         return buildAssemblyViewFrame(contentOnly, cont);
     }
 
@@ -141,17 +141,17 @@ public class VGlobals {
      * @return the component AssemblyViewFrame
      */
     public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly) {
-        AssemblyController cont = new AssemblyController();
+        AssemblyControllerImpl cont = new AssemblyControllerImpl();
         return initAssemblyViewFrame(contentOnly, cont);
     }
 
-    private AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+    private AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl cont) {
         initAssemblyViewFrame(contentOnly, cont);
         cont.begin();
         return avf;
     }
 
-    private AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyController cont) {
+    private AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl cont) {
         acont = cont;
         avf = new AssemblyViewFrame(contentOnly, cont);
         cont.setView(avf);
@@ -162,11 +162,11 @@ public class VGlobals {
         avf.rebuildTreePanels();
     }
 
-    public AssemblyModel getAssemblyModel() {
+    public AssemblyModelImpl getAssemblyModel() {
         return amod;
     }
 
-    public AssemblyController getAssemblyController() {
+    public AssemblyControllerImpl getAssemblyController() {
         return acont;
     }
 
@@ -215,7 +215,7 @@ public class VGlobals {
         assyQuitHandler = lis;
     }
 
-    /* EventGraphViewFrame / EventGraphController */
+    /* EventGraphViewFrame / EventGraphControllerImpl */
 
     EventGraphViewFrame egvf;
 
@@ -224,38 +224,38 @@ public class VGlobals {
     }
 
     public EventGraphViewFrame buildEventGraphViewFrame() {
-        return buildEventGraphViewFrame(false, new EventGraphController());
+        return buildEventGraphViewFrame(false, new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame buildEventGraphViewFrame(boolean contentOnly, EventGraphController cont) {
+    public EventGraphViewFrame buildEventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl cont) {
         initEventGraphViewFrame(contentOnly, cont);
         cont.begin();
         return egvf;
     }
 
     /** This method starts the chain of various Viskit startup steps.  By
-     * calling for a new EventGraphController(), in its constructor is a call
-     * to initConfig() which is the first time that the viskitConfig.xml is
-     * looked for, or if one is not there, to create one from the template.  The
-     * viskitConfig.xml is an important file that holds information on recent
-     * assembly and event graph openings, gui sizes and cacheing of compiled
-     * source from EventGraphs.
+ calling for a new EventGraphControllerImpl(), in its constructor is a call
+ to initConfig() which is the first time that the viskitConfig.xml is
+ looked for, or if one is not there, to create one from the template.  The
+ viskitConfig.xml is an important file that holds information on recent
+ assembly and event graph openings, gui sizes and cacheing of compiled
+ source from EventGraphs.
      *
      * @param contentOnly
      * @return an instance of the EventGraphViewFrame
      */
     public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly) {
-        return initEventGraphViewFrame(contentOnly, new EventGraphController());
+        return initEventGraphViewFrame(contentOnly, new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly, EventGraphController cont) {
+    public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl cont) {
         egvf = new EventGraphViewFrame(contentOnly, cont);
         cont.setView(egvf);
         return egvf;
     }
 
-    public ViskitModel getActiveEventGraphModel() {
-        return (ViskitModel) egvf.getModel();
+    public Model getActiveEventGraphModel() {
+        return (Model) egvf.getModel();
     }
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {

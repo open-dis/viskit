@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.ViskitController;
+import viskit.EventGraphController;
 import viskit.model.CancellingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;
@@ -58,7 +58,7 @@ public class vGraphUI extends BasicGraphUI {
 
             @Override
             public void run() {
-                ViskitController cntl = (ViskitController) vGraphUI.this.parent.parent.getController();     // todo fix this
+                EventGraphController cntl = (EventGraphController) vGraphUI.this.parent.parent.getController();     // todo fix this
                 if (cell instanceof vEdgeCell) {
                     Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
                     if (e instanceof SchedulingEdge) {
