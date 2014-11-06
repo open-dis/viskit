@@ -74,18 +74,10 @@ public class CryptoMethods
       byte[] ciphertext = desCipher.doFinal(cleartext);
       return getString(ciphertext);
     }
-    catch (InvalidKeyException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (NoSuchAlgorithmException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (BadPaddingException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (IllegalBlockSizeException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (NoSuchPaddingException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      }
-      return null;
+    catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+        LogUtils.getLogger(CryptoMethods.class).error(e);
+    }
+    return null;
   }
 
   public static String doDecryption(String string, Key key)
@@ -98,17 +90,9 @@ public class CryptoMethods
 
       return new String(cleartext);
     }
-    catch (InvalidKeyException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (NoSuchAlgorithmException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (BadPaddingException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (IllegalBlockSizeException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (NoSuchPaddingException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      }
+    catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+        LogUtils.getLogger(CryptoMethods.class).error(e);
+    }
     return null;
   }
 
@@ -121,13 +105,9 @@ public class CryptoMethods
       SecretKey s = skf.generateSecret(pass);
       return s;
     }
-    catch (InvalidKeyException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (NoSuchAlgorithmException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      } catch (InvalidKeySpecException e) {
-          LogUtils.getLogger(CryptoMethods.class).error(e);
-      }
+    catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        LogUtils.getLogger(CryptoMethods.class).error(e);
+    }
     return null;
   }
 

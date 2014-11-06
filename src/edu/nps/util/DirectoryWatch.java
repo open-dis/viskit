@@ -47,7 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -56,9 +56,9 @@ import java.util.Vector;
 public class DirectoryWatch {
 
     private static int sequenceNum = 0;
-    private final static int DEFAULTSLEEPTIMEMS = 3 * 1000; // 3 seconds
+    private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
     private long sleepTimeMs = DEFAULTSLEEPTIMEMS;
-    private HashMap<String, Long> lastFiles;
+    private Map<String, Long> lastFiles;
     private Thread thread;
     private File root;
 
@@ -100,7 +100,7 @@ public class DirectoryWatch {
         if (!root.exists()) {
             throw new FileNotFoundException("File or directory passed to DirectoryWatch constructor does not exist");
         }
-        lastFiles = new HashMap<String, Long>(50);
+        lastFiles = new HashMap<>(50);
 
         fileAdder fa = new fileAdder();
         if (recurse) {
@@ -112,9 +112,10 @@ public class DirectoryWatch {
 
     class fileAdder implements RecurseListener {
 
+        @Override
         public void foundFile(File f) {
             try {
-                lastFiles.put(f.getCanonicalPath(), new Long(f.lastModified()));
+                lastFiles.put(f.getCanonicalPath(), f.lastModified());
             } catch (IOException e) {
                 System.out.println("error in getCanonicalPath() of " + f.toString());
             }
@@ -133,13 +134,13 @@ public class DirectoryWatch {
         } else {
             File[] fa = f.listFiles();
             if (fa != null) {
-                for (int i = 0; i < fa.length; i++) {
-                    recurseTree(fa[i], lis);
+                for (File fa1 : fa) {
+                    recurseTree(fa1, lis);
                 }
             }
         }
     }
-    private HashSet<DirectoryChangeListener> listeners = new HashSet<DirectoryChangeListener>();
+    private HashSet<DirectoryChangeListener> listeners = new HashSet<>();
 
     /**
      * @param lis
@@ -158,16 +159,16 @@ public class DirectoryWatch {
     }
 
     private void fireAction(File f, int action) {
-        for (Iterator itr = listeners.iterator(); itr.hasNext();) {
-            DirectoryChangeListener lis = (DirectoryChangeListener) itr.next();
+        for (DirectoryChangeListener lis : listeners) {
             lis.fileChanged(f, action, this);
         }
     }
 
     class Runner implements Runnable, RecurseListener {
 
-        HashMap<String, Long> workingHM = new HashMap<String, Long>(50);
+        Map<String, Long> workingHM = new HashMap<>(50);
 
+        @Override
         public void run() {
             while (true) {
                 workingHM.clear();
@@ -182,17 +183,13 @@ public class DirectoryWatch {
                 for (String cPath : lastFiles.keySet()) {
                     fireAction(new File(cPath), DirectoryChangeListener.FILE_REMOVED);
                 }
-                HashMap<String, Long> temp = lastFiles;
+                Map<String, Long> temp = lastFiles;
                 lastFiles = workingHM;
                 workingHM = temp; // gets zeroed above
-
-                for (Iterator itr = changed.iterator(); itr.hasNext();) {
-                    File f = (File) itr.next();
+                for (File f : changed) {
                     fireAction(f, DirectoryChangeListener.FILE_CHANGED);
                 }
-
-                for (Iterator itr = added.iterator(); itr.hasNext();) {
-                    File f = (File) itr.next();
+                for (File f : added) {
                     fireAction(f, DirectoryChangeListener.FILE_ADDED);
                 }
 
@@ -204,11 +201,12 @@ public class DirectoryWatch {
                 }
             }
         }
-        Vector<File> added = new Vector<File>();
-        Vector<File> changed = new Vector<File>();
+        Vector<File> added = new Vector<>();
+        Vector<File> changed = new Vector<>();
 
+        @Override
         public void foundFile(File f) {
-            String canonP = null;
+            String canonP;
             try {
                 canonP = f.getCanonicalPath();
             } catch (IOException e) {
@@ -223,25 +221,24 @@ public class DirectoryWatch {
                 added.add(f);//fireAction(f,DirectoryChangeListener.FILE_ADDED);
             } else {
                 lastFiles.remove(canonP);
-                if (lastdate.longValue() != moddate) {
+                if (lastdate != moddate) {
                     changed.add(f); //fireAction(f,DirectoryChangeListener.FILE_CHANGED);
                 }
             }
-            workingHM.put(canonP, new Long(moddate));
+            workingHM.put(canonP, moddate);
         }
     }
 
     interface RecurseListener {
-
-        public void foundFile(File f);
+        void foundFile(File f);
     }
 
     static public interface DirectoryChangeListener {
 
-        public final static int FILE_ADDED = 0;
-        public final static int FILE_REMOVED = 1;
-        public final static int FILE_CHANGED = 2;
+        int FILE_ADDED = 0;
+        int FILE_REMOVED = 1;
+        int FILE_CHANGED = 2;
 
-        public void fileChanged(File file, int action, DirectoryWatch source);
+        void fileChanged(File file, int action, DirectoryWatch source);
     }
 }

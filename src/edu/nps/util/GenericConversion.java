@@ -15,13 +15,13 @@
  *
  * References:   http://javasymposium.techtarget.com/images/TSSJS_E_Presentations/Naftalin_Maurice_EffectiveGenerics.pdf
  *
- * URL:          
+ * URL:
  *
  * Requirements: 1) JDK1.5+
  *
- * Assumptions:  1) 
+ * Assumptions:  1)
  *
- * TODO:         
+ * TODO:
  *
  * Copyright (c) 1995-2011 held by the author(s).  All rights reserved.
  *
@@ -72,19 +72,19 @@ import java.util.List;
  *     Time:     0701Z
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.GenericConversion">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
- * 
+ *
  *     Date:     12 DEC 07
  *     Time:     0106Z
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.GenericConversion">Terry Norbraten, NPS MOVES</a>
- *     Comments: 1) Created method to take a Collection of Type and fill a 
+ *     Comments: 1) Created method to take a Collection of Type and fill a
  *                  Collection Array of Type
  *   </b></pre>
  * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class GenericConversion {
-    
-    /** Method to convert a "Collection" to an array.  Will warn of an 
+
+    /** Method to convert a "Collection" to an array.  Will warn of an
      * "unchecked cast," but this is a known cast to us, therefore permissible.
      * @param <T> the type to cast this array
      * @param c the Collection of Type to convert
@@ -94,7 +94,7 @@ public class GenericConversion {
     @SuppressWarnings("unchecked")
     public static <T> T[] toArray(Collection<T> c, T[] a) {
         if (a.length < c.size()) {
-            
+
             // known unchecked cast
             a = (T[]) Array.newInstance(a.getClass().getComponentType(), c.size());
         }
@@ -107,8 +107,8 @@ public class GenericConversion {
         }
         return a;
     }
-  
-    /** Method to return a generic List&lt;Object&gt; array initialized based 
+
+    /** Method to return a generic List&lt;Object&gt; array initialized based
      * on runtime type information.  Will warn of an unchecked cast which, in
      * this case, is permissible
      * @param <T> the type to cast this array
@@ -125,7 +125,7 @@ public class GenericConversion {
         // known unchecked cast
         List<Object>[] lis = (List<Object>[]) Array.newInstance(type, length);
         for (int ix = 0; ix < lis.length; ix++) {
-            lis[ix] = new ArrayList<Object>();
+            lis[ix] = new ArrayList<>();
         }
         return lis;
     }

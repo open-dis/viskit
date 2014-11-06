@@ -66,14 +66,14 @@ import java.util.jar.Manifest;
 import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
 
-/**
- * MOVES Institute</p>
- * Naval Postgraduate School, Monterey, CA</p>
+/**<p>
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since Oct 24, 2005
  * @since 9:42:57 AM
- * 
+ *
  * Simple class loader to illustrate custom Class
  * loading with new delegation model in Java 1.2.
  * Derived from Simple1_2ClassLoader in
@@ -85,7 +85,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
      *  Provide delegation constructor
      *
      * @param parent
-     * @param dirsJarsOrZips 
+     * @param dirsJarsOrZips
      */
     public SimpleDirectoriesAndJarsClassLoader(ClassLoader parent, String[] dirsJarsOrZips) {
         super(parent);
@@ -95,7 +95,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     /**
      *  Same old ClassLoader constructor
      *
-     * @param dirsJarsOrZips 
+     * @param dirsJarsOrZips
      */
     public SimpleDirectoriesAndJarsClassLoader(String[] dirsJarsOrZips) {
         super();
@@ -165,41 +165,39 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
         String path = name.replace('.', '/');
         path = path + ".class";
         InputStream is = null;
-        for (int i = 0; i < roots.length; i++) {
-            if (roots[i] == null) {
+        for (Object root : roots) {
+            if (root == null) {
                 continue;
             }
             try {
-                if (roots[i] instanceof JarFile) {
-                    JarFile jf = (JarFile) roots[i];
+                if (root instanceof JarFile) {
+                    JarFile jf = (JarFile) root;
                     JarEntry je = jf.getJarEntry(path);
                     if (je == null) {
                         continue;
                     }
                     is = jf.getInputStream(je);
-                } else if (roots[i] instanceof ZipFile) {
-                    ZipFile zf = (ZipFile) roots[i];
+                } else if (root instanceof ZipFile) {
+                    ZipFile zf = (ZipFile) root;
                     ZipEntry ze = zf.getEntry(path);
                     if (ze == null) {
                         continue;
                     }
                     is = zf.getInputStream(ze);
-                } else if (roots[i] instanceof File) {
-                    File f = new File((File) roots[i], path);
+                } else if (root instanceof File) {
+                    File f = new File((File) root, path);
                     if (!f.exists()) {
                         continue;
                     }
                     is = new FileInputStream(f);
                 }
-
                 byte[] classBytes = new byte[is.available()];
                 is.read(classBytes);
                 is.close();
                 definePackage(name);
                 return defineClass(name, classBytes, 0, classBytes.length);
-
-            } catch (Exception e) {
-                System.out.println("exc: " + e.getMessage());
+            } catch (IOException e) {
+                System.err.println("exc: " + e.getMessage());
             }
         }
         /*
@@ -249,7 +247,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
      *
      *  @param name the resource name
      *  @return Enumeration of one URL
-     * @throws java.io.IOException 
+     * @throws java.io.IOException
      */
     @Override
     protected Enumeration<URL> findResources(final String name) throws IOException {
@@ -261,10 +259,12 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
 
             URL resource = findResource(name);
 
+            @Override
             public boolean hasMoreElements() {
-                return (resource != null ? true : false);
+                return resource != null;
             }
 
+            @Override
             public URL nextElement() {
                 if (!hasMoreElements()) {
                     throw new NoSuchElementException();
@@ -280,7 +280,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     /**
      *  Minimal package definition
      *
-     * @param className 
+     * @param className
      */
     private void definePackage(String className) {
         // Extract the package name from the class name,
@@ -345,7 +345,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
             }
             JarEntry je = jf.getJarEntry("simkit/util/Misc.class");
             System.out.println(je.toString());
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
     }
