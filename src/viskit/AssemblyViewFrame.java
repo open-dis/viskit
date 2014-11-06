@@ -1024,7 +1024,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         AssemblyController aController = ((AssemblyController) getController());
         if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
-            String title = "Close Current Project";
+            String title = "Close Current Project?";
 
             ret = genericAskYN(title, msg);
             if (ret == JOptionPane.YES_OPTION) {

@@ -104,7 +104,7 @@ public class VGlobals {
     }
 
     private VGlobals() {
-        cbMod = new DefaultComboBoxModel<String>(new Vector<String>(Arrays.asList(defaultTypeStrings)));
+        cbMod = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
         initProjectHome();
@@ -306,7 +306,7 @@ public class VGlobals {
     }
 
     public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
-        return new DefaultComboBoxModel<ViskitElement>(getStateVarsList());
+        return new DefaultComboBoxModel<>(getStateVarsList());
     }
 
     /******/
@@ -709,7 +709,7 @@ public class VGlobals {
     }
 
     public String[] getArraySize(String typ) {
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         Matcher m = bracketsPattern.matcher(typ);
 
         while (m.find()) {
@@ -741,7 +741,7 @@ public class VGlobals {
     }
 
     public JComboBox<String> getTypeCB() {
-        JComboBox<String> cb = new JComboBox<String>(cbMod);
+        JComboBox<String> cb = new JComboBox<>(cbMod);
         cb.addActionListener(myListener);
         cb.addItemListener(myListener);
         cb.setRenderer(new myTypeListRenderer());

@@ -214,6 +214,8 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 JFileChooser chooser;
 private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtActionPerformed
+
+    // TODO: replace with ViskitProject.newProjectPath(JFrame, String)
     if (chooser == null) {
         chooser = new JFileChooser();
         chooser.setMultiSelectionEnabled(false);

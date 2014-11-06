@@ -191,7 +191,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     setupViskitProject(projF);
 
     // The work directory will have already been created by default as VGlobals.init
-    // was already called by the ${user.home}/.viskit which creates the directory
+    // was already called which creates the directory ${user.home}/.viskit
     // during constructor init
 }//GEN-LAST:event_createButtActionPerformed
 

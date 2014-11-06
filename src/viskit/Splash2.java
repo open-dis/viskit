@@ -7,6 +7,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -17,7 +18,7 @@ import java.lang.reflect.Method;
  * @author Mike Bailey
  * @since Apr 13, 2004
  * @since 9:19:25 AM
- * 
+ *
  * Based on code posted by Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
  */
 public class Splash2 extends JFrame {
@@ -124,18 +125,21 @@ public class Splash2 extends JFrame {
     }
 
     public static void main(String[] args) {
-        
+
         if (viskit.Vstatics.debug) {
             System.out.println(System.getProperty("java.class.path"));
         }
-        Splash2 spl = new Splash2();
+        final Splash2 spl = new Splash2();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         spl.setLocation((d.width - spl.getWidth()) / 2, (d.height - spl.getHeight()) / 2);
-        spl.setVisible(true);
 
-        if (args.length == 0) {
-            args = new String[] {"viskit.EventGraphAssemblyComboMain"};
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                spl.setVisible(true);
+            }
+        });
 
         // First argument is main class
         String target = args[0];
@@ -148,10 +152,11 @@ public class Splash2 extends JFrame {
         // this is used to give us some min splash viewing
         try {
             Thread.sleep(1000);
-        } catch (Exception e) {
-        }  
+        } catch (InterruptedException e) {}
+
         progressBar.setString("Starting Viskit...");
         try {
+
             // Call the main() method of the application using reflection
             Object[] arguments = new Object[] {newArgs};
             Class[] parameterTypes = new Class[] {newArgs.getClass()};
@@ -160,11 +165,18 @@ public class Splash2 extends JFrame {
 
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
         progressBar.setString("Complete");
-        spl.dispose();
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                spl.dispose();
+            }
+        });
     }
 
     static public class DefaultEntry {
@@ -174,15 +186,6 @@ public class Splash2 extends JFrame {
         }
     }
 
-    /** Deprecated, please use viskit.EventGraphAssemblyComboMain 
-     * @deprecated since DEC 2007.
-     */
-    static public class DefaultEntryOrig {
-
-        public static void main(String[] args) {
-            Splash2.main(new String[]{"viskit.Main"});
-        }
-    }
 }
 
 class MyPanel extends JPanel {
