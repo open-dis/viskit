@@ -70,7 +70,7 @@
     </path>
 
     <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar"/>
     </path>
 
     <!-- The following used for the IzPack installer routine -->
@@ -171,21 +171,6 @@
 
             </and>
         </condition>
-    </target>
-    <target name="initializeWindows" if="isWindows" depends="initializeAll">
-        <echo message="os.architecture.bitness=${os.architecture.bitness}"/>
-        <property name="run.args" value="${win_runarguments}"/>
-    </target>
-    <target name="initializeUnix" if="isUnixNotMac" depends="initializeAll">
-        <property name="run.args" value="${unix_runarguments}"/>
-    </target>
-    <target name="initializeMac" if="isMac" depends="initializeAll">
-        <property name="run.args" value="${mac_runarguments}"/>
-    </target>
-    <target name="initializeAll" >
-        <property name="win_runarguments"  value="${common.args} ${runarg6} ${runarg7}"/>
-        <property name="unix_runarguments" value="${common.args} ${runarg8} ${runarg9}"/>
-        <property name="mac_runarguments"  value="${common.args} ${runarg10} ${runarg11} ${runarg12} ${runarg13} ${runarg17}"/>
     </target>
 
     <target name="check.JAVA_HOME" unless="env.JAVA_HOME" if="isWindows">
@@ -569,9 +554,12 @@
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-            <arg value="${main.class}"/>
             <jvmarg value="-Xmx256m"/>
+
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+            <arg value="${main.class}"/>
         </java>
     </target>
     <target name="build.run.no.extensions"
@@ -580,75 +568,26 @@
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
+            <jvmarg value="-Xmx256m"/>
+
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
             <arg value="${main.class}"/>
-            <jvmarg value="-Xmx256m"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    <target name="build.run.default.orig"
-            depends="jar"
-            description="Build and Run Viskit (original L and F) only, no module dependencies, Viskit custom Splash @deprecated (Use build.run.no.extensions)">
-        <java classname="viskit.Splash2"
-              classpathref="runtime.classpath"
-              fork="true">
-            <arg value="viskit.Main"/>
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-
-    <target name="splashy" description="@deprecated">
-        <splash imageurl="file:///${basedir}/${dir.src}/viskit/images/ViskitSplash2.png" showduration="0"/>
-    </target>
-
-    <!-- TARGET: Run w/Ant Splash @deprecated -->
-    <target name="build.run"
-            depends="splashy,jar,runtime.extensions"
-            description="Build and Run Viskit, include external runtime modules if any, display Ant Splash @deprecated (Use build.run.with.extensions)">
-        <java classname="${main.class}"
-              classpathref="runtime.classpath"
-              fork="true">
-            <jvmarg value="-Xmx256m"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    <target name="build.run.orig"
-            depends="splashy,jar"
-            description="Build and Run Viskit (original L and F) only, no module dependencies, display Ant Splash @deprecated (Use build.run.no.extensions)">
-        <java classname="viskit.Main"
-              classpathref="runtime.classpath"
-              fork="true">
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
 
     <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
-    <target name="quick.run" description="Run Viskit, don't check dependencies, don't rebuild">
+    <target depends="init" name="quick.run" description="Run Viskit, don't check dependencies, don't rebuild">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
+	    <jvmarg value="-Xmx256m"/>
+
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
+            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
             <arg value="${main.class}"/>
-	    <!--arg value="Your path to an assembly file to initialize Viskit ready to run"/-->
-	    <!--arg value="${basedir}/MyViskitProjects/DefaultProject/Assemblies/atfp/PortOfBaltimoreAssembly.xml"/-->
-	    <!--arg value="${basedir}/MyViskitProjects/TestFoo/Assemblies/oa3302/ServerAssembly.xml"/-->
-            <jvmarg value="-Xmx256m"/>
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-        </java>
-    </target>
-    <target name="quick.run.orig"
-            description="Run Viskit (original L and F), don't check dependencies @deprecated (Use quick.run)">
-        <java classname="viskit.Splash2"
-              classpathref="runtime.classpath"
-              fork="true">
-            <arg value="viskit.Main"/>
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
 
@@ -657,12 +596,17 @@
         <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <java classname="${debug.class}" fork="true">
+        <java classname="${debug.class}"
+              classpathref="runtime.classpath"
+              fork="true">
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <classpath refid="runtime.classpath"/>
+            <jvmarg value="-Xmx256m"/>
+
+            <!-- Font anti-aliasing -->
+            <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
         </java>
     </target>
@@ -682,6 +626,7 @@
             <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx256m"/>
+
             <!-- Font anti-aliasing -->
             <jvmarg value="-Dswing.aatext=true"/>
             <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
