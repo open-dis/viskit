@@ -664,7 +664,7 @@ public class SimkitXML2Java {
             pw.println();
         }
 
-        LinkedList<String> decls = new LinkedList<String>();
+        LinkedList<String> decls = new LinkedList<>();
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
@@ -859,7 +859,7 @@ public class SimkitXML2Java {
     // note a subclass should have at least the superclass's
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
-        List<Parameter> localSuperParams = new ArrayList<Parameter>();
+        List<Parameter> localSuperParams = new ArrayList<>();
         if (extendz.equals("simkit.SimEntityBase") || extendz.equals("simkit.BasicSimEntity")) {
             return localSuperParams;
         }
@@ -925,9 +925,9 @@ public class SimkitXML2Java {
     // unused?
     private List<Parameter> paramsInSuper(Constructor<?> c, List<Parameter> params) {
         Class<?>[] cTypes = c.getParameterTypes();
-        Vector<String> pTypes = new Vector<String>();
-        Vector<String> superPTypes = new Vector<String>();
-        Vector<Parameter> subset = new Vector<Parameter>();
+        Vector<String> pTypes = new Vector<>();
+        Vector<String> superPTypes = new Vector<>();
+        Vector<Parameter> subset = new Vector<>();
         for (Parameter p : params) {
             pTypes.addElement(p.getType());
         }

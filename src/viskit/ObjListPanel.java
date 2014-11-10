@@ -151,6 +151,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
     }
 
+    @Override
     public void caretUpdate(CaretEvent e) {
         if (changeListener != null) {
             changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
@@ -159,7 +160,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
     /* returns a list of instantiators */
     public List<Object> getData() {
-        Vector<Object> v = new Vector<Object>();
+        Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLab.length; i++) {
             if (shadow[i] instanceof VInstantiator.FreeF) {
                 ((VInstantiator.FreeF) shadow[i]).setValue(entryTF[i].getText().trim());
@@ -170,13 +171,14 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         return v;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         int idx = Integer.parseInt(e.getActionCommand());
 
         VInstantiator vinst = shadow[idx].vcopy();
         //VInstantiator vinst = shadow[idx];
         //List[] params = Vstatics.resolveParameters(vinst.getType()); //
-        //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ??? 
+        //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ???
         Class<?> c = Vstatics.classForName(vinst.getType());
         if (c.isArray()) {
             ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp

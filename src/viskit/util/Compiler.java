@@ -12,9 +12,9 @@ import viskit.VGlobals;
 
 /** Using the java compiler now part of javax, we no longer have to
  * either ship tools.jar or require a jdk environment variable.
- * This class was taken from viskit.SourceWindow.
+ * This class was based upon {@link viskit.SourceWindow}.
  * TBD refactor out from SourceWindow, the main difference being Compiler actually
- * creates .class Files, where SourceWindow did in memory.
+ * creates .class files, where SourceWindow compiled to memory.
  *
  * @author Rick Goldberg
  * @version $Id$

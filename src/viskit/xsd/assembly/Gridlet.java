@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -53,6 +54,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.apache.xmlrpc.XmlRpcException;
 import viskit.doe.DoeException;
 import viskit.xsd.bindings.assembly.DesignPoint;
 import viskit.xsd.bindings.assembly.EventGraph;
@@ -156,14 +158,14 @@ public class Gridlet extends Thread {
                 // still needed?
                 if (taskID == 1) {
 
-                    Vector<Object> v = new Vector<Object>();
+                    Vector<Object> v = new Vector<>();
                     v.add(usid);
-                    v.add(new Integer(jobID));
+                    v.add(jobID);
                     xmlrpc.execute("gridkit.setJobID", v);
                 }
 
                 // get any thirdPartyJars and install them now
-                Vector<Object> v = new Vector<Object>();
+                Vector<Object> v = new Vector<>();
                 v.add(usid);
 
                 // TODO: Fix generics
@@ -189,7 +191,7 @@ public class Gridlet extends Thread {
                 }
                 usid = "LOCAL-RUN";
             }
-        } catch (Exception e) {
+        } catch (IOException | XmlRpcException | RuntimeException e) {
             e.printStackTrace();
         }
     }
@@ -206,11 +208,7 @@ public class Gridlet extends Thread {
             //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ Thread.currentThread().getContextClassLoader());
             //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURI().toURL().openStream());
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -255,7 +253,7 @@ public class Gridlet extends Thread {
         Iterator<TerminalParameter> itd = designParams.iterator();
         Iterator<TerminalParameter> itp = designArgs.iterator();
 
-        boolean debug_io = Boolean.valueOf(exp.getDebug()).booleanValue();
+        boolean debug_io = Boolean.valueOf(exp.getDebug());
         debug_io = false;
         //if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
 
@@ -310,7 +308,7 @@ public class Gridlet extends Thread {
             }
 
             List<EventGraph> depends = root.getEventGraph();
-            List<File> javaFiles = new ArrayList<File>();
+            List<File> javaFiles = new ArrayList<>();
 
             // submit all EventGraphs
             for (EventGraph d : depends) {
@@ -332,9 +330,9 @@ public class Gridlet extends Thread {
                 // pass the source for this SimEntity in for compile
                 String eventGraphJava = sx2j.translate();
                 File eventGraphJavaFile = new File(tempDir,sx2j.getRoot().getName()+".java");
-                FileWriter writer = new FileWriter(eventGraphJavaFile);
-                writer.write(eventGraphJava);
-                writer.close();
+                try (FileWriter writer = new FileWriter(eventGraphJavaFile)) {
+                    writer.write(eventGraphJava);
+                }
                 // since there may be some kind of event-graph interdependency, compile
                 // all .java's "at once"; javac should be able to resolve these if given
                 // on the command line all at once.
@@ -344,7 +342,7 @@ public class Gridlet extends Thread {
             // compile eventGraphJavaFiles and deposit the .classes in the appropriate
             // direcory under tempDir
 
-            List<String> cmdLine = new ArrayList<String>();
+            List<String> cmdLine = new ArrayList<>();
 
             cmdLine.add("-Xlint:unchecked");
             cmdLine.add("-Xlint:deprecation");
@@ -358,13 +356,13 @@ public class Gridlet extends Thread {
 
             String assemblyJava = sax2j.translate();
             File assemblyJavaFile = new File(tempDir, root.getName()+".java");
-            FileWriter writer = new FileWriter(assemblyJavaFile);
-            writer.write(assemblyJava);
-            writer.close();
+            try (FileWriter writer = new FileWriter(assemblyJavaFile)) {
+                writer.write(assemblyJava);
+            }
             javaFiles.add(assemblyJavaFile);
 
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics,null,null);
             Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(javaFiles);
             compiler.getTask(null, fileManager, null, cmdLine, null, compilationUnits).call();
@@ -455,11 +453,11 @@ public class Gridlet extends Thread {
                             mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStats.length, statXml);
                         } else {
 
-                            Vector<Object> args = new Vector<Object>();
+                            Vector<Object> args = new Vector<>();
                             args.add(usid);
-                            args.add(new Integer(sampleIndex));
-                            args.add(new Integer(designPtIndex));
-                            args.add(new Integer(designPointStats.length));
+                            args.add(sampleIndex);
+                            args.add(designPtIndex);
+                            args.add(designPointStats.length);
                             args.add(statXml);
                             if (debug_io) {
                                 System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
@@ -498,11 +496,11 @@ public class Gridlet extends Thread {
                                         //gridRunner.addReplicationStat(sampleIndex,designPtIndex,j,statXml);
                                     } else {
                                         // use rpc to runner on grid
-                                        Vector<Object> args = new Vector<Object>();
+                                        Vector<Object> args = new Vector<>();
                                         args.add(usid);
-                                        args.add(new Integer(sampleIndex));
-                                        args.add(new Integer(designPtIndex));
-                                        args.add(new Integer(j));
+                                        args.add(sampleIndex);
+                                        args.add(designPtIndex);
+                                        args.add(j);
                                         args.add(statXml);
                                         if (debug_io) {
                                             System.out.println("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
@@ -562,21 +560,21 @@ public class Gridlet extends Thread {
                 PrintWriter out;
                 StringWriter sw;
                 String line;
-                List<String> logs = new ArrayList<String>();
-                List<String> propertyChanges = new ArrayList<String>();
-                List<String> errs = new ArrayList<String>();
+                List<String> logs = new ArrayList<>();
+                List<String> propertyChanges = new ArrayList<>();
+                List<String> errs = new ArrayList<>();
 
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
                 String qu  = "\"";
                 out.println("<Results index="+qu+(taskID-1)+qu+" job="+qu+jobID+qu+" designPoint="+qu+designPtIndex+qu+" sample="+qu+sampleIndex+qu+">");
                 while( (line = br.readLine()) != null ) {
-                    if (line.indexOf("<PropertyChange") < 0) {
+                    if (!line.contains("<PropertyChange")) {
                         logs.add(line);
                     } else {
                         propertyChanges.add(line);
                         // all one line? already added, else :
-                        while (line.indexOf("</PropertyChange>") < 0 ) {
+                        while (!line.contains("</PropertyChange>") ) {
                             if ( ( line = br.readLine() ) != null ) {
                                 propertyChanges.add(line);
                             }
@@ -619,7 +617,7 @@ public class Gridlet extends Thread {
                     mthd.invoke(gridRunner,jobID,taskID);
                 } else {
                     //send results back to front end
-                    Vector<Object> parms = new Vector<Object>();
+                    Vector<Object> parms = new Vector<>();
                     parms.add(usid);
                     parms.add(sw.toString());
 
@@ -637,11 +635,11 @@ public class Gridlet extends Thread {
                     parms.add(taskID);
                     xmlrpc.execute("gridkit.removeTask", parms);
                 }
-            } catch (Exception e) {
+            } catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | XmlRpcException e) {
                 e.printStackTrace();
             }
 
-        } catch (Exception e) {
+        } catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException | InstantiationException e) {
             e.printStackTrace();
         }
     }

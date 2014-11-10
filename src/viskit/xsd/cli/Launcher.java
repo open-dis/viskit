@@ -20,7 +20,7 @@ public class Launcher extends Thread implements Runnable {
     static Logger log = LogUtils.getLogger(Launcher.class);
     String assembly = null;
     String assemblyName;
-    Hashtable<String, String> eventGraphs = new Hashtable<String, String>();
+    Hashtable<String, String> eventGraphs = new Hashtable<>();
     private static final boolean debug = true;
     private boolean compiled = true;
     private boolean inGridlet = false;
@@ -58,7 +58,7 @@ public class Launcher extends Thread implements Runnable {
                         String name = je.getName();
 
                         // Assemblies are foreced to be identified with "Assembly" in the file name
-                        if (name.indexOf(eventGraphDir) >= 0 && name.endsWith("xml") && !name.contains("Assembly") ) {
+                        if (name.contains(eventGraphDir) && name.endsWith("xml") && !name.contains("Assembly") ) {
                             log.info("Loading EventGraph from: " + name);
                             addEventGraph(jis);
                         }
@@ -92,7 +92,7 @@ public class Launcher extends Thread implements Runnable {
                     if (debug) {
                         System.out.println(line);
                     }
-                    if (line.indexOf("SGE_TASK_ID") > -1) {
+                    if (line.contains("SGE_TASK_ID")) {
                         SGE = line;
                         break;
                     }
@@ -141,18 +141,20 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
             while (a < args.length - 1) {
-                if (args[a].equals("-A")) {
-                    u = new URL(args[a + 1]);
-                    setAssembly(u);
-                    a += 2;
-                } else if (args[a].equals("-E")) {
-                    u = new URL(args[a + 1]);
-                    addEventGraph(u);
-                    a += 2;
-                } else {
-                    throw new IllegalArgumentException(args[a] + " not a valid arg, exiting");
+                switch (args[a]) {
+                    case "-A":
+                        u = new URL(args[a + 1]);
+                        setAssembly(u);
+                        a += 2;
+                        break;
+                    case "-E":
+                        u = new URL(args[a + 1]);
+                        addEventGraph(u);
+                        a += 2;
+                        break;
+                    default:
+                        throw new IllegalArgumentException(args[a] + " not a valid arg, exiting");
                 }
-
             }
 
             if (assemblyName == null) {

@@ -49,6 +49,7 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
+import javax.swing.text.JTextComponent;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -162,8 +163,8 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
         fillWidgets();     // put the data into the widgets
 
-        modified = (ed == null ? true : false);     // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled((ed == null ? true : false));
+        modified = (ed == null);     // if it's a new pclNode, they can always accept defaults with no typing
+        okButt.setEnabled((ed == null));
 
         getRootPane().setDefaultButton(canButt);
 
@@ -185,9 +186,9 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         Vstatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
-            ((JTextField) tf).setEditable(edit);
+            ((JTextComponent) tf).setEditable(edit);
             if (edit) {
-                ((JTextField) tf).addCaretListener(lis);
+                ((JTextComponent) tf).addCaretListener(lis);
             }
         }
     }
@@ -197,8 +198,8 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
         fillWidgets();
 
-        modified = (ae == null ? true : false);
-        okButt.setEnabled((ae == null ? true : false));
+        modified = (ae == null);
+        okButt.setEnabled((ae == null));
 
         getRootPane().setDefaultButton(canButt);
 
@@ -262,8 +263,9 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
-            modified = false;    // for the caller            
+            modified = false;    // for the caller
             VGlobals.instance().getAssemblyController().delete();
             dispose();
         }
@@ -271,6 +273,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             String stf = sourceEventTF.getText().trim();
             String ttf = targetEventTF.getText().trim();
@@ -287,12 +290,14 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }
@@ -300,6 +305,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     class findSourceEventsAction implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             commonFindEvents(sourceEVG, sourceEventTF);
         }
@@ -307,13 +313,14 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
     class findTargetEventsAction implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             commonFindEvents(targetEVG, targetEventTF);
         }
     }
 
     private void commonFindEvents(EvGraphNode node, JTextField selection) {
-        Class<?> c = null;
+        Class<?> c;
         String classname = node.getType();
         try {
             c = Vstatics.classForName(classname);
@@ -322,10 +329,9 @@ public class AdapterConnectionInspectorDialog extends JDialog {
             }
             Method[] methods = c.getMethods();
             //assert (methods != null && methods.length > 0);
-            Vector<String> evsv = new Vector<String>();
+            Vector<String> evsv = new Vector<>();
             if (methods != null && methods.length > 0) {
-                for (int i = 0; i < methods.length; i++) {
-                    Method m = methods[i];
+                for (Method m : methods) {
                     if (!m.getReturnType().getName().equals("void")) {
                         continue;
                     }
@@ -354,7 +360,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
                 modified = true;
                 selection.setText(evsv.get(which));
             }
-        } catch (Throwable t) {
+        } catch (ClassNotFoundException | SecurityException | HeadlessException t) {
             System.err.println("Error connecting: " + t.getMessage());
         }
 //    catch (ClassNotFoundException e) {

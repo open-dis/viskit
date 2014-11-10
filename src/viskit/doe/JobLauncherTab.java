@@ -63,6 +63,7 @@ import java.net.URL;
 import java.security.Key;
 import java.util.*;
 import java.util.List;
+import org.apache.xmlrpc.XmlRpcException;
 import viskit.ViskitConfig;
 
 /**
@@ -89,7 +90,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     // TODO: single variable for all viskit
     String clusterDNS = "wipeout.hpr.nps.edu";
-    int defaultClusterPort = 4444;
+    int defaultClusterPort = 4_444;
     String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
     String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
     String clusterWebStatus = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
@@ -228,6 +229,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         doQstatConsole = new JButton("Qstat Console");
         doQstatConsole.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 if (qstatConsole == null) {
                     //qstatConsole = new QstatConsole(unameTF.getText(),new String(upwPF.getPassword()),clusterTF.getText().trim(),portTF.getText().trim());
@@ -358,6 +360,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     class svLister implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
             saveParamsToJaxbNoNotify();
@@ -365,17 +368,19 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         }
     }
 
+    @Override
     public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
     }
 
+    @Override
     public String getHandle() {
         return "Launch Cluster Job";
     }
 
     private void saveParamsToJaxbNoNotify() {
         // Put the params from the GUI into the jaxbRoot
-        Experiment exp = null;
-        Schedule sch = null;
+        Experiment exp;
+        Schedule sch;
         exp = OpenAssembly.inst().jaxbFactory.createExperiment();
         sch = OpenAssembly.inst().jaxbFactory.createSchedule();
 
@@ -494,6 +499,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     class ButtListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand().charAt(0)) {
                 case 'r':
@@ -503,7 +509,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                     stopRun();
                     break;
                 case 'a':
-                    int port = 0;
+                    int port;
                     try {
                         port = Integer.parseInt(portTF.getText().trim());
                     } catch (NumberFormatException e1) {
@@ -523,9 +529,9 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                             if (jfc.getSelectedFile() != null) {
                                 File f = jfc.getSelectedFile();
                                 try {
-                                    FileWriter fw = new FileWriter(f);
-                                    fw.write(statusTextArea.getText());
-                                    fw.close();
+                            try (FileWriter fw = new FileWriter(f)) {
+                                fw.write(statusTextArea.getText());
+                            }
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 }
@@ -565,13 +571,14 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
         Thread jobKiller = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 if (thread != null) {
                     Thread t = thread;
                     thread = null;
                     t.interrupt();
                     try {
-                        t.join(1000);
+                        t.join(1_000);
                     } catch (InterruptedException e) {
                         System.err.println("join exception");
                     }
@@ -581,7 +588,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                         Vector parms = new Vector();
                         rpc.execute("gridkit.clear", parms);
                     }
-                } catch (Exception e) {
+                } catch (XmlRpcException | IOException e) {
                     System.err.println("RPC exception: " + e.getMessage());
                 }
 
@@ -594,6 +601,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     private void writeStatus(final String s) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 statusTextArea.append(s);
                 statusTextArea.append("\n");
@@ -602,38 +610,40 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
     }
 
     private boolean sendEGToServer(File file) throws Exception {
-        FileInputStream fis = new FileInputStream(file);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int rdRet;
-        while ((rdRet = fis.read(buf)) > 0) {
-            baos.write(buf, 0, rdRet);
+        ByteArrayOutputStream baos;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            baos = new ByteArrayOutputStream();
+            byte[] buf = new byte[1_024];
+            int rdRet;
+            while ((rdRet = fis.read(buf)) > 0) {
+                baos.write(buf, 0, rdRet);
+            }
         }
-        fis.close();
         baos.flush();
         baos.close();
         String egText = new String(baos.toByteArray());
 
-        Vector<Object> args = new Vector<Object>();
+        Vector<Object> args = new Vector<>();
         args.add(userID);
         args.add(egText);
 
         Boolean ret = (Boolean) rpc.execute("gridkit.addEventGraph", args);
-        return ret.booleanValue();
+        return ret;
     }
     StringWriter data;
 
+    @Override
     public void run() {
         writeStatus("Hello");
     }
 
     public void runOrig() {
-        Vector<Object> args = new Vector<Object>(5);
+        Vector<Object> args = new Vector<>(5);
 
         boolean doClustStat = this.doClusterStat.isSelected();
 
         outputDirty = true;
-        outputList = new ArrayList<Object[]>();
+        outputList = new ArrayList<>();
         lp3:
         {
             try {
@@ -684,8 +694,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 }
                 writeStatus("Sending job file to " + localClusterDNS);
                 Boolean retBool = (Boolean) rpc.execute("gridkit.setAssembly", args);
-                writeStatus("gridkit.setAssembly returned " + retBool.booleanValue());
-                if (retBool.booleanValue() == false) {
+                writeStatus("gridkit.setAssembly returned " + retBool);
+                if (retBool == false) {
                     throw new Exception("Set Assembly returned false.");
                 }
                 // Run it!
@@ -694,8 +704,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 writeStatus("Executing job");
                 retBool = (Boolean) rpc.execute("gridkit.run", args);
                 //retBool = (Boolean)gr.run();                         //todo
-                writeStatus("gridkit.run returned " + retBool.booleanValue());
-                if (retBool.booleanValue() == false) {
+                writeStatus("gridkit.run returned " + retBool);
+                if (retBool == false) {
                     throw new Exception("Set Assembly returned false.");
                 }
 
@@ -716,7 +726,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 args.add(userID);
                 try {
                     rpc.execute("gridkit.logout", args);
-                } catch (Exception e1) {
+                } catch (XmlRpcException | IOException e1) {
                 }
                 break lp3;
             }
@@ -739,7 +749,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         args.add(userID);
         try {
             rpc.execute("gridkit.logout", args);
-        } catch (Exception e) {
+        } catch (XmlRpcException | IOException e) {
         }
 
         stopRun();
@@ -769,7 +779,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
             // initial number of tasks ( can also query getRemainingTasks )
             args.clear();
             args.add(userID);
-            int tasksRemaining = ((Integer) rpc.execute("gridkit.getRemainingTasks", args)).intValue(); //5 * 3;
+            int tasksRemaining = (int) rpc.execute("gridkit.getRemainingTasks", args); //5 * 3;
             writeStatus("Total tasks: " + tasksRemaining);
 
             while (tasksRemaining > 0) {
@@ -782,13 +792,13 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 for (int i = 0; i < queue.size(); i++) {
                     // trick: any change between queries indicates a transition at
                     // taskID = i (well i+1 really, taskID's in SGE start at 1)
-                    if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
+                    if (!lastQueue.get(i).equals(queue.get(i))) {
                         int sampleIndex = i / designPoints; // 3; // number of designPoints chosed in this experiemnt was 3
                         int designPtIndex = i % designPoints; // 3; // can also just use getResultByTaskID(int)
                         args.clear();
                         args.add(userID);
-                        args.add(new Integer(sampleIndex));
-                        args.add(new Integer(designPtIndex));
+                        args.add(sampleIndex);
+                        args.add(designPtIndex);
                         // this is reallllly verbose, you may wish to consider
                         // not getting the output logs unless there is a problem
                         // even so at that point the design points can be run
@@ -804,7 +814,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                         ret = rpc.execute("gridkit.getDesignPointStats", args);
                         if (statsGraph == null) {
 
-                            final String[] properties = (String[]) ((Hashtable) ret).keySet().toArray(new String[0]);
+                            final String[] properties = (String[]) ((Map) ret).keySet().toArray(new String[0]);
                         //statsGraph = new StatsGraph(jaxbRoot.getName(),properties,designPoints, samples);
                         //statsGraph.setVisible(true);
                         }
@@ -815,9 +825,9 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                             writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
                             args.clear();
                             args.add(userID);
-                            args.add(new Integer(sampleIndex));
-                            args.add(new Integer(designPtIndex));
-                            args.add(new Integer(j));
+                            args.add(sampleIndex);
+                            args.add(designPtIndex);
+                            args.add(j);
                             ret = rpc.execute("gridkit.getReplicationStats", args);
                         //writeStatus(ret.toString());
                         }
@@ -830,7 +840,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
             }
             statsGraph = null; // allow to gc after done
-        } catch (Exception e) {
+        } catch (XmlRpcException | IOException | NumberFormatException e) {
             e.printStackTrace();
             writeStatus("Error in cluster execution: " + e.getMessage());
         }
@@ -860,8 +870,8 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
 
     private Gresults getSingleResult(Object[] oa) {
         File f = new File((String) oa[2]);
-        int dp = ((Integer) oa[0]).intValue();
-        int nrun = ((Integer) oa[1]).intValue();
+        int dp = (int) oa[0];
+        int nrun = (int) oa[1];
         Gresults res = new Gresults();
 
         Document doc;
@@ -945,13 +955,13 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         try {
             File f = File.createTempFile("DoeResults", ".xml", outDir);
             f.deleteOnExit();
-            FileWriter fw = new FileWriter(f);
-            fw.write(o);
-            fw.close();
+            try (FileWriter fw = new FileWriter(f)) {
+                fw.write(o);
+            }
             writeStatus("Result saved to " + f.getAbsolutePath());
             //outputs.put("" + dp + "," + nrun, f);
             int idx = outputList.size();
-            outputList.add(new Object[]{new Integer(dp), new Integer(nrun), f.getAbsolutePath()});
+            outputList.add(new Object[]{dp, nrun, f.getAbsolutePath()});
             return idx;
         } catch (IOException e) {
             writeStatus("error saving output for run " + dp + ", " + nrun + ": " + e.getMessage());
@@ -982,7 +992,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         try {
             statusURL = new URL(surl);
             editorPane.setPage(statusURL);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Error showing cluster status: " + e.getMessage());
             return;
         }
@@ -1047,14 +1057,14 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         public void run() {
             if (waitToGo) {
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(60_000);
                 } catch (InterruptedException e) {
                 }
             }
 
             while (statusThread != null && clusterStatusFrame != null) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(10_000);
 
                     // to refresh
                     javax.swing.text.Document doc = editorPane.getDocument();
@@ -1075,7 +1085,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                             vbar.setValue(50); //vbar.getMaximum());
                         }
                     });
-                } catch (Exception e) {
+                } catch (InterruptedException | IOException e) {
                     System.out.println("statusUpdater kill: " + e.getMessage());
                 }
             }

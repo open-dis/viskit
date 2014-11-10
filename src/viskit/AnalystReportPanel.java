@@ -93,7 +93,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
-    JComboBox<String> classifiedTF = new JComboBox<String>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    JComboBox<String> classifiedTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
@@ -559,7 +559,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         entityParamCommentsTA.setText(arb.getParameterComments());
 
-        Vector<String> colNames = new Vector<String>();
+        Vector<String> colNames = new Vector<>();
         colNames.add("Category");
         colNames.add("Name");
         colNames.add("Description");
@@ -567,7 +567,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         Vector v = arb.getParameterTables();
 
         for (Iterator itr = v.iterator(); itr.hasNext();) {
-            Vector<Vector<String>> tableVector = new Vector<Vector<String>>();
+            Vector<Vector<String>> tableVector = new Vector<>();
             Object[] oa = (Object[]) itr.next();
             String nm = (String) oa[0];
             Vector v0 = (Vector) oa[1];
@@ -575,14 +575,14 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 // Rows here
                 Object[] oa0 = (Object[]) itr0.next();
                 String nm0 = (String) oa0[0];
-                Vector<String> rowVect = new Vector<String>(3);
+                Vector<String> rowVect = new Vector<>(3);
                 rowVect.add(nm0);
                 rowVect.add("");
                 rowVect.add("");
                 tableVector.add(rowVect);
                 Vector v1 = (Vector) oa0[1];
                 for (Iterator itr1 = v1.iterator(); itr1.hasNext();) {
-                    rowVect = new Vector<String>(3);
+                    rowVect = new Vector<>(3);
                     rowVect.add("");
                     String[] sa = (String[]) itr1.next();
                     rowVect.add(sa[0]); // name
@@ -684,15 +684,15 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             lab = new JLabel("Image location:  " + behaviorImagePath);
             p.add(lab);
 
-            Vector<String> cols = new Vector<String>(3);
+            Vector<String> cols = new Vector<>(3);
             cols.add("name");
             cols.add("type");
             cols.add("description");
 
-            Vector<Vector<String>> data = new Vector<Vector<String>>(behaviorParameters.size());
+            Vector<Vector<String>> data = new Vector<>(behaviorParameters.size());
             for (Object behaviorParameter : behaviorParameters) {
                 String[] sa = (String[]) behaviorParameter;
-                Vector<String> row = new Vector<String>(3);
+                Vector<String> row = new Vector<>(3);
                 row.add(sa[0]);
                 row.add(sa[1]);
                 row.add(sa[2]);
@@ -703,10 +703,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
             jsp.setBorder(new TitledBorder("Parameters"));
             p.add(jsp);
 
-            data = new Vector<Vector<String>>(behaviorStateVariables.size());
+            data = new Vector<>(behaviorStateVariables.size());
             for (Object behaviorStateVariable : behaviorStateVariables) {
                 String[] sa = (String[]) behaviorStateVariable;
-                Vector<String> row = new Vector<String>(3);
+                Vector<String> row = new Vector<>(3);
                 row.add(sa[0]);
                 row.add(sa[1]);
                 row.add(sa[2]);
@@ -1152,7 +1152,7 @@ class EntityParamTable extends ROTable implements TableCellRenderer {
         Object o1 = getValueAt(row, 1);
         Object o2 = getValueAt(row, 2);
 
-        if (o0 != null && (o1 == null || ((String) o1).length() <= 0) && ((o2 == null || ((String) o2).length() <= 0))) {
+        if (o0 != null && (o1 == null || ((CharSequence) o1).length() <= 0) && ((o2 == null || ((CharSequence) o2).length() <= 0))) {
             c.setBackground(grey);
         } else {
             c.setBackground(origBkgd);

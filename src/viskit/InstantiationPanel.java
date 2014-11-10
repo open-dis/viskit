@@ -87,7 +87,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         methodLab = new JLabel("method", JLabel.TRAILING);
 
-        methodCB = new JComboBox<String>(new String[]{"free form", "constructor", "factory"});
+        methodCB = new JComboBox<>(new String[]{"free form", "constructor", "factory"});
         //or
         JTextField onlyConstrTF = new JTextField("Constructor");
         onlyConstrTF.setEditable(false);
@@ -143,7 +143,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     ffPan.setData(new VInstantiator.FreeF(newType, ""));
                     //conPan.setData(new VInstantiator.Constr(newType,new Vector()));
                     //conPan.setType(newType);
-                    factPan.setData(new VInstantiator.Factory(newType, "", "", new Vector<Object>()));
+                    factPan.setData(new VInstantiator.Factory(newType, "", "", new Vector<>()));
                 }
                 int idx = methodCB.getSelectedIndex();
                 if (lastIdx != idx) {
@@ -402,7 +402,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
-            factClassCB = new JComboBox<Object>(new Object[]{"simkit.random.RandomVariateFactory"});
+            factClassCB = new JComboBox<>(new Object[]{"simkit.random.RandomVariateFactory"});
             // this is wierd, I want it's height to be the one for a non-editable CB
             //  factClassCB.setEditable(false);
             factClassCB.setEditable(true);
@@ -492,8 +492,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     //factClassCB.selectAll();
                     return;
                 }
-                Vector<String> vn = new Vector<String>();
-                Map<String, Method> hm = new HashMap<String, Method>();
+                Vector<String> vn = new Vector<>();
+                Map<String, Method> hm = new HashMap<>();
 
                 for (Method method : statMeths) {
                     int mods = method.getModifiers();
@@ -530,10 +530,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 factMethodLab.setEnabled(true);
                 factMethodButt.setEnabled(true);
                 Class<?>[] pc = m.getParameterTypes();
-                Vector<Object> vc = new Vector<Object>();
+                Vector<Object> vc = new Vector<>();
                 for (Class cl : pc) {
                     if (cl.isArray()) {
-                        vc.add(new VInstantiator.Array(Vstatics.convertClassName(cl.getName()), new ArrayList<Object>()));
+                        vc.add(new VInstantiator.Array(Vstatics.convertClassName(cl.getName()), new ArrayList<>()));
                     } else {
                         vc.add(new VInstantiator.FreeF(Vstatics.convertClassName(cl.getName()), ""));
                     }
@@ -609,7 +609,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             String m = factMethodTF.getText();
             m = (m == null) ? "" : m.trim();
             List<Object> lis;
-            lis = (olp != null) ? olp.getData() : new Vector<Object>();
+            lis = (olp != null) ? olp.getData() : new Vector<>();
             return new VInstantiator.Factory(typ, fc, m, lis);
         }
     }

@@ -85,7 +85,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     BufferedReader br;
     JFrame mom;
     String lineEnd = System.getProperty("line.separator");
-    int defaultClusterPort = 4444;
+    int defaultClusterPort = 4_444;
 
     // TODO: single variable for all viskit
     String clusterDNS = "wipeout.hpr.nps.edu";
@@ -656,7 +656,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     clusterConfigReturn = null;
                     configDialog.setVisible(true);
 
-                    if (clusterConfigReturn.booleanValue()) {// true means apply
+                    if (clusterConfigReturn) {// true means apply
                         unloadServerWidgets();
                         writeConfig();
                     }
@@ -673,9 +673,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                             if (jfc.getSelectedFile() != null) {
                                 File f = jfc.getSelectedFile();
                                 try {
-                                    FileWriter fw = new FileWriter(f);
-                                    fw.write(statusTextArea.getText());
-                                    fw.close();
+                                    try (FileWriter fw = new FileWriter(f)) {
+                                        fw.write(statusTextArea.getText());
+                                    }
                                 } catch (IOException e1) {
                                     LogUtils.getLogger(ButtListener.class).error(e1);
                                 }
@@ -722,7 +722,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     thread = null;
                     t.interrupt();
                     try {
-                        t.join(1000);
+                        t.join(1_000);
                     } catch (InterruptedException e) {
                         System.err.println("join exception");
                     }
@@ -730,7 +730,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 try {
                     doe.clear();
                     doe = null; // will cause doe to logout() on GC if it's a grid run
-                } catch (Exception e) {
+                } catch (DoeException e) {
                     System.err.println("DoeException: " + e.getMessage());
                 }
 
@@ -752,14 +752,15 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void addEventGraphFile(File file) throws Exception {
-        FileInputStream fis = new FileInputStream(file);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int rdRet;
-        while ((rdRet = fis.read(buf)) > 0) {
-            baos.write(buf, 0, rdRet);
+        ByteArrayOutputStream baos;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            baos = new ByteArrayOutputStream();
+            byte[] buf = new byte[1_024];
+            int rdRet;
+            while ((rdRet = fis.read(buf)) > 0) {
+                baos.write(buf, 0, rdRet);
+            }
         }
-        fis.close();
         baos.flush();
         baos.close();
         String egText = new String(baos.toByteArray());
@@ -808,7 +809,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
 
             outputDirty = true;
-            outputList = new ArrayList<Object[]>();
+            outputList = new ArrayList<>();
             lp3:
             {
                 try {
@@ -887,7 +888,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         protected Void doInBackground() throws Exception {
             processResults();
-            return (Void) null;
+            return null;
         }
 
         // TODO: XML RPC v2.0 not updated to generics
@@ -907,7 +908,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 int tasksRemaining = totalTasks;
                 writeStatus("Total tasks: " + totalTasks);
                 //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
-                bQ = new ArrayBlockingQueue<DesignPointStatsWrapper>(totalTasks);
+                bQ = new ArrayBlockingQueue<>(totalTasks);
                 graphUpdater = new GraphUpdater(bQ, statsGraph);
                 doe.run();
                 graphUpdater.execute();
@@ -927,9 +928,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                 // taskID = i (well i+1 really, taskID's in SGE start at 1)
                                 //if (!((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i)))) {
 
-                                boolean state = ((Boolean) li.next()).booleanValue();
+                                boolean state = ((Boolean) li.next());
 
-                                if (((Boolean) lastQueue.get(i)).booleanValue() != state) {
+                                if (((Boolean) lastQueue.get(i)) != state) {
                                     int sampleIndex = i / designPoints;
                                     int designPtIndex = i % designPoints;
 
@@ -963,12 +964,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                             }
                         }
 
-                    } catch (Exception e) {
+                    } catch (NumberFormatException | DoeException e) {
                         LogUtils.getLogger(ButtListener.class).error(e);
                     }
 
                 }
-            } catch (Exception e) {
+            } catch (DoeException e) {
                 LogUtils.getLogger(ButtListener.class).error(e);
                 writeStatus("Error in cluster execution: " + e.getMessage());
             }
@@ -999,8 +1000,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private Gresults getSingleResult(Object[] oa) {
         File f = new File((String) oa[2]);
-        int dp = ((Integer) oa[0]).intValue();
-        int nrun = ((Integer) oa[1]).intValue();
+        int dp = (int) oa[0];
+        int nrun = (int) oa[1];
         Gresults res = new Gresults();
 
         Document doc;
@@ -1084,13 +1085,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             File f = File.createTempFile("DoeResults", ".xml", outDir);
             f.deleteOnExit();
-            FileWriter fw = new FileWriter(f);
-            fw.write(o);
-            fw.close();
+            try (FileWriter fw = new FileWriter(f)) {
+                fw.write(o);
+            }
             writeStatus("Result saved to " + f.getAbsolutePath());
             //outputs.put("" + dp + "," + nrun, f);
             int idx = outputList.size();
-            outputList.add(new Object[]{new Integer(dp), new Integer(nrun), f.getAbsolutePath()});
+            outputList.add(new Object[]{dp, nrun, f.getAbsolutePath()});
             return idx;
         } catch (IOException e) {
             writeStatus("error saving output for run " + dp + ", " + nrun + ": " + e.getMessage());
@@ -1121,7 +1122,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             statusURL = new URL(surl);
             editorPane.setPage(statusURL);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error showing cluster status: " + e.getMessage());
             return;
         }
@@ -1186,14 +1187,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void run() {
             if (waitToGo) {
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(60_000);
                 } catch (InterruptedException e) {
                 }
             }
 
             while (statusThread != null && clusterStatusFrame != null) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(10_000);
 
                     // to refresh
                     javax.swing.text.Document doc = editorPane.getDocument();
@@ -1214,7 +1215,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                             vbar.setValue(50); //vbar.getMaximum());
                         }
                     });
-                } catch (Exception e) {
+                } catch (IOException | InterruptedException e) {
                     System.out.println("statusUpdater kill: " + e.getMessage());
                 }
             }
@@ -1375,7 +1376,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         protected void process(List<DesignPointStatsWrapper> chunks) {
             for (DesignPointStatsWrapper dp : chunks) {
-                java.util.Enumeration stats = ((Hashtable) dp.statsReturned).elements();
+                java.util.Enumeration stats = ((Dictionary) dp.statsReturned).elements();
                 while (stats.hasMoreElements()) {
                     String data = (String) stats.nextElement();
                     try {

@@ -201,7 +201,7 @@ public class SourceWindow extends JFrame {
 
                     sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
-                    if (diag.messageString.toString().indexOf("No Compiler Errors") < 0) {
+                    if (!diag.messageString.toString().contains("No Compiler Errors")) {
                         ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.PINK);
                         int startOffset = (int) diag.getLineNumber() * 5 + (int) diag.getStartOffset();
                         int endOffset = (int) diag.getLineNumber() * 5 + (int) diag.getEndOffset();
@@ -242,9 +242,9 @@ public class SourceWindow extends JFrame {
                 }
 
                 try {
-                    FileWriter fw = new FileWriter(f);
-                    fw.write(src);
-                    fw.close();
+                    try (FileWriter fw = new FileWriter(f)) {
+                        fw.write(src);
+                    }
                     SourceWindow.this.dispose();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, "Exception on source file write" +
@@ -252,7 +252,6 @@ public class SourceWindow extends JFrame {
                             "\n" + ex.getMessage(),
                             "File I/O Error", JOptionPane.ERROR_MESSAGE);
                 }
-
             }
         });
     }
@@ -423,7 +422,7 @@ public class SourceWindow extends JFrame {
 
         // Mac uses cmd-G
         String vers = System.getProperty("os.name").toLowerCase();
-        if (vers.indexOf("mac") != -1) {
+        if (vers.contains("mac")) {
             key = KeyStroke.getKeyStroke(KeyEvent.VK_G, cntlKeyMask);
             iMap.put(key, searchAgainHandle);
         }

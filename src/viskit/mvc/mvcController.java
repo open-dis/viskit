@@ -17,12 +17,11 @@ package viskit.mvc;
 /**
  * Primary role of controller is to determine what should happen in response to user input.
  */
-
 public interface mvcController
 {
   void setModel(mvcModel model);
   void setView (mvcView  view);
-  
+
   mvcModel getModel();
   mvcView  getView();
 }

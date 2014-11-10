@@ -141,7 +141,7 @@ public class ArrayInspector extends JDialog {
             return;
         }
 
-        Vector<Object> v = new Vector<Object>(sz);
+        Vector<Object> v = new Vector<>(sz);
         for (int i = 0; i < sz; i++) {
             v.add(new VInstantiator.FreeF(myTyp, ""));
         }

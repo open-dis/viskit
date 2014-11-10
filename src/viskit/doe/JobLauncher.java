@@ -48,6 +48,7 @@ import java.util.Vector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.TempFileManager;
 import org.apache.xmlrpc.XmlRpcClientLite;
+import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -78,7 +79,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     // TODO: single variable for all viskit
     String clusterDNS = "wipeout.hpr.nps.edu";
-    int clusterPort = 4444;
+    int clusterPort = 4_444;
     int chosenPort;
     String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
     String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
@@ -299,6 +300,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     }
 
     /* Here's where we are informed of changed in the assembly file */
+    @Override
     public void fileChanged(File file, int action, DirectoryWatch source) {
         // temp:
         switch (action) {
@@ -327,6 +329,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     class ButtListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand().charAt(0)) {
                 case 'r':
@@ -353,9 +356,9 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                             if (jfc.getSelectedFile() != null) {
                                 File f = jfc.getSelectedFile();
                                 try {
-                                    FileWriter fw = new FileWriter(f);
-                                    fw.write(ta.getText());
-                                    fw.close();
+                            try (FileWriter fw = new FileWriter(f)) {
+                                fw.write(ta.getText());
+                            }
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 }
@@ -408,13 +411,14 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
         Thread jobKiller = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 if (thread != null) {
                     Thread t = thread;
                     thread = null;
                     t.interrupt();
                     try {
-                        t.join(1000);
+                        t.join(1_000);
                     } catch (InterruptedException e) {
                         System.out.println("join exception");
                     }
@@ -425,7 +429,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     //o = rpc.execute("experiment.flushQueue",parms);
                     Object o = rpc.execute("experiment.clear", parms);
                 //writeStatus("flushQueue = " + o);
-                } catch (Exception e) {
+                } catch (XmlRpcException | IOException e) {
                     e.printStackTrace();
                 }
 
@@ -438,6 +442,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     private void writeStatus(final String s) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ta.append(s);
                 ta.append("\n");
@@ -446,13 +451,14 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     }
     StringWriter data;
 
+    @Override
     public void run() {
         System.out.println("Hello Run");
     }
 
     public void runOrig() {
         outputDirty = true;
-        outputList = new ArrayList<Object[]>();
+        outputList = new ArrayList<>();
         lp3:
         {
             try {
@@ -472,7 +478,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                 out.flush();
                 out.close();
 
-                Vector<String> parms = new Vector<String>();
+                Vector<String> parms = new Vector<>();
                 parms.add(data.toString());
 
                 writeStatus("Sending job file to " + clusterDNS);
@@ -492,14 +498,14 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
             //writeStatus("10 second wait before getting results.");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(10_000);
             } catch (InterruptedException e) {
                 break lp3;
             }
             writeStatus("Getting results:");
 
-            Vector<Integer> parms = new Vector<Integer>();
-            Object o = null;
+            Vector<Integer> parms = new Vector<>();
+            Object o;
             int i = 0;
             int n = designPts * samps * numRuns;
             lp:
@@ -508,8 +514,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     for (int nrun = 0; nrun < numRuns; nrun++, i++) {
                         try {
                             parms.clear();
-                            parms.add(new Integer(dp));
-                            parms.add(new Integer(nrun));
+                            parms.add(dp);
+                            parms.add(nrun);
                             o = rpc.execute("experiment.getResult", parms);
                             if (thread == null) {
                                 break lp;
@@ -522,7 +528,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                             } else {
                                 System.out.println("Output not saved");
                             }
-                        } catch (Exception e) {
+                        } catch (XmlRpcException | IOException e) {
                             if (thread != null) {
                                 writeStatus("Error from experiment.getResult(): " + e.getMessage());
                             }
@@ -534,7 +540,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         } // lp3
         stopRun();
     }
-    ArrayList<Object[]> outputList;
+    java.util.List<Object[]> outputList;
 
     private void createOutputDir() throws Exception {
         outDir = TempFileManager.createTempFile("DoeRun", "");
@@ -558,8 +564,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     private Gresults getSingleResult(Object[] oa) {
         File f = new File((String) oa[2]);
-        int dp = ((Integer) oa[0]).intValue();
-        int nrun = ((Integer) oa[1]).intValue();
+        int dp = (int) oa[0];
+        int nrun = (int) oa[1];
         Gresults res = new Gresults();
 
         Document document;
@@ -645,13 +651,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         try {
             File f = File.createTempFile("DoeResults", ".xml", outDir);
             f.deleteOnExit();
-            FileWriter fw = new FileWriter(f);
-            fw.write(o);
-            fw.close();
+            try (FileWriter fw = new FileWriter(f)) {
+                fw.write(o);
+            }
             writeStatus("Result saved to " + f.getAbsolutePath());
             //outputs.put("" + dp + "," + nrun, f);
             int idx = outputList.size();
-            outputList.add(new Object[]{new Integer(dp), new Integer(nrun), f.getAbsolutePath()});
+            outputList.add(new Object[]{dp, nrun, f.getAbsolutePath()});
             return idx;
         } catch (IOException e) {
             writeStatus("error saving output for run " + dp + ", " + nrun + ": " + e.getMessage());
@@ -682,7 +688,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         try {
             statusURL = new URL(surl);
             editorPane.setPage(statusURL);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error showing cluster status: " + e.getMessage());
             return;
         }
@@ -739,16 +745,17 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     class statusUpdater implements Runnable {
 
+        @Override
         public void run() {
             if (waitToGo == true) {
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(60_000);
                 } catch (InterruptedException e) {}
             }
 
             while (statusThread != null && clusterStatusFrame != null) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(10_000);
 
                     // to refresh
                     javax.swing.text.Document doc = editorPane.getDocument();
@@ -769,7 +776,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                             vbar.setValue(50); //vbar.getMaximum());
                         }
                     });
-                } catch (Exception e) {
+                } catch (InterruptedException | IOException e) {
                     System.out.println("statusUpdater kill: " + e.getMessage());
                 }
             }

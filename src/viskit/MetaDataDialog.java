@@ -197,6 +197,7 @@ abstract public class MetaDataDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;
             dispose();
@@ -205,6 +206,7 @@ abstract public class MetaDataDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             // In this class, if the user hits the apply button, it is assumed that the data has been changed,
             // so the model is marked dirty.  A different, more controlled scheme would be to have change listeners

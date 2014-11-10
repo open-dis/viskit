@@ -14,9 +14,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
+import javax.swing.text.JTextComponent;
+import viskit.model.ViskitElement;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -100,8 +103,8 @@ public class PclEdgeInspectorDialog extends JDialog {
 
         fillWidgets();     // put the data into the widgets
 
-        modified = (ed == null ? true : false);     // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled((ed == null ? true : false));
+        modified = (ed == null);     // if it's a new pclNode, they can always accept defaults with no typing
+        okButt.setEnabled((ed == null));
 
         getRootPane().setDefaultButton(canButt);
 
@@ -123,9 +126,9 @@ public class PclEdgeInspectorDialog extends JDialog {
         Vstatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
-            ((JTextField) tf).setEditable(edit);
+            ((JTextComponent) tf).setEditable(edit);
             if (edit) {
-                ((JTextField) tf).addCaretListener(lis);
+                ((JTextComponent) tf).addCaretListener(lis);
             }
         }
     }
@@ -135,8 +138,8 @@ public class PclEdgeInspectorDialog extends JDialog {
 
         fillWidgets();
 
-        modified = (p == null ? true : false);
-        okButt.setEnabled((p == null ? true : false));
+        modified = (p == null);
+        okButt.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
 
@@ -188,6 +191,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             VGlobals.instance().getAssemblyController().delete();
@@ -197,6 +201,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 unloadWidgets();
@@ -207,12 +212,14 @@ public class PclEdgeInspectorDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }
@@ -221,13 +228,14 @@ public class PclEdgeInspectorDialog extends JDialog {
     // TODO: Fix so that it will show parameterized generic types
     class findPropertiesAction implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Object o = pclEdge.getFrom();
             String classname = null;
             if (o instanceof EvGraphNode) {
-                classname = ((EvGraphNode) o).getType();
+                classname = ((ViskitElement) o).getType();
             } else if (o instanceof PropChangeListenerNode) {
-                classname = ((PropChangeListenerNode) o).getType();
+                classname = ((ViskitElement) o).getType();
             }
 
             try {
@@ -245,15 +253,15 @@ public class PclEdgeInspectorDialog extends JDialog {
                             "Enter name manually.");
                     return;
                 }
-                Vector<String> nams = new Vector<String>();
-                Vector<String> typs = new Vector<String>();
-                for (int i = 0; i < pds.length; i++) {
-                    if (pds[i].getWriteMethod() != null) {
+                Vector<String> nams = new Vector<>();
+                Vector<String> typs = new Vector<>();
+                for (PropertyDescriptor pd : pds) {
+                    if (pd.getWriteMethod() != null) {
                         // want getters but no setter
                         continue;
                     }
-                    nams.add(pds[i].getName());
-                    typs.add(pds[i].getPropertyType().getName());
+                    nams.add(pd.getName());
+                    typs.add(pd.getPropertyType().getName());
                 }
                 String[][] nms = new String[nams.size()][2];
                 for (int i = 0; i < nams.size(); i++) {
@@ -266,7 +274,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                     modified = true;
                     propertyTF.setText(nms[which][0]);
                 }
-            } catch (Throwable e1) {
+            } catch (ClassNotFoundException | IntrospectionException | HeadlessException e1) {
                 System.out.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
                 System.out.println(System.getProperty("java.class.path"));
             }

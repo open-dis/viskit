@@ -151,17 +151,18 @@ public class Boot extends URLClassLoader implements Runnable {
                     if ( name.endsWith("jar") ) {
                         log.debug("Found internal jar externalizing " + name);
                         File extJar = TempFileManager.createTempFile(name,".jar");
+
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
-                        FileOutputStream fos = new FileOutputStream(extJar);
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        int c;
-                        byte[] buff = new byte[512];
-                        while ((c = jis.read(buff)) > -1 ) {
-                            baos.write(buff,0,c);
+                        try (FileOutputStream fos = new FileOutputStream(extJar)) {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            int c;
+                            byte[] buff = new byte[512];
+                            while ((c = jis.read(buff)) > -1 ) {
+                                baos.write(buff,0,c);
+                            }
+                            fos.write(baos.toByteArray());
+                            fos.flush();
                         }
-                        fos.write(baos.toByteArray());
-                        fos.flush();
-                        fos.close();
                         // capture any jars within the jar in the jar...
                         addURL(extJar.toURI().toURL());
                         log.debug("File to new jar " + extJar.getCanonicalPath());

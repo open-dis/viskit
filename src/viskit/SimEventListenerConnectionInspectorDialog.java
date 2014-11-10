@@ -85,8 +85,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
     fillWidgets();     // put the data into the widgets
 
-    modified = (ed == null ? true : false);     // if it's a new pclNode, they can always accept defaults with no typing
-    okButt.setEnabled((ed == null ? true : false));
+    modified = (ed == null);     // if it's a new pclNode, they can always accept defaults with no typing
+    okButt.setEnabled((ed == null));
 
     getRootPane().setDefaultButton(canButt);
 
@@ -120,8 +120,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
     fillWidgets();
 
-    modified = (ae == null ? true : false);
-    okButt.setEnabled((ae == null ? true : false));
+    modified = (ae == null);
+    okButt.setEnabled((ae == null));
 
     getRootPane().setDefaultButton(canButt);
 
@@ -164,6 +164,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
   class cancelButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       modified = false;    // for the caller
@@ -173,6 +174,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
   class applyButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       if (modified)
@@ -184,6 +186,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
   class enableApplyButtonListener implements CaretListener, ActionListener
   {
+    @Override
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
@@ -191,6 +194,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
       getRootPane().setDefaultButton(okButt);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       caretUpdate(null);

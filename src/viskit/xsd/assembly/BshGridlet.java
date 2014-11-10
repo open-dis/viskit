@@ -100,14 +100,14 @@ public class BshGridlet extends Thread {
                 // where you'd need jobID
                 // better
                 if (taskID == 1) {
-                    Vector<Object> v = new Vector<Object>();
+                    Vector<Object> v = new Vector<>();
                     v.add(usid);
                     v.add(jobID);
                     xmlrpc.execute("gridkit.setJobID", v);
                 }
 
                 // get any thirdPartyJars and install them now
-                Vector<String> v = new Vector<String>();
+                Vector<String> v = new Vector<>();
                 v.add(usid);
 
                 // TODO: fix generics
@@ -127,11 +127,7 @@ public class BshGridlet extends Thread {
             } else {
                 throw new RuntimeException("Not running as SGE job?");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (XmlRpcException e) {
+        } catch (IOException | RuntimeException | XmlRpcException e) {
             e.printStackTrace();
         }
     }
@@ -279,7 +275,7 @@ public class BshGridlet extends Thread {
                         if (debug_io) {
                             System.out.println(statXml);
                         }
-                        Vector<Object> args = new Vector<Object>();
+                        Vector<Object> args = new Vector<>();
                         args.add(usid);
                         args.add(sampleIndex);
                         args.add(designPtIndex);
@@ -362,9 +358,9 @@ public class BshGridlet extends Thread {
                 PrintWriter out;
                 StringWriter sw;
                 String line;
-                List<String> logs = new ArrayList<String>();
-                List<String> propertyChanges = new ArrayList<String>();
-                List<String> errs = new ArrayList<String>();
+                List<String> logs = new ArrayList<>();
+                List<String> propertyChanges = new ArrayList<>();
+                List<String> errs = new ArrayList<>();
 
                 sw = new StringWriter();
                 out = new PrintWriter(sw);
@@ -414,7 +410,7 @@ public class BshGridlet extends Thread {
                 out.println();
 
                 //send results back to front end
-                Vector<Object> parms = new Vector<Object>();
+                Vector<Object> parms = new Vector<>();
                 parms.add(usid);
                 parms.add(sw.toString());
 
@@ -432,9 +428,7 @@ public class BshGridlet extends Thread {
                 parms.add(taskID);
                 xmlrpc.execute("gridkit.removeTask", parms);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XmlRpcException e) {
+            } catch (IOException | XmlRpcException e) {
                 e.printStackTrace();
             }
 
