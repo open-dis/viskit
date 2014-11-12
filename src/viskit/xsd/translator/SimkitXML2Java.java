@@ -504,19 +504,22 @@ public class SimkitXML2Java {
     void doRunBlock(Event run, StringWriter runBlock) {
 
         PrintWriter pw = new PrintWriter(runBlock);
+        List<LocalVariable> liLocalV = run.getLocalVariable();
         List<Object> liSchedCanc = run.getScheduleOrCancel();
+
+        /* Handle the reset method */
 
         pw.println(sp4 + "/** Set initial values of all state variables */");
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void reset() {");
+        pw.println(sp8 + "super.reset()" + sc);
 
-        List<LocalVariable> liLocalV = run.getLocalVariable();
+        pw.println();
 
         for (LocalVariable local : liLocalV) {
             pw.println(sp8 + local.getType() + sp + local.getName() + sc);
         }
 
-        pw.println(sp8 + "super.reset()" + sc);
         pw.println();
         pw.println(sp8 + "/* StateTransitions for the Run Event */");
 
@@ -531,20 +534,20 @@ public class SimkitXML2Java {
              * array types.
              */
             boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
-            String spn = isar ? sp12 : sp8;
+            String sps = isar ? sp12 : sp8;
             String in = indexFrom(st);
 
             if (isar) {
-                pw.print(sp8 + "for (" + in + " = 0; " + in + " < " + sv.getName() + pd + "length");
+                pw.print(sp8 + "for (" + in + sp + eq + sp + "0; " + in + " < " + sv.getName() + pd + "length");
                 pw.println(sc + sp + in + "++" + rp + sp + ob);
-                pw.print(spn + sv.getName() + lb + in + rb);
+                pw.print(sps + sv.getName() + lb + in + rb);
             } else {
-                pw.print(spn + sv.getName());
+                pw.print(sps + sv.getName());
             }
 
-            if (asg == null) {
+            if (ops != null) {
                 pw.println(pd + ops.getMethod() + sc);
-            } else {
+            } else if (asg != null) {
                 pw.println(sp + eq + sp + asg.getValue() + sc);
             }
 
@@ -556,10 +559,13 @@ public class SimkitXML2Java {
         pw.println(sp4 + cb);
         pw.println();
 
+        /* Handle the doRun method */
+
+        Method doRun = null;
+
         // check if super has a doRun()
         if (!extendz.contains("SimEntityBase")) {
 
-            Method doRun = null;
             try {
                 Class<?> sup = Class.forName(extendz, true, VGlobals.instance().getWorkClassLoader());
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
@@ -572,24 +578,45 @@ public class SimkitXML2Java {
             } catch (NoSuchMethodException cnfe) {
 //                log.error(cnfe);
             }
-            if (doRun != null) {
-                pw.println(sp4 + "@Override");
-                pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
-                pw.println(sp8 + "super.doRun" + lp + rp + sc);
-            } else {
-                pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
-            }
+        }
+
+        if (doRun != null) {
+            pw.println(sp4 + "@Override");
+            pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
+            pw.println(sp8 + "super.doRun" + lp + rp + sc);
         } else {
             pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
         }
 
+        for (LocalVariable local : liLocalV) {
+            pw.println(sp8 + local.getType() + sp + local.getName() + (local.getValue() != null ? sp + eq + sp + local.getValue() + sc : sc));
+        }
+
+        pw.println();
+
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
+            Assignment asg = st.getAssignment();
+            Operation ops = st.getOperation();
+
+            boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
+
             pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
 
             // Give these FPC "getters" as arguments
             String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
-            String stateVariableGetter = "get" + stateVariableName + lp + rp;
+            String stateVariableGetter = "get" + stateVariableName + lp;
+
+            if (isar) {
+                if (ops != null) {
+                    stateVariableGetter += rp + pd + ops.getMethod();
+                } else if (asg != null) {
+                    stateVariableGetter += asg.getValue() + rp;
+                }
+            } else {
+                stateVariableGetter += rp;
+            }
+
             pw.println(cm + sp + stateVariableGetter + rp + sc);
         }
 

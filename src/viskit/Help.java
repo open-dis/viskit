@@ -69,7 +69,7 @@ public class Help {
     static {
         ClassLoader cl = viskit.Help.class.getClassLoader();
         URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
-        HelpSet hs = null;
+        HelpSet hs;
         try {
             hs = new HelpSet(null, helpSetURL);
             hb = hs.createHelpBroker();
@@ -84,7 +84,9 @@ public class Help {
         CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
     }
 
-    /** Creates a new instance of Help */
+    /** Creates a new instance of Help
+     * @param parent main frame to center on
+     */
     public Help(Component parent) {
         this.parent = parent;
         icon = new ImageIcon(
@@ -101,7 +103,6 @@ public class Help {
                 + SIMKIT_PAGE + VERSIONS);
 
         aboutAssemblyEditorPane = new JEditorPane();
-
         aboutAssemblyEditorPane.addHyperlinkListener(
                 new BrowserLauncher());
         aboutAssemblyEditorPane.setContentType("text/html");

@@ -37,8 +37,13 @@ import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import edu.nps.util.LogUtils;
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Image;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.swing.*;
 
 /**
@@ -50,6 +55,8 @@ import javax.swing.*;
  * @version $Id$
  */
 public class EventGraphAssemblyComboMain {
+
+    private static ImageIcon aboutIcon = null;
 
     /**
      * Viskit entry point from the command line, or introspection
@@ -115,6 +122,8 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void createGUI(String[] args) {
+
+        boolean onMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
         String initialFile = null;
 
         if (args.length > 0) {
@@ -130,8 +139,17 @@ public class EventGraphAssemblyComboMain {
         ToolTipManager ttm = ToolTipManager.sharedInstance();
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
+
         JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
         VGlobals.instance().setMainAppWindow(mainFrame);
+
+        if (onMac) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Viskit");
+            aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
+            setupMacGUI();
+        }
+
         mainFrame.setVisible(true);
     }
 
@@ -159,6 +177,51 @@ public class EventGraphAssemblyComboMain {
 
         UIManager.setLookAndFeel(laf);
         ShadowPopupFactory.uninstall();
+    }
+
+    private static void setupMacGUI() {
+        try {
+            Class<?> applicationListener = Class.forName("com.apple.eawt.ApplicationListener");
+            Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
+
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) {
+                    switch (method.getName()) {
+                        case "handleQuit":
+                            ((EventGraphAssemblyComboMainFrame)VGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
+                            break;
+                        case "handleAbout":
+                            try {
+                                Help help = new Help(VGlobals.instance().getMainAppWindow());
+                                help.aboutEventGraphEditor();
+                                Class<?> applicationEventClass = Class.forName("com.apple.eawt.ApplicationEvent");
+                                Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
+                                setHandled.invoke(args[0], true);
+                            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                System.err.println("Error showing About Box: " + ex);
+                            }   break;
+                    }
+                    return null;
+                }
+            });
+
+            Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+            Object applicationInstance = applicationClass.newInstance();
+
+            Method m = applicationClass.getMethod("addApplicationListener", applicationListener);
+            m.invoke(applicationInstance, proxy);
+
+            if (aboutIcon != null) {
+                try {
+                    m = applicationClass.getMethod("setDockIconImage", Image.class);
+                    m.invoke(applicationInstance, aboutIcon.getImage());
+                } catch (NoSuchMethodException ex){
+                    System.err.println("Error showing aboutIcon in dock " + ex);
+                }
+            }
+        } catch (ClassNotFoundException | IllegalArgumentException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+            System.err.println("Error defining Apple Quit & About handlers: " + ex);
+        }
     }
 
 } // end class file EventGraphAssemblyComboMain.java

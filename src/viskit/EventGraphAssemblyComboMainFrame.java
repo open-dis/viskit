@@ -109,7 +109,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         return myQuitAction;
     }
 
-    java.util.List<JMenuBar> menus = new ArrayList<JMenuBar>();
+    java.util.List<JMenuBar> menus = new ArrayList<>();
 
     private void initUI() {
         VGlobals.instance().setAssemblyQuitHandler(null);
