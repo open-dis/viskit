@@ -127,33 +127,31 @@ public class VGlobals {
 
     /** Used only if a call to {@link getAssemblyEditor()} ever returns null
      *
-     * @param contentOnly
      * @return the component AssemblyViewFrame
      */
-    public AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly) {
+    public AssemblyViewFrame buildAssemblyViewFrame() {
         AssemblyControllerImpl cont = new AssemblyControllerImpl();
-        return buildAssemblyViewFrame(contentOnly, cont);
+        return buildAssemblyViewFrame(cont);
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize UI startup
      *
-     * @param contentOnly if true, build certain menu items only
      * @return the component AssemblyViewFrame
      */
-    public AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly) {
+    public AssemblyViewFrame initAssemblyViewFrame() {
         AssemblyControllerImpl cont = new AssemblyControllerImpl();
-        return initAssemblyViewFrame(contentOnly, cont);
+        return initAssemblyViewFrame(cont);
     }
 
-    private AssemblyViewFrame buildAssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl cont) {
-        initAssemblyViewFrame(contentOnly, cont);
+    private AssemblyViewFrame buildAssemblyViewFrame(AssemblyControllerImpl cont) {
+        initAssemblyViewFrame(cont);
         cont.begin();
         return avf;
     }
 
-    private AssemblyViewFrame initAssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl cont) {
+    private AssemblyViewFrame initAssemblyViewFrame(AssemblyControllerImpl cont) {
         acont = cont;
-        avf = new AssemblyViewFrame(contentOnly, cont);
+        avf = new AssemblyViewFrame(cont);
         cont.setView(avf);
         return avf;
     }
@@ -172,7 +170,7 @@ public class VGlobals {
 
     public void runAssemblyView() {
         if (avf == null) {
-            buildAssemblyViewFrame(false);
+            buildAssemblyViewFrame();
         }
 
         avf.setVisible(true);
@@ -224,32 +222,31 @@ public class VGlobals {
     }
 
     public EventGraphViewFrame buildEventGraphViewFrame() {
-        return buildEventGraphViewFrame(false, new EventGraphControllerImpl());
+        return buildEventGraphViewFrame(new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame buildEventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl cont) {
-        initEventGraphViewFrame(contentOnly, cont);
+    public EventGraphViewFrame buildEventGraphViewFrame(EventGraphControllerImpl cont) {
+        initEventGraphViewFrame(cont);
         cont.begin();
         return egvf;
     }
 
     /** This method starts the chain of various Viskit startup steps.  By
- calling for a new EventGraphControllerImpl(), in its constructor is a call
- to initConfig() which is the first time that the viskitConfig.xml is
- looked for, or if one is not there, to create one from the template.  The
- viskitConfig.xml is an important file that holds information on recent
- assembly and event graph openings, gui sizes and cacheing of compiled
- source from EventGraphs.
+     * calling for a new EventGraphControllerImpl(), in its constructor is a call
+     * to initConfig() which is the first time that the viskitConfig.xml is
+     * looked for, or if one is not there, to create one from the template.  The
+     * viskitConfig.xml is an important file that holds information on recent
+     * assembly and event graph openings, gui sizes and caching of compiled
+     * source from EventGraphs.
      *
-     * @param contentOnly
      * @return an instance of the EventGraphViewFrame
      */
-    public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly) {
-        return initEventGraphViewFrame(contentOnly, new EventGraphControllerImpl());
+    public EventGraphViewFrame initEventGraphViewFrame() {
+        return initEventGraphViewFrame(new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame initEventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl cont) {
-        egvf = new EventGraphViewFrame(contentOnly, cont);
+    public EventGraphViewFrame initEventGraphViewFrame(EventGraphControllerImpl cont) {
+        egvf = new EventGraphViewFrame(cont);
         cont.setView(egvf);
         return egvf;
     }

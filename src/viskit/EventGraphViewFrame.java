@@ -79,39 +79,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public EventGraphControllerImpl controller;
     private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
 
-    public EventGraphViewFrame(EventGraphControllerImpl ctrl) {
-        this(false, ctrl);
-    }
-
     /**
      * Constructor; lays out initial GUI objects
-     * @param contentOnly
-     * @param ctrl
+     * @param ctrl the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(boolean contentOnly, EventGraphControllerImpl ctrl) {
+    public EventGraphViewFrame(EventGraphControllerImpl ctrl) {
         super(FRAME_DEFAULT_TITLE);
         this.controller = ctrl;
         initMVC(ctrl);   // set up mvc linkages
-        initUI(contentOnly);    // build widgets
-
-        if (!contentOnly) {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation((d.width - 800) / 2, (d.height - 600) / 2);
-            setSize(800, 600);
-
-            setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            addWindowListener(new WindowAdapter() {
-
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    controller.quit();
-                // if this simply returns, nothing happens
-                // else, the controller will Sys.exit()
-                }
-            });
-            ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
-            setIconImage(icon.getImage());
-        }
+        initUI();    // build widgets
     }
 
     public JComponent getContent() {
@@ -158,11 +134,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     /**
      * Initialize the user interface
-     * @param contentOnly
      */
-    private void initUI(boolean contentOnly) {
+    private void initUI() {
+
         // Layout menus
-        buildMenus(contentOnly);
+        buildMenus();
 
         // Layout of toolbar
         setupToolbar();
@@ -180,10 +156,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         eventGraphViewerContent.add(tabbedPane, BorderLayout.CENTER);
         eventGraphViewerContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        if (!contentOnly) // Can't add it here if we're going to put it somewhere  else
-        {
-            getContentPane().add(eventGraphViewerContent);
-        }
     }
 
     private VgraphComponentWrapper getCurrentVgcw() {
@@ -588,7 +560,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JMenu openRecentMenu;
     private _RecentFileListener myFileListener;
 
-    private void buildMenus(boolean contentOnly) {
+    private void buildMenus() {
         EventGraphController vcontroller = (EventGraphController) getController();
 
         myFileListener = new _RecentFileListener();
@@ -622,16 +594,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J, null));
         fileMenu.add(buildMenuItem(vcontroller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        if (!contentOnly) {
-            fileMenu.addSeparator();
-            fileMenu.add(buildMenuItem(vcontroller, "runAssemblyEditor", "Assembly Editor", null, null));
-        }
-        if (contentOnly) {
-            fileMenu.addSeparator();
-            fileMenu.add(buildMenuItem(vcontroller, "settings", "Settings", null, null));
-        }
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
+        fileMenu.add(buildMenuItem(vcontroller, "settings", "Settings", null, null));
+        fileMenu.addSeparator();
+        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit",
+                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
@@ -679,11 +646,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
-
-
-        if (!contentOnly) {
-            setJMenuBar(myMenuBar);
-        }
     }
 
     // Use the actions package

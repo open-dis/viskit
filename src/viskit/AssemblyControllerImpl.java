@@ -1398,9 +1398,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     // From menu
-    /**
-     *
-     */
     @Override
     public void export2grid() {
         AssemblyModel model = (AssemblyModel) getModel();

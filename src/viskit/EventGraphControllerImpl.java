@@ -759,7 +759,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void runAssemblyEditor() {
         if (VGlobals.instance().getAssemblyEditor() == null) {
-            VGlobals.instance().buildAssemblyViewFrame(false);
+            VGlobals.instance().buildAssemblyViewFrame();
         }
         VGlobals.instance().runAssemblyView();
     }

@@ -67,31 +67,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private int untitledCount = 0;
 
     public AssemblyViewFrame(AssemblyControllerImpl controller) {
-        this(false, controller);
-    }
-
-    public AssemblyViewFrame(boolean contentOnly, AssemblyControllerImpl controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
-        initUI(contentOnly);   // build widgets
-
-        if (!contentOnly) {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(((d.width - 800) / 2) + 30, ((d.height - 600) / 2) + 30);
-            setSize(800, 600);
-
-            setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            this.addWindowListener(new WindowAdapter() {
-
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    ((AssemblyController) getController()).quit();
-                }
-            });
-
-            ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
-            setIconImage(icon.getImage());
-        }
+        initUI();   // build widgets
     }
 
     public JComponent getContent() {
@@ -116,11 +94,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     /**
      * Initialize the user interface
-     * @param contentOnly
      */
-    private void initUI(boolean contentOnly) {
-        buildMenus(contentOnly);
-        buildToolbar(contentOnly);
+    private void initUI() {
+
+        buildMenus();
+        buildToolbar();
 
         // Build here to prevent NPE from EGContrlr
         buildTreePanels();
@@ -138,11 +116,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         tabbedPane.addChangeListener(new TabSelectionHandler());
         assemblyEditorContent.add(tabbedPane, BorderLayout.CENTER);
         assemblyEditorContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        if (!contentOnly) // Can't add it here if we're going to put it somewhere else
-        {
-            getContentPane().add(assemblyEditorContent);
-        }
     }
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
@@ -309,7 +282,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    private void buildMenus(boolean contentOnly) {
+    private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
 
         myAssyFileListener = new _RecentAssyFileListener();
@@ -352,17 +325,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
-        if (contentOnly) {
-            fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
-        }
-        if (!contentOnly) {
-            fileMenu.addSeparator();
-            fileMenu.add(buildMenuItem(controller, "runEventGraphEditor", "Event Graph Editor", null, null));
-        }
-        if (contentOnly) {
-            fileMenu.addSeparator();
-            fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
-        }
+        // TODO: Unknown what this exactly does
+        fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
+
+        fileMenu.addSeparator();
+        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
+
         fileMenu.addSeparator();
         fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
 
@@ -410,10 +378,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
         helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
         myMenuBar.add(helpMenu);
-
-        if (!contentOnly) {
-            setJMenuBar(myMenuBar);
-        }
     }
 
     private JMenu buildMenu(String name) {
@@ -464,7 +428,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         return 0;
     }
 
-    private void buildToolbar(boolean contentOnly) {
+    private void buildToolbar() {
         ButtonGroup modeButtonGroup = new ButtonGroup();
         setToolBar(new JToolBar());
 

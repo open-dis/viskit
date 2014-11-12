@@ -50,11 +50,12 @@ import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
-/**
+/** <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
+ * </pre>
  * @author Mike Bailey
  * @since Jun 17, 2004
  * @since 8:27:07 AM
@@ -115,9 +116,9 @@ public class Vstatics {
 
     /**
      * Clamp the size of c to the preferred height of h and the preferred width of w
-     * @param c
-     * @param h
-     * @param w
+     * @param c the component to size clamp
+     * @param h component height
+     * @param w component width
      */
     public static void clampSize(JComponent c, JComponent h, JComponent w) {
         Dimension d = new Dimension(h.getPreferredSize().width, w.getPreferredSize().height);
@@ -212,8 +213,8 @@ public class Vstatics {
     }
 
     /**
-     * Call this method to inst a class representation of an entity.  We'll try first
-     * the "standard" classpath-classloader, then try to inst any that were loaded by file.
+     * Call this method to instantiate a class representation of an entity.  We'll try first
+     * the "standard" classpath-classloader, then try to instantiate any that were loaded by file.
      * @param s the name of the class to instantiate
      * @return an instantiated class given by s if available from the loader
      */
@@ -289,32 +290,33 @@ public class Vstatics {
     }
 
     static Class<?> tryPrimitive(String s, retrnChar rc) {
-        if (s.equals("long")) {
-            rc.c = 'J';
-            return long.class;
-        } else if (s.equals("float")) {
-            rc.c = 'F';
-            return float.class;
-        } else if (s.equals("char")) {
-            rc.c = 'C';
-            return char.class;
-        } else if (s.equals("int")) {
-            rc.c = 'I';
-            return int.class;
-        } else if (s.equals("short")) {
-            rc.c = 'S';
-            return short.class;
-        } else if (s.equals("double")) {
-            rc.c = 'D';
-            return double.class;
-        } else if (s.equals("byte")) {
-            rc.c = 'B';
-            return byte.class;
-        } else if (s.equals("boolean")) {
-            rc.c = 'Z';
-            return boolean.class;
-        } else {
-            return null;
+        switch (s) {
+            case "long":
+                rc.c = 'J';
+                return long.class;
+            case "float":
+                rc.c = 'F';
+                return float.class;
+            case "char":
+                rc.c = 'C';
+                return char.class;
+            case "int":
+                rc.c = 'I';
+                return int.class;
+            case "short":
+                rc.c = 'S';
+                return short.class;
+            case "double":
+                rc.c = 'D';
+                return double.class;
+            case "byte":
+                rc.c = 'B';
+                return byte.class;
+            case "boolean":
+                rc.c = 'Z';
+                return boolean.class;
+            default:
+                return null;
         }
     }
 
@@ -373,7 +375,7 @@ public class Vstatics {
         return System.getProperty("file.separator");
     }
 
-    static Map<String, List<Object>[]> parameterMap = new HashMap<String, List<Object>[]>();
+    static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
     static void putParameterList(String type, List<Object>[] p) {
         if (debug) {
@@ -430,7 +432,7 @@ public class Vstatics {
                     for (int n = 0; n < numConstrs; n++) {
                         String[] params = paramMap[n];
                         if (params != null) {
-                            plist[n] = new ArrayList<Object>();
+                            plist[n] = new ArrayList<>();
                             for (int k = 0; k < params.length; k += 2) {
                                 try {
                                     Parameter p = of.createParameter();
@@ -460,7 +462,7 @@ public class Vstatics {
                 }
                 for (int i = 0; i < constr.length; i++) {
                     Class<?>[] ptypes = constr[i].getParameterTypes();
-                    plist[i] = new ArrayList<Object>();
+                    plist[i] = new ArrayList<>();
                     if (debug) {
                         System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                     }
@@ -483,22 +485,31 @@ public class Vstatics {
                                 // check if length of string is > 2, then it is [classname
                                 // also, note name is followed by ;
                                 if (ptname.length() == 2) { // must be a prim type
-                                    if (ptname.equals("[B")) {
-                                        ptname = "byte[]";
-                                    } else if (ptname.equals("[C")) {
-                                        ptname = "char[]";
-                                    } else if (ptname.equals("[D")) {
-                                        ptname = "double[]";
-                                    } else if (ptname.equals("[F")) {
-                                        ptname = "float[]";
-                                    } else if (ptname.equals("[I")) {
-                                        ptname = "int[]";
-                                    } else if (ptname.equals("[J")) {
-                                        ptname = "long[]";
-                                    } else if (ptname.equals("[S")) {
-                                        ptname = "short[]";
-                                    } else if (ptname.equals("[Z")) {
-                                        ptname = "boolean[]";
+                                    switch (ptname) {
+                                        case "[B":
+                                            ptname = "byte[]";
+                                            break;
+                                        case "[C":
+                                            ptname = "char[]";
+                                            break;
+                                        case "[D":
+                                            ptname = "double[]";
+                                            break;
+                                        case "[F":
+                                            ptname = "float[]";
+                                            break;
+                                        case "[I":
+                                            ptname = "int[]";
+                                            break;
+                                        case "[J":
+                                            ptname = "long[]";
+                                            break;
+                                        case "[S":
+                                            ptname = "short[]";
+                                            break;
+                                        case "[Z":
+                                            ptname = "boolean[]";
+                                            break;
                                     }
                                 } else {
                                     ptname = convertClassName(ptname);

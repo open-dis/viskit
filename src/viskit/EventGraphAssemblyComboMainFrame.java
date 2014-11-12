@@ -123,7 +123,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         myQuitAction = new ExitAction("Exit");
 
         // Tabbed event graph editor
-        egFrame = VGlobals.instance().initEventGraphViewFrame(true);
+        egFrame = VGlobals.instance().initEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(egFrame.getContent());
             int idx = tabbedPane.indexOfComponent(egFrame.getContent());
@@ -135,14 +135,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             jamSettingsHandler(menuBar);
             egFrame.setTitleListener(myTitleListener, idx);
             setJMenuBar(menuBar);
-            jamQuitHandler(egFrame.getQuitMenuItem(), myQuitAction, egFrame.getMenus());
+            jamQuitHandler(egFrame.getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_EGEDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_EGEDITOR_IDX] = -1;
         }
 
         // Assembly editor
-        asyFrame = VGlobals.instance().initAssemblyViewFrame(true);
+        asyFrame = VGlobals.instance().initAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(asyFrame.getContent());
             int idx = tabbedPane.indexOfComponent(asyFrame.getContent());
@@ -157,7 +157,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 setJMenuBar(menuBar);
             }
             asyFrame.setTitleListener(myTitleListener, idx);
-            jamQuitHandler(asyFrame.getQuitMenuItem(), myQuitAction, asyFrame.getMenus());
+            jamQuitHandler(asyFrame.getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_ASSYEDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
@@ -193,7 +193,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 setJMenuBar(menuBar);
             }
             reportPanel.setTitleListener(myTitleListener, idx);
-            jamQuitHandler(null, myQuitAction, reportPanel.getMenus());
+            jamQuitHandler(null, myQuitAction, menuBar);
             tabIndices[TAB0_ANAL_REPORT_IDX] = idx;
         } else {
             tabIndices[TAB0_ANAL_REPORT_IDX] = -1;
@@ -209,7 +209,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         doCommonHelp(menuBar);
         jamSettingsHandler(menuBar);
         asyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
-        jamQuitHandler(asyRunComponent.getQuitMenuItem(), myQuitAction, asyRunComponent.getMenus());
+        jamQuitHandler(asyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) asyFrame.getController());
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
