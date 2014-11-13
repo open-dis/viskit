@@ -37,7 +37,6 @@ import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import edu.nps.util.LogUtils;
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.lang.reflect.InvocationHandler;
@@ -139,13 +138,10 @@ public class EventGraphAssemblyComboMain {
         ToolTipManager ttm = ToolTipManager.sharedInstance();
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
-
         JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
         VGlobals.instance().setMainAppWindow(mainFrame);
 
         if (onMac) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Viskit");
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
