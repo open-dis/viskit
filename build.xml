@@ -549,67 +549,53 @@
 
     <!-- TARGET: Run w/Viskit custom splash -->
     <target name="build.run.with.extensions"
-            depends="build.viskit.with.extensions"
+            depends="build.viskit.with.extensions,quick.run"
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
-        <java classname="viskit.Splash2"
-              classpathref="runtime.classpath"
-              fork="true">
-            <jvmarg value="-Xmx256m"/>
-
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-            <arg value="${main.class}"/>
-        </java>
     </target>
     <target name="build.run.no.extensions"
-            depends="jar"
+            depends="jar,quick.run"
             description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
-        <java classname="viskit.Splash2"
-              classpathref="runtime.classpath"
-              fork="true">
-            <jvmarg value="-Xmx256m"/>
-
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
-            <arg value="${main.class}"/>
-        </java>
     </target>
 
     <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
-    <target depends="init" name="quick.run" description="Run Viskit, don't check dependencies, don't rebuild">
+    <target name="quick.run"
+            depends="init,quick.run.win,quick.run.mac,quick.run.linux"
+            description="Run Viskit, don't check dependencies, don't rebuild"/>
+
+    <target name="quick.run.win" if="isWindows">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-	    <jvmarg value="-Xmx256m"/>
 
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+            <jvmarg line="${common.run.args}"/>
             <arg value="${main.class}"/>
         </java>
     </target>
 
-    <target depends="compile" description="Debug Project" name="debug">
-        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
-            <classpath refid="runtime.classpath"/>
-        </nbjpdastart>
-        <java classname="${debug.class}"
+    <target name="quick.run.linux" if="isUnixNotMac">
+        <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg value="-Xmx256m"/>
 
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+            <jvmarg line="${common.run.args}"/>
+            <arg value="${main.class}"/>
         </java>
     </target>
+
+    <target name="quick.run.mac" if="isMac">
+        <java classname="viskit.Splash2"
+              classpathref="runtime.classpath"
+              fork="true">
+	    <jvmarg line="${common.run.args}"/>
+
+            <jvmarg value="-Xdock:name=${product.shortname}"/>
+            <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
+            <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+            <arg value="${main.class}"/>
+        </java>
+    </target>
+
+    <target depends="compile,quick.debug" description="Debug Project" name="debug"/>
 
     <!-- TARGET: Quick Debug don't check dependencies, TBD ant should be able to not rebuild if not needed -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
@@ -625,11 +611,8 @@
             <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg value="-Xmx256m"/>
 
-            <!-- Font anti-aliasing -->
-            <jvmarg value="-Dswing.aatext=true"/>
-            <jvmarg value="-Djava.endorsed.dirs=${java.endorsed}"/>
+            <jvmarg line="${common.run.args}"/>
 
             <!-- Any debug args can go here -->
             <!--arg value="localhost" />

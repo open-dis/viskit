@@ -2,6 +2,7 @@
 <project basedir=".." name="Viskit-IDE">
     <property file="nbproject/private/private.properties"/>
     <import file="../build.xml"/>
+
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#compilesingle) -->
     <target depends="init" name="compile-selected-files-in-src">
@@ -40,6 +41,7 @@
         <java classname="${debug.class}" fork="true">
             <classpath refid="runtime.classpath"/>
             <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <!-- Uncomment for translating and compiling EGs -->
             <arg value="${viskit.eg}"/>
