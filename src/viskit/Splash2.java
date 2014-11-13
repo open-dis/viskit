@@ -1,5 +1,6 @@
 package viskit;
 
+import edu.nps.util.LogUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -82,13 +83,13 @@ public class Splash2 extends JFrame {
         });
     }
 
-    protected void createScreenImage() {
+    protected final void createScreenImage() {
         try {
             if (robot == null) {
                 robot = new Robot();
             }
         } catch (AWTException ex) {
-            ex.printStackTrace();
+            LogUtils.getLogger(getClass()).error(ex);
         }
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -129,6 +130,7 @@ public class Splash2 extends JFrame {
         if (viskit.Vstatics.debug) {
             System.out.println(System.getProperty("java.class.path"));
         }
+
         final Splash2 spl = new Splash2();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         spl.setLocation((d.width - spl.getWidth()) / 2, (d.height - spl.getHeight()) / 2);
@@ -165,8 +167,8 @@ public class Splash2 extends JFrame {
 
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            LogUtils.getLogger(Splash2.class).error(ex);
         }
         progressBar.setString("Complete");
 
