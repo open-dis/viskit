@@ -137,13 +137,20 @@
     </taskdef>
 
     <!--  === TARGET: help === -->
-    <target name="help">
+    <target name="help" depends="javahelp">
         <echo>
-            This is the Ant build file for the NPS Viskit and associated libraries.
-            Third-party jar files are not compiled from source here, but they are
-            copied as necessary for the simkit distribution.  This buildfile was created
-            and tested using Ant version 1.7.1.  Modified from Simkit's build.xml.
+This is the Ant build file for the NPS Viskit and associated libraries.
+Third-party jar files are not compiled from source here, but they are
+copied as necessary for the viskit distribution.  This buildfile was
+created and tested using ${ant.version}.
+Type "ant -p" on the command line for a list of targets to invoke and
+their descpritions.
         </echo>
+        <java classpath="${dir.lib}/hsviewer.jar:${dir.lib}/jhall.jar"
+              classname="sunw.demo.jhdemo.JHLauncher"
+              fork="true">
+            <arg line="-helpset ${build.javahelp}/vHelpSet.hs"/>
+        </java>
     </target>
 
     <!--  === TARGET: hudson === -->

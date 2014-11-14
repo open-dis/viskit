@@ -13,8 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.ModelEvent;
-import viskit.EventGraphController;
+import viskit.control.EventGraphController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
@@ -191,7 +190,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
 
             m.marshal(jaxbRoot, fw);
-            fw.close();
 
             // OK, made it through the marshal, overwrite the "real" file
             FileIO.copyFile(tmpF, f, true);

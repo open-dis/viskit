@@ -44,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import javax.swing.*;
+import viskit.view.EventGraphAssemblyComboMainFrame;
 
 /**
  * <p>MOVES Institute

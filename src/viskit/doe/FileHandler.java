@@ -48,7 +48,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import viskit.OpenAssembly;
+import viskit.util.OpenAssembly;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.SimEntity;

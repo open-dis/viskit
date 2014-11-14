@@ -43,7 +43,7 @@ package viskit.doe;
 
 import edu.nps.util.TempFileManager;
 import org.jdom.Document;
-import viskit.OpenAssembly;
+import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.bindings.assembly.ValueRange;
 

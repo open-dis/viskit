@@ -17,28 +17,28 @@ import java.util.List;
  * @version $Id$
  */
 public class LocalDriverImpl implements DoeRunDriver {
-    
+
     LocalBootLoader loader;
     Object runner;
     Class<?> gridRunnerz;
     Hashtable<String, Method> methods;
-    
+
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
         loader = new LocalBootLoader(new URL[] {}, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
         initGridRunner(loader);
     }
-    
+
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
         loader = new LocalBootLoader(extClassPaths, Thread.currentThread().getContextClassLoader(), workDir);
         initGridRunner(loader);
     }
-    
+
     void initGridRunner(LocalBootLoader loader) {
         loader = loader.init();
         Thread.currentThread().setContextClassLoader(loader);
         try {
-            gridRunnerz = loader.loadClass("viskit.xsd.assembly.GridRunner");
+            gridRunnerz = loader.loadClass("viskit.gridlet.GridRunner");
             try {
                 Class<?> loaderz = loader.loadClass("viskit.doe.LocalBootLoader");
                 Constructor lconstr = loaderz.getConstructor(URL[].class, ClassLoader.class, File.class);
@@ -48,7 +48,7 @@ public class LocalDriverImpl implements DoeRunDriver {
                 Constructor constr = gridRunnerz.getConstructor(loader.loadClass("viskit.doe.LocalBootLoader")); //yep
                 runner = constr.newInstance(rloader);
                 Method[] mthds = gridRunnerz.getMethods();
-                methods = new Hashtable<String, Method>();
+                methods = new Hashtable<>();
                 for(Method m : mthds) {
                     methods.put(m.getName(), m);
                     //System.out.println("put "+m.getName()+" "+m);
@@ -71,7 +71,7 @@ public class LocalDriverImpl implements DoeRunDriver {
             ex.printStackTrace();
         }
     }
-    
+
     public void clear() throws DoeException {
         try {
             Method clear = gridRunnerz.getMethod("clear", new Class<?>[]{});
@@ -81,7 +81,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.clear();
     }
-    
+
     public int flushQueue() throws DoeException {
         try {
             Method flushQueue = gridRunnerz.getMethod("flushQueue", new Class<?>[]{});
@@ -91,7 +91,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.flushQueue();
     }
-    
+
     public int getDesignPointCount() throws DoeException {
         try {
             return (Integer) (methods.get("getDesignPointCount")).invoke(runner,new Object[]{});
@@ -100,7 +100,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.getDesignPointCount();
     }
-    
+
     public synchronized Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
         try {
             return (Hashtable) methods.get("getDesignPointStats").invoke(runner,sampleIndex,designPtIndex);
@@ -110,18 +110,18 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.getDesignPointStats(sampleIndex,designPtIndex);
     }
-    
+
     public int getRemainingTasks() throws DoeException {
         try {
             return (Integer) methods.get("getRemainingTasks").invoke(runner,new Object[]{});
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
         //return runner.getRemainingTasks();
     }
-    
+
     public synchronized Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
         try {
             return (Hashtable) methods.get("getReplicationStats").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
@@ -130,9 +130,9 @@ public class LocalDriverImpl implements DoeRunDriver {
             throw new DoeException(ex.getMessage());
         }
         //return runner.getReplicationStats(sampleIndex,designPtIndex,replicationIndex);
-        
+
     }
-    
+
     public synchronized String getResult(int sampleIndex, int designPtIndex) throws DoeException {
         try {
             return (String) methods.get("getResult").invoke(runner,sampleIndex,designPtIndex);
@@ -142,7 +142,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.getResult(sample,designPt);
     }
-    
+
     public synchronized String getResultByTaskID(int taskID) throws DoeException {
         try {
             return (String) methods.get("getResultByTaskID").invoke(runner,taskID);
@@ -152,7 +152,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.getResultByTaskID(taskID);
     }
-    
+
     public synchronized List<Object> getTaskQueue() throws DoeException {
         try {
             ArrayList queue = (ArrayList) methods.get("getTaskQueue").invoke(runner,new Object[]{});
@@ -167,20 +167,20 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //return runner.getTaskQueue();
     }
-    
+
     public String qstat() throws DoeException {
         try {
             return (String) methods.get("qstat").invoke(runner);
         } catch (Exception ex) {
             return "See Task Queue";
         }
-        
+
     }
-    
+
     public String qstatXML() throws DoeException {
         return "<!--See Task Queue-->";
     }
-    
+
     public void removeIndexedTask(int sampleIndex, int designPtIndex) throws DoeException {
         try {
             methods.get("removeIndexedTask").invoke(runner, sampleIndex, designPtIndex);
@@ -190,7 +190,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.removeIndexedTask(sampleIndex,designPtIndex);
     }
-    
+
     public void removeTask(int jobID, int taskID) throws DoeException {
         try {
             methods.get("removeTask").invoke(runner,jobID,taskID);
@@ -200,7 +200,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.removeTask(jobID,taskID);
     }
-    
+
     public void setAssembly(String assembly) throws DoeException {
         try {
             methods.get("setAssembly").invoke(runner,assembly);
@@ -210,7 +210,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.setAssembly(assembly);
     }
-    
+
     public void addEventGraph(String eventGraph) throws DoeException {
         try {
             methods.get("addEventGraph").invoke(runner,eventGraph);
@@ -220,7 +220,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         }
         //runner.addEventGraph(eventGraph);
     }
-    
+
     // tbd, project jars? ie with XML
     public void addJar(File jarFile) throws DoeException {
         try {
@@ -231,7 +231,7 @@ public class LocalDriverImpl implements DoeRunDriver {
             e.printStackTrace();
         }
     }
-    
+
     public void run() throws DoeException {
         try {
             Method runMethod = methods.get("run");
@@ -241,5 +241,5 @@ public class LocalDriverImpl implements DoeRunDriver {
             throw new DoeException(ex.getMessage());
         }
         //runner.run();
-    }    
+    }
 }

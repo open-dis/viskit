@@ -18,9 +18,9 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
-import viskit.AssemblyViewFrame;
-import viskit.ModelEvent;
-import viskit.AssemblyController;
+import viskit.view.AssemblyViewFrame;
+import viskit.model.ModelEvent;
+import viskit.control.AssemblyController;
 import viskit.model.*;
 
 /**

@@ -33,6 +33,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import viskit.control.FileBasedClassManager;
+import viskit.view.dialog.SettingsDialog;
 import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
@@ -194,7 +196,7 @@ public class Vstatics {
         return null;
     }
 
-    static String getClassPathAsString() {
+    public static String getClassPathAsString() {
         // The order of the class path is 1) existing classpath, 2) extra paths, 3) work dir
         String sep = getPathSeparator();
         StringBuilder cPath = new StringBuilder();
@@ -377,7 +379,7 @@ public class Vstatics {
 
     static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
-    static void putParameterList(String type, List<Object>[] p) {
+    static public void putParameterList(String type, List<Object>[] p) {
         if (debug) {
             System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
         }

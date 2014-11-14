@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
-import viskit.TitleListener;
+import viskit.util.TitleListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

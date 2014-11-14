@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.EventGraphController;
+import viskit.control.EventGraphController;
 import viskit.model.CancellingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;

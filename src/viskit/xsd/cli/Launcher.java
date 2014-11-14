@@ -337,9 +337,9 @@ public class Launcher extends Thread implements Runnable {
         String assemblyJava;
         File tempDir;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
-        axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
-        assyContlr = cloader.loadClass("viskit.AssemblyController");
+        xml2jz = cloader.loadClass("viskit.xsd.translator.eg.SimkitXML2Java");
+        axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
+        assyContlr = cloader.loadClass("viskit.control.AssemblyController");
         tempDirz = cloader.loadClass("viskit.VGlobals");
 
         try {
@@ -475,8 +475,8 @@ public class Launcher extends Thread implements Runnable {
         ByteArrayInputStream bais;
         String assemblyJava;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
-        axml2jz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
+        xml2jz = cloader.loadClass("viskit.xsd.translator.eg.SimkitXML2Java");
+        axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
         bshz = cloader.loadClass("bsh.Interpreter");
         bshcmz = cloader.loadClass("bsh.BshClassManager");
 
@@ -486,8 +486,8 @@ public class Launcher extends Thread implements Runnable {
         m = bshz.getDeclaredMethod("getClassManager", new Class<?>[]{});
         bshcm = m.invoke(bsh, new Object[]{});
         m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
-        out = m.invoke(bshcm, new Object[]{"viskit.xsd.assembly.BasicAssembly"});
-        log.debug("Checking if viskit.xsd.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
+        out = m.invoke(bshcm, new Object[]{"viskit.xsd.translator.assembly.BasicAssembly"});
+        log.debug("Checking if viskit.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
 
         try {
             Enumeration<String> e = eventGraphs.keys();
@@ -614,7 +614,7 @@ public class Launcher extends Thread implements Runnable {
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
-    Class clz = cloader.loadClass("viskit.xsd.assembly.SimkitAssemblyXML2Java");
+    Class clz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();
@@ -692,7 +692,7 @@ public class Launcher extends Thread implements Runnable {
     // Gridlets also do their own to get PORT and other env
     void launchGridlet() {
         try {
-            Class<?> gridletz = cloader.loadClass("viskit.xsd.assembly.Gridlet");
+            Class<?> gridletz = cloader.loadClass("viskit.gridlet.Gridlet");
             Method m = gridletz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{}});
         } catch (ClassNotFoundException e) {
@@ -718,7 +718,7 @@ public class Launcher extends Thread implements Runnable {
 
     void launchAssemblyServer(int port) {
         try {
-            Class<?> serverz = cloader.loadClass("viskit.xsd.assembly.AssemblyServer");
+            Class<?> serverz = cloader.loadClass("viskit.gridlet.AssemblyServer");
             Method m = serverz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"-p", "" + port}});
         } catch (ClassNotFoundException e) {

@@ -111,6 +111,7 @@ public class DoeMain implements DoeEvents {
         // Make frame visible in GUI thread to be strictly legal
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 mainFrame.setVisible(true);
             }
@@ -122,7 +123,7 @@ public class DoeMain implements DoeEvents {
         String laf;
 
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.indexOf("windows") != -1) {
+        if (os.contains("windows")) {
             laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         } else {
             /*if (os.indexOf("mac") != -1)*/ laf = "javax.swing.plaf.metal.MetalLookAndFeel";
@@ -139,8 +140,8 @@ public class DoeMain implements DoeEvents {
             UIManager.setLookAndFeel(laf);
         //ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
         //Wrapper.wrap(); //Force all widgets to go anti-aliased
-        } catch (Exception e) {
-            System.out.println("can't change l&f");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            System.err.println("can't change l&f");
         }
     }
 

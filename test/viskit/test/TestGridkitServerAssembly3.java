@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBElement;
 import org.apache.log4j.Logger;
-import viskit.xsd.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;

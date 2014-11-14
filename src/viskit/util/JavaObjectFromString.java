@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import javax.tools.SimpleJavaFileObject;
 
-/** This is a helper class for the javax internal compiler 
+/** This is a helper class for the javax internal compiler
  * @version $Id$
  */
 public class JavaObjectFromString extends SimpleJavaFileObject {
@@ -19,5 +19,5 @@ public class JavaObjectFromString extends SimpleJavaFileObject {
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
         return contents;
-    }    
+    }
 }

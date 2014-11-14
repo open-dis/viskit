@@ -382,7 +382,7 @@ public class LocalBootLoader extends URLClassLoader {
                     boolean isEventGraph = true;
                     try {
                         Class<?> clz = stage1.loadClass(entryClass);
-                        Class<?> vzClz = stage1.loadClass("viskit.xsd.assembly.ViskitAssembly");
+                        Class<?> vzClz = stage1.loadClass("viskit.assembly.ViskitAssembly");
                         if (vzClz.isAssignableFrom(clz)) {
                             isEventGraph = false;
                         }

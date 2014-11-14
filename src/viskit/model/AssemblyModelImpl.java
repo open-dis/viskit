@@ -13,9 +13,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.FileBasedAssyNode;
-import viskit.ModelEvent;
-import viskit.AssemblyController;
+import viskit.util.FileBasedAssyNode;
+import viskit.control.AssemblyController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
@@ -153,6 +152,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (f == null) {
             f = currentFile;
         }
+        
         // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
         // file on a marshal error.
 

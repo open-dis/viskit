@@ -70,12 +70,12 @@ import java.util.List;
  *   <pre><b>
  *     Date:     07 DEC 07
  *     Time:     0701Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.GenericConversion">Terry Norbraten, NPS MOVES</a>
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.GenericConversion">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
  *
  *     Date:     12 DEC 07
  *     Time:     0106Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.xsd.assembly.GenericConversion">Terry Norbraten, NPS MOVES</a>
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.GenericConversion">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Created method to take a Collection of Type and fill a
  *                  Collection Array of Type
  *   </b></pre>

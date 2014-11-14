@@ -9,7 +9,7 @@
     name        ID      #REQUIRED
     version     CDATA   "1.0"
     package     CDATA   #REQUIRED
-    extend      CDATA   "viskit.xsd.assembly.ViskitAssembly"
+    extend      CDATA   "viskit.assembly.ViskitAssembly"
     implement   CDATA   #IMPLIED
 >
 
@@ -70,8 +70,8 @@
     y       CDATA #REQUIRED
 >
 
-<!-- The proper mode for a PropertyChangeListener is singular, however, for 
-     backwards compatibility with older EventGraphs, we allow both singular and 
+<!-- The proper mode for a PropertyChangeListener is singular, however, for
+     backwards compatibility with older EventGraphs, we allow both singular and
      plural modes (tdn 16 SEP 2008-->
 <!ELEMENT PropertyChangeListener ((%Parameters;)*, (Coordinate?))>
 <!ATTLIST PropertyChangeListener

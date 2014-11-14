@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.util.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.xsd.assembly.SessionManager;
+import viskit.gridlet.SessionManager;
 /**
  *
  * @author Rick Goldberg

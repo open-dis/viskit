@@ -3,7 +3,7 @@ package viskit.model;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
-import viskit.FileBasedAssyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**

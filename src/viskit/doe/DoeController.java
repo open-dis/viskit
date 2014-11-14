@@ -51,8 +51,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
-import viskit.OpenAssembly;
-import viskit.VGlobals;
+import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.TerminalParameter;
@@ -83,6 +82,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         actionPerformed(new ActionEvent(src, 0, new String(new char[] {c})));
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         char c = e.getActionCommand().charAt(0);
 
@@ -251,18 +251,18 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // clone the jaxbroot (we want to use currently checked widgets, but don't want to force save
     // No clone method, but save the params
 
-        savedDesignParms = new Vector<TerminalParameter>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
+        savedDesignParms = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
         saveDoeParmsNoNotify();
 
         // put Event graphs in place (CDATA stuff)
 
-        savedEvGraphs = new Vector<EventGraph>(OpenAssembly.inst().jaxbRoot.getEventGraph());
+        savedEvGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
         // eventgraphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
         return true;
     }
 
     public Collection getLoadedEventGraphs() {
-        return new Vector<File>(loadedEventGraphs);
+        return new Vector<>(loadedEventGraphs);
     }
 
     public void restorePrepRun() {
@@ -378,7 +378,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         return myEGListener;
     }
     private DirectoryWatch.DirectoryChangeListener myEGListener = new EGListener();
-    Vector<File> loadedEventGraphs = new Vector<File>();
+    Vector<File> loadedEventGraphs = new Vector<>();
 
     /* and here we hear about open event graphs */
     class EGListener implements DirectoryWatch.DirectoryChangeListener {

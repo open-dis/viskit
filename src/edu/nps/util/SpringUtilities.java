@@ -44,9 +44,6 @@ import java.awt.*;
  * These utilities are used by several programs, such as
  * SpringBox and SpringCompactGrid.
  *
- * Viskit Discrete Event Simulation (DES) Tool
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
  * @author Mike Bailey
  * @since Dec 21, 2004
  * @since 11:43:06 AM
@@ -71,7 +68,7 @@ public class SpringUtilities {
      * preferred width and height of the components.
      * The parent is made just big enough to fit them all.
      *
-     * @param parent 
+     * @param parent
      * @param rows number of rows
      * @param cols number of columns
      * @param initialX x location to start the grid at
@@ -175,7 +172,7 @@ public class SpringUtilities {
      * height is similarly determined for each row.
      * The parent is made just big enough to fit them all.
      *
-     * @param parent 
+     * @param parent
      * @param rows number of rows
      * @param cols number of columns
      * @param initialX x location to start the grid at
@@ -219,12 +216,10 @@ public class SpringUtilities {
             Spring height = Spring.constant(0);
             for (int c = 0; c < cols; c++) {
                 height = Spring.max(height,
-                                    getConstraintsForCell(r, c, parent, cols).
-                                        getHeight());
+                                 getConstraintsForCell(r, c, parent, cols).getHeight());
             }
             for (int c = 0; c < cols; c++) {
-                SpringLayout.Constraints constraints =
-                        getConstraintsForCell(r, c, parent, cols);
+                SpringLayout.Constraints constraints = getConstraintsForCell(r, c, parent, cols);
                 constraints.setY(y);
                 constraints.setHeight(height);
             }

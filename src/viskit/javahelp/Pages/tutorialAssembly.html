@@ -33,23 +33,23 @@
 
 <p>It is necessary to have the two event graphs already loaded. The first
 graph was created during the Event Graph Tutorial and is called ArrivalProcess.
-The second graph is SimpleServer. Both of these can be loaded from the 'examples' 
+The second graph is SimpleServer. Both of these can be loaded from the 'examples'
 directory. If you don't have both of these loaded, please do so now.</p>
 
-<p>When the event graphs have correctly loaded, there will be ArrivalProcess 
-and SimpleServer icons in the upper left panel under "Event Graphs". This 
-indicates they have been imported into the Java classpath and can be used 
+<p>When the event graphs have correctly loaded, there will be ArrivalProcess
+and SimpleServer icons in the upper left panel under "Event Graphs". This
+indicates they have been imported into the Java classpath and can be used
 to build an assembly. This is indicated in Figure 1.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/assemblyImage001.png"></p>
-<p class="caption">Figure 1. Availabiliy of Event Graphs in Assembly Editor.</p>
+<p class="caption">Figure 1. Availability of Event Graphs in Assembly Editor.</p>
 
 
 <h3>3.2. Preview</h3>
 
-<p>First lets see what a finished assembly looks like. Use <span class='menu'>File 
+<p>First lets see what a finished assembly looks like. Use <span class='menu'>File
 <img src='Tutorial_files/iconMenu.png' width='12' height='9'> Open</span>
-and go to examples directory as before (up 3 levels), select and open 
+and go to examples directory as before (up 3 levels), select and open
 ServerAssembly.xml. You will see the view in Figure 2.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/assemblyImage002.png"></p>
@@ -72,7 +72,7 @@ to be inspected or modified.</p>
 
 <p>The purpose of the 'Assembly Editor' is to connect the needed event graphs and
 establish the proper listeners for the data of interest. Once that is completed, the
-simulation is run. This example is now ready to run. That is done by using the 
+simulation is run. This example is now ready to run. That is done by using the
 'Compile/initialize assembly runner' icon <img src='Tutorial_files/iconRun.png' width='28' height='28'>.
 Once the button is pressed, Viskit automatically changes tot he 'Assembly Run' tab.
 (A full description of the 'Assembly Run' tab is in <a href='tutorialRun.html'>Section 4</a>.)</p>
@@ -91,7 +91,7 @@ running you will see a result something like Figure 5. You may choose to de-sele
 
 <p>We will now create an assembly. First go back to the 'Assembly Editor' tab. It
 is not necessary to delete or otherwise modify the existing ServerAssembly graph.
-A new assembly is created with <span class='menu'>File 
+A new assembly is created with <span class='menu'>File
 <img src='Tutorial_files/iconMenu.png' width='12' height='9'> New Assembly</span>.
 The 'Assembly Properties' panel is displayed (see Figure 6). Set the name to
 'MyServerAssembly' and the package to 'hello.world', and apply the changes. An empty
@@ -109,7 +109,7 @@ behavior to the upper right. Figure 7 shows the process.</p>
 <p class="caption">Figure 7. Process of adding behaviors to the assembly.</p>
 
 
-<p>The two events need to be connected. Select the "Connect Assemblies with Adapter 
+<p>The two events need to be connected. Select the "Connect Assemblies with Adapter
 Pattern" <img src='Tutorial_files/iconAdapterConnect.png' width='32' height='32'>
 icon and draw a line from the "Arrival Process" event to the "Simple Server" event.
 This will bring up the "Adapter Connection" popup (see Figure 8).</p>
@@ -121,18 +121,18 @@ adapter-specific information.</p>
 
 <p>Select the <img src='Tutorial_files/icon3dot.png' width='22' height='18'> button after "source event", then select "Arrival" from the
 popup. Click on "Apply changes" to insert it back into the "Adapter Connection"
-window. Follow the same steps for the "target event" field, and click on 
+window. Follow the same steps for the "target event" field, and click on
 "Apply changes" on the "Adapter Connection" window.</p>
 
 <p>Click on the Select <img src='Tutorial_files/iconSelect.png' width='32' height='32'>
 icon, and double-click on the "Arrival Process" event box. That will bring up the
 "Event Graph Inspector" (see Figure 9). Now click on the <img src='Tutorial_files/icon3dot.png' width='22' height='18'> button after
-simkit.random.RandomVariate field. Set the "method" field to "factory" using 
-the drop-down list in the "Object Inspector". Press the 'Enter' key to 
-indicate acceptance of the "Factory class" field (see Figure 10). A 
-"Factory methods" popup will display (see Figure 11). This window allows you 
+simkit.random.RandomVariate field. Set the "method" field to "factory" using
+the drop-down list in the "Object Inspector". Press the 'Enter' key to
+indicate acceptance of the "Factory class" field (see Figure 10). A
+"Factory methods" popup will display (see Figure 11). This window allows you
 to select the actual Java means for generating the values. Choose the entry
-<span class='code'>getInstance(java.lang.String,java.lang.Object[],simkit.random.RandomNumber)</span> 
+<span class='code'>getInstance(java.lang.String,java.lang.Object[],simkit.random.RandomNumber)</span>
 and click "OK" to use.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/assemblyImage009.png"></p>
@@ -145,13 +145,13 @@ and click "OK" to use.</p>
 <p class="caption">Figure 11. Java-specific means for generating random variable??</p>
 
 
-<p>In the field java.lang.String enter <span class='code'>simkit.random.Normal3Variate</span>. 
+<p>In the field java.lang.String enter <span class='code'>simkit.random.Normal3Variate</span>.
 Click on the <img src='Tutorial_files/icon3dot.png' width='22' height='18'> button after java.lang.Object[]. That brings up the Array Inspector
-window. Enter '2' in the field for 'Array length' and press 'Enter'. 
+window. Enter '2' in the field for 'Array length' and press 'Enter'.
 Two new fields will be present in the window (see Figure 13). These fields
-are the two parameters that describe a normal distribution. The first paramter
-(top field) is the mean. The second paramter (bottom box) is the standard deviation. 
-Type <span class='code'>new Double(5.0)</span> in the top of the two new boxes. 
+are the two parameters that describe a normal distribution. The first parameter
+(top field) is the mean. The second parameter (bottom box) is the standard deviation.
+Type <span class='code'>new Double(5.0)</span> in the top of the two new boxes.
 In the bottom box type in <span class='code'>new Double(.5)</span>.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/assemblyImage012.png"></p>
@@ -171,15 +171,15 @@ class. The 'Factory methods' dialogue window will popup. Click 'OK'.</p>
 
 
 <p>Don't know what to do next. There appear to be problems in the Object Inspector,
-and clicking on 'Apply changes' doesn't popupate the other Object Inspector window.
+and clicking on 'Apply changes' doesn't populate the other Object Inspector window.
 
 <p class=BodyTextCentered><img src="Tutorial_files/ZZrandomProblem.png"></p>
 <p class="caption">Figure 14. Problem here.</p>
 
 
 
-<p>Apply the 
-changes to the 'Array Inspector' and 'Object Inspector' dialogue windows. 
+<p>Apply the
+changes to the 'Array Inspector' and 'Object Inspector' dialogue windows.
 To apply the changes to the 'Event Graph Inspector' dialogue window, first click
 in the 'description' field, then click on the 'Apply Changes' button.</p>
 

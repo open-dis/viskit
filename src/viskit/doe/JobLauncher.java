@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -53,8 +54,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
-import viskit.SpringUtilities;
-import viskit.TitleListener;
+import viskit.util.TitleListener;
 
 /**
  * MOVES Institute

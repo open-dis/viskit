@@ -123,10 +123,10 @@ public class JobResults extends JFrame {
 
         TextTitle tt = new TextTitle("1 Terrorist successful, 0 Platform defended, -1 Results inconclusive");
         tt.setBackgroundPaint(new Color(255, 255, 255, 192)); // translucent white
-        
+
         // JFreeChart v 1.2.0
         tt.setFrame(new BlockBorder(Color.black));
-        
+
         // JFreeChart v 1.0.4
 //        tt.setBorder(new BlockBorder(Color.black));
         f = tt.getFont();
@@ -157,6 +157,7 @@ public class JobResults extends JFrame {
 
                     StringBuffer sb = new StringBuffer();
 
+                    @Override
                     public String generateToolTip(XYDataset dataset, int series, int item) {
                         MyDataSet mds = (MyDataSet) dataset;
                         JobLauncher.Gresults res = (JobLauncher.Gresults) mds.getCanonicalDataItem(item);
@@ -214,26 +215,31 @@ class MyDataSet extends AbstractXYDataset implements XYDataset {
         return v.get(idx);
     }
 
+    @Override
     public int getSeriesCount() {
         return 1;
     }
 
+    @Override
     public Comparable getSeriesKey(int series) {
         return "" + myseq;
     }
 
+    @Override
     public int getItemCount(int series) {
         return v.size();
     }
 
+    @Override
     public Number getX(int series, int item) {
-        return new Integer(item);
+        return item;
     }
 
+    @Override
     public Number getY(int series, int item) {
         JobLauncher.Gresults results = v.get(item);
         if (!results.resultsValid) {
-            return new Double(-1d);
+            return -1d;
         }
         return (results.resultsMean < 1.0d) ? new Double(1d) : new Double(0d);
     }

@@ -44,7 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
-import viskit.xsd.assembly.SessionManager;
+import viskit.gridlet.SessionManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

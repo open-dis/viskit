@@ -35,7 +35,7 @@ package viskit.doe;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
-import viskit.OpenAssembly;
+import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
 
 import javax.swing.event.TableModelEvent;

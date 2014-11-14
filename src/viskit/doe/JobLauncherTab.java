@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import edu.nps.util.CryptoMethods;
+import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.xmlrpc.XmlRpcClientLite;
@@ -40,10 +41,9 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
-import viskit.OpenAssembly;
-import viskit.SpringUtilities;
-import viskit.TitleListener;
-import viskit.xsd.assembly.SessionManager;
+import viskit.util.OpenAssembly;
+import viskit.util.TitleListener;
+import viskit.gridlet.SessionManager;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.Schedule;

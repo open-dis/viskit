@@ -39,7 +39,7 @@
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="package" use="required"/>
-      <xs:attribute name="extend" default="viskit.xsd.assembly.ViskitAssembly"/>
+      <xs:attribute name="extend" default="viskit.assembly.ViskitAssembly"/>
       <xs:attribute name="implement"/>
     </xs:complexType>
   </xs:element>
@@ -105,8 +105,8 @@
     </xs:complexType>
   </xs:element>
   <!--
-     The proper mode for a PropertyChangeListener is singular, however, for 
-    backwards compatibility with older EventGraphs, we allow both singular and 
+     The proper mode for a PropertyChangeListener is singular, however, for
+    backwards compatibility with older EventGraphs, we allow both singular and
     plural modes (tdn 16 SEP 2008
   -->
   <xs:element name="PropertyChangeListener">

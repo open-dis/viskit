@@ -33,6 +33,13 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import viskit.control.EventGraphControllerImpl;
+import viskit.control.AssemblyControllerImpl;
+import viskit.view.ViskitProjectButtonPanel;
+import viskit.view.RunnerPanel2;
+import viskit.view.dialog.SettingsDialog;
+import viskit.view.AssemblyViewFrame;
+import viskit.view.EventGraphViewFrame;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
@@ -114,7 +121,7 @@ public class VGlobals {
     /* routines to manage the singleton-aspect of the views. */
     AssemblyViewFrame avf;
     AssemblyControllerImpl acont;
-    AssemblyModelImpl amod;
+    public AssemblyModelImpl amod;
     boolean assyFirstRun = false;
 
     /**

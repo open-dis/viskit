@@ -22,9 +22,9 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
-import viskit.EventGraphViewFrame;
-import viskit.ModelEvent;
-import viskit.EventGraphController;
+import viskit.view.EventGraphViewFrame;
+import viskit.model.ModelEvent;
+import viskit.control.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
 
