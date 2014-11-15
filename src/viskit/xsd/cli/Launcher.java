@@ -337,7 +337,7 @@ public class Launcher extends Thread implements Runnable {
         String assemblyJava;
         File tempDir;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.eg.SimkitXML2Java");
+        xml2jz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
         assyContlr = cloader.loadClass("viskit.control.AssemblyController");
         tempDirz = cloader.loadClass("viskit.VGlobals");
@@ -475,7 +475,7 @@ public class Launcher extends Thread implements Runnable {
         ByteArrayInputStream bais;
         String assemblyJava;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.eg.SimkitXML2Java");
+        xml2jz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
         bshz = cloader.loadClass("bsh.Interpreter");
         bshcmz = cloader.loadClass("bsh.BshClassManager");
@@ -595,7 +595,7 @@ public class Launcher extends Thread implements Runnable {
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = cloader.loadClass("viskit.xsd.translator.SimkitXML2Java");
+    Class clz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     //xml2j = new SimkitXML2Java(bais);
     xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );

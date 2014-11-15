@@ -805,14 +805,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initReportFile();
 
-            /* Invoke the AnalystReportBuilder via reflection.  Reflection is used
-             * due to the sequential building of Viskit where this class file gets
-             * compiled before the AnalystReportBuilder and therefore would throw a
-             * compile time error.
-             */
             ClassLoader localLoader = Thread.currentThread().getContextClassLoader();
             try {
-                Class<?> clazz = localLoader.loadClass("viskit.AnalystReportBuilder");
+                Class<?> clazz = localLoader.loadClass("viskit.reports.AnalystReportBuilder");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), getPclNodeCache());
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
@@ -835,7 +830,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             }
         }
 
-        // TODO: Determine if these actually work they way you intend them too?
+        // TODO: Determine if these actually work they way are intended too?
         System.runFinalization();
         System.gc();
     }

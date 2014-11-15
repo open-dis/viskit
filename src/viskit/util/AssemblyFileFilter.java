@@ -61,7 +61,7 @@ import javax.swing.filechooser.FileFilter;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial, Bug 1247 fix
  *   </b></pre>
- * </p>
+ *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten</a>
  */
 public final class AssemblyFileFilter extends FileFilter {

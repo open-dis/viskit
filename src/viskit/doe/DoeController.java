@@ -328,7 +328,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     /**
-   * From save button;  this takes the data from the table...possibly editted and puts it into
+   * From save button;  this takes the data from the table...possibly edited and puts it into
    * the jaxb SimkitAssembly object, ready to be marshalled with the next Assembly save;
    */
     public void saveDoeParams() {

@@ -95,7 +95,7 @@ import viskit.VGlobals;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphCache">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Made a singleton to deal with new project creation tasks
  *   </b></pre>
- * </p>
+ *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {

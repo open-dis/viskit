@@ -59,8 +59,6 @@
 package viskit.jgraph;
 
 import javax.swing.JSplitPane;
-import viskit.jgraph.vGraphAssemblyComponent;
-import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.AssemblyModel;
 import viskit.view.AssemblyViewFrame;
 
@@ -78,12 +76,12 @@ import viskit.view.AssemblyViewFrame;
  *     Comments: 1) Initial
  *
  *   </b></pre>
- * </p>
+ *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
 
-    public AssemblyModel model;
+    public AssemblyModel assyModel;
     public JSplitPane drawingSplitPane;
     public JSplitPane trees;
     public boolean isActive = true;

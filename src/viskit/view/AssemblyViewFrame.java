@@ -179,8 +179,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
-            setModel((AssemblyModelImpl) myVgacw.model);          // hold on locally
-            getController().setModel((AssemblyModelImpl) myVgacw.model);  // tell controller
+            setModel((AssemblyModelImpl) myVgacw.assyModel);          // hold on locally
+            getController().setModel((AssemblyModelImpl) myVgacw.assyModel);  // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null) {
@@ -190,7 +190,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetaData gmd = myVgacw.model.getMetaData();
+            GraphMetaData gmd = myVgacw.assyModel.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
             } else if (viskit.Vstatics.debug) {
@@ -601,7 +601,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.graph = graphPane;                               // todo fix this
 
-        graphPane.model = mod;
+        graphPane.assyModel = mod;
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
@@ -628,8 +628,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        // the view holds only one model, so it gets overwritten with each tab
-        // but this call serves also to register the view with the passed model
+        // the view holds only one assyModel, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed assyModel
         setModel((mvcModel) mod);
 
         // Now expose the Assembly toolbar
@@ -644,7 +644,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
             VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
-            if (vgacw.model == mod) {
+            if (vgacw.assyModel == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
 
@@ -665,7 +665,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
             VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
-            vm[i] = vgacw.model;
+            vm[i] = vgacw.assyModel;
         }
         return vm;
     }

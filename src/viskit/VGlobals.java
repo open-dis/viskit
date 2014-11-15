@@ -132,7 +132,7 @@ public class VGlobals {
         return avf;
     }
 
-    /** Used only if a call to {@link getAssemblyEditor()} ever returns null
+    /** Used only if a call to {@link #getAssemblyEditor()} ever returns null
      *
      * @return the component AssemblyViewFrame
      */
@@ -243,8 +243,8 @@ public class VGlobals {
      * to initConfig() which is the first time that the viskitConfig.xml is
      * looked for, or if one is not there, to create one from the template.  The
      * viskitConfig.xml is an important file that holds information on recent
-     * assembly and event graph openings, gui sizes and caching of compiled
-     * source from EventGraphs.
+     * assembly and event graph openings, and caching of compiled source from
+     * EventGraphs.
      *
      * @return an instance of the EventGraphViewFrame
      */

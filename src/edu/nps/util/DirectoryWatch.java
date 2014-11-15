@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -117,7 +118,7 @@ public class DirectoryWatch {
             try {
                 lastFiles.put(f.getCanonicalPath(), f.lastModified());
             } catch (IOException e) {
-                System.out.println("error in getCanonicalPath() of " + f.toString());
+                System.err.println("error in getCanonicalPath() of " + f.toString());
             }
         }
     }
@@ -140,7 +141,7 @@ public class DirectoryWatch {
             }
         }
     }
-    private HashSet<DirectoryChangeListener> listeners = new HashSet<>();
+    private Set<DirectoryChangeListener> listeners = new HashSet<>();
 
     /**
      * @param lis

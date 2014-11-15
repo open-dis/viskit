@@ -5,7 +5,7 @@ import java.io.File;
 /**<p>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
- * Naval Postgraduate School, Monterey, CA<
+ * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since Jul 21, 2004

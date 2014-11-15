@@ -84,11 +84,11 @@ public class ConstructorPanel extends JPanel {
     }
 
     /**
-     * @param clazz Class<?>[] array, typically from constructor signature
+     * @param clazz Class&lt;?&gt;[] array, typically from constructor signature
      * @return String identifying Class's signature
      */
     public static String getSignature(Class<?>[] clazz) {
-        StringBuffer buf = new StringBuffer("(");
+        StringBuilder buf = new StringBuilder("(");
         for (int i = 0; i < clazz.length; ++i) {
             buf.append(clazz[i].getName());
             if (i < clazz.length - 1) {

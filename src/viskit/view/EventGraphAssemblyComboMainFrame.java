@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view;
 
 import viskit.view.dialog.SettingsDialog;
-import viskit.assembly.InternalAssemblyRunner;
+import viskit.control.InternalAssemblyRunner;
 import edu.nps.util.SysExitHandler;
 import java.awt.*;
 import java.awt.event.*;
@@ -281,7 +281,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
 
-        // let the assebmly controller establish the Viskit classpath and open
+        // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
         runLater(500L, new Runnable() {
             @Override

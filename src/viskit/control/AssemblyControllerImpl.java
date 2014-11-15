@@ -1,9 +1,5 @@
 package viskit.control;
 
-import viskit.view.dialog.AssemblyMetaDataDialog;
-import viskit.view.RunnerPanel2;
-import viskit.view.AssemblyViewFrame;
-import viskit.view.AssemblyView;
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.LogUtils;
@@ -44,6 +40,10 @@ import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
+import viskit.view.dialog.AssemblyMetaDataDialog;
+import viskit.view.RunnerPanel2;
+import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyView;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -189,9 +189,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return ret;  // proceed
     }
 
-    /**
-     *
-     */
     @Override
     public void settings() {
         // placeholder for combo gui
@@ -1628,6 +1625,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     };
 
+    /** Override the default AssemblyRunnerPlug
+     *
+     * @param plug the AssemblyRunnerPlug to set
+     */
     public void setAssemblyRunner(AssemblyRunnerPlug plug) {
         runner = plug;
     }
@@ -1802,16 +1803,5 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private XMLConfiguration getHistoryConfig() {
         return historyConfig;
-    }
-}
-
-class PkgAndFile {
-
-    String pkg;
-    File f;
-
-    PkgAndFile(String pkg, File f) {
-        this.pkg = pkg;
-        this.f = f;
     }
 }

@@ -31,9 +31,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-package viskit.assembly;
+package viskit.control;
 
-import viskit.control.AssemblyControllerImpl;
 import viskit.view.RunnerPanel2;
 import viskit.view.dialog.SettingsDialog;
 import viskit.view.AnalystReportPanel;
@@ -59,9 +58,11 @@ import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitProject;
 import viskit.Vstatics;
+import viskit.assembly.BasicAssembly;
+import viskit.assembly.JTextAreaOutputStream;
 import viskit.doe.LocalBootLoader;
 
-/** Handles RunnerPanel2
+/** Controller for the Assembly Run panel
  *
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -248,6 +249,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
     JTextAreaOutputStream textAreaOutputStream;
 
     protected void initRun() {
+
+        // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1) {
             return;
@@ -256,10 +259,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         try {
 
-            // TODO: Two interesting things here.  First, check if we really need
-            // to reset the Local Classloader here.  Second, why are we resetting
-            // the RNG seed?  Is it to ensure the same run of events if we
-            // invoke another Assembly run?
+            // Must reset the Classloader to free this assembly run from any
+            // previously initialized static references thereby ensuring an
+            // independent sim run
             loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
             Class<?> obj = loader.loadClass("java.lang.Object");
 
@@ -319,11 +321,10 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
             new SimThreadMonitor(simRunner).start();
-            simRunner.join();
+
+            // Restore Viskit's JVM ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
-        } catch (InterruptedException ex) {
-            log.error(ex);
         } catch (IllegalAccessException ex) {
             log.error(ex);
         } catch (IllegalArgumentException ex) {
@@ -341,6 +342,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         }
     }
 
+    /** Class to perform end of simulation run cleanup items */
     public class SimThreadMonitor extends Thread {
 
         Thread waitOn;
@@ -361,7 +363,7 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
             end();
 
-            // Grab the temp analyst report and signal the AnalystPeportPanel
+            // Grab the temp analyst report and signal the AnalystReportPanel
             try {
                 Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
@@ -379,37 +381,12 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             signalReportReady();
         }
 
+        /** Perform simulation stop and reset calls */
         public void end() {
-
             System.out.println("Simulation ended");
             System.out.println("----------------");
             runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
-            try {
-                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-                Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
-                setStopRun.invoke(assemblyObj, true);
-                Schedule.coldReset();
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-            } catch (SecurityException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (IllegalArgumentException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (NoSuchMethodException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (InvocationTargetException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (IllegalAccessException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            }
-            mutex--;
-
-            twiddleButtons(InternalAssemblyRunner.STOP);
-            textAreaOutputStream.kill();
+            new stopListener().actionPerformed(null);
         }
     }
 
@@ -454,28 +431,18 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         public void actionPerformed(ActionEvent e) {
             Method setStopRun;
             try {
+                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
                 setStopRun = targetClass.getMethod("setStopRun", boolean.class);
                 setStopRun.invoke(assemblyObj, true);
-            } catch (SecurityException ex) {
+                Schedule.coldReset();
+                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                 log.error(ex);
-//                ex.printStackTrace();
-            } catch (IllegalArgumentException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (NoSuchMethodException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (InvocationTargetException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (IllegalAccessException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
             }
 
             twiddleButtons(InternalAssemblyRunner.STOP);
             textAreaOutputStream.kill();
-            //runPanel.fileChaser.stop();
+            mutex--;
         }
     }
 

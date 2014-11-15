@@ -1024,7 +1024,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     /**
      * Here we can use a Script to optionally set values before each set of Runs.
      * eg.
-     * <Script> server.getServiceTime().getRandomNumber().resetSeed(); </Script>
+     * &lt;Script&gt; server.getServiceTime().getRandomNumber().resetSeed(); &lt;/Script&gt;
      * so, the script should get copied into each DesignPoint instance (?).
      *
      * The DesignParameters return a range of values as per the FullFactorial

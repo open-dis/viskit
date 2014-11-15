@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 /**
  * Reads a file assumed to be in the following form (2 lines):
  * <pre>
- * <major version>.<minor version>.<subminor version>
+ * &lt;major version&gt;.&lt;minor version&gt;.&lt;subminor version&gt;
  * $Date: 2007-12-16 11:44:04 -0800 (Sun, 16 Dec 2007) $
  * </pre>
  *
@@ -22,21 +22,21 @@ import org.apache.log4j.Logger;
  * @author ahbuss
  */
 public class Version {
-    
+
     static Logger log = LogUtils.getLogger(Version.class);
-    
+
     protected String versionString;
-    
+
     protected int majorVersion;
-    
+
     protected int minorVersion;
-    
+
     protected int patchVersion;
-    
+
     protected Date lastModified;
-    
+
     protected int svnRevisionNumber;
-    
+
     public Version(String versionString, String dateString) {
         int[] version = parseVersionString(versionString);
         majorVersion = version[0];
@@ -44,7 +44,7 @@ public class Version {
         patchVersion = version[2];
         lastModified = parseDateString(dateString);
     }
-    
+
     public Version(String fileName) {
         InputStream versionStream =
                 Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
@@ -64,7 +64,7 @@ public class Version {
             log.error("Problem reading " + fileName + ": " + e);
         }
     }
-    
+
     protected static int[] parseVersionString(String versionString) {
         String[] versions = versionString.split("\\.");
 //        if (versions.length != 4) {
@@ -78,11 +78,11 @@ public class Version {
         }
         return versionNumber;
     }
-    
+
     protected static Date parseDateString(String dateString) {
         Date date = null;
         try {
-            Pattern pattern = 
+            Pattern pattern =
                     Pattern.compile("\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d \\d\\d:\\d\\d:\\d\\d");
             Matcher matcher = pattern.matcher(dateString);
             if (matcher.find()) {
@@ -93,47 +93,47 @@ public class Version {
         }
         return date;
     }
-    
+
     protected static int parseRevisionString(String revisionString) {
         String[] data = revisionString.split("\\D+");
         return Integer.parseInt(data[1]);
     }
-    
+
     public String getVersionString() {
         return versionString;
     }
-    
+
     public Date getLastModified() {
         return lastModified;
     }
-    
+
     public int getMajorVersion() {
         return majorVersion;
     }
-    
+
     public int getMinorVersion() {
         return minorVersion;
     }
-    
+
     public int getPatchVersion() {
         return patchVersion;
     }
-    
+
     public int getSVNRevisionNumber() {
         return svnRevisionNumber;
     }
-    
+
     public boolean isSameVersionAs(String otherVersionString) {
         return getVersionString().equals(otherVersionString);
     }
-    
+
     public boolean isHigherVersionThan(String otherVersionString) {
         int[] otherVersion = parseVersionString(otherVersionString);
         return getMajorVersion() > otherVersion[0] ||
                 getMinorVersion() > otherVersion[1] ||
                 getPatchVersion() > otherVersion[2];
     }
-    
+
     @Override
     public String toString() {
         return "Version " +  + getMajorVersion() + "." +

@@ -17,8 +17,8 @@ import viskit.Vstatics;
  * super class.
  * <p>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
- * MOVES Institute<
- * Naval Postgraduate School, Monterey, CA<
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since May 3, 2004 : 2:39:34 PM

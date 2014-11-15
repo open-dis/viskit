@@ -59,10 +59,10 @@ import viskit.mvc.mvcModelEvent;
  2) When the ChangeListener is hit, the controller.setModel() method installs
  the appropriate model for the newly-selected eventgraph.
 
- OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects<p/>
- * MOVES Institute<p/>
- * Naval Postgraduate School, Monterey CA<p/>
- * www.nps.edu<p/>
+ OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey CA
+ * www.nps.edu
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM

@@ -151,7 +151,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
         // If a user cancels this edge, it needs to be counted as selected
         // so that the AssemblyControllerImpl can find it
-        Vector<Object> ev = new Vector<Object>();
+        Vector<Object> ev = new Vector<>();
         ev.add(ae);
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
     }
@@ -243,7 +243,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
         // If a user cancels this edge, it needs to be counted as selected
         // so that the AssemblyControllerImpl can find it
-        Vector<Object> ev = new Vector<Object>();
+        Vector<Object> ev = new Vector<>();
         ev.add(pce);
         VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
     }

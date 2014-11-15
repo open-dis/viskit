@@ -246,10 +246,10 @@ public class FileBasedClassManager implements Runnable {
             for (File file : files) {
                 byte[] buf = new byte[(int) file.length()];
                 try {
-                    InputStream is = file.toURI().toURL().openStream();
-                    is.read(buf);
-                    md.update(buf);
-                    is.close();
+                    try (InputStream is = file.toURI().toURL().openStream()) {
+                        is.read(buf);
+                        md.update(buf);
+                    }
                 } catch (MalformedURLException ex) {
                     log.error(ex);
 //                    ex.printStackTrace();

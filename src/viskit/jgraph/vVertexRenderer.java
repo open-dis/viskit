@@ -57,7 +57,7 @@ import org.jgraph.graph.*;
  * This renderer displays entries that implement the CellView interface
  * and supports the following attributes. If the cell view is not a leaf,
  * this object is only visible if it is selected.
- * <li>
+ * <pre>
  * GraphConstants.BOUNDS
  * GraphConstants.ICON
  * GraphConstants.FONT
@@ -71,7 +71,7 @@ import org.jgraph.graph.*;
  * GraphConstants.HORIZONTAL_ALIGNMENT
  * GraphConstants.VERTICAL_TEXT_POSITION
  * GraphConstants.HORIZONTAL_TEXT_POSITION
- * </li>
+ * </pre>
  *
  * @version 1.0 1/1/02
  * @author Gaudenz Alder

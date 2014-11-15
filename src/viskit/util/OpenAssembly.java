@@ -134,6 +134,7 @@ public class OpenAssembly {
     }
 
     static public interface AssyChangeListener {
+
         // public final static int JDOM_CHANGED = 0;
         int JAXB_CHANGED = 1;
         int NEW_ASSY = 2;

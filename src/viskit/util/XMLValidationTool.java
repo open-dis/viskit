@@ -47,7 +47,7 @@ import viskit.ViskitConfig;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.XMLValidationTool">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
  *   </b></pre>
- * </p>
+ *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.XMLValidationTool">Terry Norbraten</a>
  */
 public class XMLValidationTool {

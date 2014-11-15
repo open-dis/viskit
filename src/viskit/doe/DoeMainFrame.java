@@ -72,7 +72,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         addWindowListener(new myWlistener());
 
         leftP = new JPanel(new BorderLayout());
-        
+
         content = new JPanel();
         content.setLayout(new BorderLayout());
 
@@ -107,6 +107,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
             JButton sv = new JButton("Save");
             sv.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     controller.saveDoeParams();
                 }
@@ -145,6 +146,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         public void windowClosing(WindowEvent e) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     controller.actionPerformed(EXIT_APP);
                 }

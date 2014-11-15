@@ -79,7 +79,7 @@ import java.util.List;
  *     Comments: 1) Created method to take a Collection of Type and fill a
  *                  Collection Array of Type
  *   </b></pre>
- * </p>
+ * 
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class GenericConversion {

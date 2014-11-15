@@ -1,9 +1,5 @@
 package viskit.control;
 
-import viskit.view.dialog.EventGraphMetaDataDialog;
-import viskit.view.AssemblyView;
-import viskit.view.EventGraphViewFrame;
-import viskit.view.EventGraphView;
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileIO;
@@ -32,6 +28,10 @@ import viskit.Vstatics;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
+import viskit.view.dialog.EventGraphMetaDataDialog;
+import viskit.view.AssemblyView;
+import viskit.view.EventGraphViewFrame;
+import viskit.view.EventGraphView;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**

@@ -66,7 +66,7 @@ import javax.swing.filechooser.FileFilter;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphFileFilter">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Better filename filtering
  *   </b></pre>
- * </p>
+ *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphFileFilter">Terry Norbraten</a>
  */
 public final class EventGraphFileFilter extends FileFilter {

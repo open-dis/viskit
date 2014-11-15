@@ -4,7 +4,7 @@
          "http://java.sun.com/products/javahelp/map_2_0.dtd">
 
 <map version="2.0">
-  <mapID target="Introduction"  url="Pages/Intro.html"/>
+  <mapID target="Introduction"  url="VisPages/intro_no_diskit.html"/>
   <mapID target="Contributors"  url="Pages/Contributors.html"/>
   <mapID target="Overview"      url="Pages/empty.html"/>
   <mapID target="Terms"         url="Pages/Terms.html"/>
@@ -89,7 +89,7 @@
        have to use the 'file:' protocol indicator.  AND, although I believe having no slash after
        the colon is not kosher, it's the only way that works here. -->
   <!-- So the relative path is calculated from the directory where AmvwHelpSet.hs is located. -->
-  
+
 <!-- EXAMPLE:
   <mapID target="articles"           url="file:../documentation/articles/articles.html" />
 -->

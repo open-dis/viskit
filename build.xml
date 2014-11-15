@@ -137,7 +137,9 @@
     </taskdef>
 
     <!--  === TARGET: help === -->
-    <target name="help" depends="javahelp">
+    <target name="help"
+            depends="javahelp"
+            description="Display Viskit build infomation and launch the JavaHelp set">
         <echo>
 This is the Ant build file for the NPS Viskit and associated libraries.
 Third-party jar files are not compiled from source here, but they are
@@ -410,21 +412,26 @@ their descpritions.
                            value="${nps}, ${moves.institute}, ${savage.research.group}"/>
                 <attribute name="Implementation-URL"
                            value="${Savage.url}"/>
-                <section name="edu.nps.util"/>
-                <section name="viskit"/>
-                <section name="viskit.doe"/>
-                <section name="viskit.images"/>
-                <section name="viskit.jgraph"/>
-                <section name="viskit.model"/>
-                <section name="viskit.mvc"/>
-                <section name="viskit.util"/>
-                <section name="viskit.xsd.assembly"/>
-                <section name="viskit.xsd.bindings.assembly"/>
-                <section name="viskit.xsd.bindings.stats"/>
-                <section name="viskit.xsd.bindings.cli"/>
-                <section name="viskit.xsd.bindings.eventgraph"/>
-                <section name="viskit.xsd.cli"/>
-                <section name="viskit.xsd.translator"/>
+            <section name="edu.nps.util"/>
+            <section name="viskit"/>
+            <section name="viskit.assembly"/>
+            <section name="viskit.control"/>
+            <section name="viskit.doe"/>
+            <section name="viskit.gridlet"/>
+            <section name="viskit.images"/>
+            <section name="viskit.jgraph"/>
+            <section name="viskit.model"/>
+            <section name="viskit.mvc"/>
+            <section name="viskit,reports"/>
+            <section name="viskit.util"/>
+            <section name="viskit.view.*"/>
+            <section name="viskit.xsd.bindings.assembly"/>
+            <section name="viskit.xsd.bindings.assembly.stats"/>
+            <section name="viskit.xsd.bindings.cli"/>
+            <section name="viskit.xsd.bindings.eventgraph"/>
+            <section name="viskit.xsd.cli"/>
+            <section name="viskit.xsd.translator.assembly"/>
+            <section name="viskit.xsd.translator.eventgraph"/>
 
                 <!-- used by native launcher, see launch4j -->
                 <attribute name="Main-Class" value="viskit.Splash2" />
@@ -457,19 +464,24 @@ their descpritions.
             </classpath>
             <package name="edu.nps.util"/>
             <package name="viskit"/>
+            <package name="viskit.assembly"/>
+            <package name="viskit.control"/>
             <package name="viskit.doe"/>
+            <package name="viskit.gridlet"/>
             <package name="viskit.images"/>
             <package name="viskit.jgraph"/>
             <package name="viskit.model"/>
             <package name="viskit.mvc"/>
+            <package name="viskit,reports"/>
             <package name="viskit.util"/>
-            <package name="viskit.xsd.assembly"/>
+            <package name="viskit.view.*"/>
             <package name="viskit.xsd.bindings.assembly"/>
             <package name="viskit.xsd.bindings.assembly.stats"/>
             <package name="viskit.xsd.bindings.cli"/>
             <package name="viskit.xsd.bindings.eventgraph"/>
             <package name="viskit.xsd.cli"/>
-            <package name="viskit.xsd.translator"/>
+            <package name="viskit.xsd.translator.assembly"/>
+            <package name="viskit.xsd.translator.eventgraph"/>
 
             <!-- Updated links to current APIs -->
             <link href="${j2se.api}"/>
@@ -687,14 +699,10 @@ their descpritions.
 
     <!--  === TARGET: clean === -->
     <target name="clean"
-            description="Deletes build directory, javadoc and dist directories, and lib/ext/*.jar(s)">
+            description="Deletes build directory, xsd bindings, dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
         <delete dir="${dir.dist}"/>
-        <delete dir="${dir.lib.ext}">
-            <include name="*.jar"/>
-        </delete>
-
         <delete dir="${dir.lib.ext}">
             <include name="*.jar"/>
         </delete>

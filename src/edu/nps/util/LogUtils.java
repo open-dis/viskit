@@ -24,9 +24,9 @@ public class LogUtils {
         configureLog4j("configuration/log4j.properties");
     }
 
-    /**
+    /**<p>
      * This is a utility to configure the Log4j logger.
-     * <p/>
+     * </p>
      * If requested configuration file can not be read, the default behavior
      * will be to use BasicConfigurator and set the debug level to INFO.
      *
@@ -37,9 +37,9 @@ public class LogUtils {
         return configureLog4j(configFileFname, false);
     }
 
-    /**
+    /**<p>
      * This is a utility to configure the Log4J logger.
-     * <p/>
+     * </p>
      * If requested configuration file can not be read, the default behavior
      * will be to use BasicConfigurator and set the debug level to INFO.
      *

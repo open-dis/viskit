@@ -73,7 +73,7 @@ public class FindClassesForInterface {
         private File f;
         private ByteBuffer buffer;
         private RandomAccessFile classFile;
-        private Hashtable<String, Class<?>> found = new Hashtable<String, Class<?>>();
+        private Hashtable<String, Class<?>> found = new Hashtable<>();
 
         Class<?> buildIt(File fil) throws java.lang.Throwable {
             f = fil;
@@ -104,7 +104,7 @@ public class FindClassesForInterface {
                 return clz;
             } catch (Exception e) {
                 LogUtils.getLogger(FindClassesForInterface.class).error(e);
-                return (Class<?>) null;
+                return null;
             } finally {
                 try {
                     classFile.close();
@@ -122,7 +122,7 @@ public class FindClassesForInterface {
      * desired interface
      */
     public static List<Class<?>> findClasses(JarFile jarFile, Class<?> implementing) {
-        List<Class<?>> found = new ArrayList<Class<?>>();
+        List<Class<?>> found = new ArrayList<>();
         URLClassLoader loader = null;
         try {
             loader = new URLClassLoader(new URL[] {new File(jarFile.getName()).toURI().toURL()});
@@ -183,8 +183,8 @@ public class FindClassesForInterface {
         if (true) {
             return;
         }
-        List<Class<?>> simEntities = new ArrayList<Class<?>>();
-        List<Class<?>> propertyChangeListeners = new ArrayList<Class<?>>();
+        List<Class<?>> simEntities = new ArrayList<>();
+        List<Class<?>> propertyChangeListeners = new ArrayList<>();
         System.out.println(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {

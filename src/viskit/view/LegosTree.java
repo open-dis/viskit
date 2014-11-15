@@ -1,6 +1,5 @@
 package viskit.view;
 
-import viskit.view.DragStartListener;
 import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
 import java.awt.*;
@@ -29,11 +28,11 @@ import viskit.Vstatics;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
-/**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects<p/>
- * MOVES Institute<p/>
- * Naval Postgraduate School, Monterey, CA<p/>
- * www.nps.edu<p/>
+/**<p>
+ * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:31 AM

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  *  Refer to Sun bugs 4171239 and 4950148 for more details.
  *
  *  Code adapted from article titled "Clean Up Your Mess: Managing Temp Files in Java Apps"
- *  @link http://www.devx.com/Java/Article/22018/1954
+ *  http://www.devx.com/Java/Article/22018/1954
  *  @author Michael Pilone
  *  @version $Id$
  */

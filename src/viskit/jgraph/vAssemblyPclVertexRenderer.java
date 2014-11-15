@@ -58,7 +58,7 @@ import viskit.model.AssemblyNode;
  * This renderer displays entries that implement the CellView interface
  * and supports the following attributes. If the cell view is not a leaf,
  * this object is only visible if it is selected.
- * <li>
+ * <pre>
  * GraphConstants.BOUNDS
  * GraphConstants.ICON
  * GraphConstants.FONT
@@ -72,7 +72,7 @@ import viskit.model.AssemblyNode;
  * GraphConstants.HORIZONTAL_ALIGNMENT
  * GraphConstants.VERTICAL_TEXT_POSITION
  * GraphConstants.HORIZONTAL_TEXT_POSITION
- * </li>
+ * </pre>
  *
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
@@ -364,7 +364,7 @@ public class vAssemblyPclVertexRenderer
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
-     * 
+     *
      * TODO: Not currently used
      */
     public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {

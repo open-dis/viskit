@@ -411,7 +411,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
-            System.out.println("couldn't make temp file");
+            System.err.println("couldn't make temp file " + e);
         }
 
         try {
@@ -425,8 +425,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     /**
      * This is where an open assembly gets mentioned here
      *
-     * @param jaxbRoot
-     * @param file
+     * @param jaxbRoot the in memory XML file representation
+     * @param file the Assembly XML file
      */
     public void setAssemblyFile(SimkitAssembly jaxbRoot, File file) {
         this.jaxbRoot = jaxbRoot;
@@ -1180,7 +1180,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             t.interrupt();
             Thread.currentThread().setPriority(pr);
             Thread.yield();
-
         }
     }
     boolean waitToGo = true;
