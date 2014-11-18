@@ -525,7 +525,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
      */
     class myGraphSelectionListener implements GraphSelectionListener {
 
-        Vector<Object> selected = new Vector<Object>();
+        Vector<Object> selected = new Vector<>();
 
         @Override
         public void valueChanged(GraphSelectionEvent e) {

@@ -56,10 +56,11 @@ public class EventInspectorDialog extends JDialog {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
-     * @return whether data modified
+     * 
      * @param f parent frame
      * @param comp location component
      * @param node EventNode to edit
+     * @return whether data was modified, or not
      */
     public static boolean showDialog(JFrame f, Component comp, EventNode node) {
         if (dialog == null) {
@@ -218,6 +219,7 @@ public class EventInspectorDialog extends JDialog {
                 boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
                 if (modified) {
                     arguments.updateRow(ea);
+                    setModified(true);
                 }
             }
         });
@@ -234,8 +236,7 @@ public class EventInspectorDialog extends JDialog {
                 boolean modified = EventTransitionDialog.showDialog(EventInspectorDialog.this, locationComponent, est, arguments);
                 if (modified) {
                     transitions.updateTransition(est);
-                    okButton.setEnabled(true);
-                    EventInspectorDialog.modified = true;
+                    setModified(true);
                 }
             }
         });
@@ -250,11 +251,15 @@ public class EventInspectorDialog extends JDialog {
                 boolean modified = LocalVariableDialog.showDialog(fr, locationComponent, elv);
                 if (modified) {
                     localVariables.updateRow(elv);
-                    okButton.setEnabled(true);
-                    EventInspectorDialog.modified = true;
+                    setModified(true);
                 }
             }
         });
+    }
+
+    private void setModified(boolean f) {
+        okButton.setEnabled(f);
+        modified = f;
     }
 
     private void sizeAndPosition() {
@@ -303,8 +308,7 @@ public class EventInspectorDialog extends JDialog {
         localVariables.setData(node.getLocalVariables());
         hideShowLocals(!localVariables.isEmpty());
 
-        modified = false;
-        okButton.setEnabled(false);
+        setModified(false);
         getRootPane().setDefaultButton(cancelButton);
     }
 
@@ -370,7 +374,7 @@ public class EventInspectorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            modified = false;
+            setModified(false);
 
             // To start numbering over next time
             VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
@@ -478,8 +482,7 @@ public class EventInspectorDialog extends JDialog {
 
         @Override
         public void keyTyped(KeyEvent e) {
-            modified = true;
-            okButton.setEnabled(true);
+            setModified(true);
             getRootPane().setDefaultButton(okButton);
         }
     }
@@ -488,8 +491,7 @@ public class EventInspectorDialog extends JDialog {
 
         @Override
         public void stateChanged(ChangeEvent event) {
-            modified = true;
-            okButton.setEnabled(true);
+            setModified(true);
             getRootPane().setDefaultButton(okButton);
         }
 
@@ -527,8 +529,7 @@ public class EventInspectorDialog extends JDialog {
             if (modded) {
                 EventInspectorDialog.this.description.setText(sb.toString().trim());
                 EventInspectorDialog.this.description.setCaretPosition(0);
-                modified = true;
-                okButton.setEnabled(true);
+                setModified(true);
             }
         }
     }

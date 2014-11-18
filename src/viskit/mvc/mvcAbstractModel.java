@@ -7,7 +7,7 @@ import java.util.List;
  * Abstract root class of the model hierarchy.  Provides basic notification behavior.
  *
  * From an article at www.jaydeetechnology.co.uk
- * 
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -18,11 +18,11 @@ import java.util.List;
  */
 public abstract class mvcAbstractModel implements mvcModel {
 
-    private List<mvcModelListener> listeners = new ArrayList<mvcModelListener>(4);
+    private List<mvcModelListener> listeners = new ArrayList<>(4);
 
     @Override
     public void notifyChanged(mvcModelEvent event) {
-        
+
         for (mvcModelListener ml : listeners) {
             ml.modelChanged(event);
         }

@@ -3,6 +3,7 @@ package viskit.jgraph;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.CancellingEdge;
@@ -63,8 +64,7 @@ public class vGraphModel extends DefaultGraphModel {
         CircleCell c = (CircleCell) en.opaqueViewObject;
         c.setUserObject(en);
 
-        graph.getUI().stopEditing(graph);
-        graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+        reDrawNodes(); // jmb try...yes, I thought the stopEditing would do the same thing
     }
 
     public void changeEdge(SchedulingEdge ed) {
@@ -88,8 +88,12 @@ public class vGraphModel extends DefaultGraphModel {
         edgeC.setSource(edgeC.getTarget());
         edgeC.setTarget(dpFrom);
 
-        graph.getUI().stopEditing(graph);    // this does it, but label is screwed
-        graph.graphDidChange(); // needed for redraw
+        reDrawNodes(); // this does it, but label is screwed
+    }
+
+    private void reDrawNodes() {
+        graph.getUI().stopEditing(graph);
+        graph.refresh();
     }
 
     public void deleteAll() {

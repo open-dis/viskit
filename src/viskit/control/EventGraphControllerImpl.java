@@ -550,7 +550,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void newSimParameter() //------------------------
     {
         ((EventGraphView) getView()).addParameterDialog();
-
     }
 
     @Override

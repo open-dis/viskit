@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
@@ -51,28 +50,21 @@ public class vGraphUI extends BasicGraphUI {
     }
 
     protected void createEditDialog(Object c, MouseEvent event) {
-        final Object cell = c;
-        //MouseEvent ev = event;
+        Object cell = c;
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                EventGraphController cntl = (EventGraphController) vGraphUI.this.parent.parent.getController();     // todo fix this
-                if (cell instanceof vEdgeCell) {
-                    Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
-                    if (e instanceof SchedulingEdge) {
-                        cntl.arcEdit((SchedulingEdge) e);
-                    } else //if(e instanceof CancellingEdge)
-                    {
-                        cntl.canArcEdit((CancellingEdge) e);
-                    }
-                } else if (cell instanceof CircleCell) {
-                    EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
-                    cntl.nodeEdit(en);
-                }
+        EventGraphController cntl = (EventGraphController) vGraphUI.this.parent.parent.getController();     // todo fix this
+        if (cell instanceof vEdgeCell) {
+            Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
+            if (e instanceof SchedulingEdge) {
+                cntl.arcEdit((SchedulingEdge) e);
+            } else //if(e instanceof CancellingEdge)
+            {
+                cntl.canArcEdit((CancellingEdge) e);
             }
-        });
+        } else if (cell instanceof CircleCell) {
+            EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
+            cntl.nodeEdit(en);
+        }
     }
 
     /**
@@ -88,6 +80,7 @@ public class vGraphUI extends BasicGraphUI {
     protected void completeEditing(boolean messageStop,
             boolean messageCancel,
             boolean messageGraph) {
+
         if (stopEditingInCompleteEditing && editingComponent != null && editDialog != null) {
             Object oldCell = editingCell;
             GraphCellEditor oldEditor = cellEditor;
@@ -108,7 +101,7 @@ public class vGraphUI extends BasicGraphUI {
             if (messageGraph) {
                 Map map = graphLayoutCache.createNestedMap();
                 GraphConstants.setValue(map, newValue);
-                Map<Object, Map> nested = new Hashtable<Object, Map>();
+                Map<Object, Map> nested = new Hashtable<>();
                 nested.put(oldCell, map);
                 graphLayoutCache.edit(nested, null, null, null);
             }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
+import javax.swing.SwingUtilities;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.ConnectionSet;
@@ -70,12 +71,15 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle, Color.black);
     }
 
+    private void reDrawNodes() {
+        graph.getUI().stopEditing(graph);
+        graph.refresh();
+    }
+
     public void changeEvent(AssemblyNode en) {
         DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
         c.setUserObject(en);
-
-        graph.getUI().stopEditing(graph);
-        graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+        reDrawNodes();
     }
 
     public void deleteAll() {
@@ -100,9 +104,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void changeEGNode(EvGraphNode egn) {
         AssemblyCircleCell c = (AssemblyCircleCell) egn.opaqueViewObject;
         c.setUserObject(egn);
-
-        graph.getUI().stopEditing(graph);
-        graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+        reDrawNodes();
     }
 
     public void deletePCLNode(PropChangeListenerNode pcln) {
@@ -114,9 +116,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void changePCLNode(PropChangeListenerNode pcln) {
         AssemblyPropListCell c = (AssemblyPropListCell) pcln.opaqueViewObject;
         c.setUserObject(pcln);
-
-        graph.getUI().stopEditing(graph);
-        graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
+        reDrawNodes();
     }
 
     // TODO: This version JGraph does not support generics
@@ -163,10 +163,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void changeAnyEdge(AssemblyEdge asEd) {
         DefaultGraphCell c = (DefaultGraphCell) asEd.opaqueViewObject;
         c.setUserObject(asEd);
-
-        graph.getUI().stopEditing(graph);
-        graph.graphDidChange(); // jmb try...yes, I thought the stopEditing would do the same thing
-
+        reDrawNodes();
     }
 
     public void changeAdapterEdge(AdapterEdge ae) {

@@ -107,6 +107,9 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
 
         saver = new saveListener();
 
+        // NOTE:
+        // Don't supply rewind or pause buttons on VCR, not hooked up, or working right
+        // false will enable all VCR buttons.  Currently, only start and stop work
         runPanel = new RunnerPanel2(null, true);
         doMenus();
         runPanel.vcrStop.addActionListener(new stopListener());
@@ -661,9 +664,13 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
             File f; // = tmpFile;
             String osName = System.getProperty("os.name");
             String filePath = "";
-            String tool = "notepad";
-            if (!osName.startsWith("Windows")) {
-                tool = "gedit";
+            String tool;
+            if (osName.toLowerCase().contains("win")) {
+                tool = "notepad";
+            } else if (osName.toLowerCase().contains("mac")) {
+                tool = "open -a";
+            } else {
+                tool = "gedit"; // assuming Linux here
             }
 
             String s = runPanel.soutTA.getText().trim();

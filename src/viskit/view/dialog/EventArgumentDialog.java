@@ -115,7 +115,7 @@ public class EventArgumentDialog extends JDialog {
     }
 
     private int maxWidth(JComponent[] c) {
-        int tmpw = 0, maxw = 0;
+        int tmpw, maxw = 0;
         for (JComponent jc : c) {
             tmpw = jc.getPreferredSize().width;
             if (tmpw > maxw) {
@@ -183,6 +183,7 @@ public class EventArgumentDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
@@ -191,6 +192,7 @@ public class EventArgumentDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 unloadWidgets();
@@ -201,12 +203,14 @@ public class EventArgumentDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }

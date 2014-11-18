@@ -30,15 +30,15 @@ import viskit.model.ViskitElement;
  * @version $Id$
  */
 public abstract class ViskitTablePanel extends JPanel {
-    
+
     protected JTable tab;
     private JScrollPane jsp;
     private JButton plusButt,  minusButt,  edButt;
     private ThisTableModel mod;
     private int defaultWidth = 0,  defaultNumRows = 3;
-    
+
     // List has no implemented clone method
-    private ArrayList<ViskitElement> shadow = new ArrayList<ViskitElement>();
+    private ArrayList<ViskitElement> shadow = new ArrayList<>();
     private ActionListener myEditLis,  myPlusLis,  myMinusLis;
     private String plusToolTip = "Add a row to this table";
     private String minusToolTip = "Delete the selected row from this table;";
@@ -118,7 +118,7 @@ public abstract class ViskitTablePanel extends JPanel {
             buttPan.add(minusButt);
             buttPan.add(Box.createHorizontalGlue());
             add(buttPan);
-            
+
             // install local add, delete handlers
             plusButt.addActionListener(lis);
             minusButt.addActionListener(lis);
@@ -192,7 +192,7 @@ public abstract class ViskitTablePanel extends JPanel {
     public void addRow(ViskitElement o) {
         shadow.add(o);
 
-        Vector<String> rowData = new Vector<String>();
+        Vector<String> rowData = new Vector<>();
         String[] fields = getFields(o, 0);
         rowData.addAll(Arrays.asList(fields));
         mod.addRow(rowData);
@@ -205,7 +205,7 @@ public abstract class ViskitTablePanel extends JPanel {
     }
 
     /**
-     * Add a row to the end of the table.  The row object will be built through 
+     * Add a row to the end of the table.  The row object will be built through
      * the abstract method, newRowObject().
      */
     public void addRow() {
@@ -221,7 +221,7 @@ public abstract class ViskitTablePanel extends JPanel {
     }
 
     /**
-     * Remove the row identified by the passed zero-based row number from the 
+     * Remove the row identified by the passed zero-based row number from the
      * table.
      * @param r index of the object to remove
      */
@@ -262,7 +262,7 @@ public abstract class ViskitTablePanel extends JPanel {
 
     /**
      * Update the table row, typically after editing, representing the passed rowObject.
-     * @param rowObject
+     * @param rowObject the object to update a table row with
      */
     public void updateRow(Object rowObject) {
         int row = findObjectRow(rowObject);
@@ -289,7 +289,7 @@ public abstract class ViskitTablePanel extends JPanel {
      * @return String array of titles
      */
     abstract public String[] getColumnTitles();
-    
+
     /**
      * Return the fields to be displayed in the table.
      * @param o row object
@@ -297,19 +297,19 @@ public abstract class ViskitTablePanel extends JPanel {
      * @return  String array of fields
      */
     abstract public String[] getFields(Object o, int rowNum);
-    
+
     /**
      * Build a new row object
      * @return a new row object
      */
     abstract public ViskitElement newRowObject();
-    
+
     /**
      * Specify how many rows the table should display at a minimum
      * @return number of rows
      */
     abstract public int getNumVisibleRows();
-    
+
     // private methods
     /**
      * If a double-clicked listener has been installed, message it with the row
@@ -393,14 +393,14 @@ public abstract class ViskitTablePanel extends JPanel {
     private void putARow(ViskitElement o) {
         shadow.add(o);
 
-        Vector<String> rowData = new Vector<String>();
+        Vector<String> rowData = new Vector<>();
         String[] fields = getFields(o, shadow.size() - 1);
         rowData.addAll(Arrays.asList(fields));
         mod.addRow(rowData);
     }
 
     /**
-     * Whether this class should add and delete rows on plus-minus clicks.  
+     * Whether this class should add and delete rows on plus-minus clicks.
      * Else that's left to a listener
      * @param boo How to play it
      */
@@ -413,32 +413,29 @@ public abstract class ViskitTablePanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (event.getActionCommand().equals("p")) {
-                if (myPlusLis != null) {
-                    myPlusLis.actionPerformed(event);
-                }
-                if (shouldDoAddsAndDeletes) {
-                    addRow();
-                }
-            } else if (event.getActionCommand().equals("m")) {
-                int reti = JOptionPane.showConfirmDialog(ViskitTablePanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
-                if (reti != JOptionPane.YES_OPTION) {
-                    return;
-                }
-
-                if (myMinusLis != null) {
-                    event.setSource(shadow.get(tab.getSelectedRow()));
-                    myMinusLis.actionPerformed(event);
-                }
-                
-                // Begin T/S for Bug 1373.  This process should remove edge 
-                // parameters not only from the preceding EdgeInspectorDialog,
-                // but also from the EG XML representation
-                if (shouldDoAddsAndDeletes) {
-                    removeRow(tab.getSelectedRow());
-                }
-            } else {
-                doEdit();
+            switch (event.getActionCommand()) {
+                case "p":
+                    if (myPlusLis != null) {
+                        myPlusLis.actionPerformed(event);
+                    }   if (shouldDoAddsAndDeletes) {
+                        addRow();
+                    }   break;
+                case "m":
+                    int reti = JOptionPane.showConfirmDialog(ViskitTablePanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+                    if (reti != JOptionPane.YES_OPTION) {
+                        return;
+                    }   if (myMinusLis != null) {
+                        event.setSource(shadow.get(tab.getSelectedRow()));
+                        myMinusLis.actionPerformed(event);
+                    }   // Begin T/S for Bug 1373.  This process should remove edge
+                    // parameters not only from the preceding EdgeInspectorDialog,
+                    // but also from the EG XML representation
+                    if (shouldDoAddsAndDeletes) {
+                        removeRow(tab.getSelectedRow());
+                    }   break;
+                default:
+                    doEdit();
+                    break;
             }
             adjustColumnWidths();
         }

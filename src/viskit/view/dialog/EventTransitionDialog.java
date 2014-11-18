@@ -93,7 +93,7 @@ public class EventTransitionDialog extends JDialog {
         JLabel commLab = new JLabel("state var. comment");
         int w = maxWidth(new JComponent[]{nameLab, assTo, opOn, actionLab, commLab});
 
-        stateVarsCB = new JComboBox<ViskitElement>(VGlobals.instance().getStateVarsCBModel());
+        stateVarsCB = new JComboBox<>(VGlobals.instance().getStateVarsCBModel());
         setMaxHeight(stateVarsCB);
         stateVarsCB.setBackground(Color.white);
         newSVButt = new JButton("new");
