@@ -56,14 +56,15 @@ public class ViskitConfig {
     public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
-    public static final String CACHED_CLEAR_KEY = "Cached";
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
-    public static final String CACHED_WORKING_DIR_KEY = CACHED_CLEAR_KEY + "[@workDir]";
+    public static final String CACHED_CLEAR_KEY = "Cached";
+    public static final String CACHED_DIGEST_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@digest]";
     public static final String CACHED_EVENTGRAPHS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@xml]";
     public static final String CACHED_EVENTGRAPHS_CLASS_KEY = CACHED_CLEAR_KEY + ".EventGraphs[@class]";
     public static final String CACHED_MISS_FILE_KEY = CACHED_CLEAR_KEY + ".Miss[@file]";
     public static final String CACHED_MISS_DIGEST_KEY = CACHED_CLEAR_KEY + ".Miss[@digest]";
+
     public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
     public static final String ASSY_EDITOR_FRAME_BOUNDS_KEY = "app.AssemblyEditor.FrameBounds";
     public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
