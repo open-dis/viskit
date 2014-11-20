@@ -43,6 +43,7 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
+import viskit.mvc.mvcRecentFileListener;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.SimEventListenerConnectionInspectorDialog;
@@ -138,8 +139,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
     JMenu openRecentAssyMenu, openRecentProjMenu;
-    private _RecentAssyFileListener myAssyFileListener;
-    private _RecentProjFileListener myProjFileListener;
+    private RecentAssyFileListener myAssyFileListener;
+    private RecentProjFileSetListener myProjFileListener;
 
     private VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -199,10 +200,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    class _RecentAssyFileListener implements AssemblyController.RecentAssyFileListener {
+    class RecentAssyFileListener implements mvcRecentFileListener {
 
         @Override
-        public void assySetChanged() {
+        public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
             Set<String> lis = acontroller.getRecentAssyFileSet();
             openRecentAssyMenu.removeAll();
@@ -229,10 +230,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    class _RecentProjFileListener implements AssemblyController.RecentProjFileListener {
+    class RecentProjFileSetListener implements mvcRecentFileListener {
 
         @Override
-        public void projSetChanged() {
+        public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
             Set<String> lis = acontroller.getRecentProjFileSet();
             openRecentProjMenu.removeAll();
@@ -256,10 +257,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 mi.setToolTipText("Clear this list");
                 openRecentProjMenu.add(mi);
             }
-        }
-
-        public void assyProjChanged() {
-            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -303,10 +300,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
 
-        myAssyFileListener = new _RecentAssyFileListener();
+        myAssyFileListener = new RecentAssyFileListener();
         controller.addRecentAssyFileSetListener(myAssyFileListener);
 
-        myProjFileListener = new _RecentProjFileListener();
+        myProjFileListener = new RecentProjFileSetListener();
         controller.addRecentProjFileSetListener(myProjFileListener);
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -824,8 +821,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
         XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
-        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
         appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
         appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
         appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }

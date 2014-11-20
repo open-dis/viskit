@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 /**
  * From an article at www.jaydeetechnology.co.uk
  */
-public class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener {
+public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener {
 
     private mvcModel model;
     private mvcController controller;
@@ -50,6 +50,5 @@ public class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelLi
     }
 
     @Override
-    public void modelChanged(mvcModelEvent event) {
-    }
+    public abstract void modelChanged(mvcModelEvent event);
 }

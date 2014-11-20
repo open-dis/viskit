@@ -41,6 +41,7 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
+import viskit.mvc.mvcRecentFileListener;
 
 /**
  * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
@@ -90,7 +91,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JMenuItem quitMenuItem;
     private TitleListener titlList;
     private int titlKey;
-    public EventGraphControllerImpl controller;
     private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
 
     /**
@@ -99,7 +99,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      */
     public EventGraphViewFrame(EventGraphControllerImpl ctrl) {
         super(FRAME_DEFAULT_TITLE);
-        this.controller = ctrl;
         initMVC(ctrl);   // set up mvc linkages
         initUI();    // build widgets
     }
@@ -470,6 +469,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
+
         // tell the help screen where we are so he can center himself
         help.mainFrameLocated(this.getBounds());
     }
@@ -478,8 +478,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public void prepareToQuit() {
         Rectangle bounds = getBounds();
         XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
-        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
         appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
+        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
         appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
         appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
     }
@@ -524,7 +524,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
 
-    class _RecentFileListener implements EventGraphController.RecentFileListener {
+    class RecentEgFileListener implements mvcRecentFileListener {
 
         @Override
         public void listChanged() {
@@ -572,13 +572,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
     private JMenu openRecentMenu;
-    private _RecentFileListener myFileListener;
+    private RecentEgFileListener myEgFileListener;
 
     private void buildMenus() {
         EventGraphController vcontroller = (EventGraphController) getController();
 
-        myFileListener = new _RecentFileListener();
-        vcontroller.addRecentFileListListener(myFileListener);
+        myEgFileListener = new RecentEgFileListener();
+        vcontroller.addRecentEgFileListener(myEgFileListener);
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 

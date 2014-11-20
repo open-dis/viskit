@@ -28,6 +28,7 @@ import viskit.Vstatics;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
+import viskit.mvc.mvcRecentFileListener;
 import viskit.view.dialog.EventGraphMetaDataDialog;
 import viskit.view.AssemblyView;
 import viskit.view.EventGraphViewFrame;
@@ -188,7 +189,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         _doOpen(new File(path));
     }
 
-    // Protected for the AssemblyControllerImpl's access to open EventGraphs
+    // Package protected for the AssemblyControllerImpl's access to open EventGraphs
     protected void _doOpen(File file) {
         EventGraphView viskitView = (EventGraphView) getView();
         ModelImpl mod = new ModelImpl(this);
@@ -299,23 +300,23 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         dirWatch.removeListener(lis);
     }
 
-    Set<RecentFileListener> recentListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentFileListListener(RecentFileListener lis)
+    public void addRecentEgFileListener(mvcRecentFileListener lis)
     {
       recentListeners.add(lis);
     }
 
     @Override
-    public void removeRecentFileListListener(RecentFileListener lis)
+    public void removeRecentEgFileListener(mvcRecentFileListener lis)
     {
       recentListeners.remove(lis);
     }
 
     private void notifyRecentFileListeners()
     {
-      for(RecentFileListener lis : recentListeners) {
+      for(mvcRecentFileListener lis : recentListeners) {
             lis.listChanged();
         }
     }
@@ -422,6 +423,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void quit() {
         if (preQuit()) {
+            ((EventGraphView) getView()).prepareToQuit();
             postQuit();
         }
     }
@@ -444,7 +446,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void postQuit() {
-        ((EventGraphView) getView()).prepareToQuit();
         VGlobals.instance().quitEventGraphEditor();
     }
 
@@ -908,13 +909,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         imgSaveCount = "" + (++imgSaveInt);
     }
 
-    /** Provides an automatic capture of all Event Graphs images used in an
-     * Assembly and stores them to a specified location for inclusion in the
-     * generated Analyst Report
-     *
-     * @param eventGraphs a list of Event Graph paths to image capture
-     * @param eventGraphImages a list of Event Graph image paths to write .png files
-     */
+    @Override
     public void captureEventGraphImages(java.util.List<File> eventGraphs, java.util.List<String> eventGraphImages) {
         ListIterator<String> itr = eventGraphImages.listIterator(0);
 

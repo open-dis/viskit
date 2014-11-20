@@ -36,4 +36,8 @@ public abstract class mvcAbstractController implements mvcController {
     public void setView(mvcView view) {
         this.view = view;
     }
+    
+    static interface RecentFileListener {
+        void listChanged();
+    }
 }

@@ -51,6 +51,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.util.EventGraphCache;
 import viskit.VGlobals;
+import viskit.control.EventGraphController;
 import viskit.model.AssemblyNode;
 
 /** This class constructs and exports an analyst report based on the parameters
@@ -992,7 +993,7 @@ public final class AnalystReportBuilder {
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
-        VGlobals.instance().getEventGraphEditor().controller.captureEventGraphImages(evc.getEventGraphFilesList(),
+        ((EventGraphController)VGlobals.instance().getEventGraphEditor().getController()).captureEventGraphImages(evc.getEventGraphFilesList(),
                 evc.getEventGraphImagePathsList());
     }
 

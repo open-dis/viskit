@@ -38,6 +38,7 @@ import viskit.doe.LocalBootLoader;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
+import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetaDataDialog;
@@ -315,7 +316,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
-                    VGlobals.instance().getEventGraphEditor().controller.closeAll();
+                    ((EventGraphController)VGlobals.instance().getEventGraphEditor().getController()).closeAll();
 
                     AssemblyModel vmod = (AssemblyModel) getModel();
                     markAssyConfigClosed(vmod.getLastFile());
@@ -368,43 +369,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         OpenAssembly.inst().removeListener(lis);
     }
 
-    Set<RecentAssyFileListener> recentAssyListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssyFileSetListener(RecentAssyFileListener lis) {
+    public void addRecentAssyFileSetListener(mvcRecentFileListener lis) {
         recentAssyListeners.add(lis);
     }
 
     @Override
-    public void removeRecentAssyFileSetListener(RecentAssyFileListener lis) {
+    public void removeRecentAssyFileSetListener(mvcRecentFileListener lis) {
         recentAssyListeners.remove(lis);
     }
 
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssyFileListeners() {
-        for (RecentAssyFileListener lis : recentAssyListeners) {
-            lis.assySetChanged();
+        for (mvcRecentFileListener lis : recentAssyListeners) {
+            lis.listChanged();
         }
     }
 
-    Set<RecentProjFileListener> recentProjListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjFileSetListener(RecentProjFileListener lis) {
+    public void addRecentProjFileSetListener(mvcRecentFileListener lis) {
         recentProjListeners.add(lis);
     }
 
     @Override
-    public void removeRecentProjFileSetListener(RecentProjFileListener lis) {
+    public void removeRecentProjFileSetListener(mvcRecentFileListener lis) {
         recentProjListeners.remove(lis);
     }
 
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentProjFileListeners() {
-        for (RecentProjFileListener lis : recentProjListeners) {
-            lis.projSetChanged();
+        for (mvcRecentFileListener lis : recentProjListeners) {
+            lis.listChanged();
         }
     }
 
@@ -601,6 +602,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void quit() {
         if (preQuit()) {
+            ((AssemblyView) getView()).prepareToQuit();
             postQuit();
         }
     }
@@ -623,7 +625,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void postQuit() {
-        ((AssemblyView) getView()).prepareToQuit();
         VGlobals.instance().quitAssemblyEditor();
     }
 
@@ -1026,8 +1027,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         "Please select an XML Event Graph to load to EG Editor tab");
                 return;
             }
+
             // _doOpen checks if a tab is already opened
-            VGlobals.instance().getEventGraphEditor().controller._doOpen(f);
+            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphEditor().getController())._doOpen(f);
         }
     }
 
@@ -1645,8 +1647,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             for (File file : eGFiles) {
 
                 tempFile = file;
+
                 // _doOpen checks if a tab is already opened
-                VGlobals.instance().getEventGraphEditor().controller._doOpen(tempFile);
+                ((EventGraphControllerImpl)VGlobals.instance().getEventGraphEditor().getController())._doOpen(tempFile);
             }
         } catch (Exception ex) {
             LOGGER.error("EventGraph file: " + tempFile + " caused error: " + ex);
