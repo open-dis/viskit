@@ -20,7 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.*;
 import org.apache.log4j.Logger;
-import viskit.VGlobals;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
